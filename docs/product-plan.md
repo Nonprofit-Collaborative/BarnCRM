@@ -25,6 +25,14 @@ Read it in this order:
 
 **Rule for the builder:** when this document and a Salesforce platform constraint disagree, the platform wins, and you record the deviation in the decision log (Section 12) with what you did instead and why. When this document and a nice idea disagree, this document wins. Put the idea in the parking lot (Section 11.3).
 
+**Build state (recorded 2026-10-12, at the handoff to a new Claude account):**
+- Merged to `main` through PR #178 (v0.6 work including X-01 Opportunity mirror, X-02 Campaign sync, C-23 automation pause, G-20 posting lock, G-04 Cancelled gifts). Per-feature status lives in the release notes, `docs/release-notes/v0.N-draft-*.md`.
+- Not merged: C-29 Neutral Core, PRs #163 to #174 (branches `feature/c-29-neutral-core-1` to `-12`, top head `3da9276`). Review-approved; ADR-0059 numbered. It needs one clean full org-test run on the top head before landing (the last full run passed 2,234 of 2,235; the one failure was the known flaky `DuplicateServiceTest` case). Also open: two Dependabot PRs (#179, #180).
+- Never tested in any org: Core installed without Giving; the Platform-only shape (Section 11.2 item 26).
+- Test orgs `oi-test` and `oi-pa` (Person Accounts shape, Brandon's Dev Hub) expire 2026-10-23 and 2026-10-24. Recreating `oi-pa` is pre-approved; any other new org needs Brandon's approval.
+- Open work: engineering follow-ups in Section 11.3, owner questions in Section 11.2 items 14 to 27, next roadmap items X-07 and v0.7 (C-32 to C-35) in Section 6.
+- Full handoff, including the exact C-29 landing steps: `docs/contributor-guide/ci.md`, section "Handoff: open work and what still needs testing".
+
 ---
 
 ## 1. Vision and principles
@@ -732,6 +740,12 @@ A short markdown report in `docs/release-notes/v0.N.md` with: features completed
 ### 9.6 Concurrent iterations (owner decision, 2026-09-07)
 
 Brandon directed the build session to run features from several iterations at once rather than waiting for each iteration's package version to be promoted (Section 6 sequencing rule relaxed because no Dev Hub or package versions exist yet and the owner is handling DevOps separately). Rules that still hold: the canonical model for an iteration's entities is published before its feature agents start; each feature is its own branch and pull request, reviewed against 7.4 and 9.4, and squash-merged to `main` when it passes; features from a later iteration may merge to `main` before the earlier iteration has been accepted, because `main` is unreleased. Each iteration is tagged (for example `v0.1.0-review`) when its features are complete so Brandon can QA that exact state in a fresh scratch org while `main` moves on; the iteration's release notes point at the tag. Package versions are still created only after the namespace and Dev Hub decisions.
+
+Standing owner instructions for the build session (recorded 2026-10-12 from the session's working notes):
+- **Merge authority (Brandon, 2026-09-23):** "Merge anything when you decide it is ready and doesn't need anything and doesn't have a reason why it shouldn't." In practice: squash-merge without asking when every required check (Static checks, DCO sign-off check, Org tests (local)) is green on the head commit, review threads are resolved, and nothing is open or questionable. Hold and ask when an owner question, a failing or skipped check, or a design doubt is involved. Report merges afterwards.
+- **Test orgs (Brandon, 2026-09-23 and 2026-09-24):** use only `oi-test` and `oi-pa`; creating any other scratch org needs Brandon's approval first, and recreating `oi-pa` from `config/scratch-defs/person-accounts.json` when it expires is pre-approved. Agents share each org one deploy or test run at a time. Never read, print or store an org auth URL, and never dispatch the GitHub org-test workflow.
+- **Gate from a clean checkout:** run `scripts/org/run-org-tests.sh` only from a dedicated worktree checked out detached at the pushed head, never from a worktree someone is editing; the script checks for a clean tree only when it starts, so mid-run edits get deployed half-finished.
+- **Synced checkout:** the maintainer's checkout sits in a synced folder that creates untracked "name 2.ext" copies (including inside `.git/`). Stage by explicit path, never `git add -A`, and check `git show --stat` for ` 2.` files before pushing.
 
 ## 10. v0.1 in detail (the first build)
 
