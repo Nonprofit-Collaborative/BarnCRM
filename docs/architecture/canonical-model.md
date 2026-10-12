@@ -914,6 +914,52 @@ definition.
 
 ---
 
+## 12A. What's New Seen
+
+### Definition
+
+For one person, the newest release whose notes they have dismissed from the What's new card on
+the BarnCRM home page (C-27). It exists so that each person sees each release's notes once. It
+holds no setting anybody chooses: it is written only by that person's Dismiss.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Person | reference(User) | yes | The person this record belongs to. One record per person at most. |
+| Last Seen Version | text (20) | no | The release version, as dot separated numbers such as 0.12, that was current when this person last dismissed the card. |
+
+### Rules
+
+**R-WN1 Per person only.** A record belongs to one person. No organization-wide or profile
+value exists, and none is read: a person with no record has never dismissed the card.
+**R-WN2 What is shown.** The current version is the highest version among the shipped Release
+Note records (Section 13). A person with no record sees the notes of the current version only.
+A person with a record sees every note whose version is higher than their Last Seen Version,
+newest version first. A person whose Last Seen Version is the current one or higher sees
+nothing.
+**R-WN3 Versions compare as numbers.** Versions are compared part by part as whole numbers, so
+0.12 is newer than 0.9, and a missing part counts as zero, so 0.12 and 0.12.0 are the same
+release. A version that is not dot separated whole numbers is ignored: a note carrying one is
+never shown, and a stored Last Seen Version carrying one reads as no record.
+**R-WN4 Dismiss.** Dismissing stores the current version as the person's Last Seen Version.
+With no notes shipped, Dismiss stores nothing.
+
+### Salesforce implementation
+
+- **Custom setting:** `Whats_New_Seen__c`, hierarchy, protected, with user-level records only
+  (`SetupOwnerId` is the person). Not a key on `BarnCRM_Settings__c`, because a user-level
+  record of that setting would hide the organization's values from that person (ADR-NEXT,
+  `NEXT-whats-new-from-packaged-release-notes.md`).
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Last Seen Version | `Last_Seen_Version__c` | Text(20) | Written in system mode by `WhatsNewSeenWriter` (ADR-0021), for the running user only. |
+
+- **Service:** `WhatsNewController`, with the LWC `whatsNew` on the BarnCRM home page.
+
+---
+
 ## 13. Shipped defaults (custom metadata)
 
 Package-shipped defaults are read-only to admins and are materialized into the
@@ -1032,6 +1078,23 @@ read by the relationship service when it maintains the other side of a connectio
 The API names are given here, as they are for Automation Registry above, because the
 shipped records name fields and a record that names a field its type does not define
 refuses the whole deployment.
+
+### Release Note
+
+`Release_Note__mdt` (C-27): the notes the What's new card on the BarnCRM home page shows after
+an upgrade, one record per note. Unlike the types above it is never materialized into records:
+it is read as shipped (R-WN2, Section 12A). The type belongs to Core, and any package that
+depends on Core may ship its own records; Core never names them.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the note. |
+| Label | `MasterLabel` | text | The note's name in Setup; not shown on the card. |
+| Version | `Version__c` | text (20) | The product release this note describes, as dot separated numbers such as 0.12. One numbering for every package, because a release ships them together. |
+| Headline | `Headline__c` | text (255) | The note in one line, shown in bold. |
+| Details | `Details__c` | long text | Optional. Plain text, one point per line; each line is shown as one item under the headline. |
+| Sort Order | `Sort_Order__c` | number | Optional. The order of this note within its version, lowest first; a note without one comes last. |
+| Module | `Module__c` | text (40) | Optional. The package the note describes, for example Giving, shown beside the headline. |
 
 ### Rule
 
@@ -5398,6 +5461,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| What's New Seen | Core | v0.6 | 12A |
+| Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
@@ -5471,3 +5536,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-NEXT, `NEXT-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
