@@ -64,6 +64,12 @@ public with sharing class GiftBatchController {
         public String fundId;
         @AuraEnabled
         public String appealId;
+        /** The scheduled payment this line's gift pays, or empty (R-GR5). */
+        @AuraEnabled
+        public String installmentId;
+        /** The grid's own name for a line, saved or not, so payment choices find their line. */
+        @AuraEnabled
+        public String key;
         @AuraEnabled
         public String giftId;
         @AuraEnabled
@@ -75,6 +81,7 @@ public with sharing class GiftBatchController {
         }
 
         public Line(Gift_Batch_Row__c row) {
+            this.installmentId = row.Installment__c;
             this.id = row.Id;
             this.donorContactId = row.Donor_Contact__c;
             this.donorAccountId = row.Donor_Account__c;
@@ -157,6 +164,39 @@ public with sharing class GiftBatchController {
         }
     }
 
+    /**
+     * The scheduled payments each line's donor still owes, for the Pays column (R-GR5, R-DM8),
+     * one answer per line key in one lookup. A line with no date of its own is matched on the
+     * batch's date (R-GB1).
+     */
+    @AuraEnabled
+    public static List<GiftEntryPayments.Choices> getPaymentChoices(Id batchId, List<Line> lines) {
+        try {
+            Gift_Batch__c batch = batchId == null ? null : GiftBatchSelector.selectById(batchId);
+            if (batch == null) {
+                throw new GiftBatchException(Label.Giving_GiftBatch_ErrorBatchMissing);
+            }
+            List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
+            for (Line line : lines == null ? new List<Line>() : lines) {
+                requests.add(
+                    new GiftEntryPayments.Request(
+                        line.key,
+                        asId(line.donorContactId, Contact.SObjectType),
+                        asId(line.donorAccountId, Account.SObjectType),
+                        line.giftDate != null ? line.giftDate : batch.Default_Gift_Date__c,
+                        line.amount
+                    )
+                );
+            }
+            return GiftEntryPayments.forRequests(requests).values();
+        } catch (GiftBatchException e) {
+            throw asAuraException(e.getMessage());
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT + '.getPaymentChoices', batchId);
+            throw asAuraException(Label.Giving_GiftEntryPays_ErrorLoad);
+        }
+    }
+
     /** Posts the batch. Everything that decides whether it may is in `GiftBatchService.post`. */
     @AuraEnabled
     public static PostResult postBatch(Id batchId) {
@@ -190,7 +230,8 @@ public with sharing class GiftBatchController {
                     : null,
                 Payment_Reference__c = line.paymentReference,
                 Fund__c = asId(line.fundId, Fund__c.SObjectType),
-                Appeal__c = asId(line.appealId, Appeal__c.SObjectType)
+                Appeal__c = asId(line.appealId, Appeal__c.SObjectType),
+                Installment__c = asId(line.installmentId, Installment__c.SObjectType)
             );
             Id rowId = asId(line.id, Gift_Batch_Row__c.SObjectType);
             if (rowId == null) {

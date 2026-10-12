@@ -72,8 +72,9 @@ date (its own, or the batch's) and its expected amount is within the allowed dif
 the line's amount. These are the settings gift imports use: **BarnCRM Settings**, **Import**,
 **Days either side of a payment's due date** and **Amount difference allowed**. When exactly
 one payment is suggested, the line chooses it and the cell says so; when two or more are,
-nothing is chosen and you pick. A payment you picked yourself stays picked while it is still
-in the list. Change the donor, the amount or the date, and the list is looked up again.
+nothing is chosen and you pick. A payment you picked yourself stays picked. Change the amount
+or the date, and the list is looked up again; change the donor, and the line goes back to
+None until the new donor's list arrives.
 
 Posting links each such gift to its payment and pledge, and the payment's status and the
 pledge's paid to date and balance update on their own. Posting checks every chosen payment
@@ -118,8 +119,13 @@ to be designated. Set the default fund in BarnCRM Settings and post again; nothi
 created by the failed attempt.
 
 **A line says "This line pays a payment that is no longer open".** The payment was paid, or
-its pledge completed or cancelled, after you chose it. Choose again in **Pays**, or None, and
-post again; nothing was created by the failed attempt.
+its pledge completed or cancelled, after you chose it. Its **Pays** cell reads **A payment
+that is no longer open: choose again**. Choose another payment, or None, and post again;
+nothing was created by the failed attempt.
+
+**A saved line keeps its choice.** A line you saved keeps the payment it was saved with, or
+None, when you open the batch again: nothing is chosen for it in advance a second time. A new
+line, or a saved line whose donor you change, gets a suggestion as described above.
 
 **A suggestion chosen for the wrong pledge.** A suggestion is only a suggestion: check the
 **Pays** cell of every line that shows one before you post, and choose **None** where the

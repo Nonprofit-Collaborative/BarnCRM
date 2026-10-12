@@ -40,6 +40,10 @@
         </div>
       </template>
 
+      <template lwc:if={paymentLoadFailed}>
+        <p class="slds-text-body_small slds-m-bottom_small" role="status" data-id="pays-error">{labels.paysErrorLoad}</p>
+      </template>
+
       <template lwc:if={isPhone}>
         <p class="slds-text-body_small slds-m-bottom_small" data-id="use-computer">{labels.useComputer}</p>
       </template>
@@ -57,6 +61,7 @@
                 <th scope="col">{labels.columnMethod}</th>
                 <th scope="col">{labels.columnFund}</th>
                 <th scope="col">{labels.columnAppeal}</th>
+                <th scope="col">{labels.columnPays}</th>
                 <th scope="col">{labels.columnGift}</th>
               </tr>
             </thead>
@@ -182,6 +187,23 @@
                       data-field="appealId"
                       onchange={handleField}
                     ></lightning-record-picker>
+                  </td>
+                  <td>
+                    <template lwc:if={row.showPays}>
+                      <lightning-combobox
+                        label={row.cellLabels.pays}
+                        variant="label-hidden"
+                        options={row.payOptions}
+                        value={row.payValue}
+                        disabled={locked}
+                        data-key={row.key}
+                        data-id="pays"
+                        onchange={handlePays}
+                      ></lightning-combobox>
+                      <p class="slds-text-body_small slds-text-color_weak" aria-live="polite" data-id="pays-note">
+                        {row.paysNote}
+                      </p>
+                    </template>
                   </td>
                   <td>
                     <template lwc:if={row.giftUrl}>

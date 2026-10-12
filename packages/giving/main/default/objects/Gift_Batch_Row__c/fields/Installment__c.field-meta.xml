@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Installment__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <inlineHelpText>
+    The scheduled payment of a pledge or recurring gift this line's gift pays. Left empty, the gift is a gift on its own.
+  </inlineHelpText>
+  <label>Installment</label>
+  <referenceTo>Installment__c</referenceTo>
+  <relationshipLabel>Gift Batch Lines</relationshipLabel>
+  <relationshipName>Gift_Batch_Rows</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

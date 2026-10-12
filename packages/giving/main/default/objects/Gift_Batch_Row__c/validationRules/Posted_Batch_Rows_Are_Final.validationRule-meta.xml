@@ -4,7 +4,8 @@
   <active>true</active>
   <description>
     R-GR4: once its batch is posted, a line is the link between the deposit slip and a gift, so it
-    is not added or changed. The platform clearing Gift when that gift is deleted is allowed.
+    is not added or changed. The platform clearing Gift or Installment when that record is deleted
+    is allowed.
   </description>
   <errorConditionFormula>
     AND(
@@ -19,6 +20,7 @@
         ISCHANGED(Payment_Reference__c),
         ISCHANGED(Fund__c),
         ISCHANGED(Appeal__c),
+        AND(ISCHANGED(Installment__c), NOT(ISBLANK(Installment__c))),
         AND(ISCHANGED(Gift__c), NOT(ISBLANK(Gift__c)))
       )
     )
