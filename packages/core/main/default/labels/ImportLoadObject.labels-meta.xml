@@ -192,4 +192,12 @@
         <shortDescription>Load one object run log: a lookup's chosen field cannot be searched</shortDescription>
         <value>{0} is found by {1}, which you cannot search by, so no record was found for it. Choose another field in the columns step.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_UndoKeptNotCreatedByImport</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo: a journaled record was not created by this import's commit</shortDescription>
+        <value>Kept: this record was not created by the person who ran this import while it ran, so the undo left it in place.</value>
+    </labels>
 </CustomLabels>

@@ -570,6 +570,7 @@ private class ImportUndoTest {
         Assert.areEqual(
             new List<String>{
                 ImportUndoBatch.PASS_RESTORE,
+                ImportUndoBatch.PASS_CREATED,
                 ImportUndoBatch.PASS_TAGGED_PREFIX + 'Contact',
                 ImportUndoBatch.PASS_CONTACTS,
                 ImportUndoBatch.PASS_PERSON_ACCOUNTS,
