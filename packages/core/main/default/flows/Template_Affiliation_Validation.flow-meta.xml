@@ -352,6 +352,7 @@
     <connector>
       <targetReference>Settle_Status</targetReference>
     </connector>
+    <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.Contact__c}), ISCHANGED({!$Record.Person_Account__c}), ISCHANGED({!$Record.Organization__c}), ISCHANGED({!$Record.Role__c}), ISCHANGED({!$Record.Start_Date__c}), ISCHANGED({!$Record.End_Date__c}), ISCHANGED({!$Record.Status__c}), ISCHANGED({!$Record.Is_Primary__c}))</filterFormula>
     <object>Affiliation__c</object>
     <recordTriggerType>CreateAndUpdate</recordTriggerType>
     <triggerType>RecordBeforeSave</triggerType>
