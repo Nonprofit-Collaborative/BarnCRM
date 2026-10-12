@@ -309,7 +309,7 @@ or a person with the same name or ID is never taken for one.
 rule. It lists the fields your org marks **External ID** or **Unique** that hold text or an
 email. If the list is empty, ask your Salesforce administrator to mark the field that holds
 your other system's ID as External ID. Then, on the columns step, set the column holding the
-ID to that field: it appears in the column list as, for example, "First person: Member Number"
+ID to that field: it appears in the column list as, for example, "Person: Member Number"
 or "Organization: Charity Number". A row with no ID is not matched, so its person or
 organization is created (an organization needs a name for that).
 

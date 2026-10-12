@@ -1080,4 +1080,172 @@
         <shortDescription>Import error: a value for every row would name one person</shortDescription>
         <value>A value for every row cannot give a person's name, email or matching ID, because every row would then be the same person. Remove the value for {0} and try again.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_PersonMatchFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the ID field people are matched on</shortDescription>
+        <value>ID field people are matched on</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OrganizationRuleLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the organization matching rule picker label</shortDescription>
+        <value>Match a row to an organization you already have by</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OrganizationNameHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the organization name rule does and risks</shortDescription>
+        <value>Matches an organization with exactly the same name, ignoring capitals and extra spaces. Two organizations that share a name, such as two branches, are taken as one.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OrganizationExternalIdHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the organization ID rule does and risks</shortDescription>
+        <value>Matches on an ID your other system gave the organization. Only as good as the IDs: a value typed into the wrong record matches the wrong organization.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OrganizationMatchFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the ID field organizations are matched on</shortDescription>
+        <value>ID field organizations are matched on</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_NoMatchFields</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: no field can be matched on</shortDescription>
+        <value>No field can be matched on yet. Ask your Salesforce administrator to mark the field holding your other system's ID as External ID, or choose another rule.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_MatchFieldNotMapped</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the chosen ID field is not a column</shortDescription>
+        <value>No column is set to this field, so nobody will be matched by it. Go back to the columns and set the column holding the ID to it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralMatchesLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the several matches picker label</shortDescription>
+        <value>When more than one record matches a row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralRejectOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: several matches option, reject the row</shortDescription>
+        <value>Reject the row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralRecentOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: several matches option, most recently changed</shortDescription>
+        <value>Use the most recently changed record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralRejectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what rejecting several matches does</shortDescription>
+        <value>The row is rejected with the reason and nothing is written for it. The safe choice: a row loaded into the wrong duplicate is hard to notice.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_SeveralRecentHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what using the most recent of several does and risks</shortDescription>
+        <value>The row is loaded into whichever record was changed last. Use it only when you know your duplicates and the newest is the one you keep.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_FileValuesHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: values for every row heading</shortDescription>
+        <value>Values for every row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_FileValuesHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what values for every row do</shortDescription>
+        <value>A value here is used on each row of this file whose own cell is empty, and only for this file. It cannot be a person's name, email or ID.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_AddFileValueButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: add a value for every row</shortDescription>
+        <value>Add a value</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RemoveFileValueLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: remove a value for every row</shortDescription>
+        <value>Remove this value</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_FileValueTargetLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a value for every row is for</shortDescription>
+        <value>Value for</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_FileValueLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the value given to every row</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetFirstPersonField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, a first person's ID field</shortDescription>
+        <value>Person: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetSecondPersonField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, a second person's ID field</shortDescription>
+        <value>Second person: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetOrganizationField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, an organization's ID field</shortDescription>
+        <value>Organization: {0}</value>
+    </labels>
 </CustomLabels>

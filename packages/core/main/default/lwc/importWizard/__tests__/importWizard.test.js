@@ -12,6 +12,7 @@ import getBatch from '@salesforce/apex/ImportController.getBatch';
 import getRows from '@salesforce/apex/ImportController.getRows';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
+import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -47,6 +48,9 @@ jest.mock('@salesforce/apex/ImportController.getRows', () => ({ default: jest.fn
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getEntityTargets', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getMatchFields', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -127,6 +131,7 @@ describe('the import wizard', () => {
     getBatch.mockResolvedValue(DRY_RUN_BATCH);
     getRows.mockResolvedValue([]);
     getEntityTargets.mockResolvedValue([]);
+    getMatchFields.mockResolvedValue({ contact: [], account: [] });
   });
 
   afterEach(() => {
@@ -401,7 +406,13 @@ describe('the import wizard', () => {
     await flush();
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson)).toEqual({
       expectedCount: 2,
-      expectedAmount: null
+      expectedAmount: null,
+      matching: {
+        personMatchField: null,
+        organizationRule: 'Name exact',
+        organizationMatchField: null,
+        severalMatches: 'Reject the row'
+      }
     });
 
     document.body.removeChild(element);
@@ -411,7 +422,13 @@ describe('the import wizard', () => {
     await flush();
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson)).toEqual({
       expectedCount: null,
-      expectedAmount: null
+      expectedAmount: null,
+      matching: {
+        personMatchField: null,
+        organizationRule: 'Name exact',
+        organizationMatchField: null,
+        severalMatches: 'Reject the row'
+      }
     });
   });
 
@@ -497,6 +514,12 @@ describe('the import wizard', () => {
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson)).toEqual({
       expectedCount: null,
       expectedAmount: null,
+      matching: {
+        personMatchField: null,
+        organizationRule: 'Name exact',
+        organizationMatchField: null,
+        severalMatches: 'Reject the row'
+      },
       savePaymentMatching: true,
       paymentMatching: 'Never match',
       matchDateWindowDays: 3,
@@ -527,5 +550,135 @@ describe('the import wizard', () => {
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="expected-count"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="results"]')).toBeNull();
+  });
+
+  it('asks for the ID field under External ID, and warns when no column holds it', async () => {
+    getMatchFields.mockResolvedValue({
+      contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
+      account: []
+    });
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="person-field"]')).toBeNull();
+    const rule = element.shadowRoot.querySelector('[data-id="rule"]');
+    rule.dispatchEvent(new CustomEvent('change', { detail: { value: 'External ID' } }));
+    await flush();
+    const field = element.shadowRoot.querySelector('[data-id="person-field"]');
+    expect(field.value).toBe('Member_Number__c');
+    expect(element.shadowRoot.querySelector('[data-id="person-field-warning"]').textContent).toBe(
+      'c.Core_Import_MatchFieldNotMapped'
+    );
+    click(element, 'dry-run');
+    await flush();
+    const sent = JSON.parse(createBatch.mock.calls[0][0].optionsJson);
+    expect(sent.matching.personMatchField).toBe('Member_Number__c');
+    expect(createBatch.mock.calls[0][0].matchingRule).toBe('External ID');
+  });
+
+  it('offers each ID field as a column for either person and the organization', async () => {
+    getMatchFields.mockResolvedValue({
+      contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
+      account: [{ value: 'Charity_Number__c', label: 'Charity Number' }]
+    });
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const values = picker.options.map((option) => option.value);
+    expect(values).toEqual(
+      expect.arrayContaining([
+        'Contact1.Member_Number__c',
+        'Contact2.Member_Number__c',
+        'Organization.Charity_Number__c'
+      ])
+    );
+  });
+
+  it('will not dry run under External ID when no field can be matched on, and says why', async () => {
+    getTemplates.mockResolvedValue([{ ...TEMPLATE, matchingRule: 'External ID' }]);
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="no-person-fields"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
+  });
+
+  it('offers the organization rule only where the file names an organization', async () => {
+    let element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="organization-rule"]')).toBeNull();
+    document.body.removeChild(element);
+
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [
+          { source: 'Last Name', target: 'Contact1.LastName' },
+          { source: 'Email', target: 'Contact1.Email' },
+          { source: 'Notes', target: 'Organization.Name' }
+        ]
+      })
+    );
+    element = await toMatchingStep();
+    const rule = element.shadowRoot.querySelector('[data-id="organization-rule"]');
+    expect(rule.value).toBe('Name exact');
+    expect(element.shadowRoot.querySelector('[data-id="organization-rule-help"]').textContent).toBe(
+      'c.Core_Import_OrganizationNameHelp'
+    );
+  });
+
+  it('rejects several matches by default, says what each choice risks, and sends the choice', async () => {
+    const element = await toMatchingStep();
+    const several = element.shadowRoot.querySelector('[data-id="several-matches"]');
+    expect(several.value).toBe('Reject the row');
+    expect(element.shadowRoot.querySelector('[data-id="several-help"]').textContent).toBe(
+      'c.Core_Import_SeveralRejectHelp'
+    );
+    several.dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Use the most recently changed' } })
+    );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="several-help"]').textContent).toBe(
+      'c.Core_Import_SeveralRecentHelp'
+    );
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).matching.severalMatches).toBe(
+      'Use the most recently changed'
+    );
+  });
+
+  it('sends values for every row, never offers a person name for one, and drops blanks', async () => {
+    const element = await toMatchingStep();
+    click(element, 'add-file-value');
+    await flush();
+    click(element, 'add-file-value');
+    await flush();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="file-value-row"]');
+    expect(rows).toHaveLength(2);
+    const target = rows[0].querySelector('lightning-combobox');
+    const offered = target.options.map((option) => option.value);
+    expect(offered).toContain('Contact1.MailingCity');
+    expect(offered).toContain('Organization.Name');
+    expect(offered).not.toContain('Contact1.LastName');
+    expect(offered).not.toContain('Contact2.Email');
+    expect(offered).not.toContain('Ignore');
+    target.dispatchEvent(new CustomEvent('change', { detail: { value: 'Contact1.MailingCity' } }));
+    const input = rows[0].querySelector('lightning-input');
+    input.value = ' Portland ';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).fileValues).toEqual([
+      { target: 'Contact1.MailingCity', value: 'Portland' }
+    ]);
+  });
+
+  it('removes a value for every row', async () => {
+    const element = await toMatchingStep();
+    click(element, 'add-file-value');
+    await flush();
+    element.shadowRoot.querySelector('[data-id="file-value-row"] lightning-button-icon').click();
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="file-value-row"]')).toHaveLength(0);
   });
 });
