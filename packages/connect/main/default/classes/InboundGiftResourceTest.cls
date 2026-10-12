@@ -8,8 +8,10 @@ private class InboundGiftResourceTest {
 
     @TestSetup
     static void setup() {
-        insert new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true);
-        insert new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = EMAIL);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insert new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true);
+            insert new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = EMAIL);
+        }
     }
 
     private static Map<String, Object> post(String body) {
@@ -39,39 +41,48 @@ private class InboundGiftResourceTest {
 
     @IsTest
     static void aNewGiftIsCreatedAndASecondSendFindsIt() {
-        Test.startTest();
-        Map<String, Object> first = post(body('stripe:ch_9', 50));
-        Map<String, Object> second = post(body('stripe:ch_9', 50));
-        Map<String, Object> conflict = post(body('stripe:ch_9', 55));
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            Map<String, Object> first = post(body('stripe:ch_9', 50));
+            Map<String, Object> second = post(body('stripe:ch_9', 50));
+            Map<String, Object> conflict = post(body('stripe:ch_9', 55));
+            Test.stopTest();
 
-        Assert.areEqual(201, first.get('status'));
-        Assert.areEqual('created', first.get('outcome'));
-        Assert.isFalse(first.containsKey('errorCode'), 'Empty fields are left out of the body.');
-        Assert.areEqual(200, second.get('status'));
-        Assert.areEqual('existing', second.get('outcome'));
-        Assert.areEqual(first.get('giftId'), second.get('giftId'));
-        Assert.areEqual(409, conflict.get('status'));
-        Assert.areEqual('external_id_conflict', conflict.get('errorCode'));
-        Assert.areEqual(1, [SELECT COUNT() FROM Gift__c]);
+            Assert.areEqual(201, first.get('status'));
+            Assert.areEqual('created', first.get('outcome'));
+            Assert.isFalse(
+                first.containsKey('errorCode'),
+                'Empty fields are left out of the body.'
+            );
+            Assert.areEqual(200, second.get('status'));
+            Assert.areEqual('existing', second.get('outcome'));
+            Assert.areEqual(first.get('giftId'), second.get('giftId'));
+            Assert.areEqual(409, conflict.get('status'));
+            Assert.areEqual('external_id_conflict', conflict.get('errorCode'));
+            Assert.areEqual(1, [SELECT COUNT() FROM Gift__c]);
+        }
     }
 
     @IsTest
     static void badBodiesAndUnknownDonorsGetTheirDocumentedStatus() {
-        Map<String, Object> unknownField = post('{"externalId":"x:1","amount":5,"colour":"red"}');
-        Map<String, Object> missingAmount = post(
-            '{"externalId":"x:2","paymentMethod":"Card","donorEmail":"' + EMAIL + '"}'
-        );
-        Map<String, Object> stranger = post(
-            '{"externalId":"x:3","amount":5,"paymentMethod":"Card","donorEmail":"who@example.org"}'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Map<String, Object> unknownField = post(
+                '{"externalId":"x:1","amount":5,"colour":"red"}'
+            );
+            Map<String, Object> missingAmount = post(
+                '{"externalId":"x:2","paymentMethod":"Card","donorEmail":"' + EMAIL + '"}'
+            );
+            Map<String, Object> stranger = post(
+                '{"externalId":"x:3","amount":5,"paymentMethod":"Card","donorEmail":"who@example.org"}'
+            );
 
-        Assert.areEqual(400, unknownField.get('status'));
-        Assert.areEqual('invalid_request', unknownField.get('errorCode'));
-        Assert.areEqual(400, missingAmount.get('status'));
-        Assert.areEqual('invalid_field', missingAmount.get('errorCode'));
-        Assert.areEqual(422, stranger.get('status'));
-        Assert.areEqual('donor_not_found', stranger.get('errorCode'));
-        Assert.areEqual('rejected', stranger.get('outcome'));
+            Assert.areEqual(400, unknownField.get('status'));
+            Assert.areEqual('invalid_request', unknownField.get('errorCode'));
+            Assert.areEqual(400, missingAmount.get('status'));
+            Assert.areEqual('invalid_field', missingAmount.get('errorCode'));
+            Assert.areEqual(422, stranger.get('status'));
+            Assert.areEqual('donor_not_found', stranger.get('errorCode'));
+            Assert.areEqual('rejected', stranger.get('outcome'));
+        }
     }
 }

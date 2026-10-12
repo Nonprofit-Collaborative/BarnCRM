@@ -14,8 +14,10 @@ private class OpportunityMirrorBatchTest {
 
     @TestSetup
     static void setup() {
-        GivingTestDataFactory.ensureDefaultFund();
-        GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.ensureDefaultFund();
+            GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
+        }
     }
 
     private static void choose(String direction, Date startDate) {
@@ -115,168 +117,188 @@ private class OpportunityMirrorBatchTest {
 
     @IsTest
     static void aRunGivesTheGiftsThatWereThereBeforeTheirOpportunities() {
-        List<Gift__c> gifts = GivingTestDataFactory.buildGifts(luisId(), 3, 40);
-        gifts.add(GivingTestDataFactory.buildGift(luisId(), 15));
-        gifts[3].Status__c = 'Pending';
-        insert gifts;
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, null);
-        Test.startTest();
-        System.runAs(maria()) {
-            OpportunityMirrorBatch.run();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<Gift__c> gifts = GivingTestDataFactory.buildGifts(luisId(), 3, 40);
+            gifts.add(GivingTestDataFactory.buildGift(luisId(), 15));
+            gifts[3].Status__c = 'Pending';
+            insert gifts;
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, null);
+            Test.startTest();
+            System.runAs(maria()) {
+                OpportunityMirrorBatch.run();
+            }
+            Test.stopTest();
+            if (!OpportunityMirrorService.isAvailable()) {
+                Assert.areEqual(0, giftsFromOpportunities().size(), 'Nothing without Opportunity.');
+                return;
+            }
+            Assert.areEqual(
+                3,
+                giftsFromOpportunities().size(),
+                'The three received gifts, not Pending.'
+            );
+            Assert.areEqual(
+                3,
+                Database.countQuery(
+                    'SELECT COUNT() FROM ' + opportunityObject(),
+                    AccessLevel.SYSTEM_MODE
+                ),
+                'One Opportunity each.'
+            );
+            Assert.areEqual(1, countLogs('Info', LOG_CONTEXT), 'The run says what it did.');
         }
-        Test.stopTest();
-        if (!OpportunityMirrorService.isAvailable()) {
-            Assert.areEqual(0, giftsFromOpportunities().size(), 'Nothing without Opportunity.');
-            return;
-        }
-        Assert.areEqual(
-            3,
-            giftsFromOpportunities().size(),
-            'The three received gifts, not Pending.'
-        );
-        Assert.areEqual(
-            3,
-            Database.countQuery(
-                'SELECT COUNT() FROM ' + opportunityObject(),
-                AccessLevel.SYSTEM_MODE
-            ),
-            'One Opportunity each.'
-        );
-        Assert.areEqual(1, countLogs('Info', LOG_CONTEXT), 'The run says what it did.');
     }
 
     @IsTest
     static void copyingARangeAgainPutsAHandEditRight() {
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, null);
-        User admin = maria();
-        Gift__c given = GivingTestDataFactory.buildGift(luisId(), 100);
-        given.Gift_Date__c = Date.newInstance(2026, 9, 20);
-        System.runAs(admin) {
-            insert given;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, null);
+            User admin = maria();
+            Gift__c given = GivingTestDataFactory.buildGift(luisId(), 100);
+            given.Gift_Date__c = Date.newInstance(2026, 9, 20);
+            System.runAs(admin) {
+                insert given;
+            }
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingMirrored();
+                return;
+            }
+            Id linked = [
+                SELECT Opportunity_Id__c
+                FROM Gift__c
+                WHERE Id = :given.Id
+                WITH SYSTEM_MODE
+            ]
+            .Opportunity_Id__c;
+            SObject edited = OpportunityMirrorService.opportunityType().newSObject(linked);
+            edited.put('Amount', 175);
+            update edited;
+            Test.startTest();
+            System.runAs(admin) {
+                OpportunityMirrorBatch.runRange(
+                    Date.newInstance(2026, 9, 1),
+                    Date.newInstance(2026, 9, 30)
+                );
+            }
+            Test.stopTest();
+            SObject copy = Database.queryWithBinds(
+                'SELECT Amount FROM ' + opportunityObject() + ' WHERE Id = :linked',
+                new Map<String, Object>{ 'linked' => linked },
+                AccessLevel.SYSTEM_MODE
+            )[0];
+            Assert.areEqual(100, (Decimal) copy.get('Amount'), 'The gift is the source (R-OM11).');
         }
-        if (!OpportunityMirrorService.isAvailable()) {
-            assertNothingMirrored();
-            return;
-        }
-        Id linked = [
-            SELECT Opportunity_Id__c
-            FROM Gift__c
-            WHERE Id = :given.Id
-            WITH SYSTEM_MODE
-        ]
-        .Opportunity_Id__c;
-        SObject edited = OpportunityMirrorService.opportunityType().newSObject(linked);
-        edited.put('Amount', 175);
-        update edited;
-        Test.startTest();
-        System.runAs(admin) {
-            OpportunityMirrorBatch.runRange(
-                Date.newInstance(2026, 9, 1),
-                Date.newInstance(2026, 9, 30)
-            );
-        }
-        Test.stopTest();
-        SObject copy = Database.queryWithBinds(
-            'SELECT Amount FROM ' + opportunityObject() + ' WHERE Id = :linked',
-            new Map<String, Object>{ 'linked' => linked },
-            AccessLevel.SYSTEM_MODE
-        )[0];
-        Assert.areEqual(100, (Decimal) copy.get('Amount'), 'The gift is the source (R-OM11).');
     }
 
     @IsTest
     static void wonOpportunitiesBecomeGiftsOnceAndRefusalsAreGroupedByReason() {
-        if (!OpportunityMirrorService.isAvailable()) {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            if (!OpportunityMirrorService.isAvailable()) {
+                choose(
+                    OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS,
+                    Date.newInstance(2026, 1, 1)
+                );
+                Assert.isNull(OpportunityMirrorBatch.run(), 'No Opportunity, no run.');
+                return;
+            }
+            Date closed = Date.newInstance(2026, 9, 20);
+            SObject good = onlineGift('Online gift from Luis', 60, closed, true);
+            onlineGift('Old online gift', 70, Date.newInstance(2025, 12, 31), true);
+            onlineGift('Free ticket', 0, closed, true);
+            onlineGift('Free ticket too', 0, closed, true);
+            onlineGift('Nobody gave this', 30, closed, false);
             choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS, Date.newInstance(2026, 1, 1));
-            Assert.isNull(OpportunityMirrorBatch.run(), 'No Opportunity, no run.');
-            return;
-        }
-        Date closed = Date.newInstance(2026, 9, 20);
-        SObject good = onlineGift('Online gift from Luis', 60, closed, true);
-        onlineGift('Old online gift', 70, Date.newInstance(2025, 12, 31), true);
-        onlineGift('Free ticket', 0, closed, true);
-        onlineGift('Free ticket too', 0, closed, true);
-        onlineGift('Nobody gave this', 30, closed, false);
-        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS, Date.newInstance(2026, 1, 1));
-        User admin = maria();
-        Test.startTest();
-        System.runAs(admin) {
-            OpportunityMirrorBatch.run();
-        }
-        Test.stopTest();
+            User admin = maria();
+            Test.startTest();
+            System.runAs(admin) {
+                OpportunityMirrorBatch.run();
+            }
+            Test.stopTest();
 
-        List<Gift__c> made = giftsFromOpportunities();
-        Assert.areEqual(
-            1,
-            made.size(),
-            'Only the won Opportunity after the start date with a donor.'
-        );
-        Assert.areEqual(
-            String.valueOf(good.Id),
-            made[0].Opportunity_Id__c,
-            'Linked in the insert.'
-        );
-        Assert.areEqual(60, made[0].Amount__c, 'The amount is the Opportunity\'s.');
-        Assert.areEqual(closed, made[0].Gift_Date__c, 'So is the date.');
-        Assert.areEqual(luisId(), made[0].Donor_Contact__c, 'The primary contact is the donor.');
-        Assert.areEqual(
-            'Other',
-            made[0].Type__c,
-            'An Opportunity says nothing of how it was paid.'
-        );
-        Assert.areEqual(
-            2,
-            countLogs('Warning', 'Opportunity mirror'),
-            'One Warning per reason: two free tickets share one, the donorless one has its own.'
-        );
+            List<Gift__c> made = giftsFromOpportunities();
+            Assert.areEqual(
+                1,
+                made.size(),
+                'Only the won Opportunity after the start date with a donor.'
+            );
+            Assert.areEqual(
+                String.valueOf(good.Id),
+                made[0].Opportunity_Id__c,
+                'Linked in the insert.'
+            );
+            Assert.areEqual(60, made[0].Amount__c, 'The amount is the Opportunity\'s.');
+            Assert.areEqual(closed, made[0].Gift_Date__c, 'So is the date.');
+            Assert.areEqual(
+                luisId(),
+                made[0].Donor_Contact__c,
+                'The primary contact is the donor.'
+            );
+            Assert.areEqual(
+                'Other',
+                made[0].Type__c,
+                'An Opportunity says nothing of how it was paid.'
+            );
+            Assert.areEqual(
+                2,
+                countLogs('Warning', 'Opportunity mirror'),
+                'One Warning per reason: two free tickets share one, the donorless one has its own.'
+            );
 
-        // A second run makes nothing new: the Opportunity ID on the gift remembers it.
-        OpportunityMirrorService.Result again;
-        System.runAs(admin) {
-            again = OpportunityGiftService.makeGifts(new List<SObject>{ good });
+            // A second run makes nothing new: the Opportunity ID on the gift remembers it.
+            OpportunityMirrorService.Result again;
+            System.runAs(admin) {
+                again = OpportunityGiftService.makeGifts(new List<SObject>{ good });
+            }
+            Assert.areEqual(0, again.created, 'Never twice.');
+            Assert.areEqual(1, again.unchanged, 'It is recognized.');
         }
-        Assert.areEqual(0, again.created, 'Never twice.');
-        Assert.areEqual(1, again.unchanged, 'It is recognized.');
     }
 
     @IsTest
     static void withoutAStartDateNoOpportunityBecomesAGift() {
-        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS, null);
-        if (!OpportunityMirrorService.isAvailable()) {
-            assertNothingMirrored();
-            return;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS, null);
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingMirrored();
+                return;
+            }
+            onlineGift('Online gift from Luis', 60, Date.today(), true);
+            Test.startTest();
+            System.runAs(maria()) {
+                OpportunityMirrorBatch.run();
+            }
+            Test.stopTest();
+            Assert.areEqual(0, giftsFromOpportunities().size(), 'No start date, no gifts (R-OM7).');
         }
-        onlineGift('Online gift from Luis', 60, Date.today(), true);
-        Test.startTest();
-        System.runAs(maria()) {
-            OpportunityMirrorBatch.run();
-        }
-        Test.stopTest();
-        Assert.areEqual(0, giftsFromOpportunities().size(), 'No start date, no gifts (R-OM7).');
     }
 
     @IsTest
     static void theNightlyRunIsScheduledOnceAndStopped() {
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, null);
-        User admin = maria();
-        Test.startTest();
-        // The nightly run executes as the person who scheduled it.
-        System.runAs(admin) {
-            Id first = OpportunityMirrorSchedulable.schedule();
-            Id second = OpportunityMirrorSchedulable.schedule();
-            Assert.areEqual(first, second, 'Pressing Schedule twice keeps one job.');
-            Assert.isNotNull(
-                OpportunityMirrorSchedulable.nextRunAt(),
-                'It knows when it runs next.'
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, null);
+            User admin = maria();
+            Test.startTest();
+            // The nightly run executes as the person who scheduled it.
+            System.runAs(admin) {
+                Id first = OpportunityMirrorSchedulable.schedule();
+                Id second = OpportunityMirrorSchedulable.schedule();
+                Assert.areEqual(first, second, 'Pressing Schedule twice keeps one job.');
+                Assert.isNotNull(
+                    OpportunityMirrorSchedulable.nextRunAt(),
+                    'It knows when it runs next.'
+                );
+                OpportunityMirrorSchedulable.stop();
+                Assert.isNull(
+                    OpportunityMirrorSchedulable.nextRunAt(),
+                    'Stopped, it has no next run.'
+                );
+                new OpportunityMirrorSchedulable().execute(null);
+            }
+            Test.stopTest();
+            Assert.isFalse(
+                OpportunityMirrorSchedulable.isRunning(),
+                'The run it started has finished.'
             );
-            OpportunityMirrorSchedulable.stop();
-            Assert.isNull(OpportunityMirrorSchedulable.nextRunAt(), 'Stopped, it has no next run.');
-            new OpportunityMirrorSchedulable().execute(null);
         }
-        Test.stopTest();
-        Assert.isFalse(
-            OpportunityMirrorSchedulable.isRunning(),
-            'The run it started has finished.'
-        );
     }
 }

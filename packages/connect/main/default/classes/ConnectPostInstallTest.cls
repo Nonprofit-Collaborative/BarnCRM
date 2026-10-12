@@ -14,43 +14,55 @@ private class ConnectPostInstallTest {
 
     @IsTest
     static void installingConnectCreatesTheCampaignSyncSwitch() {
-        Test.startTest();
-        Test.testInstall(new ConnectPostInstall(), null);
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            Test.testInstall(new ConnectPostInstall(), null);
+            Test.stopTest();
 
-        List<Automation_Setting__c> switches = campaignSyncSwitch();
-        Assert.areEqual(1, switches.size(), 'The switch row exists from install.');
-        Assert.isTrue(switches[0].Enabled__c, 'It arrives on; the Giving setting is what is off.');
+            List<Automation_Setting__c> switches = campaignSyncSwitch();
+            Assert.areEqual(1, switches.size(), 'The switch row exists from install.');
+            Assert.isTrue(
+                switches[0].Enabled__c,
+                'It arrives on; the Giving setting is what is off.'
+            );
+        }
     }
 
     @IsTest
     static void upgradingKeepsTheAdministratorsChoice() {
-        Test.testInstall(new ConnectPostInstall(), null);
-        Automation_Setting__c row = campaignSyncSwitch()[0];
-        row.Enabled__c = false;
-        update row;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.testInstall(new ConnectPostInstall(), null);
+            Automation_Setting__c row = campaignSyncSwitch()[0];
+            row.Enabled__c = false;
+            update row;
 
-        Test.startTest();
-        Test.testInstall(new ConnectPostInstall(), new Version(1, 0), true);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(new ConnectPostInstall(), new Version(1, 0), true);
+            Test.stopTest();
 
-        List<Automation_Setting__c> switches = campaignSyncSwitch();
-        Assert.areEqual(1, switches.size(), 'An upgrade does not add a second row.');
-        Assert.isFalse(switches[0].Enabled__c, 'The switch stays where the administrator left it.');
+            List<Automation_Setting__c> switches = campaignSyncSwitch();
+            Assert.areEqual(1, switches.size(), 'An upgrade does not add a second row.');
+            Assert.isFalse(
+                switches[0].Enabled__c,
+                'The switch stays where the administrator left it.'
+            );
+        }
     }
 
     @IsTest
     static void installingConnectCreatesTheOpportunityMirrorSwitch() {
-        Test.startTest();
-        Test.testInstall(new ConnectPostInstall(), null);
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            Test.testInstall(new ConnectPostInstall(), null);
+            Test.stopTest();
 
-        List<Automation_Setting__c> switches = [
-            SELECT Enabled__c
-            FROM Automation_Setting__c
-            WHERE Automation_Name__c = :OpportunityMirrorService.AUTOMATION_NAME
-        ];
-        Assert.areEqual(1, switches.size(), 'The switch row exists from install.');
-        Assert.isTrue(switches[0].Enabled__c, 'It arrives on; the direction setting is Off.');
+            List<Automation_Setting__c> switches = [
+                SELECT Enabled__c
+                FROM Automation_Setting__c
+                WHERE Automation_Name__c = :OpportunityMirrorService.AUTOMATION_NAME
+            ];
+            Assert.areEqual(1, switches.size(), 'The switch row exists from install.');
+            Assert.isTrue(switches[0].Enabled__c, 'It arrives on; the direction setting is Off.');
+        }
     }
 }

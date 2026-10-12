@@ -21,64 +21,81 @@ private class ConnectNightlyJobProviderTest {
 
     @IsTest
     static void listsNothingWhileTheMirrorIsOff() {
-        choose(OpportunityMirrorService.OFF);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            choose(OpportunityMirrorService.OFF);
 
-        Assert.isTrue(
-            new ConnectNightlyJobProvider().nightlyJobs().isEmpty(),
-            'A mirror that is Off has no run worth scheduling.'
-        );
+            Assert.isTrue(
+                new ConnectNightlyJobProvider().nightlyJobs().isEmpty(),
+                'A mirror that is Off has no run worth scheduling.'
+            );
+        }
     }
 
     @IsTest
     static void listsNothingWhenNoDirectionHasEverBeenChosen() {
-        Assert.isTrue(new ConnectNightlyJobProvider().nightlyJobs().isEmpty());
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Assert.isTrue(new ConnectNightlyJobProvider().nightlyJobs().isEmpty());
+        }
     }
 
     @IsTest
     static void listsTheMirrorRunOnceADirectionIsChosen() {
-        if (!OpportunityMirrorService.isAvailable()) {
-            // No Opportunity in this org: the provider must skip, and says so by listing nothing.
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            if (!OpportunityMirrorService.isAvailable()) {
+                // No Opportunity in this org: the provider must skip, and says so by listing nothing.
+                choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+                Assert.isTrue(new ConnectNightlyJobProvider().nightlyJobs().isEmpty());
+                return;
+            }
             choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-            Assert.isTrue(new ConnectNightlyJobProvider().nightlyJobs().isEmpty());
-            return;
+
+            List<NightlyJob> jobs = new ConnectNightlyJobProvider().nightlyJobs();
+
+            Assert.areEqual(1, jobs.size());
+            Assert.areEqual(System.Label.Connect_NightlyJob_MirrorName, jobs[0].label());
+            Assert.isFalse(jobs[0].isScheduled(), 'Nothing is scheduled yet.');
         }
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-
-        List<NightlyJob> jobs = new ConnectNightlyJobProvider().nightlyJobs();
-
-        Assert.areEqual(1, jobs.size());
-        Assert.areEqual(System.Label.Connect_NightlyJob_MirrorName, jobs[0].label());
-        Assert.isFalse(jobs[0].isScheduled(), 'Nothing is scheduled yet.');
     }
 
     @IsTest
     static void schedulingTwiceLeavesOneJobAndItCountsAsScheduled() {
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            if (!OpportunityMirrorService.isAvailable()) {
+                return;
+            }
+            choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
+            NightlyJob job = new ConnectNightlyJobProvider().nightlyJobs()[0];
+
+            Test.startTest();
+            job.schedule();
+            job.schedule();
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                mirrorTriggerCount(),
+                'A second press returns the job already there.'
+            );
+            Assert.isTrue(job.isScheduled());
         }
-        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
-        NightlyJob job = new ConnectNightlyJobProvider().nightlyJobs()[0];
-
-        Test.startTest();
-        job.schedule();
-        job.schedule();
-        Test.stopTest();
-
-        Assert.areEqual(1, mirrorTriggerCount(), 'A second press returns the job already there.');
-        Assert.isTrue(job.isScheduled());
     }
 
     @IsTest
     static void aScheduledRunIsNoLongerWaiting() {
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-        Test.startTest();
-        OpportunityMirrorSchedulable.schedule();
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            if (!OpportunityMirrorService.isAvailable()) {
+                return;
+            }
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+            Test.startTest();
+            OpportunityMirrorSchedulable.schedule();
+            Test.stopTest();
 
-        NightlyJob job = new ConnectNightlyJobProvider().nightlyJobs()[0];
-        Assert.isTrue(job.isScheduled(), 'The job the Opportunity mirror page scheduled is seen.');
+            NightlyJob job = new ConnectNightlyJobProvider().nightlyJobs()[0];
+            Assert.isTrue(
+                job.isScheduled(),
+                'The job the Opportunity mirror page scheduled is seen.'
+            );
+        }
     }
 }
