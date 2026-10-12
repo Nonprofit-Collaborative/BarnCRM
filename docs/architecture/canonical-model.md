@@ -2390,7 +2390,7 @@ object means something specific and is unavailable on Platform licenses.
 | Parent Appeal | reference(Appeal) | no | The larger effort this appeal is part of, for example a gala within a capital campaign. |
 | Active | boolean | yes (defaults true) | Whether the appeal is offered when entering a new gift. |
 | Net Raised | decimal | computed | Total raised less cost, calculated live from the two values. |
-| Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. |
+| Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. The Percent formula returns the plain ratio (0.5 for half) and Salesforce displays it as 50%. |
 
 ### Relationships
 
