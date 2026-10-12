@@ -24,30 +24,36 @@ private class GiftRealTimeRollupTest {
 
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+            GivingRollupTestData.installShippedRollups();
+        }
     }
 
     @IsTest
     static void everyGivingSourceIsRegisteredForRealTimeRollups() {
-        Set<String> registered = new Set<String>();
-        for (Automation_Registry__mdt entry : [
-            SELECT Object_Name__c, Enabled_By_Default__c
-            FROM Automation_Registry__mdt
-            WHERE Handler_Class__c = 'RollupTriggerHandler' AND Object_Name__c IN :GIVING_SOURCES
-        ]) {
-            Assert.isTrue(
-                entry.Enabled_By_Default__c,
-                'A real-time total is on from install, like every shipped total.'
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Set<String> registered = new Set<String>();
+            for (Automation_Registry__mdt entry : [
+                SELECT Object_Name__c, Enabled_By_Default__c
+                FROM Automation_Registry__mdt
+                WHERE
+                    Handler_Class__c = 'RollupTriggerHandler'
+                    AND Object_Name__c IN :GIVING_SOURCES
+            ]) {
+                Assert.isTrue(
+                    entry.Enabled_By_Default__c,
+                    'A real-time total is on from install, like every shipped total.'
+                );
+                registered.add(entry.Object_Name__c);
+            }
+            Assert.areEqual(
+                GIVING_SOURCES,
+                registered,
+                'Gift, Commitment, Gift Allocation and Soft Credit run the real-time rollups.'
             );
-            registered.add(entry.Object_Name__c);
         }
-        Assert.areEqual(
-            GIVING_SOURCES,
-            registered,
-            'Gift, Commitment, Gift Allocation and Soft Credit run the real-time rollups.'
-        );
     }
 
     /**
@@ -56,22 +62,24 @@ private class GiftRealTimeRollupTest {
      */
     @IsTest
     static void aSavedGiftUpdatesThePersonAndTheHousehold() {
-        Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(ana.Id, 250);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(ana.Id, 250);
+            Test.stopTest();
 
-        Contact person = GivingRollupTestData.person(ana.Id);
-        GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
-        Assert.areEqual(250, person.Total_Giving__c, 'Ana\'s total giving');
-        Assert.areEqual(1, person.Gift_Count__c, 'Ana\'s gift count');
-        Assert.areEqual(250, person.Largest_Gift__c, 'Ana\'s largest gift');
-        Assert.areEqual(Date.today(), person.Last_Gift_Date__c, 'Ana\'s last gift date');
+            Contact person = GivingRollupTestData.person(ana.Id);
+            GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
+            Assert.areEqual(250, person.Total_Giving__c, 'Ana\'s total giving');
+            Assert.areEqual(1, person.Gift_Count__c, 'Ana\'s gift count');
+            Assert.areEqual(250, person.Largest_Gift__c, 'Ana\'s largest gift');
+            Assert.areEqual(Date.today(), person.Last_Gift_Date__c, 'Ana\'s last gift date');
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(250, household.Total_Giving__c, 'The Nolan household\'s total giving');
-        Assert.areEqual(1, household.Gift_Count__c, 'The Nolan household\'s gift count');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(250, household.Total_Giving__c, 'The Nolan household\'s total giving');
+            Assert.areEqual(1, household.Gift_Count__c, 'The Nolan household\'s gift count');
+        }
     }
 
     /**
@@ -82,17 +90,19 @@ private class GiftRealTimeRollupTest {
      */
     @IsTest
     static void aSavedGiftUpdatesTheFundItIsAllocatedTo() {
-        Contact ana = [SELECT Id FROM Contact LIMIT 1];
-        Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = [SELECT Id FROM Contact LIMIT 1];
+            Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(ana.Id, 250);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(ana.Id, 250);
+            Test.stopTest();
 
-        Fund__c fund = GivingRollupTestData.fund(general.Id);
-        GivingTestDataFactory.assertRollupWrote(fund.Total_Raised__c);
-        Assert.areEqual(250, fund.Total_Raised__c, 'General has raised the gift');
-        Assert.areEqual(1, fund.Gift_Count__c, 'One gift designated to General');
+            Fund__c fund = GivingRollupTestData.fund(general.Id);
+            GivingTestDataFactory.assertRollupWrote(fund.Total_Raised__c);
+            Assert.areEqual(250, fund.Total_Raised__c, 'General has raised the gift');
+            Assert.areEqual(1, fund.Gift_Count__c, 'One gift designated to General');
+        }
     }
 
     /**
@@ -103,56 +113,60 @@ private class GiftRealTimeRollupTest {
      */
     @IsTest
     static void aSavedSoftCreditUpdatesThePersonCredited() {
-        Contact ana = [SELECT Id FROM Contact LIMIT 1];
-        Contact bea = GivingTestDataFactory.insertHouseholdContact(
-            'The Lindqvist Family',
-            'Bea',
-            'Lindqvist'
-        );
-        Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
-        insert gift;
-        GivingRollupTestData.nextSave();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = [SELECT Id FROM Contact LIMIT 1];
+            Contact bea = GivingTestDataFactory.insertHouseholdContact(
+                'The Lindqvist Family',
+                'Bea',
+                'Lindqvist'
+            );
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
+            insert gift;
+            GivingRollupTestData.nextSave();
 
-        Test.startTest();
-        insert new Soft_Credit__c(
-            Gift__c = gift.Id,
-            Contact__c = bea.Id,
-            Role__c = 'Solicitor',
-            Amount__c = 500
-        );
-        Test.stopTest();
+            Test.startTest();
+            insert new Soft_Credit__c(
+                Gift__c = gift.Id,
+                Contact__c = bea.Id,
+                Role__c = 'Solicitor',
+                Amount__c = 500
+            );
+            Test.stopTest();
 
-        Contact credited = GivingRollupTestData.person(bea.Id);
-        GivingTestDataFactory.assertRollupWrote(credited.Total_Soft_Credits__c);
-        Assert.areEqual(500, credited.Total_Soft_Credits__c, 'Bea is recognized for the gift');
-        Assert.areEqual(
-            0,
-            GivingRollupTestData.valueOf(credited.Total_Giving__c),
-            'Recognition is never giving'
-        );
+            Contact credited = GivingRollupTestData.person(bea.Id);
+            GivingTestDataFactory.assertRollupWrote(credited.Total_Soft_Credits__c);
+            Assert.areEqual(500, credited.Total_Soft_Credits__c, 'Bea is recognized for the gift');
+            Assert.areEqual(
+                0,
+                GivingRollupTestData.valueOf(credited.Total_Giving__c),
+                'Recognition is never giving'
+            );
+        }
     }
 
     /** Ana pledges 300. Her pledge balance shows it as soon as the pledge is saved. */
     @IsTest
     static void aSavedCommitmentUpdatesThePledgeBalance() {
-        Contact ana = [SELECT Id FROM Contact LIMIT 1];
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = [SELECT Id FROM Contact LIMIT 1];
 
-        Test.startTest();
-        insert new Commitment__c(
-            Type__c = 'Pledge',
-            Status__c = 'Active',
-            Donor_Contact__c = ana.Id,
-            Amount__c = 100,
-            Frequency__c = 'Monthly',
-            Start_Date__c = Date.today(),
-            Expected_Total__c = 300,
-            Installments_Planned__c = 3
-        );
-        Test.stopTest();
+            Test.startTest();
+            insert new Commitment__c(
+                Type__c = 'Pledge',
+                Status__c = 'Active',
+                Donor_Contact__c = ana.Id,
+                Amount__c = 100,
+                Frequency__c = 'Monthly',
+                Start_Date__c = Date.today(),
+                Expected_Total__c = 300,
+                Installments_Planned__c = 3
+            );
+            Test.stopTest();
 
-        Contact person = GivingRollupTestData.person(ana.Id);
-        GivingTestDataFactory.assertRollupWrote(person.Pledge_Balance__c);
-        Assert.areEqual(300, person.Pledge_Balance__c, 'Promised and not yet paid');
+            Contact person = GivingRollupTestData.person(ana.Id);
+            GivingTestDataFactory.assertRollupWrote(person.Pledge_Balance__c);
+            Assert.areEqual(300, person.Pledge_Balance__c, 'Promised and not yet paid');
+        }
     }
 
     /**
@@ -162,44 +176,46 @@ private class GiftRealTimeRollupTest {
      */
     @IsTest
     static void twoHundredGiftsInOneSaveUpdateEveryDonor() {
-        List<String> names = new List<String>();
-        for (Integer i = 0; i < 20; i++) {
-            names.add('Donor' + i);
-        }
-        List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
-        List<Gift__c> gifts = new List<Gift__c>();
-        for (Contact donor : donors) {
-            gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
-        }
-        Assert.areEqual(200, gifts.size(), 'The bulk case is two hundred records');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<String> names = new List<String>();
+            for (Integer i = 0; i < 20; i++) {
+                names.add('Donor' + i);
+            }
+            List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
+            List<Gift__c> gifts = new List<Gift__c>();
+            for (Contact donor : donors) {
+                gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
+            }
+            Assert.areEqual(200, gifts.size(), 'The bulk case is two hundred records');
 
-        Test.startTest();
-        insert gifts;
-        Test.stopTest();
+            Test.startTest();
+            insert gifts;
+            Test.stopTest();
 
-        Map<Id, Contact> people = new Map<Id, Contact>(
-            [
-                SELECT Id, AccountId, Total_Giving__c, Gift_Count__c
-                FROM Contact
-                WHERE Id IN :donors
-            ]
-        );
-        Set<Id> householdIds = new Set<Id>();
-        for (Contact donor : people.values()) {
-            GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
-            Assert.areEqual(250, donor.Total_Giving__c, 'Ten gifts of 25 from each donor');
-            Assert.areEqual(10, donor.Gift_Count__c, 'Ten gifts from each donor');
-            householdIds.add(donor.AccountId);
+            Map<Id, Contact> people = new Map<Id, Contact>(
+                [
+                    SELECT Id, AccountId, Total_Giving__c, Gift_Count__c
+                    FROM Contact
+                    WHERE Id IN :donors
+                ]
+            );
+            Set<Id> householdIds = new Set<Id>();
+            for (Contact donor : people.values()) {
+                GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
+                Assert.areEqual(250, donor.Total_Giving__c, 'Ten gifts of 25 from each donor');
+                Assert.areEqual(10, donor.Gift_Count__c, 'Ten gifts from each donor');
+                householdIds.add(donor.AccountId);
+            }
+            for (Account household : [
+                SELECT Total_Giving__c, Gift_Count__c
+                FROM Account
+                WHERE Id IN :householdIds
+            ]) {
+                Assert.areEqual(250, household.Total_Giving__c, 'Each household\'s total');
+                Assert.areEqual(10, household.Gift_Count__c, 'Each household\'s gift count');
+            }
+            // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo.
         }
-        for (Account household : [
-            SELECT Total_Giving__c, Gift_Count__c
-            FROM Account
-            WHERE Id IN :householdIds
-        ]) {
-            Assert.areEqual(250, household.Total_Giving__c, 'Each household\'s total');
-            Assert.areEqual(10, household.Gift_Count__c, 'Each household\'s gift count');
-        }
-        // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo.
     }
 
     /**
@@ -209,15 +225,17 @@ private class GiftRealTimeRollupTest {
      */
     @IsTest
     static void theTotalsAreRightInTheSameTransaction() {
-        Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(ana.Id, 250);
-        Contact person = GivingRollupTestData.person(ana.Id);
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(ana.Id, 250);
+            Contact person = GivingRollupTestData.person(ana.Id);
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Test.stopTest();
 
-        Assert.areEqual(250, person.Total_Giving__c, 'Right before the save returned');
-        Assert.areEqual(250, household.Total_Giving__c, 'And on the household too');
+            Assert.areEqual(250, person.Total_Giving__c, 'Right before the save returned');
+            Assert.areEqual(250, household.Total_Giving__c, 'And on the household too');
+        }
     }
 }

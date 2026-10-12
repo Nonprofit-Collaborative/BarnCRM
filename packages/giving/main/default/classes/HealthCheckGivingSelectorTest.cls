@@ -39,41 +39,43 @@ private class HealthCheckGivingSelectorTest {
      */
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        Contact ana = GivingTestDataFactory.insertHouseholdContact(
-            'The Nolan Family',
-            'Ana',
-            'Nolan'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            Contact ana = GivingTestDataFactory.insertHouseholdContact(
+                'The Nolan Family',
+                'Ana',
+                'Nolan'
+            );
 
-        Gift__c received = GivingTestDataFactory.buildGift(ana.Id, 10);
-        received.Status__c = 'Received';
-        received.Gift_Date__c = lastClosedDay();
+            Gift__c received = GivingTestDataFactory.buildGift(ana.Id, 10);
+            received.Status__c = 'Received';
+            received.Gift_Date__c = lastClosedDay();
 
-        Gift__c refunded = GivingTestDataFactory.buildGift(ana.Id, 20);
-        refunded.Status__c = 'Refunded';
-        refunded.Gift_Date__c = lastClosedDay();
+            Gift__c refunded = GivingTestDataFactory.buildGift(ana.Id, 20);
+            refunded.Status__c = 'Refunded';
+            refunded.Gift_Date__c = lastClosedDay();
 
-        Gift__c writtenOff = GivingTestDataFactory.buildGift(ana.Id, 30);
-        writtenOff.Status__c = 'Written off';
-        writtenOff.Gift_Date__c = lastClosedDay();
+            Gift__c writtenOff = GivingTestDataFactory.buildGift(ana.Id, 30);
+            writtenOff.Status__c = 'Written off';
+            writtenOff.Gift_Date__c = lastClosedDay();
 
-        Gift__c pending = GivingTestDataFactory.buildGift(ana.Id, 50);
-        pending.Status__c = 'Pending';
-        pending.Gift_Date__c = lastClosedDay();
+            Gift__c pending = GivingTestDataFactory.buildGift(ana.Id, 50);
+            pending.Status__c = 'Pending';
+            pending.Gift_Date__c = lastClosedDay();
 
-        Gift__c inKind = GivingTestDataFactory.buildGift(ana.Id, 0);
-        inKind.Status__c = 'Received';
-        inKind.Type__c = 'In-kind';
-        inKind.Fair_Market_Value__c = 60;
-        inKind.In_Kind_Description__c = 'A used laptop';
-        inKind.Gift_Date__c = lastClosedDay();
+            Gift__c inKind = GivingTestDataFactory.buildGift(ana.Id, 0);
+            inKind.Status__c = 'Received';
+            inKind.Type__c = 'In-kind';
+            inKind.Fair_Market_Value__c = 60;
+            inKind.In_Kind_Description__c = 'A used laptop';
+            inKind.Gift_Date__c = lastClosedDay();
 
-        Gift__c afterClose = GivingTestDataFactory.buildGift(ana.Id, 70);
-        afterClose.Status__c = 'Received';
-        afterClose.Gift_Date__c = Date.today();
+            Gift__c afterClose = GivingTestDataFactory.buildGift(ana.Id, 70);
+            afterClose.Status__c = 'Received';
+            afterClose.Gift_Date__c = Date.today();
 
-        insert new List<Gift__c>{ received, refunded, writtenOff, pending, inKind, afterClose };
+            insert new List<Gift__c>{ received, refunded, writtenOff, pending, inKind, afterClose };
+        }
     }
 
     /**
@@ -97,51 +99,56 @@ private class HealthCheckGivingSelectorTest {
 
     @IsTest
     static void countsExactlyTheCountingStatusesNotTheRest() {
-        User jen = jen();
-        addAnAlreadyPostedGift(jen);
-        GivingTestDataFactory.closeBooksThrough(lastClosedDay());
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User jen = jen();
+            addAnAlreadyPostedGift(jen);
+            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
-        System.runAs(jen) {
-            Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(
-                lastClosedDay(),
-                1001
-            );
+            System.runAs(jen) {
+                Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(
+                    lastClosedDay(),
+                    1001
+                );
 
-            System.assertEquals(
-                3,
-                count,
-                'Received, Refunded and Written off count; Pending, In-kind, a gift dated ' +
-                'after the close and an already-posted gift do not.'
-            );
+                System.assertEquals(
+                    3,
+                    count,
+                    'Received, Refunded and Written off count; Pending, In-kind, a gift dated ' +
+                    'after the close and an already-posted gift do not.'
+                );
+            }
+
         }
     }
 
     @IsTest
     static void linksNameOnlyTheQualifyingGifts() {
-        User jen = jen();
-        addAnAlreadyPostedGift(jen);
-        GivingTestDataFactory.closeBooksThrough(lastClosedDay());
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User jen = jen();
+            addAnAlreadyPostedGift(jen);
+            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
-        // The selector's own query never selects Amount__c (the ADR-0057 amendment promises
-        // nothing but Id, Name and Gift_Date__c crosses the sharing boundary), so the three
-        // qualifying gifts are identified here, as the running test user who owns them, before
-        // entering Jen's context to call the selector.
-        Set<Id> expectedIds = new Map<Id, Gift__c>(
-                [SELECT Id FROM Gift__c WHERE Amount__c IN (10, 20, 30)]
-            )
-            .keySet();
+            // The selector's own query never selects Amount__c (the ADR-0057 amendment promises
+            // nothing but Id, Name and Gift_Date__c crosses the sharing boundary), so the three
+            // qualifying gifts are identified here, as the running test user who owns them, before
+            // entering Jen's context to call the selector.
+            Set<Id> expectedIds = new Map<Id, Gift__c>(
+                    [SELECT Id FROM Gift__c WHERE Amount__c IN (10, 20, 30)]
+                )
+                .keySet();
 
-        List<Gift__c> linked;
-        System.runAs(jen) {
-            linked = HealthCheckGivingSelector.unpostedInClosedPeriod(lastClosedDay(), 10);
+            List<Gift__c> linked;
+            System.runAs(jen) {
+                linked = HealthCheckGivingSelector.unpostedInClosedPeriod(lastClosedDay(), 10);
+            }
+
+            System.assertEquals(
+                expectedIds,
+                new Map<Id, Gift__c>(linked).keySet(),
+                'Only the three qualifying gifts (10 Received, 20 Refunded, 30 Written off) are ' +
+                'named.'
+            );
         }
-
-        System.assertEquals(
-            expectedIds,
-            new Map<Id, Gift__c>(linked).keySet(),
-            'Only the three qualifying gifts (10 Received, 20 Refunded, 30 Written off) are ' +
-            'named.'
-        );
     }
 
     /**
@@ -153,25 +160,28 @@ private class HealthCheckGivingSelectorTest {
      */
     @IsTest
     static void aViewerWithoutManageSettingsGetsNothingEvenCalledDirectly() {
-        GivingTestDataFactory.closeBooksThrough(lastClosedDay());
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.closeBooksThrough(lastClosedDay());
 
-        System.runAs(david()) {
-            Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(
-                lastClosedDay(),
-                1001
-            );
-            List<Gift__c> linked = HealthCheckGivingSelector.unpostedInClosedPeriod(
-                lastClosedDay(),
-                10
-            );
+            System.runAs(david()) {
+                Integer count = HealthCheckGivingSelector.countUnpostedInClosedPeriod(
+                    lastClosedDay(),
+                    1001
+                );
+                List<Gift__c> linked = HealthCheckGivingSelector.unpostedInClosedPeriod(
+                    lastClosedDay(),
+                    10
+                );
 
-            System.assertEquals(
-                0,
-                count,
-                'The gate is asserted in the selector itself, so a viewer without Manage ' +
-                'BarnCRM Settings gets nothing, not an under-permissioned peek at the org.'
-            );
-            System.assertEquals(0, linked.size());
+                System.assertEquals(
+                    0,
+                    count,
+                    'The gate is asserted in the selector itself, so a viewer without Manage ' +
+                    'BarnCRM Settings gets nothing, not an under-permissioned peek at the org.'
+                );
+                System.assertEquals(0, linked.size());
+            }
+
         }
     }
 }

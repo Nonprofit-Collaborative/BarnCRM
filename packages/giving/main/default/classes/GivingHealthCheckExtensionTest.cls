@@ -25,56 +25,65 @@ private class GivingHealthCheckExtensionTest {
 
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        Contact ana = GivingTestDataFactory.insertHouseholdContact(
-            'The Nolan Family',
-            'Ana',
-            'Nolan'
-        );
-        Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
-        gift.Gift_Date__c = Date.today().toStartOfMonth().addDays(-1);
-        insert gift;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            Contact ana = GivingTestDataFactory.insertHouseholdContact(
+                'The Nolan Family',
+                'Ana',
+                'Nolan'
+            );
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
+            gift.Gift_Date__c = Date.today().toStartOfMonth().addDays(-1);
+            insert gift;
+        }
     }
 
     @IsTest
     static void delegatesStraightToTheGivingChecks() {
-        // Nobody holds the receipt lock override and no receipt run failed, whatever the test
-        // org holds, so the one finding counted is the closed period one.
-        HealthCheckGivingChecks.holdersOverride = new CustomPermissionSelector.Holders();
-        ReceiptGenerationFailureSelector.resultOverride = new ReceiptGenerationFailureSelector.Result();
-        // Closing the books is Maria's own act on the Accounting Periods page, done here as
-        // the test-running admin: GivingTestDataFactory writes the protected custom setting
-        // directly, which is a test-only shortcut around AccountingPeriodWriter's system-mode
-        // door (ADR-0021) and needs more than Jen's packaged permission sets grant.
-        GivingTestDataFactory.closeBooksThrough(Date.today().toStartOfMonth().addDays(-1));
-        User jen = jen();
-        System.runAs(jen) {
-            List<HealthCheckService.Finding> findings = new GivingHealthCheckExtension().findings();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // Nobody holds the receipt lock override and no receipt run failed, whatever the test
+            // org holds, so the one finding counted is the closed period one.
+            HealthCheckGivingChecks.holdersOverride = new CustomPermissionSelector.Holders();
+            ReceiptGenerationFailureSelector.resultOverride = new ReceiptGenerationFailureSelector.Result();
+            // Closing the books is Maria's own act on the Accounting Periods page, done here as
+            // the test-running admin: GivingTestDataFactory writes the protected custom setting
+            // directly, which is a test-only shortcut around AccountingPeriodWriter's system-mode
+            // door (ADR-0021) and needs more than Jen's packaged permission sets grant.
+            GivingTestDataFactory.closeBooksThrough(Date.today().toStartOfMonth().addDays(-1));
+            User jen = jen();
+            System.runAs(jen) {
+                List<HealthCheckService.Finding> findings = new GivingHealthCheckExtension()
+                    .findings();
 
-            System.assertEquals(1, findings.size());
-            System.assertEquals('unposted_gifts_closed_period', asMap(findings[0]).get('key'));
+                System.assertEquals(1, findings.size());
+                System.assertEquals('unposted_gifts_closed_period', asMap(findings[0]).get('key'));
+            }
+
         }
     }
 
     @IsTest
     static void coresOneReportCarriesTheGivingFindingWhenBothPackagesAreInstalled() {
-        GivingTestDataFactory.closeBooksThrough(Date.today().toStartOfMonth().addDays(-1));
-        User jen = jen();
-        System.runAs(jen) {
-            List<HealthCheckService.Finding> findings = HealthCheckService.run();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.closeBooksThrough(Date.today().toStartOfMonth().addDays(-1));
+            User jen = jen();
+            System.runAs(jen) {
+                List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
-            HealthCheckService.Finding giving = null;
-            for (HealthCheckService.Finding finding : findings) {
-                if ('unposted_gifts_closed_period'.equals(asMap(finding).get('key'))) {
-                    giving = finding;
+                HealthCheckService.Finding giving = null;
+                for (HealthCheckService.Finding finding : findings) {
+                    if ('unposted_gifts_closed_period'.equals(asMap(finding).get('key'))) {
+                        giving = finding;
+                    }
                 }
+                System.assertNotEquals(
+                    null,
+                    giving,
+                    'Core resolves the installed extension by name and reports what it finds, ' +
+                    'without Core ever naming a gift or a closed period itself.'
+                );
             }
-            System.assertNotEquals(
-                null,
-                giving,
-                'Core resolves the installed extension by name and reports what it finds, ' +
-                'without Core ever naming a gift or a closed period itself.'
-            );
+
         }
     }
 }
