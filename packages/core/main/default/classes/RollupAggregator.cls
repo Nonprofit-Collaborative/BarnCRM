@@ -94,10 +94,10 @@ public without sharing class RollupAggregator {
 
     /** Which target records each reference read off a source row counts towards. */
     private class Fanout {
-        Set<Id> keys = new Set<Id>();
-        Map<Id, Set<Id>> targetsByKey = new Map<Id, Set<Id>>();
+        public Set<Id> keys = new Set<Id>();
+        public Map<Id, Set<Id>> targetsByKey = new Map<Id, Set<Id>>();
 
-        void add(Id key, Id targetId) {
+        public void add(Id key, Id targetId) {
             this.keys.add(key);
             if (!this.targetsByKey.containsKey(key)) {
                 this.targetsByKey.put(key, new Set<Id>());
