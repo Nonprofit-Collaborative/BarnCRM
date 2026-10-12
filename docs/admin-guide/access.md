@@ -11,11 +11,11 @@ change our settings?" in a few seconds.
 Roles ship with BarnCRM and are kept up to date for you.
 
 One thing they do not do yet. A role today carries what Core provides, and nothing a
-module adds: the Giving module ships its own **Giving Admin**, **Giving Staff** and
-**Giving Read Only** permission sets, and no role includes them. Until the Module Manager
-in version 0.7 joins the two up, somebody with the Fundraising Staff role sees households
-and people but no gifts, and a Salesforce administrator has to assign the module's
-permission set in Setup alongside the role. That is the one place BarnCRM still sends
+module adds: a module ships its own permission sets (Giving, for example, ships **Giving
+Admin**, **Giving Staff** and **Giving Read Only**), and no role includes them. Until the
+Module Manager in version 0.7 joins the two up, somebody with a role sees households and
+people but nothing the module adds, and a Salesforce administrator has to assign the
+module's permission set in Setup alongside the role. That is the one place BarnCRM still sends
 you to Setup for access, and it is a gap rather than a design.
 
 BarnCRM Core ships four roles. The Fundraising Staff role comes with the Giving module,
@@ -29,9 +29,9 @@ so it is listed only where Giving is installed, which makes five:
 | Volunteer Coordinator | Whoever schedules and tracks volunteers | Day to day work with people, households, and volunteer records |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
 
-## Who can read a donor's receipts and tax statements
+## Who can read a donor's receipts and tax statements (with Giving)
 
-Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
+This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
 worth stating plainly, because a file in Salesforce is reached through the record it is attached
 to, not through the record it is about.
 
@@ -76,7 +76,7 @@ Two things control who can use the page:
 
 ## A five-minute walkthrough
 
-Maria has just hired David as Development Director. His Salesforce user already exists.
+Maria has just hired David to run a program. His Salesforce user already exists.
 Here is how she gives him access, checks it, and takes it away again.
 
 1. Open the BarnCRM app and click the **BarnCRM Settings** tab.
@@ -86,21 +86,21 @@ Here is how she gives him access, checks it, and takes it away again.
 3. In the **Find a person** box, type `David`. Matching active users appear as you type,
    each with their name and email address so you can tell two Davids apart.
 4. Choose **David Okafor**.
-5. Choose the role **Fundraising Staff** and click **Give access**. A confirmation asks you
+5. Choose the role **Program Staff** and click **Give access**. A confirmation asks you
    to confirm the person and the role. Click **Give access** again.
-6. A message says "David Okafor now has the Fundraising Staff role." David's name appears
-   on the Fundraising Staff card, and the number in brackets beside the role name goes up
+6. A message says "David Okafor now has the Program Staff role." David's name appears
+   on the Program Staff card, and the number in brackets beside the role name goes up
    by one.
 7. David can now sign in and see households and contacts. He does not see BarnCRM
-   Settings, because that belongs to the BarnCRM Admin role, and he does not see gifts
-   yet either: for those he also needs the Giving module's own **Giving Staff**
-   permission set, which today is assigned in Salesforce Setup.
-8. To take the role away, find David's name on the Fundraising Staff card and click
-   **Remove**. Confirm, and a message says "David Okafor no longer has the Fundraising
-   Staff role." His name disappears from the card.
+   Settings, because that belongs to the BarnCRM Admin role. If your org has a module, he
+   does not see what it adds yet either: for that he also needs the module's own permission
+   set (for Giving, **Giving Staff**), which today is assigned in Salesforce Setup.
+8. To take the role away, find David's name on the Program Staff card and click
+   **Remove**. Confirm, and a message says "David Okafor no longer has the Program Staff
+   role." His name disappears from the card.
 
-A person can hold more than one role. Giving David the Program Staff role as well does not
-remove Fundraising Staff, and removing one role leaves the other in place. Giving someone a
+A person can hold more than one role. Giving David the Volunteer Coordinator role as well
+does not remove Program Staff, and removing one role leaves the other in place. Giving someone a
 role they already have changes nothing and reports no error.
 
 ## What still needs Setup
@@ -138,6 +138,13 @@ just after the package is installed or upgraded, and it cannot hand the role out
 rebuild is running. It usually finishes in under a minute. If you still see the message
 after ten minutes, open the Error Log tile on the Hub home page and send what it says with
 your support request.
+
+**The Error Log says the BarnCRM Admin role was still being prepared at install.** The
+entry reads "Warning: the BarnCRM Admin role was still being prepared after {0} attempts,
+so it was not given to the person who installed BarnCRM. They already have the BarnCRM
+Admin permission set, so BarnCRM Settings works. To finish, open BarnCRM Settings, then
+Access, and give them the BarnCRM Admin role.", with the number of attempts in place of
+{0}. Do what it says: on this page, give the installer the BarnCRM Admin role.
 
 **You edited one of the shipped roles in Setup and now an upgrade has undone your change.**
 The shipped roles (four with BarnCRM Core, and Fundraising Staff with the Giving module)

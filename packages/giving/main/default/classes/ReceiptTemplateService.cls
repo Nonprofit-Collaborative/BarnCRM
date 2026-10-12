@@ -11,19 +11,19 @@
  *
  * - The Giving post-install script, at install and at every upgrade, which is where a shipped
  *   default is supposed to arrive. There is no running user there and nothing to check.
- * - `Restore the shipped letters` on the Receipts page, after `Manage_Nonprofit_Settings`. It is
+ * - `Restore the shipped letters` on the Receipts page, after `Manage_BarnCRM_Settings`. It is
  *   the recovery path for an install whose step failed, exactly as the Restore shipped rollups
  *   button is for ADR-0029.
  * - `activeBodyFor`, when an org is issuing a receipt and has no letter of that kind, after
  *   `Issue_Receipts`. A receipt that fails to generate because a bootstrap step did not run is a
  *   worse outcome than a record created on the issuing path.
  *
- * Editing a letter (`saveBody`, `activate`) checks `Manage_Nonprofit_Settings`, like every other
+ * Editing a letter (`saveBody`, `activate`) checks `Manage_BarnCRM_Settings`, like every other
  * write the settings console makes, and the DML stays in user mode on top of that.
  */
 public with sharing class ReceiptTemplateService {
     /** Configuring the app. The same permission every other console write checks. */
-    public static final String MANAGE_PERMISSION = 'Manage_Nonprofit_Settings';
+    public static final String MANAGE_PERMISSION = 'Manage_BarnCRM_Settings';
 
     private static final String INSTALL_CONTEXT = 'ReceiptTemplateService.installDefaults';
 

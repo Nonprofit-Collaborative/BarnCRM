@@ -58,7 +58,7 @@ private class AccountingExportServiceTest {
             allocation(cancelled.Id, general.Id, 65),
             allocation(september.Id, general.Id, 25)
         };
-        Nonprofit_Settings__c running = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c running = TestDataFactory.defaultSettings();
         running.Automation_Paused_Until__c = null;
         TestDataFactory.saveSettings(running);
     }
@@ -231,7 +231,7 @@ private class AccountingExportServiceTest {
     static void theFileHoldsOnlyTheGiftsThePersonCanSee() {
         User jen = TestDataFactory.createUser(
             'Jen',
-            new List<String>{ 'Nonprofit_Read_Only', 'Giving_Read_Only' }
+            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
         );
         AccountingExportService.ExportFile file;
         System.runAs(jen) {
@@ -302,7 +302,7 @@ private class AccountingExportServiceTest {
         return owningAugust(
             TestDataFactory.createUser(
                 'Jen',
-                new List<String>{ 'Nonprofit_Read_Only', 'Giving_Read_Only', 'Accounting_Export' }
+                new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only', 'Accounting_Export' }
             )
         );
     }
@@ -443,7 +443,7 @@ private class AccountingExportServiceTest {
         User reader = owningAugust(
             TestDataFactory.createUser(
                 'Reader',
-                new List<String>{ 'Nonprofit_Read_Only', 'Giving_Read_Only' }
+                new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
             )
         );
         System.runAs(reader) {

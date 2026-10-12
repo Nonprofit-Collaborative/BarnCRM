@@ -30,7 +30,7 @@ to install and no Setup step. Two things are worth setting once.
 2. In the left navigation choose **Addresses**.
 3. Set **When a person's address is edited** to the behavior your organization wants:
    - **Update household** (the default): editing one person's address moves the whole
-     household, which is what most nonprofits want, because a household shares a mailbox.
+     household, which is what most organizations want, because a household shares a mailbox.
    - **Create personal address**: editing one person's address gives that person an
      address of their own and leaves the rest of the household where it is. Choose this if
      you often track students away at school, adult children at a parent's household, or
@@ -68,7 +68,8 @@ Two things to know about the schedule.
   is written to the Error Log instead of going through quietly.
 
 To let your team see and manage addresses, make sure they have one of the packaged access
-levels (BarnCRM Admin, Fundraising Staff, or Program Staff) on the **Access** page in
+levels (BarnCRM Admin, Program Staff, or Volunteer Coordinator, or Fundraising Staff with
+Giving) on the **Access** page in
 BarnCRM Settings. Read Only users can see addresses and cannot change them.
 
 Addresses appear in two places once you are set up: an **Addresses** card on every

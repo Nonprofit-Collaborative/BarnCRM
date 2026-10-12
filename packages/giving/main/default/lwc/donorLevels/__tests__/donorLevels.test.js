@@ -32,7 +32,7 @@ jest.mock(
   '@salesforce/label/c.Giving_DonorLevels_Off',
   () => ({
     default:
-      'Donor levels are off. Build your ladder here, then turn Donor levels on in Nonprofit Settings under Giving.'
+      'Donor levels are off. Build your ladder here, then turn Donor levels on in BarnCRM Settings under Giving.'
   }),
   { virtual: true }
 );
@@ -208,7 +208,7 @@ describe('c-donor-levels', () => {
 
   it('shows the message the server sends when a recalculation is refused', async () => {
     recalculate.mockRejectedValue({
-      body: { message: 'Turn Donor levels on in Nonprofit Settings under Giving first.' }
+      body: { message: 'Turn Donor levels on in BarnCRM Settings under Giving first.' }
     });
     const element = createComponent();
     getLadder.emit(LADDER);
@@ -218,7 +218,7 @@ describe('c-donor-levels', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent.trim()).toBe(
-      'Turn Donor levels on in Nonprofit Settings under Giving first.'
+      'Turn Donor levels on in BarnCRM Settings under Giving first.'
     );
   });
 

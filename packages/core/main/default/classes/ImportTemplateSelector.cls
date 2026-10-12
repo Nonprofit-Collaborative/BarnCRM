@@ -24,7 +24,7 @@ public with sharing class ImportTemplateSelector {
                 Source_Name__c,
                 Last_Import_Date__c,
                 Active__c,
-                Donation_Matching__c,
+                Payment_Matching__c,
                 Match_Date_Window_Days__c,
                 Match_Amount_Tolerance__c
             FROM Import_Template__c
@@ -56,7 +56,7 @@ public with sharing class ImportTemplateSelector {
                 Source_Name__c,
                 Last_Import_Date__c,
                 Active__c,
-                Donation_Matching__c,
+                Payment_Matching__c,
                 Match_Date_Window_Days__c,
                 Match_Amount_Tolerance__c
             FROM Import_Template__c

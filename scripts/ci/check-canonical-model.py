@@ -89,7 +89,7 @@ def main():
 
     # settings keys and shipped-default field names are declared in their own sections
     for chunk in re.split(r"^## ", text, flags=re.M):
-        if chunk.startswith("12. Nonprofit Settings") or chunk.startswith("13. Shipped defaults"):
+        if chunk.startswith("12. BarnCRM Settings") or chunk.startswith("13. Shipped defaults"):
             declared.update(API.findall(chunk))
 
     used = set(API.findall(text))

@@ -63,6 +63,17 @@ describe('c-campaign-sync', () => {
     expect(find(element, 'no-access')).toBeNull();
   });
 
+  it('says the cap with a plus past the count limit', async () => {
+    const element = await mount({
+      ...READY,
+      appealCount: 10000,
+      appealCountCapped: true,
+      linkedCount: 2,
+      linkedCountCapped: false
+    });
+    expect(find(element, 'counts').textContent).toBe('2 of 10000+ appeals have a Campaign.');
+  });
+
   it('says so, and offers nothing, where the org has no Campaigns', async () => {
     const element = await mount({ ...READY, available: false });
     expect(find(element, 'unavailable')).not.toBeNull();

@@ -54,6 +54,18 @@ private class CampaignSyncServiceTest {
         );
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Campaign: the appeals
+     * saved, and none of them was given a Campaign.
+     */
+    private static void assertNoAppealLinked() {
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Appeal__c WHERE Campaign_Id__c != NULL WITH SYSTEM_MODE],
+            'Without Campaign no appeal is linked (R-CS1).'
+        );
+    }
+
     private static Integer countWarnings() {
         return [
             SELECT COUNT()
@@ -121,6 +133,7 @@ private class CampaignSyncServiceTest {
             insert spring;
         }
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         String link = reread(spring.Id).Campaign_Id__c;
@@ -158,6 +171,7 @@ private class CampaignSyncServiceTest {
             insert spring;
         }
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         CampaignSyncService.Result result;
@@ -188,6 +202,7 @@ private class CampaignSyncServiceTest {
         }
         Test.stopTest();
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         Assert.areEqual(
@@ -210,6 +225,7 @@ private class CampaignSyncServiceTest {
         );
         insert child;
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         // Neither has a Campaign yet: both were saved while the sync was off. Maria's catch-up
@@ -288,6 +304,7 @@ private class CampaignSyncServiceTest {
     static void twoHundredRefusedCampaignsCostOneLogWrite() {
         User admin = maria();
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         // 200 appeals linked, while the sync was off, to Campaigns that are then deleted: each
@@ -378,6 +395,7 @@ private class CampaignSyncServiceTest {
             insert spring;
         }
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         String taken = reread(spring.Id).Campaign_Id__c;
@@ -434,6 +452,7 @@ private class CampaignSyncServiceTest {
     static void pastingAnExistingCampaignLinksToItAndWritesTheAppealOntoIt() {
         User admin = maria();
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         SObject existing = CampaignSyncService.campaignType().newSObject();
@@ -469,6 +488,7 @@ private class CampaignSyncServiceTest {
             insert spring;
         }
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         Appeal__c saved = reread(spring.Id);
@@ -504,6 +524,7 @@ private class CampaignSyncServiceTest {
         }
         Test.stopTest();
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         Integer linked = [

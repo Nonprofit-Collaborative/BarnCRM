@@ -59,9 +59,9 @@ private class CoexistenceServiceTest {
         Test.stopTest();
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_STANDALONE,
             applied,
-            'A Person Accounts org is an Agentforce Nonprofit org.'
+            'Person Accounts alone name no other product, so the org is Standalone.'
         );
         System.assertEquals(
             CoexistenceService.MEMBERSHIP_JUNCTION,
@@ -98,16 +98,16 @@ private class CoexistenceServiceTest {
             'NPSP coexistence can be chosen by hand.'
         );
 
-        CoexistenceService.setMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+        CoexistenceService.setMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_NONPROFIT_CLOUD,
             CoexistenceService.getCurrentMode(),
-            'Agentforce Nonprofit coexistence can be chosen by hand.'
+            'Nonprofit Cloud coexistence can be chosen by hand.'
         );
         System.assertEquals(
             CoexistenceService.MEMBERSHIP_JUNCTION,
             CoexistenceService.getMembershipMode(),
-            'Choosing Agentforce Nonprofit by hand still brings junction membership with it.'
+            'Choosing Nonprofit Cloud by hand still brings junction membership with it.'
         );
     }
 
@@ -156,17 +156,17 @@ private class CoexistenceServiceTest {
                 'NPSP coexistence can be applied by an administrator.'
             );
 
-            CoexistenceService.applyMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+            CoexistenceService.applyMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
             System.assertEquals(
-                CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+                CoexistenceService.MODE_NONPROFIT_CLOUD,
                 CoexistenceService.getCurrentMode(),
-                'Agentforce Nonprofit coexistence can be applied by an administrator.'
+                'Nonprofit Cloud coexistence can be applied by an administrator.'
             );
         }
     }
 
     @IsTest
-    static void applyModeBringsJunctionMembershipWithAgentforceNonprofit() {
+    static void applyModeBringsJunctionMembershipWithNonprofitCloud() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
         System.runAs(maria) {
@@ -176,7 +176,7 @@ private class CoexistenceServiceTest {
                 'Membership starts in contact mode.'
             );
 
-            CoexistenceService.applyMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+            CoexistenceService.applyMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
 
             System.assertEquals(
                 CoexistenceService.MEMBERSHIP_JUNCTION,
@@ -236,10 +236,10 @@ private class CoexistenceServiceTest {
     }
 
     @IsTest
-    static void anExplicitContactChoiceSurvivesAgentforceNonprofitDetection() {
+    static void anExplicitContactChoiceSurvivesNonprofitCloudDetection() {
         // Maria's org has Person Accounts switched on but stores everyone as a contact, and
         // she chose the simple way of belonging on purpose. Neither detection nor choosing
-        // the Agentforce Nonprofit mode by hand is allowed to override that choice.
+        // the Nonprofit Cloud mode by hand is allowed to override that choice.
         SettingsService.saveValues(
             new Map<String, Object>{
                 CoexistenceService.KEY_MEMBERSHIP_MODE => CoexistenceService.MEMBERSHIP_CONTACT
@@ -257,11 +257,11 @@ private class CoexistenceServiceTest {
             'Detection proposes the flexible way only where nobody has chosen.'
         );
 
-        CoexistenceService.setMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+        CoexistenceService.setMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
         Test.stopTest();
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_NONPROFIT_CLOUD,
             CoexistenceService.getCurrentMode(),
             'The coexistence mode itself is still set.'
         );

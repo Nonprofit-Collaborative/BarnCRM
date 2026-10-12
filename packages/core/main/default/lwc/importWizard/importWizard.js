@@ -52,13 +52,13 @@ import controlTotalsHeading from '@salesforce/label/c.Core_Import_ControlTotalsH
 import controlTotalsHelp from '@salesforce/label/c.Core_Import_ControlTotalsHelp';
 import expectedCountLabel from '@salesforce/label/c.Core_Import_ExpectedCountLabel';
 import expectedAmountLabel from '@salesforce/label/c.Core_Import_ExpectedAmountLabel';
-import donationMatchingHeading from '@salesforce/label/c.Core_Import_DonationMatchingHeading';
-import donationMatchingHelp from '@salesforce/label/c.Core_Import_DonationMatchingHelp';
-import donationMatchingLabel from '@salesforce/label/c.Core_Import_DonationMatchingLabel';
-import donationMatchOrCreate from '@salesforce/label/c.Core_Import_DonationMatchOrCreate';
-import donationAlwaysCreate from '@salesforce/label/c.Core_Import_DonationAlwaysCreate';
-import donationMatchOnly from '@salesforce/label/c.Core_Import_DonationMatchOnly';
-import donationNeverMatch from '@salesforce/label/c.Core_Import_DonationNeverMatch';
+import paymentMatchingHeading from '@salesforce/label/c.Core_Import_PaymentMatchingHeading';
+import paymentMatchingHelp from '@salesforce/label/c.Core_Import_PaymentMatchingHelp';
+import paymentMatchingLabel from '@salesforce/label/c.Core_Import_PaymentMatchingLabel';
+import paymentMatchOrCreate from '@salesforce/label/c.Core_Import_PaymentMatchingMatchOrCreate';
+import paymentAlwaysCreate from '@salesforce/label/c.Core_Import_PaymentMatchingAlwaysCreate';
+import paymentMatchOnly from '@salesforce/label/c.Core_Import_PaymentMatchingMatchOnly';
+import paymentNeverMatch from '@salesforce/label/c.Core_Import_PaymentMatchingNeverMatch';
 import matchWindowLabel from '@salesforce/label/c.Core_Import_MatchWindowLabel';
 import matchToleranceLabel from '@salesforce/label/c.Core_Import_MatchToleranceLabel';
 
@@ -112,22 +112,11 @@ const TARGETS = [
 ];
 
 /**
- * The gift columns offered where no module that loads gifts is installed: recognized, kept
- * with the row, and loaded by nothing. Where one is installed its own targets replace these
- * (R-IR6).
+ * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
+ * the targets an installed module supplies: with none installed, Core offers no gift column
+ * at all, and a suggested one becomes "Do not load" (the staged row still keeps the whole
+ * original line). NEXT-core-names-other-products-only-when-detected.md.
  */
-const GIFT_TARGETS_NOT_LOADED = [
-  { value: 'Gift.Amount__c', label: 'Gift: amount (kept with the row, not loaded yet)' },
-  { value: 'Gift.Gift_Date__c', label: 'Gift: date (kept with the row, not loaded yet)' },
-  { value: 'Gift.Type__c', label: 'Gift: payment method (kept with the row, not loaded yet)' },
-  {
-    value: 'Gift.Payment_Reference__c',
-    label: 'Gift: payment reference (kept with the row, not loaded yet)'
-  },
-  { value: 'Allocation.Fund', label: 'Gift: fund (kept with the row, not loaded yet)' }
-];
-
-/** The row entities a module outside Core loads (R-IR6). */
 const DEFERRED_ENTITY_PREFIXES = ['Gift.', 'Allocation.', 'SoftCredit.', 'Tribute.'];
 
 const RULES = [
@@ -171,7 +160,7 @@ export default class ImportWizard extends LightningElement {
   expectedCount = '';
   expectedAmount = '';
   /** How this mapping's gifts are matched to scheduled payments (R-IT7), as the template holds it. */
-  donationMatching = 'Match or create';
+  paymentMatching = 'Match or create';
   matchDateWindowDays = '';
   matchAmountTolerance = '';
 
@@ -205,9 +194,9 @@ export default class ImportWizard extends LightningElement {
     controlTotalsHelp,
     expectedCountLabel,
     expectedAmountLabel,
-    donationMatchingHeading,
-    donationMatchingHelp,
-    donationMatchingLabel,
+    paymentMatchingHeading,
+    paymentMatchingHelp,
+    paymentMatchingLabel,
     matchWindowLabel,
     matchToleranceLabel
   };
@@ -261,7 +250,7 @@ export default class ImportWizard extends LightningElement {
     }
     this.isRecurring = Boolean(template && template.isRecurring);
     this.sourceName = (template && template.sourceName) || '';
-    this.donationMatching = (template && template.donationMatching) || 'Match or create';
+    this.paymentMatching = (template && template.paymentMatching) || 'Match or create';
     this.matchDateWindowDays = numberText(template && template.matchDateWindowDays);
     this.matchAmountTolerance = numberText(template && template.matchAmountTolerance);
   }
@@ -376,8 +365,11 @@ export default class ImportWizard extends LightningElement {
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
     const parsed = JSON.parse(suggested || '{}');
+    const offered = new Set(this.targetOptions.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
-      targets[column.source] = column.target;
+      targets[column.source] = this.isOfferedTarget(column.target, offered)
+        ? column.target
+        : IGNORE;
     });
     this.columns = this.headers.map((heading) => ({
       key: heading,
@@ -397,11 +389,18 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
-    const giftTargets =
-      this.entityTargets.length > 0 ? this.entityTargets : GIFT_TARGETS_NOT_LOADED;
     return [{ label: doNotLoad, value: IGNORE }]
       .concat(TARGETS)
-      .concat(giftTargets.map((target) => ({ value: target.value, label: target.label })));
+      .concat(this.entityTargets.map((target) => ({ value: target.value, label: target.label })));
+  }
+
+  /**
+   * Whether a suggested target can be shown as chosen. A column a module would load is
+   * suggested only while that module offers it; without one it is left as "Do not load".
+   */
+  isOfferedTarget(target, offered) {
+    const deferred = DEFERRED_ENTITY_PREFIXES.some((prefix) => (target || '').startsWith(prefix));
+    return !deferred || offered.has(target);
   }
 
   /** Whether any column is mapped to something a module outside Core loads. */
@@ -424,17 +423,17 @@ export default class ImportWizard extends LightningElement {
     this.expectedAmount = event.target.value;
   }
 
-  get donationMatchingOptions() {
+  get paymentMatchingOptions() {
     return [
-      { value: 'Match or create', label: donationMatchOrCreate },
-      { value: 'Always create', label: donationAlwaysCreate },
-      { value: 'Match only', label: donationMatchOnly },
-      { value: 'Never match', label: donationNeverMatch }
+      { value: 'Match or create', label: paymentMatchOrCreate },
+      { value: 'Always create', label: paymentAlwaysCreate },
+      { value: 'Match only', label: paymentMatchOnly },
+      { value: 'Never match', label: paymentNeverMatch }
     ];
   }
 
-  handleDonationMatchingChange(event) {
-    this.donationMatching = event.detail.value;
+  handlePaymentMatchingChange(event) {
+    this.paymentMatching = event.detail.value;
   }
 
   handleMatchWindowChange(event) {
@@ -458,8 +457,8 @@ export default class ImportWizard extends LightningElement {
       const days = String(this.matchDateWindowDays || '').trim();
       const tolerance = String(this.matchAmountTolerance || '').trim();
       Object.assign(options, {
-        saveDonationMatching: true,
-        donationMatching: this.donationMatching,
+        savePaymentMatching: true,
+        paymentMatching: this.paymentMatching,
         matchDateWindowDays: days === '' ? null : Number(days),
         matchAmountTolerance: tolerance === '' ? null : Number(tolerance)
       });

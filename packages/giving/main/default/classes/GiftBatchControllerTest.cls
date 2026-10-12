@@ -8,7 +8,7 @@ private class GiftBatchControllerTest {
     private static User david() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 
@@ -155,7 +155,7 @@ private class GiftBatchControllerTest {
         User fundraiser = david();
         User treasurer = TestDataFactory.createUser(
             'Jen',
-            new List<String>{ 'Nonprofit_Read_Only', 'Giving_Read_Only' }
+            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
         );
         Gift_Batch__c tuesday;
         System.runAs(fundraiser) {
