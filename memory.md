@@ -31,13 +31,14 @@ Last refreshed from BMemory 2026-10-12.
 | D-21 | 2026-10-12 | "What's new" notes (C-27) are labelled by release; first is "0.6" |
 | D-22 | 2026-10-12 | New ADRs accepted: migration kit, Flow templates, suite choice first, Module Manager, interaction notes as Tasks, settings record pickers, Health Check schedules nightly jobs |
 | D-23 | 2026-10-12 | Platform capabilities: keep LWC, audit API 67.0 access modes, Apex Cursors, GraphQL in new screens, AI-ready action descriptions, cheap portability steps; avoid Data 360, Heroku AppLink, Functions and similar |
+| D-24 | 2026-10-12 | Telemetry (C-26) deferred indefinitely: no AppExchange for now; if listed later, prefer AppExchange App Analytics |
 
 ## Open questions still open (plan Section 11.2)
 
 - 1: Namespace registration (deferred; blocks package versions only).
 - 3: Dev Hub type (Partner Business Org or Developer Edition with a planned migration).
 - 4: Steward entity.
-- 7: Telemetry (C-26): include opt-in anonymous usage, default off. Awaiting owner input.
+- 7: Telemetry (C-26): resolved 2026-10-12, deferred indefinitely (D-24).
 - 12: Remove the three permission set groups that contain only the staff set before the first package version.
 - 14: Shipped import templates copied at install or at first use.
 - 16: Per-automation switches: optional end date or stay off until turned on.

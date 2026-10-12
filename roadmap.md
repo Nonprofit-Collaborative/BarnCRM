@@ -10,7 +10,7 @@ Status as of 2026-10-12 (main at PR #183). "Built" means built on a branch or op
 2. Land the 12 sibling PRs (#201 to #212) as one batch.
 3. Open PRs for the branches built 2026-10-12: C-32 import matching, C-34 Find, hub rebuild, C-24 Module Manager, C-30 suite choice, C-27 what's new, C-31 migration kit, Flow templates, C-39 interaction notes, UX core, rollup S1 to S5, AI-ready actions, portability checks, explicit access modes, household fixes (keep households with gifts, import undo), pledge payment picker.
 4. Rollup engine (D-16, D-18): S6 in progress, then S7 to S17 and the operations slice after S8.
-5. Telemetry (C-26): awaiting owner input.
+5. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
 6. Rollup trigger coverage on admin objects (S16) needs a production-type org to confirm.
 
 ## Iterations
@@ -27,7 +27,7 @@ Status as of 2026-10-12 (main at PR #183). "Built" means built on a branch or op
 | v0.8 | Volunteers | V-01 to V-08; C-24 and C-30 built | C-24, C-30 built; V-items planned |
 | v0.9 | Programs and Logic Models | P-01, P-02, P-04 to P-08, L-01 to L-04; C-39 built; G-19 if capacity | C-39 built; rest planned |
 | v0.10 | Funders and Nonprofit Cloud mirror | F-01 to F-08, X-07, L-06; X-05 | Planned |
-| v0.11 | Hardening | Security review, scale test, C-31, C-26 | C-31 built; C-26 awaiting owner input |
+| v0.11 | Hardening | Security review, scale test, C-31 (C-26 deferred indefinitely, D-24) | C-31 built |
 | v0.12 | Beta | Beta cohort, C-27 | C-27 built |
 | v0.13 | AppExchange | Listing, v1.0 on approval | Planned |
 
