@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Lets a user open Find: build, run, save and share queries and export the results to CSV.
+    Grants no access to any record or field; everything Find reads uses the user's own access.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Find and Export Records</label>
+</CustomPermission>

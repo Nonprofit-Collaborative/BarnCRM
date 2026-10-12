@@ -32,4 +32,44 @@
         <shortDescription>Refusal: a field cannot be sorted on. {0}: the field.</shortDescription>
         <value>This field cannot be used to sort: {0}. Choose another.</value>
     </labels>
+    <labels>
+        <fullName>Core_Find_ErrorNoPermission</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when the user lacks the Find and Export Records permission.</shortDescription>
+        <value>Find needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorNotYours</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when someone changes a saved query they do not own.</shortDescription>
+        <value>Only the person who saved this query can change, share or delete it. Use Save as to keep your own copy.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorNotFound</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when a saved query is gone or no longer shared.</shortDescription>
+        <value>This saved query no longer exists, or is no longer shared with you.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorName</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal when a saved query has no name or a name over 80 characters.</shortDescription>
+        <value>Give the query a name of up to 80 characters.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_UnexpectedError</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown when Find fails for a reason it cannot explain.</shortDescription>
+        <value>Something went wrong in Find. It has been recorded in the Error Log. Try again, and tell your administrator if it happens again.</value>
+    </labels>
 </CustomLabels>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Shared__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>True when everyone who uses Find can open this query. Find keeps the matching Apex managed share in step (R-SQ4).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Shown to everyone who uses Find. Change it in Find, which shares or unshares the query.</inlineHelpText>
+  <label>Shared</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>
