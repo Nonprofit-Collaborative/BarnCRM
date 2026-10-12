@@ -38,4 +38,8 @@
     <field>Navigation_Target__c</field>
     <value xsi:type="xsd:string">Receipts</value>
   </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">Giving_Settings__c</value>
+  </values>
 </CustomMetadata>
