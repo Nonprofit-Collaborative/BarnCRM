@@ -1395,7 +1395,7 @@ from Nonprofit Cloud", section 5).
 - **Service:** `ImportTemplateService` (materialization and save), `ImportTemplateSelector`,
   `ImportMapping` (the mapping document in R-IT1), `ImportColumnLibrary` (the known column
   names automatic mapping suggests from), LWC `importWizard` (where a template is marked
-  recurring), `HubController` and LWC `hubHome` (the recurring sources list, R-IT6).
+  recurring), `HubController` and LWC `hubRecurringFiles` (the recurring sources list, R-IT6).
 
 ---
 

@@ -26,9 +26,9 @@ nothing to configure.
 4. Click **Re-run** whenever you want a fresh look. Health Check reads your org each time;
    it never shows you a saved result.
 
-The BarnCRM home page does not carry a Health Check card today, although the Hub
-itself has shipped. The settings console is the way in, and it is the way that always
-works.
+An administrator also finds the same report on the BarnCRM home page, under the setup
+checklist. The settings console is the way in that always works, including for staff who
+do not see the home page copy and for an org where someone removed it from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says

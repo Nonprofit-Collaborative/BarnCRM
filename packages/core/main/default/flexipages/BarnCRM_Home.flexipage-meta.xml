@@ -1,22 +1,108 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The BarnCRM home page: welcome, setup checklist, automation banner, errors tile, and quick
-    links.
+    The BarnCRM home page. Each tile is its own component so an administrator can move, remove
+    or add tiles in the Lightning App Builder. The checklist, Health Check and status tiles are
+    shown only with the Manage BarnCRM Settings permission.
   </description>
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
-        <componentName>hubHome</componentName>
-        <identifier>hubHome1</identifier>
+        <componentName>hubWelcome</componentName>
+        <identifier>hubWelcome1</identifier>
       </componentInstance>
     </itemInstances>
-    <name>main</name>
+    <name>region1</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>hubErrors</componentName>
+        <identifier>hubErrors1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>hubRollups</componentName>
+        <identifier>hubRollups1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>hubSeasonalAddresses</componentName>
+        <identifier>hubSeasonalAddresses1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>hubRecurringFiles</componentName>
+        <identifier>hubRecurringFiles1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>hubQuickLinks</componentName>
+        <identifier>hubQuickLinks1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>region2</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>hubSetup</componentName>
+        <identifier>hubSetup1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>healthCheckPanel</componentName>
+        <identifier>healthCheckPanel1</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!$Permission.CustomPermission.Manage_BarnCRM_Settings}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>true</rightValue>
+          </criteria>
+        </visibilityRule>
+      </componentInstance>
+    </itemInstances>
+    <name>region3</name>
     <type>Region</type>
   </flexiPageRegions>
   <masterLabel>BarnCRM Home</masterLabel>
   <template>
-    <name>flexipage:defaultAppHomeTemplate</name>
+    <name>flexipage:appHomeTemplateHeaderTwoColumnsLeftSidebar</name>
   </template>
   <type>AppPage</type>
 </FlexiPage>
