@@ -16,6 +16,8 @@ public with sharing class BulkUpdateService {
     public static final Integer MAX_CHANGES = 5;
     /** How many records the preview shows before and after. */
     public static final Integer SAMPLE_SIZE = 5;
+    /** Records a chunk saves, so one journal page holds one chunk (R-IJ1). */
+    public static final Integer MAX_CHUNK = 200;
     /** The run limit's default and highest value (R-BU2). */
     public static final Integer MAX_RUN_LIMIT = 48000;
     /** Query rows left free for the reads around a count. */
@@ -315,6 +317,87 @@ public with sharing class BulkUpdateService {
             );
         }
         return count;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Start
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Starts a bulk update of at most `confirmedCount` records after counting again: refused
+     * when more records match now than were confirmed, or than the run limit allows (R-BU2).
+     * The job record is the package's own bookkeeping, written in system mode (ADR-0021); every
+     * record the job changes is saved in the person's own mode.
+     */
+    public static Import_Batch__c start(
+        String queryJson,
+        String changesJson,
+        Integer confirmedCount
+    ) {
+        Plan checked = plan(queryJson, changesJson);
+        if (confirmedCount == null || confirmedCount < 1) {
+            throw new BulkUpdateFields.BulkUpdateException(
+                System.Label.Core_BulkUpdate_ErrorConfirm
+            );
+        }
+        Integer ceiling = runLimit();
+        if (confirmedCount > ceiling) {
+            throw new BulkUpdateFields.BulkUpdateException(overLimit(ceiling));
+        }
+        Integer count = countWithin(checked, confirmedCount);
+        if (count > confirmedCount) {
+            throw new BulkUpdateFields.BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorMoreThanConfirmed,
+                    new List<Object>{ confirmedCount.format() }
+                )
+            );
+        }
+        Import_Batch__c job = createJob(checked, count, confirmedCount);
+        Id jobId = Database.executeBatch(new BulkUpdateBatch(job.Id), MAX_CHUNK);
+        job.Job_Id__c = jobId;
+        Database.update(
+            new Import_Batch__c(Id = job.Id, Job_Id__c = jobId),
+            AccessLevel.SYSTEM_MODE
+        );
+        return job;
+    }
+
+    /**
+     * The job record: committed when it starts, with its undo deadline stamped then, as an
+     * import's is, so a later change to the setting never moves it (R-IB7, R-BU2).
+     */
+    @TestVisible
+    private static Import_Batch__c createJob(Plan checked, Integer count, Integer confirmedCount) {
+        Datetime now = Datetime.now();
+        Import_Batch__c job = new Import_Batch__c(
+            Operation__c = OPERATION_UPDATE,
+            Operation_JSON__c = checked.definition(confirmedCount),
+            Status__c = ImportBatchService.STATUS_COMMITTING,
+            Is_Dry_Run__c = false,
+            Row_Count__c = count,
+            Rows_Created__c = 0,
+            Rows_Updated__c = 0,
+            Rows_Matched__c = 0,
+            Rows_Rejected__c = 0,
+            Chunk_Size__c = MAX_CHUNK,
+            Started_At__c = now,
+            Committed_By__c = UserInfo.getUserId(),
+            Undo_Deadline__c = now.addDays(ImportBatchService.undoWindowDays()),
+            Run_Log__c = String.format(
+                System.Label.Core_BulkUpdate_LogStarted,
+                new List<Object>{
+                    UserInfo.getName(),
+                    now.format(),
+                    count.format(),
+                    checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabelPlural(),
+                    confirmedCount.format()
+                }
+            )
+        );
+        Database.insert(job, AccessLevel.SYSTEM_MODE);
+        return job;
     }
 
     /** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BU2). */

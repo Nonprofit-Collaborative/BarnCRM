@@ -144,4 +144,52 @@
         <shortDescription>Refusal: too many records to count in one request.</shortDescription>
         <value>Too many records match to count in one go. Narrow the query, or run it in parts.</value>
     </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorConfirm</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: no confirmed count was given.</shortDescription>
+        <value>Type the number of records to confirm, then try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorMoreThanConfirmed</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more records match now than were confirmed.</shortDescription>
+        <value>More records match now than the {0} you confirmed. Nothing was changed. Preview again and confirm the new number.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_LogStarted</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log line: who started a bulk update, when, and on how many records.</shortDescription>
+        <value>{0} started a bulk update on {1}: {2} {3} matched; {4} confirmed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_LogStopped</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log line: a bulk update stopped before changing anything, and why.</shortDescription>
+        <value>Stopped before changing anything: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_LogFinished</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log line: what a bulk update did.</shortDescription>
+        <value>Finished: {0} updated, {1} already held the new values, {2} no longer matched, {3} failed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_LogJournalIncomplete</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log line: part of the journal could not be written.</shortDescription>
+        <value>Part of the journal could not be written, so some changes cannot be undone. See the Error Log.</value>
+    </labels>
 </CustomLabels>
