@@ -171,15 +171,16 @@ public with sharing class FindInlineEditService {
     }
 
     private static Id recordIdOf(Schema.SObjectType type, Object raw) {
+        Id recordId;
         try {
-            Id recordId = Id.valueOf(String.valueOf(raw));
-            if (recordId.getSObjectType() == type) {
-                return recordId;
-            }
+            recordId = Id.valueOf(String.valueOf(raw));
         } catch (Exception notAnId) {
-            // Refused below.
+            throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_Find_ErrorEditRecord);
         }
-        throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_Find_ErrorEditRecord);
+        if (recordId.getSObjectType() != type) {
+            throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_Find_ErrorEditRecord);
+        }
+        return recordId;
     }
 
     /** An empty value clears a field that may be empty; anything else is typed (R-BU4). */

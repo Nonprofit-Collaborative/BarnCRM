@@ -90,7 +90,7 @@ describe('c/findQueryText', () => {
     const document = parseQueryText(
       'SELECT Name, (SELECT Name, Email FROM Contacts LIMIT 3) FROM Account ' +
         "WHERE Id IN (SELECT Household__c FROM Gift__c WHERE Gift_Date__c = THIS_YEAR) AND Type = 'Household' " +
-        'AND Id NOT IN (SELECT AccountId FROM Case)'
+        'AND Id NOT IN (SELECT Organization__c FROM Affiliation__c)'
     );
     expect(document.children).toEqual([
       { relationship: 'Contacts', fields: ['Name', 'Email'], limit: 3 }
@@ -105,7 +105,7 @@ describe('c/findQueryText', () => {
           conditions: [{ id: 1, field: 'Gift_Date__c', operator: 'this year' }]
         }
       },
-      { object: 'Case', field: 'AccountId', has: false }
+      { object: 'Affiliation__c', field: 'Organization__c', has: false }
     ]);
     expect(document.filter.conditions).toEqual([
       { id: 1, field: 'Type', operator: 'equals', value: 'Household' }

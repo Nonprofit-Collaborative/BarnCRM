@@ -70,6 +70,10 @@ export default class FindRelatedPanel extends LightningElement {
     return this.relatedEntries();
   }
   set related(entries) {
+    // Find hands back what this panel just reported; keep the rows being edited.
+    if (JSON.stringify(entries || []) === this.lastRelated) {
+      return;
+    }
     this.conditions = (entries || []).map((entry) => ({
       key: this.key(),
       has: entry.has === false ? 'no' : 'yes',
@@ -87,6 +91,9 @@ export default class FindRelatedPanel extends LightningElement {
     return this.childEntries();
   }
   set children(entries) {
+    if (JSON.stringify(entries || []) === this.lastChildren) {
+      return;
+    }
     this.columns = (entries || []).map((entry) => ({
       key: this.key(),
       relationship: entry.relationship,
@@ -106,7 +113,7 @@ export default class FindRelatedPanel extends LightningElement {
     }
     this.loadedFor = this._objectApiName;
     try {
-      this.options = await listChildRelationships({ objectApiName: this._objectApiName });
+      this.options = (await listChildRelationships({ objectApiName: this._objectApiName })) || [];
       this.columns.forEach((column) => this.loadFields(column.relationship));
     } catch (error) {
       this.errorMessage = messageFrom(error);
@@ -210,11 +217,15 @@ export default class FindRelatedPanel extends LightningElement {
   }
 
   announce() {
+    const related = this.relatedEntries();
+    const children = this.childEntries();
+    this.lastRelated = JSON.stringify(related);
+    this.lastChildren = JSON.stringify(children);
     this.dispatchEvent(
       new CustomEvent('change', {
         detail: {
-          related: this.relatedEntries(),
-          children: this.childEntries(),
+          related,
+          children,
           valid: this.conditions.every((condition) => condition.valid)
         }
       })

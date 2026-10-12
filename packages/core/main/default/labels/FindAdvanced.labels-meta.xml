@@ -392,4 +392,28 @@
         <shortDescription>Button: remove a related records condition or column.</shortDescription>
         <value>Remove</value>
     </labels>
+    <labels>
+        <fullName>Core_Find_ExportExcel</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: download the results as an Excel workbook.</shortDescription>
+        <value>Export to Excel</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_EditSaved</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after table edits are saved. {0} saved count, {1} unchanged count.</shortDescription>
+        <value>Saved {0} records. {1} already held the values. Undo from the Bulk Update tab.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_EditFailed</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error after table edits when some rows failed. {0} failed count.</shortDescription>
+        <value>{0} records were not saved; each is marked in the table.</value>
+    </labels>
 </CustomLabels>

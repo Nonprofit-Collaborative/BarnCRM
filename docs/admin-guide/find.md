@@ -99,6 +99,9 @@ a value; the operators offered depend on the field:
   with the name of the person who shared each.
 - A shared query that names a field someone cannot see opens with that condition or column
   marked, and does not run for them until it is removed from their copy.
+- Another page, such as the Data Hygiene console, can open Find on a saved query. Find opens
+  that query and runs it straight away, as if you had chosen it from the list and pressed
+  **Run**. A query you cannot open (deleted, or not shared with you) is simply not opened.
 
 ## 6. Common mistakes
 

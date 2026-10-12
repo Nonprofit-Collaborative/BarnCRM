@@ -1,5 +1,11 @@
 import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import listObjects from '@salesforce/apex/FindController.listObjects';
+import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
+import saveEdits from '@salesforce/apex/FindController.saveEdits';
+import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
+import { CELL_TYPES, writeXlsx, xlsxFileName } from 'c/xlsxWriter';
+import { valueAt } from 'c/findCsv';
 import getPage from '@salesforce/apex/FindController.getPage';
 import previewQuery from '@salesforce/apex/FindController.previewQuery';
 import runQuery from '@salesforce/apex/FindController.runQuery';
@@ -50,6 +56,37 @@ import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
 import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
 import LOADING from '@salesforce/label/c.Core_Find_Loading';
 import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
+import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
+import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
+import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
+import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
+
+const XLSX_TYPES = {
+  currency: CELL_TYPES.NUMBER,
+  double: CELL_TYPES.NUMBER,
+  integer: CELL_TYPES.NUMBER,
+  long: CELL_TYPES.NUMBER,
+  percent: CELL_TYPES.NUMBER,
+  date: CELL_TYPES.DATE,
+  datetime: CELL_TYPES.DATETIME,
+  boolean: CELL_TYPES.BOOLEAN
+};
+/** Field types lightning-datatable can edit in place (C-36, R-SQ10). */
+const EDITABLE_TYPES = new Set([
+  'string',
+  'email',
+  'phone',
+  'url',
+  'currency',
+  'double',
+  'integer',
+  'percent',
+  'date',
+  'boolean'
+]);
+const TABLE_EDIT_TYPES = { email: 'email', phone: 'phone', url: 'url' };
+/** The page state key a link to a saved query uses: `c__savedQueryId`, or the namespace's. */
+const SAVED_QUERY_STATE = '__savedQueryId';
 
 const DEFAULT_ROWS = 200;
 const OFFERED_TYPES = new Set(['address', 'location', 'base64']);
@@ -96,6 +133,8 @@ export default class FindRecords extends LightningElement {
     soqlHelp: SOQL_HELP,
     run: RUN,
     export: EXPORT,
+    exportExcel: EXPORT_EXCEL,
+    summarize: SUMMARIZE,
     bulkUpdate: BULK_UPDATE,
     noResults: NO_RESULTS,
     savedQueries: SAVED_QUERIES,
@@ -134,6 +173,28 @@ export default class FindRecords extends LightningElement {
   infoVersion = 0;
   previewSequence = 0;
 
+  // Advanced Find (C-36): related records, the summary, and editing in the grid.
+  related = [];
+  children = [];
+  relatedValid = true;
+  aggregate;
+  childLabels = {};
+  editableFields = new Set();
+  draftValues = [];
+  tableErrors;
+  requestedSavedQueryId;
+
+  /** Another page (Data Hygiene, C-28) can link to Find with a saved query to open and run. */
+  @wire(CurrentPageReference)
+  handlePageReference(pageReference) {
+    const state = (pageReference && pageReference.state) || {};
+    const key = Object.keys(state).find((name) => name.endsWith(SAVED_QUERY_STATE));
+    if (key && state[key]) {
+      this.requestedSavedQueryId = state[key];
+      this.openRequested();
+    }
+  }
+
   @wire(listObjects)
   wiredObjects({ data, error }) {
     if (data) {
@@ -153,6 +214,21 @@ export default class FindRecords extends LightningElement {
     } catch (error) {
       this.errorMessage = this.messageFrom(error);
     }
+    this.openRequested();
+  }
+
+  /** Opens and runs the saved query a link asked for, once the saved queries are loaded. */
+  async openRequested() {
+    const requested = this.requestedSavedQueryId;
+    const query =
+      this.page &&
+      (this.page.savedQueries || []).find((candidate) => candidate.recordId === requested);
+    if (!query) {
+      return;
+    }
+    this.requestedSavedQueryId = undefined;
+    await this.openSaved(query);
+    await this.handleRun();
   }
 
   /* ---------- what the markup reads ---------- */
@@ -273,26 +349,64 @@ export default class FindRecords extends LightningElement {
   }
 
   get tableColumns() {
-    return this.columns.map((path) => ({
-      label: this.columnLabel(path),
-      fieldName: path,
-      type: TABLE_TYPES[this.fieldOf(path)?.dataType] || 'text'
-    }));
+    return this.outputColumns().map((column) => {
+      const dataType = column.field?.dataType;
+      const shown = {
+        label: column.label,
+        fieldName: column.key,
+        type: TABLE_EDIT_TYPES[dataType] || TABLE_TYPES[dataType] || 'text'
+      };
+      if (this.editableFields.has(column.key)) {
+        shown.editable = true;
+      }
+      return shown;
+    });
   }
 
   get tableRows() {
     return (this.rows || []).map((row) => {
       const flat = { Id: row.Id };
-      for (const path of this.columns) {
-        flat[path] = path
-          .split('.')
-          .reduce(
-            (value, name) => (value === undefined || value === null ? undefined : value[name]),
-            row
-          );
+      for (const column of this.outputColumns()) {
+        flat[column.key] = column.valueOf(row);
       }
       return flat;
     });
+  }
+
+  /**
+   * Every column the grid and the exports show: the chosen fields, then each related record
+   * column as text such as "Ana Ruiz, ana@example.org; Ben Ruiz, ben@example.org".
+   */
+  outputColumns() {
+    const fields = this.columns.map((path) => ({
+      key: path,
+      label: this.columnLabel(path),
+      field: this.fieldOf(path),
+      valueOf: (row) => valueAt(row, path)
+    }));
+    const related = this.children.map((child) => ({
+      key: child.relationship,
+      label: this.childLabels[child.relationship] || child.relationship,
+      field: undefined,
+      valueOf: (row) => {
+        const records = row[child.relationship];
+        const list = Array.isArray(records) ? records : (records && records.records) || [];
+        return list
+          .map((record) =>
+            child.fields
+              .map((path) => valueAt(record, path))
+              .filter((value) => value !== undefined && value !== null && value !== '')
+              .join(', ')
+          )
+          .join('; ');
+      }
+    }));
+    return [...fields, ...related];
+  }
+
+  /** The query as the summary panel reads it: the document without its summary. */
+  get summaryQueryJson() {
+    return this.hasObject && this.columns.length > 0 ? this.queryDocument(false) : '';
   }
 
   get hasRows() {
@@ -323,7 +437,7 @@ export default class FindRecords extends LightningElement {
 
   /* ---------- the query document ---------- */
 
-  queryDocument() {
+  queryDocument(withSummary = true) {
     const document = {
       version: 1,
       object: this.objectApiName,
@@ -336,6 +450,15 @@ export default class FindRecords extends LightningElement {
     if (this.sortField) {
       document.orderBy = [{ field: this.sortField, direction: this.sortDirection }];
     }
+    if (this.related.length > 0) {
+      document.related = this.related;
+    }
+    if (this.children.length > 0) {
+      document.children = this.children;
+    }
+    if (withSummary && this.aggregate) {
+      document.aggregate = this.aggregate;
+    }
     return JSON.stringify(document);
   }
 
@@ -346,7 +469,7 @@ export default class FindRecords extends LightningElement {
       return false;
     }
     const builder = this.template.querySelector('c-filter-builder');
-    if (!this.filterValid || (builder && !builder.reportValidity())) {
+    if (!this.filterValid || !this.relatedValid || (builder && !builder.reportValidity())) {
       this.errorMessage = FIX_CONDITIONS;
       return false;
     }
@@ -356,7 +479,12 @@ export default class FindRecords extends LightningElement {
   async refreshPreview() {
     // The bulk update panel acts on the query it was opened with; an edited query closes it.
     this.bulkQueryJson = undefined;
-    if (!this.objectApiName || this.columns.length === 0 || !this.filterValid) {
+    if (
+      !this.objectApiName ||
+      this.columns.length === 0 ||
+      !this.filterValid ||
+      !this.relatedValid
+    ) {
       this.soql = '';
       return;
     }
@@ -382,7 +510,105 @@ export default class FindRecords extends LightningElement {
     this.objectApiName = event.detail.value;
     await this.loadInfo(this.objectApiName);
     this.columns = this.defaultColumns();
+    this.loadEditable();
     this.refreshPreview();
+  }
+
+  handleRelatedChange(event) {
+    this.related = event.detail.related;
+    this.children = event.detail.children;
+    this.relatedValid = event.detail.valid;
+    this.loadChildLabels();
+    this.refreshPreview();
+  }
+
+  handleSummaryChange(event) {
+    this.aggregate = event.detail.aggregate;
+  }
+
+  /** A typed query, read into a document by findQueryTextPanel (R-SQ7), loads like a saved one. */
+  async handleTypedQuery(event) {
+    this.noticeMessage = undefined;
+    const keep = { openQueryId: this.openQueryId, queryName: this.queryName, shared: this.shared };
+    await this.work(async () => {
+      await this.loadDocument(event.detail.document);
+      Object.assign(this, keep);
+    });
+    this.refreshPreview();
+  }
+
+  handleCellChange(event) {
+    const byId = new Map(this.draftValues.map((draft) => [draft.Id, draft]));
+    for (const draft of event.detail.draftValues) {
+      byId.set(draft.Id, { ...(byId.get(draft.Id) || {}), ...draft });
+    }
+    this.draftValues = [...byId.values()];
+  }
+
+  handleCancelEdits() {
+    this.draftValues = [];
+    this.tableErrors = undefined;
+  }
+
+  /** Saves the grid's edits as the person, journaled and undoable (C-36, R-SQ10). */
+  async handleSaveEdits(event) {
+    const drafts = event.detail.draftValues;
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      const summary = await saveEdits({
+        objectApiName: this.objectApiName,
+        editsJson: JSON.stringify(drafts)
+      });
+      const result = await runQuery({ queryJson: this.queryDocument() });
+      this.rows = result.rows;
+      const failed = new Set(summary.errors.map((error) => error.recordId));
+      this.draftValues = drafts.filter((draft) => failed.has(draft.Id));
+      this.tableErrors = failed.size === 0 ? undefined : this.errorsFor(summary.errors, drafts);
+      this.noticeMessage = format(EDIT_SAVED, String(summary.saved), String(summary.unchanged));
+    });
+  }
+
+  errorsFor(errors, drafts) {
+    const rows = {};
+    for (const error of errors) {
+      const draft = drafts.find((candidate) => candidate.Id === error.recordId) || {};
+      rows[error.recordId] = {
+        title: EDIT_FAILED.split('{0}').join('1'),
+        messages: [error.message],
+        fieldNames: Object.keys(draft).filter((name) => name !== 'Id')
+      };
+    }
+    return {
+      rows,
+      table: { title: EDIT_FAILED.split('{0}').join(String(errors.length)), messages: [] }
+    };
+  }
+
+  /** The fields the person may edit in the grid: the object's own that bulk update may write. */
+  async loadEditable() {
+    this.editableFields = new Set();
+    if (!this.canBulkUpdate || !this.objectApiName) {
+      return;
+    }
+    // An object bulk update cannot write is simply not editable in the grid.
+    const targets = (await getTargets({ objectName: this.objectApiName }).catch(() => [])) || [];
+    this.editableFields = new Set(
+      targets.filter((target) => EDITABLE_TYPES.has(target.dataType)).map((t) => t.apiName)
+    );
+  }
+
+  async loadChildLabels() {
+    if (this.children.length === 0 || this.childLabels.loadedFor === this.objectApiName) {
+      return;
+    }
+    // Without the labels, a related record column is headed by its relationship name.
+    const options =
+      (await listChildRelationships({ objectApiName: this.objectApiName }).catch(() => [])) || [];
+    const labels = { loadedFor: this.objectApiName };
+    options.forEach((option) => {
+      labels[option.relationshipName] = option.label;
+    });
+    this.childLabels = labels;
   }
 
   handleColumnsChange(event) {
@@ -433,10 +659,21 @@ export default class FindRecords extends LightningElement {
       const result = await runQuery({ queryJson: this.queryDocument() });
       this.soql = result.soql;
       this.rows = result.rows;
+      this.draftValues = [];
+      this.tableErrors = undefined;
     });
   }
 
-  async handleExport() {
+  handleExport() {
+    return this.exportAs('csv');
+  }
+
+  handleExportExcel() {
+    return this.exportAs('xlsx');
+  }
+
+  /** Reads every page (R-SQ3) and writes CSV, or an Excel workbook (R-SQ11). */
+  async exportAs(kind) {
     this.noticeMessage = undefined;
     if (!this.checkReady()) {
       return;
@@ -458,12 +695,38 @@ export default class FindRecords extends LightningElement {
       }
       const stopped = rows.length >= limit && !done;
       rows = rows.slice(0, limit);
-      this.download(
-        toCsv(
-          this.columns.map((path) => ({ label: this.columnLabel(path), path })),
-          rows
-        )
-      );
+      const columns = this.outputColumns();
+      if (kind === 'xlsx') {
+        const bytes = await writeXlsx(
+          columns.map((column) => ({
+            label: column.label,
+            type: XLSX_TYPES[column.field?.dataType] || CELL_TYPES.TEXT
+          })),
+          rows.map((row) => columns.map((column) => column.valueOf(row))),
+          { sheetName: this.objectApiName }
+        );
+        this.download(
+          new Blob([bytes], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          }),
+          xlsxFileName(this.objectApiName)
+        );
+      } else {
+        // Each row as an array, so a column's path is its position.
+        const flat = rows.map((row) => columns.map((column) => column.valueOf(row)));
+        this.download(
+          new Blob(
+            [
+              toCsv(
+                columns.map((column, index) => ({ label: column.label, path: String(index) })),
+                flat
+              )
+            ],
+            { type: 'text/csv;charset=utf-8' }
+          ),
+          fileName(this.objectApiName)
+        );
+      }
       this.noticeMessage = stopped
         ? format(EXPORT_STOPPED, String(limit))
         : format(EXPORT_DONE, String(rows.length));
@@ -536,30 +799,43 @@ export default class FindRecords extends LightningElement {
     if (!query) {
       return;
     }
+    await this.openSaved(query);
+  }
+
+  async openSaved(query) {
     await this.work(async () => {
-      const document = JSON.parse(query.queryJson);
-      this.resetQuery();
-      this.objectApiName = document.object;
-      await this.loadInfo(this.objectApiName);
-      for (const path of document.fields || []) {
-        const segments = path.split('.');
-        for (let depth = 1; depth < segments.length; depth++) {
-          // A related path needs the one before it described first.
-          // eslint-disable-next-line no-await-in-loop
-          await this.addRelated(segments.slice(0, depth).join('.'));
-        }
-      }
-      this.columns = [...(document.fields || [])];
-      this.filterJson = document.filter ? JSON.stringify(document.filter) : '';
-      const order = (document.orderBy || [])[0];
-      this.sortField = order ? order.field : '';
-      this.sortDirection = order ? order.direction : 'ASC';
-      this.rowLimit = document.limit || DEFAULT_ROWS;
+      await this.loadDocument(JSON.parse(query.queryJson));
       this.openQueryId = query.recordId;
       this.queryName = query.name;
       this.shared = query.shared === true;
     });
     this.refreshPreview();
+  }
+
+  /** Loads a query document into the builder: a saved query's, or a typed one's. */
+  async loadDocument(document) {
+    this.resetQuery();
+    this.objectApiName = document.object;
+    await this.loadInfo(this.objectApiName);
+    for (const path of document.fields || []) {
+      const segments = path.split('.');
+      for (let depth = 1; depth < segments.length; depth++) {
+        // A related path needs the one before it described first.
+        // eslint-disable-next-line no-await-in-loop
+        await this.addRelated(segments.slice(0, depth).join('.'));
+      }
+    }
+    this.columns = [...(document.fields || [])];
+    this.filterJson = document.filter ? JSON.stringify(document.filter) : '';
+    const order = (document.orderBy || [])[0];
+    this.sortField = order ? order.field : '';
+    this.sortDirection = order ? order.direction : 'ASC';
+    this.rowLimit = document.limit || DEFAULT_ROWS;
+    this.related = document.related || [];
+    this.children = document.children || [];
+    this.aggregate = document.aggregate;
+    this.loadChildLabels();
+    this.loadEditable();
   }
 
   /* ---------- helpers ---------- */
@@ -579,6 +855,12 @@ export default class FindRecords extends LightningElement {
     this.queryName = '';
     this.shared = false;
     this.bulkQueryJson = undefined;
+    this.related = [];
+    this.children = [];
+    this.relatedValid = true;
+    this.aggregate = undefined;
+    this.draftValues = [];
+    this.tableErrors = undefined;
   }
 
   async work(action) {
@@ -677,10 +959,10 @@ export default class FindRecords extends LightningElement {
       : leaf;
   }
 
-  download(csv) {
+  download(blob, name) {
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    link.download = fileName(this.objectApiName);
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
     link.click();
     URL.revokeObjectURL(link.href);
   }

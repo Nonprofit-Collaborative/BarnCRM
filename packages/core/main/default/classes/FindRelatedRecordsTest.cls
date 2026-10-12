@@ -131,7 +131,7 @@ private class FindRelatedRecordsTest {
     static void aRelatedRecordColumnListsTheNewestRelatedRecords() {
         makeJobs();
         Map<String, Object> column = new Map<String, Object>{
-            'relationship' => 'Import_Journals',
+            'relationship' => 'Import_Journals__r',
             'fields' => new List<Object>{ 'Phase__c', 'Entry_Count__c' },
             'limit' => 1
         };
@@ -145,13 +145,13 @@ private class FindRelatedRecordsTest {
 
         System.Assert.isTrue(
             compiled.soql.contains(
-                '(SELECT Id, Phase__c, Entry_Count__c FROM Import_Journals ORDER BY CreatedDate DESC LIMIT 1)'
+                '(SELECT Id, Phase__c, Entry_Count__c FROM Import_Journals__r ORDER BY CreatedDate DESC LIMIT 1)'
             ),
             'The column is a subquery: ' + compiled.soql
         );
         Integer withPages = 0;
         for (SObject row : rows) {
-            List<SObject> pages = row.getSObjects('Import_Journals');
+            List<SObject> pages = row.getSObjects('Import_Journals__r');
             if (pages != null && !pages.isEmpty()) {
                 System.Assert.areEqual(1, pages.size(), 'At most the limit per record');
                 withPages++;
@@ -211,7 +211,7 @@ private class FindRelatedRecordsTest {
                 null,
                 new List<Object>{
                     new Map<String, Object>{
-                        'relationship' => 'Import_Journals',
+                        'relationship' => 'Import_Journals__r',
                         'fields' => new List<Object>{ 'Phase__c' },
                         'limit' => 11
                     }
@@ -242,7 +242,7 @@ private class FindRelatedRecordsTest {
             );
             FindRelatedRecords.ChildOption journalsOption = null;
             for (FindRelatedRecords.ChildOption option : options) {
-                if (option.relationshipName == 'Import_Journals') {
+                if (option.relationshipName == 'Import_Journals__r') {
                     journalsOption = option;
                 }
             }

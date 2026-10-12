@@ -9,6 +9,30 @@ import saveQuery from '@salesforce/apex/FindController.saveQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import getBulkPage from '@salesforce/apex/BulkUpdateController.getPage';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
+import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
+import saveEdits from '@salesforce/apex/FindController.saveEdits';
+import * as navigation from 'lightning/navigation';
+import { TextEncoder as NodeTextEncoder } from 'util';
+
+// jsdom has no TextEncoder; the Excel writer needs one, as browsers have.
+global.TextEncoder = global.TextEncoder || NodeTextEncoder;
+
+jest.mock(
+  '@salesforce/apex/FindController.listChildRelationships',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/apex/FindController.saveEdits', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/FindController.summarize', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Core_Find_EditSaved',
+  () => ({ default: 'Saved {0}. {1} unchanged.' }),
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/FindController.listObjects',
@@ -324,5 +348,161 @@ describe('c-find-records', () => {
     await choose(one(element, 'columns'), ['Name', 'Amount__c']);
 
     expect(element.shadowRoot.querySelector('c-bulk-update')).toBeNull();
+  });
+
+  /* ---------- Advanced Find (C-36) ---------- */
+
+  it('opens and runs the saved query a link names in its page state', async () => {
+    runQuery.mockResolvedValue({ soql: 'SELECT ...', rows: [] });
+    const element = await render();
+    // Reached through the module namespace: a wire adapter may only be named in @wire.
+    navigation.CurrentPageReference.emit({ state: { c__savedQueryId: 'a0X000000000001AAA' } });
+    await flush();
+    await flush();
+    await flush();
+
+    expect(one(element, 'saved').value).toBe('a0X000000000001AAA');
+    expect(one(element, 'columns').value).toEqual(['Name', 'Donor_Contact__r.LastName']);
+    expect(runQuery).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(runQuery.mock.calls[0][0].queryJson)).toEqual(
+      expect.objectContaining({ object: 'Gift__c', limit: 50 })
+    );
+  });
+
+  it('loads a typed query into the builder', async () => {
+    const element = await render();
+    await choose(one(element, 'object'), 'Contact');
+    const panel = element.shadowRoot.querySelector('c-find-query-text-panel');
+    panel.dispatchEvent(
+      new CustomEvent('apply', {
+        detail: {
+          document: {
+            version: 1,
+            object: 'Gift__c',
+            fields: ['Name', 'Amount__c'],
+            filter: {
+              version: 1,
+              conditions: [{ id: 1, field: 'Amount__c', operator: 'greater than', value: 5 }]
+            },
+            limit: 10
+          }
+        }
+      })
+    );
+    await flush();
+    await flush();
+
+    expect(one(element, 'object').value).toBe('Gift__c');
+    expect(one(element, 'columns').value).toEqual(['Name', 'Amount__c']);
+    expect(one(element, 'row-limit').value).toBe(10);
+    const sent = JSON.parse(previewQuery.mock.calls.pop()[0].queryJson);
+    expect(sent.filter.conditions).toHaveLength(1);
+  });
+
+  it('exports the results as an Excel workbook', async () => {
+    exportPage.mockResolvedValue({
+      rows: [{ Id: '1', Name: 'A', Amount__c: 12.5 }],
+      lastId: '1',
+      done: true
+    });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), ['Name', 'Amount__c']);
+    one(element, 'export-excel').click();
+    await flush();
+    await flush();
+
+    expect(one(element, 'error-message')).toBeNull();
+    const blob = global.URL.createObjectURL.mock.calls[0][0];
+    expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    expect(blob.size).toBeGreaterThan(0);
+    expect(one(element, 'notice-message').textContent).toBe('Exported 1 rows.');
+  });
+
+  it('saves grid edits as the person and marks the rows that failed', async () => {
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
+    getTargets.mockResolvedValue([
+      { apiName: 'Amount__c', dataType: 'currency' },
+      { apiName: 'Donor_Contact__c', dataType: 'reference' }
+    ]);
+    runQuery.mockResolvedValue({
+      soql: 'SELECT ...',
+      rows: [
+        { Id: 'a01', Name: 'G-1', Amount__c: 5 },
+        { Id: 'a02', Name: 'G-2', Amount__c: 6 }
+      ]
+    });
+    saveEdits.mockResolvedValue({
+      saved: 1,
+      unchanged: 0,
+      jobId: 'a0J1',
+      errors: [{ recordId: 'a02', message: 'Amount is too large.' }]
+    });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), ['Name', 'Amount__c']);
+    one(element, 'run').click();
+    await flush();
+    await flush();
+
+    const table = one(element, 'results');
+    expect(table.columns.map((column) => Boolean(column.editable))).toEqual([false, true]);
+    const drafts = [
+      { Id: 'a01', Amount__c: '7' },
+      { Id: 'a02', Amount__c: '9999999' }
+    ];
+    table.dispatchEvent(new CustomEvent('save', { detail: { draftValues: drafts } }));
+    await flush();
+    await flush();
+
+    expect(saveEdits).toHaveBeenCalledWith({
+      objectApiName: 'Gift__c',
+      editsJson: JSON.stringify(drafts)
+    });
+    expect(one(element, 'results').draftValues).toEqual([drafts[1]]);
+    expect(one(element, 'results').errors.rows.a02.messages).toEqual(['Amount is too large.']);
+    expect(one(element, 'notice-message').textContent).toBe('Saved 1. 0 unchanged.');
+  });
+
+  it('shows a related record column as text and asks for the related records', async () => {
+    listChildRelationships.mockResolvedValue([
+      {
+        label: 'Payments (Gift)',
+        relationshipName: 'Payments__r',
+        objectName: 'Payment__c',
+        field: 'Gift__c',
+        filterable: true
+      }
+    ]);
+    runQuery.mockResolvedValue({
+      soql: 'SELECT ...',
+      rows: [
+        {
+          Id: 'a01',
+          Name: 'G-1',
+          Payments__r: {
+            records: [
+              { Id: 'p1', Name: 'P-1', Status__c: 'Paid' },
+              { Id: 'p2', Name: 'P-2', Status__c: null }
+            ]
+          }
+        }
+      ]
+    });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    const children = [{ relationship: 'Payments__r', fields: ['Name', 'Status__c'], limit: 10 }];
+    element.shadowRoot
+      .querySelector('c-find-related-panel')
+      .dispatchEvent(new CustomEvent('change', { detail: { related: [], children, valid: true } }));
+    await flush();
+    one(element, 'run').click();
+    await flush();
+    await flush();
+
+    expect(JSON.parse(runQuery.mock.calls[0][0].queryJson).children).toEqual(children);
+    const table = one(element, 'results');
+    expect(table.columns[1].label).toBe('Payments (Gift)');
+    expect(table.data[0].Payments__r).toBe('P-1, Paid; P-2');
   });
 });

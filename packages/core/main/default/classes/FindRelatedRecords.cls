@@ -133,7 +133,7 @@ public with sharing class FindRelatedRecords {
         return rendered;
     }
 
-    /** `(SELECT Id, fields FROM Relationship ORDER BY CreatedDate DESC LIMIT n)`. */
+    /** A subquery over the named child relationship, newest first, at most `limit` rows. */
     public static Rendered childColumn(String parentObject, Object rawEntry) {
         Map<String, Object> entry = asMap(rawEntry);
         String name = String.valueOf(entry.get('relationship'));
