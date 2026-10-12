@@ -64,6 +64,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>DataHygieneController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DuplicateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -1475,6 +1479,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Find</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Data_Hygiene</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

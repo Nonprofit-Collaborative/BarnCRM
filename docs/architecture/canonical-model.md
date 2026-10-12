@@ -5489,6 +5489,14 @@ and write runs as the user.
 **R-SQ5 Permission.** Every Find action requires the `Find_And_Export_Records` custom
 permission, which opens the tool and grants no record access.
 
+**R-SQ6 Data hygiene copies (C-28).** The Data Hygiene tab builds each check's query document
+in code when it is counted or opened, from schema tokens and the org's membership mode; no
+check is stored in the package. Its count is `SELECT COUNT()` over that same document, bound
+and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved Query owned by
+the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
+own saved query of that name if there is one. Nothing else about Saved Query changes
+(ADR-NEXT, `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+
 **R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
 in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists
 what each accepts). The browser parses it into a query document and loads that document into
@@ -5550,6 +5558,8 @@ third-party code (the same reasoning as ADR-0049).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
+- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data Hygiene tab
+  (app page `Data_Hygiene`, component `dataHygieneConsole`).
 
 ---
 
@@ -5805,6 +5815,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.7 | 2026-10-12 | C-35 bulk update (ADR-NEXT, `NEXT-bulk-update-runs-as-the-user-from-a-find-query.md`). New Section 29E, rules R-BU1 to R-BU6; no new object. `Import_Batch__c` gains `Operation__c` (Import, Update) and `Operation_JSON__c`, and Section 16's definition covers both kinds of data job. R-IJ2 and R-IJ3: the journal gains the Failed entry. BarnCRM Settings gains `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Update_Records` and permission set `BarnCRM_Bulk_Update`. |
 | v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-NEXT `NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
 | 1.x | 2026-10-12 | C-36 Advanced Find (ADR-NEXT, `NEXT-typed-find-queries-are-parsed-into-the-query-document.md`). No object, field or settings key added. R-SQ1 gains three optional keys at version 1 (`related`, `children`, `aggregate`). New rules R-SQ7 (typed queries parsed in the browser into the document), R-SQ8 (related-records conditions as semi-joins and anti-joins, related record columns as subqueries), R-SQ9 (summaries), R-SQ10 (editing results, journaled as an Update data job) and R-SQ11 (Excel export). New service `FindInlineEditService`. |
+| v0.7 | 2026-10-12 | C-28 Data hygiene console. No object or field added. New rule R-SQ6: the Data Hygiene tab builds each check's query document in code, counts it in user mode over the same document, and opens it in Find by saving an unshared Saved Query owned by the person. The checks read rules already defined: R-C1 and R-M2 (no household), R-H11 (Member Count), R-M4 (a membership naming nobody), R-AD1 (an address with no owner), R-AD3 (the default address) and R-AD6 (Verification Status). ADR-NEXT `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`. |
 
 ---
 ## 32. Entity ownership by package

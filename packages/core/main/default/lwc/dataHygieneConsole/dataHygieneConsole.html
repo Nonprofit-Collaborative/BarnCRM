@@ -1,0 +1,64 @@
+<template>
+  <lightning-card title={labels.pageTitle} icon-name="standard:data_integration_hub">
+    <lightning-button
+      slot="actions"
+      label={labels.recount}
+      onclick={handleRecount}
+      disabled={busy}
+      data-id="recount"
+    ></lightning-button>
+    <div class="slds-p-horizontal_medium slds-is-relative">
+      <p class="slds-m-bottom_xx-small">{labels.intro}</p>
+      <p class="slds-text-color_weak slds-m-bottom_medium">{labels.healthCheckNote}</p>
+      <template lwc:if={errorMessage}>
+        <div class="slds-text-color_error slds-m-bottom_small" role="alert" data-id="error">
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={busy}>
+        <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+      </template>
+      <ul class="slds-has-dividers_bottom-space" aria-busy={ariaBusy}>
+        <template for:each={rows} for:item="check">
+          <li key={check.key} class="slds-item" data-key={check.key}>
+            <section aria-labelledby={check.headingId}>
+              <lightning-layout multiple-rows vertical-align="center">
+                <lightning-layout-item size="12" medium-device-size="8" padding="around-small">
+                  <h3 class="slds-text-heading_small" id={check.headingId}>{check.title}</h3>
+                  <p>{check.description}</p>
+                  <template lwc:if={check.note}>
+                    <p class="slds-text-color_weak slds-m-top_xx-small" data-id="note">
+                      {check.note}
+                    </p>
+                  </template>
+                  <template lwc:if={check.errorMessage}>
+                    <p class="slds-text-color_error slds-m-top_xx-small" data-id="check-error">
+                      {check.errorMessage}
+                    </p>
+                  </template>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" medium-device-size="2" padding="around-small">
+                  <template lwc:if={check.hasCount}>
+                    <p class="slds-text-heading_medium" data-id="count">{check.countLabel}</p>
+                    <p class="slds-text-body_small slds-text-color_weak">{labels.recordsFound}</p>
+                  </template>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" medium-device-size="2" padding="around-small">
+                  <template lwc:if={check.canOpenInFind}>
+                    <lightning-button
+                      label={labels.openInFind}
+                      data-key={check.key}
+                      data-id="open"
+                      onclick={handleOpen}
+                      disabled={busy}
+                    ></lightning-button>
+                  </template>
+                </lightning-layout-item>
+              </lightning-layout>
+            </section>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </lightning-card>
+</template>

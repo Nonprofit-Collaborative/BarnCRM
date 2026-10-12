@@ -151,3 +151,4 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | UX review item 2 | [A donor's giving on their record](donor-records.md) | Giving | v0.6 |
 | C-34 Find and export | [find.md](find.md) | Core | v0.7 |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |
+| C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
