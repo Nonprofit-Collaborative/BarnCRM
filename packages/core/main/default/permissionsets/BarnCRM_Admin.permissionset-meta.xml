@@ -1455,6 +1455,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Data_Hygiene</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>

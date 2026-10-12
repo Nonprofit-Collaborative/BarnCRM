@@ -48,6 +48,10 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
+    <tab>Data_Hygiene</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Find</tab>
     <visibility>Visible</visibility>
   </tabSettings>

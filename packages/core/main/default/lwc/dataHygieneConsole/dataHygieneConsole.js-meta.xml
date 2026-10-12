@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Data hygiene (C-28): counts records that need tidying with the user's own access, and opens
+    each check in Find as the user's own saved query. Never changes a record.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Data Hygiene</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>
