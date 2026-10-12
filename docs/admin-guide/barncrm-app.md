@@ -3,7 +3,7 @@
 ## What it does
 
 The BarnCRM app is the app you work in every day, whatever kind of organization you are.
-Before version 0.6 it was called the Nonprofit Hub. It gives you one home page that tells
+It gives you one home page that tells
 you what to do next, a setup checklist that remembers how far you got, and a short list of
 the places you go most: your households, your people, your organizations, and your
 settings.
@@ -13,9 +13,9 @@ is the answer to that question. You start here.
 
 ## How to turn it on
 
-There is nothing to turn on. The app is installed with BarnCRM Core. The Giving module
-adds its own app, **Fundraising**, for entering gifts and reading the giving numbers; the
-home page lists it under **Modules** once Giving is installed.
+There is nothing to turn on. The app is installed with BarnCRM Core. A module can add its
+own app, and the home page lists it under **Modules** once that module is installed (with
+Giving, that is the **Fundraising** app).
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
 2. Type `BarnCRM` and choose **BarnCRM**.
@@ -40,10 +40,11 @@ Maria has just installed BarnCRM and has the sample data loaded.
    have got, for example "3 of 8" (seven steps with Core alone, eight with Giving). The steps are guided: each one is done here, on the home
    page, not somewhere else.
 3. The first step, **Confirm how BarnCRM fits your existing org**, says what it found in
-   your org. If your org uses Person Accounts, as Nonprofit Cloud orgs do, it says so
-   plainly, recommends Agentforce Nonprofit coexistence, and household membership uses the
-   junction model so that what you already have keeps working. Click **Confirm and
-   continue**.
+   your org and recommends a fit. On a fresh org it says "This looks like a fresh org, with
+   no other household model and no Person Accounts. BarnCRM can run on its own." and
+   recommends **Standalone**. If your org uses Person Accounts, it says so plainly, and
+   household membership uses one record per person so that what you already have keeps
+   working. Click **Confirm and continue**.
 4. Use **Next**, **Back**, and **Skip for now** to move around. Skipping does not mark a
    step done: it moves the step out of the way and offers it to you again next time. The
    full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).

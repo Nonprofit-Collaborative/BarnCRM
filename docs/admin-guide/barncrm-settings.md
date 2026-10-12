@@ -2,7 +2,7 @@
 
 ## What it does
 
-BarnCRM Settings (called Nonprofit Settings before version 0.6) is the one page where
+BarnCRM Settings is the one page where
 everything about how BarnCRM behaves is changed: how households are named, which
 automations run, who has access, and how this org fits alongside anything you already had.
 Settings are grouped into sections on the left, every setting has a plain-language
@@ -54,7 +54,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    showing the setting, the old value, the new value, your name, and the time. Nothing is
    ever changed silently: one row is written per setting you actually changed, and saving a
    page without changing anything writes nothing.
-7. Now sign in as David, who has the Fundraising Staff role and not Manage BarnCRM
+7. Now sign in as David, who has the Program Staff role and not Manage BarnCRM
    Settings. He opens the same tab and sees the same sections and the same values, with a
    notice across the top: "You can read these settings but not change them. Ask your
    administrator for the Manage BarnCRM Settings permission." Every control is greyed
@@ -76,9 +76,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
   replaced.
 - **Wondering whether a nightly job or another page changed your settings.** A job saves only
   its own run details (when it ran and what it did), and a page such as Accounting Periods
-  saves only its own setting. A setting that ships switched on, such as applying gifts to
-  installments, household soft credits, or printing the logo on receipts, stays on until
-  someone switches it off, even when a job was the first thing ever to save your settings.
+  saves only its own setting. A setting that ships switched on (with Giving, for example,
+  printing the logo on receipts) stays on until someone switches it off, even when a job was
+  the first thing ever to save your settings.
 - **Looking for a setting in Setup because it is not in the section you expected.** Use the
   search box before you go hunting. It searches the setting name, the description, and the
   section name, so `greeting`, `household`, or `pause` all find something.

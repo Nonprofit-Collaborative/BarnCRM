@@ -12,7 +12,7 @@ record carries a **Household** panel that names the household they belong to and
 it, so you can get from a person to their household and back without searching.
 
 The primary contact is the person letters are addressed to when only one person can be.
-Receipts, acknowledgments and mail merges read it, so a household with the wrong primary
+Mail merges read it (and, with Giving, receipts and acknowledgments), so a household with the wrong primary
 contact sends its mail to the wrong person.
 
 ## How to turn it on
