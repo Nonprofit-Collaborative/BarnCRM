@@ -23,7 +23,7 @@ public with sharing class CustomMetadataManagerSelector {
 
     /** Every row of the type, shipped and the organization's own, by label. */
     public static List<StoredRow> selectRows(Schema.SObjectType type, List<String> fieldNames) {
-        String typeName = type.getDescribe().getName();
+        String typeName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
         if (rowsOverride != null) {
             List<StoredRow> rows = rowsOverride.get(typeName);
             return rows == null ? new List<StoredRow>() : rows;
@@ -31,15 +31,22 @@ public with sharing class CustomMetadataManagerSelector {
         List<String> columns = new List<String>{ 'DeveloperName', 'MasterLabel' };
         columns.addAll(fieldNames);
         // The type and its field names come from the service's own registry, never from the
-        // caller, so nothing user supplied reaches this query.
-        String soql =
+        // caller, so nothing user supplied reaches this query; they are escaped regardless.
+        String soql = String.escapeSingleQuotes(
             'SELECT ' +
-            String.join(columns, ', ') +
-            ' FROM ' +
-            typeName +
-            ' WITH SYSTEM_MODE ORDER BY MasterLabel LIMIT 2000';
+                String.join(columns, ', ') +
+                ' FROM ' +
+                typeName +
+                ' ORDER BY MasterLabel LIMIT 2000'
+        );
         List<StoredRow> rows = new List<StoredRow>();
-        for (SObject record : Database.query(soql)) {
+        for (
+            SObject record : Database.queryWithBinds(
+                soql,
+                new Map<String, Object>(),
+                AccessLevel.SYSTEM_MODE
+            )
+        ) {
             StoredRow row = new StoredRow();
             row.developerName = (String) record.get('DeveloperName');
             row.label = (String) record.get('MasterLabel');
