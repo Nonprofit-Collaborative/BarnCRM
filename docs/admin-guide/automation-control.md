@@ -12,8 +12,9 @@ spreadsheet, then let it turn itself back on. You never have to call anyone to g
 unstuck.
 
 A small number of automations are not switches at all. They enforce a rule rather than
-doing something for you, and BarnCRM runs them whatever this page says: the receipt
-lock on gifts is the first of them. They are still listed here, so you can find them and
+doing something for you, and BarnCRM runs them whatever this page says. Today they all
+come with the Giving module (the receipt lock on gifts is the first of them). They are still
+listed here, so you can find them and
 read what they do, but their switch is off, greyed out, and carries a line explaining that
 the automation always runs. See "Automations that always run" below.
 
@@ -112,7 +113,7 @@ the line "This automation enforces a rule, so it always runs. It cannot be switc
 here and a pause does not suspend it." Clicking the switch does nothing, and if a change
 somehow reaches the server it is refused with the same explanation.
 
-Three ship today:
+Three ship today, all with the Giving module, so an org with Core alone has none:
 
 - **Gift: receipt lock** refuses a change to the amount, the date, the donor or the receipt
   number of a gift that carries a receipt number, and refuses to delete such a gift. That
@@ -122,7 +123,7 @@ Three ship today:
   in a closed period. See [Posting and Closed Periods](posting-and-closed-periods.md); that
   lock has its own override, Override Posting Lock.
 
-If you genuinely have to change a receipted gift, there is a way, and it is deliberately
+With Giving, if you genuinely have to change a receipted gift, there is a way, and it is deliberately
 not on this page. It is the Override Receipt Lock permission, described under "Lifting the
 receipt lock" on the [Gifts page](gifts.md). Every change made with it is written to the
 [Error Log](error-log.md).
@@ -138,9 +139,9 @@ receipt lock" on the [Gifts page](gifts.md). Every change made with it is writte
   the recompute action on the Households page.
 - **Expecting the pause to suspend everything.** It does not, and it never did what its
   name suggests for the rules that refuse a change. The pause stops the housekeeping:
-  households, names, greetings, default allocations. An automation marked as always running
-  keeps running through the pause, so a receipted gift stays locked while everything else is
-  paused for your import.
+  households, names, greetings (and, with Giving, default allocations). An automation marked
+  as always running keeps running through the pause: with Giving, a receipted gift stays
+  locked while everything else is paused for your import.
 - **Expecting pause to undo work already done.** Pause stops future automation. It does
   not roll back anything that already ran. If something ran that you did not want, fix the
   records themselves.

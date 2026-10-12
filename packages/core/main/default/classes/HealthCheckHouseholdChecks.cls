@@ -38,7 +38,7 @@ public with sharing class HealthCheckHouseholdChecks {
 
     private static HealthCheckService.Finding peopleWithoutHouseholdFinding() {
         Id householdType = HouseholdService.householdRecordTypeId();
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         Boolean expected = settings != null && settings.Auto_Create_Households__c == true;
         if (householdType == null || !expected) {
             return null;

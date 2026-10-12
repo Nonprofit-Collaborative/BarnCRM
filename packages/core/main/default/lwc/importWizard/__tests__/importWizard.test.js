@@ -52,7 +52,7 @@ jest.mock('@salesforce/apex/ImportController.getEntityTargets', () => ({ default
 
 const TEMPLATE = {
   id: 'a01',
-  name: 'Generic donor list',
+  name: 'Generic contact list',
   description: 'A list of people with their contact details.',
   matchingRule: 'Email exact',
   personMode: 'Contacts',
@@ -140,7 +140,7 @@ describe('the import wizard', () => {
     const element = render();
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="template"]').options).toEqual([
-      { label: 'Generic donor list', value: 'a01' }
+      { label: 'Generic contact list', value: 'a01' }
     ]);
   });
 
@@ -445,10 +445,35 @@ describe('the import wizard', () => {
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).expectedAmount).toBe(125.5);
   });
 
+  it('offers no gift column without a module, and leaves a suggested one unloaded', async () => {
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [
+          { source: 'Last Name', target: 'Contact1.LastName' },
+          { source: 'Email', target: 'Contact1.Email' },
+          { source: 'Notes', target: 'Gift.Amount__c' }
+        ]
+      })
+    );
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const pickers = element.shadowRoot.querySelectorAll(
+      '[data-id="column-row"] lightning-combobox'
+    );
+    const labels = pickers[0].options.map((option) => option.label);
+    expect(labels.some((label) => label.startsWith('Gift'))).toBe(false);
+    expect(pickers[2].value).toBe('Ignore');
+    expect(pickers[0].value).toBe('Contact1.LastName');
+  });
+
   it('shows how gifts match scheduled payments, from the template, and saves the choice', async () => {
     getEntityTargets.mockResolvedValue([{ value: 'Gift.Amount__c', label: 'Gift: amount' }]);
     getTemplates.mockResolvedValue([
-      { ...TEMPLATE, donationMatching: 'Match only', matchDateWindowDays: 3 }
+      { ...TEMPLATE, paymentMatching: 'Match only', matchDateWindowDays: 3 }
     ]);
     suggestMapping.mockResolvedValue(
       JSON.stringify({
@@ -461,7 +486,7 @@ describe('the import wizard', () => {
       })
     );
     const element = await toMatchingStep();
-    const choice = element.shadowRoot.querySelector('[data-id="donation-matching"]');
+    const choice = element.shadowRoot.querySelector('[data-id="payment-matching"]');
     expect(choice.value).toBe('Match only');
     expect(element.shadowRoot.querySelector('[data-id="match-window"]').value).toBe('3');
     choice.dispatchEvent(new CustomEvent('change', { detail: { value: 'Never match' } }));
@@ -472,20 +497,20 @@ describe('the import wizard', () => {
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson)).toEqual({
       expectedCount: null,
       expectedAmount: null,
-      saveDonationMatching: true,
-      donationMatching: 'Never match',
+      savePaymentMatching: true,
+      paymentMatching: 'Never match',
       matchDateWindowDays: 3,
       matchAmountTolerance: 0.5
     });
   });
 
-  it('does not offer donation matching where no module loads gifts', async () => {
+  it('does not offer payment matching where no module loads gifts', async () => {
     const element = await toMatchingStep();
-    expect(element.shadowRoot.querySelector('[data-id="donation-matching"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="payment-matching"]')).toBeNull();
     click(element, 'dry-run');
     await flush();
     expect(
-      JSON.parse(createBatch.mock.calls[0][0].optionsJson).saveDonationMatching
+      JSON.parse(createBatch.mock.calls[0][0].optionsJson).savePaymentMatching
     ).toBeUndefined();
   });
 

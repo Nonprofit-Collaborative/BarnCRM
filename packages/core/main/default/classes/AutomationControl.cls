@@ -1,11 +1,11 @@
 /**
- * The on and off switches behind the Automation page of the Nonprofit Settings console.
+ * The on and off switches behind the Automation page of the BarnCRM Settings console.
  *
  * Three separate mechanisms, in the order the dispatcher applies them:
  *
  *   1. a per transaction bypass, for tests and for internal bulk operations that deliberately
  *      run without a handler;
- *   2. the org wide pause, held as a datetime on Nonprofit Settings, so it expires by itself,
+ *   2. the org wide pause, held as a datetime on BarnCRM Settings, so it expires by itself,
  *      with a one-time `AutomationResumeJob` that records the end (R-A5, ADR-0055);
  *   3. the per automation switch, held as a row per automation on Automation Setting.
  *
@@ -23,7 +23,7 @@ public with sharing class AutomationControl {
     public static final String PAUSE_SETTING_NAME = 'Automation Paused Until';
     // Bare, and correctly so: a custom permission defined in the same package resolves without a
     // namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
-    public static final String MANAGE_SETTINGS_PERMISSION = 'Manage_Nonprofit_Settings';
+    public static final String MANAGE_SETTINGS_PERMISSION = 'Manage_BarnCRM_Settings';
 
     private static final Set<Integer> ALLOWED_PAUSE_HOURS = new Set<Integer>{ 1, 2, 4, 8, 24 };
 
@@ -118,7 +118,7 @@ public with sharing class AutomationControl {
      */
     @NamespaceAccessible
     public static Datetime pausedUntil() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         if (settings == null || settings.Automation_Paused_Until__c == null) {
             return null;
         }
@@ -255,7 +255,9 @@ public with sharing class AutomationControl {
 
     private static Datetime writePausedUntil(Datetime until) {
         requirePermission();
-        Datetime previous = SettingsService.getSettingsForUpdate().Automation_Paused_Until__c;
+        // Read under the lock the save below also takes, so the audit row's old value is the
+        // one stored, not one another person replaced a moment ago.
+        Datetime previous = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
         AutomationSettingsWriter.savePausedUntil(until);
         SettingsService.clearCache();
         SettingsService.logChange(
@@ -302,7 +304,7 @@ public with sharing class AutomationControl {
      *
      * Called by each package's post-install script (through `ensureDefaultsDuringInstall`), so
      * the Automation page lists every switch from the first install, and by the Health Check fix
-     * (C-21), which enforces Manage Nonprofit Settings before it gets here.
+     * (C-21), which enforces Manage BarnCRM Settings before it gets here.
      */
     @NamespaceAccessible
     public static Integer ensureDefaults() {

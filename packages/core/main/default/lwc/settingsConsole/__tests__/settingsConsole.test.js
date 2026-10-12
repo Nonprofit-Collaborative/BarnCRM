@@ -72,7 +72,7 @@ function model(canEdit) {
             checked: false,
             options: [
               { label: 'On its own', value: 'Standalone' },
-              { label: 'Alongside Nonprofit Cloud', value: 'AgentforceNonprofit' }
+              { label: 'Alongside Nonprofit Cloud', value: 'NonprofitCloud' }
             ]
           }
         ]
@@ -105,7 +105,7 @@ function model(canEdit) {
             description: 'What BarnCRM found in your org.',
             dataType: 'Component',
             section: 'Health',
-            settingsObject: 'Nonprofit_Settings__c',
+            settingsObject: 'BarnCRM_Settings__c',
             component: 'notAComponentInThisBuild',
             navigationTarget: null,
             helpUrl: null,

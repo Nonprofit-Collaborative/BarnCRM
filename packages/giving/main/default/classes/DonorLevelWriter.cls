@@ -22,17 +22,15 @@ public without sharing class DonorLevelWriter {
 
     /**
      * Stamps when a recalculation finished, the freshness promise the rollups make (Principle 2).
+     * Only this key is written, on the locked stored record, and a first save keeps the
+     * checkboxes that ship on (OrgSettingsSystemWriter).
      */
     public static void stampRecalculation(Datetime completedAt) {
-        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-        settings.Donor_Levels_Last_Recalculated__c = completedAt;
-        List<Giving_Settings__c> records = new List<Giving_Settings__c>{ settings };
-        if (settings.Id == null) {
-            settings.SetupOwnerId = UserInfo.getOrganizationId();
-            Database.insert(records, true, AccessLevel.SYSTEM_MODE);
-        } else {
-            Database.update(records, true, AccessLevel.SYSTEM_MODE);
-        }
-        SettingsService.clearCaches();
+        OrgSettingsSystemWriter.save(
+            Giving_Settings__c.SObjectType,
+            new Map<Schema.SObjectField, Object>{
+                Giving_Settings__c.Donor_Levels_Last_Recalculated__c => completedAt
+            }
+        );
     }
 }

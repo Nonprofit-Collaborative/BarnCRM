@@ -326,7 +326,7 @@ public with sharing class ImportRowProcessor {
 
     /**
      * Turns a single whole-name column into a first and a last name, because a great many
-     * donor lists have only one. "Ramirez, Ana" and "Ana Ramirez" both read the same way.
+     * contact lists have only one. "Ramirez, Ana" and "Ana Ramirez" both read the same way.
      */
     private static void splitFullNames(Map<String, Map<String, String>> byEntity) {
         for (

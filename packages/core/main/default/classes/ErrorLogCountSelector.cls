@@ -8,20 +8,11 @@ public with sharing class ErrorLogCountSelector {
     private static final String STATUS_NEW = 'New';
 
     /**
-     * How many Error Log entries nobody has looked at yet, or zero for a user who cannot read
-     * the Error Log at all. A person without access is told nothing rather than shown a
-     * failure: what they cannot see is not evidence of what is there.
-     */
-    public static Integer countNew() {
-        if (!isReadable()) {
-            return 0;
-        }
-        return [SELECT COUNT() FROM Error_Log__c WHERE Status__c = :STATUS_NEW WITH USER_MODE];
-    }
-
-    /**
-     * The same count, stopping at `cap + 1`, so a count over a flooded Error Log spends at most
-     * that many query rows. A result above `cap` means "more than `cap`".
+     * How many Error Log entries nobody has looked at yet, stopping at `cap + 1`, so a count
+     * over a flooded Error Log spends at most that many query rows. A result above `cap` means
+     * "more than `cap`". Zero for a user who cannot read the Error Log at all: a person without
+     * access is told nothing rather than shown a failure, because what they cannot see is not
+     * evidence of what is there. There is no uncapped count on purpose.
      */
     public static Integer countNewUpTo(Integer cap) {
         if (!isReadable()) {

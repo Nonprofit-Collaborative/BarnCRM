@@ -207,7 +207,7 @@ private class AccessServiceTest {
     }
 
     @IsTest
-    static void removeRoleRefusesToRemoveTheLastNonprofitAdmin() {
+    static void removeRoleRefusesToRemoveTheLastBarnCrmAdmin() {
         TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
         User maria = insertUser('Maria', 'Alvarez');
         AccessService.assignRole(maria.Id, AccessService.ADMIN_ROLE);
@@ -216,7 +216,7 @@ private class AccessServiceTest {
         Test.startTest();
         try {
             AccessService.removeRole(maria.Id, AccessService.ADMIN_ROLE);
-            Assert.fail('Removing the only Nonprofit Admin should be refused.');
+            Assert.fail('Removing the only BarnCRM Admin should be refused.');
         } catch (AccessService.AccessException e) {
             message = e.getMessage();
         }
@@ -230,7 +230,7 @@ private class AccessServiceTest {
         Assert.areEqual(
             1,
             countAssignments(maria.Id, AccessService.ADMIN_ROLE),
-            'Maria should still hold the Nonprofit Admin role.'
+            'Maria should still hold the BarnCRM Admin role.'
         );
     }
 
@@ -247,7 +247,7 @@ private class AccessServiceTest {
         }
         Assert.isTrue(
             names.contains(AccessService.ADMIN_ROLE),
-            'The Nonprofit Admin role should be one of the packaged roles.'
+            'The BarnCRM Admin role should be one of the packaged roles.'
         );
         Assert.isTrue(names.contains(PROGRAM_ROLE), 'The Program Staff role should be packaged.');
     }
@@ -306,7 +306,7 @@ private class AccessServiceTest {
 
         Assert.isTrue(
             refused,
-            'A person without the Manage Nonprofit Settings permission should be refused.'
+            'A person without the Manage BarnCRM Settings permission should be refused.'
         );
         Assert.areEqual(
             0,

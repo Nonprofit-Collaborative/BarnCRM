@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Total given by this household two fiscal years ago, used by SYBUNT and retention reporting. The fiscal year runs from the fiscal year start month in Nonprofit Settings, and a gift falls in it by its gift date.</value>
+        <value xsi:type="xsd:string">Total given by this household two fiscal years ago, used by SYBUNT and retention reporting. The fiscal year runs from the fiscal year start month in BarnCRM Settings, and a gift falls in it by its gift date.</value>
     </values>
     <values>
         <field>Definition_Key__c</field>

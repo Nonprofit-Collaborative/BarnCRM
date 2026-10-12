@@ -117,7 +117,7 @@
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Duplicates: action needs Manage Nonprofit Settings</shortDescription>
+        <shortDescription>Duplicates: action needs Manage BarnCRM Settings</shortDescription>
         <value>Scanning, dismissing and merging from this panel need the Manage BarnCRM Settings permission. Ask your BarnCRM administrator.</value>
     </labels>
     <labels>

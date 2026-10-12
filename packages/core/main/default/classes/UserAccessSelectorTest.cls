@@ -54,9 +54,7 @@ private class UserAccessSelectorTest {
     @IsTest
     static void thePackagedGroupsAreQueryable() {
         Test.startTest();
-        Set<Id> assigned = UserAccessSelector.getAssignedUserIds(
-            HealthCheckService.NONPROFIT_GROUPS
-        );
+        Set<Id> assigned = UserAccessSelector.getAssignedUserIds(HealthCheckService.BARNCRM_GROUPS);
         Integer standardUsers = UserAccessSelector.countActiveStandardUsersExcluding(assigned);
         Test.stopTest();
 

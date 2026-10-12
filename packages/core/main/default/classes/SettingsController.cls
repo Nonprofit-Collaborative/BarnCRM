@@ -1,10 +1,10 @@
 /**
- * The Nonprofit Settings console's Apex surface: what to render, what the values are,
+ * The BarnCRM Settings console's Apex surface: what to render, what the values are,
  * whether this user may change them, what a search matches, and what changed recently.
  */
 @NamespaceAccessible
 public with sharing class SettingsController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String HELP_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/';
     private static final String TYPE_COMPONENT = 'Component';
     private static final String TYPE_CHECKBOX = 'Checkbox';
@@ -286,6 +286,9 @@ public with sharing class SettingsController {
             ? null
             : HELP_BASE + definition.Help_Path__c;
         setting.options = toOptions(definition);
+        if (isCoexistenceMode(settingsObject, definition.Setting_Key__c)) {
+            setting.options = offeredModesOnly(setting.options);
+        }
         if (isComponent) {
             setting.checked = false;
             return setting;
@@ -316,6 +319,27 @@ public with sharing class SettingsController {
             options.add(option);
         }
         return options;
+    }
+
+    private static Boolean isCoexistenceMode(String settingsObject, String key) {
+        return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
+            CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
+    }
+
+    /**
+     * The coexistence options this org is offered: a mode named after another Salesforce
+     * product appears only where that product is detected, or where it is already saved
+     * (CoexistenceService.availableModes), in the order the definition lists them.
+     */
+    private static List<Option> offeredModesOnly(List<Option> options) {
+        Set<String> offered = new Set<String>(CoexistenceService.availableModes());
+        List<Option> kept = new List<Option>();
+        for (Option option : options) {
+            if (offered.contains(option.value)) {
+                kept.add(option);
+            }
+        }
+        return kept;
     }
 
     private static AuraHandledException asAuraException(String message) {
