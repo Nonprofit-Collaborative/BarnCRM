@@ -183,6 +183,15 @@
                     <p class="slds-text-body_small slds-var-m-top_x-small" data-id="several-help">
                         {severalHelp}
                     </p>
+                    <lightning-input
+                        class="slds-var-m-top_medium"
+                        type="checkbox"
+                        data-id="match-only"
+                        label={labels.matchOnlyLabel}
+                        field-level-help={labels.matchOnlyHelp}
+                        checked={matchOnly}
+                        onchange={handleMatchOnlyChange}
+                    ></lightning-input>
                     <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
                         {labels.fileValuesHeading}
                     </h3>

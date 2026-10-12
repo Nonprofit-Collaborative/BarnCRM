@@ -130,6 +130,12 @@ public with sharing class ImportController {
         /** Account fields, for organizations and for people stored as person accounts. */
         @AuraEnabled
         public List<MatchFieldView> account = new List<MatchFieldView>();
+        /** The fields a person's column can be mapped to besides the fixed list (R-IT11). */
+        @AuraEnabled
+        public List<ImportMapping.Target> personFields = new List<ImportMapping.Target>();
+        /** The fields an organization's column can be mapped to besides the fixed list. */
+        @AuraEnabled
+        public List<ImportMapping.Target> organizationFields = new List<ImportMapping.Target>();
     }
 
     /** One staged row as the exceptions table shows it. */
@@ -213,7 +219,8 @@ public with sharing class ImportController {
     /**
      * The fields a row can be matched on under External ID, for people and organizations
      * (R-IT8): those marked External ID or Unique, holding text or an email, that the user
-     * may read.
+     * may read. With them, the fields of people and organizations a column can be mapped to
+     * besides the fixed list (R-IT11).
      */
     @AuraEnabled
     public static MatchFieldsView getMatchFields() {
@@ -222,6 +229,8 @@ public with sharing class ImportController {
             MatchFieldsView view = new MatchFieldsView();
             view.contact = fieldViews(Contact.SObjectType);
             view.account = fieldViews(Account.SObjectType);
+            view.personFields = ImportFieldCatalog.personFields();
+            view.organizationFields = ImportFieldCatalog.organizationFields();
             return view;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getMatchFields');

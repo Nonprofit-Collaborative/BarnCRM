@@ -83,6 +83,9 @@ import fileValueLabel from '@salesforce/label/c.Core_Import_FileValueLabel';
 import targetFirstPersonField from '@salesforce/label/c.Core_Import_TargetFirstPersonField';
 import targetSecondPersonField from '@salesforce/label/c.Core_Import_TargetSecondPersonField';
 import targetOrganizationField from '@salesforce/label/c.Core_Import_TargetOrganizationField';
+import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdFieldName';
+import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
+import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
 
 /** Fills a label's {0} with a value. */
 function format(label, value) {
@@ -168,7 +171,14 @@ const SEVERAL_CHOICES = [
 ];
 
 /** A person's attributes a value for every row may not set: every row would be one person. */
-const PERSON_ATTRIBUTES_NOT_FOR_EVERY_ROW = ['FirstName', 'LastName', 'FullName', 'Email'];
+const PERSON_ATTRIBUTES_NOT_FOR_EVERY_ROW = ['FirstName', 'LastName', 'FullName', 'Email', 'Id'];
+
+/** A column holding a Salesforce record ID matches that record (R-IT10). */
+const RECORD_ID_TARGETS = [
+  { value: 'Contact1.Id', label: format(targetFirstPersonField, recordIdFieldName) },
+  { value: 'Contact2.Id', label: format(targetSecondPersonField, recordIdFieldName) },
+  { value: 'Organization.Id', label: format(targetOrganizationField, recordIdFieldName) }
+];
 
 /**
  * The import wizard (C-14): choose a mapping, upload a file, check the columns, choose how
@@ -213,8 +223,13 @@ export default class ImportWizard extends LightningElement {
   organizationRule = 'Name exact';
   organizationMatchField = '';
   severalMatches = SEVERAL_REJECT;
-  /** The fields matching accepts, per object (R-IT8). */
-  matchFields = { contact: [], account: [] };
+  /**
+   * The fields matching accepts, per object (R-IT8), and the fields of people and
+   * organizations a column can be mapped to besides the fixed list (R-IT11).
+   */
+  matchFields = { contact: [], account: [], personFields: [], organizationFields: [] };
+  /** Whether this file only matches and creates nobody (R-IB15). */
+  matchOnly = false;
   /** Values for every row of this file (R-IB14), as typed: { key, target, value }. */
   fileValues = [];
   fileValueCounter = 0;
@@ -264,7 +279,9 @@ export default class ImportWizard extends LightningElement {
     addFileValueButton,
     removeFileValueLabel,
     fileValueTargetLabel,
-    fileValueLabel
+    fileValueLabel,
+    matchOnlyLabel,
+    matchOnlyHelp
   };
 
   async connectedCallback() {
@@ -276,7 +293,9 @@ export default class ImportWizard extends LightningElement {
         const fields = await getMatchFields();
         this.matchFields = {
           contact: (fields && fields.contact) || [],
-          account: (fields && fields.account) || []
+          account: (fields && fields.account) || [],
+          personFields: (fields && fields.personFields) || [],
+          organizationFields: (fields && fields.organizationFields) || []
         };
         if (this.templates.length > 0) {
           this.selectTemplate(this.templates[0].id);
@@ -468,10 +487,36 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
-    return [{ label: doNotLoad, value: IGNORE }]
+    const all = [{ label: doNotLoad, value: IGNORE }]
       .concat(TARGETS)
+      .concat(RECORD_ID_TARGETS)
       .concat(this.matchFieldTargets)
+      .concat(this.ownFieldTargets)
       .concat(this.entityTargets.map((target) => ({ value: target.value, label: target.label })));
+    // A field offered twice (a fixed column, or an ID field that is also writable) is listed
+    // once, under its first name.
+    const seen = new Set();
+    return all.filter((option) => {
+      const key = option.value.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  }
+
+  /** The org's own fields of people and organizations the user may write (R-IT11). */
+  get ownFieldTargets() {
+    const people = this.matchFields.personFields.flatMap((field) => [
+      { value: `Contact1.${field.value}`, label: format(targetFirstPersonField, field.label) },
+      { value: `Contact2.${field.value}`, label: format(targetSecondPersonField, field.label) }
+    ]);
+    const organizations = this.matchFields.organizationFields.map((field) => ({
+      value: `Organization.${field.value}`,
+      label: format(targetOrganizationField, field.label)
+    }));
+    return people.concat(organizations);
   }
 
   /** The fields people are matched on, from the object this mapping stores them on (R-IT3). */
@@ -567,6 +612,9 @@ export default class ImportWizard extends LightningElement {
       .map((each) => ({ target: each.target, value: String(each.value).trim() }));
     if (fileValues.length > 0) {
       options.fileValues = fileValues;
+    }
+    if (this.matchOnly) {
+      options.matchOnly = true;
     }
     if (this.showExpectedAmount) {
       // Shown only where a module loads gifts, and saved on the template only then (R-IT7).
@@ -744,6 +792,11 @@ export default class ImportWizard extends LightningElement {
     });
   }
 
+  /** Whether this file only matches and creates nobody (R-IB15); for this file only. */
+  handleMatchOnlyChange(event) {
+    this.matchOnly = event.target.checked;
+  }
+
   handleAddFileValue() {
     this.fileValueCounter += 1;
     this.fileValues = this.fileValues.concat({
@@ -909,6 +962,7 @@ export default class ImportWizard extends LightningElement {
     this.expectedCount = '';
     this.expectedAmount = '';
     this.fileValues = [];
+    this.matchOnly = false;
   }
 
   // ---------------------------------------------------------------------------------------

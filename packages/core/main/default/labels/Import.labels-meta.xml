@@ -1288,4 +1288,28 @@
         <shortDescription>Import error: a match-only file found no record for the row</shortDescription>
         <value>Nothing matches this row, and this file only matches, so nothing was created. To add new people or organizations, untick Match only and import the row again.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_RecordIdFieldName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the name of a column holding a Salesforce record ID</shortDescription>
+        <value>Salesforce record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_MatchOnlyLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the match-only checkbox</shortDescription>
+        <value>Match only: update records you already have, add none</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_MatchOnlyHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the match-only checkbox does</shortDescription>
+        <value>A row whose person or organization matches no record is rejected instead of creating one. The dry run lists those rows first. This choice is for this file only.</value>
+    </labels>
 </CustomLabels>

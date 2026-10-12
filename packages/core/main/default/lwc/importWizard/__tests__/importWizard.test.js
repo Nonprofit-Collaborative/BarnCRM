@@ -595,6 +595,61 @@ describe('the import wizard', () => {
     );
   });
 
+  it('offers record ID columns and the org own fields, each once', async () => {
+    getMatchFields.mockResolvedValue({
+      contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
+      account: [],
+      personFields: [
+        { value: 'Department', label: 'Department' },
+        { value: 'Member_Number__c', label: 'Member Number' }
+      ],
+      organizationFields: [
+        { value: 'Industry', label: 'Industry' },
+        { value: 'Name', label: 'Account Name' }
+      ]
+    });
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const values = picker.options.map((option) => option.value);
+    expect(values).toEqual(
+      expect.arrayContaining([
+        'Contact1.Id',
+        'Contact2.Id',
+        'Organization.Id',
+        'Contact1.Department',
+        'Contact2.Department',
+        'Organization.Industry'
+      ])
+    );
+    expect(values.filter((value) => value === 'Contact1.Member_Number__c')).toHaveLength(1);
+    const names = picker.options.filter((option) => option.value === 'Organization.Name');
+    expect(names).toHaveLength(1);
+    expect(names[0].label).toBe('Organization: name');
+  });
+
+  it('sends Match only when ticked, and never offers a person ID as a value for every row', async () => {
+    const element = await toMatchingStep();
+    const matchOnly = element.shadowRoot.querySelector('[data-id="match-only"]');
+    expect(matchOnly.checked).toBe(false);
+    matchOnly.checked = true;
+    matchOnly.dispatchEvent(new CustomEvent('change'));
+    click(element, 'add-file-value');
+    await flush();
+    const offered = element.shadowRoot
+      .querySelector('[data-id="file-value-row"] lightning-combobox')
+      .options.map((option) => option.value);
+    expect(offered).not.toContain('Contact1.Id');
+    expect(offered).not.toContain('Contact2.Id');
+    expect(offered).toContain('Organization.Id');
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).matchOnly).toBe(true);
+  });
+
   it('will not dry run under External ID when no field can be matched on, and says why', async () => {
     getTemplates.mockResolvedValue([{ ...TEMPLATE, matchingRule: 'External ID' }]);
     const element = await toMatchingStep();
