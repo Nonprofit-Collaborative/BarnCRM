@@ -16,7 +16,7 @@ member count looks wrong, the Households page is where to fix it.
 
 BarnCRM calculates them for you and shows you when each one was last calculated, so
 you never have to guess whether a number on a record is current. If the calculation has
-not run recently, the Hub says so on the home page rather than leaving a stale number
+not run recently, the BarnCRM home page says so rather than leaving a stale number
 looking fresh.
 
 ## What BarnCRM calculates for you (with Giving)
@@ -105,7 +105,7 @@ One step is left for you, and nothing in the app does it on your behalf:
    is scheduled for 2:00 AM."
 
 Do that on the day you install. The Setup Assistant has no rollup step, so until you click
-it nothing recalculates overnight and the Hub tile stays in warning.
+it nothing recalculates overnight and the home page tile stays in warning.
 
 ### If a rollup is missing
 
@@ -162,7 +162,7 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    the **Rollups last calculated** field on the record shows the same time. That field is
    the answer to "is this number current" for one record; the Rollups page answers it for
    the whole org.
-6. Go back to the Hub home page. The Rollups tile shows the time you just recalculated.
+6. Go back to the BarnCRM home page. The Rollups tile shows the time you just recalculated.
 
 ## Common mistakes
 
@@ -194,7 +194,7 @@ never created. Clear its **Active** box instead. That is remembered, and it leav
 numbers already calculated on the records.
 
 **Never starting the nightly schedule.** If nobody clicks **Schedule nightly
-recalculation**, nothing recalculates overnight and the Hub tile stays in warning. Nothing
+recalculation**, nothing recalculates overnight and the home page tile stays in warning. Nothing
 schedules it for you. The tile is the only warning you get, so act on it.
 
 **Changing the fiscal year start month and stopping there.** The year based totals are

@@ -76,7 +76,7 @@ Total time: about five minutes, most of it assigning roles.
 **Only if your org has NPSP or Nonprofit Cloud.** With the Nonprofit Success Pack, step 2
 reads **NPSP detected** and the recommendation is **NPSP coexistence**. With Nonprofit Cloud,
 step 2 reads **Nonprofit Cloud objects detected**, the recommendation is **Nonprofit Cloud
-coexistence**, and **Use recommended mode** switches household membership to junction mode
+coexistence**, and **Use recommended mode** switches household membership to the flexible way of belonging, with one membership record per person,
 with it. If that org has Nonprofit Cloud gift objects and the Connect module is not
 installed, there is also a blue finding, **The Gift Transaction mirror is in the Connect
 module**: install Connect if you want Nonprofit Cloud's own summaries to keep working.
@@ -203,8 +203,7 @@ today are the ones somebody has to group by hand later.
 
 **Ignoring the red membership finding in a Person Accounts org.** "Household membership does
 not fit Person Accounts" is red for a reason: in that state, new households are built through
-the person's account, which in a Person Accounts org is the person. Click **Switch to junction
-membership** and the app fixes it for you. The longer it waits, the more households have to be
+the person's account, which in a Person Accounts org is the person. Click **Switch to the flexible way of belonging** and the app fixes it for you. The longer it waits, the more households have to be
 sorted out afterward.
 
 **Fixing access by editing profiles.** Health Check counts the packaged roles the Access page

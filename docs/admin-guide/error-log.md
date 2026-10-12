@@ -37,7 +37,7 @@ automation, never stops the Error Log from recording a problem.
 
 ## The error digest email
 
-If nobody opens the Hub for a few days, nobody sees the tile. The error digest fixes that:
+If nobody opens the BarnCRM home page for a few days, nobody sees the tile. The error digest fixes that:
 once a day (or once a week), BarnCRM emails a short summary of the new entries to the
 people who look after it. It is off until you switch it on.
 

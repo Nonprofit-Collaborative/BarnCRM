@@ -32,6 +32,7 @@ person what they can act on:
 | **Errors to review** | Administrators |
 | **Rollups last completed** | Administrators |
 | **Seasonal addresses last swapped** | Administrators |
+| **Modules** | Administrators |
 | **Files that arrive regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
 | **Quick links** | Everyone |
 
@@ -77,7 +78,10 @@ Admin role.
 9. If someone has paused automation (for example during a large import), a banner under
    the welcome says BarnCRM automation is paused. It disappears by itself when the pause
    expires.
-10. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
+10. Look at **Modules**. It lists BarnCRM Core and each module installed in your org (with
+    Giving, that is Giving), and says for each whether it is on or installed and off. Click
+    **Open the Module Manager** to turn a module on or off.
+11. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
     going back to the app launcher.
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
