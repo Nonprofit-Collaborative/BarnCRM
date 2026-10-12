@@ -85,7 +85,7 @@ fi
 # A real install gives the installing administrator the admin roles, and the tests run as
 # that user in user mode, so they need the same roles here. "Duplicate" means the role is
 # already assigned, which is the normal case after the first run.
-for ps in Nonprofit_Admin Giving_Admin; do
+for ps in BarnCRM_Admin Giving_Admin; do
   sf org assign permset --name "$ps" --target-org "$ALIAS" --json > "${TMPDIR:-/tmp}/assign.json" || true
   if jq -e '.result.failures[]? | select(.message | test("Duplicate") | not)' \
     "${TMPDIR:-/tmp}/assign.json" > /dev/null; then

@@ -111,7 +111,7 @@ public with sharing class HealthCheckService {
     }
 
     /** The settings console tab that hosts every section a fix can point at. */
-    public static final String SETTINGS_TAB = 'Nonprofit_Settings';
+    public static final String SETTINGS_TAB = 'BarnCRM_Settings';
 
     /** The page state parameter that tells the console which section to open. */
     public static final String SECTION_STATE_PARAMETER = 'section';
@@ -126,8 +126,8 @@ public with sharing class HealthCheckService {
      * assigns) that mean "this person uses BarnCRM", and the permission set that means
      * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
      */
-    public static final String GROUP_ADMIN = 'Nonprofit_Admin_Group';
-    public static final String PERMISSION_SET_ADMIN = 'Nonprofit_Admin';
+    public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
+    public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';
     public static final Set<String> NONPROFIT_GROUPS = new Set<String>{
         GROUP_ADMIN,
         'Fundraising_Staff',
@@ -142,8 +142,8 @@ public with sharing class HealthCheckService {
      */
     public static final Set<String> NONPROFIT_PERMISSION_SETS = new Set<String>{
         PERMISSION_SET_ADMIN,
-        'Nonprofit_Staff',
-        'Nonprofit_Read_Only'
+        'BarnCRM_Staff',
+        'BarnCRM_Read_Only'
     };
 
     /**

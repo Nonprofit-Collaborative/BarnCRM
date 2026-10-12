@@ -85,7 +85,7 @@ public class ReceiptTestDataFactory {
     public static User issuer() {
         return TestDataFactory.createUserOnTheRunningUsersProfile(
             'Issuer',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 

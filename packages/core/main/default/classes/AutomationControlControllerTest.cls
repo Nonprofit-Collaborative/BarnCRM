@@ -11,11 +11,11 @@ private class AutomationControlControllerTest {
     private static final String NAMING = 'Household_Naming';
 
     private static User nonprofitAdmin() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
     private static User staffOnly() {
-        return TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
     }
 
     @IsTest

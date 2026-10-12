@@ -9,7 +9,7 @@
 @IsTest
 private class ErrorDigestServiceTest {
     private static User maria() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
     private static Error_Log__c entry(String source, String severity, String status) {
@@ -39,7 +39,7 @@ private class ErrorDigestServiceTest {
     @IsTest
     static void theDigestCountsNewEntriesAndGoesToTheListedUser() {
         TestDataFactory.defaultSettings();
-        User jen = TestDataFactory.createUser('Jen', new List<String>{ 'Nonprofit_Staff' });
+        User jen = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Staff' });
         User admin = maria();
         setDigest('JEN@barncrm.example.invalid', null, null);
         List<Error_Log__c> logs = new List<Error_Log__c>{

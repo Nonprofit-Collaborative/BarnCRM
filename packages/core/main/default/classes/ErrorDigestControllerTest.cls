@@ -15,7 +15,7 @@ private class ErrorDigestControllerTest {
     @IsTest
     static void mariaSchedulesSendsNowAndStops() {
         TestDataFactory.defaultSettings();
-        User maria = TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+        User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
         System.runAs(maria) {
             Test.startTest();
@@ -44,7 +44,7 @@ private class ErrorDigestControllerTest {
     @IsTest
     static void theScheduledJobRunsTheDigest() {
         TestDataFactory.defaultSettings();
-        User maria = TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+        User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
         System.runAs(maria) {
             Test.startTest();
@@ -66,7 +66,7 @@ private class ErrorDigestControllerTest {
     @IsTest
     static void davidCanReadThePanelButNotScheduleOrSend() {
         TestDataFactory.defaultSettings();
-        User david = TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
         System.runAs(david) {
             Test.startTest();

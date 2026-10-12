@@ -145,10 +145,10 @@ Modify All Data.
 
 That takes two steps, because the platform makes the obvious one unreliable:
 
-1. **Assign the `Nonprofit_Admin` permission set.** A permission set has no calculation
+1. **Assign the `BarnCRM_Admin` permission set.** A permission set has no calculation
    status, so this works the moment the install finishes. This is the step that matters:
    after it, the installer can use the app.
-2. **Assign the `Nonprofit_Admin_Group` permission set group**, which is the role the
+2. **Assign the `BarnCRM_Admin_Group` permission set group**, which is the role the
    Access page shows. Salesforce recalculates packaged groups in the background after an
    install and refuses to assign one while that is running, which is the usual state in the
    first minutes, so this is attempted and, if the group is not ready,

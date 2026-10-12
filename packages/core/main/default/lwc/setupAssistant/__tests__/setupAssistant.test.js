@@ -106,7 +106,7 @@ function state(overrides = {}) {
     },
     modules: [{ name: 'Core', present: true, docsUrl: 'https://example.invalid/core' }],
     roles: [
-      { developerName: 'Nonprofit_Admin', label: 'BarnCRM Admin' },
+      { developerName: 'BarnCRM_Admin', label: 'BarnCRM Admin' },
       { developerName: 'Program_Staff', label: 'Program Staff' }
     ],
     importAvailable: false,
@@ -280,7 +280,7 @@ describe('c-setup-assistant', () => {
 
     const options = element.shadowRoot.querySelector('lightning-combobox').options;
     expect(options).toEqual([
-      { label: 'BarnCRM Admin', value: 'Nonprofit_Admin' },
+      { label: 'BarnCRM Admin', value: 'BarnCRM_Admin' },
       { label: 'Program Staff', value: 'Program_Staff' }
     ]);
   });

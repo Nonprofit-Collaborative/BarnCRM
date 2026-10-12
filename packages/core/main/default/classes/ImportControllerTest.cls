@@ -17,7 +17,7 @@ private class ImportControllerTest {
      * rolls back at the same moment. The full explanation is on `ReceiptTestDataFactory.issuer`.
      */
     private static User importer() {
-        return TestDataFactory.createUser('Importer', new List<String>{ 'Nonprofit_Admin' });
+        return TestDataFactory.createUser('Importer', new List<String>{ 'BarnCRM_Admin' });
     }
 
     private static Import_Template__c permittedTemplate() {

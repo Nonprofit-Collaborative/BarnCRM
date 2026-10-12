@@ -1,7 +1,7 @@
 /**
  * The healthCheckPanel component's entry point (feature C-11).
  *
- * Reading the report needs no permission: anyone who can open the Nonprofit Hub can look at
+ * Reading the report needs no permission: anyone who can open the BarnCRM app can look at
  * it and tell an administrator what it says. Acting on a finding needs the
  * Manage_BarnCRM_Settings custom permission, checked here rather than trusted from the
  * component.

@@ -276,7 +276,7 @@ private class DuplicateControllerTest {
             insert admin;
             insert new PermissionSetAssignment(
                 AssigneeId = admin.Id,
-                PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'Nonprofit_Admin']
+                PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'BarnCRM_Admin']
                 .Id
             );
         }

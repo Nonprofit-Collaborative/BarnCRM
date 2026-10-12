@@ -36,7 +36,7 @@ const OVERVIEW = {
   users: null,
   roles: [
     {
-      developerName: 'Nonprofit_Admin_Group',
+      developerName: 'BarnCRM_Admin_Group',
       label: 'BarnCRM Admin',
       description: 'For the person who configures the app.',
       isReady: true
@@ -50,7 +50,7 @@ const OVERVIEW = {
   ],
   assignments: [
     {
-      roleDeveloperName: 'Nonprofit_Admin_Group',
+      roleDeveloperName: 'BarnCRM_Admin_Group',
       users: [{ userId: MARIA_ID, name: 'Maria Alvarez', email: 'maria@example.invalid' }]
     },
     { roleDeveloperName: 'Fundraising_Staff', users: [] }
@@ -206,7 +206,7 @@ describe('c-access-manager', () => {
 
     expect(removeRole).toHaveBeenCalledWith({
       userId: MARIA_ID,
-      roleDeveloperName: 'Nonprofit_Admin_Group'
+      roleDeveloperName: 'BarnCRM_Admin_Group'
     });
   });
 

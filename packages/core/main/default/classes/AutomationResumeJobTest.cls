@@ -9,7 +9,7 @@
 @IsTest
 private class AutomationResumeJobTest {
     private static User nonprofitAdmin() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
     private static List<CronTrigger> resumeJobs() {
@@ -198,7 +198,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void onlyAnAdministratorCanPauseOrScheduleAResume() {
         TestDataFactory.defaultSettings();
-        User david = TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
         System.runAs(david) {
             Test.startTest();

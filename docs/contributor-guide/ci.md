@@ -97,7 +97,7 @@ Salesforce org is needed for this job. Steps:
    the repository does not ship, or a permission set group contains a set that is not there. A dangling grant refuses the whole deployment, and the
    permission sets are assembled by hand at every merge from each branch's integration
    file, so the reference and the metadata can drift apart silently. This ran because
-   `Nonprofit_Admin` granted a `Household_Member__c` tab that was never created.
+   `BarnCRM_Admin` granted a `Household_Member__c` tab that was never created.
 11. `scripts/ci/check-help-links.py`, failing the build if a Setting Definition's Learn
    more link points at a page that does not exist. `SettingsController` appends
    `Help_Path__c` to a base already ending in `docs/admin-guide/`, so a row storing
@@ -130,7 +130,7 @@ Salesforce org is needed for this job. Steps:
    page nothing assigns is never shown, so the component sits on a page nobody opens. Same
    defect class one level up, and the same symptom: it deploys, every test passes, and the
    administrator sees none of it until they wire it up by hand in the Lightning App Builder.
-   This ran because `Nonprofit_Hub.app-meta.xml` carried no `actionOverrides` at all, so the
+   This ran because `BarnCRM.app-meta.xml` carried no `actionOverrides` at all, so the
    household walkthrough failed at step 4 on every fresh install, and because
    `Gift_Record_Page` and `Commitment_Record_Page` were stranded the same way in Fundraising.
 15. `scripts/ci/check-canonical-model.py`, failing the build if a shipped object or field
@@ -297,7 +297,7 @@ scripts/org/run-org-tests.sh <org alias>
 ```
 
 It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, assigns
-`Nonprofit_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
+`BarnCRM_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
 posts `Org tests (local)` on that commit: success only when every test passed, failure
 otherwise. It names the test classes rather than running every test in the org, because the
 test org is shared: another branch's deploy can leave its own test classes behind, and those

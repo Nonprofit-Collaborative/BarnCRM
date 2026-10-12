@@ -227,7 +227,7 @@ private class ErrorLoggerTest {
         // profile, so the log runs inside System.runAs him: publishing is governed by Create on
         // the event, and if Nonprofit Staff did not carry it the writer would silently fall back
         // to the direct insert and the entry would go down with the rollback.
-        User david = TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
         Test.startTest();
         Savepoint beforeTheFailure = Database.setSavepoint();
