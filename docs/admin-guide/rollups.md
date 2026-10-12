@@ -183,6 +183,16 @@ recalculated once a night, so a record entered this afternoon does not move it u
 tomorrow morning. That is what the last calculated time is there to tell you. If a total
 needs to be right the moment a record is saved, set it to **Real time** or **Both**.
 
+**Switching off a rollup automation and forgetting it (with Giving).** Real time and Both
+work because Giving runs an automation each time a gift, a soft credit, a gift allocation
+or a commitment is saved. They are listed on the **Automation** page as **Update rollups
+when a gift changes**, **Update rollups when soft credits change**, **Update rollups when
+allocations change** and **Update rollups when a commitment changes**. Switching one off,
+or pausing all automation for a data load, leaves the totals it feeds where they were. A
+rollup in **Both** mode is put right by the nightly run; one in **Real time** mode stays
+behind until you click **Recalculate** on its row. Switch the automation back on
+afterwards.
+
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is
 deliberate, so that turning something off never destroys data. If you want the field
