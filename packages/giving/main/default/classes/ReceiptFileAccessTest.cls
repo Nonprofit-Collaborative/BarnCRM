@@ -27,32 +27,35 @@ private class ReceiptFileAccessTest {
      */
     @IsTest
     static void aYearEndStatementIsLinkedOnlyToItsReceipt() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            ReceiptTestDataFactory.setUpReceipting();
-            Contact reyes = GivingTestDataFactory.insertHouseholdContact(
-                'The Reyes Family',
-                'Ana',
-                'Reyes'
-            );
-            insert ReceiptTestDataFactory.plainCashGift(
-                reyes.Id,
-                250,
-                Date.newInstance(YEAR, 3, 1)
-            );
-            Receipt__c statement = issueOneStatement();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                ReceiptTestDataFactory.setUpReceipting();
+                Contact reyes = GivingTestDataFactory.insertHouseholdContact(
+                    'The Reyes Family',
+                    'Ana',
+                    'Reyes'
+                );
+                insert ReceiptTestDataFactory.plainCashGift(
+                    reyes.Id,
+                    250,
+                    Date.newInstance(YEAR, 3, 1)
+                );
+                Receipt__c statement = issueOneStatement();
 
-            Set<Id> linked = linkedEntitiesFor(statement.Content_Document_Id__c);
+                Set<Id> linked = linkedEntitiesFor(statement.Content_Document_Id__c);
 
-            Assert.areEqual(
-                new Set<Id>{ statement.Id },
-                linked,
-                'A statement is linked to its receipt and to nothing else, because a link is what ' +
-                'grants access to the file.'
-            );
-            Assert.isFalse(
-                linked.contains(reyes.AccountId),
-                'It is not linked to the donor household, whose record every Core role can read.'
-            );
+                Assert.areEqual(
+                    new Set<Id>{ statement.Id },
+                    linked,
+                    'A statement is linked to its receipt and to nothing else, because a link is what ' +
+                    'grants access to the file.'
+                );
+                Assert.isFalse(
+                    linked.contains(reyes.AccountId),
+                    'It is not linked to the donor household, whose record every Core role can read.'
+                );
+            }
+
         }
     }
 
@@ -62,44 +65,47 @@ private class ReceiptFileAccessTest {
      */
     @IsTest
     static void aPerGiftReceiptIsLinkedToItsReceiptAndItsGiftAndNothingElse() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            ReceiptTestDataFactory.setUpReceipting();
-            Contact haddad = GivingTestDataFactory.insertHouseholdContact(
-                'The Haddad Family',
-                'Nour',
-                'Haddad'
-            );
-            Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-                haddad.Id,
-                300,
-                Date.newInstance(YEAR, 4, 2)
-            );
-            insert gift;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                ReceiptTestDataFactory.setUpReceipting();
+                Contact haddad = GivingTestDataFactory.insertHouseholdContact(
+                    'The Haddad Family',
+                    'Nour',
+                    'Haddad'
+                );
+                Gift__c gift = ReceiptTestDataFactory.plainCashGift(
+                    haddad.Id,
+                    300,
+                    Date.newInstance(YEAR, 4, 2)
+                );
+                insert gift;
 
-            Test.startTest();
-            Receipt__c issued = ReceiptService.issueForGift(gift.Id);
-            Test.stopTest();
+                Test.startTest();
+                Receipt__c issued = ReceiptService.issueForGift(gift.Id);
+                Test.stopTest();
 
-            Receipt__c stored = [
-                SELECT Content_Document_Id__c
-                FROM Receipt__c
-                WHERE Id = :issued.Id
-            ];
-            Set<Id> linked = linkedEntitiesFor(stored.Content_Document_Id__c);
+                Receipt__c stored = [
+                    SELECT Content_Document_Id__c
+                    FROM Receipt__c
+                    WHERE Id = :issued.Id
+                ];
+                Set<Id> linked = linkedEntitiesFor(stored.Content_Document_Id__c);
 
-            Assert.areEqual(
-                new Set<Id>{ issued.Id, gift.Id },
-                linked,
-                'The receipt and the gift, which are the two records a Giving permission set governs.'
-            );
-            Assert.isFalse(
-                linked.contains(haddad.Id),
-                'Not the donor Contact: Read on a Contact is not permission to read their tax document.'
-            );
-            Assert.isFalse(
-                linked.contains(haddad.AccountId),
-                'Not the donor household either, for the same reason.'
-            );
+                Assert.areEqual(
+                    new Set<Id>{ issued.Id, gift.Id },
+                    linked,
+                    'The receipt and the gift, which are the two records a Giving permission set governs.'
+                );
+                Assert.isFalse(
+                    linked.contains(haddad.Id),
+                    'Not the donor Contact: Read on a Contact is not permission to read their tax document.'
+                );
+                Assert.isFalse(
+                    linked.contains(haddad.AccountId),
+                    'Not the donor household either, for the same reason.'
+                );
+            }
+
         }
     }
 
@@ -110,53 +116,60 @@ private class ReceiptFileAccessTest {
      */
     @IsTest
     static void programStaffWithNoGivingPermissionSetCannotReachAStatementThroughTheDonor() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            User coordinator = TestDataFactory.createUser(
-                'Priya',
-                new List<String>{ 'BarnCRM_Staff' }
-            );
-            ReceiptTestDataFactory.setUpReceipting();
-            Contact osei = GivingTestDataFactory.insertHouseholdContact(
-                'The Osei Family',
-                'Kofi',
-                'Osei'
-            );
-            insert ReceiptTestDataFactory.plainCashGift(osei.Id, 400, Date.newInstance(YEAR, 5, 1));
-            Receipt__c statement = issueOneStatement();
-            Id household = osei.AccountId;
-            Id documentId = statement.Content_Document_Id__c;
-            // Whether staff can open a household somebody else entered is the org's sharing model,
-            // so Priya is given this one: what is under test is the file, not the household.
-            update new Account(Id = household, OwnerId = coordinator.Id);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                User coordinator = TestDataFactory.createUser(
+                    'Priya',
+                    new List<String>{ 'BarnCRM_Staff' }
+                );
+                ReceiptTestDataFactory.setUpReceipting();
+                Contact osei = GivingTestDataFactory.insertHouseholdContact(
+                    'The Osei Family',
+                    'Kofi',
+                    'Osei'
+                );
+                insert ReceiptTestDataFactory.plainCashGift(
+                    osei.Id,
+                    400,
+                    Date.newInstance(YEAR, 5, 1)
+                );
+                Receipt__c statement = issueOneStatement();
+                Id household = osei.AccountId;
+                Id documentId = statement.Content_Document_Id__c;
+                // Whether staff can open a household somebody else entered is the org's sharing model,
+                // so Priya is given this one: what is under test is the file, not the household.
+                update new Account(Id = household, OwnerId = coordinator.Id);
 
-            List<Account> householdsSheCanSee;
-            List<ContentDocumentLink> linksOnTheHousehold;
-            List<ContentDocument> documentsSheCanSee;
-            System.runAs(coordinator) {
-                householdsSheCanSee = [SELECT Id FROM Account WHERE Id = :household];
-                linksOnTheHousehold = [
-                    SELECT ContentDocumentId
-                    FROM ContentDocumentLink
-                    WHERE LinkedEntityId = :household
-                ];
-                documentsSheCanSee = [SELECT Id FROM ContentDocument WHERE Id = :documentId];
+                List<Account> householdsSheCanSee;
+                List<ContentDocumentLink> linksOnTheHousehold;
+                List<ContentDocument> documentsSheCanSee;
+                System.runAs(coordinator) {
+                    householdsSheCanSee = [SELECT Id FROM Account WHERE Id = :household];
+                    linksOnTheHousehold = [
+                        SELECT ContentDocumentId
+                        FROM ContentDocumentLink
+                        WHERE LinkedEntityId = :household
+                    ];
+                    documentsSheCanSee = [SELECT Id FROM ContentDocument WHERE Id = :documentId];
+                }
+
+                Assert.areEqual(
+                    1,
+                    householdsSheCanSee.size(),
+                    'She can open the household, which is the whole reason this test exists: the record ' +
+                    'is hers to see and the tax document is not.'
+                );
+                Assert.isTrue(
+                    linksOnTheHousehold.isEmpty(),
+                    'No receipt file hangs off the donor record, so the Files related list has nothing ' +
+                    'of the donor tax history in it.'
+                );
+                Assert.isTrue(
+                    documentsSheCanSee.isEmpty(),
+                    'And the file itself is out of reach: her only route to it would have been a link.'
+                );
             }
 
-            Assert.areEqual(
-                1,
-                householdsSheCanSee.size(),
-                'She can open the household, which is the whole reason this test exists: the record ' +
-                'is hers to see and the tax document is not.'
-            );
-            Assert.isTrue(
-                linksOnTheHousehold.isEmpty(),
-                'No receipt file hangs off the donor record, so the Files related list has nothing ' +
-                'of the donor tax history in it.'
-            );
-            Assert.isTrue(
-                documentsSheCanSee.isEmpty(),
-                'And the file itself is out of reach: her only route to it would have been a link.'
-            );
         }
     }
 
@@ -166,51 +179,60 @@ private class ReceiptFileAccessTest {
      */
     @IsTest
     static void everyReceiptDocumentLinkIsViewerOnlyAndInternal() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            ReceiptTestDataFactory.setUpReceipting();
-            Contact diallo = GivingTestDataFactory.insertHouseholdContact(
-                'The Diallo Family',
-                'Awa',
-                'Diallo'
-            );
-            Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-                diallo.Id,
-                90,
-                Date.newInstance(YEAR, 6, 6)
-            );
-            insert gift;
-
-            Test.startTest();
-            Receipt__c issued = ReceiptService.issueForGift(gift.Id);
-            Test.stopTest();
-
-            Receipt__c stored = [
-                SELECT Content_Document_Id__c
-                FROM Receipt__c
-                WHERE Id = :issued.Id
-            ];
-            List<ContentDocumentLink> links = linksOtherThanTheOwner(stored.Content_Document_Id__c);
-
-            Assert.areEqual(2, links.size(), 'The receipt and the gift, which is what was linked.');
-            for (ContentDocumentLink link : links) {
-                Assert.areEqual(
-                    'V',
-                    link.ShareType,
-                    'Viewer, so record edit access can never become file edit access on a document ' +
-                    'that is immutable once issued.'
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                ReceiptTestDataFactory.setUpReceipting();
+                Contact diallo = GivingTestDataFactory.insertHouseholdContact(
+                    'The Diallo Family',
+                    'Awa',
+                    'Diallo'
                 );
-                // An org with external users is given InternalUsers. An org with none refuses that
-                // value, and AllUsers there reaches the same internal users (ADR-0034), so AllUsers is
-                // accepted only when the platform refused InternalUsers in this very run.
-                Assert.areEqual(
-                    ReceiptWriter.orgRefusesInternalOnlyLinks == true
-                        ? 'AllUsers'
-                        : 'InternalUsers',
-                    link.Visibility,
-                    'A receipt is an internal document: no external user reaches one through a link ' +
-                    'this package created.'
+                Gift__c gift = ReceiptTestDataFactory.plainCashGift(
+                    diallo.Id,
+                    90,
+                    Date.newInstance(YEAR, 6, 6)
                 );
+                insert gift;
+
+                Test.startTest();
+                Receipt__c issued = ReceiptService.issueForGift(gift.Id);
+                Test.stopTest();
+
+                Receipt__c stored = [
+                    SELECT Content_Document_Id__c
+                    FROM Receipt__c
+                    WHERE Id = :issued.Id
+                ];
+                List<ContentDocumentLink> links = linksOtherThanTheOwner(
+                    stored.Content_Document_Id__c
+                );
+
+                Assert.areEqual(
+                    2,
+                    links.size(),
+                    'The receipt and the gift, which is what was linked.'
+                );
+                for (ContentDocumentLink link : links) {
+                    Assert.areEqual(
+                        'V',
+                        link.ShareType,
+                        'Viewer, so record edit access can never become file edit access on a document ' +
+                        'that is immutable once issued.'
+                    );
+                    // An org with external users is given InternalUsers. An org with none refuses that
+                    // value, and AllUsers there reaches the same internal users (ADR-0034), so AllUsers is
+                    // accepted only when the platform refused InternalUsers in this very run.
+                    Assert.areEqual(
+                        ReceiptWriter.orgRefusesInternalOnlyLinks == true
+                            ? 'AllUsers'
+                            : 'InternalUsers',
+                        link.Visibility,
+                        'A receipt is an internal document: no external user reaches one through a link ' +
+                        'this package created.'
+                    );
+                }
             }
+
         }
     }
 
@@ -220,29 +242,31 @@ private class ReceiptFileAccessTest {
      */
     @IsTest
     static void linkingAReceiptDocumentToADonorRecordIsRefused() {
-        ReceiptTestDataFactory.setUpReceipting();
-        Contact ferreira = GivingTestDataFactory.insertHouseholdContact(
-            'The Ferreira Family',
-            'Luis',
-            'Ferreira'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTestDataFactory.setUpReceipting();
+            Contact ferreira = GivingTestDataFactory.insertHouseholdContact(
+                'The Ferreira Family',
+                'Luis',
+                'Ferreira'
+            );
 
-        Test.startTest();
-        try {
-            ReceiptWriter.storeDocument(
-                'HFH-2026-000099',
-                Blob.valueOf('<p>A statement</p>'),
-                new List<Id>{ ferreira.Id }
-            );
-            Assert.fail('A receipt document was linked to a donor Contact.');
-        } catch (ReceiptWriter.ReceiptFileLinkException refused) {
-            Assert.isTrue(
-                refused.getMessage().contains('Contact'),
-                'The message names the object that was refused, so the mistake is obvious: ' +
-                refused.getMessage()
-            );
+            Test.startTest();
+            try {
+                ReceiptWriter.storeDocument(
+                    'HFH-2026-000099',
+                    Blob.valueOf('<p>A statement</p>'),
+                    new List<Id>{ ferreira.Id }
+                );
+                Assert.fail('A receipt document was linked to a donor Contact.');
+            } catch (ReceiptWriter.ReceiptFileLinkException refused) {
+                Assert.isTrue(
+                    refused.getMessage().contains('Contact'),
+                    'The message names the object that was refused, so the mistake is obvious: ' +
+                    refused.getMessage()
+                );
+            }
+            Test.stopTest();
         }
-        Test.stopTest();
     }
 
     // ----------------------------------------------------------------------- helpers

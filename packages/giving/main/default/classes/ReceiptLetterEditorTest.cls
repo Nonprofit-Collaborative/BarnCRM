@@ -17,119 +17,137 @@ private class ReceiptLetterEditorTest {
 
     @TestSetup
     static void setUp() {
-        ReceiptTestDataFactory.setUpReceipting();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTestDataFactory.setUpReceipting();
+        }
     }
 
     @IsTest
     static void theEditorIsGivenTheLetterWithoutTheOldLetterhead() {
-        Assert.areEqual(
-            '<p>Dear {{DonorName}},</p>',
-            ReceiptTemplateService.letterOf(LEGACY_BODY),
-            'The old letterhead block is not offered for editing.'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Assert.areEqual(
+                '<p>Dear {{DonorName}},</p>',
+                ReceiptTemplateService.letterOf(LEGACY_BODY),
+                'The old letterhead block is not offered for editing.'
+            );
+        }
     }
 
     @IsTest
     static void aLetterWithoutTheOldLetterheadIsGivenToTheEditorUnchanged() {
-        String body = '<p>Thank you for supporting {{OrganizationName}}.</p>';
-        Assert.areEqual(body, ReceiptTemplateService.letterOf(body), 'Nothing is removed.');
-        Assert.isNull(ReceiptTemplateService.letterOf(null), 'An empty body stays empty.');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            String body = '<p>Thank you for supporting {{OrganizationName}}.</p>';
+            Assert.areEqual(body, ReceiptTemplateService.letterOf(body), 'Nothing is removed.');
+            Assert.isNull(ReceiptTemplateService.letterOf(null), 'An empty body stays empty.');
+        }
     }
 
     @IsTest
     static void theReceiptsPageReadsTheLetterWithoutTheOldLetterhead() {
-        Receipt_Template__c legacy = new Receipt_Template__c(
-            Name = 'Saved before the editor',
-            Type__c = ReceiptNumberSequence.TYPE_PER_GIFT,
-            Body__c = LEGACY_BODY,
-            Active__c = false
-        );
-        insert legacy;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Receipt_Template__c legacy = new Receipt_Template__c(
+                Name = 'Saved before the editor',
+                Type__c = ReceiptNumberSequence.TYPE_PER_GIFT,
+                Body__c = LEGACY_BODY,
+                Active__c = false
+            );
+            insert legacy;
 
-        Test.startTest();
-        List<ReceiptController.TemplateView> views = ReceiptController.getTemplates();
-        Test.stopTest();
+            Test.startTest();
+            List<ReceiptController.TemplateView> views = ReceiptController.getTemplates();
+            Test.stopTest();
 
-        for (ReceiptController.TemplateView view : views) {
-            if (view.id == legacy.Id) {
-                Assert.isFalse(
-                    view.body.contains('letterhead'),
-                    'The page never offers the old block: ' + view.body
-                );
-                return;
+            for (ReceiptController.TemplateView view : views) {
+                if (view.id == legacy.Id) {
+                    Assert.isFalse(
+                        view.body.contains('letterhead'),
+                        'The page never offers the old block: ' + view.body
+                    );
+                    return;
+                }
             }
+            Assert.fail('The letter saved before the editor was not listed.');
         }
-        Assert.fail('The letter saved before the editor was not listed.');
     }
 
     @IsTest
     static void thePreviewFillsInASampleGiftAndWritesNothing() {
-        Integer dmlBefore = Limits.getDmlStatements();
-        Integer receiptsBefore = [SELECT COUNT() FROM Receipt__c];
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Integer dmlBefore = Limits.getDmlStatements();
+            Integer receiptsBefore = [SELECT COUNT() FROM Receipt__c];
 
-        Test.startTest();
-        String html = ReceiptController.previewTemplate(
-            ReceiptNumberSequence.TYPE_PER_GIFT,
-            '<p>Dear {{DonorName}}, thank you for {{Amount}}.</p>'
-        );
-        Test.stopTest();
+            Test.startTest();
+            String html = ReceiptController.previewTemplate(
+                ReceiptNumberSequence.TYPE_PER_GIFT,
+                '<p>Dear {{DonorName}}, thank you for {{Amount}}.</p>'
+            );
+            Test.stopTest();
 
-        Assert.isTrue(
-            html.contains(Label.Giving_Receipt_PreviewDonor.escapeHtml4()),
-            'The sample donor is named: ' + html
-        );
-        Assert.isTrue(html.contains('$100.00'), 'The sample amount is filled in: ' + html);
-        Assert.isTrue(
-            html.contains('class="orgname"'),
-            'The letterhead the package prints is in the preview: ' + html
-        );
-        Assert.isTrue(
-            html.contains(ReceiptContentBuilder.SENTENCE_NO_GOODS),
-            'So are the tax sentences: ' + html
-        );
-        Assert.isFalse(html.contains('<body>'), 'Only the inside of the document comes back.');
-        Assert.areEqual(dmlBefore, Limits.getDmlStatements(), 'A preview writes nothing.');
-        Assert.areEqual(receiptsBefore, [SELECT COUNT() FROM Receipt__c], 'And issues no receipt.');
+            Assert.isTrue(
+                html.contains(Label.Giving_Receipt_PreviewDonor.escapeHtml4()),
+                'The sample donor is named: ' + html
+            );
+            Assert.isTrue(html.contains('$100.00'), 'The sample amount is filled in: ' + html);
+            Assert.isTrue(
+                html.contains('class="orgname"'),
+                'The letterhead the package prints is in the preview: ' + html
+            );
+            Assert.isTrue(
+                html.contains(ReceiptContentBuilder.SENTENCE_NO_GOODS),
+                'So are the tax sentences: ' + html
+            );
+            Assert.isFalse(html.contains('<body>'), 'Only the inside of the document comes back.');
+            Assert.areEqual(dmlBefore, Limits.getDmlStatements(), 'A preview writes nothing.');
+            Assert.areEqual(
+                receiptsBefore,
+                [SELECT COUNT() FROM Receipt__c],
+                'And issues no receipt.'
+            );
+        }
     }
 
     @IsTest
     static void aStatementPreviewPutsTheGiftLinesWhereTheParagraphTokenIs() {
-        Test.startTest();
-        String html = ReceiptController.previewTemplate(
-            ReceiptNumberSequence.TYPE_STATEMENT,
-            '<p>Dear {{DonorName}},</p><p>{{GiftLines}}</p><p>Thank you.</p>'
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            String html = ReceiptController.previewTemplate(
+                ReceiptNumberSequence.TYPE_STATEMENT,
+                '<p>Dear {{DonorName}},</p><p>{{GiftLines}}</p><p>Thank you.</p>'
+            );
+            Test.stopTest();
 
-        Assert.isTrue(html.contains('<table class="gifts">'), 'The lines are a table: ' + html);
-        Assert.isFalse(
-            html.contains('<p><table'),
-            'The table replaces the paragraph rather than sitting inside it: ' + html
-        );
-        Assert.areEqual(
-            1,
-            html.countMatches('<table class="gifts">'),
-            'The lines print once, where the letter put them: ' + html
-        );
-        Assert.isTrue(
-            html.contains('$100.00') && html.contains('$250.00'),
-            'Both sample gifts are lines: ' + html
-        );
+            Assert.isTrue(html.contains('<table class="gifts">'), 'The lines are a table: ' + html);
+            Assert.isFalse(
+                html.contains('<p><table'),
+                'The table replaces the paragraph rather than sitting inside it: ' + html
+            );
+            Assert.areEqual(
+                1,
+                html.countMatches('<table class="gifts">'),
+                'The lines print once, where the letter put them: ' + html
+            );
+            Assert.isTrue(
+                html.contains('$100.00') && html.contains('$250.00'),
+                'Both sample gifts are lines: ' + html
+            );
+        }
     }
 
     @IsTest
     static void anEmptyLetterCannotBePreviewed() {
-        Test.startTest();
-        try {
-            ReceiptController.previewTemplate(ReceiptNumberSequence.TYPE_PER_GIFT, ' ');
-            Assert.fail('An empty letter was previewed.');
-        } catch (AuraHandledException refused) {
-            Assert.areEqual(
-                Label.Giving_Receipt_EmptyTemplate,
-                refused.getMessage(),
-                'It says what to do.'
-            );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            try {
+                ReceiptController.previewTemplate(ReceiptNumberSequence.TYPE_PER_GIFT, ' ');
+                Assert.fail('An empty letter was previewed.');
+            } catch (AuraHandledException refused) {
+                Assert.areEqual(
+                    Label.Giving_Receipt_EmptyTemplate,
+                    refused.getMessage(),
+                    'It says what to do.'
+                );
+            }
+            Test.stopTest();
         }
-        Test.stopTest();
     }
 }

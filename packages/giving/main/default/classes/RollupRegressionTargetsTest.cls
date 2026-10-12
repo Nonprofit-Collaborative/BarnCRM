@@ -26,8 +26,10 @@ private class RollupRegressionTargetsTest {
 
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+        }
     }
 
     private static Contact ana() {
@@ -44,19 +46,21 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aHouseholdsTotalIsTheHouseholdRollupsAnswer() {
-        Contact ana = ana();
-        insert new List<Gift__c>{
-            GivingTestDataFactory.buildAccountGift(ana.AccountId, 500),
-            GivingTestDataFactory.buildGift(ana.Id, 100)
-        };
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            insert new List<Gift__c>{
+                GivingTestDataFactory.buildAccountGift(ana.AccountId, 500),
+                GivingTestDataFactory.buildGift(ana.Id, 100)
+            };
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(TOTAL_GIVING_KEYS);
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(TOTAL_GIVING_KEYS);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(600, household.Total_Giving__c, 'Everything the household gave');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(600, household.Total_Giving__c, 'Everything the household gave');
+        }
     }
 
     /**
@@ -65,18 +69,20 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aHouseholdsOwnGiftSavedNowKeepsTheHouseholdAnswer() {
-        Contact ana = ana();
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(ana.Id, 100);
-        GivingRollupTestData.nextSave();
-        insert GivingTestDataFactory.buildAccountGift(ana.AccountId, 500);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(ana.Id, 100);
+            GivingRollupTestData.nextSave();
+            insert GivingTestDataFactory.buildAccountGift(ana.AccountId, 500);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(600, household.Total_Giving__c, 'Everything the household gave');
-        Assert.areEqual(2, household.Gift_Count__c, 'Both gifts');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(600, household.Total_Giving__c, 'Everything the household gave');
+            Assert.areEqual(2, household.Gift_Count__c, 'Both gifts');
+        }
     }
 
     /**
@@ -86,19 +92,21 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void anOrganizationsTotalIsTheAccountRollupsAnswer() {
-        Account riverbend = GivingTestDataFactory.insertOrganization('Riverbend Manufacturing');
-        insert GivingTestDataFactory.buildAccountGift(riverbend.Id, 1000);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Account riverbend = GivingTestDataFactory.insertOrganization('Riverbend Manufacturing');
+            insert GivingTestDataFactory.buildAccountGift(riverbend.Id, 1000);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(TOTAL_GIVING_KEYS);
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(TOTAL_GIVING_KEYS);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1000,
-            GivingRollupTestData.account(riverbend.Id).Total_Giving__c,
-            'Riverbend\'s own giving'
-        );
+            Assert.areEqual(
+                1000,
+                GivingRollupTestData.account(riverbend.Id).Total_Giving__c,
+                'Riverbend\'s own giving'
+            );
+        }
     }
 
     // -------------------------------------------------------------------------------- freshness
@@ -109,43 +117,47 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aSavedGiftStampsTheRecordsItChanged() {
-        Contact ana = ana();
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(ana.Id, 100);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(ana.Id, 100);
+            Test.stopTest();
 
-        Assert.isNotNull(
-            GivingRollupTestData.person(ana.Id).Rollups_Last_Calculated__c,
-            'Ana\'s totals were calculated'
-        );
-        Assert.isNotNull(
-            GivingRollupTestData.account(ana.AccountId).Rollups_Last_Calculated__c,
-            'Her household\'s were too'
-        );
+            Assert.isNotNull(
+                GivingRollupTestData.person(ana.Id).Rollups_Last_Calculated__c,
+                'Ana\'s totals were calculated'
+            );
+            Assert.isNotNull(
+                GivingRollupTestData.account(ana.AccountId).Rollups_Last_Calculated__c,
+                'Her household\'s were too'
+            );
+        }
     }
 
     /** Once a recalculation has finished, the Rollups page says when it ran. */
     @IsTest
     static void aFinishedRecalculationMarksTheRollupCalculated() {
-        Contact ana = ana();
-        insert GivingTestDataFactory.buildGift(ana.Id, 100);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            insert GivingTestDataFactory.buildGift(ana.Id, 100);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(new Set<String>{ GivingRollupTestData.CONTACT_TOTAL });
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(new Set<String>{ GivingRollupTestData.CONTACT_TOTAL });
+            Test.stopTest();
 
-        Rollup_Definition__c definition = GivingRollupTestData.definitions(
-            new Set<String>{ GivingRollupTestData.CONTACT_TOTAL }
-        )[0];
-        Assert.isNotNull(definition.Last_Calculated__c, 'The run finished');
-        Assert.areEqual(
-            100,
-            GivingRollupTestData.person(ana.Id).Total_Giving__c,
-            'And wrote the total'
-        );
+            Rollup_Definition__c definition = GivingRollupTestData.definitions(
+                new Set<String>{ GivingRollupTestData.CONTACT_TOTAL }
+            )[0];
+            Assert.isNotNull(definition.Last_Calculated__c, 'The run finished');
+            Assert.areEqual(
+                100,
+                GivingRollupTestData.person(ana.Id).Total_Giving__c,
+                'And wrote the total'
+            );
+        }
     }
 
     /**
@@ -155,31 +167,33 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aRecalculationStampsTheRecordsItWrote() {
-        Contact ana = ana();
-        insert GivingTestDataFactory.buildGift(ana.Id, 100);
-        GivingRollupTestData.installShippedRollups();
-        Assert.isNull(
-            GivingRollupTestData.person(ana.Id).Rollups_Last_Calculated__c,
-            'Nothing has calculated Ana\'s totals yet'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            insert GivingTestDataFactory.buildGift(ana.Id, 100);
+            GivingRollupTestData.installShippedRollups();
+            Assert.isNull(
+                GivingRollupTestData.person(ana.Id).Rollups_Last_Calculated__c,
+                'Nothing has calculated Ana\'s totals yet'
+            );
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(
-            new Set<String>{
-                GivingRollupTestData.CONTACT_TOTAL,
-                GivingRollupTestData.HOUSEHOLD_TOTAL
-            }
-        );
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(
+                new Set<String>{
+                    GivingRollupTestData.CONTACT_TOTAL,
+                    GivingRollupTestData.HOUSEHOLD_TOTAL
+                }
+            );
+            Test.stopTest();
 
-        Assert.isNotNull(
-            GivingRollupTestData.person(ana.Id).Rollups_Last_Calculated__c,
-            'Ana\'s totals were recalculated'
-        );
-        Assert.isNotNull(
-            GivingRollupTestData.account(ana.AccountId).Rollups_Last_Calculated__c,
-            'Her household\'s were too'
-        );
+            Assert.isNotNull(
+                GivingRollupTestData.person(ana.Id).Rollups_Last_Calculated__c,
+                'Ana\'s totals were recalculated'
+            );
+            Assert.isNotNull(
+                GivingRollupTestData.account(ana.AccountId).Rollups_Last_Calculated__c,
+                'Her household\'s were too'
+            );
+        }
     }
 
     /**
@@ -191,32 +205,35 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aRollupIsNeverMarkedCalculatedBeforeItsTotalsAre() {
-        Contact ana = ana();
-        insert GivingTestDataFactory.buildGift(ana.Id, 100);
-        GivingRollupTestData.installShippedRollups();
-        Set<String> keys = new Set<String>{ GivingRollupTestData.CONTACT_TOTAL };
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            insert GivingTestDataFactory.buildGift(ana.Id, 100);
+            GivingRollupTestData.installShippedRollups();
+            Set<String> keys = new Set<String>{ GivingRollupTestData.CONTACT_TOTAL };
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(keys);
-        Datetime markedWhileRunning = GivingRollupTestData.definitions(keys)[0].Last_Calculated__c;
-        Decimal totalWhileRunning = GivingRollupTestData.person(ana.Id).Total_Giving__c;
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(keys);
+            Datetime markedWhileRunning = GivingRollupTestData.definitions(keys)[0]
+                .Last_Calculated__c;
+            Decimal totalWhileRunning = GivingRollupTestData.person(ana.Id).Total_Giving__c;
+            Test.stopTest();
 
-        if (markedWhileRunning != null) {
+            if (markedWhileRunning != null) {
+                Assert.areEqual(
+                    100,
+                    totalWhileRunning,
+                    'Marked calculated, so the total had to be written already'
+                );
+            }
+            Assert.isNotNull(
+                GivingRollupTestData.definitions(keys)[0].Last_Calculated__c,
+                'Marked calculated once the run finished'
+            );
             Assert.areEqual(
                 100,
-                totalWhileRunning,
-                'Marked calculated, so the total had to be written already'
+                GivingRollupTestData.person(ana.Id).Total_Giving__c,
+                'With the total written'
             );
         }
-        Assert.isNotNull(
-            GivingRollupTestData.definitions(keys)[0].Last_Calculated__c,
-            'Marked calculated once the run finished'
-        );
-        Assert.areEqual(
-            100,
-            GivingRollupTestData.person(ana.Id).Total_Giving__c,
-            'With the total written'
-        );
     }
 }

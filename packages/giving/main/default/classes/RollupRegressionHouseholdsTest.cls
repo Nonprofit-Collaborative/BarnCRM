@@ -31,10 +31,12 @@ private class RollupRegressionHouseholdsTest {
 
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        // Credits are made by hand in these tests, so that which household is credited is
-        // decided by the test and not by the automatic household credit.
-        RecognitionTestData.setAutomaticHouseholdCredits(false);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            // Credits are made by hand in these tests, so that which household is credited is
+            // decided by the test and not by the automatic household credit.
+            RecognitionTestData.setAutomaticHouseholdCredits(false);
+        }
     }
 
     /** A gift from Wei, solicited by the person given. Returns the gift. */
@@ -63,50 +65,54 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aGiftLandsOnTheHouseholdInJunctionMode() {
-        RecognitionTestData.useJunctionMembership();
-        Account garcia = RecognitionTestData.household('The Garcia Family');
-        Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
-        RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.useJunctionMembership();
+            Account garcia = RecognitionTestData.household('The Garcia Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
+            RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(ana.Id, 120);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(ana.Id, 120);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(garcia.Id);
-        GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
-        Assert.areEqual(120, household.Total_Giving__c, 'The household Ana is a member of');
-        Assert.areEqual(1, household.Gift_Count__c, 'One gift');
-        Assert.areEqual(
-            120,
-            GivingRollupTestData.person(ana.Id).Total_Giving__c,
-            'And Ana herself'
-        );
+            Account household = GivingRollupTestData.account(garcia.Id);
+            GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
+            Assert.areEqual(120, household.Total_Giving__c, 'The household Ana is a member of');
+            Assert.areEqual(1, household.Gift_Count__c, 'One gift');
+            Assert.areEqual(
+                120,
+                GivingRollupTestData.person(ana.Id).Total_Giving__c,
+                'And Ana herself'
+            );
+        }
     }
 
     /** The same gift recalculated, as the nightly run would, in junction mode. */
     @IsTest
     static void aRecalculatedGiftLandsOnTheHouseholdInJunctionMode() {
-        RecognitionTestData.useJunctionMembership();
-        Account garcia = RecognitionTestData.household('The Garcia Family');
-        Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
-        RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
-        insert GivingTestDataFactory.buildGift(ana.Id, 120);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.useJunctionMembership();
+            Account garcia = RecognitionTestData.household('The Garcia Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
+            RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
+            insert GivingTestDataFactory.buildGift(ana.Id, 120);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(
-            new Set<String>{
-                GivingRollupTestData.HOUSEHOLD_TOTAL,
-                GivingRollupTestData.HOUSEHOLD_COUNT
-            }
-        );
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(
+                new Set<String>{
+                    GivingRollupTestData.HOUSEHOLD_TOTAL,
+                    GivingRollupTestData.HOUSEHOLD_COUNT
+                }
+            );
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(garcia.Id);
-        GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
-        Assert.areEqual(120, household.Total_Giving__c, 'The household Ana is a member of');
-        Assert.areEqual(1, household.Gift_Count__c, 'One gift');
+            Account household = GivingRollupTestData.account(garcia.Id);
+            GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
+            Assert.areEqual(120, household.Total_Giving__c, 'The household Ana is a member of');
+            Assert.areEqual(1, household.Gift_Count__c, 'One gift');
+        }
     }
 
     // ------------------------------------------------------------------- household soft credits
@@ -117,27 +123,33 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aSoftCreditLandsOnTheHouseholdInContactMode() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact(
-            'The Nolan Family',
-            'Ana',
-            'Nolan'
-        );
-        Gift__c gift = giftFromWei(500);
-        insert solicitorCredit(gift.Id, ana.Id, 500);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact(
+                'The Nolan Family',
+                'Ana',
+                'Nolan'
+            );
+            Gift__c gift = giftFromWei(500);
+            insert solicitorCredit(gift.Id, ana.Id, 500);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(500, household.Total_Soft_Credits__c, 'Ana\'s credit, on her household');
-        Assert.areEqual(1, household.Soft_Credit_Count__c, 'One gift recognized');
-        Assert.areEqual(
-            0,
-            GivingRollupTestData.valueOf(household.Total_Giving__c),
-            'Recognition is never giving'
-        );
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(
+                500,
+                household.Total_Soft_Credits__c,
+                'Ana\'s credit, on her household'
+            );
+            Assert.areEqual(1, household.Soft_Credit_Count__c, 'One gift recognized');
+            Assert.areEqual(
+                0,
+                GivingRollupTestData.valueOf(household.Total_Giving__c),
+                'Recognition is never giving'
+            );
+        }
     }
 
     /**
@@ -146,22 +158,28 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aSoftCreditLandsOnTheHouseholdInJunctionMode() {
-        RecognitionTestData.useJunctionMembership();
-        Account garcia = RecognitionTestData.household('The Garcia Family');
-        Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
-        RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
-        Contact wei = RecognitionTestData.person('Wei', 'Lee', null);
-        Gift__c gift = RecognitionTestData.gift(wei.Id, null, 500);
-        insert solicitorCredit(gift.Id, ana.Id, 500);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.useJunctionMembership();
+            Account garcia = RecognitionTestData.household('The Garcia Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
+            RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
+            Contact wei = RecognitionTestData.person('Wei', 'Lee', null);
+            Gift__c gift = RecognitionTestData.gift(wei.Id, null, 500);
+            insert solicitorCredit(gift.Id, ana.Id, 500);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(garcia.Id);
-        Assert.areEqual(500, household.Total_Soft_Credits__c, 'Ana\'s credit, on her household');
-        Assert.areEqual(1, household.Soft_Credit_Count__c, 'One gift recognized');
+            Account household = GivingRollupTestData.account(garcia.Id);
+            Assert.areEqual(
+                500,
+                household.Total_Soft_Credits__c,
+                'Ana\'s credit, on her household'
+            );
+            Assert.areEqual(1, household.Soft_Credit_Count__c, 'One gift recognized');
+        }
     }
 
     /**
@@ -172,29 +190,31 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aRefundedCreditNetsOutOfTheHouseholdTotal() {
-        RecognitionTestData.setAutomaticHouseholdCredits(true);
-        Contact ana = GivingTestDataFactory.insertHouseholdContact(
-            'The Nolan Family',
-            'Ana',
-            'Nolan'
-        );
-        insert new Contact(FirstName = 'Luis', LastName = 'Nolan', AccountId = ana.AccountId);
-        Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
-        insert gift;
-        GiftService.refund(gift.Id, 200, 'Part returned');
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.setAutomaticHouseholdCredits(true);
+            Contact ana = GivingTestDataFactory.insertHouseholdContact(
+                'The Nolan Family',
+                'Ana',
+                'Nolan'
+            );
+            insert new Contact(FirstName = 'Luis', LastName = 'Nolan', AccountId = ana.AccountId);
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
+            insert gift;
+            GiftService.refund(gift.Id, 200, 'Part returned');
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(
-            300,
-            household.Total_Soft_Credits__c,
-            'Luis is recognized for what is held'
-        );
-        Assert.areEqual(1, household.Soft_Credit_Count__c, 'Still one gift recognized');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(
+                300,
+                household.Total_Soft_Credits__c,
+                'Luis is recognized for what is held'
+            );
+            Assert.areEqual(1, household.Soft_Credit_Count__c, 'Still one gift recognized');
+        }
     }
 
     /**
@@ -203,22 +223,24 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aSavedSoftCreditUpdatesTheHousehold() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact(
-            'The Nolan Family',
-            'Ana',
-            'Nolan'
-        );
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact(
+                'The Nolan Family',
+                'Ana',
+                'Nolan'
+            );
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        Gift__c gift = giftFromWei(500);
-        GivingRollupTestData.nextSave();
-        insert solicitorCredit(gift.Id, ana.Id, 500);
-        Test.stopTest();
+            Test.startTest();
+            Gift__c gift = giftFromWei(500);
+            GivingRollupTestData.nextSave();
+            insert solicitorCredit(gift.Id, ana.Id, 500);
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(500, household.Total_Soft_Credits__c, 'Moved with the save');
-        Assert.areEqual(1, household.Soft_Credit_Count__c, 'Moved with the save');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(500, household.Total_Soft_Credits__c, 'Moved with the save');
+            Assert.areEqual(1, household.Soft_Credit_Count__c, 'Moved with the save');
+        }
     }
 
     /**
@@ -229,38 +251,40 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aPersonWhoMovesTakesTheirSoftCreditsWithThem() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact(
-            'The Nolan Family',
-            'Ana',
-            'Nolan'
-        );
-        Contact bea = GivingTestDataFactory.insertHouseholdContact(
-            'The Lindqvist Family',
-            'Bea',
-            'Lindqvist'
-        );
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact(
+                'The Nolan Family',
+                'Ana',
+                'Nolan'
+            );
+            Contact bea = GivingTestDataFactory.insertHouseholdContact(
+                'The Lindqvist Family',
+                'Bea',
+                'Lindqvist'
+            );
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        Gift__c gift = giftFromWei(500);
-        GivingRollupTestData.nextSave();
-        insert solicitorCredit(gift.Id, ana.Id, 500);
-        GivingRollupTestData.nextSave();
-        update new Contact(Id = ana.Id, AccountId = bea.AccountId);
-        Test.stopTest();
+            Test.startTest();
+            Gift__c gift = giftFromWei(500);
+            GivingRollupTestData.nextSave();
+            insert solicitorCredit(gift.Id, ana.Id, 500);
+            GivingRollupTestData.nextSave();
+            update new Contact(Id = ana.Id, AccountId = bea.AccountId);
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            GivingRollupTestData.valueOf(
-                GivingRollupTestData.account(ana.AccountId).Total_Soft_Credits__c
-            ),
-            'The household Ana left'
-        );
-        Assert.areEqual(
-            500,
-            GivingRollupTestData.account(bea.AccountId).Total_Soft_Credits__c,
-            'The household Ana joined'
-        );
+            Assert.areEqual(
+                0,
+                GivingRollupTestData.valueOf(
+                    GivingRollupTestData.account(ana.AccountId).Total_Soft_Credits__c
+                ),
+                'The household Ana left'
+            );
+            Assert.areEqual(
+                500,
+                GivingRollupTestData.account(bea.AccountId).Total_Soft_Credits__c,
+                'The household Ana joined'
+            );
+        }
     }
 
     /**
@@ -271,36 +295,38 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aMemberWhoMovesTakesCreditsButNotGivingInJunctionMode() {
-        RecognitionTestData.useJunctionMembership();
-        Account garcia = RecognitionTestData.household('The Garcia Family');
-        Account lee = RecognitionTestData.household('The Lee Family');
-        Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
-        Contact luis = RecognitionTestData.person('Luis', 'Garcia', null);
-        Contact wei = RecognitionTestData.person('Wei', 'Lee', null);
-        RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
-        RecognitionTestData.membership(garcia.Id, luis.Id, 'Member');
-        RecognitionTestData.membership(lee.Id, wei.Id, 'Head');
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.useJunctionMembership();
+            Account garcia = RecognitionTestData.household('The Garcia Family');
+            Account lee = RecognitionTestData.household('The Lee Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
+            Contact luis = RecognitionTestData.person('Luis', 'Garcia', null);
+            Contact wei = RecognitionTestData.person('Wei', 'Lee', null);
+            RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
+            RecognitionTestData.membership(garcia.Id, luis.Id, 'Member');
+            RecognitionTestData.membership(lee.Id, wei.Id, 'Head');
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        RecognitionTestData.gift(ana.Id, null, 100);
-        Gift__c weisGift = RecognitionTestData.gift(wei.Id, null, 500);
-        GivingRollupTestData.nextSave();
-        insert solicitorCredit(weisGift.Id, ana.Id, 500);
-        GivingRollupTestData.nextSave();
-        HouseholdService.moveMembers(new Set<Id>{ ana.Id }, lee.Id);
-        Test.stopTest();
+            Test.startTest();
+            RecognitionTestData.gift(ana.Id, null, 100);
+            Gift__c weisGift = RecognitionTestData.gift(wei.Id, null, 500);
+            GivingRollupTestData.nextSave();
+            insert solicitorCredit(weisGift.Id, ana.Id, 500);
+            GivingRollupTestData.nextSave();
+            HouseholdService.moveMembers(new Set<Id>{ ana.Id }, lee.Id);
+            Test.stopTest();
 
-        Account left = GivingRollupTestData.account(garcia.Id);
-        Account joined = GivingRollupTestData.account(lee.Id);
-        Assert.areEqual(
-            0,
-            GivingRollupTestData.valueOf(left.Total_Soft_Credits__c),
-            'The credit left Garcia'
-        );
-        Assert.areEqual(500, joined.Total_Soft_Credits__c, 'And joined Lee');
-        Assert.areEqual(100, left.Total_Giving__c, 'Ana\'s gift stays with Garcia (R-G2)');
-        Assert.areEqual(500, joined.Total_Giving__c, 'Lee has only Wei\'s gift');
+            Account left = GivingRollupTestData.account(garcia.Id);
+            Account joined = GivingRollupTestData.account(lee.Id);
+            Assert.areEqual(
+                0,
+                GivingRollupTestData.valueOf(left.Total_Soft_Credits__c),
+                'The credit left Garcia'
+            );
+            Assert.areEqual(500, joined.Total_Soft_Credits__c, 'And joined Lee');
+            Assert.areEqual(100, left.Total_Giving__c, 'Ana\'s gift stays with Garcia (R-G2)');
+            Assert.areEqual(500, joined.Total_Giving__c, 'Lee has only Wei\'s gift');
+        }
     }
 
     /**
@@ -309,39 +335,41 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void twoHundredSoftCreditsReachTwentyHouseholds() {
-        List<String> names = new List<String>();
-        for (Integer i = 0; i < 20; i++) {
-            names.add('Solicitor' + i);
-        }
-        List<Contact> solicitors = GivingRollupTestData.peopleInOwnHouseholds(names);
-        Account riverbend = GivingTestDataFactory.insertOrganization('Riverbend Manufacturing');
-        List<Gift__c> gifts = new List<Gift__c>();
-        for (Integer i = 0; i < 200; i++) {
-            gifts.add(GivingTestDataFactory.buildAccountGift(riverbend.Id, 10));
-        }
-        insert gifts;
-        List<Soft_Credit__c> credits = new List<Soft_Credit__c>();
-        for (Integer i = 0; i < 200; i++) {
-            credits.add(solicitorCredit(gifts[i].Id, solicitors[Math.mod(i, 20)].Id, 10));
-        }
-        insert credits;
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<String> names = new List<String>();
+            for (Integer i = 0; i < 20; i++) {
+                names.add('Solicitor' + i);
+            }
+            List<Contact> solicitors = GivingRollupTestData.peopleInOwnHouseholds(names);
+            Account riverbend = GivingTestDataFactory.insertOrganization('Riverbend Manufacturing');
+            List<Gift__c> gifts = new List<Gift__c>();
+            for (Integer i = 0; i < 200; i++) {
+                gifts.add(GivingTestDataFactory.buildAccountGift(riverbend.Id, 10));
+            }
+            insert gifts;
+            List<Soft_Credit__c> credits = new List<Soft_Credit__c>();
+            for (Integer i = 0; i < 200; i++) {
+                credits.add(solicitorCredit(gifts[i].Id, solicitors[Math.mod(i, 20)].Id, 10));
+            }
+            insert credits;
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(HOUSEHOLD_SOFT_KEYS);
+            Test.stopTest();
 
-        Set<Id> householdIds = new Set<Id>();
-        for (Contact solicitor : solicitors) {
-            householdIds.add(solicitor.AccountId);
-        }
-        for (Account household : [
-            SELECT Total_Soft_Credits__c, Soft_Credit_Count__c
-            FROM Account
-            WHERE Id IN :householdIds
-        ]) {
-            Assert.areEqual(100, household.Total_Soft_Credits__c, 'Ten credits of 10');
-            Assert.areEqual(10, household.Soft_Credit_Count__c, 'Ten gifts recognized');
+            Set<Id> householdIds = new Set<Id>();
+            for (Contact solicitor : solicitors) {
+                householdIds.add(solicitor.AccountId);
+            }
+            for (Account household : [
+                SELECT Total_Soft_Credits__c, Soft_Credit_Count__c
+                FROM Account
+                WHERE Id IN :householdIds
+            ]) {
+                Assert.areEqual(100, household.Total_Soft_Credits__c, 'Ten credits of 10');
+                Assert.areEqual(10, household.Soft_Credit_Count__c, 'Ten gifts recognized');
+            }
         }
     }
 }

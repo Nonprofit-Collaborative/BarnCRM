@@ -22,8 +22,10 @@ private class RollupRegressionAmountsTest {
 
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+        }
     }
 
     private static Contact ana() {
@@ -43,25 +45,27 @@ private class RollupRegressionAmountsTest {
      */
     @IsTest
     static void aPartialRefundSavedNowLeavesWhatIsHeld() {
-        GivingRollupTestData.installShippedRollups();
-        Contact ana = ana();
-        Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingRollupTestData.installShippedRollups();
+            Contact ana = ana();
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
 
-        Test.startTest();
-        insert gift;
-        GivingRollupTestData.nextSave();
-        GiftService.refund(gift.Id, 100, 'Donor asked for the misdirected portion back');
-        Test.stopTest();
+            Test.startTest();
+            insert gift;
+            GivingRollupTestData.nextSave();
+            GiftService.refund(gift.Id, 100, 'Donor asked for the misdirected portion back');
+            Test.stopTest();
 
-        Contact person = GivingRollupTestData.person(ana.Id);
-        GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
-        Assert.areEqual(150, person.Total_Giving__c, 'What the organization still holds');
-        Assert.areEqual(1, person.Gift_Count__c, 'A refund is not a gift given');
-        Assert.areEqual(250, person.Largest_Gift__c, 'The largest gift is the gift as given');
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        Assert.areEqual(150, household.Total_Giving__c, 'The household holds the same');
-        Assert.areEqual(1, household.Gift_Count__c, 'And gave once');
-        // The fund after a refund is asserted by the recalculation below.
+            Contact person = GivingRollupTestData.person(ana.Id);
+            GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
+            Assert.areEqual(150, person.Total_Giving__c, 'What the organization still holds');
+            Assert.areEqual(1, person.Gift_Count__c, 'A refund is not a gift given');
+            Assert.areEqual(250, person.Largest_Gift__c, 'The largest gift is the gift as given');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            Assert.areEqual(150, household.Total_Giving__c, 'The household holds the same');
+            Assert.areEqual(1, household.Gift_Count__c, 'And gave once');
+            // The fund after a refund is asserted by the recalculation below.
+        }
     }
 
     /**
@@ -70,39 +74,45 @@ private class RollupRegressionAmountsTest {
      */
     @IsTest
     static void aFullRefundRecalculatedLeavesZeroAndOneGift() {
-        Contact ana = ana();
-        Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
-        insert gift;
-        GivingRollupTestData.nextSave();
-        GiftService.refund(gift.Id, 250, 'Gift sent to the wrong organization');
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 250);
+            insert gift;
+            GivingRollupTestData.nextSave();
+            GiftService.refund(gift.Id, 250, 'Gift sent to the wrong organization');
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(
-            new Set<String>{
-                GivingRollupTestData.HOUSEHOLD_TOTAL,
-                GivingRollupTestData.HOUSEHOLD_COUNT,
-                GivingRollupTestData.HOUSEHOLD_LARGEST,
-                GivingRollupTestData.CONTACT_LARGEST,
-                GivingRollupTestData.FUND_TOTAL,
-                GivingRollupTestData.FUND_COUNT
-            }
-        );
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(
+                new Set<String>{
+                    GivingRollupTestData.HOUSEHOLD_TOTAL,
+                    GivingRollupTestData.HOUSEHOLD_COUNT,
+                    GivingRollupTestData.HOUSEHOLD_LARGEST,
+                    GivingRollupTestData.CONTACT_LARGEST,
+                    GivingRollupTestData.FUND_TOTAL,
+                    GivingRollupTestData.FUND_COUNT
+                }
+            );
+            Test.stopTest();
 
-        Account household = GivingRollupTestData.account(ana.AccountId);
-        GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
-        Assert.areEqual(0, household.Total_Giving__c, 'Nothing held, and zero rather than blank');
-        Assert.areEqual(1, household.Gift_Count__c, 'The household gave once');
-        Assert.areEqual(250, household.Largest_Gift__c, 'The gift as given');
-        Assert.areEqual(
-            250,
-            GivingRollupTestData.person(ana.Id).Largest_Gift__c,
-            'A negative gift is never anybody\'s largest'
-        );
-        Fund__c fund = GivingRollupTestData.fund(general().Id);
-        Assert.areEqual(0, fund.Total_Raised__c, 'The fund holds nothing of it');
-        Assert.areEqual(1, fund.Gift_Count__c, 'One gift to the fund');
+            Account household = GivingRollupTestData.account(ana.AccountId);
+            GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
+            Assert.areEqual(
+                0,
+                household.Total_Giving__c,
+                'Nothing held, and zero rather than blank'
+            );
+            Assert.areEqual(1, household.Gift_Count__c, 'The household gave once');
+            Assert.areEqual(250, household.Largest_Gift__c, 'The gift as given');
+            Assert.areEqual(
+                250,
+                GivingRollupTestData.person(ana.Id).Largest_Gift__c,
+                'A negative gift is never anybody\'s largest'
+            );
+            Fund__c fund = GivingRollupTestData.fund(general().Id);
+            Assert.areEqual(0, fund.Total_Raised__c, 'The fund holds nothing of it');
+            Assert.areEqual(1, fund.Gift_Count__c, 'One gift to the fund');
+        }
     }
 
     /**
@@ -111,39 +121,45 @@ private class RollupRegressionAmountsTest {
      */
     @IsTest
     static void twoHundredRefundsInOneSaveAreAllCounted() {
-        GivingRollupTestData.installShippedRollups();
-        List<String> names = new List<String>();
-        for (Integer i = 0; i < 20; i++) {
-            names.add('Donor' + i);
-        }
-        List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
-        List<Gift__c> gifts = new List<Gift__c>();
-        for (Contact donor : donors) {
-            gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
-        }
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingRollupTestData.installShippedRollups();
+            List<String> names = new List<String>();
+            for (Integer i = 0; i < 20; i++) {
+                names.add('Donor' + i);
+            }
+            List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
+            List<Gift__c> gifts = new List<Gift__c>();
+            for (Contact donor : donors) {
+                gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
+            }
 
-        Test.startTest();
-        insert gifts;
-        GivingRollupTestData.nextSave();
-        List<Gift__c> refunds = new List<Gift__c>();
-        for (Gift__c gift : gifts) {
-            Gift__c refund = GivingTestDataFactory.buildGift(gift.Donor_Contact__c, -5);
-            refund.Original_Gift__c = gift.Id;
-            refund.Refund_Reason__c = 'Processing fee returned';
-            refunds.add(refund);
-        }
-        insert refunds;
-        Test.stopTest();
+            Test.startTest();
+            insert gifts;
+            GivingRollupTestData.nextSave();
+            List<Gift__c> refunds = new List<Gift__c>();
+            for (Gift__c gift : gifts) {
+                Gift__c refund = GivingTestDataFactory.buildGift(gift.Donor_Contact__c, -5);
+                refund.Original_Gift__c = gift.Id;
+                refund.Refund_Reason__c = 'Processing fee returned';
+                refunds.add(refund);
+            }
+            insert refunds;
+            Test.stopTest();
 
-        Assert.areEqual(200, refunds.size(), 'The bulk case is two hundred records');
-        for (Contact donor : [
-            SELECT Total_Giving__c, Gift_Count__c
-            FROM Contact
-            WHERE Id IN :donors
-        ]) {
-            GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
-            Assert.areEqual(200, donor.Total_Giving__c, 'Ten gifts of 25, each with 5 returned');
-            Assert.areEqual(10, donor.Gift_Count__c, 'Still ten gifts given');
+            Assert.areEqual(200, refunds.size(), 'The bulk case is two hundred records');
+            for (Contact donor : [
+                SELECT Total_Giving__c, Gift_Count__c
+                FROM Contact
+                WHERE Id IN :donors
+            ]) {
+                GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
+                Assert.areEqual(
+                    200,
+                    donor.Total_Giving__c,
+                    'Ten gifts of 25, each with 5 returned'
+                );
+                Assert.areEqual(10, donor.Gift_Count__c, 'Still ten gifts given');
+            }
         }
     }
 
@@ -230,33 +246,37 @@ private class RollupRegressionAmountsTest {
     /** A fiscal year that starts in July, as most of the sector's does. */
     @IsTest
     static void fiscalTotalsFollowAJulyStart() {
-        SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-        SettingsService.clearCaches();
-        Contact ana = ana();
-        Date thisYearStart = currentFiscalYearStart(7);
-        giftsAroundTheBoundaries(ana.Id, thisYearStart);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
+            SettingsService.clearCaches();
+            Contact ana = ana();
+            Date thisYearStart = currentFiscalYearStart(7);
+            giftsAroundTheBoundaries(ana.Id, thisYearStart);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(fiscalKeys());
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(fiscalKeys());
+            Test.stopTest();
 
-        assertFiscalTotals(ana, thisYearStart);
+            assertFiscalTotals(ana, thisYearStart);
+        }
     }
 
     /** With the start month never set, the fiscal year is the calendar year. */
     @IsTest
     static void fiscalTotalsDefaultToTheCalendarYear() {
-        Contact ana = ana();
-        Date thisYearStart = currentFiscalYearStart(1);
-        giftsAroundTheBoundaries(ana.Id, thisYearStart);
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            Date thisYearStart = currentFiscalYearStart(1);
+            giftsAroundTheBoundaries(ana.Id, thisYearStart);
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(fiscalKeys());
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(fiscalKeys());
+            Test.stopTest();
 
-        assertFiscalTotals(ana, thisYearStart);
+            assertFiscalTotals(ana, thisYearStart);
+        }
     }
 
     /**
@@ -265,31 +285,41 @@ private class RollupRegressionAmountsTest {
      */
     @IsTest
     static void aRefundCountsInTheYearItIsDated() {
-        SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
-        SettingsService.clearCaches();
-        Contact ana = ana();
-        Date thisYearStart = currentFiscalYearStart(7);
-        Gift__c gift = datedGift(ana.Id, 300, thisYearStart.addYears(-2));
-        insert gift;
-        Gift__c refund = datedGift(ana.Id, -100, thisYearStart.addYears(-1));
-        refund.Original_Gift__c = gift.Id;
-        refund.Refund_Reason__c = 'Returned the following year';
-        insert refund;
-        GivingRollupTestData.installShippedRollups();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
+            SettingsService.clearCaches();
+            Contact ana = ana();
+            Date thisYearStart = currentFiscalYearStart(7);
+            Gift__c gift = datedGift(ana.Id, 300, thisYearStart.addYears(-2));
+            insert gift;
+            Gift__c refund = datedGift(ana.Id, -100, thisYearStart.addYears(-1));
+            refund.Original_Gift__c = gift.Id;
+            refund.Refund_Reason__c = 'Returned the following year';
+            insert refund;
+            GivingRollupTestData.installShippedRollups();
 
-        Test.startTest();
-        GivingRollupTestData.recalculate(fiscalKeys());
-        Test.stopTest();
+            Test.startTest();
+            GivingRollupTestData.recalculate(fiscalKeys());
+            Test.stopTest();
 
-        Contact person = GivingRollupTestData.person(ana.Id);
-        GivingTestDataFactory.assertRollupWrote(person.Giving_Two_Years_Ago__c);
-        Assert.areEqual(300, person.Giving_Two_Years_Ago__c, 'The gift, in the year it was given');
-        Assert.areEqual(-100, person.Giving_Last_Year__c, 'The refund, in the year it went back');
-        Assert.areEqual(
-            0,
-            GivingRollupTestData.valueOf(person.Gifts_Last_Year__c),
-            'No gift given last year'
-        );
-        Assert.areEqual(200, person.Total_Giving__c, 'All time nets the two');
+            Contact person = GivingRollupTestData.person(ana.Id);
+            GivingTestDataFactory.assertRollupWrote(person.Giving_Two_Years_Ago__c);
+            Assert.areEqual(
+                300,
+                person.Giving_Two_Years_Ago__c,
+                'The gift, in the year it was given'
+            );
+            Assert.areEqual(
+                -100,
+                person.Giving_Last_Year__c,
+                'The refund, in the year it went back'
+            );
+            Assert.areEqual(
+                0,
+                GivingRollupTestData.valueOf(person.Gifts_Last_Year__c),
+                'No gift given last year'
+            );
+            Assert.areEqual(200, person.Total_Giving__c, 'All time nets the two');
+        }
     }
 }

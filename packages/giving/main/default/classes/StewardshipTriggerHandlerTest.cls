@@ -14,7 +14,9 @@ private class StewardshipTriggerHandlerTest {
      */
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.ensureDefaultFund();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.ensureDefaultFund();
+        }
     }
 
     private static Stewardship_Plan_Template__c activeTemplate() {
@@ -44,80 +46,91 @@ private class StewardshipTriggerHandlerTest {
 
     @IsTest
     static void switchingTheAutomationOffStopsPlansStarting() {
-        activeTemplate();
-        Contact person = donor();
-        // The switch is a row the post-install script writes from the registry; a test
-        // sees none of the org's rows, so it writes them the same way first.
-        AutomationControl.ensureDefaults();
-        AutomationControl.setEnabled('Stewardship_Plan_Starter', false);
-        AutomationControl.clearCache();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            activeTemplate();
+            Contact person = donor();
+            // The switch is a row the post-install script writes from the registry; a test
+            // sees none of the org's rows, so it writes them the same way first.
+            AutomationControl.ensureDefaults();
+            AutomationControl.setEnabled('Stewardship_Plan_Starter', false);
+            AutomationControl.clearCache();
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(person.Id, 100);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(person.Id, 100);
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Stewardship_Plan__c],
-            'An administrator who switched stewardship off before a bulk load gets no plans (R-SP1).'
-        );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Stewardship_Plan__c],
+                'An administrator who switched stewardship off before a bulk load gets no plans (R-SP1).'
+            );
+        }
     }
 
     @IsTest
     static void switchingItBackOnDoesNotStartPlansForTheGiftsItMissed() {
-        activeTemplate();
-        Contact person = donor();
-        // The switch is a row the post-install script writes from the registry; a test
-        // sees none of the org's rows, so it writes them the same way first.
-        AutomationControl.ensureDefaults();
-        AutomationControl.setEnabled('Stewardship_Plan_Starter', false);
-        AutomationControl.clearCache();
-        insert GivingTestDataFactory.buildGift(person.Id, 100);
-        AutomationControl.setEnabled('Stewardship_Plan_Starter', true);
-        AutomationControl.clearCache();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            activeTemplate();
+            Contact person = donor();
+            // The switch is a row the post-install script writes from the registry; a test
+            // sees none of the org's rows, so it writes them the same way first.
+            AutomationControl.ensureDefaults();
+            AutomationControl.setEnabled('Stewardship_Plan_Starter', false);
+            AutomationControl.clearCache();
+            insert GivingTestDataFactory.buildGift(person.Id, 100);
+            AutomationControl.setEnabled('Stewardship_Plan_Starter', true);
+            AutomationControl.clearCache();
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(person.Id, 200);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(person.Id, 200);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Stewardship_Plan__c],
-            'Only the gift saved while it was on started a plan. Nothing is caught up afterwards, ' +
-            'because a welcome for a gift from three weeks ago is not a welcome.'
-        );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Stewardship_Plan__c],
+                'Only the gift saved while it was on started a plan. Nothing is caught up afterwards, ' +
+                'because a welcome for a gift from three weeks ago is not a welcome.'
+            );
+        }
     }
 
     @IsTest
     static void aGiftWithNoDonorStartsNothingAndStillSaves() {
-        activeTemplate();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            activeTemplate();
 
-        Test.startTest();
-        Gift__c orphan = GivingTestDataFactory.buildGift(null, 100);
-        Database.SaveResult saved = Database.insert(orphan, false);
-        Test.stopTest();
+            Test.startTest();
+            Gift__c orphan = GivingTestDataFactory.buildGift(null, 100);
+            Database.SaveResult saved = Database.insert(orphan, false);
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Stewardship_Plan__c],
-            'There is nobody to steward, so nothing starts.'
-        );
-        Assert.isNotNull(saved, 'And the save was attempted rather than blocked by stewardship.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Stewardship_Plan__c],
+                'There is nobody to steward, so nothing starts.'
+            );
+            Assert.isNotNull(
+                saved,
+                'And the save was attempted rather than blocked by stewardship.'
+            );
+        }
     }
 
     @IsTest
     static void aGiftSavesEvenWhenThereAreNoTemplatesAtAll() {
-        Contact person = donor();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact person = donor();
 
-        Test.startTest();
-        insert GivingTestDataFactory.buildGift(person.Id, 100);
-        Test.stopTest();
+            Test.startTest();
+            insert GivingTestDataFactory.buildGift(person.Id, 100);
+            Test.stopTest();
 
-        Assert.areEqual(1, [SELECT COUNT() FROM Gift__c], 'The gift is recorded.');
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Stewardship_Plan__c],
-            'An org that has not set up any stewardship pays nothing for the feature existing.'
-        );
+            Assert.areEqual(1, [SELECT COUNT() FROM Gift__c], 'The gift is recorded.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Stewardship_Plan__c],
+                'An org that has not set up any stewardship pays nothing for the feature existing.'
+            );
+        }
     }
 }

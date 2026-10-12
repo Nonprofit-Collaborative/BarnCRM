@@ -22,60 +22,64 @@ private class SoftCreditRefundTest {
      */
     @IsTest
     static void aFullyRefundedGiftLeavesTheHouseholdMemberRecognizedForNothing() {
-        RecognitionTestData.setAutomaticHouseholdCredits(true);
-        GivingTestDataFactory.insertDefaultFund();
-        Account garcias = RecognitionTestData.household('The Garcia Family');
-        Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
-        Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.setAutomaticHouseholdCredits(true);
+            GivingTestDataFactory.insertDefaultFund();
+            Account garcias = RecognitionTestData.household('The Garcia Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
+            Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
 
-        Gift__c gift = RecognitionTestData.gift(ana.Id, null, 250);
-        Assert.areEqual(
-            250,
-            RecognitionTestData.creditsFor(gift.Id)[0].Amount__c,
-            'Luis starts recognized for the whole gift.'
-        );
+            Gift__c gift = RecognitionTestData.gift(ana.Id, null, 250);
+            Assert.areEqual(
+                250,
+                RecognitionTestData.creditsFor(gift.Id)[0].Amount__c,
+                'Luis starts recognized for the whole gift.'
+            );
 
-        Id refundId = GiftService.refund(gift.Id, 250, 'Donor asked for all of it back');
+            Id refundId = GiftService.refund(gift.Id, 250, 'Donor asked for all of it back');
 
-        Assert.areEqual(
-            'Refunded',
-            [SELECT Status__c FROM Gift__c WHERE Id = :gift.Id].Status__c,
-            'The whole gift has gone back, so R-G3 moves the original off Received.'
-        );
-        Assert.areEqual(
-            1,
-            RecognitionTestData.creditsFor(gift.Id).size(),
-            'The refunded gift keeps the credit it earned: the reversal is the negative gift, ' +
-            'not the deletion of this one (ADR-0023).'
-        );
-        Assert.areEqual(
-            -250,
-            RecognitionTestData.creditsFor(refundId)[0].Amount__c,
-            'The negative gift carries the negative credit that cancels it (R-SC5).'
-        );
+            Assert.areEqual(
+                'Refunded',
+                [SELECT Status__c FROM Gift__c WHERE Id = :gift.Id].Status__c,
+                'The whole gift has gone back, so R-G3 moves the original off Received.'
+            );
+            Assert.areEqual(
+                1,
+                RecognitionTestData.creditsFor(gift.Id).size(),
+                'The refunded gift keeps the credit it earned: the reversal is the negative gift, ' +
+                'not the deletion of this one (ADR-0023).'
+            );
+            Assert.areEqual(
+                -250,
+                RecognitionTestData.creditsFor(refundId)[0].Amount__c,
+                'The negative gift carries the negative credit that cancels it (R-SC5).'
+            );
 
-        Test.startTest();
-        RollupService.ensureDefaults();
-        RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
-        Test.stopTest();
+            Test.startTest();
+            RollupService.ensureDefaults();
+            RollupService.runFullRecalculation(
+                definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
+            );
+            Test.stopTest();
 
-        Contact recalculated = [
-            SELECT Total_Soft_Credits__c, Soft_Credit_Count__c
-            FROM Contact
-            WHERE Id = :luis.Id
-        ];
-        GivingTestDataFactory.assertRollupWrote(recalculated.Total_Soft_Credits__c);
-        Assert.areEqual(
-            0,
-            recalculated.Total_Soft_Credits__c,
-            'Recognition reverses the way money does: nothing left, not minus the gift.'
-        );
-        Assert.areEqual(
-            1,
-            recalculated.Soft_Credit_Count__c,
-            'Luis was recognized on one gift. The reversal is not a second gift recognized, ' +
-            'and it is not minus one either.'
-        );
+            Contact recalculated = [
+                SELECT Total_Soft_Credits__c, Soft_Credit_Count__c
+                FROM Contact
+                WHERE Id = :luis.Id
+            ];
+            GivingTestDataFactory.assertRollupWrote(recalculated.Total_Soft_Credits__c);
+            Assert.areEqual(
+                0,
+                recalculated.Total_Soft_Credits__c,
+                'Recognition reverses the way money does: nothing left, not minus the gift.'
+            );
+            Assert.areEqual(
+                1,
+                recalculated.Soft_Credit_Count__c,
+                'Luis was recognized on one gift. The reversal is not a second gift recognized, ' +
+                'and it is not minus one either.'
+            );
+        }
     }
 
     /**
@@ -85,30 +89,36 @@ private class SoftCreditRefundTest {
      */
     @IsTest
     static void aPartiallyRefundedGiftLeavesRecognitionForWhatIsStillHeld() {
-        RecognitionTestData.setAutomaticHouseholdCredits(true);
-        GivingTestDataFactory.insertDefaultFund();
-        Account garcias = RecognitionTestData.household('The Garcia Family');
-        Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
-        Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            RecognitionTestData.setAutomaticHouseholdCredits(true);
+            GivingTestDataFactory.insertDefaultFund();
+            Account garcias = RecognitionTestData.household('The Garcia Family');
+            Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
+            Contact luis = RecognitionTestData.person('Luis', 'Garcia', garcias.Id);
 
-        Gift__c gift = RecognitionTestData.gift(ana.Id, null, 250);
-        GiftService.refund(gift.Id, 100, 'Donor asked for the misdirected portion back');
+            Gift__c gift = RecognitionTestData.gift(ana.Id, null, 250);
+            GiftService.refund(gift.Id, 100, 'Donor asked for the misdirected portion back');
 
-        Assert.areEqual(
-            'Received',
-            [SELECT Status__c FROM Gift__c WHERE Id = :gift.Id].Status__c,
-            'Part of the gift is still held, so the original keeps its status.'
-        );
+            Assert.areEqual(
+                'Received',
+                [SELECT Status__c FROM Gift__c WHERE Id = :gift.Id].Status__c,
+                'Part of the gift is still held, so the original keeps its status.'
+            );
 
-        Test.startTest();
-        RollupService.ensureDefaults();
-        RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL }));
-        Test.stopTest();
+            Test.startTest();
+            RollupService.ensureDefaults();
+            RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL }));
+            Test.stopTest();
 
-        Decimal total = [SELECT Total_Soft_Credits__c FROM Contact WHERE Id = :luis.Id]
-        .Total_Soft_Credits__c;
-        GivingTestDataFactory.assertRollupWrote(total);
-        Assert.areEqual(150, total, 'Recognition tracks the money the organization still holds.');
+            Decimal total = [SELECT Total_Soft_Credits__c FROM Contact WHERE Id = :luis.Id]
+            .Total_Soft_Credits__c;
+            GivingTestDataFactory.assertRollupWrote(total);
+            Assert.areEqual(
+                150,
+                total,
+                'Recognition tracks the money the organization still holds.'
+            );
+        }
     }
 
     private static List<Rollup_Definition__c> definitionsFor(Set<String> keys) {
