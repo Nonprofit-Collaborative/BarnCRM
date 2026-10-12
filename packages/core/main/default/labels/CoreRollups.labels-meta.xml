@@ -344,4 +344,28 @@
         <shortDescription>Error Log summary when a full recalculation did not save everything.</shortDescription>
         <value>The rollup recalculation finished, but {0} records' totals could not be saved and {1} batches of records stopped before they finished. The saves are tried again automatically; rollups whose records stopped are not marked calculated and are put right by the next run.</value>
     </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunAlreadyRunning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollups page: a full recalculation is already running.</shortDescription>
+        <value>A full recalculation is already running. Its totals will be on the records when it finishes, so try again after that.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunAlreadyRunningLog</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a full recalculation did not start, one was running.</shortDescription>
+        <value>A rollup recalculation did not start because another one was still running (job {0}). The running one brings the totals up to date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunChunkQueued</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: records of a stopped recalculation chunk were queued.</shortDescription>
+        <value>Part of a rollup recalculation stopped before it finished. The totals of its {0} records are recalculated in the background within minutes.</value>
+    </labels>
 </CustomLabels>

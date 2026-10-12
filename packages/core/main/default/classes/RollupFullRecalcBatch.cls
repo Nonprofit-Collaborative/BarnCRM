@@ -20,16 +20,22 @@
  * Locks and failures: no `FOR UPDATE`; writes in Id order with partial success (`RollupWriter`);
  * a record the platform refused goes to the Rollup Queue to be tried again, Failed after five
  * attempts; a chunk that stopped on something it could not catch leaves its entity's definitions
- * unmarked and is counted in one Error Log summary per run (R-RQ4). A run that saves a record a
- * Failed queue entry holds takes the entry off the list (R-RQ4).
+ * unmarked and is counted in one Error Log summary per run (R-RQ4), and the platform's
+ * `BatchApexErrorEvent` for it hands the chunk's records to the Rollup Queue
+ * (`RollupRecalcErrorHandler`, R-R14). A run that saves a record a Failed queue entry holds takes
+ * the entry off the list (R-RQ4).
+ *
+ * One full run at a time (R-R14): a start while another run is going starts nothing and answers
+ * the running job.
  *
  * DOCUMENTED EXCEPTION to user mode reads (plan Section 4.13, ADR-0021, as in `RollupAggregator`
  * and `RollupQueue`): every record of a target entity is read and the queue is written in system
  * mode and without sharing, because a total must not depend on who scheduled the run.
  */
-public without sharing class RollupFullRecalcBatch implements Database.Batchable<SObject>, Database.Stateful {
+public without sharing class RollupFullRecalcBatch implements Database.Batchable<SObject>, Database.Stateful, Database.RaisesPlatformEvents {
     private static final String LOG_CONTEXT = 'RollupFullRecalcBatch';
-    private static final String CLASS_NAME = 'RollupFullRecalcBatch';
+    /** The class name the platform records on each pass's job, read by the error handler. */
+    public static final String CLASS_NAME = 'RollupFullRecalcBatch';
     private static final Set<String> RUNNING = new Set<String>{
         'Holding',
         'Queued',
@@ -56,6 +62,21 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /** Records the run remembers as refused at most, to clear Failed queue entries (R-RQ4). */
     private static final Integer FAILED_IDS_LIMIT = 10000;
+
+    /**
+     * The runs this transaction started. A test sees only these as running: the org a test runs
+     * in may have its own nightly run going, which a test can neither see past nor stop.
+     */
+    private static Set<Id> startedHere = new Set<Id>();
+
+    /** Thrown by a chunk a test asks to stop, as a governor limit would stop it. */
+    @TestVisible
+    private class ChunkStoppedException extends Exception {
+    }
+
+    /** Set by a test to stop the next chunk with an error the run does not catch. */
+    @TestVisible
+    private static Boolean stopNextChunk = false;
 
     /** One target entity: the definitions planned for it, and what estimates a record's weight. */
     @TestVisible
@@ -113,10 +134,11 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /**
      * Starts a full recalculation of these definitions over every record they write. Does nothing
-     * while all automation is paused (R-RQ5); the next run catches up.
+     * while all automation is paused (R-RQ5); the next run catches up. Starts nothing while
+     * another full run is going (R-R14): that run's job is answered and an Info entry says so.
      *
      * @param definitions the definitions to recalculate, of any target entities
-     * @return the first pass's job, or null when nothing started
+     * @return the first pass's job, the running job, or null when nothing started
      */
     public static Id begin(List<Rollup_Definition__c> definitions) {
         if (AutomationControl.isPaused()) {
@@ -127,8 +149,46 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
             );
             return null;
         }
+        Id running = runningJobId();
+        if (running != null) {
+            ErrorLogger.logMessage(
+                String.format(
+                    System.Label.Core_Rollups_FullRunAlreadyRunningLog,
+                    new List<String>{ String.valueOf(running) }
+                ),
+                LOG_CONTEXT,
+                ErrorLogger.SEVERITY_INFO
+            );
+            return running;
+        }
         RollupFullRecalcBatch first = firstPass(definitions);
-        return first == null ? null : Database.executeBatch(first, first.scope);
+        if (first == null) {
+            return null;
+        }
+        Id started = Database.executeBatch(first, first.scope);
+        startedHere.add(started);
+        return started;
+    }
+
+    /**
+     * The job of the full run going now, or null when none is (R-R14). Between two passes of a
+     * run the finishing pass is still Processing when it starts the next, so a run in progress
+     * always has a job in one of the running states.
+     */
+    public static Id runningJobId() {
+        for (AsyncApexJob job : [
+            SELECT Id
+            FROM AsyncApexJob
+            WHERE JobType = 'BatchApex' AND ApexClass.Name = :CLASS_NAME AND Status IN :RUNNING
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate
+            LIMIT 50
+        ]) {
+            if (!Test.isRunningTest() || startedHere.contains(job.Id)) {
+                return job.Id;
+            }
+        }
+        return null;
     }
 
     /**
@@ -215,6 +275,10 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
     /** Takes the records that fit this chunk's budget, holds back the rest, and recalculates. */
     public void execute(Database.BatchableContext context, List<SObject> records) {
+        if (stopNextChunk) {
+            stopNextChunk = false;
+            throw new ChunkStoppedException(LOG_CONTEXT);
+        }
         Target target = currentTarget();
         Set<Id> taken = new Set<Id>();
         Set<Id> overflow = new Set<Id>();

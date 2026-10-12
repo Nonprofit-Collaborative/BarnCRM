@@ -137,6 +137,7 @@ public with sharing class RollupController {
         try {
             requirePermission();
             require(definitionId);
+            refuseWhileAFullRunIsGoing();
             RollupService.recalculate(definitionId);
             return currentPage();
         } catch (Exception caught) {
@@ -149,6 +150,7 @@ public with sharing class RollupController {
     public static RollupPageView recalculateAll() {
         try {
             requirePermission();
+            refuseWhileAFullRunIsGoing();
             RollupScheduler.runNow();
             return currentPage();
         } catch (Exception caught) {
@@ -249,6 +251,15 @@ public with sharing class RollupController {
             );
         }
         return definition;
+    }
+
+    /** R-R14: one full run at a time, and the admin is told so rather than left guessing. */
+    private static void refuseWhileAFullRunIsGoing() {
+        if (RollupFullRecalcBatch.runningJobId() != null) {
+            throw new RollupService.RollupServiceException(
+                Label.Core_Rollups_FullRunAlreadyRunning
+            );
+        }
     }
 
     private static Boolean canManage() {

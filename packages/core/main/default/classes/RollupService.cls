@@ -276,21 +276,25 @@ public with sharing class RollupService {
      * run reconciles whatever real time missed.
      *
      * @param definitions the definitions to recalculate, of any source and target entities
-     * @return how many were handed to the run, or zero when nothing started
+     * @return how many were handed to the run, or zero when nothing started, including when
+     *         another full run is still going (R-R14)
      */
     @NamespaceAccessible
     public static Integer runFullRecalculation(List<Rollup_Definition__c> definitions) {
         if (definitions == null || definitions.isEmpty()) {
             return 0;
         }
-        return RollupFullRecalcBatch.begin(definitions) == null ? 0 : definitions.size();
+        Id running = RollupFullRecalcBatch.runningJobId();
+        Id started = RollupFullRecalcBatch.begin(definitions);
+        return started == null || started == running ? 0 : definitions.size();
     }
 
     /**
      * Starts the nightly run now: every active Scheduled and Both definition, over every record
      * (R-R4). The scheduled job and the Recalculate all button both call this.
      *
-     * @return the batch job started, or null when nothing started
+     * @return the batch job started, the full run still going when there is one (R-R14), or
+     *         null when nothing started
      */
     public static Id startNightlyRun() {
         return RollupFullRecalcBatch.begin(RollupSelector.selectActiveForModes(SCHEDULED_MODES));
