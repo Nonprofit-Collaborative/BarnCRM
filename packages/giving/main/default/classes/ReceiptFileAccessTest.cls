@@ -7,7 +7,7 @@
  * thing letting the wrong people in.
  *
  * The defect these cover: the file was linked to the donor Contact and the donor Account as well
- * as to the receipt, and a Program Staff or Volunteer Coordinator user, who holds `Nonprofit_Staff`
+ * as to the receipt, and a Program Staff or Volunteer Coordinator user, who holds `BarnCRM_Staff`
  * and no Giving permission set at all, has Read on Account and Contact. A donor's year end
  * statement, listing their whole giving history, the organization's EIN and the signer's name, was
  * in the Files related list of a record those users open every day.
@@ -104,7 +104,7 @@ private class ReceiptFileAccessTest {
     }
 
     /**
-     * The one that matters. Priya coordinates volunteers, holds `Nonprofit_Staff` and no Giving
+     * The one that matters. Priya coordinates volunteers, holds `BarnCRM_Staff` and no Giving
      * permission set, and can open the donor's household record. She must not be able to reach the
      * household's year end statement from it.
      */
@@ -113,7 +113,7 @@ private class ReceiptFileAccessTest {
         System.runAs(ReceiptTestDataFactory.issuer()) {
             User coordinator = TestDataFactory.createUser(
                 'Priya',
-                new List<String>{ 'Nonprofit_Staff' }
+                new List<String>{ 'BarnCRM_Staff' }
             );
             ReceiptTestDataFactory.setUpReceipting();
             Contact osei = GivingTestDataFactory.insertHouseholdContact(

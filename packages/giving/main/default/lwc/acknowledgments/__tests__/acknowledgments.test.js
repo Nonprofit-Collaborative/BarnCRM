@@ -54,7 +54,7 @@ jest.mock(
   '@salesforce/label/c.Giving_Acknowledgments_Off',
   () => ({
     default:
-      'Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in Nonprofit Settings, under Giving.'
+      'Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.'
   }),
   { virtual: true }
 );
@@ -314,7 +314,7 @@ describe('c-acknowledgments', () => {
     sendEmailsNow.mockRejectedValue({
       body: {
         message:
-          'Sending thank yous needs the Send Acknowledgments permission. Ask your administrator to add you to Giving Staff or Giving Admin.'
+          'Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.'
       }
     });
     const element = createComponent();

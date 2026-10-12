@@ -1,5 +1,5 @@
 /**
- * What the Error Log tile on the Nonprofit Hub home page reads and writes.
+ * What the Error Log tile on the BarnCRM home page reads and writes.
  *
  * Reads run in user mode through the selector, so a person sees only the entries their access
  * allows. Marking an entry acknowledged is the one write, and it is the only field this class

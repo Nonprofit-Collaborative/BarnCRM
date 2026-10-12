@@ -182,7 +182,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the reader may not change the schedule</shortDescription>
-    <value>You can see whether the jobs are running. Changing the schedule needs the Manage Nonprofit Settings permission.</value>
+    <value>You can see whether the jobs are running. Changing the schedule needs the Manage BarnCRM Settings permission.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_PermissionRequired</fullName>
@@ -190,7 +190,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: refusal for a user without the permission</shortDescription>
-    <value>Scheduling the nightly jobs needs the Manage Nonprofit Settings permission.</value>
+    <value>Scheduling the nightly jobs needs the Manage BarnCRM Settings permission.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_UnexpectedError</fullName>

@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Accounting periods read only</shortDescription>
-        <value>You can see this date. Changing it needs the Manage Nonprofit Settings permission.</value>
+        <value>You can see this date. Changing it needs the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Giving_Periods_PermissionRequired</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Close period needs permission</shortDescription>
-        <value>Closing a period needs the Manage Nonprofit Settings permission.</value>
+        <value>Closing a period needs the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Giving_Periods_NotBeforeToday</fullName>

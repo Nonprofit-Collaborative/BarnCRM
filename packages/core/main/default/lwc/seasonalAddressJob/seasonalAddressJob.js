@@ -2,7 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
-import canManageSettings from '@salesforce/customPermission/Manage_Nonprofit_Settings';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
 import setSchedule from '@salesforce/apex/SeasonalAddressController.setSchedule';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
@@ -22,7 +22,7 @@ import READ_ONLY from '@salesforce/label/c.Core_SeasonalAddress_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_SeasonalAddress_UnexpectedError';
 
 /**
- * The seasonal address swap panel on the Addresses page of the Nonprofit Settings console.
+ * The seasonal address swap panel on the Addresses page of the BarnCRM Settings console.
  *
  * It exists because a nightly job whose last run nobody can see is a job nobody trusts. It
  * answers, in this order, whether the job is switched on, when it last ran, and what it did,

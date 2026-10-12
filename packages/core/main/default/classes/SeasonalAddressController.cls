@@ -1,13 +1,13 @@
 /**
- * The Addresses page's seasonal swap panel, in the Nonprofit Settings console.
+ * The Addresses page's seasonal swap panel, in the BarnCRM Settings console.
  *
  * It answers three questions an administrator has about a nightly job, in this order: is it
  * switched on, when did it last run, and what did it do. It also carries the only two ways the
- * job is ever started, so the `Manage_Nonprofit_Settings` permission checked here is the
+ * job is ever started, so the `Manage_BarnCRM_Settings` permission checked here is the
  * authorization for everything the run does in system mode afterwards (ADR-0027).
  */
 public with sharing class SeasonalAddressController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
 
     /** Raised with a message the panel shows as it is. */
     public class SeasonalAddressException extends Exception {

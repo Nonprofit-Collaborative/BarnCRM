@@ -12,7 +12,7 @@ public with sharing class PermissionSetSelector {
      * Used only by the post-install script, which runs as a platform user with no session
      * and no permission set of its own, so user mode has nothing to enforce against.
      *
-     * @param permissionSetName the permission set's API name, for example Nonprofit_Admin
+     * @param permissionSetName the permission set's API name, for example BarnCRM_Admin
      * @return the permission set, or null when the org does not have it
      */
     public PermissionSet selectByNameInSystemMode(String permissionSetName) {

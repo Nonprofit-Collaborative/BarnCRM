@@ -2,7 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in Core resolves without a namespace
 // prefix while the namespace is deferred.
-import canManageSettings from '@salesforce/customPermission/Manage_Nonprofit_Settings';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getJobs from '@salesforce/apex/GivingJobsController.getJobs';
 import setSchedule from '@salesforce/apex/GivingJobsController.setSchedule';
 import runNow from '@salesforce/apex/GivingJobsController.runNow';
