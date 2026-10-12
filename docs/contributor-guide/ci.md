@@ -1,7 +1,9 @@
 # Continuous integration
 
 This page explains what `.github/workflows/ci.yml` does, how the one long lived test org it
-deploys into is configured, and how to sign off commits under the project's DCO policy.
+deploys into is configured, and how to sign off commits under the project's DCO policy. Open
+work items, unmerged work and untested areas are listed at the end, under
+"Handoff: open work and what still needs testing".
 
 It used to say the workflow tests four org shapes. It does not, and has not since the org
 tests moved to a single long lived org: there is no shape matrix, so exactly one shape is
@@ -248,6 +250,25 @@ step 2 with the new auth URL. Anything typed into the org by hand is lost at tha
 point, which is the discipline the package needs anyway: what matters belongs in this
 repository.
 
+### The second test org (`oi-pa`)
+
+The maintainer approved a second scratch org on 2026-09-24, alias `oi-pa`, created from
+`person-accounts.json` on the `devhub` Dev Hub. It expires 2026-10-24 and is recreated from the
+same definition when it does. `oi-test` expires 2026-10-23. Neither is the Platform-only
+shape: both have Person Accounts, and ADR-0013 notes that even a Platform-only scratch org
+keeps the standard objects, so no org run proves Core without them. The static checks and
+review do that.
+
+`oi-pa` is not named by any secret, so the `org-tests` workflow never uses it. It exists so
+local gate runs and Person Account testing can go on while `oi-test` is busy or stuck. The
+gate script works against either: `scripts/org/run-org-tests.sh oi-pa` posts the same
+`Org tests (local)` status. No other org is used for testing without the maintainer's
+approval.
+
+When several people or agents share these orgs, take turns: one deploy or test run per org at
+a time. A deploy from one branch while another branch's tests run leaves the org holding a
+mix of the two.
+
 ### The org test gate
 
 A pull request that changes deployable source cannot merge into `main` until its Apex tests
@@ -299,6 +320,19 @@ with no test results and its output names `UNKNOWN_EXCEPTION` or a platform or n
 (or is empty), the script waits `TEST_RETRY_WAIT_SECONDS` (300 by default) and runs the tests
 once more. A run with any result, including real failures, is never retried. Deploy stages
 that stall are resubmitted too: see "Stalled deploys" under `org-tests`.
+
+**At about 2,200 tests the sf CLI can run out of memory reading the results.** The Node
+process aborts with `JavaScript heap out of memory` after every stage has deployed, the retry
+hits the same wall, and the script posts a failure reading `0 of 0 failed`: no test failed.
+Run the gate with a larger heap:
+`NODE_OPTIONS=--max-old-space-size=8192 scripts/org/run-org-tests.sh <org alias>`.
+
+**One test depends on Salesforce's own duplicate matching.**
+`DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce` asks the platform's
+matching service about two identical contacts inserted in the same test. In a full parallel
+run it has failed once with no pair found, and passed when its class was rerun alone. A
+failure of that test alone, on a change that does not touch duplicates, is a reason to rerun
+the gate, not to change the code.
 
 **The org allows a fixed number of test classes per rolling 24 hours** (`DailyAsyncApexTests`
 in `sf org list limits`). Several gate runs in a day can use it up, and then every run,
@@ -691,3 +725,120 @@ the commits the merge brings in, and every one of those is still checked. The De
 Certificate of Origin's own tooling makes the same exemption. Signing a merge anyway,
 with `git merge --signoff`, is harmless and costs nothing, so integrators who want an
 unbroken chain of trailers can keep doing it.
+
+## Handoff: open work and what still needs testing
+
+Recorded 2026-09-26, when development moved from one maintainer session to shared Claude
+Code users. Everything below is pushed to GitHub; nothing lives only on a local machine.
+Remove each item from this list in the PR that finishes it.
+
+### Waiting to merge: C-29 neutral Core (PRs #163 to #174)
+
+- Branches `feature/c-29-neutral-core-1` to `-12`, stacked; top head
+  `3da9276ad53ed3231e01b314d7e0e6205a23f8e7`. Review approved. ADR-0059 is already numbered.
+- Not yet tested cleanly: the `Org tests (local)` status on the top head is `failure`. Of two
+  full runs, one hit the sf CLI heap crash, and the other passed 2,234 of 2,235; the one failure
+  was the flaky `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce`,
+  which passed 16 times out of 16 when run alone.
+- To land it:
+  1. Run one full gate from a clean detached worktree at the top head, with
+     `NODE_OPTIONS=--max-old-space-size=8192 scripts/org/run-org-tests.sh oi-test` (or `oi-pa`).
+     If only the flaky test fails, rerun the gate.
+  2. Fast-forward each lower branch to the top head:
+     `git push origin 3da9276ad53ed3231e01b314d7e0e6205a23f8e7:refs/heads/feature/c-29-neutral-core-N`
+     for N = 1 to 11.
+  3. Wait for the CI checks.
+  4. Squash-merge the bottom PR:
+     `gh pr merge 163 --squash --match-head-commit 3da9276ad53ed3231e01b314d7e0e6205a23f8e7`.
+     The stacked PRs close as merged.
+
+### Never tested
+
+- Core installed without Giving, in any org. Every gate run deploys all three packages.
+- The Platform-only shape. Both test orgs (`oi-test`, `oi-pa`) have Person Accounts, and
+  ADR-0013 notes that even a Platform-only scratch org keeps the standard objects. Only the
+  static checks (`check-standard-objects.sh`) and review cover it.
+
+### Work items
+
+These are also recorded, in the same detail, in plan Section 11.3 (parking lot). Remove an item
+from both when its PR merges.
+
+1. **Harden the settings writers and cap uncapped counts.**
+   - `SettingsService.applyValues`, through `SettingsWriter.saveOrgDefault`, upserts the whole
+     cached, unlocked `Nonprofit_Settings__c` record. It should update only the changed fields
+     through `OrgSettingsSystemWriter` and `SettingsRecordSelector.lockStored()`.
+   - Giving makes raw first saves from `getOrgDefaults()` in `AcknowledgmentService`,
+     `DonorLevelWriter`, `AccountingPeriodWriter`, `AcknowledgmentController` and
+     `CommitmentService`. A first save from the raw record writes false into
+     `Giving_Settings__c` checkboxes that default to true:
+     - `Auto_Apply_Gifts_To_Installments__c`
+     - `Automatic_Household_Soft_Credits__c`
+     - `Receipt_Print_Logo__c`
+   - `SettingsService.getSettingsForUpdate()` takes no lock: rename it.
+   - Cap `HealthCheckSettingsChecks.countNew()`.
+2. **Log unrecognized checkbox values in imports.** `ImportRowProcessor.convertCheckbox` reads
+   only `true`, `yes` and `1` as true. The new rule:
+   - **True:** `true`, `yes`, `y`, `1`, `x`, `checked`, `on`, `t`.
+   - **False:** `false`, `no`, `n`, `0`, `off`, `f`.
+   - **Blank:** no change.
+   - **Anything else:** skip the field, with a note in the run log.
+
+   Update the admin guide first. Add tests, including a 200-row bulk case.
+3. **Fix the dynamic Apex convention violations** (see `dynamic-apex.md`).
+   - **Bug:** `HealthCheckOrgShapeChecks` looks for a `ConnectService` class that does not
+     exist, so it always reports Connect as not installed. Point it at a real Connect class,
+     and update item 4 of `packages/core/integration/c-07-c-11.permissions.md`.
+   - **Uncapped counts:** `ReceiptGapSelector` (on `main`; C-29 replaces it),
+     `CampaignSyncSelector.countAppeals`, `HubErrorCountSelector.countNewErrors`, and
+     `HealthCheckSettingsChecks.errorLogFinding` (use `countNewUpTo`).
+   - **Describes inside loops:** `ImportMatcher.firstNameOf`, `ImportUndoBatch.fieldMap`, and
+     `SettingsService.hasKey` / `SettingsController.toSetting`.
+   - **`HubErrorCountSelector`:** add a field-level check on `Status__c` and a namespace-first
+     lookup.
+   - **Wrong-shape classes:** `ImportEntityProcessors` and `SampleDataModules` should log them.
+     `SampleDataModules` should also cache its lookups.
+   - **CI gaps:**
+     - add a static check for Person Account field references;
+     - extend `check-standard-objects.sh` to cover the declarations in `packages/connect`.
+   - **Tests:**
+     - add a "Campaign unavailable" test seam;
+     - make tests that return early assert both cases.
+4. **Raise the sf CLI heap in the org test script.**
+   - Export `NODE_OPTIONS=--max-old-space-size=8192` in `scripts/org/run-org-tests.sh`, and in
+     `scripts/org/deploy-packages.sh` if it needs it.
+   - Detect the out-of-memory signature and report it as a client crash, not as "0 of 0
+     failed".
+   - Consider requesting a smaller result payload.
+   - Update the heap paragraph in this page.
+5. **Smaller review follow-ups.**
+   - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
+   - X-01: the admin guide should warn against listing `Master` in the record-type filter.
+   - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.
+
+### Next on the roadmap
+
+Product plan Section 6 is the source of truth:
+- **X-07 Gift Transaction mirror.** It shares `ConnectSync` with X-01.
+- **v0.7 items:**
+  - C-32: import matching and per-file values;
+  - C-33: load one object;
+  - C-34: Find query builder;
+  - C-35: bulk update, which depends on C-34.
+
+  Before C-34, the query compiler needs a security review and scale tests.
+
+### Owner questions
+
+The owner questions raised while building v0.5 and v0.6 are plan Section 11.2, items 14 to 27,
+each with the default that shipped and a recommendation.
+
+### Working notes for new contributors
+
+- **Test orgs:** `oi-test` and `oi-pa` are on the maintainer's Dev Hub. A contributor who
+  cannot reach them needs their own Dev Hub and org, and the maintainer's approval for any
+  new org, as described earlier on this page.
+- **The gate:** run it from a clean, detached worktree at the pushed head. The script checks
+  for a clean tree only when it starts.
+- **Staging:** stage by explicit path. A synced checkout can create untracked copies named
+  like `file 2.md`.
