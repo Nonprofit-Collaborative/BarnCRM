@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import GIFT_OBJECT from '@salesforce/schema/Gift__c';
@@ -13,6 +14,7 @@ import donorKindLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindL
 import donorKindPerson from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindPerson';
 import donorKindOrganization from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindOrganization';
 import personLabel from '@salesforce/label/c.Giving_QuickGiftEntry_PersonLabel';
+import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
 import organizationLabel from '@salesforce/label/c.Giving_QuickGiftEntry_OrganizationLabel';
 import donorPlaceholder from '@salesforce/label/c.Giving_QuickGiftEntry_DonorPlaceholder';
 import amountLabel from '@salesforce/label/c.Giving_QuickGiftEntry_AmountLabel';
@@ -58,9 +60,10 @@ const FIELD_ORDER = [
 /**
  * Quick gift entry (G-03): one screen, built for a phone, for a gift that has just
  * arrived. Defaults come from BarnCRM Settings, validation messages come back from the
- * controller and are shown beside the field that caused them.
+ * controller and are set on the field that caused them through the base components' own
+ * validity, so each message is announced and tied to its field.
  */
-export default class QuickGiftEntry extends LightningElement {
+export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   /** Set when the component sits on a record page, so the donor can be filled in. */
   @api recordId;
   /** The object of the record page the component sits on, when it sits on one. */
@@ -70,6 +73,7 @@ export default class QuickGiftEntry extends LightningElement {
     heading,
     donorKindLabel,
     personLabel,
+    newPerson,
     organizationLabel,
     donorPlaceholder,
     amountLabel,
@@ -169,60 +173,28 @@ export default class QuickGiftEntry extends LightningElement {
     return this.savedGift ? successMessage.replace('{0}', this.savedGift.name) : '';
   }
 
-  get errorDonor() {
-    return this.fieldErrors.donor;
-  }
-
-  get errorAmount() {
-    return this.fieldErrors.amount;
-  }
-
-  get errorDate() {
-    return this.fieldErrors.giftDate;
-  }
-
-  get errorType() {
-    return this.fieldErrors.giftType;
-  }
-
-  get errorInKindDescription() {
-    return this.fieldErrors.inKindDescription;
-  }
-
-  get errorFairMarketValue() {
-    return this.fieldErrors.fairMarketValue;
-  }
-
-  get errorAppeal() {
-    return this.fieldErrors.appealId;
-  }
-
-  get errorFund() {
-    return this.fieldErrors.fundId;
-  }
-
   get isSaveDisabled() {
     return this.saving || this.entrySaved;
   }
 
   handleDonorKindChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.donorKind = event.detail.value;
     this.donorId = undefined;
   }
 
   handleDonorChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.donorId = event.detail ? event.detail.recordId : undefined;
   }
 
   handleAmountChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.amount = event.detail.value;
   }
 
   handleDateChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.giftDate = event.detail.value;
   }
 
@@ -231,7 +203,7 @@ export default class QuickGiftEntry extends LightningElement {
    * before the type was chosen is never saved against a gift it does not belong to.
    */
   handleTypeChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.giftType = event.detail.value;
     if (this.isInKindGift) {
       this.amount = undefined;
@@ -242,33 +214,55 @@ export default class QuickGiftEntry extends LightningElement {
   }
 
   handleInKindDescriptionChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.inKindDescription = event.detail.value;
   }
 
   handleFairMarketValueChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.fairMarketValue = event.detail.value;
   }
 
   handlePaymentReferenceChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.paymentReference = event.detail.value;
   }
 
   handleAppealChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.appealId = event.detail ? event.detail.recordId : undefined;
   }
 
   handleFundChange(event) {
-    this.markChanged();
+    this.markChanged(event);
     this.fundId = event.detail ? event.detail.recordId : undefined;
   }
 
-  /** Any edit makes this a gift that has not been saved yet. */
-  markChanged() {
+  /**
+   * Any edit makes this a gift that has not been saved yet, and takes away the controller's
+   * message from the field being edited: the person is fixing it.
+   */
+  markChanged(event) {
     this.entrySaved = false;
+    const target = event && event.target;
+    const entry =
+      target && FIELD_ORDER.find((candidate) => candidate.slice(1).includes(target.dataset.id));
+    if (entry && this.fieldErrors[entry[0]]) {
+      const remaining = { ...this.fieldErrors };
+      delete remaining[entry[0]];
+      this.setFieldErrors(remaining);
+    }
+  }
+
+  /** New person: the standard new record form, so the person is created the usual way. */
+  handleNewPerson() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: this.personObjectApiName, actionName: 'new' },
+      // Stay on this form after the save rather than opening the new record, so the
+      // person can be picked straight away and nothing typed so far is lost.
+      state: { navigationLocation: 'RELATED_LIST', useRecordTypeCheck: 1 }
+    });
   }
 
   handleSave() {
@@ -329,7 +323,7 @@ export default class QuickGiftEntry extends LightningElement {
     }
     this.formError = undefined;
     this.saveWarning = undefined;
-    this.fieldErrors = {};
+    this.setFieldErrors({});
     this.saving = true;
     try {
       const result = await saveGift({ input: this.buildInput() });
@@ -407,11 +401,34 @@ export default class QuickGiftEntry extends LightningElement {
     fieldErrors.forEach((fieldError) => {
       errors[fieldError.field] = fieldError.message;
     });
-    this.fieldErrors = errors;
+    this.setFieldErrors(errors);
     this.formError = result && result.formError ? result.formError : undefined;
     if (!this.formError && fieldErrors.length === 0) {
       this.formError = errorUnexpected;
     }
+  }
+
+  /**
+   * Puts each message on its own field with the base components' custom validity, which
+   * shows it under the field, links it to the field and announces it. A field that had a
+   * message and no longer does is cleared the same way.
+   */
+  setFieldErrors(errors) {
+    FIELD_ORDER.forEach(([key, ...dataIds]) => {
+      const message = errors[key] || '';
+      const hadMessage = Boolean(this.fieldErrors[key]);
+      dataIds.forEach((dataId) => {
+        const field = this.template.querySelector(`[data-id="${dataId}"]`);
+        if (!field || typeof field.setCustomValidity !== 'function') {
+          return;
+        }
+        field.setCustomValidity(message);
+        if (message || hadMessage) {
+          field.reportValidity();
+        }
+      });
+    });
+    this.fieldErrors = errors;
   }
 
   /**
@@ -442,7 +459,7 @@ export default class QuickGiftEntry extends LightningElement {
     this.inKindDescription = undefined;
     this.fairMarketValue = undefined;
     this.paymentReference = undefined;
-    this.fieldErrors = {};
+    this.setFieldErrors({});
     const donor = this.template.querySelector('[data-id="donor-person"]')
       ? this.template.querySelector('[data-id="donor-person"]')
       : this.template.querySelector('[data-id="donor-organization"]');
