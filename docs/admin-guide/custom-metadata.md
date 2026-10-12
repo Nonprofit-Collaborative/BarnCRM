@@ -51,20 +51,22 @@ them.
 3. Click **Add**. Fill in:
    - **Name**: Mentor
    - **Type**: Mentor
-   - **Reciprocal type**: Mentee
+   - **Reciprocal Type**: Mentee
    - **Description**: Someone who mentors this person through the program.
    Click **Save**. The page says "Saving. Salesforce applies the change in the
    background, usually within a minute." When it is done it says "Saved. Mentor is in the
-   list." and the row appears under **Added by your organization**.
+   list." and the row appears under **Added by your organization**, with the status
+   **In use**.
 4. Click **Add** again and add the other side: **Name** Mentee, **Type** Mentee,
-   **Reciprocal type** Mentor. Save and wait for "Saved".
+   **Reciprocal Type** Mentor. Save and wait for "Saved".
 5. Open a person, add a relationship of type **Mentor** to someone else, and save. Open
    the other person: their card reads **Mentee**. Before step 3 it would have read
    **Other**.
-6. Back on the Custom metadata page, choose **Archive** on the Mentee row. Once it says
-   "Saved", the row shows **Archived** and BarnCRM stops using it: a new Mentor
-   relationship gets **Other** on the other side. Choose **Restore** to bring it back.
-7. Scroll to **Recent changes** in General. Each save is listed with your name and the
+6. Back on the Custom metadata page, open the menu at the end of the Mentee row and choose
+   **Archive**. Once it says "Saved", the row's status is **Archived** and BarnCRM stops
+   using it: a new Mentee relationship gets **Other** on the other side. Choose
+   **Restore** from the same menu to bring it back.
+7. Scroll to **Recent changes** at the bottom of the page. Each save is listed with your name and the
    values before and after.
 
 ## Common mistakes

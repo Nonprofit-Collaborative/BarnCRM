@@ -54,6 +54,8 @@ function importCoreComponent(name) {
       return import('c/errorDigestJob');
     case 'moduleManager':
       return import('c/moduleManager');
+    case 'customMetadataManager':
+      return import('c/customMetadataManager');
     default:
       return null;
   }
