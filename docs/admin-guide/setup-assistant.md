@@ -44,12 +44,12 @@ Two things sit outside the assistant, because Salesforce does not let an app do 
 - **Creating a Salesforce user** who has never signed in. Step four links you to the Setup
   page that does it, then you come back and give the new person a role.
 - **Installing another BarnCRM module.** Step six tells you which modules are present
-  and links to the install instructions for the rest.
+  and links to what each one does.
 
 ## A five-minute walkthrough, and then the eight steps
 
 Maria has just installed BarnCRM Core and the Giving module in her organization's
-Nonprofit Cloud org. That org has Person Accounts turned on, which matters in step one and
+Salesforce org. That org has Person Accounts turned on, which matters in step one and
 nowhere else. She has half an hour before her next meeting.
 
 ### Before you start
@@ -65,27 +65,41 @@ ready than to go and find:
 
 ### Step 1: Confirm how BarnCRM fits your org
 
-BarnCRM looks at your org and tells you what it found, in plain words:
+The step reads: "If your org uses Person Accounts, household membership uses the junction
+model so that what you already have keeps working. Confirm that here, or choose a different
+fit." BarnCRM then looks at your org and tells you what it found, in plain words:
 
-- **"Your org uses Person Accounts, as Nonprofit Cloud orgs do."** This is Maria's case.
-  BarnCRM recommends **Agentforce Nonprofit coexistence**: households are tracked with
-  a membership record for each person, so a person can belong to more than one household
-  and nothing you already have is disturbed. Your existing records keep working exactly as
-  they do today. Confirming this mode switches household membership to those membership
-  records, and from then on saving a new person creates their household and their
-  membership of it, exactly as it does in the simple mode. The switch that governs that is
-  "create a household automatically" on the Households page of BarnCRM Settings.
-- **"NPSP is installed in this org."** BarnCRM recommends **NPSP coexistence**, which
-  records that NPSP is here. In this version it changes no behaviour: BarnCRM builds its
-  own households and leaves NPSP's alone.
-- **"This looks like a fresh org."** BarnCRM recommends **Standalone**, the simplest
+- **"Your org uses Person Accounts. Household membership is tracked with one record per
+  person, so a person can be in more than one household and everything you already have
+  keeps working."** This is Maria's case. BarnCRM recommends **Standalone** and proposes
+  a membership record for each person, because a person stored as an account needs one.
+  Your existing records keep working exactly as they do today. Confirming switches
+  household membership to those membership records, unless an administrator already chose
+  a way of belonging, which is never overwritten. From then on saving a new person creates
+  their household and their membership of it, exactly as it does in the simple mode. The
+  switch that governs that is "create a household automatically" on the Households page of
+  BarnCRM Settings.
+- **Only in an org with Salesforce Nonprofit Cloud:** when BarnCRM finds Nonprofit Cloud
+  objects, it recommends **Nonprofit Cloud coexistence**, with a membership record for
+  each person as above. See [Nonprofit Cloud households](nonprofit-cloud-households.md).
+- **Only in an org with NPSP: "NPSP is installed in this org."** BarnCRM recommends **NPSP
+  coexistence**, which records that NPSP is here. In this version it changes no behaviour:
+  BarnCRM builds its own households and leaves NPSP's alone.
+- **"This looks like a fresh org, with no other household model and no Person Accounts.
+  BarnCRM can run on its own."** BarnCRM recommends **Standalone**, the simplest
   arrangement.
+
+The list of modes offers **Standalone** in every org, **NPSP coexistence** only when NPSP
+is in your org, and **Nonprofit Cloud coexistence** only when Nonprofit Cloud objects are
+in your org. A mode you saved earlier is always in the list, so your choice is never
+hidden. The **Coexistence mode** setting, in the General section of BarnCRM Settings,
+offers the same list. See [Coexistence mode](coexistence-mode.md).
 
 Read the recommendation, then click **Confirm and continue**. If you know something the
 detection cannot see, choose a different mode from the list first and then confirm.
 
-**What Maria sees:** the sentence about Person Accounts, the recommended mode already
-selected, and one button. She clicks it. Two seconds.
+**What Maria sees:** the sentence about Person Accounts, **Standalone** already selected,
+and one button. She clicks it. Two seconds.
 
 **What she decides:** nothing, unless she disagrees with the detection.
 
@@ -162,7 +176,7 @@ With the Giving module installed, the same form also asks for what your receipts
 - **Signer name and title**, for example `Ana Ruiz` and `Executive Director`.
 
 Click **Save**. The step completes when the legal name is filled in, because that is the
-one a receipt or letter cannot be printed without.
+one a letter (or, with Giving, a receipt) cannot be printed without.
 
 Two things to know about the uploaded files. They are stored as Salesforce files owned by
 whoever uploads them, and they are attached to that person's user record, because
@@ -180,8 +194,14 @@ the legal name goes here and your everyday name goes on the letter text later.
 
 ### Step 6: Choose which modules to turn on
 
-A list of the six BarnCRM packages: Core, Giving, Volunteers, Programs, Funders, and
-Connect. Each says **Present** or **Not installed**, with a link to what it does.
+A list of the BarnCRM packages that fit your org. Each says **Present** or **Not
+installed**, with a **Learn more** link to that package's description (its README on
+GitHub).
+
+- Without the Giving module, the list shows Core and Volunteers, plus any other module
+  already installed.
+- With Giving installed, it shows all six: Core, Giving, Volunteers, Programs, Funders, and
+  Connect.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means
@@ -193,8 +213,8 @@ version 0.7. Until then this step is a truthful inventory and a set of links.
 
 Click **Next** when you have read it. The step marks itself done.
 
-**What Maria sees:** Core present, everything else not installed. She makes a note to
-install Giving this afternoon.
+**What Maria sees:** all six packages, Core and Giving present, the other four not
+installed. She makes a note to read about Volunteers this afternoon.
 
 ### Step 7: Bring in your data
 
@@ -243,11 +263,11 @@ finished, because it is.
 - **Uploading the logo from a colleague's login, then deactivating them.** The file belongs
   to the person who uploaded it. Upload the logo and the signature from an account that
   will stay active, ideally the administrator's.
-- **Putting the everyday name in the legal name box.** Receipts have to carry the name your
-  official filings carry. If they differ, the legal name goes in step five.
-- **Expecting the assistant to install Giving.** No app can install another package for
-  you. Step six gives you the link and the instructions, and the Giving steps appear the
-  moment you come back after installing it.
+- **Putting the everyday name in the legal name box.** Letters (and, with Giving, receipts)
+  have to carry the name your official filings carry. If they differ, the legal name goes in step five.
+- **Expecting the assistant to install a module.** No app can install another package for
+  you. Step six links to what each module does, and a module's steps (Giving's, for
+  example) appear the moment you come back after installing it.
 - **Re-running setup to fix one thing.** You do not have to. Every answer is on the
   BarnCRM Settings page, grouped by section, with a search box. Reopen the assistant when
   something big changes, such as a new fiscal year or a merger, not to correct a typo.
