@@ -368,4 +368,76 @@
         <shortDescription>Error Log: records of a stopped recalculation chunk were queued.</shortDescription>
         <value>Part of a rollup recalculation stopped before it finished. The totals of its {0} records are recalculated in the background within minutes.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupComparison_Summary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: the opening line of the report.</shortDescription>
+        <value>Engine comparison: {0} definitions and {1} values compared, {2} differences.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_Difference</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: one value the two engines disagree on.</shortDescription>
+        <value>{0} writes {1} on {2}: stored {3}, BarnCRM engine {4}, vendored engine {5}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NotCompared</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: a definition that was not compared, and why.</shortDescription>
+        <value>{0} was not compared: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NotReached</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: definitions the run stopped before.</shortDescription>
+        <value>The run stopped before these definitions to stay within limits. Run it again with these keys: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NoDefinition</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: no active definition has the key asked for.</shortDescription>
+        <value>No active definition has this key.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NoRecords</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: no target records to compare a definition over.</shortDescription>
+        <value>No records to compare it over.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_RefusedByBarnCrm</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: the BarnCRM engine refused the definition.</shortDescription>
+        <value>The BarnCRM engine could not plan it. Recalculating it on the Rollups page writes the reason to the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_VendoredFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: the vendored engine failed on the definition.</shortDescription>
+        <value>The vendored engine failed: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_BackgroundWork</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: run undone, the vendored engine started a job.</shortDescription>
+        <value>The vendored engine started a background job, so nothing from this run was kept. Compare fewer records or fewer definitions at a time. The report: {0}</value>
+    </labels>
 </CustomLabels>
