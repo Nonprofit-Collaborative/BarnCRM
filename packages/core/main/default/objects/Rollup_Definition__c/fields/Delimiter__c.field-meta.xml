@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Delimiter__c</fullName>
+    <description>What separates the values of a text list: a comma and a space, a semicolon and a space, or a line break. Read only by the Text list calculations; blank means Comma.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>What goes between the values of a text list. Choose Semicolon or New line when the values themselves contain commas.</inlineHelpText>
+    <label>Delimiter</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Comma</fullName>
+                <default>true</default>
+                <label>Comma</label>
+            </value>
+            <value>
+                <fullName>Semicolon</fullName>
+                <default>false</default>
+                <label>Semicolon</label>
+            </value>
+            <value>
+                <fullName>New line</fullName>
+                <default>false</default>
+                <label>New line</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

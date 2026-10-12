@@ -179,6 +179,52 @@ contacts, then all funds), and calculate all of a record's totals together:
 - **If anything could not be saved, one summary goes to the Error Log**, so the Hub's error
   tile shows it.
 
+## What a rollup can calculate
+
+Each rollup has a **calculation**, and the calculation decides what kind of field can show
+the result. BarnCRM refuses to save a rollup whose field cannot hold its result, and says
+which kind of field to choose instead.
+
+| Calculation | What it gives you | Shown in |
+|---|---|---|
+| **Sum**, **Average** | The total or the average of a number or an amount. | A number, currency or percent field |
+| **Minimum**, **Maximum** | The smallest or largest value, for example the largest gift or the latest date. | A number, currency, percent or date field |
+| **Count** | How many records match. | A number field |
+| **Count distinct** | How many different values a field holds, for example how many different funds a donor has given to. Blank values are not counted. | A number field |
+| **First**, **Last** | The value from the earliest or latest record, by the field you choose to order by, for example the appeal of a donor's first gift. | A number, currency, percent, date or text field |
+| **Any** | Checked when at least one record matches, for example "has ever given a gift over $1,000". | A checkbox field |
+| **None** | Checked when no record matches, for example "has no open pledge". | A checkbox field |
+| **Text list** | Every matching value in one field, for example the names of every program a person volunteers for. Blank values are left out. | A text or long text field |
+| **Text list, each value once** | The same, with each value listed once. | A text or long text field |
+
+What to know about them:
+
+- **Any and None count the records your conditions describe.** They do not read a field of
+  their own. For "has ever given a gift over $1,000", choose **Any** and the condition
+  "Amount greater than 1000".
+- **A text list is separated by a comma, a semicolon, or a new line.** Choose one with
+  **Delimiter**; a comma is used when you choose nothing. A value that contains the
+  separator is not changed, so if your values contain commas (for example "Smith, Jane"),
+  choose a semicolon or a new line so the list still reads clearly. A new line suits a long
+  text field.
+- **A text list is in order.** If you choose a field to order by, the values follow it,
+  oldest or smallest first. Otherwise they are listed alphabetically.
+- **A text that is too long is cut.** A list longer than the field holds is cut at the
+  field's length, so a 255 character field shows the first 255 characters. Use a long text
+  field for a list that can grow.
+- **Each value once means exactly once.** "Gold" and "gold" are two different values to
+  **Text list, each value once** and to **Count distinct**.
+- **First and Last take the first record even when its value is blank.** Add the condition
+  "is not blank" on that field if you want the first record that has one. When two records
+  share the same order value, the one created first wins, so the answer never changes from
+  one run to the next.
+- **A number or date copied into text is written plainly**, for example `1250.00` or
+  `2026-03-01`, without a currency symbol or your local date format.
+- **They stay right as records change.** Like every rollup, these are worked out again from
+  all the matching records each time, so a deleted record, a record moved to another parent,
+  or a value changed back is reflected the next time the total is calculated, whatever its
+  mode.
+
 ## The Rollup Builder (coming)
 
 The Rollup Builder is coming. It will be a tab of its own,
@@ -189,8 +235,10 @@ own, without typing a query. It walks you through five steps:
    the field does not exist yet, it links you to Setup to create it.
 2. **What should be counted?** The records that feed the total, and, for a person's
    records, whether the total lands on the person or on their household.
-3. **How should it be calculated?** Total, count, smallest, largest, average, first or
-   last, and the time window: all time, this fiscal year, last fiscal year, or two years ago.
+3. **How should it be calculated?** Any calculation in
+   [What a rollup can calculate](#what-a-rollup-can-calculate), offered only when the field
+   from step 1 can hold it, and the time window: all time, this fiscal year, last fiscal
+   year, or two years ago.
 4. **Which records count?** Conditions you pick from lists, read back as a sentence
    ("Gifts whose Status is Received, Refunded or Written off").
 5. **Check and save.** Pick a real record and see what the total would be next to what the
@@ -253,8 +301,9 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    into a warning and offers a link to the Rollups page. Click that link, or open
    **BarnCRM Settings** and choose **Rollups**.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
-   Each row says what the number means in plain language, what it counts ("SUM Amount__c
-   on Gift__c"), where it shows ("Account.Total_Giving__c"), its mode, and when it was
+   Each row says what the number means in plain language, what it counts ("Sum Amount__c
+   on Gift__c", or for a text list "Text list Name on Program__c, separated by Semicolon"),
+   where it shows ("Account.Total_Giving__c"), its mode, and when it was
    last calculated. The names begin with the kind of record the number lands on, so
    **Household total giving**, **Account total giving**, and **Contact total giving** sit
    next to each other.
@@ -335,6 +384,7 @@ For report builders only. Nothing on this page requires you to know these.
 |---|---|
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
 | Last calculated, on the Rollups page | `Last_Calculated__c` on Rollup Definition |
+| Calculation, and the delimiter of a text list | `Aggregate__c` and `Delimiter__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
 
 With Giving installed:

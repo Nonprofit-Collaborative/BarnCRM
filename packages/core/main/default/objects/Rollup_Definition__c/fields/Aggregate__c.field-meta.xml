@@ -3,7 +3,7 @@
     <fullName>Aggregate__c</fullName>
     <description>The calculation applied to the matching source records.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Sum adds the values up, Count counts the records, Min and Max take the smallest and largest, First and Last take the earliest and latest by the order by field, Average divides the sum by the count.</inlineHelpText>
+    <inlineHelpText>Sum adds the values up, Count counts the records, Min and Max take the smallest and largest, First and Last take the earliest and latest by the order by field, Average divides the sum by the count. Count distinct counts different values. Any and None fill a checkbox. A text list joins the values into a text field.</inlineHelpText>
     <label>Aggregate</label>
     <required>false</required>
     <trackHistory>true</trackHistory>
@@ -46,6 +46,31 @@
                 <fullName>AVG</fullName>
                 <default>false</default>
                 <label>Average</label>
+            </value>
+            <value>
+                <fullName>COUNT_DISTINCT</fullName>
+                <default>false</default>
+                <label>Count distinct</label>
+            </value>
+            <value>
+                <fullName>ANY</fullName>
+                <default>false</default>
+                <label>Any</label>
+            </value>
+            <value>
+                <fullName>NONE</fullName>
+                <default>false</default>
+                <label>None</label>
+            </value>
+            <value>
+                <fullName>TEXT_LIST</fullName>
+                <default>false</default>
+                <label>Text list</label>
+            </value>
+            <value>
+                <fullName>TEXT_LIST_DISTINCT</fullName>
+                <default>false</default>
+                <label>Text list, each value once</label>
             </value>
         </valueSetDefinition>
     </valueSet>

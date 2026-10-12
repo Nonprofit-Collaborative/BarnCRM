@@ -1076,10 +1076,11 @@ edited (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`).
 | Source Entity | text | yes | The entity whose records are aggregated, for example Gift. |
 | Target Entity | text | yes | The entity that carries the calculated number, for example Household. |
 | Relationship Path | text | yes | How a source record reaches its target, written in the path notation below; supports the household membership abstraction. |
-| Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG) | yes | The calculation applied to the matching source records. |
-| Source Attribute | text | conditional | The attribute aggregated; required for every aggregate except COUNT. |
-| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST. |
-| Target Attribute | text | yes | The attribute on the target entity that receives the result. |
+| Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT) | yes | The calculation applied to the matching source records (R-R15). |
+| Source Attribute | text | conditional | The attribute aggregated; required for every aggregate except COUNT, ANY and NONE. |
+| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST. For a text list, optional: the order the values are listed in. |
+| Delimiter | picklist(Comma, Semicolon, New line) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
+| Target Attribute | text | yes | The attribute on the target entity that receives the result; its type must suit the aggregate (R-R15). |
 | Filter | long text | no | Which source records count, held as a filter document (see R-R2); empty means all of them. |
 | Target Filter | long text | no | Which target records this definition maintains, held in the same filter format; empty means all of them. |
 | Fiscal Year Aware | boolean | yes (defaults false) | Whether the calculation is limited to one fiscal year window. |
@@ -1208,7 +1209,11 @@ packaged defaults of Section 26.
 **R-R10 Validation on save.** The target attribute must exist and be writable, the
 aggregate must suit the source attribute type, and FIRST and LAST must have an Order By
 Attribute. A definition that fails validation is not saved, and the message names the
-problem in plain language.
+problem in plain language. Today the save refuses a target attribute whose type does not suit
+the aggregate (R-R15) and a COUNT_DISTINCT or text list with no Source Attribute; the other
+checks are made by the engine when it plans the definition, which leaves a definition that
+fails them out of the run and records why in the Error Log (R-R10 is completed with the Rollup
+Builder).
 
 **R-R11 Recompute, and what marks a target.** Every calculation, instant, queued, nightly
 or on demand, recomputes each affected target record from all its source records; nothing
@@ -1252,6 +1257,46 @@ finishes. A chunk of a full run that the platform stops with an error the run ca
 (a governor limit) has its target records written to the Rollup Queue (Section 14A), so they
 are recalculated within minutes rather than at the next night.
 
+**R-R15 Aggregates and the target types they fill.** Each aggregate fills only the target
+types below; any other pairing is refused on save (R-R10) and by the planner.
+
+| Aggregate | What it answers | Target attribute types |
+|---|---|---|
+| SUM, AVG, MIN, MAX | The total, the average, the smallest and the largest value of the Source Attribute. | number, currency, percent, date, datetime |
+| COUNT | How many records match. | number, currency, percent, date, datetime (as before; a number is what makes sense) |
+| FIRST, LAST | The Source Attribute of the record with the lowest (FIRST) or highest (LAST) Order By Attribute. | number, currency, percent, date, datetime, text, long text |
+| COUNT_DISTINCT | How many different values the Source Attribute holds among the matching records. | number |
+| ANY | True when at least one record matches, false when none does. | checkbox |
+| NONE | True when no record matches, false when at least one does. | checkbox |
+| TEXT_LIST | The Source Attribute of every matching record, joined by the Delimiter. | text, long text |
+| TEXT_LIST_DISTINCT | The same, with each value listed once. | text, long text |
+
+- **Blanks.** A blank Source Attribute is never counted by COUNT_DISTINCT and never listed by
+  a text list. FIRST and LAST take the first record's value even when it is blank; a filter
+  condition "is not null" on the Source Attribute skips such records. ANY and NONE read no
+  Source Attribute: the filter says which records count, so "any gift over 1,000" is ANY with
+  the filter `Amount__c greater than 1000`.
+- **Ties.** When two records have the same Order By Attribute, FIRST and LAST take the one
+  with the lower record Id, so the answer is the same on every run (R-R9).
+- **Order of a text list.** By the Order By Attribute when there is one, ascending, records
+  with a blank one last; otherwise alphabetically by value, ignoring case. Ties go to the lower
+  record Id. TEXT_LIST_DISTINCT keeps the first occurrence of each value, compared exactly
+  (letter case counts), and so does COUNT_DISTINCT.
+- **Delimiter.** Comma joins with a comma and a space, Semicolon with a semicolon and a space,
+  New line with a line break. A value that contains the delimiter is written as it is, not
+  escaped, so a list of names that contain commas reads best with Semicolon or New line.
+- **Values into text.** A number, date or checkbox copied into text by FIRST, LAST or a text
+  list is written as its plain value (`1250.00`, `2026-03-01`, `true`), not converted between
+  currencies.
+- **Cut at the field length.** A text result longer than the target attribute holds is cut at
+  the attribute's length, so the save never fails on it and the same value is written on every
+  run.
+- **Exact under recompute.** Every aggregate here is recomputed from all the source records of
+  each marked target (R-R11), so an instant, queued, nightly or on-demand calculation gives the
+  same answer; none of them needs a fallback to a full recalculation. COUNT_DISTINCT and the
+  text lists read the matching rows rather than a grouped answer, so a value found on the
+  records of two household members, or of two path alternatives, is counted once.
+
 ### Salesforce implementation
 
 - **Object:** `Rollup_Definition__c`, listed and edited in the settings console.
@@ -1264,7 +1309,8 @@ are recalculated within minutes rather than at the next night.
 | Source Entity | `Source_Object__c` | Text |
 | Target Entity | `Target_Object__c` | Text |
 | Relationship Path | `Relationship_Path__c` | Text |
-| Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG |
+| Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT (labels Sum, Count, Minimum, Maximum, First, Last, Average, Count distinct, Any, None, Text list, Text list, each value once) |
+| Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line (default Comma) |
 | Source Attribute | `Source_Field__c` | Text |
 | Order By Attribute | `Order_By_Field__c` | Text |
 | Target Attribute | `Target_Field__c` | Text |
@@ -5617,3 +5663,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
 | v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |
 | v0.6 | 2026-10-12 | Rollup engine swap (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S8). No object or field added. BarnCRM's own engine is the only path for real time, the queue, Recalculate, Recalculate all and the nightly run; `RollupBatch` is removed. The Mode picklist labels become Instantly, Every night and Both (recommended) on `Rollup_Definition__c`, `Rollup_Definition_Default__mdt` and the `Rollup_Mode_Default__c` setting, stored values unchanged. R-R4 loses its interim sentence; new R-R14 (one full run at a time, and a stopped chunk's records are queued). The four rollup rows in Section 30 are closed. |
+| v0.6 | 2026-10-12 | Rollup operations slice (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, decision 10). `Rollup_Definition__c.Aggregate__c` gains COUNT_DISTINCT, ANY, NONE, TEXT_LIST and TEXT_LIST_DISTINCT, and the definition gains `Delimiter__c` (Comma, Semicolon, New line). New rule R-R15 says which target types each aggregate fills (checkbox targets for ANY and NONE, text targets for FIRST, LAST and the text lists), how blanks, ties, order, the delimiter and the field length are handled, and that every aggregate stays exact under recompute. R-R10 records what the save checks today. The shipped-default type `Rollup_Definition_Default__mdt` keeps its seven aggregates and has no delimiter: no shipped rollup uses the new ones. |
