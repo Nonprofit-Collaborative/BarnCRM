@@ -2,11 +2,12 @@
 
 ## What it does
 
-Rollups are the totals that appear on a household, a person, an organization, a fund, an
-appeal, a pledge, or a scheduled payment without anyone adding them up: total giving,
-first and last gift, largest gift, gift count, giving this year and the two years before
-it, pledge balance, soft credit totals, what a fund and an appeal have raised, what has
-been paid against a pledge.
+Rollups are the totals that appear on a household, a person, an organization, or another
+record without anyone adding them up: a count, a sum, a first or last date, a largest
+value. BarnCRM Core runs the rollup engine; the totals themselves are shipped by the
+modules that own the records being counted, and with the Giving module installed they
+include total giving, gift counts and dates, pledge balances and what a fund and an appeal
+have raised.
 
 The member count on a household is not one of them. It looks like a rollup and it is kept
 up to date for you, but it is maintained by the household automation every time somebody
@@ -18,7 +19,10 @@ you never have to guess whether a number on a record is current. If the calculat
 not run recently, the Hub says so on the home page rather than leaving a stale number
 looking fresh.
 
-## What BarnCRM calculates for you
+## What BarnCRM calculates for you (with Giving)
+
+This section applies only when the Giving module is installed. Core on its own ships no
+totals, so its Rollups page lists only rollups you add yourself.
 
 Every total below is created when you install the module that owns it, switched on and
 ready to calculate, and every one of them can then be switched to another mode, made
@@ -87,10 +91,10 @@ about a number that looks wrong:
 
 ## How to turn it on
 
-Most of it is already on. Installing a module creates its rollups: the giving totals
-arrive with the Giving module, active and ready to calculate, and an upgrade adds anything
-newly shipped without touching a rollup you have changed. An org with Core alone has no
-giving totals because it has no gifts, and they appear when the Giving module is installed.
+Most of it is already on. Installing a module creates its rollups, active and ready to
+calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
+without touching a rollup you have changed. An org with Core alone starts with no shipped
+totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
@@ -133,7 +137,8 @@ controls are simply read only.
 
 ## A five-minute walkthrough
 
-Do this as Maria, with the sample data loaded.
+Do this as Maria, with the sample data loaded. Steps 2 to 5 use the giving totals, so they
+need the Giving module; with Core alone, do them on a rollup you have added.
 
 1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
    "Rollups last completed" with a time. If it has been more than 36 hours, the tile turns
@@ -161,22 +166,22 @@ Do this as Maria, with the sample data loaded.
 
 ## Common mistakes
 
-**Typing over a total by hand.** The giving totals are calculated fields, and so is the
+**Typing over a total by hand.** The totals are calculated fields, and so is the
 member count, though that one is maintained by the household automation rather than here. If you edit one on a record, the next calculation overwrites what you typed and
-your change disappears without a message. If a total looks wrong, the gift records behind
+your change disappears without a message. If a total looks wrong, the records behind
 it are wrong; fix those and recalculate. If you need a number the rollups do not
 calculate, add your own field rather than borrowing one of these.
 
-**Expecting a soft credit to show in total giving.** It never will. A spouse recognized on
+**Expecting a soft credit to show in total giving (with Giving).** It never will. A spouse recognized on
 a household gift has it in **Total soft credits**, and the person who actually gave has it
 in **Total giving**. Adding the two together double counts the gift, which is why they are
 two numbers and not one. Report on whichever answers your question, and say which one you
 used.
 
 **Expecting a nightly total to change immediately.** A rollup in **Scheduled** mode is
-recalculated once a night, so a gift entered this afternoon does not move it until
+recalculated once a night, so a record entered this afternoon does not move it until
 tomorrow morning. That is what the last calculated time is there to tell you. If a total
-needs to be right the moment a gift is saved, set it to **Real time** or **Both**.
+needs to be right the moment a record is saved, set it to **Real time** or **Both**.
 
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is
@@ -205,6 +210,11 @@ For report builders only. Nothing on this page requires you to know these.
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
 | Last calculated, on the Rollups page | `Last_Calculated__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
+
+With Giving installed:
+
+| What you see | Field |
+|---|---|
 | Total giving, on an account or a contact | `Total_Giving__c` |
 | Gift count, on an account or a contact | `Gift_Count__c` |
 | First gift date | `First_Gift_Date__c` |

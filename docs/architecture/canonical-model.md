@@ -30,8 +30,17 @@ It exists for three reasons (plan Section 4.4):
    Section 9.3).
 4. Attribute names here are human names. Salesforce API names appear only in the
    implementation subsection of each entity.
-5. Labels use nonprofit language, not Salesforce language: "Gift" not "Donation
-   Transaction," "Fund" not "General Accounting Unit" (plan Section 7.1).
+5. Labels use plain language, not Salesforce language, and Core's labels are neutral: no
+   Core label, help text, option, message or seeded record says "nonprofit" or uses
+   nonprofit-only vocabulary (gift, donor, donation, grant, fundraising, receipt, pledge,
+   appeal), because Core alone is the Community Suite. The exceptions are text shown only
+   when Giving (or another module) is installed; the names of Salesforce products (NPSP,
+   Nonprofit Cloud, Gift Transaction) shown only when Core detects that product in the org;
+   import column aliases that only match file headers; and the Nonprofit Edition choice
+   (C-30). Giving's labels use giving language: "Gift" not "Donation Transaction," "Fund"
+   not "General Accounting Unit" (plan Section 7.1). See ADR-NEXT
+   (`decisions/NEXT-core-names-other-products-only-when-detected.md`), which amends ADR-0059
+   decision 5.
 
 ## 3. Versioning
 
@@ -120,7 +129,7 @@ does.
 | Custom Name | boolean | yes (defaults false) | When true, Name, Formal Greeting, and Informal Greeting are never recomputed; the staff member's wording stands. |
 | Primary Contact | reference(Contact) | no | The household member who receives correspondence when only one person can be named. In junction mode it mirrors the primary member (R-M3), and a person stored as a Person Account is named by their person contact. |
 | Member Count | integer | computed | The number of current (not ended, not deceased-excluded) members of the household. |
-| Anniversary | date | no | A household-level date the nonprofit stewards, most often a wedding anniversary. |
+| Anniversary | date | no | A household-level date the organization keeps, most often a wedding anniversary. |
 | Record Type | picklist(Household, Organization) | yes | Distinguishes a household from an organization; a Household always carries Household. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
@@ -412,9 +421,9 @@ code never branches on membership mode.
 
 ### Definition
 
-A person the nonprofit knows: a donor, a household member, a volunteer, a program
-participant, a board member, or a staff contact at an organization. The Contact is the
-person; the Household is how the nonprofit addresses and credits them.
+A person the organization knows: a member, a household member, a volunteer, a program
+participant, a board member, a donor (with Giving), or a staff contact at an organization.
+The Contact is the person; the Household is how the organization addresses and credits them.
 
 ### Attributes
 
@@ -434,7 +443,7 @@ address fields are used as the platform provides them.
 | Personal Email | email | no | The person's own email address, the one they read at home. |
 | Work Email | email | no | The email address this person uses at work. |
 | Alternate Email | email | no | A third email address for a person who has one, for example a seasonal or a school address. |
-| Preferred Email | picklist(Personal, Work, Alternate) | no | Which of the three addresses the nonprofit should write to. Leaving it empty means the org is not using the three addresses at all. |
+| Preferred Email | picklist(Personal, Work, Alternate) | no | Which of the three addresses the organization should write to. Leaving it empty means the org is not using the three addresses at all. |
 | Employer | reference(Organization) | no | The organization this person works for, used to recognize the employer when a matching gift arrives (G-10). |
 | Household | reference(Household) | conditional | The household this person belongs to; in contact mode this is the person's Account. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
@@ -539,7 +548,7 @@ partner. Organizations are not households and never carry household naming or gr
 |---|---|---|---|
 | Name | text | yes | The organization's legal or commonly used name, entered by staff and never computed. |
 | Record Type | picklist(Household, Organization) | yes | Always Organization for this entity. |
-| Primary Contact | reference(Contact) | no | The person the nonprofit deals with at this organization. |
+| Primary Contact | reference(Contact) | no | The person you deal with at this organization. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
 ### Relationships
@@ -634,7 +643,7 @@ digest that is scheduled but has not run for two days is a Health Check warning 
 
 ### Salesforce implementation
 
-- **Object:** `Error_Log__c`, surfaced as an admin-only tab in the Nonprofit Hub app. The
+- **Object:** `Error_Log__c`, surfaced as an admin-only tab in the BarnCRM app. The
   record name is the auto number `ERR-{000000}`.
 - **Fields:** `Timestamp__c` (DateTime), `User__c` (Lookup to User), `Context__c` (Text),
   `Record_Reference__c` (Text), `Object_Name__c` (Text), `Message__c` (Long Text Area),
@@ -666,7 +675,7 @@ calling anyone.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Automation Name | text | yes | The stable identifier of the automation, matching its entry in the shipped registry. |
-| Description | long text | yes | What this automation does, in the language a nonprofit administrator uses. |
+| Description | long text | yes | What this automation does, in the language an administrator uses. |
 | Enabled | boolean | yes (defaults true) | Whether the automation runs; unchecking it bypasses the handler. |
 | Always Runs | boolean | yes (defaults false) | Whether this automation enforces a rule rather than providing a convenience. An automation marked this way runs whatever the switch, the pause and the bypass say, and its switch is shown off and disabled in the console (ADR-0024). |
 | Handler Class | text | no | The packaged code the dispatcher runs for this automation, copied from the shipped registry. |
@@ -792,7 +801,7 @@ may add keys, and must add them here first.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Coexistence_Mode__c` | picklist(Standalone, NPSP, AgentforceNonprofit) | Standalone | How this org coexists with what is already installed; set by the Setup Assistant after automatic detection and confirmable later (plan Section 4.5). |
+| `Coexistence_Mode__c` | picklist(Standalone, NPSP, AgentforceNonprofit) | Standalone | How this org coexists with what is already installed; set by the Setup Assistant after automatic detection and confirmable later (plan Section 4.5). Shown as Standalone, NPSP coexistence and Nonprofit Cloud coexistence. Standalone is always offered; NPSP coexistence only when `OrgShapeDetector` finds NPSP (`hasNpsp`); Nonprofit Cloud coexistence only when it finds Nonprofit Cloud objects (`hasIndustriesNonprofit`); the saved value is always offered. The Setup Assistant and the console offer the same list. Recommended: Nonprofit Cloud coexistence, else NPSP coexistence, else Standalone (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). |
 | `Household_Membership_Mode__c` | picklist(Contact, Junction) | Contact | Whether household membership uses the Contact's Account reference or the Household Member junction. |
 | `Auto_Create_Households__c` | boolean | true | Whether saving a new person who belongs to no household creates one automatically. Governs both membership modes, and both objects a person can be stored on (R-H1, R-H2). |
 | `Delete_Empty_Households__c` | boolean | true | Whether a household left with no members is deleted. |
@@ -914,7 +923,7 @@ This is how upgrade safety (Principle 6) is achieved (Decision D-06).
 
 ### Setting Definition
 
-`Setting_Definition__mdt`: the catalog of everything the Nonprofit Settings console shows,
+`Setting_Definition__mdt`: the catalog of everything the BarnCRM Settings console shows,
 one row per setting or per section that a component renders, so that a feature adds its
 settings to the console by shipping rows rather than by editing the console.
 
@@ -1060,7 +1069,7 @@ never types SOQL (plan Section 2.3).
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | The rollup's name as the admin sees it, for example "Household total giving". |
-| Description | long text | no | What this number means, in the language a nonprofit administrator uses. |
+| Description | long text | no | What this number means, in the language an administrator uses. |
 | Definition Key | text | yes | The stable identifier of this rollup, matching the shipped default it came from; unique. |
 | Source Entity | text | yes | The entity whose records are aggregated, for example Gift. |
 | Target Entity | text | yes | The entity that carries the calculated number, for example Household. |
@@ -1239,7 +1248,7 @@ Maria load the same payment processor export every month without rebuilding the 
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Name | text | yes | The template's name as the admin sees it, for example "Generic donor list". |
+| Name | text | yes | The template's name as the admin sees it, for example "Generic contact list". |
 | Description | long text | no | What kind of file this template reads, with an example of its columns. |
 | Template Key | text | yes | The stable identifier of this template, matching the shipped default it came from; unique. |
 | Column Mapping | long text | yes | The mapping from source column names to canonical targets, held as a mapping document (see R-IT1). |
@@ -1251,7 +1260,7 @@ Maria load the same payment processor export every month without rebuilding the 
 | Source Name | text | conditional | The named source of a recurring feed, for example "Monthly processor export"; required when Is Recurring is true. |
 | Last Import Date | date | computed | The date a batch using this template last completed, shown on the Hub. |
 | Active | boolean | yes (defaults true) | Whether the template is offered in the import wizard. |
-| Donation Matching | picklist(Always create, Match or create, Match only, Never match) | no | How a gift on a row is matched to a payment the donor already owes; empty means Match or create (R-IT7, R-DM5). |
+| Payment Matching | picklist(Always create, Match or create, Match only, Never match) | no | Whether an imported record pays a scheduled payment it matches (used by modules that load payments; with Giving, a gift matched to a payment the donor already owes); empty means Match or create (R-IT7, R-DM5). |
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
 
@@ -1324,20 +1333,22 @@ the mapping loads a gift; an empty value means the org's default (ADR-0052). A c
 read them: it runs under the values its dry run recorded on the batch (R-IB11, R-DM7), so a
 template edited after the dry run changes the next dry run, not the commit.
 
-**R-IT5 What ships.** Core ships a generic donor list template and a generic gift list
-template (v0.2). The migration templates (v0.5) are rows of the same type, placed by what
-they load: a template that loads only people and organizations ships from Core, so an org
-with only Core installed can use it, and a template that loads any gift target ships from
-Giving, the way Giving ships its rollup definition defaults. Each has a sample export in
+**R-IT5 What ships.** Core ships the generic contact list template (v0.2); Giving ships the
+generic gift list template. The migration templates (v0.5) are rows of the same type, and
+all of them ship from Giving, the way Giving ships its rollup definition defaults, so they
+are created only in an org that has Giving. That includes the two that load only people,
+because they name nonprofit products, which Core shows only where they apply (rule 5), and
+detecting the old product would be the wrong gate: a migration usually goes into a fresh org where it is
+not installed (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). Each has a sample export in
 `docs/admin-guide/samples/` that `check-custom-metadata.py` compares with its headings.
 
 | Template Key | Package | Reads |
 |---|---|---|
-| `npc_person_accounts` | Core | An export of Nonprofit Cloud person accounts |
+| `npc_person_accounts` | Giving | An export of Nonprofit Cloud person accounts |
 | `npc_gift_transactions` | Giving | An export of gift transaction designations whose donor is a person, one row per designation |
 | `npc_organization_gifts` | Giving | The same export whose donor is not a person |
 | `npc_undesignated_gifts` | Giving | An export of gift transactions with no designation |
-| `npsp_contacts` | Core | An export of NPSP contacts |
+| `npsp_contacts` | Giving | An export of NPSP contacts |
 | `npsp_payments` | Giving | An export of paid NPSP payments whose opportunity's account is individual |
 | `npsp_organization_payments` | Giving | The same export whose account is not individual |
 
@@ -1366,7 +1377,7 @@ from Nonprofit Cloud", section 5).
 | Source Name | `Source_Name__c` | Text |
 | Last Import Date | `Last_Import_Date__c` | Date |
 | Active | `Active__c` | Checkbox |
-| Donation Matching | `Donation_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
+| Payment Matching (labelled Donation Matching before v0.6) | `Donation_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
 
@@ -5430,7 +5441,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
-and Agentforce Nonprofit orgs: the Gift Transaction mirror is v0.6, brought forward from
+orgs: the Gift Transaction mirror is v0.6, brought forward from
 v0.9, and NPSP household adoption is v0.9, moved back from v0.6. The plan's roadmap table
 is the place that reprioritization is recorded permanently; this table follows it.
 | v0.1 | 2026-09-07 | C-03: added the shipped-defaults type Setting Definition (Section 13), which drives the Nonprofit Settings console, and the Nonprofit Settings key `Setup_Steps_Completed__c` (Section 12), which records Setup Assistant progress. |
@@ -5456,3 +5467,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
 | v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-10-12 | Neutral Core wording (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
