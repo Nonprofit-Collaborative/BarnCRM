@@ -1,6 +1,6 @@
 # Dynamic Apex conventions
 
-How Open Impact reaches an object, field or class that a subscriber org may not have. Every
+How BarnCRM reaches an object, field or class that a subscriber org may not have. Every
 rule here is one the code on `main` already follows; each names the class to copy. Plan
 Section 4.2 sets the requirement, ADR-0009 and ADR-0013 the Platform-only floor, ADR-0017
 the cross-package mechanisms.

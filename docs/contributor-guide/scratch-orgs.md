@@ -1,6 +1,6 @@
 # Scratch orgs
 
-Open Impact is verified against five org shapes, matching the license and package
+BarnCRM is verified against five org shapes, matching the license and package
 configurations described in the product plan (Section 4.2). Each shape has a scratch org
 definition in `config/scratch-defs/`. Four of them any Dev Hub can create; the fifth needs
 an entitlement, and is described below.
