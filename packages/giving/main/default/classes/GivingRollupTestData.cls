@@ -158,6 +158,7 @@ public class GivingRollupTestData {
                 Total_Giving__c,
                 Gift_Count__c,
                 Largest_Gift__c,
+                Giving_This_Year__c,
                 Total_Soft_Credits__c,
                 Soft_Credit_Count__c,
                 Pledge_Balance__c,
