@@ -145,6 +145,12 @@ Salesforce org is needed for this job. Steps:
    silently, which is a defect only an org run finds (ADR-0035). This ran because C-15 had
    been writing one side of every relationship since it merged: the reciprocal upkeep read
    its own shipped default as false.
+   `scripts/ci/check-setting-object-explicit.py` fails the build if a Setting Definition
+   record omits `Settings_Object__c`. A custom metadata default is applied only when a record
+   is created, never when a record that omits the field is redeployed or upgraded, so an org
+   keeps the value it first stored. The rename of the default to `BarnCRM_Settings__c` left
+   such orgs pointed at the old object and every save refused with "That setting does not
+   exist in this org".
 17. A grep check that fails the build if any tracked file contains an em dash character.
 18. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
