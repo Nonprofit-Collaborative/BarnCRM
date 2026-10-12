@@ -110,6 +110,8 @@ public with sharing class ImportController {
         public ImportTemplateService.MatchingChoices matching;
         /** The values every row of this file takes where it has none (R-IB14). */
         public List<ImportMapping.Assignment> fileValues;
+        /** True when the file only matches and creates nobody (R-IB15). */
+        public Boolean matchOnly;
     }
 
     /** A field a row can be matched on, as the wizard lists it (R-IT8). */
@@ -317,7 +319,8 @@ public with sharing class ImportController {
                     fileName,
                     options.expectedCount,
                     options.expectedAmount,
-                    options.fileValues
+                    options.fileValues,
+                    options.matchOnly == true
                 )
             );
         } catch (Exception e) {

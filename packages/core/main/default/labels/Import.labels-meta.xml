@@ -1248,4 +1248,44 @@
         <shortDescription>Import wizard: column target, an organization's ID field</shortDescription>
         <value>Organization: {0}</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordIdInvalid</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a record ID column holds something that is not an ID</shortDescription>
+        <value>"{0}" is not a Salesforce record ID. Fix the ID, or set its column to Do not load, then import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordIdNotPerson</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a person's record ID belongs to another kind of record</shortDescription>
+        <value>The ID {0} is not a person. Map the column to the right record ID, or fix the ID, then import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordIdNotOrganization</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: an organization's record ID belongs to another kind of record</shortDescription>
+        <value>The ID {0} is not an organization. Map the column to the right record ID, or fix the ID, then import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordIdNotFound</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: no visible record has the record ID the row gives</shortDescription>
+        <value>No record with the ID {0} was found that you can see. A row with an ID never creates a record: check the ID and your access to it, then import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchOnlyNoMatch</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a match-only file found no record for the row</shortDescription>
+        <value>Nothing matches this row, and this file only matches, so nothing was created. To add new people or organizations, untick Match only and import the row again.</value>
+    </labels>
 </CustomLabels>

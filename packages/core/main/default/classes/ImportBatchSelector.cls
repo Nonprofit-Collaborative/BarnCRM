@@ -13,7 +13,7 @@ public with sharing class ImportBatchSelector {
         'Rows_Updated__c, Rows_Matched__c, Rows_Rejected__c, Run_Log__c, Started_At__c, ' +
         'Completed_At__c, Chunk_Size__c, Undo_Deadline__c, Committed_By__c, Expected_Count__c, ' +
         'Expected_Amount__c, File_Amount__c, Processor_Settings_JSON__c, Pass_Number__c, Job_Id__c, ' +
-        'File_Values_JSON__c';
+        'File_Values_JSON__c, Match_Only__c';
 
     /** One batch, or null. */
     @NamespaceAccessible

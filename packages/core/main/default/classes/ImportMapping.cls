@@ -199,7 +199,8 @@ public with sharing class ImportMapping {
 
     /**
      * True when a target names or finds a person: either person's first, last or full name,
-     * their email, or the field people are matched on (null when the rule uses none). A value
+     * their email, their record ID (R-IT10), or the field people are matched on (null when the
+     * rule uses none). A value
      * for every row of a file may not be one of these, since every row would then be one
      * person (R-IB14).
      */
@@ -219,6 +220,7 @@ public with sharing class ImportMapping {
                 'FirstName',
                 'LastName',
                 'Email',
+                'Id',
                 ATTRIBUTE_FULL_NAME
             }
         ) {

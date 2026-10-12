@@ -85,6 +85,31 @@ public with sharing class ImportBatchService {
         Decimal expectedAmount,
         List<ImportMapping.Assignment> fileValues
     ) {
+        return create(
+            templateId,
+            fileId,
+            fileName,
+            expectedCount,
+            expectedAmount,
+            fileValues,
+            false
+        );
+    }
+
+    /**
+     * Creates the batch for one upload as above, marked Match only when the file is to update
+     * records the org already has and create none (R-IB15).
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c create(
+        Id templateId,
+        String fileId,
+        String fileName,
+        Integer expectedCount,
+        Decimal expectedAmount,
+        List<ImportMapping.Assignment> fileValues,
+        Boolean matchOnly
+    ) {
         if (expectedCount != null && expectedCount < 0) {
             throw new ImportException(Label.Core_Import_ErrorControlCountNegative);
         }
@@ -107,7 +132,8 @@ public with sharing class ImportBatchService {
             Chunk_Size__c = chunkSize(),
             Expected_Count__c = expectedCount,
             Expected_Amount__c = expectedAmount == null ? null : expectedAmount.setScale(2),
-            File_Values_JSON__c = fileValuesDocument
+            File_Values_JSON__c = fileValuesDocument,
+            Match_Only__c = matchOnly == true
         );
         Database.insert(batch, AccessLevel.USER_MODE);
         return batch;

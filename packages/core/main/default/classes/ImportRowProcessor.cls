@@ -157,6 +157,13 @@ public with sharing class ImportRowProcessor {
         String organizationGroup;
         /** True when a key this row was looked for by found several records (R-IT9). */
         Boolean severalMatches = false;
+        /** The record IDs the row gives, as typed, taken out of its values (R-IT10). */
+        String givenOrganizationId;
+        String givenPerson1Id;
+        String givenPerson2Id;
+        /** True when a person was matched by the record ID the row gives (R-IT10). */
+        Boolean givenPerson1 = false;
+        Boolean givenPerson2 = false;
         String personKey1;
         String personKey2;
         Id organizationId;
@@ -202,6 +209,7 @@ public with sharing class ImportRowProcessor {
         noteFieldsWithoutAccess(mapping, personAccounts, outcome);
 
         List<Working> working = read(batch, rows, mapping, outcome);
+        resolveGivenIds(working, personAccounts);
         resolveOrganizations(working, batch, dryRun, outcome);
         resolvePeople(working, rule, batch, personAccounts, dryRun, outcome);
         tagAndNameHouseholds(working, batch, dryRun, outcome);
@@ -303,6 +311,10 @@ public with sharing class ImportRowProcessor {
             item.values = rawValues(row);
             item.byEntity = groupByEntity(item.values, targets, mapping.defaults);
             splitFullNames(item.byEntity);
+            // A record ID matches and is never written to a field (R-IT10).
+            item.givenOrganizationId = takeId(item.byEntity, ImportMapping.ENTITY_ORGANIZATION);
+            item.givenPerson1Id = takeId(item.byEntity, ImportMapping.ENTITY_CONTACT_1);
+            item.givenPerson2Id = takeId(item.byEntity, ImportMapping.ENTITY_CONTACT_2);
             String name = attribute(item.byEntity, ImportMapping.ENTITY_ORGANIZATION, 'Name');
             item.organizationName = String.isBlank(name) ? null : name;
             // A blank key is never looked up, so a row without one is never matched (R-IT8).
@@ -436,6 +448,157 @@ public with sharing class ImportRowProcessor {
         }
     }
 
+    /** Removes an entity's record ID from its values and returns it, or null when blank. */
+    private static String takeId(Map<String, Map<String, String>> byEntity, String entity) {
+        Map<String, String> held = byEntity.get(entity);
+        if (held == null) {
+            return null;
+        }
+        String given;
+        for (String attributeName : new List<String>(held.keySet())) {
+            if ('Id'.equalsIgnoreCase(attributeName)) {
+                String value = held.remove(attributeName);
+                given = String.isBlank(value) ? given : value.trim();
+            }
+        }
+        return given;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Record IDs
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Matches each row's people and organization by the record IDs it gives (R-IT10), before
+     * any rule is asked. An ID must be a record ID of the object the entity is stored on, of a
+     * record the user can see, with the right record type for an account; any other ID
+     * rejects the row with the reason, and nothing is created for it. One query per object
+     * for the whole chunk.
+     */
+    private static void resolveGivenIds(List<Working> working, Boolean personAccounts) {
+        Schema.SObjectType personType = personAccounts ? Account.SObjectType : Contact.SObjectType;
+        Set<Id> personIds = new Set<Id>();
+        Set<Id> organizationIds = new Set<Id>();
+        for (Working item : working) {
+            for (Integer which = 0; which <= 2; which++) {
+                String given = which == 0
+                    ? item.givenOrganizationId
+                    : which == 1 ? item.givenPerson1Id : item.givenPerson2Id;
+                if (given == null || item.error != null) {
+                    continue;
+                }
+                Id parsed = parsedId(given);
+                Schema.SObjectType expected = which == 0 ? Account.SObjectType : personType;
+                if (parsed == null) {
+                    item.error = String.format(
+                        Label.Core_Import_ErrorRecordIdInvalid,
+                        new List<String>{ given }
+                    );
+                } else if (parsed.getSObjectType() != expected) {
+                    item.error = wrongKind(which, given);
+                } else {
+                    (which == 0 ? organizationIds : personIds).add(parsed);
+                }
+            }
+        }
+        if (personIds.isEmpty() && organizationIds.isEmpty()) {
+            return;
+        }
+        Map<Id, Id> recordTypeById = visibleRecords(personIds, organizationIds, personAccounts);
+        Id organizationType = recordTypeId(ORGANIZATION_RECORD_TYPE);
+        for (Working item : working) {
+            for (Integer which = 0; which <= 2; which++) {
+                String given = which == 0
+                    ? item.givenOrganizationId
+                    : which == 1 ? item.givenPerson1Id : item.givenPerson2Id;
+                if (given == null || item.error != null) {
+                    continue;
+                }
+                Id parsed = parsedId(given);
+                if (!recordTypeById.containsKey(parsed)) {
+                    item.error = String.format(
+                        Label.Core_Import_ErrorRecordIdNotFound,
+                        new List<String>{ given }
+                    );
+                    continue;
+                }
+                Id recordType = recordTypeById.get(parsed);
+                Boolean rightKind = which == 0
+                    ? recordType != null && recordType == organizationType
+                    : !personAccounts || personRecordTypeIds().contains(recordType);
+                if (!rightKind) {
+                    item.error = wrongKind(which, given);
+                } else if (which == 0) {
+                    item.organizationId = parsed;
+                    item.organizationKey = null;
+                } else if (which == 1) {
+                    item.person1Id = parsed;
+                    item.givenPerson1 = true;
+                } else {
+                    item.person2Id = parsed;
+                    item.givenPerson2 = true;
+                }
+            }
+        }
+    }
+
+    /** A record ID as typed, or null when it is not one. */
+    private static Id parsedId(String given) {
+        try {
+            return Id.valueOf(given);
+        } catch (Exception notAnId) {
+            return null;
+        }
+    }
+
+    /** The rejection for an ID of the wrong kind of record: 0 the organization, else a person. */
+    private static String wrongKind(Integer which, String given) {
+        return String.format(
+            which == 0
+                ? Label.Core_Import_ErrorRecordIdNotOrganization
+                : Label.Core_Import_ErrorRecordIdNotPerson,
+            new List<String>{ given }
+        );
+    }
+
+    /**
+     * The given records the user can see, each with its account record type (null for a
+     * contact). Read in user mode, so a record the user may not see reads as not found.
+     */
+    private static Map<Id, Id> visibleRecords(
+        Set<Id> personIds,
+        Set<Id> organizationIds,
+        Boolean personAccounts
+    ) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        Set<Id> accountIds = new Set<Id>(organizationIds);
+        if (personAccounts) {
+            accountIds.addAll(personIds);
+        } else if (!personIds.isEmpty()) {
+            for (Contact person : [
+                SELECT Id
+                FROM Contact
+                WHERE Id IN :personIds
+                WITH USER_MODE
+                LIMIT 2000
+            ]) {
+                result.put(person.Id, null);
+            }
+        }
+        if (!accountIds.isEmpty()) {
+            for (Account record : [
+                SELECT Id, RecordTypeId
+                FROM Account
+                WHERE Id IN :accountIds
+                WITH USER_MODE
+                LIMIT 2000
+            ]) {
+                result.put(record.Id, record.RecordTypeId);
+            }
+        }
+        return result;
+    }
+
     // -------------------------------------------------------------------------------------
     // Organizations
     // -------------------------------------------------------------------------------------
@@ -456,10 +619,13 @@ public with sharing class ImportRowProcessor {
         Set<String> keys = new Set<String>();
         Boolean namesOne = false;
         for (Working item : working) {
+            if (!looksForOrganization(item)) {
+                continue;
+            }
             if (item.organizationKey != null) {
                 keys.add(item.organizationKey);
             }
-            namesOne = namesOne || item.organizationKey != null || item.organizationName != null;
+            namesOne = true;
         }
         if (!namesOne) {
             return;
@@ -483,7 +649,7 @@ public with sharing class ImportRowProcessor {
         List<Account> toCreate = new List<Account>();
         List<String> createdKeys = new List<String>();
         for (Working item : working) {
-            if (item.organizationKey == null && item.organizationName == null) {
+            if (!looksForOrganization(item)) {
                 continue;
             }
             Id found = item.organizationKey == null ? null : existing.get(item.organizationKey);
@@ -496,6 +662,11 @@ public with sharing class ImportRowProcessor {
                     }
                 }
                 item.organizationId = found;
+                continue;
+            }
+            if (batch.Match_Only__c == true) {
+                // A file that only matches creates no organization (R-IB15).
+                item.error = Label.Core_Import_ErrorMatchOnlyNoMatch;
                 continue;
             }
             if (item.organizationName == null) {
@@ -557,6 +728,17 @@ public with sharing class ImportRowProcessor {
                 item.error = Label.Core_Import_ErrorOrganizationNotSaved;
             }
         }
+    }
+
+    /**
+     * Whether the row's organization is still to be found by its rule: it names one, was not
+     * given by record ID (R-IT10), and the row is not already rejected.
+     */
+    private static Boolean looksForOrganization(Working item) {
+        return item.error == null &&
+            item.organizationId == null &&
+            (item.organizationKey != null ||
+            item.organizationName != null);
     }
 
     /** Whether the row's organization is one this chunk creates. */
@@ -638,6 +820,13 @@ public with sharing class ImportRowProcessor {
                 rule,
                 externalIdField
             );
+            // A person given by record ID is matched already, and no rule is asked (R-IT10).
+            if (item.givenPerson1) {
+                item.personKey1 = null;
+            }
+            if (item.givenPerson2) {
+                item.personKey2 = null;
+            }
             item.byName = !ImportTemplateService.RULE_EXTERNAL_ID.equals(rule);
             tellApartByFirstName(item, rule);
             collect(
@@ -682,6 +871,9 @@ public with sharing class ImportRowProcessor {
         findPerson(working, matches, earlier, true);
         findPerson(working, matches, earlier, false);
         validate(working);
+        if (batch.Match_Only__c == true) {
+            rejectUnmatchedPeople(working);
+        }
 
         if (dryRun) {
             countUpdatesInPreview(working, personAccounts, rule);
@@ -691,6 +883,29 @@ public with sharing class ImportRowProcessor {
             return;
         }
         savePeople(working, batch, personAccounts, outcome);
+    }
+
+    /**
+     * In a file that only matches, rejects a row whose first or second person matched nobody,
+     * before anything is saved, so the dry run and the commit reject the same rows (R-IB15).
+     */
+    private static void rejectUnmatchedPeople(List<Working> working) {
+        for (Working item : working) {
+            if (item.error != null) {
+                continue;
+            }
+            Boolean newFirst =
+                item.person1Id == null &&
+                !item.comingPerson1 &&
+                describesPerson(item, ImportMapping.ENTITY_CONTACT_1);
+            Boolean newSecond =
+                item.person2Id == null &&
+                !item.comingPerson2 &&
+                describesPerson(item, ImportMapping.ENTITY_CONTACT_2);
+            if (newFirst || newSecond) {
+                item.error = Label.Core_Import_ErrorMatchOnlyNoMatch;
+            }
+        }
     }
 
     /**
@@ -1039,6 +1254,9 @@ public with sharing class ImportRowProcessor {
             Boolean hasPerson2 = describesPerson(item, ImportMapping.ENTITY_CONTACT_2);
             Boolean identifiesSomebody =
                 hasOrganization ||
+                item.organizationId != null ||
+                item.givenPerson1 ||
+                item.givenPerson2 ||
                 identifiesPerson(item, ImportMapping.ENTITY_CONTACT_1) ||
                 identifiesPerson(item, ImportMapping.ENTITY_CONTACT_2);
             if (!identifiesSomebody) {
@@ -1501,10 +1719,10 @@ public with sharing class ImportRowProcessor {
             if (item.error != null) {
                 continue;
             }
-            if (item.person1Id != null && item.personKey1 != null) {
+            if (item.person1Id != null && (item.personKey1 != null || item.givenPerson1)) {
                 matchedIds.add(item.person1Id);
             }
-            if (item.person2Id != null && item.personKey2 != null) {
+            if (item.person2Id != null && (item.personKey2 != null || item.givenPerson2)) {
                 matchedIds.add(item.person2Id);
             }
         }
@@ -2150,6 +2368,10 @@ public with sharing class ImportRowProcessor {
                 continue;
             }
             String attribute = ImportMapping.attributeOf(target);
+            if ('Id'.equalsIgnoreCase(attribute)) {
+                // A record ID matches and is never written (R-IT10).
+                continue;
+            }
             // Only a person's attributes are contact names to translate; an organization's
             // are the account's own, whatever the person mode.
             if (!ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
