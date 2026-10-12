@@ -117,12 +117,25 @@ public with sharing class OpportunityMirrorService {
 
     // ------------------------------------------------------------------ what the org allows
 
+    /**
+     * Set by tests to see the org as having no Opportunity, the Platform-only shape no test org
+     * has (dynamic-apex.md section 9), so the absent path is run rather than skipped.
+     */
+    @TestVisible
+    private static Boolean unavailableForTest = false;
+
     /** The Opportunity object, or null in an org without it (a Platform-only org). */
     public static Schema.SObjectType opportunityType() {
+        if (unavailableForTest == true) {
+            return null;
+        }
         return OpportunityMirrorContext.opportunityType();
     }
 
     public static Schema.SObjectType roleType() {
+        if (unavailableForTest == true) {
+            return null;
+        }
         return OpportunityMirrorContext.roleType();
     }
 

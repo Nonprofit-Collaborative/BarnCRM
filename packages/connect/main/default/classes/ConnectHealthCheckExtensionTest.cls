@@ -27,9 +27,27 @@ private class ConnectHealthCheckExtensionTest {
         return false;
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: a run
+     * scheduled and three days late is not reported, since no run can work there (R-OM1).
+     * `OpportunityMirrorUnavailableTest` runs this branch.
+     */
+    private static void assertNothingReported() {
+        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+        System.runAs(maria()) {
+            OpportunityMirrorSchedulable.schedule();
+            ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);
+            Assert.isFalse(
+                reported(new ConnectHealthCheckExtension().findings()),
+                'Without Opportunity there is no run to be late.'
+            );
+        }
+    }
+
     @IsTest
     static void aScheduledRunThatHasNotRunForTwoDaysIsReportedInCoresReport() {
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingReported();
             return;
         }
         choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
@@ -55,6 +73,7 @@ private class ConnectHealthCheckExtensionTest {
     @IsTest
     static void nothingIsReportedWhenTheRunIsNotExpected() {
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingReported();
             return;
         }
         ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);

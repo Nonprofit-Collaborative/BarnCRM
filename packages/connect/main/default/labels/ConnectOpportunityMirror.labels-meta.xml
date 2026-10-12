@@ -89,6 +89,14 @@
     <value>The Opportunity mirror's record type list names record types this org does not have: {0}. They match no Opportunity, so no gift is made from them. Correct the list in the Opportunity mirror settings.</value>
   </labels>
   <labels>
+    <fullName>Connect_OpportunityMirror_MasterRecordType</fullName>
+    <categories>Connect, Opportunity Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Run: record type list names Master</shortDescription>
+    <value>The Opportunity mirror's record type list includes Master. An Opportunity without a record type stores none, so Master matches no Opportunity and the run left it out. Remove Master from the list in the Opportunity mirror settings, or leave the list empty to include every Opportunity.</value>
+  </labels>
+  <labels>
     <fullName>Connect_OpportunityMirror_DeletedKept</fullName>
     <categories>Connect, Opportunity Mirror</categories>
     <language>en_US</language>

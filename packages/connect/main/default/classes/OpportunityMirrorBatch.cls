@@ -96,6 +96,14 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
                     ErrorLogger.SEVERITY_WARNING
                 );
             }
+            if (OpportunityGiftService.listsMasterRecordType()) {
+                // Master is a real name, so it is not unknown, yet it matches no Opportunity.
+                ErrorLogger.logMessage(
+                    Label.Connect_OpportunityMirror_MasterRecordType,
+                    LOG_CONTEXT,
+                    ErrorLogger.SEVERITY_WARNING
+                );
+            }
             if (recordTypeIds != null && recordTypeIds.isEmpty()) {
                 // Nothing listed exists, and an org without record types has no field to filter.
                 return nothing();

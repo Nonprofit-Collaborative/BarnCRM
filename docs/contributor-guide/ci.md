@@ -815,10 +815,6 @@ from both when its PR merges.
      failed".
    - Consider requesting a smaller result payload.
    - Update the heap paragraph in this page.
-5. **Smaller review follow-ups.**
-   - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
-   - X-01: the admin guide should warn against listing `Master` in the record-type filter.
-   - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.
 
 ### Next on the roadmap
 

@@ -1,8 +1,8 @@
 /**
  * What stops, limits and records a run of the Opportunity mirror (X-01, R-OM7, R-OM8): a pause or
- * the Automation page switch, a direction changed partway through, the record type list, two runs
- * making the same gift, a chunk of two hundred, and the last run kept for the page and for Health
- * Check.
+ * the Automation page switch, a direction changed partway through, the record type list (Master
+ * included), two runs making the same gift, a chunk of two hundred, and the last run kept for the
+ * page and for Health Check.
  *
  * Opportunity is written and read through describe here too, so this class compiles where it
  * does not exist; there each test checks that nothing happened and stops.
@@ -66,6 +66,31 @@ private class OpportunityMirrorRunTest {
         ];
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: no run
+     * started, no gift was linked, and nothing was logged (R-OM1).
+     * `OpportunityMirrorUnavailableTest` runs this branch.
+     */
+    private static void assertNothingMirrored() {
+        Set<String> contexts = new Set<String>{ RUN_CONTEXT, OpportunityMirrorService.CONTEXT };
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Gift__c WHERE Opportunity_Id__c != NULL WITH SYSTEM_MODE],
+            'Without Opportunity no gift is linked (R-OM1).'
+        );
+        Assert.areEqual(
+            0,
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c IN :contexts
+                WITH SYSTEM_MODE
+            ],
+            'No run started, so nothing is logged.'
+        );
+        Assert.isNull(OpportunityMirrorBatch.run(), 'And none can start.');
+    }
+
     private static Connect_Settings__c stored() {
         return [
             SELECT Opportunity_Mirror_Last_Run__c, Opportunity_Mirror_Last_Summary__c
@@ -86,6 +111,7 @@ private class OpportunityMirrorRunTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Assert.areEqual(0, countOpportunities(), 'Paused is paused (R-OM8).');
@@ -107,6 +133,7 @@ private class OpportunityMirrorRunTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Assert.areEqual(0, countOpportunities(), 'Off is off.');
@@ -119,6 +146,7 @@ private class OpportunityMirrorRunTest {
     static void chunksAfterAPauseOrADirectionChangeAreLeftForTheNextRun() {
         List<Gift__c> gifts = giftsBeforeTheMirror(4);
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         User admin = maria();
@@ -165,6 +193,7 @@ private class OpportunityMirrorRunTest {
             insert given;
         }
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         ConnectSettingsWriter.recordOpportunityMirrorRun(System.now().addDays(-1), 'Yesterday');
@@ -205,6 +234,7 @@ private class OpportunityMirrorRunTest {
     static void aChunkOfTwoHundredIsCopiedAndLinked() {
         List<Gift__c> gifts = giftsBeforeTheMirror(200);
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         OpportunityMirrorService.Result result;
@@ -229,6 +259,7 @@ private class OpportunityMirrorRunTest {
         settings.Opportunity_Mirror_Record_Types__c = 'No_Such_Record_Type';
         upsert settings;
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Assert.areEqual(0, OpportunityGiftService.recordTypeIds().size(), 'Matches nothing.');
@@ -260,8 +291,126 @@ private class OpportunityMirrorRunTest {
     }
 
     @IsTest
-    static void anOpportunityMadeIntoAGiftTwiceAtOnceIsCountedUnchanged() {
+    static void masterInTheRecordTypeListIsLeftOutAndNamedOnce() {
+        Connect_Settings__c settings = Connect_Settings__c.getOrgDefaults();
+        settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS;
+        settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
+        settings.Opportunity_Mirror_Record_Types__c = 'Master';
+        upsert settings;
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
+            return;
+        }
+        Assert.isTrue(OpportunityGiftService.listsMasterRecordType(), 'Master is listed.');
+        Assert.areEqual(
+            0,
+            OpportunityGiftService.recordTypeIds().size(),
+            'An Opportunity without a record type stores none, so Master is left out.'
+        );
+        Assert.isTrue(
+            OpportunityGiftService.unknownRecordTypes().isEmpty(),
+            'Master is a real name, not a mistyped one.'
+        );
+        Test.startTest();
+        System.runAs(maria()) {
+            OpportunityMirrorBatch.run();
+        }
+        Test.stopTest();
+        List<Error_Log__c> warned = [
+            SELECT Message__c
+            FROM Error_Log__c
+            WHERE Context__c = :RUN_CONTEXT AND Severity__c = 'Warning'
+            WITH SYSTEM_MODE
+        ];
+        Assert.areEqual(1, warned.size(), 'One Warning a run, not a silent run.');
+        Assert.areEqual(
+            Label.Connect_OpportunityMirror_MasterRecordType,
+            warned[0].Message__c,
+            'It says why Master matches nothing and what to do.'
+        );
+        settings.Opportunity_Mirror_Record_Types__c = 'master, No_Such_Record_Type';
+        upsert settings;
+        Assert.isTrue(OpportunityGiftService.listsMasterRecordType(), 'In any case.');
+        Assert.areEqual(
+            new List<String>{ 'No_Such_Record_Type' },
+            OpportunityGiftService.unknownRecordTypes(),
+            'Only the mistyped name is unknown.'
+        );
+    }
+
+    @IsTest
+    static void onlyADuplicateOnTheLinkItselfIsAnotherRunsGift() {
+        String link = Gift__c.Opportunity_Id__c.getDescribe().getName();
+        String lookalike = link.removeEndIgnoreCase('__c') + '_Legacy__c';
+        String other = Gift__c.External_Id__c.getDescribe().getName();
+        StatusCode duplicate = StatusCode.DUPLICATE_VALUE;
+
+        // The refusal names its fields.
+        Assert.isTrue(
+            OpportunityGiftService.isLinkDuplicate(duplicate, new List<String>{ link }, ''),
+            'A duplicate on the link is another run\'s gift.'
+        );
+        Assert.isFalse(
+            OpportunityGiftService.isLinkDuplicate(
+                duplicate,
+                new List<String>{ other },
+                'duplicate value found: ' + link
+            ),
+            'The fields decide when there are any.'
+        );
+        Assert.isFalse(
+            OpportunityGiftService.isLinkDuplicate(
+                StatusCode.REQUIRED_FIELD_MISSING,
+                new List<String>{ link },
+                link
+            ),
+            'Only a duplicate.'
+        );
+
+        // The refusal names the field only in its message.
+        for (List<String> noFields : new List<List<String>>{ null, new List<String>() }) {
+            Assert.isTrue(
+                OpportunityGiftService.isLinkDuplicate(
+                    duplicate,
+                    noFields,
+                    'duplicate value found: ' +
+                        link +
+                        ' duplicates value on record with id: a0B000000000001AAA'
+                ),
+                'The link, as a whole word of the message.'
+            );
+            Assert.isFalse(
+                OpportunityGiftService.isLinkDuplicate(
+                    duplicate,
+                    noFields,
+                    'duplicate value found: ' +
+                        lookalike +
+                        ' duplicates value on record with id: a0B000000000001AAA'
+                ),
+                'A field whose name only contains the link\'s is not the link.'
+            );
+            Assert.isFalse(
+                OpportunityGiftService.isLinkDuplicate(
+                    duplicate,
+                    noFields,
+                    'duplicate value found: ' +
+                        other +
+                        ' duplicates value on record with id: a0B000000000001AAA'
+                ),
+                'Another unique field is not the link.'
+            );
+            Assert.isFalse(
+                OpportunityGiftService.isLinkDuplicate(duplicate, noFields, null),
+                'No message, no match.'
+            );
+        }
+    }
+
+    @IsTest
+    static void anOpportunityMadeIntoAGiftTwiceAtOnceIsCountedUnchanged() {
+        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
+        if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         String won;
@@ -277,7 +426,6 @@ private class OpportunityMirrorRunTest {
         online.put('StageName', won);
         online.put('AccountId', [SELECT AccountId FROM Contact WHERE Id = :luisId()].AccountId);
         insert online;
-        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
         OpportunityMirrorService.Result result;
         Test.startTest();
         System.runAs(maria()) {

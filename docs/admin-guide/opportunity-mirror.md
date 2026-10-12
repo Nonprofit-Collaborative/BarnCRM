@@ -45,7 +45,11 @@ appeal is the one whose Campaign is the Opportunity's Campaign. To make gifts fr
 Opportunity only, list their record types' API names, separated by commas, in **Opportunity
 mirror record types** (for example `Donation,Major_Gift`); left empty, every won Opportunity
 after the start date counts, and a name your org does not have is named in a Warning in the
-Error Log. The start date is read in your organization's default time zone. The gift then gets its fund,
+Error Log. Do not list `Master`. Salesforce names the record type of an Opportunity without one
+`Master`, but such an Opportunity stores no record type at all, so `Master` matches no
+Opportunity and no gift is made from those Opportunities. A run that finds `Master` in the list
+leaves it out and says so in a Warning in the Error Log. To include Opportunities without a
+record type, leave the list empty. The start date is read in your organization's default time zone. The gift then gets its fund,
 household and thank-you status from your Giving settings, like any gift. A gift is never
 changed afterwards, even if its Opportunity is: the reconciliation shows the difference.
 
