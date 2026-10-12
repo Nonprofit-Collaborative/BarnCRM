@@ -6,7 +6,13 @@ module.exports = {
   moduleNameMapper: {
     // sfdx-lwc-jest ships no stub for lightning/actions, which a quick action screen uses to
     // close itself.
-    '^lightning/actions$': '<rootDir>/packages/giving/test/jest-mocks/lightning/actions.js'
+    '^lightning/actions$': '<rootDir>/packages/giving/test/jest-mocks/lightning/actions.js',
+    // Map to the sfdx-lwc-jest stub explicitly so every file resolves one module id. Through the
+    // custom resolver alone, jest caches the id per importing directory without regard to virtual
+    // mocks, so a test that mocks it (setupStepFields) lost to the unmocked stub whenever a test
+    // rendering that component without the mock (setupAssistant) ran first in the same worker.
+    '^lightning/navigation$':
+      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/navigation/navigation.js'
   },
   // No LWC components exist yet in any package; allow jest to pass cleanly until they do.
   passWithNoTests: true
