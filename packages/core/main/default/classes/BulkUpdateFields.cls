@@ -1,0 +1,462 @@
+/**
+ * Which objects and fields a bulk update may write, which fields may be copied into which, and
+ * how a value to set is typed (C-35, canonical model R-BU4, ADR-NEXT bulk update).
+ *
+ * Everything is asked of the running user's describe: a target is a field of the query's own
+ * object that the user may edit, of a type a value can be written to, and not one the package
+ * keeps. The package's list is worked out when asked, from the Rollup Definitions and a short
+ * list of names, so a rollup added later is protected without a code change. Core names no
+ * object of another module (ADR-0059); their own lock triggers refuse a locked record's save.
+ *
+ * This decides what may be offered and checked. Every write is still in user mode.
+ */
+public with sharing class BulkUpdateFields {
+    /** Raised for anything the person can fix; the message is for them. */
+    public class BulkUpdateException extends Exception {
+    }
+
+    /** Core's bookkeeping objects, by their names without a namespace, in lower case. */
+    private static final Set<String> BOOKKEEPING = new Set<String>{
+        'import_template__c',
+        'import_batch__c',
+        'import_row__c',
+        'import_journal__c',
+        'error_log__c',
+        'barncrm_settings__c',
+        'setting_change__c',
+        'automation_setting__c',
+        'rollup_definition__c',
+        'duplicate_dismissal__c',
+        'saved_query__c'
+    };
+
+    /** Salesforce setup and security objects, which Setup manages (ADR-0047, never built). */
+    private static final Set<String> SETUP = new Set<String>{
+        'user',
+        'group',
+        'groupmember',
+        'profile',
+        'userrole',
+        'permissionset',
+        'permissionsetassignment',
+        'permissionsetgroup',
+        'permissionsetgroupcomponent',
+        'permissionsetlicenseassign',
+        'recordtype',
+        'organization',
+        'queuesobject'
+    };
+
+    /** Fields the package keeps on any object that carries them (R-BU4), local names. */
+    private static final Set<String> KEPT = new Set<String>{
+        'created_by_import_batch__c',
+        'sample_data_key__c',
+        'household_formal_greeting__c',
+        'household_informal_greeting__c',
+        'member_count__c'
+    };
+
+    private static final String LAST_CALCULATED_SUFFIX = 'last_calculated__c';
+
+    private static final Set<Schema.DisplayType> TEXT_TARGETS = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.TEXTAREA
+    };
+    private static final Set<Schema.DisplayType> TEXT_SOURCES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.TEXTAREA,
+        Schema.DisplayType.EMAIL,
+        Schema.DisplayType.PHONE,
+        Schema.DisplayType.URL,
+        Schema.DisplayType.PICKLIST,
+        Schema.DisplayType.COMBOBOX
+    };
+    private static final Set<Schema.DisplayType> NUMBERS = new Set<Schema.DisplayType>{
+        Schema.DisplayType.INTEGER,
+        Schema.DisplayType.DOUBLE,
+        Schema.DisplayType.CURRENCY,
+        Schema.DisplayType.PERCENT
+    };
+    /** Types a bulk update can write a value of. The undo puts each of them back typed. */
+    private static final Set<Schema.DisplayType> WRITABLE = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.TEXTAREA,
+        Schema.DisplayType.EMAIL,
+        Schema.DisplayType.PHONE,
+        Schema.DisplayType.URL,
+        Schema.DisplayType.PICKLIST,
+        Schema.DisplayType.MULTIPICKLIST,
+        Schema.DisplayType.COMBOBOX,
+        Schema.DisplayType.BOOLEAN,
+        Schema.DisplayType.INTEGER,
+        Schema.DisplayType.DOUBLE,
+        Schema.DisplayType.CURRENCY,
+        Schema.DisplayType.PERCENT,
+        Schema.DisplayType.DATE,
+        Schema.DisplayType.DATETIME,
+        Schema.DisplayType.REFERENCE
+    };
+
+    /** Set only by tests: the Rollup Definitions to read in place of the org's. */
+    @TestVisible
+    private static List<Rollup_Definition__c> definitionsOverride;
+
+    /** Rollup targets by local object name, read once per transaction. */
+    private static Map<String, Set<String>> rollupTargets;
+
+    /** One field a bulk update may write, as the page offers it. */
+    public class Target {
+        @AuraEnabled
+        public String apiName;
+        @AuraEnabled
+        public String label;
+        /** The describe type in lower case, as QueryFieldCatalog gives it. */
+        @AuraEnabled
+        public String dataType;
+        /** True when the field may be cleared. */
+        @AuraEnabled
+        public Boolean nillable;
+        /** The parent object of a lookup with exactly one parent type; empty otherwise. */
+        @AuraEnabled
+        public String referenceTo;
+        @AuraEnabled
+        public List<QueryFieldCatalog.PicklistOption> picklistValues;
+    }
+
+    /** The object, or a refusal naming it when no bulk update may write its records. */
+    public static Schema.SObjectType writableObject(String objectName) {
+        Schema.DescribeSObjectResult described;
+        try {
+            described = QueryFieldCatalog.describeObject(objectName);
+        } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+            throw new BulkUpdateException(refused.getMessage());
+        }
+        String reason = objectReason(described);
+        if (reason != null) {
+            throw new BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorObject,
+                    new List<Object>{ described.getLabelPlural(), reason }
+                )
+            );
+        }
+        return described.getSObjectType();
+    }
+
+    /** Every field of the object a bulk update may write, sorted by label. */
+    public static List<Target> targets(String objectName) {
+        Schema.SObjectType type = writableObject(objectName);
+        Map<String, Target> byLabel = new Map<String, Target>();
+        for (Schema.SObjectField token : fieldMap(type).values()) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            if (fieldReason(type, field) != null) {
+                continue;
+            }
+            Target target = new Target();
+            target.apiName = field.getName();
+            target.label = field.getLabel();
+            target.dataType = String.valueOf(field.getType()).toLowerCase();
+            target.nillable = field.isNillable();
+            List<Schema.SObjectType> parents = field.getReferenceTo();
+            target.referenceTo = parents.size() == 1
+                ? parents[0].getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+                : null;
+            target.picklistValues = new List<QueryFieldCatalog.PicklistOption>();
+            for (Schema.PicklistEntry entry : field.getPicklistValues()) {
+                if (entry.isActive()) {
+                    QueryFieldCatalog.PicklistOption option = new QueryFieldCatalog.PicklistOption();
+                    option.label = entry.getLabel();
+                    option.value = entry.getValue();
+                    target.picklistValues.add(option);
+                }
+            }
+            byLabel.put(target.label.toLowerCase() + '\u0000' + target.apiName, target);
+        }
+        List<String> keys = new List<String>(byLabel.keySet());
+        keys.sort();
+        List<Target> result = new List<Target>();
+        for (String key : keys) {
+            result.add(byLabel.get(key));
+        }
+        return result;
+    }
+
+    /** The fields the person may read that can be copied into this target, sorted by label. */
+    public static List<QueryFieldCatalog.PicklistOption> copySources(
+        String objectName,
+        String targetName
+    ) {
+        Schema.SObjectType type = writableObject(objectName);
+        Schema.DescribeFieldResult target = writableField(type, targetName);
+        Map<String, QueryFieldCatalog.PicklistOption> byLabel = new Map<String, QueryFieldCatalog.PicklistOption>();
+        for (Schema.SObjectField token : fieldMap(type).values()) {
+            Schema.DescribeFieldResult source = token.getDescribe();
+            if (
+                source.getName() == target.getName() ||
+                !source.isAccessible() ||
+                !compatible(target, source)
+            ) {
+                continue;
+            }
+            QueryFieldCatalog.PicklistOption option = new QueryFieldCatalog.PicklistOption();
+            option.label = source.getLabel();
+            option.value = source.getName();
+            byLabel.put(option.label.toLowerCase() + '\u0000' + option.value, option);
+        }
+        List<String> keys = new List<String>(byLabel.keySet());
+        keys.sort();
+        List<QueryFieldCatalog.PicklistOption> result = new List<QueryFieldCatalog.PicklistOption>();
+        for (String key : keys) {
+            result.add(byLabel.get(key));
+        }
+        return result;
+    }
+
+    /** A field of the object itself the person may read, found in describe, or a refusal. */
+    public static Schema.DescribeFieldResult ownField(Schema.SObjectType type, Object rawName) {
+        String name = rawName == null ? '' : String.valueOf(rawName).trim();
+        Schema.SObjectField token = String.isBlank(name) || name.contains('.')
+            ? null
+            : fieldMap(type).get(name.toLowerCase());
+        if (token == null || !token.getDescribe().isAccessible()) {
+            throw new BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorUnknownField,
+                    new List<Object>{ name.abbreviate(80) }
+                )
+            );
+        }
+        return token.getDescribe();
+    }
+
+    /** A field the person may bulk update, or a refusal naming it and saying why. */
+    public static Schema.DescribeFieldResult writableField(
+        Schema.SObjectType type,
+        Object rawName
+    ) {
+        Schema.DescribeFieldResult field = ownField(type, rawName);
+        String reason = fieldReason(type, field);
+        if (reason != null) {
+            throw new BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorField,
+                    new List<Object>{ field.getLabel(), reason }
+                )
+            );
+        }
+        return field;
+    }
+
+    /** Whether `source` may be copied into `target` (R-BU4). */
+    public static Boolean compatible(
+        Schema.DescribeFieldResult target,
+        Schema.DescribeFieldResult source
+    ) {
+        Schema.DisplayType to = target.getType();
+        Schema.DisplayType given = source.getType();
+        if (!WRITABLE.contains(to)) {
+            return false;
+        }
+        if (to == Schema.DisplayType.REFERENCE) {
+            if (given != Schema.DisplayType.REFERENCE) {
+                return false;
+            }
+            Set<Schema.SObjectType> reachable = new Set<Schema.SObjectType>(
+                target.getReferenceTo()
+            );
+            for (Schema.SObjectType parent : source.getReferenceTo()) {
+                if (reachable.contains(parent)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        if (TEXT_TARGETS.contains(to)) {
+            return TEXT_SOURCES.contains(given);
+        }
+        if (NUMBERS.contains(to)) {
+            return NUMBERS.contains(given);
+        }
+        return to == given;
+    }
+
+    /** A value to set, as the field's own type, or a refusal naming the field. */
+    public static Object typed(Schema.DescribeFieldResult field, Object raw) {
+        BulkUpdateException refused = new BulkUpdateException(
+            String.format(
+                System.Label.Core_BulkUpdate_ErrorBadValue,
+                new List<Object>{ field.getLabel() }
+            )
+        );
+        if (raw == null || String.isBlank(String.valueOf(raw))) {
+            throw refused;
+        }
+        String text = String.valueOf(raw).trim();
+        try {
+            switch on field.getType() {
+                when BOOLEAN {
+                    if (text.equalsIgnoreCase('true') || text.equalsIgnoreCase('false')) {
+                        return Boolean.valueOf(text);
+                    }
+                    throw refused;
+                }
+                when INTEGER {
+                    Decimal value = Decimal.valueOf(text);
+                    if (value.stripTrailingZeros().scale() > 0) {
+                        throw refused;
+                    }
+                    return value.intValue();
+                }
+                when DOUBLE, CURRENCY, PERCENT {
+                    return Decimal.valueOf(text);
+                }
+                when DATE {
+                    Date parsed = Date.valueOf(text);
+                    if (String.valueOf(parsed) != text) {
+                        throw refused;
+                    }
+                    return parsed;
+                }
+                when DATETIME {
+                    return (Datetime) JSON.deserialize('"' + text + '"', Datetime.class);
+                }
+                when REFERENCE {
+                    Id value = Id.valueOf(text);
+                    if (!field.getReferenceTo().contains(value.getSObjectType())) {
+                        throw refused;
+                    }
+                    return value;
+                }
+                when PICKLIST, MULTIPICKLIST {
+                    checkPicklist(field, text, refused);
+                    return text;
+                }
+                when else {
+                    String original = String.valueOf(raw);
+                    if (field.getLength() > 0 && original.length() > field.getLength()) {
+                        throw refused;
+                    }
+                    return original;
+                }
+            }
+        } catch (BulkUpdateException known) {
+            throw known;
+        } catch (Exception unreadable) {
+            throw refused;
+        }
+    }
+
+    /** Why no record of this object may be bulk updated, or null when its records may be. */
+    @TestVisible
+    private static String objectReason(Schema.DescribeSObjectResult described) {
+        String name = described.getName().toLowerCase();
+        if (described.isCustom() && BOOKKEEPING.contains(ownLocalName(name))) {
+            return System.Label.Core_BulkUpdate_ReasonBookkeeping;
+        }
+        if (described.isCustomSetting()) {
+            return System.Label.Core_BulkUpdate_ReasonBookkeeping;
+        }
+        if (!described.isCustom() && SETUP.contains(name)) {
+            return System.Label.Core_BulkUpdate_ReasonSetup;
+        }
+        if (!described.isUpdateable()) {
+            return System.Label.Core_BulkUpdate_ReasonNoObjectAccess;
+        }
+        return null;
+    }
+
+    /** Why this field may not be bulk updated, or null when it may. */
+    @TestVisible
+    private static String fieldReason(Schema.SObjectType type, Schema.DescribeFieldResult field) {
+        String name = field.getName().toLowerCase();
+        String own = field.isCustom() ? ownLocalName(name) : null;
+        if (
+            (own != null && (KEPT.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX))) ||
+            rollupTargetsOf(type).contains(localName(name))
+        ) {
+            return System.Label.Core_BulkUpdate_ReasonKept;
+        }
+        if (!field.isUpdateable() || !field.isAccessible()) {
+            return System.Label.Core_BulkUpdate_ReasonNoFieldAccess;
+        }
+        if (!WRITABLE.contains(field.getType())) {
+            return System.Label.Core_BulkUpdate_ReasonType;
+        }
+        return null;
+    }
+
+    /** The target fields of every Rollup Definition on this object, local names, lower case. */
+    private static Set<String> rollupTargetsOf(Schema.SObjectType type) {
+        if (rollupTargets == null) {
+            rollupTargets = new Map<String, Set<String>>();
+            for (
+                Rollup_Definition__c definition : definitionsOverride != null
+                    ? definitionsOverride
+                    : RollupSelector.selectAll()
+            ) {
+                if (
+                    String.isBlank(definition.Target_Object__c) ||
+                    String.isBlank(definition.Target_Field__c)
+                ) {
+                    continue;
+                }
+                String target = localName(definition.Target_Object__c.trim().toLowerCase());
+                if (!rollupTargets.containsKey(target)) {
+                    rollupTargets.put(target, new Set<String>());
+                }
+                rollupTargets.get(target)
+                    .add(localName(definition.Target_Field__c.trim().toLowerCase()));
+            }
+        }
+        String key = localName(
+            type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
+        );
+        return rollupTargets.containsKey(key) ? rollupTargets.get(key) : new Set<String>();
+    }
+
+    private static Map<String, Schema.SObjectField> fieldMap(Schema.SObjectType type) {
+        return type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
+    }
+
+    /** A restricted picklist takes only its active values; an open one takes any text. */
+    private static void checkPicklist(
+        Schema.DescribeFieldResult field,
+        String text,
+        BulkUpdateException refused
+    ) {
+        if (!field.isRestrictedPicklist()) {
+            return;
+        }
+        Set<String> active = new Set<String>();
+        for (Schema.PicklistEntry entry : field.getPicklistValues()) {
+            if (entry.isActive()) {
+                active.add(entry.getValue());
+            }
+        }
+        List<String> chosen = field.getType() == Schema.DisplayType.MULTIPICKLIST
+            ? text.split(';')
+            : new List<String>{ text };
+        for (String value : chosen) {
+            if (!active.contains(value)) {
+                throw refused;
+            }
+        }
+    }
+
+    /** A lower-case name without this package's namespace, or null for another namespace's. */
+    private static String ownLocalName(String lowerCaseName) {
+        String prefix = NamespaceUtil.prefix().toLowerCase();
+        if (String.isBlank(prefix)) {
+            return lowerCaseName;
+        }
+        return lowerCaseName.startsWith(prefix) ? lowerCaseName.removeStart(prefix) : null;
+    }
+
+    /** A lower-case name without this package's namespace. */
+    private static String localName(String lowerCaseName) {
+        String prefix = NamespaceUtil.prefix().toLowerCase();
+        return String.isNotBlank(prefix) && lowerCaseName.startsWith(prefix)
+            ? lowerCaseName.removeStart(prefix)
+            : lowerCaseName;
+    }
+}

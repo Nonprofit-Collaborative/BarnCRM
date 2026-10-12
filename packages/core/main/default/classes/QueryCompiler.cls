@@ -39,6 +39,8 @@ public with sharing class QueryCompiler {
         public Map<String, Object> binds;
         public String objectName;
         public List<String> fields;
+        /** The FROM and WHERE part, for a count of the same records. */
+        public String fromWhere;
     }
 
     /** Reads a query document; refuses one that is not a version 1 document within limits. */
@@ -98,7 +100,7 @@ public with sharing class QueryCompiler {
     /** The query the results grid runs: the document's own order and row count. */
     public static Compiled compile(String queryJson) {
         QueryDocument document = parse(queryJson);
-        Compiled compiled = selectAndWhere(document, null);
+        Compiled compiled = selectAndWhere(document, null, null);
         String order = '';
         if (String.isNotBlank(document.orderField)) {
             Schema.DescribeFieldResult sortField = resolve(
@@ -129,11 +131,41 @@ public with sharing class QueryCompiler {
     /** One export page: the document's filter, in Id order, after the last Id already read. */
     public static Compiled compileExportPage(String queryJson, Id afterId) {
         QueryDocument document = parse(queryJson);
-        Compiled compiled = selectAndWhere(document, afterId);
+        Compiled compiled = selectAndWhere(document, afterId, null);
         compiled.binds.put('pageSize', EXPORT_PAGE_SIZE);
         compiled.soql += ' ORDER BY Id LIMIT :pageSize';
         compiled.display += ' ORDER BY Id LIMIT ' + EXPORT_PAGE_SIZE;
         return compiled;
+    }
+
+    /**
+     * The document's filter over other fields of its object, for bulk update (C-35, R-BU1): the
+     * document's own columns, order and row count are ignored. With `onlyIds`, only those
+     * records; the caller adds any order and row count.
+     */
+    public static Compiled compileSelection(
+        String queryJson,
+        Set<String> fieldNames,
+        Set<Id> onlyIds
+    ) {
+        QueryDocument document = parse(queryJson);
+        document.fields = new List<String>(fieldNames);
+        return selectAndWhere(document, null, onlyIds);
+    }
+
+    /**
+     * How many records the document's filter matches, as the user, counting at most `atMost`
+     * (a count reads one query row per record, R-BU2).
+     */
+    public static Integer count(String queryJson, Integer atMost) {
+        Compiled compiled = selectAndWhere(parse(queryJson), null, null);
+        Map<String, Object> binds = new Map<String, Object>(compiled.binds);
+        binds.put('countLimit', atMost);
+        return Database.countQueryWithBinds(
+            'SELECT COUNT()' + compiled.fromWhere + ' LIMIT :countLimit',
+            binds,
+            AccessLevel.USER_MODE
+        );
     }
 
     /** Runs a compiled query with the running user's access. */
@@ -141,7 +173,7 @@ public with sharing class QueryCompiler {
         return Database.queryWithBinds(compiled.soql, compiled.binds, AccessLevel.USER_MODE);
     }
 
-    private static Compiled selectAndWhere(QueryDocument document, Id afterId) {
+    private static Compiled selectAndWhere(QueryDocument document, Id afterId, Set<Id> onlyIds) {
         String objectName;
         try {
             objectName = QueryFieldCatalog.describeObject(document.objectName).getName();
@@ -175,12 +207,21 @@ public with sharing class QueryCompiler {
             whereParts.add('Id > :afterId');
             shownParts.add('Id > \'' + String.valueOf(afterId) + '\'');
         }
+        if (onlyIds != null) {
+            binds.put('onlyIds', onlyIds);
+            whereParts.add('Id IN :onlyIds');
+            shownParts.add('Id IN :onlyIds');
+        }
 
         String selectFrom = 'SELECT ' + String.join(fields, ', ') + ' FROM ' + objectName;
         Compiled compiled = new Compiled();
         compiled.objectName = objectName;
         compiled.fields = fields;
         compiled.binds = binds;
+        compiled.fromWhere =
+            ' FROM ' +
+            objectName +
+            (whereParts.isEmpty() ? '' : ' WHERE ' + String.join(whereParts, ' AND '));
         compiled.soql =
             selectFrom + (whereParts.isEmpty() ? '' : ' WHERE ' + String.join(whereParts, ' AND '));
         compiled.display =

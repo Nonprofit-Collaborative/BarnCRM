@@ -105,6 +105,32 @@ private class QueryCompilerTest {
     }
 
     @IsTest
+    static void bulkUpdateCountsAtMostTheCapAndReadsChosenRecordsWithTheFilter() {
+        makeLogs(200, 20);
+        String document = query(ERRORS_ONLY, null, 10);
+
+        System.Assert.areEqual(200, QueryCompiler.count(document, 1000), 'Only matches count');
+        System.Assert.areEqual(150, QueryCompiler.count(document, 150), 'A count stops at the cap');
+
+        Set<Id> chosen = new Map<Id, Error_Log__c>([SELECT Id FROM Error_Log__c]).keySet();
+        QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
+            document,
+            new Set<String>{ 'Message__c' },
+            chosen
+        );
+        List<SObject> rows = QueryCompiler.run(selection);
+        System.Assert.areEqual(200, rows.size(), 'Chosen records that do not match are left out');
+        System.Assert.isTrue(
+            selection.soql.startsWith('SELECT Id, Message__c FROM Error_Log__c WHERE'),
+            'The document\'s columns and row count are ignored: ' + selection.soql
+        );
+        System.Assert.isTrue(
+            selection.soql.endsWith('AND Id IN :onlyIds'),
+            'The chosen records are bound: ' + selection.soql
+        );
+    }
+
+    @IsTest
     static void refusesDocumentsOutsideTheRules() {
         Map<String, String> refused = new Map<String, String>{
             'not JSON' => 'SELECT Id FROM Account',

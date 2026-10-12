@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorObject</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the query's object cannot be bulk updated, and why.</shortDescription>
+        <value>{0} cannot be bulk updated: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorField</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a field cannot be bulk updated, and why.</shortDescription>
+        <value>{0} cannot be bulk updated: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorUnknownField</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a change names a field the person cannot see.</shortDescription>
+        <value>A change names a field that is not available to you: {0}. Remove that change, or ask your administrator for access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorBadValue</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a value to set does not fit its field.</shortDescription>
+        <value>The value for {0} does not fit that field. Check it and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ReasonBookkeeping</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why an object cannot be bulk updated: the package keeps it.</shortDescription>
+        <value>BarnCRM keeps these records itself.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ReasonSetup</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why an object cannot be bulk updated: it belongs to Setup.</shortDescription>
+        <value>change them in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ReasonNoObjectAccess</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why an object cannot be bulk updated: no edit access.</shortDescription>
+        <value>you may not edit these records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ReasonKept</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a field cannot be bulk updated: the package calculates it.</shortDescription>
+        <value>BarnCRM calculates it. Change what it is calculated from instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ReasonNoFieldAccess</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a field cannot be bulk updated: no edit access.</shortDescription>
+        <value>you may not edit it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ReasonType</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Why a field cannot be bulk updated: its type cannot be set in bulk.</shortDescription>
+        <value>values of this type cannot be set in bulk.</value>
+    </labels>
+</CustomLabels>
