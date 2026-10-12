@@ -43,7 +43,7 @@ const CREATE_USER_URL = '/lightning/setup/ManageUsers/home';
 // The tabs the assistant links to. Both are unprefixed today; they are revisited when a
 // namespace is assigned (Decision D-01), which is recorded in the integration file.
 const IMPORT_URL = '/lightning/n/Import';
-const SETTINGS_PAGE = '/lightning/n/Nonprofit_Settings';
+const SETTINGS_PAGE = '/lightning/n/BarnCRM_Settings';
 
 /**
  * The guided Setup Assistant: one step open at a time, Back and Next, Skip for now, and it

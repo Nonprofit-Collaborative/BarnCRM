@@ -8,7 +8,7 @@
 
 Every household gets a name and two greetings, written for you and kept up to date: the
 household name for lists and reports ("The Garcia Family"), a formal greeting for letters
-and receipts ("Mr. and Mrs. John Smith"), and an informal greeting for personal notes
+("Mr. and Mrs. John Smith"), and an informal greeting for personal notes
 ("John and Jane").
 
 They are recalculated whenever the people in the household change, so a mail merge is
@@ -129,7 +129,7 @@ For report builders only.
 | Where | Field label | Purpose |
 |---|---|---|
 | Household | Account Name | The computed household name |
-| Household | Formal Greeting | Used on letters and receipts |
+| Household | Formal Greeting | Used on letters (and receipts, with Giving) |
 | Household | Informal Greeting | Used on personal notes |
 | Household | Custom Name | When checked, nothing recalculates this household |
 | Person | Preferred Name | Used in place of the first name in greetings |

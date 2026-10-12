@@ -10,11 +10,11 @@
  * person rather than a platform stack trace.
  */
 public with sharing class AccessService {
-    /** The DeveloperName of the group that grants Nonprofit Settings. */
-    public static final String ADMIN_ROLE = 'Nonprofit_Admin_Group';
+    /** The DeveloperName of the group that grants BarnCRM Settings. */
+    public static final String ADMIN_ROLE = 'BarnCRM_Admin_Group';
 
     /** The permission set inside that group, assignable before the group is calculated. */
-    public static final String ADMIN_PERMISSION_SET = 'Nonprofit_Admin';
+    public static final String ADMIN_PERMISSION_SET = 'BarnCRM_Admin';
 
     /** The five packaged roles, in the order the page shows them. */
     public static final List<String> ROLE_DEVELOPER_NAMES = new List<String>{
@@ -267,7 +267,7 @@ public with sharing class AccessService {
      *
      * This is the guaranteed half of the bootstrap. A permission set, unlike a permission
      * set group, has no calculation status, so it can be assigned the moment the install
-     * finishes and the installing person can open Nonprofit Settings straight away.
+     * finishes and the installing person can open BarnCRM Settings straight away.
      *
      * Documented exception to the user mode rule (plan Section 7.2), and the same one that
      * applies to every method here whose name ends in DuringInstall. A post-install script

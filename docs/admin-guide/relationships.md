@@ -4,7 +4,7 @@
 
 Relationships records how the people in your database are connected to each other: who is
 married to whom, whose child is at the same school, which two board members are siblings,
-and which friend introduced your largest donor. You enter the connection once, from either
+and which friend introduced your longest-serving member. You enter the connection once, from either
 person, and BarnCRM writes the other side for you, so the wife's record shows her
 husband and the husband's record shows his wife without anyone typing it twice.
 
@@ -40,7 +40,8 @@ They are two rows on purpose. Switching the upkeep off before a large import, wh
 usual reason to touch it, leaves every check running.
 
 To let your team see and manage relationships, make sure they have one of the packaged
-access levels (BarnCRM Admin, Fundraising Staff, or Program Staff) on the **Access** page
+access levels (BarnCRM Admin, Program Staff, or Volunteer Coordinator, or Fundraising Staff
+with Giving) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them.
 
 Relationships appear in two places once you are set up: a **Relationships** card on every
@@ -67,7 +68,7 @@ The list ships ready to use, and none of it depends on anyone's gender.
 
 ## A five-minute walkthrough
 
-You are Maria. Your Executive Director wants to know which of your donors are related to
+You are Maria. Your Executive Director wants to know which of your members are related to
 each other before the gala seating is decided, and the Garcia family keeps coming up. Start
 from the sample data.
 
@@ -114,8 +115,7 @@ the second record already existed, because BarnCRM wrote it. Open the record the
 names instead of creating another one.
 
 **Expecting a relationship to move someone into a household.** It does not, deliberately. A
-relationship says two people are connected; a household says who receives one letter and one
-receipt. Spouses in the same household usually have both, and adding a Spouse relationship
+relationship says two people are connected; a household says who receives one letter. Spouses in the same household usually have both, and adding a Spouse relationship
 to someone in a different household leaves both households exactly as they were. To move a
 person, use **Move to another household** on their record, which is the Households feature.
 

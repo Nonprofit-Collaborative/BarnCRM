@@ -14,7 +14,7 @@ private class GiftImportProcessorTest {
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
@@ -406,7 +406,7 @@ private class GiftImportProcessorTest {
         );
         User staff = TestDataFactory.createUser(
             'Staff',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Staff' }
         );
         ImportRowProcessor.Outcome outcome;
 

@@ -3,7 +3,7 @@
  *
  * The setting exists because ADR-0016's first spike is open: nobody has yet confirmed in a real
  * org that `Blob.toPdf()` is not metered as a callout inside a batch. If it is, an org can move to
- * the fallback implementation by changing one value in the Nonprofit Settings console rather than
+ * the fallback implementation by changing one value in the BarnCRM Settings console rather than
  * by waiting for a package version. An empty setting, which is the shipped state, means the
  * renderer the package ships.
  *

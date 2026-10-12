@@ -2,7 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
-import canManageSettings from '@salesforce/customPermission/Manage_Nonprofit_Settings';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getPage from '@salesforce/apex/AutomationControlController.getPage';
 import pauseAll from '@salesforce/apex/AutomationControlController.pauseAll';
 import resumeAll from '@salesforce/apex/AutomationControlController.resumeAll';

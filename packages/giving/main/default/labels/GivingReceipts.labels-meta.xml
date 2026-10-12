@@ -38,7 +38,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>No active template for this receipt type</shortDescription>
-    <value>No receipt letter is switched on for this kind of document. Open Nonprofit Settings, then Receipts, then Receipt templates, and switch one on.</value>
+    <value>No receipt letter is switched on for this kind of document. Open BarnCRM Settings, then Receipts, then Receipt templates, and switch one on.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NoPermission</fullName>
@@ -46,7 +46,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>User cannot issue receipts</shortDescription>
-    <value>You do not have permission to issue receipts. Ask your administrator for the Giving Staff or Giving Admin role.</value>
+    <value>You do not have permission to issue receipts. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NoTemplatePermission</fullName>
@@ -54,7 +54,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>User cannot change the receipt letters</shortDescription>
-    <value>You do not have permission to change the receipt letters. Ask your administrator for the Nonprofit Admin role, which carries Manage Nonprofit Settings.</value>
+    <value>You do not have permission to change the receipt letters. Ask your administrator for the BarnCRM Admin role, which carries Manage BarnCRM Settings.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_NotFound</fullName>
@@ -78,7 +78,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Organization legal name missing</shortDescription>
-    <value>A receipt has to state who issued it. Open Nonprofit Settings, then Organization, and fill in your legal name.</value>
+    <value>A receipt has to state who issued it. Open BarnCRM Settings, then Organization, and fill in your legal name.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ReissueNeedsGift</fullName>

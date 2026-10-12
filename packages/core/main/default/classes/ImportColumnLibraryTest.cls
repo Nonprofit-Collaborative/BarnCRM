@@ -1,5 +1,5 @@
 /**
- * Automatic column mapping: the headings a nonprofit's file actually carries, and the
+ * Automatic column mapping: the headings an organization's file actually carries, and the
  * deliberate refusal to guess at one nobody recognizes.
  */
 @IsTest

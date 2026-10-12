@@ -1,22 +1,22 @@
 /**
- * The Duplicates panel on the Households page of Nonprofit Settings (C-20).
+ * The Duplicates panel on the Households page of BarnCRM Settings (C-20).
  *
  * It answers three questions: are duplicate rules switched on, what have they found, and what
  * do I do about each pair. Everything it shows was found by the org's own rules (R-DP1), and
  * the only merge it performs is the household merge C-09 ships, one pair at a time with a
  * person confirming it (R-DP4).
  *
- * Every action on the panel needs `Manage_Nonprofit_Settings`: scanning and dismissing are
+ * Every action on the panel needs `Manage_BarnCRM_Settings`: scanning and dismissing are
  * configuration, and a merge from here also closes the suggestion. Merging households from
  * the household record page stays open to anyone who can edit both, as C-09 decided.
  *
  * Suggestions also need access to the platform's duplicate record sets, which Salesforce
- * grants only to Sales Cloud and Service Cloud licenses, through the optional Nonprofit
+ * grants only to Sales Cloud and Service Cloud licenses, through the optional BarnCRM
  * Duplicate Review permission set. Without it the panel still shows the rules and says why
  * there is nothing else, rather than failing (ADR-0013, ADR-0050).
  */
 public with sharing class DuplicateController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String SCAN_CLASS = 'DuplicateScanBatch';
     private static final Integer MAX_SUGGESTIONS = 50;
     /**

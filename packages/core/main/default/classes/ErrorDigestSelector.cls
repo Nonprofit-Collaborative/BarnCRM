@@ -3,7 +3,7 @@
  * the users it may go to.
  *
  * Every read runs in user mode. The digest runs as the administrator who scheduled it, so it
- * counts what that person can see, which for a Nonprofit Admin is every entry; it never widens
+ * counts what that person can see, which for a BarnCRM Admin is every entry; it never widens
  * what anybody can read, and the links it sends open only for someone allowed to open them.
  */
 public with sharing class ErrorDigestSelector {

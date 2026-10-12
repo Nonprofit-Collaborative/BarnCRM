@@ -4,7 +4,7 @@
  * The file is read in the browser and sent to the server as rows, so the server never holds
  * a whole spreadsheet in memory. That is why the parsing lives here rather than in Apex.
  *
- * It handles what a nonprofit's export actually contains: quoted fields, commas and line
+ * It handles what an organization's export actually contains: quoted fields, commas and line
  * breaks inside quotes, doubled quotes as an escape, both line ending conventions, a byte
  * order mark from Excel, and a trailing blank line. Anything more exotic is a reason to open
  * the file in a spreadsheet and save it again, which the admin guide says.

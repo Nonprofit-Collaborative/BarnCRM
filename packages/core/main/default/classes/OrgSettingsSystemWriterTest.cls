@@ -1,7 +1,7 @@
 @IsTest
 private class OrgSettingsSystemWriterTest {
-    private static Nonprofit_Settings__c stored() {
-        List<Nonprofit_Settings__c> rows = [
+    private static BarnCRM_Settings__c stored() {
+        List<BarnCRM_Settings__c> rows = [
             SELECT
                 Id,
                 Relationship_Auto_Reciprocal__c,
@@ -10,14 +10,14 @@ private class OrgSettingsSystemWriterTest {
                 Household_Membership_Mode__c,
                 Automation_Paused_Until__c,
                 Seasonal_Address_Last_Run__c
-            FROM Nonprofit_Settings__c
+            FROM BarnCRM_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
         ];
         Assert.areEqual(1, rows.size(), 'One org-level settings record.');
         return rows[0];
     }
 
-    private static void assertShippedDefaultsKept(Nonprofit_Settings__c saved) {
+    private static void assertShippedDefaultsKept(BarnCRM_Settings__c saved) {
         Assert.isTrue(saved.Relationship_Auto_Reciprocal__c, 'A feature that ships on stays on.');
         Assert.isTrue(saved.Auto_Create_Households__c, 'Households are still created by default.');
         Assert.isNull(saved.Coexistence_Mode__c, 'Nobody confirmed a coexistence mode.');
@@ -31,7 +31,7 @@ private class OrgSettingsSystemWriterTest {
         AutomationSettingsWriter.savePausedUntil(until);
         Test.stopTest();
 
-        Nonprofit_Settings__c saved = stored();
+        BarnCRM_Settings__c saved = stored();
         Assert.areEqual(until, saved.Automation_Paused_Until__c, 'The pause is saved.');
         assertShippedDefaultsKept(saved);
     }
@@ -43,14 +43,14 @@ private class OrgSettingsSystemWriterTest {
         SeasonalAddressWriter.recordRun(finishedAt, 'Nothing to swap.');
         Test.stopTest();
 
-        Nonprofit_Settings__c saved = stored();
+        BarnCRM_Settings__c saved = stored();
         Assert.areEqual(finishedAt, saved.Seasonal_Address_Last_Run__c, 'The run is recorded.');
         assertShippedDefaultsKept(saved);
     }
 
     @IsTest
     static void aLaterSaveChangesOnlyItsOwnKeys() {
-        insert new Nonprofit_Settings__c(
+        insert new BarnCRM_Settings__c(
             SetupOwnerId = UserInfo.getOrganizationId(),
             Relationship_Auto_Reciprocal__c = false,
             Auto_Create_Households__c = true,
@@ -61,7 +61,7 @@ private class OrgSettingsSystemWriterTest {
         AutomationSettingsWriter.savePausedUntil(null);
         Test.stopTest();
 
-        Nonprofit_Settings__c saved = stored();
+        BarnCRM_Settings__c saved = stored();
         Assert.isNull(saved.Automation_Paused_Until__c, 'The pause is cleared.');
         Assert.isFalse(saved.Relationship_Auto_Reciprocal__c, 'A deliberate off is left alone.');
         Assert.areEqual('Standalone', saved.Coexistence_Mode__c, 'A chosen mode is left alone.');
@@ -69,7 +69,7 @@ private class OrgSettingsSystemWriterTest {
 
     @IsTest
     static void twoFirstSavesAtOnceKeepBothRunsValues() {
-        OrgSettingsSystemWriter.competingFirstSaveForTest = new Nonprofit_Settings__c(
+        OrgSettingsSystemWriter.competingFirstSaveForTest = new BarnCRM_Settings__c(
             SetupOwnerId = UserInfo.getOrganizationId(),
             Seasonal_Address_Last_Run_Summary__c = 'Swapped 2 households.',
             Relationship_Auto_Reciprocal__c = true,
@@ -85,14 +85,14 @@ private class OrgSettingsSystemWriterTest {
             1,
             [
                 SELECT COUNT()
-                FROM Nonprofit_Settings__c
+                FROM BarnCRM_Settings__c
                 WHERE SetupOwnerId = :UserInfo.getOrganizationId()
             ],
             'Still one org-level record: the losing insert became an update.'
         );
-        Nonprofit_Settings__c saved = [
+        BarnCRM_Settings__c saved = [
             SELECT Automation_Paused_Until__c, Seasonal_Address_Last_Run_Summary__c
-            FROM Nonprofit_Settings__c
+            FROM BarnCRM_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
         ];
         Assert.areEqual(until, saved.Automation_Paused_Until__c, 'This run saved its key.');

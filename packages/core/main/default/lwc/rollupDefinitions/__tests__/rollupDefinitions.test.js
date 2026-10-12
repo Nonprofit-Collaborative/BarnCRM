@@ -34,7 +34,7 @@ jest.mock('@salesforce/apex/RollupController.restoreDefaults', () => ({ default:
   virtual: true
 });
 
-jest.mock('@salesforce/customPermission/Manage_Nonprofit_Settings', () => ({ default: true }), {
+jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
 

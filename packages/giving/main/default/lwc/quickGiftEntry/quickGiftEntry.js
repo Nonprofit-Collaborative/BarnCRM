@@ -57,7 +57,7 @@ const FIELD_ORDER = [
 
 /**
  * Quick gift entry (G-03): one screen, built for a phone, for a gift that has just
- * arrived. Defaults come from Nonprofit Settings, validation messages come back from the
+ * arrived. Defaults come from BarnCRM Settings, validation messages come back from the
  * controller and are shown beside the field that caused them.
  */
 export default class QuickGiftEntry extends LightningElement {

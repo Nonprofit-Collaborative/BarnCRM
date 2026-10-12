@@ -11,9 +11,9 @@ function build(coexistence, canEdit = true) {
 
 const NONPROFIT_CLOUD = {
   detectedShape: 'PersonAccounts',
-  recommendedMode: 'AgentforceNonprofit',
+  recommendedMode: 'NonprofitCloud',
   currentMode: null,
-  modes: ['Standalone', 'NPSP', 'AgentforceNonprofit']
+  modes: ['Standalone', 'NPSP', 'NonprofitCloud']
 };
 
 describe('c-setup-step-coexistence', () => {
@@ -29,14 +29,14 @@ describe('c-setup-step-coexistence', () => {
     const shape = element.shadowRoot.querySelector('[data-id="shape"]');
     expect(shape.textContent).toContain('Core_SetupAssistant_ShapePersonAccounts');
     const recommended = element.shadowRoot.querySelector('[data-id="recommended"]');
-    expect(recommended.textContent).toContain('Core_SetupAssistant_ModeAgentforce');
+    expect(recommended.textContent).toContain('Core_SetupAssistant_ModeNonprofitCloud');
   });
 
   it('offers the recommendation already chosen, and the other two modes', () => {
     const element = build(NONPROFIT_CLOUD);
 
     const combobox = element.shadowRoot.querySelector('lightning-combobox');
-    expect(combobox.value).toBe('AgentforceNonprofit');
+    expect(combobox.value).toBe('NonprofitCloud');
     expect(combobox.options).toHaveLength(3);
   });
 

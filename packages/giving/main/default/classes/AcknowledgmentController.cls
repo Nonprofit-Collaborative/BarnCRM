@@ -7,7 +7,7 @@
  * render.
  */
 public with sharing class AcknowledgmentController {
-    private static final String MANAGE_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String MANAGE_PERMISSION = 'Manage_BarnCRM_Settings';
 
     /** One rule, flattened, with the template resolved to the label an administrator recognizes. */
     public class RuleView {

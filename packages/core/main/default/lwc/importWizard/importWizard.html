@@ -143,17 +143,17 @@
                             onchange={handleExpectedAmountChange}
                         ></lightning-input>
                         <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
-                            {labels.donationMatchingHeading}
+                            {labels.paymentMatchingHeading}
                         </h3>
                         <p class="slds-text-body_small slds-var-m-bottom_x-small">
-                            {labels.donationMatchingHelp}
+                            {labels.paymentMatchingHelp}
                         </p>
                         <lightning-combobox
-                            data-id="donation-matching"
-                            label={labels.donationMatchingLabel}
-                            value={donationMatching}
-                            options={donationMatchingOptions}
-                            onchange={handleDonationMatchingChange}
+                            data-id="payment-matching"
+                            label={labels.paymentMatchingLabel}
+                            value={paymentMatching}
+                            options={paymentMatchingOptions}
+                            onchange={handlePaymentMatchingChange}
                         ></lightning-combobox>
                         <lightning-input
                             type="number"
