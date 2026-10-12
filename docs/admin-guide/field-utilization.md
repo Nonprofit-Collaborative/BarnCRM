@@ -20,7 +20,8 @@ It only counts. It never changes a record, a field or a page.
 You need the BarnCRM Admin role (the Manage BarnCRM Settings permission). Nobody else sees
 this page.
 
-1. Open **BarnCRM Settings** and choose **Field Utilization**.
+1. Open **BarnCRM Settings** and choose **Health**. **Field utilization** is below Health
+   Check.
 2. Under **What to count**, move the kinds of records you want counted into **Counted**, for
    example Account and Contact, and choose **Save**. Nothing is counted until you have chosen at
    least one.
@@ -39,8 +40,8 @@ nightly jobs it expects to be scheduled, and its **Schedule all nightly jobs** f
 
 Start from the sample data (see [Sample data](sample-data.md)).
 
-1. Open **BarnCRM Settings** and choose **Field Utilization**. The page reads "Field use has
-   not been counted yet."
+1. Open **BarnCRM Settings** and choose **Health**. Under **Field utilization** the page reads
+   "Field use has not been counted yet."
 2. Under **What to count**, move **Account** and **Contact** into **Counted** and choose **Save**.
 3. Choose **Count now**. The page reads "The count has started. Refresh this page in a few
    minutes to see the results."
@@ -51,7 +52,7 @@ Start from the sample data (see [Sample data](sample-data.md)).
    fields first.
 6. Open any sample organization and fill in its **Website**. Choose **Count now** again and
    refresh after a minute. The Website row for Organization now shows a higher percentage, and
-   **Change** shows how many percentage points it moved since the previous count.
+   **Change (points)** shows how many percentage points it moved since the previous count.
 
 ## What is counted
 

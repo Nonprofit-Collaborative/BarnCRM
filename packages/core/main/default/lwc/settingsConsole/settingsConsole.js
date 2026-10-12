@@ -52,6 +52,8 @@ function importCoreComponent(name) {
       return import('c/duplicateReview');
     case 'errorDigestJob':
       return import('c/errorDigestJob');
+    case 'fieldUtilization':
+      return import('c/fieldUtilization');
     default:
       return null;
   }
