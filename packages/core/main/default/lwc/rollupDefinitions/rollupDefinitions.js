@@ -35,7 +35,7 @@ import READ_ONLY from '@salesforce/label/c.Core_Rollups_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 
 /**
- * The Rollups page of the Nonprofit Settings console.
+ * The Rollups page of the BarnCRM Settings console.
  *
  * It shows every total BarnCRM keeps up to date, what each one counts, when it was last
  * calculated, and whether the nightly run is scheduled. An administrator can switch a rollup off,

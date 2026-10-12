@@ -37,7 +37,7 @@ const OVERVIEW = {
   roles: [
     {
       developerName: 'Nonprofit_Admin_Group',
-      label: 'Nonprofit Admin',
+      label: 'BarnCRM Admin',
       description: 'For the person who configures the app.',
       isReady: true
     },
@@ -95,7 +95,7 @@ describe('c-access-manager', () => {
     const descriptions = element.shadowRoot.querySelectorAll('[data-id="role-description"]');
     expect(descriptions[1].textContent).toBe('For development and fundraising staff.');
     const headings = element.shadowRoot.querySelectorAll('[data-id="role-heading"]');
-    expect(headings[0].textContent).toBe('Nonprofit Admin (1)');
+    expect(headings[0].textContent).toBe('BarnCRM Admin (1)');
     expect(headings[1].textContent).toBe('Fundraising Staff (0)');
     const members = element.shadowRoot.querySelectorAll('[data-id="role-member"]');
     expect(members.length).toBe(1);
@@ -190,7 +190,7 @@ describe('c-access-manager', () => {
     });
   });
 
-  it('warns before someone removes their own Nonprofit Admin role', async () => {
+  it('warns before someone removes their own BarnCRM Admin role', async () => {
     removeRole.mockResolvedValue({ success: true });
     const element = createComponent();
     getAccessOverview.emit(OVERVIEW);

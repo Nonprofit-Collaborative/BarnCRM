@@ -109,7 +109,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import: refused because the user lacks Manage Nonprofit Settings</shortDescription>
+        <shortDescription>Import: refused because the user lacks Manage BarnCRM Settings</shortDescription>
         <value>You need the Manage BarnCRM Settings permission to import. Ask whoever set up your org for the BarnCRM Admin role.</value>
     </labels>
     <labels>
@@ -621,7 +621,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import undo journal: kept for Nonprofit Cloud records</shortDescription>
+        <shortDescription>Import undo journal: kept for records of a detected product</shortDescription>
         <value>Kept: Salesforce Nonprofit Cloud records depend on this account.</value>
     </labels>
     <labels>
@@ -933,7 +933,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: expected gift total label</shortDescription>
+        <shortDescription>Import wizard: expected amount total label</shortDescription>
         <value>Total of the gift amounts</value>
     </labels>
     <labels>
@@ -941,7 +941,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: donation matching choice unknown</shortDescription>
+        <shortDescription>Import error: payment matching choice unknown</shortDescription>
         <value>Choose how gifts are matched: Match or create, Always create, Match only or Never match.</value>
     </labels>
     <labels>
@@ -949,7 +949,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: donation matching window or tolerance below zero</shortDescription>
+        <shortDescription>Import error: payment matching window or tolerance below zero</shortDescription>
         <value>The days either side and the amount difference allowed cannot be less than zero, and the days cannot be more than 999.</value>
     </labels>
     <labels>
@@ -957,7 +957,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching heading</shortDescription>
+        <shortDescription>Import wizard: payment matching heading</shortDescription>
         <value>Scheduled payments</value>
     </labels>
     <labels>
@@ -965,7 +965,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching help</shortDescription>
+        <shortDescription>Import wizard: payment matching help</shortDescription>
         <value>When a gift pays a pledge or a recurring gift the donor already has, BarnCRM can link the two. Leave the numbers empty to use BarnCRM Settings.</value>
     </labels>
     <labels>
@@ -973,7 +973,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching choice label</shortDescription>
+        <shortDescription>Import wizard: payment matching choice label</shortDescription>
         <value>Matching gifts to scheduled payments</value>
     </labels>
     <labels>
@@ -981,7 +981,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching option Match or create</shortDescription>
+        <shortDescription>Import wizard: payment matching option Match or create</shortDescription>
         <value>Match or create: pay the payment it matches, or create it on its own</value>
     </labels>
     <labels>
@@ -989,7 +989,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching option Always create</shortDescription>
+        <shortDescription>Import wizard: payment matching option Always create</shortDescription>
         <value>Always create: never look for payments</value>
     </labels>
     <labels>
@@ -997,7 +997,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching option Match only</shortDescription>
+        <shortDescription>Import wizard: payment matching option Match only</shortDescription>
         <value>Match only: reject a gift that matches no payment</value>
     </labels>
     <labels>
@@ -1005,7 +1005,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching option Never match</shortDescription>
+        <shortDescription>Import wizard: payment matching option Never match</shortDescription>
         <value>Never match: reject a gift that matches a payment or a gift you already have</value>
     </labels>
     <labels>
@@ -1013,7 +1013,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching date window label</shortDescription>
+        <shortDescription>Import wizard: payment matching date window label</shortDescription>
         <value>Days either side of a payment's due date</value>
     </labels>
     <labels>
@@ -1021,7 +1021,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: donation matching amount tolerance label</shortDescription>
+        <shortDescription>Import wizard: payment matching amount tolerance label</shortDescription>
         <value>Amount difference allowed</value>
     </labels>
 </CustomLabels>

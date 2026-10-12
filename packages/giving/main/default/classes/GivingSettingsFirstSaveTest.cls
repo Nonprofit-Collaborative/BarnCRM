@@ -11,7 +11,7 @@
 private class GivingSettingsFirstSaveTest {
     private static final String PERMISSION_SET = 'GivingFirstSaveTestAccess';
 
-    /** The console save needs Manage Nonprofit Settings, committed before a test runs. */
+    /** The console save needs Manage BarnCRM Settings, committed before a test runs. */
     @TestSetup
     static void grantPermission() {
         SettingsTestPermissions.grantTo(PERMISSION_SET, UserInfo.getUserId());

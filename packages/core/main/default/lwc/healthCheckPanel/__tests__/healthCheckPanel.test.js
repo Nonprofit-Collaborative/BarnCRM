@@ -93,7 +93,7 @@ function agentforceReport(overrides = {}) {
       },
       {
         key: 'no_nonprofit_admin',
-        title: 'No one is assigned the Nonprofit Admin role',
+        title: 'No one is assigned the BarnCRM Admin role',
         detail: 'Nobody has the role.',
         severity: 'Error',
         category: 'Access',

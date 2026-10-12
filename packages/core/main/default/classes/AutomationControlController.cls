@@ -1,8 +1,8 @@
 /**
- * What the Automation page of the Nonprofit Settings console reads and writes.
+ * What the Automation page of the BarnCRM Settings console reads and writes.
  *
  * Every method returns the whole page, so the component never has to work out what changed, and
- * every write is refused for a user without the Manage Nonprofit Settings permission with a
+ * every write is refused for a user without the Manage BarnCRM Settings permission with a
  * message that names the permission.
  */
 public with sharing class AutomationControlController {

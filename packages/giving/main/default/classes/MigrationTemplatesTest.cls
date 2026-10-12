@@ -129,7 +129,7 @@ private class MigrationTemplatesTest {
 
     /**
      * Whether the user who ran the import may edit this field. The importer skips a field its
-     * user cannot write and says so in the run log; Nonprofit Admin grants the consent fields,
+     * user cannot write and says so in the run log; BarnCRM Admin grants the consent fields,
      * so the tests assert that Maria may write them and that their values arrive.
      */
     private static Boolean importerMayEdit(Schema.SObjectField field) {
@@ -578,15 +578,15 @@ private class MigrationTemplatesTest {
         Assert.areEqual('503-555-0103', ana.HomePhone, 'Home phone.');
         Assert.areEqual(Date.newInstance(1980, 6, 1), ana.Birthdate, 'Birthdate.');
         Assert.areEqual('Portland', ana.MailingCity, 'Mailing address.');
-        // Nonprofit Admin grants the consent fields, so an opt-out in the file is never
+        // BarnCRM Admin grants the consent fields, so an opt-out in the file is never
         // dropped: the grant is asserted, then the value.
         Assert.isTrue(
             importerMayEdit(Contact.HasOptedOutOfEmail),
-            'Nonprofit Admin may write the email opt-out.'
+            'BarnCRM Admin may write the email opt-out.'
         );
         Assert.isTrue(ana.HasOptedOutOfEmail, 'Her email opt-out comes with her.');
         Assert.isFalse(ana.DoNotCall, 'And her phone preference.');
-        Assert.isTrue(importerMayEdit(Contact.DoNotCall), 'Nonprofit Admin may write do not call.');
+        Assert.isTrue(importerMayEdit(Contact.DoNotCall), 'BarnCRM Admin may write do not call.');
         Assert.isTrue(
             [SELECT DoNotCall FROM Contact WHERE LastName = 'Lee'].DoNotCall,
             'His do not call comes with him.'
@@ -715,7 +715,7 @@ private class MigrationTemplatesTest {
         Assert.areEqual('ana.okafor@example.org', ana.Email, 'And the email to use.');
         Contact robert = [SELECT Deceased__c, DoNotCall FROM Contact WHERE LastName = 'Hale'];
         Assert.isTrue(robert.Deceased__c, 'Deceased comes across.');
-        Assert.isTrue(importerMayEdit(Contact.DoNotCall), 'Nonprofit Admin may write do not call.');
+        Assert.isTrue(importerMayEdit(Contact.DoNotCall), 'BarnCRM Admin may write do not call.');
         Assert.isTrue(robert.DoNotCall, 'So does do not call.');
     }
 

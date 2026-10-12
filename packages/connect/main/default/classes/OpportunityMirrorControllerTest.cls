@@ -19,7 +19,7 @@ private class OpportunityMirrorControllerTest {
         upsert settings;
     }
 
-    /** Maria: Nonprofit Admin, so she can manage settings, and the Opportunity Mirror set. */
+    /** Maria: BarnCRM Admin, so she can manage settings, and the Opportunity Mirror set. */
     private static User maria() {
         return TestDataFactory.createUserOnTheRunningUsersProfile(
             'Maria',

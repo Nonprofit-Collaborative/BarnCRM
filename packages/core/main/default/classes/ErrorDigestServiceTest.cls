@@ -3,7 +3,7 @@
  * nothing is new, that no entry is counted twice, and that a weekly digest waits its week.
  *
  * The digest runs as the administrator who scheduled it, so every run here is Maria's, on a
- * minimal profile holding only the packaged Nonprofit Admin set. Messages are captured rather
+ * minimal profile holding only the packaged BarnCRM Admin set. Messages are captured rather
  * than sent, except in the one test that proves the real send path handles either outcome.
  */
 @IsTest

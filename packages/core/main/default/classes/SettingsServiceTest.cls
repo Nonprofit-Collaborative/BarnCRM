@@ -18,7 +18,7 @@ private class SettingsServiceTest {
     static void theCustomPermissionThisFeatureNeedsIsInstalled() {
         Assert.isTrue(
             SettingsTestPermissions.customPermissionExists(),
-            'C-04 ships Manage Nonprofit Settings and merges before C-03: without it nobody can save'
+            'C-04 ships Manage BarnCRM Settings and merges before C-03: without it nobody can save'
         );
     }
 

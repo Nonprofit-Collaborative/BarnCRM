@@ -126,7 +126,7 @@ public with sharing class SettingsService {
     }
 
     /**
-     * Saves the given Core values, keyed by the API name of the Nonprofit Settings field.
+     * Saves the given Core values, keyed by the API name of the BarnCRM Settings field.
      * Only keys that exist on the object and are listed in a Setting Definition row are
      * accepted. Returns the refreshed Core settings.
      */

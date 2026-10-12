@@ -61,8 +61,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>The name of the Agentforce Nonprofit coexistence mode.</shortDescription>
-        <value>Agentforce Nonprofit coexistence</value>
+        <shortDescription>The name of the coexistence mode for an org with Salesforce gift objects.</shortDescription>
+        <value>Nonprofit Cloud coexistence</value>
     </labels>
     <labels>
         <fullName>Core_CoexistenceMode_InvalidMode</fullName>
@@ -70,14 +70,14 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when a coexistence mode value is not one of the three.</shortDescription>
-        <value>{0} is not a coexistence mode. Choose Standalone, NPSP coexistence, or Agentforce Nonprofit coexistence.</value>
+        <value>{0} is not a coexistence mode. Choose one of the modes BarnCRM offers for this org.</value>
     </labels>
     <labels>
         <fullName>Core_CoexistenceMode_Npsp</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>The name of the NPSP coexistence mode.</shortDescription>
+        <shortDescription>The name of the coexistence mode for an org with a detected household package.</shortDescription>
         <value>NPSP coexistence</value>
     </labels>
     <labels>

@@ -1,5 +1,5 @@
 /**
- * The error digest panel on the Error Log page of the Nonprofit Settings console (C-23).
+ * The error digest panel on the Error Log page of the BarnCRM Settings console (C-23).
  *
  * It answers what an administrator asks about a job that sends email: is it on, when does it
  * run next, when did it last run and what did it do, and who gets it. It carries the only two

@@ -1,7 +1,7 @@
 /**
  * The entry points the import wizard and the results screen call (C-14).
  *
- * Everything that changes anything checks the Manage Nonprofit Settings custom permission
+ * Everything that changes anything checks the Manage BarnCRM Settings custom permission
  * first. The read that only shows a batch's progress does not, so a colleague watching a long
  * import does not need the administrator's permission to see how it is going.
  *

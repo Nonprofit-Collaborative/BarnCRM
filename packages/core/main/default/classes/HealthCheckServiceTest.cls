@@ -447,7 +447,7 @@ private class HealthCheckServiceTest {
         ];
         System.assert(
             !packaged.isEmpty(),
-            'The Nonprofit Admin permission set is not in this org. It ships with the access ' +
+            'The BarnCRM Admin permission set is not in this org. It ships with the access ' +
             'feature (C-06), which has to merge before this test means anything.'
         );
 
@@ -698,7 +698,7 @@ private class HealthCheckServiceTest {
             Status__c = 'New'
         );
         // Counting the Error Log needs read on the object and on Status, which is what the
-        // packaged Nonprofit Admin permission set gives Maria, and mariaWithManageSettings
+        // packaged BarnCRM Admin permission set gives Maria, and mariaWithManageSettings
         // now assigns it because every audited settings save needs it too. Without that
         // access the selector keeps its promise and says nothing, which is what this test
         // used to be measuring.
@@ -832,7 +832,7 @@ private class HealthCheckServiceTest {
         System.assertNotEquals(
             null,
             finding,
-            'ADR-0025: the rollups are computed from the Nonprofit Settings month and the ' +
+            'ADR-0025: the rollups are computed from the BarnCRM Settings month and the ' +
                 'retention reports from the Setup month, so a disagreement makes every year based ' +
                 'number wrong in a way nobody notices.'
         );

@@ -1,11 +1,11 @@
 /**
- * The Accounting Periods page of the Nonprofit Settings console (G-20, R-G14, ADR-0053).
+ * The Accounting Periods page of the BarnCRM Settings console (G-20, R-G14, ADR-0053).
  *
  * It holds the one setting that closes the books: `Giving_Settings__c.Books_Closed_Through__c`.
  * The setting has no Setting Definition row naming its key, so the console's generic save cannot
  * reach it; this page is the only way it changes, and it enforces what a close date means:
  *
- * - the date moves forward only, for anyone with Manage Nonprofit Settings;
+ * - the date moves forward only, for anyone with Manage BarnCRM Settings;
  * - it is at least two days before today, so a refund or write-off, which is dated today, lands
  *   in an open period. Two, not one: `Date.today()` is the running user's day, and a user whose
  *   time zone is ahead of the org's could otherwise close the org's today;

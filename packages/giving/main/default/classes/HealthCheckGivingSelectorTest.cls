@@ -169,7 +169,7 @@ private class HealthCheckGivingSelectorTest {
                 0,
                 count,
                 'The gate is asserted in the selector itself, so a viewer without Manage ' +
-                'Nonprofit Settings gets nothing, not an under-permissioned peek at the org.'
+                'BarnCRM Settings gets nothing, not an under-permissioned peek at the org.'
             );
             System.assertEquals(0, linked.size());
         }

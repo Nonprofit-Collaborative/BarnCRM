@@ -5,7 +5,7 @@
  * but every address has to belong to an active internal user, and the digest is addressed to
  * that user record rather than to the address. That keeps the org's failures inside the org and
  * keeps the digest out of the daily limit on email sent to addresses. An empty setting means
- * everyone holding Manage Nonprofit Settings.
+ * everyone holding Manage BarnCRM Settings.
  */
 public with sharing class ErrorDigestRecipients {
     /** The most people one digest goes to. */
@@ -23,7 +23,7 @@ public with sharing class ErrorDigestRecipients {
 
     /**
      * The users the digest goes to: those whose addresses are listed, in the order listed, or,
-     * when none is, every active user holding Manage Nonprofit Settings. At most MAX_RECIPIENTS (50).
+     * when none is, every active user holding Manage BarnCRM Settings. At most MAX_RECIPIENTS (50).
      */
     public static List<User> resolve(String configured) {
         if (String.isBlank(configured)) {

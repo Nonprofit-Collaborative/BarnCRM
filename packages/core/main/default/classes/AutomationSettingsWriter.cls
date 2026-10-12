@@ -7,7 +7,7 @@
  * names it as one of its writers. Two writes, each for its own reason:
  *
  * 1. The pause. A protected hierarchy custom setting takes no object or field permissions in a
- *    subscriber org: there is no way to grant a Nonprofit Admin field access to it. Writing the
+ *    subscriber org: there is no way to grant a BarnCRM Admin field access to it. Writing the
  *    pause setting in user mode therefore fails for everyone who is not a system administrator,
  *    which is most of the people this feature is for. Nothing is read here and one field is
  *    written: the caller passes a datetime it computed from a number of hours it has already

@@ -1,11 +1,11 @@
 /**
- * The on and off switches behind the Automation page of the Nonprofit Settings console.
+ * The on and off switches behind the Automation page of the BarnCRM Settings console.
  *
  * Three separate mechanisms, in the order the dispatcher applies them:
  *
  *   1. a per transaction bypass, for tests and for internal bulk operations that deliberately
  *      run without a handler;
- *   2. the org wide pause, held as a datetime on Nonprofit Settings, so it expires by itself,
+ *   2. the org wide pause, held as a datetime on BarnCRM Settings, so it expires by itself,
  *      with a one-time `AutomationResumeJob` that records the end (R-A5, ADR-0055);
  *   3. the per automation switch, held as a row per automation on Automation Setting.
  *
@@ -304,7 +304,7 @@ public with sharing class AutomationControl {
      *
      * Called by each package's post-install script (through `ensureDefaultsDuringInstall`), so
      * the Automation page lists every switch from the first install, and by the Health Check fix
-     * (C-21), which enforces Manage Nonprofit Settings before it gets here.
+     * (C-21), which enforces Manage BarnCRM Settings before it gets here.
      */
     @NamespaceAccessible
     public static Integer ensureDefaults() {

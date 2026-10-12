@@ -3,7 +3,7 @@
  * the materialization that keeps her choices through an upgrade.
  *
  * Every test that writes runs as a user on a minimal profile whose only access is the packaged
- * Nonprofit Admin permission set, because a test that runs as the system administrator proves
+ * BarnCRM Admin permission set, because a test that runs as the system administrator proves
  * nothing about what the package grants.
  */
 @IsTest

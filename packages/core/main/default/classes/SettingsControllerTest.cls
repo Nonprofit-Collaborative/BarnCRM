@@ -1,6 +1,6 @@
 /**
  * Maria opens the console and changes a setting. David opens the same page without the
- * Manage Nonprofit Settings permission and gets a read-only view that names the permission.
+ * Manage BarnCRM Settings permission and gets a read-only view that names the permission.
  */
 @IsTest
 private class SettingsControllerTest {
@@ -212,7 +212,7 @@ private class SettingsControllerTest {
         stubDefinitions();
         Assert.isTrue(
             FeatureManagement.checkPermission(EDIT_PERMISSION),
-            'The permission set built in setup carries Manage Nonprofit Settings'
+            'The permission set built in setup carries Manage BarnCRM Settings'
         );
 
         Test.startTest();

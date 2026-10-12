@@ -9,7 +9,7 @@
  * The four ADR-0021 conditions:
  *
  * 1. **Permission enforced before this class is reached.** `AccountingPeriodController` checks
- *    Manage Nonprofit Settings, and Override Posting Lock for a date that reopens a period,
+ *    Manage BarnCRM Settings, and Override Posting Lock for a date that reopens a period,
  *    before its call to save.
  * 2. **Inputs validated by the caller.** The date is typed as a Date and checked to be before
  *    today; no text reaches this class.

@@ -1,5 +1,5 @@
 /**
- * The Nonprofit Settings console's Apex surface: what to render, what the values are,
+ * The BarnCRM Settings console's Apex surface: what to render, what the values are,
  * whether this user may change them, what a search matches, and what changed recently.
  */
 @NamespaceAccessible

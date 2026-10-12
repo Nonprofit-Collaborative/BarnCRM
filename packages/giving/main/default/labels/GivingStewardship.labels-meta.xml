@@ -62,7 +62,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: this user may read but not change plans</shortDescription>
-    <value>You can read the plans here. Changing them needs the Manage Nonprofit Settings permission.</value>
+    <value>You can read the plans here. Changing them needs the Manage BarnCRM Settings permission.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_Empty</fullName>
@@ -358,7 +358,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: this user may not change plans</shortDescription>
-    <value>Changing stewardship plans needs the Manage Nonprofit Settings permission. Ask whoever administers BarnCRM for your organization.</value>
+    <value>Changing stewardship plans needs the Manage BarnCRM Settings permission. Ask whoever administers BarnCRM for your organization.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ErrorNameRequired</fullName>

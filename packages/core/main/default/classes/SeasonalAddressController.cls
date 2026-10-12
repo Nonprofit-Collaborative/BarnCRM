@@ -1,5 +1,5 @@
 /**
- * The Addresses page's seasonal swap panel, in the Nonprofit Settings console.
+ * The Addresses page's seasonal swap panel, in the BarnCRM Settings console.
  *
  * It answers three questions an administrator has about a nightly job, in this order: is it
  * switched on, when did it last run, and what did it do. It also carries the only two ways the

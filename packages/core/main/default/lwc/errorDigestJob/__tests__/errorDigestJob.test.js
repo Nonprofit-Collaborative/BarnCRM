@@ -43,7 +43,7 @@ jest.mock('@salesforce/label/c.Core_ErrorDigest_StopButton', () => ({ default: '
 });
 jest.mock(
   '@salesforce/label/c.Core_ErrorDigest_ToAdministrators',
-  () => ({ default: 'everyone with the Manage Nonprofit Settings permission:' }),
+  () => ({ default: 'everyone with the Manage BarnCRM Settings permission:' }),
   { virtual: true }
 );
 jest.mock('@salesforce/label/c.Core_ErrorDigest_NoRecipients', () => ({ default: 'nobody yet.' }), {
@@ -104,7 +104,7 @@ describe('c-error-digest-job', () => {
     expect(byId(element, 'next-run')).toBeNull();
     expect(byId(element, 'never-run')).not.toBeNull();
     expect(byId(element, 'recipients').textContent).toContain(
-      'everyone with the Manage Nonprofit Settings permission: Maria Lopez, David Chen'
+      'everyone with the Manage BarnCRM Settings permission: Maria Lopez, David Chen'
     );
     expect(byId(element, 'schedule-button').label).toBe('Schedule');
     expect(byId(element, 'read-only')).toBeNull();
@@ -183,7 +183,7 @@ describe('c-error-digest-job', () => {
 
   it('shows the message the server refused with', async () => {
     sendNow.mockRejectedValue({
-      body: { message: 'Needs the Manage Nonprofit Settings permission.' }
+      body: { message: 'Needs the Manage BarnCRM Settings permission.' }
     });
     const element = createComponent();
     getDigest.emit(RUNNING);
@@ -192,7 +192,7 @@ describe('c-error-digest-job', () => {
     byId(element, 'send-now').click();
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('Manage Nonprofit Settings');
+    expect(byId(element, 'error').textContent).toContain('Manage BarnCRM Settings');
   });
 
   it('shows the message the page could not load with', async () => {

@@ -22,7 +22,7 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
-    /** Whether the fiscal year in Setup and the one in Nonprofit Settings agree. */
+    /** Whether the fiscal year in Setup and the one in BarnCRM Settings agree. */
     public class FiscalYearCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return fiscalYearFinding();
@@ -235,7 +235,7 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     /**
-     * Whether the fiscal year in Setup and the one in Nonprofit Settings start in the same
+     * Whether the fiscal year in Setup and the one in BarnCRM Settings start in the same
      * month (ADR-0025). They have to: the rollups are computed from the setting and the
      * packaged retention reports are filtered on Setup's fiscal year date literals, so a
      * disagreement makes every year based number quietly measure a different window.

@@ -12,7 +12,7 @@ private class GivingJobsControllerTest {
     private static final String LEVELS = 'levels';
 
     /**
-     * The running user needs Manage Nonprofit Settings to schedule anything, and the assignment
+     * The running user needs Manage BarnCRM Settings to schedule anything, and the assignment
      * has to be committed before a test method runs, which is what @TestSetup is for.
      */
     @TestSetup

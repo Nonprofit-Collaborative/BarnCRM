@@ -23,7 +23,7 @@ import READ_ONLY from '@salesforce/label/c.Core_ErrorDigest_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_ErrorDigest_UnexpectedError';
 
 /**
- * The error digest panel on the Error Log page of the Nonprofit Settings console (C-23).
+ * The error digest panel on the Error Log page of the BarnCRM Settings console (C-23).
  *
  * A job that sends email has to say, before anybody trusts it, whether it is on, when it runs,
  * what it did last time and who it goes to. This panel says all four and carries the buttons

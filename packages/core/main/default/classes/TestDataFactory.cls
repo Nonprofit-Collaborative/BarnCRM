@@ -9,7 +9,7 @@
 @NamespaceAccessible
 public class TestDataFactory {
     /**
-     * The org level Nonprofit Settings, with the shipped v0.1 defaults, saved and cached.
+     * The org level BarnCRM Settings, with the shipped v0.1 defaults, saved and cached.
      */
     @NamespaceAccessible
     public static Nonprofit_Settings__c defaultSettings() {

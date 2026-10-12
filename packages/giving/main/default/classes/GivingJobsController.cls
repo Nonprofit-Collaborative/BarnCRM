@@ -1,5 +1,5 @@
 /**
- * The Nightly Jobs page of the Nonprofit Settings console, for the Giving module (ADR-0038).
+ * The Nightly Jobs page of the BarnCRM Settings console, for the Giving module (ADR-0038).
  *
  * It answers the three questions an administrator has about a nightly job, in this order: is it
  * switched on, when did it last run, and what did it do. It also carries the only supported way

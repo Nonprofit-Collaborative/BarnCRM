@@ -232,7 +232,7 @@ describe('c-giving-nightly-jobs', () => {
   it('shows the message the controller refused with rather than a stack trace', async () => {
     setSchedule.mockRejectedValue({
       body: {
-        message: 'Scheduling the nightly jobs needs the Manage Nonprofit Settings permission.'
+        message: 'Scheduling the nightly jobs needs the Manage BarnCRM Settings permission.'
       }
     });
     const element = createComponent();
@@ -243,7 +243,7 @@ describe('c-giving-nightly-jobs', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
-      'Scheduling the nightly jobs needs the Manage Nonprofit Settings permission.'
+      'Scheduling the nightly jobs needs the Manage BarnCRM Settings permission.'
     );
   });
 });

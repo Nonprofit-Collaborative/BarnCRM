@@ -1,5 +1,5 @@
 /**
- * Records what an error digest run did, on the org-level Nonprofit Settings record (C-23).
+ * Records what an error digest run did, on the org-level BarnCRM Settings record (C-23).
  *
  * DOCUMENTED EXCEPTION to the user-mode DML rule (plan Section 7.2), of the kind ADR-0027 added
  * under ADR-0021: a scheduled job's record of its own run. The digest runs as whoever scheduled

@@ -2,7 +2,7 @@
  * The fiscal year window a fiscal-aware rollup is limited to.
  *
  * Canonical model R-R3: the window is never stored on the definition. It is computed at run time
- * from the org's fiscal year start month (Nonprofit Settings `Fiscal_Year_Start_Month__c`) and the
+ * from the org's fiscal year start month (BarnCRM Settings `Fiscal_Year_Start_Month__c`) and the
  * definition's Fiscal Year Offset, so changing the start month and recalculating corrects every
  * fiscal total in the org without touching a single definition.
  *

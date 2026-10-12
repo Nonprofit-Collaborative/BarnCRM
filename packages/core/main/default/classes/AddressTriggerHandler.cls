@@ -1,7 +1,7 @@
 /**
  * Address__c trigger handler, registered as "Copy default address to standard fields"
  * in the automation registry and dispatched by TriggerDispatcher, so an
- * administrator can switch it off from Nonprofit Settings without touching Setup.
+ * administrator can switch it off from BarnCRM Settings without touching Setup.
  *
  * After insert and after update it copies the default address into the standard address
  * fields. After delete it promotes the most recently created remaining address for that

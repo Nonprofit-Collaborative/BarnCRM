@@ -76,7 +76,7 @@ private class HealthCheckGivingChecksTest {
                 0,
                 findings.size(),
                 'Posting and the close date are an administrator question; a viewer without ' +
-                'Manage Nonprofit Settings is skipped rather than answered wrongly.'
+                'Manage BarnCRM Settings is skipped rather than answered wrongly.'
             );
         }
     }

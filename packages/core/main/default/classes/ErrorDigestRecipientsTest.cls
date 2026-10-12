@@ -27,7 +27,7 @@ private class ErrorDigestRecipientsTest {
         }
 
         Set<Id> ids = new Map<Id, User>(recipients).keySet();
-        Assert.isTrue(ids.contains(admin.Id), 'Maria holds Manage Nonprofit Settings.');
+        Assert.isTrue(ids.contains(admin.Id), 'Maria holds Manage BarnCRM Settings.');
         Assert.isFalse(ids.contains(staff.Id), 'David does not.');
     }
 

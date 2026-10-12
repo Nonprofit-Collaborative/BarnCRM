@@ -6,7 +6,7 @@
  * package. Protected components are not visible in a subscriber org, so a packaged permission
  * set cannot grant a subscriber user object or field access on them, and a user-mode write is
  * refused for every user who is not an administrator. That contradicts plan Section 2.3, which
- * says any user with the `Manage Nonprofit Settings` custom permission may change settings.
+ * says any user with the `Manage BarnCRM Settings` custom permission may change settings.
  *
  * So the write runs in system mode, and the permission is the gate instead of the object
  * permission. Three things hold at every call:
@@ -28,7 +28,7 @@ public with sharing class SettingsWriter {
     @TestVisible
     private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
 
-    /** Raised when a caller reaches the write without the Manage Nonprofit Settings permission. */
+    /** Raised when a caller reaches the write without the Manage BarnCRM Settings permission. */
     public class PermissionException extends Exception {
     }
 

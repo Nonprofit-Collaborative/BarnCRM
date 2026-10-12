@@ -34,7 +34,7 @@ private class ImportControllerTest {
         Test.startTest();
         try {
             ImportController.getTemplates();
-            Assert.fail('Importing needs the Manage Nonprofit Settings permission.');
+            Assert.fail('Importing needs the Manage BarnCRM Settings permission.');
         } catch (Exception e) {
             Assert.isTrue(
                 e.getMessage().contains('Manage BarnCRM Settings'),
@@ -334,7 +334,7 @@ private class ImportControllerTest {
         ImportController.permissionOverride = false;
         try {
             ImportController.previewUndo(batch.Id);
-            Assert.fail('Undoing an import needs the Manage Nonprofit Settings permission.');
+            Assert.fail('Undoing an import needs the Manage BarnCRM Settings permission.');
         } catch (AuraHandledException expected) {
             Assert.areEqual(
                 Label.Core_Import_ErrorNoPermission,

@@ -1,6 +1,6 @@
 /**
- * The Automation page as two people see it: Maria, who has the Manage Nonprofit Settings
- * permission through the Nonprofit Admin role, and David, who has the Nonprofit Staff role and
+ * The Automation page as two people see it: Maria, who has the Manage BarnCRM Settings
+ * permission through the BarnCRM Admin role, and David, who has the Nonprofit Staff role and
  * does not.
  *
  * Both are built on a minimal profile with only a packaged permission set, so these tests prove

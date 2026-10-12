@@ -10,7 +10,7 @@ private class CampaignSyncControllerTest {
         upsert settings;
     }
 
-    /** Maria: Nonprofit Admin, Campaign access, Marketing User and the Campaign Sync set. */
+    /** Maria: BarnCRM Admin, Campaign access, Marketing User and the Campaign Sync set. */
     private static User maria() {
         User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
             'Maria',

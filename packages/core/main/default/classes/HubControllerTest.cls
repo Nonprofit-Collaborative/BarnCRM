@@ -1,6 +1,6 @@
 /**
  * Maria lands on the Hub home page and is told what to do next. David, without the
- * Manage Nonprofit Settings permission, sees the same page and cannot change anything.
+ * Manage BarnCRM Settings permission, sees the same page and cannot change anything.
  * Finishing a step belongs to the Setup Assistant's own controller.
  */
 @IsTest
