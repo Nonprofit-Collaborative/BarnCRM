@@ -68,188 +68,214 @@ private class FindRelatedRecordsTest {
 
     @IsTest
     static void aSemiJoinKeepsTheRecordsWithMatchingRelatedRecords() {
-        makeJobs();
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
 
-        Test.startTest();
-        QueryCompiler.Compiled compiled = QueryCompiler.compile(
-            query(new List<Object>{ journals(true, UNDO_ONLY) }, null)
-        );
-        List<SObject> rows = QueryCompiler.run(compiled);
-        Test.stopTest();
+            Test.startTest();
+            QueryCompiler.Compiled compiled = QueryCompiler.compile(
+                query(new List<Object>{ journals(true, UNDO_ONLY) }, null)
+            );
+            List<SObject> rows = QueryCompiler.run(compiled);
+            Test.stopTest();
 
-        System.Assert.isTrue(
-            compiled.soql.contains(
-                'Id IN (SELECT Import_Batch__c FROM Import_Journal__c WHERE (Phase__c = :rj0_0))'
-            ),
-            'The related filter is a semi-join with its own bind names: ' + compiled.soql
-        );
-        System.Assert.areEqual('Undo', compiled.binds.get('rj0_0'), 'The value is bound');
-        System.Assert.isTrue(
-            compiled.display.contains('WHERE (Phase__c = \'Undo\'))'),
-            'The display writes the value in: ' + compiled.display
-        );
-        System.Assert.areEqual(50, rows.size(), 'Only the jobs with an undo page');
+            System.Assert.isTrue(
+                compiled.soql.contains(
+                    'Id IN (SELECT Import_Batch__c FROM Import_Journal__c WHERE (Phase__c = :rj0_0))'
+                ),
+                'The related filter is a semi-join with its own bind names: ' + compiled.soql
+            );
+            System.Assert.areEqual('Undo', compiled.binds.get('rj0_0'), 'The value is bound');
+            System.Assert.isTrue(
+                compiled.display.contains('WHERE (Phase__c = \'Undo\'))'),
+                'The display writes the value in: ' + compiled.display
+            );
+            System.Assert.areEqual(50, rows.size(), 'Only the jobs with an undo page');
+        }
     }
 
     @IsTest
     static void anAntiJoinKeepsTheRecordsWithNoRelatedRecords() {
-        makeJobs();
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
 
-        Test.startTest();
-        List<SObject> rows = QueryCompiler.run(
-            QueryCompiler.compile(query(new List<Object>{ journals(false, null) }, null))
-        );
-        Integer counted = QueryCompiler.count(
-            query(new List<Object>{ journals(false, null) }, null),
-            1000
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<SObject> rows = QueryCompiler.run(
+                QueryCompiler.compile(query(new List<Object>{ journals(false, null) }, null))
+            );
+            Integer counted = QueryCompiler.count(
+                query(new List<Object>{ journals(false, null) }, null),
+                1000
+            );
+            Test.stopTest();
 
-        System.Assert.areEqual(100, rows.size(), 'The jobs with no journal page at all');
-        System.Assert.areEqual(100, counted, 'A count reads the same records');
+            System.Assert.areEqual(100, rows.size(), 'The jobs with no journal page at all');
+            System.Assert.areEqual(100, counted, 'A count reads the same records');
+        }
     }
 
     @IsTest
     static void twoRelatedConditionsKeepTheirBindsApart() {
-        makeJobs();
-        String commitOnly = UNDO_ONLY.replace('Undo', 'Commit');
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
+            String commitOnly = UNDO_ONLY.replace('Undo', 'Commit');
 
-        QueryCompiler.Compiled compiled = QueryCompiler.compile(
-            query(new List<Object>{ journals(true, commitOnly), journals(false, UNDO_ONLY) }, null)
-        );
+            QueryCompiler.Compiled compiled = QueryCompiler.compile(
+                query(
+                    new List<Object>{ journals(true, commitOnly), journals(false, UNDO_ONLY) },
+                    null
+                )
+            );
 
-        System.Assert.areEqual('Commit', compiled.binds.get('rj0_0'), 'The first entry');
-        System.Assert.areEqual('Undo', compiled.binds.get('rj1_0'), 'The second entry');
-        System.Assert.areEqual(
-            50,
-            QueryCompiler.run(compiled).size(),
-            'A commit page and no undo page'
-        );
+            System.Assert.areEqual('Commit', compiled.binds.get('rj0_0'), 'The first entry');
+            System.Assert.areEqual('Undo', compiled.binds.get('rj1_0'), 'The second entry');
+            System.Assert.areEqual(
+                50,
+                QueryCompiler.run(compiled).size(),
+                'A commit page and no undo page'
+            );
+        }
     }
 
     @IsTest
     static void aRelatedRecordColumnListsTheNewestRelatedRecords() {
-        makeJobs();
-        Map<String, Object> column = new Map<String, Object>{
-            'relationship' => 'Import_Journals__r',
-            'fields' => new List<Object>{ 'Phase__c', 'Entry_Count__c' },
-            'limit' => 1
-        };
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
+            Map<String, Object> column = new Map<String, Object>{
+                'relationship' => 'Import_Journals__r',
+                'fields' => new List<Object>{ 'Phase__c', 'Entry_Count__c' },
+                'limit' => 1
+            };
 
-        Test.startTest();
-        QueryCompiler.Compiled compiled = QueryCompiler.compile(
-            query(null, new List<Object>{ column })
-        );
-        List<SObject> rows = QueryCompiler.run(compiled);
-        Test.stopTest();
+            Test.startTest();
+            QueryCompiler.Compiled compiled = QueryCompiler.compile(
+                query(null, new List<Object>{ column })
+            );
+            List<SObject> rows = QueryCompiler.run(compiled);
+            Test.stopTest();
 
-        System.Assert.isTrue(
-            compiled.soql.contains(
-                '(SELECT Id, Phase__c, Entry_Count__c FROM Import_Journals__r ORDER BY CreatedDate DESC LIMIT 1)'
-            ),
-            'The column is a subquery: ' + compiled.soql
-        );
-        Integer withPages = 0;
-        for (SObject row : rows) {
-            List<SObject> pages = row.getSObjects('Import_Journals__r');
-            if (pages != null && !pages.isEmpty()) {
-                System.Assert.areEqual(1, pages.size(), 'At most the limit per record');
-                withPages++;
+            System.Assert.isTrue(
+                compiled.soql.contains(
+                    '(SELECT Id, Phase__c, Entry_Count__c FROM Import_Journals__r ORDER BY CreatedDate DESC LIMIT 1)'
+                ),
+                'The column is a subquery: ' + compiled.soql
+            );
+            Integer withPages = 0;
+            for (SObject row : rows) {
+                List<SObject> pages = row.getSObjects('Import_Journals__r');
+                if (pages != null && !pages.isEmpty()) {
+                    System.Assert.areEqual(1, pages.size(), 'At most the limit per record');
+                    withPages++;
+                }
             }
+            System.Assert.areEqual(100, withPages, 'Every job with a journal page shows one');
+            System.Assert.isFalse(
+                QueryCompiler.compileSelection(
+                        query(null, new List<Object>{ column }),
+                        new Set<String>{ 'Id' },
+                        null
+                    )
+                    .soql.contains('(SELECT'),
+                'A bulk update selection ignores related record columns'
+            );
         }
-        System.Assert.areEqual(100, withPages, 'Every job with a journal page shows one');
-        System.Assert.isFalse(
-            QueryCompiler.compileSelection(
-                    query(null, new List<Object>{ column }),
-                    new Set<String>{ 'Id' },
-                    null
-                )
-                .soql.contains('(SELECT'),
-            'A bulk update selection ignores related record columns'
-        );
     }
 
     @IsTest
     static void namesThatAreNotRelatedRecordsAreRefused() {
-        expectRefusal(
-            query(
-                new List<Object>{
-                    new Map<String, Object>{
-                        'object' => 'Error_Log__c',
-                        'field' => 'User__c',
-                        'has' => true
+        System.runAs(TestUsers.admin()) {
+            expectRefusal(
+                query(
+                    new List<Object>{
+                        new Map<String, Object>{
+                            'object' => 'Error_Log__c',
+                            'field' => 'User__c',
+                            'has' => true
+                        }
+                    },
+                    null
+                ),
+                String.format(
+                    System.Label.Core_Find_ErrorRelated,
+                    new List<Object>{ 'Error_Log__c.User__c' }
+                )
+            );
+            expectRefusal(
+                query(
+                    new List<Object>{
+                        new Map<String, Object>{
+                            'object' => 'No_Such_Object__c',
+                            'field' => 'X__c'
+                        }
+                    },
+                    null
+                ),
+                String.format(
+                    System.Label.Core_Find_ErrorRelated,
+                    new List<Object>{ 'No_Such_Object__c' }
+                )
+            );
+            expectRefusal(
+                query(
+                    null,
+                    new List<Object>{ new Map<String, Object>{ 'relationship' => 'Nothing_Here' } }
+                ),
+                String.format(
+                    System.Label.Core_Find_ErrorRelated,
+                    new List<Object>{ 'Nothing_Here' }
+                )
+            );
+            expectRefusal(
+                query(
+                    null,
+                    new List<Object>{
+                        new Map<String, Object>{
+                            'relationship' => 'Import_Journals__r',
+                            'fields' => new List<Object>{ 'Phase__c' },
+                            'limit' => 11
+                        }
                     }
-                },
-                null
-            ),
-            String.format(
-                System.Label.Core_Find_ErrorRelated,
-                new List<Object>{ 'Error_Log__c.User__c' }
-            )
-        );
-        expectRefusal(
-            query(
-                new List<Object>{
-                    new Map<String, Object>{ 'object' => 'No_Such_Object__c', 'field' => 'X__c' }
-                },
-                null
-            ),
-            String.format(
-                System.Label.Core_Find_ErrorRelated,
-                new List<Object>{ 'No_Such_Object__c' }
-            )
-        );
-        expectRefusal(
-            query(
-                null,
-                new List<Object>{ new Map<String, Object>{ 'relationship' => 'Nothing_Here' } }
-            ),
-            String.format(System.Label.Core_Find_ErrorRelated, new List<Object>{ 'Nothing_Here' })
-        );
-        expectRefusal(
-            query(
-                null,
-                new List<Object>{
-                    new Map<String, Object>{
-                        'relationship' => 'Import_Journals__r',
-                        'fields' => new List<Object>{ 'Phase__c' },
-                        'limit' => 11
-                    }
-                }
-            ),
-            System.Label.Core_Find_ErrorChildColumn
-        );
-        expectRefusal(
-            query(
-                new List<Object>{
-                    journals(true, null),
-                    journals(true, null),
-                    journals(false, null)
-                },
-                null
-            ),
-            System.Label.Core_Find_ErrorRelatedCount
-        );
+                ),
+                System.Label.Core_Find_ErrorChildColumn
+            );
+            expectRefusal(
+                query(
+                    new List<Object>{
+                        journals(true, null),
+                        journals(true, null),
+                        journals(false, null)
+                    },
+                    null
+                ),
+                System.Label.Core_Find_ErrorRelatedCount
+            );
+        }
     }
 
     @IsTest
     static void theRelatedRecordListNamesEachLookup() {
-        User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+        System.runAs(TestUsers.admin()) {
+            User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
-        System.runAs(maria) {
-            List<FindRelatedRecords.ChildOption> options = FindController.listChildRelationships(
-                'Import_Batch__c'
-            );
-            FindRelatedRecords.ChildOption journalsOption = null;
-            for (FindRelatedRecords.ChildOption option : options) {
-                if (option.relationshipName == 'Import_Journals__r') {
-                    journalsOption = option;
+            System.runAs(maria) {
+                List<FindRelatedRecords.ChildOption> options = FindController.listChildRelationships(
+                    'Import_Batch__c'
+                );
+                FindRelatedRecords.ChildOption journalsOption = null;
+                for (FindRelatedRecords.ChildOption option : options) {
+                    if (option.relationshipName == 'Import_Journals__r') {
+                        journalsOption = option;
+                    }
                 }
+                System.Assert.isNotNull(journalsOption, 'The journal is offered: ' + options);
+                System.Assert.areEqual(
+                    'Import_Journal__c',
+                    journalsOption.objectName,
+                    'Its object'
+                );
+                System.Assert.areEqual('Import_Batch__c', journalsOption.field, 'Its lookup');
+                System.Assert.isTrue(journalsOption.filterable, 'It can be a condition');
             }
-            System.Assert.isNotNull(journalsOption, 'The journal is offered: ' + options);
-            System.Assert.areEqual('Import_Journal__c', journalsOption.objectName, 'Its object');
-            System.Assert.areEqual('Import_Batch__c', journalsOption.field, 'Its lookup');
-            System.Assert.isTrue(journalsOption.filterable, 'It can be a condition');
+
         }
     }
 }

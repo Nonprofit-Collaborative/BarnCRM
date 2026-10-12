@@ -13,162 +13,187 @@
 private class HealthCheckControllerTest {
     @IsTest
     static void anyoneCanReadTheReport() {
-        User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
-        System.runAs(priya) {
-            OrgShapeDetector.overrideShape = npspShape();
+            System.runAs(priya) {
+                OrgShapeDetector.overrideShape = npspShape();
 
-            Test.startTest();
-            HealthCheckService.Report report = HealthCheckController.getReport();
-            Test.stopTest();
+                Test.startTest();
+                HealthCheckService.Report report = HealthCheckController.getReport();
+                Test.stopTest();
 
-            System.assertNotEquals(null, report, 'The report is readable without any permission.');
-            System.assertNotEquals(null, report.findings, 'It carries its findings.');
-            System.assertEquals(
-                CoexistenceService.MODE_NPSP,
-                report.recommendedMode,
-                'It says what this org shape calls for.'
-            );
-            System.assertEquals(
-                false,
-                report.canManageSettings,
-                'Priya has not been given the permission, and the report says so.'
-            );
+                System.assertNotEquals(
+                    null,
+                    report,
+                    'The report is readable without any permission.'
+                );
+                System.assertNotEquals(null, report.findings, 'It carries its findings.');
+                System.assertEquals(
+                    CoexistenceService.MODE_NPSP,
+                    report.recommendedMode,
+                    'It says what this org shape calls for.'
+                );
+                System.assertEquals(
+                    false,
+                    report.canManageSettings,
+                    'Priya has not been given the permission, and the report says so.'
+                );
+            }
+
         }
     }
 
     @IsTest
     static void applyingTheRecommendationNeedsThePermission() {
-        User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
-        System.runAs(priya) {
-            OrgShapeDetector.overrideShape = npspShape();
+            System.runAs(priya) {
+                OrgShapeDetector.overrideShape = npspShape();
 
-            Boolean refused = false;
-            try {
-                HealthCheckController.applyRecommendedMode();
-            } catch (AuraHandledException e) {
-                refused = true;
+                Boolean refused = false;
+                try {
+                    HealthCheckController.applyRecommendedMode();
+                } catch (AuraHandledException e) {
+                    refused = true;
+                }
+
+                System.assert(
+                    refused,
+                    'Without the permission, the fix is refused rather than applied.'
+                );
+                System.assertEquals(
+                    null,
+                    CoexistenceService.getCurrentMode(),
+                    'Nothing was written on the way to being refused.'
+                );
             }
 
-            System.assert(
-                refused,
-                'Without the permission, the fix is refused rather than applied.'
-            );
-            System.assertEquals(
-                null,
-                CoexistenceService.getCurrentMode(),
-                'Nothing was written on the way to being refused.'
-            );
         }
     }
 
     @IsTest
     static void switchingMembershipNeedsThePermission() {
-        User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
-        System.runAs(priya) {
-            OrgShapeDetector.overrideShape = personAccountsShape();
+            System.runAs(priya) {
+                OrgShapeDetector.overrideShape = personAccountsShape();
 
-            Boolean refused = false;
-            try {
-                HealthCheckController.applyJunctionMembership();
-            } catch (AuraHandledException e) {
-                refused = true;
+                Boolean refused = false;
+                try {
+                    HealthCheckController.applyJunctionMembership();
+                } catch (AuraHandledException e) {
+                    refused = true;
+                }
+
+                System.assert(refused, 'Without the permission, the membership fix is refused.');
+                System.assertEquals(
+                    CoexistenceService.MEMBERSHIP_CONTACT,
+                    CoexistenceService.getMembershipMode(),
+                    'And membership is left where it was rather than switched.'
+                );
             }
 
-            System.assert(refused, 'Without the permission, the membership fix is refused.');
-            System.assertEquals(
-                CoexistenceService.MEMBERSHIP_CONTACT,
-                CoexistenceService.getMembershipMode(),
-                'And membership is left where it was rather than switched.'
-            );
         }
     }
 
     @IsTest
     static void withThePermissionTheRecommendationIsApplied() {
-        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
-        System.runAs(maria) {
-            OrgShapeDetector.overrideShape = npspShape();
+            System.runAs(maria) {
+                OrgShapeDetector.overrideShape = npspShape();
 
-            Test.startTest();
-            HealthCheckService.Report report = HealthCheckController.applyRecommendedMode();
-            Test.stopTest();
+                Test.startTest();
+                HealthCheckService.Report report = HealthCheckController.applyRecommendedMode();
+                Test.stopTest();
 
-            System.assertEquals(
-                true,
-                report.canManageSettings,
-                'Maria holds the permission, so she sees the fix buttons.'
-            );
-            System.assertEquals(
-                CoexistenceService.MODE_NPSP,
-                CoexistenceService.getCurrentMode(),
-                'Taking the recommendation saves it.'
-            );
-            System.assertEquals(
-                false,
-                report.modeNeedsAttention,
-                'Once applied, the mode no longer needs attention.'
-            );
+                System.assertEquals(
+                    true,
+                    report.canManageSettings,
+                    'Maria holds the permission, so she sees the fix buttons.'
+                );
+                System.assertEquals(
+                    CoexistenceService.MODE_NPSP,
+                    CoexistenceService.getCurrentMode(),
+                    'Taking the recommendation saves it.'
+                );
+                System.assertEquals(
+                    false,
+                    report.modeNeedsAttention,
+                    'Once applied, the mode no longer needs attention.'
+                );
+            }
+
         }
     }
 
     @IsTest
     static void withThePermissionMembershipIsSwitched() {
-        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
-        System.runAs(maria) {
-            OrgShapeDetector.overrideShape = personAccountsShape();
+            System.runAs(maria) {
+                OrgShapeDetector.overrideShape = personAccountsShape();
 
-            Test.startTest();
-            HealthCheckController.applyJunctionMembership();
-            Test.stopTest();
+                Test.startTest();
+                HealthCheckController.applyJunctionMembership();
+                Test.stopTest();
 
-            System.assertEquals(
-                CoexistenceService.MEMBERSHIP_JUNCTION,
-                CoexistenceService.getMembershipMode(),
-                'The membership fix does what its button says.'
-            );
+                System.assertEquals(
+                    CoexistenceService.MEMBERSHIP_JUNCTION,
+                    CoexistenceService.getMembershipMode(),
+                    'The membership fix does what its button says.'
+                );
+            }
+
         }
     }
 
     @IsTest
     static void turningOnAutomaticHouseholdsNeedsThePermission() {
-        User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
-        System.runAs(priya) {
-            OrgShapeDetector.overrideShape = personAccountsShape();
+            System.runAs(priya) {
+                OrgShapeDetector.overrideShape = personAccountsShape();
 
-            Boolean refused = false;
-            try {
-                HealthCheckController.enableAutomaticHouseholds();
-            } catch (AuraHandledException e) {
-                refused = true;
+                Boolean refused = false;
+                try {
+                    HealthCheckController.enableAutomaticHouseholds();
+                } catch (AuraHandledException e) {
+                    refused = true;
+                }
+
+                System.assert(refused, 'Without the permission, the households fix is refused.');
             }
 
-            System.assert(refused, 'Without the permission, the households fix is refused.');
         }
     }
 
     @IsTest
     static void withThePermissionAutomaticHouseholdsAreTurnedOn() {
-        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
-        System.runAs(maria) {
-            OrgShapeDetector.overrideShape = personAccountsShape();
+            System.runAs(maria) {
+                OrgShapeDetector.overrideShape = personAccountsShape();
 
-            Test.startTest();
-            HealthCheckController.enableAutomaticHouseholds();
-            Test.stopTest();
+                Test.startTest();
+                HealthCheckController.enableAutomaticHouseholds();
+                Test.stopTest();
 
-            SettingsService.clearCaches();
-            System.assertEquals(
-                true,
-                SettingsService.getSettings().Auto_Create_Households__c,
-                'The households fix does what its button says.'
-            );
+                SettingsService.clearCaches();
+                System.assertEquals(
+                    true,
+                    SettingsService.getSettings().Auto_Create_Households__c,
+                    'The households fix does what its button says.'
+                );
+            }
+
         }
     }
 

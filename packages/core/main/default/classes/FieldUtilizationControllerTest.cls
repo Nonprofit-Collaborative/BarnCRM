@@ -52,194 +52,218 @@ private class FieldUtilizationControllerTest {
 
     @IsTest
     static void aSecondRunShowsTheChangeSinceTheFirst() {
-        FieldUtilizationController.Results results;
-        System.runAs(maria()) {
-            List<Duplicate_Dismissal__c> rows = insertDismissals(200, 100);
-            countNow(System.now().addDays(-7));
-            for (Integer i = 100; i < 150; i++) {
-                rows[i].Reason__c = 'Different people';
-            }
-            update rows;
-            countNow(System.now());
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.Results results;
+            System.runAs(maria()) {
+                List<Duplicate_Dismissal__c> rows = insertDismissals(200, 100);
+                countNow(System.now().addDays(-7));
+                for (Integer i = 100; i < 150; i++) {
+                    rows[i].Reason__c = 'Different people';
+                }
+                update rows;
+                countNow(System.now());
 
-            Test.startTest();
-            results = FieldUtilizationController.getResults(DISMISSAL);
-            Test.stopTest();
-        }
-
-        Assert.isNotNull(results.previousTakenAt, 'The run before is found.');
-        FieldUtilizationController.FieldRow reasonRow;
-        for (FieldUtilizationController.FieldRow row : results.rows) {
-            if (row.fieldName == REASON) {
-                reasonRow = row;
+                Test.startTest();
+                results = FieldUtilizationController.getResults(DISMISSAL);
+                Test.stopTest();
             }
+
+            Assert.isNotNull(results.previousTakenAt, 'The run before is found.');
+            FieldUtilizationController.FieldRow reasonRow;
+            for (FieldUtilizationController.FieldRow row : results.rows) {
+                if (row.fieldName == REASON) {
+                    reasonRow = row;
+                }
+            }
+            Assert.isNotNull(reasonRow, 'Reason is in the latest results.');
+            Assert.areEqual(150, reasonRow.filled, 'Filled in the latest run.');
+            Assert.areEqual(200, reasonRow.total, 'Records looked at.');
+            Assert.areEqual(75.0, reasonRow.percent, 'The latest share, as a percentage.');
+            Assert.areEqual(25.0, reasonRow.change, 'Up 25 points since the run before.');
         }
-        Assert.isNotNull(reasonRow, 'Reason is in the latest results.');
-        Assert.areEqual(150, reasonRow.filled, 'Filled in the latest run.');
-        Assert.areEqual(200, reasonRow.total, 'Records looked at.');
-        Assert.areEqual(75.0, reasonRow.percent, 'The latest share, as a percentage.');
-        Assert.areEqual(25.0, reasonRow.change, 'Up 25 points since the run before.');
     }
 
     @IsTest
     static void theFirstRunHasNoChangeToShow() {
-        FieldUtilizationController.Results results;
-        System.runAs(maria()) {
-            insertDismissals(200, 50);
-            countNow(System.now());
-            results = FieldUtilizationController.getResults(DISMISSAL);
-        }
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.Results results;
+            System.runAs(maria()) {
+                insertDismissals(200, 50);
+                countNow(System.now());
+                results = FieldUtilizationController.getResults(DISMISSAL);
+            }
 
-        Assert.isNull(results.previousTakenAt, 'There is no earlier run.');
-        Assert.areEqual(1, results.rows.size(), 'One countable field.');
-        Assert.areEqual(25.0, results.rows[0].percent, '50 of 200.');
-        Assert.isNull(results.rows[0].change, 'No change without a run to compare with.');
+            Assert.isNull(results.previousTakenAt, 'There is no earlier run.');
+            Assert.areEqual(1, results.rows.size(), 'One countable field.');
+            Assert.areEqual(25.0, results.rows[0].percent, '50 of 200.');
+            Assert.isNull(results.rows[0].change, 'No change without a run to compare with.');
+        }
     }
 
     @IsTest
     static void savingObjectsKeepsWhatDescribeKnowsAndRefusesTheRest() {
-        FieldUtilizationController.PageView view;
-        String refusal;
-        System.runAs(maria()) {
-            view = FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL, DISMISSAL });
-            try {
-                FieldUtilizationController.saveObjects(new List<String>{ 'Not_A_Real_Object__c' });
-            } catch (AuraHandledException caught) {
-                refusal = messageOf(caught);
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.PageView view;
+            String refusal;
+            System.runAs(maria()) {
+                view = FieldUtilizationController.saveObjects(
+                    new List<String>{ DISMISSAL, DISMISSAL }
+                );
+                try {
+                    FieldUtilizationController.saveObjects(
+                        new List<String>{ 'Not_A_Real_Object__c' }
+                    );
+                } catch (AuraHandledException caught) {
+                    refusal = messageOf(caught);
+                }
             }
-        }
 
-        Assert.areEqual(
-            new List<String>{ DISMISSAL },
-            view.tracked,
-            'Saved once, as describe names it.'
-        );
-        Assert.areEqual(
-            String.format(
-                System.Label.Core_FieldUtilization_UnknownObject,
-                new List<Object>{ 'Not_A_Real_Object__c' }
-            ),
-            refusal,
-            'An object describe does not know is refused by name (R-FU1).'
-        );
-        Assert.areEqual(
-            DISMISSAL,
-            BarnCRM_Settings__c.getOrgDefaults().Field_Utilization_Objects__c,
-            'The refused save changed nothing.'
-        );
+            Assert.areEqual(
+                new List<String>{ DISMISSAL },
+                view.tracked,
+                'Saved once, as describe names it.'
+            );
+            Assert.areEqual(
+                String.format(
+                    System.Label.Core_FieldUtilization_UnknownObject,
+                    new List<Object>{ 'Not_A_Real_Object__c' }
+                ),
+                refusal,
+                'An object describe does not know is refused by name (R-FU1).'
+            );
+            Assert.areEqual(
+                DISMISSAL,
+                BarnCRM_Settings__c.getOrgDefaults().Field_Utilization_Objects__c,
+                'The refused save changed nothing.'
+            );
+        }
     }
 
     @IsTest
     static void someoneWithoutThePermissionCannotChangeAnything() {
-        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
-        String refusal;
-        System.runAs(david) {
-            try {
-                FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL });
-            } catch (AuraHandledException caught) {
-                refusal = messageOf(caught);
+        System.runAs(TestUsers.admin()) {
+            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
+            String refusal;
+            System.runAs(david) {
+                try {
+                    FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL });
+                } catch (AuraHandledException caught) {
+                    refusal = messageOf(caught);
+                }
             }
-        }
 
-        Assert.areEqual(System.Label.Core_FieldUtilization_PermissionRequired, refusal, 'Refused.');
+            Assert.areEqual(
+                System.Label.Core_FieldUtilization_PermissionRequired,
+                refusal,
+                'Refused.'
+            );
+        }
     }
 
     @IsTest
     static void anAdministratorCanScheduleAndStopTheWeeklyCount() {
-        FieldUtilizationController.PageView started;
-        FieldUtilizationController.PageView stopped;
-        // The running user's profile, as the seasonal swap's test does: scheduling Apex is
-        // what this test proves, not what a Standard User profile allows.
-        User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
-            'Maria',
-            new List<String>{ 'BarnCRM_Admin' }
-        );
-        System.runAs(admin) {
-            Test.startTest();
-            started = FieldUtilizationController.setSchedule(true);
-            stopped = FieldUtilizationController.setSchedule(false);
-            Test.stopTest();
-        }
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.PageView started;
+            FieldUtilizationController.PageView stopped;
+            // The running user's profile, as the seasonal swap's test does: scheduling Apex is
+            // what this test proves, not what a Standard User profile allows.
+            User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
+                'Maria',
+                new List<String>{ 'BarnCRM_Admin' }
+            );
+            System.runAs(admin) {
+                Test.startTest();
+                started = FieldUtilizationController.setSchedule(true);
+                stopped = FieldUtilizationController.setSchedule(false);
+                Test.stopTest();
+            }
 
-        Assert.isTrue(started.scheduled, 'Schedule actually schedules it.');
-        Assert.isNotNull(started.nextRunAt, 'And says when it next runs.');
-        Assert.isFalse(stopped.scheduled, 'Stop actually stops it.');
+            Assert.isTrue(started.scheduled, 'Schedule actually schedules it.');
+            Assert.isNotNull(started.nextRunAt, 'And says when it next runs.');
+            Assert.isFalse(stopped.scheduled, 'Stop actually stops it.');
+        }
     }
 
     @IsTest
     static void countNowNeedsSomethingChosen() {
-        String refusal;
-        System.runAs(maria()) {
-            try {
-                FieldUtilizationController.runNow();
-            } catch (AuraHandledException caught) {
-                refusal = messageOf(caught);
+        System.runAs(TestUsers.admin()) {
+            String refusal;
+            System.runAs(maria()) {
+                try {
+                    FieldUtilizationController.runNow();
+                } catch (AuraHandledException caught) {
+                    refusal = messageOf(caught);
+                }
             }
-        }
 
-        Assert.areEqual(
-            System.Label.Core_FieldUtilization_NothingChosen,
-            refusal,
-            'Nothing to count.'
-        );
+            Assert.areEqual(
+                System.Label.Core_FieldUtilization_NothingChosen,
+                refusal,
+                'Nothing to count.'
+            );
+        }
     }
 
     @IsTest
     static void countNowCountsTheChosenObjects() {
-        System.runAs(maria()) {
-            insertDismissals(200, 10);
-            FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL });
-            Test.startTest();
-            FieldUtilizationController.runNow();
-            Test.stopTest();
-        }
+        System.runAs(TestUsers.admin()) {
+            System.runAs(maria()) {
+                insertDismissals(200, 10);
+                FieldUtilizationController.saveObjects(new List<String>{ DISMISSAL });
+                Test.startTest();
+                FieldUtilizationController.runNow();
+                Test.stopTest();
+            }
 
-        Assert.areEqual(
-            10,
-            [
-                SELECT Filled_Count__c
-                FROM Field_Utilization_Snapshot__c
-                WHERE Field_Name__c = :REASON
-            ]
-            .Filled_Count__c,
-            'Count now ran the count over the saved objects.'
-        );
+            Assert.areEqual(
+                10,
+                [
+                    SELECT Filled_Count__c
+                    FROM Field_Utilization_Snapshot__c
+                    WHERE Field_Name__c = :REASON
+                ]
+                .Filled_Count__c,
+                'Count now ran the count over the saved objects.'
+            );
+        }
     }
 
     @IsTest
     static void thePickerOffersPeopleAccountsAndCustomObjectsButNotTheSnapshots() {
-        FieldUtilizationController.PageView view;
-        System.runAs(maria()) {
-            view = FieldUtilizationController.getView();
-        }
+        System.runAs(TestUsers.admin()) {
+            FieldUtilizationController.PageView view;
+            System.runAs(maria()) {
+                view = FieldUtilizationController.getView();
+            }
 
-        Set<String> offered = new Set<String>();
-        for (FieldUtilizationController.Option option : view.choosable) {
-            offered.add(option.value);
+            Set<String> offered = new Set<String>();
+            for (FieldUtilizationController.Option option : view.choosable) {
+                offered.add(option.value);
+            }
+            Assert.isTrue(
+                offered.contains(
+                    Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+                ),
+                'Account.'
+            );
+            Assert.isTrue(
+                offered.contains(
+                    Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+                ),
+                'Contact.'
+            );
+            Assert.isTrue(offered.contains(DISMISSAL), 'A custom object.');
+            Assert.isFalse(
+                offered.contains(
+                    Field_Utilization_Snapshot__c.SObjectType.getDescribe(
+                            SObjectDescribeOptions.DEFERRED
+                        )
+                        .getName()
+                ),
+                'Never its own snapshots.'
+            );
+            Assert.isTrue(view.canManage, 'Maria holds Manage BarnCRM Settings.');
+            Assert.isFalse(view.scheduled, 'Nothing schedules the count on install.');
         }
-        Assert.isTrue(
-            offered.contains(
-                Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-            ),
-            'Account.'
-        );
-        Assert.isTrue(
-            offered.contains(
-                Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-            ),
-            'Contact.'
-        );
-        Assert.isTrue(offered.contains(DISMISSAL), 'A custom object.');
-        Assert.isFalse(
-            offered.contains(
-                Field_Utilization_Snapshot__c.SObjectType.getDescribe(
-                        SObjectDescribeOptions.DEFERRED
-                    )
-                    .getName()
-            ),
-            'Never its own snapshots.'
-        );
-        Assert.isTrue(view.canManage, 'Maria holds Manage BarnCRM Settings.');
-        Assert.isFalse(view.scheduled, 'Nothing schedules the count on install.');
     }
 }

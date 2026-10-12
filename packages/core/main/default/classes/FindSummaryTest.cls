@@ -52,102 +52,125 @@ private class FindSummaryTest {
 
     @IsTest
     static void countsTwoHundredRecordsByGroup() {
-        makeJobs();
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
 
-        Test.startTest();
-        FindSummary.SummaryResult result = FindSummary.summarize(
-            query(new Map<String, Object>{ 'function' => 'count', 'groupBy' => 'Status__c' })
-        );
-        Test.stopTest();
+            Test.startTest();
+            FindSummary.SummaryResult result = FindSummary.summarize(
+                query(new Map<String, Object>{ 'function' => 'count', 'groupBy' => 'Status__c' })
+            );
+            Test.stopTest();
 
-        Map<String, Object> byGroup = lineValues(result);
-        System.Assert.areEqual(150, byGroup.get(ImportBatchService.STATUS_COMPLETE), 'Complete');
-        System.Assert.areEqual(50, byGroup.get(ImportBatchService.STATUS_FAILED), 'Failed');
-        System.Assert.isTrue(
-            result.soql.startsWith('SELECT Status__c grp, COUNT(Id) val FROM Import_Batch__c'),
-            'The SOQL shown: ' + result.soql
-        );
-        System.Assert.isTrue(
-            result.soql.endsWith('GROUP BY Status__c ORDER BY Status__c NULLS FIRST LIMIT 2000'),
-            'Grouped and ordered: ' + result.soql
-        );
-        System.Assert.isFalse(result.capped, 'Two groups are not capped');
+            Map<String, Object> byGroup = lineValues(result);
+            System.Assert.areEqual(
+                150,
+                byGroup.get(ImportBatchService.STATUS_COMPLETE),
+                'Complete'
+            );
+            System.Assert.areEqual(50, byGroup.get(ImportBatchService.STATUS_FAILED), 'Failed');
+            System.Assert.isTrue(
+                result.soql.startsWith('SELECT Status__c grp, COUNT(Id) val FROM Import_Batch__c'),
+                'The SOQL shown: ' + result.soql
+            );
+            System.Assert.isTrue(
+                result.soql.endsWith(
+                    'GROUP BY Status__c ORDER BY Status__c NULLS FIRST LIMIT 2000'
+                ),
+                'Grouped and ordered: ' + result.soql
+            );
+            System.Assert.isFalse(result.capped, 'Two groups are not capped');
+        }
     }
 
     @IsTest
     static void totalsLowestAndHighestOverTheDocumentsRecords() {
-        makeJobs();
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
 
-        Test.startTest();
-        FindSummary.SummaryResult total = FindSummary.summarize(
-            query(new Map<String, Object>{ 'function' => 'sum', 'field' => 'Rows_Updated__c' })
-        );
-        FindSummary.SummaryResult highest = FindSummary.summarize(
-            query(
-                new Map<String, Object>{
-                    'function' => 'MAX',
-                    'field' => 'Rows_Updated__c',
-                    'groupBy' => 'Status__c'
-                }
-            )
-        );
-        Test.stopTest();
+            Test.startTest();
+            FindSummary.SummaryResult total = FindSummary.summarize(
+                query(new Map<String, Object>{ 'function' => 'sum', 'field' => 'Rows_Updated__c' })
+            );
+            FindSummary.SummaryResult highest = FindSummary.summarize(
+                query(
+                    new Map<String, Object>{
+                        'function' => 'MAX',
+                        'field' => 'Rows_Updated__c',
+                        'groupBy' => 'Status__c'
+                    }
+                )
+            );
+            Test.stopTest();
 
-        System.Assert.areEqual(1, total.lines.size(), 'No group is one line');
-        System.Assert.areEqual(
-            Decimal.valueOf(150 * 151 / 2 + 50 * 10),
-            (Decimal) total.lines[0].value,
-            'The total of every record'
-        );
-        System.Assert.isNull(total.lines[0].groupValue, 'The one line has no group');
-        Map<String, Object> byGroup = lineValues(highest);
-        System.Assert.areEqual(
-            150,
-            ((Decimal) byGroup.get(ImportBatchService.STATUS_COMPLETE)).intValue(),
-            'Highest of the completed jobs'
-        );
+            System.Assert.areEqual(1, total.lines.size(), 'No group is one line');
+            System.Assert.areEqual(
+                Decimal.valueOf(150 * 151 / 2 + 50 * 10),
+                (Decimal) total.lines[0].value,
+                'The total of every record'
+            );
+            System.Assert.isNull(total.lines[0].groupValue, 'The one line has no group');
+            Map<String, Object> byGroup = lineValues(highest);
+            System.Assert.areEqual(
+                150,
+                ((Decimal) byGroup.get(ImportBatchService.STATUS_COMPLETE)).intValue(),
+                'Highest of the completed jobs'
+            );
+        }
     }
 
     @IsTest
     static void fieldsThatCannotBeMeasuredOrGroupedAreRefused() {
-        expectRefusal(
-            new Map<String, Object>{ 'function' => 'average' },
-            System.Label.Core_Find_ErrorSummary
-        );
-        String runLogLabel = Schema.SObjectType.Import_Batch__c.fields.Run_Log__c.getLabel();
-        expectRefusal(
-            new Map<String, Object>{ 'function' => 'sum', 'field' => 'Run_Log__c' },
-            String.format(System.Label.Core_Find_ErrorSummaryField, new List<Object>{ runLogLabel })
-        );
-        expectRefusal(
-            new Map<String, Object>{ 'function' => 'count', 'groupBy' => 'Run_Log__c' },
-            String.format(System.Label.Core_Find_ErrorSummaryGroup, new List<Object>{ runLogLabel })
-        );
-        expectRefusal(
-            new Map<String, Object>{ 'function' => 'sum', 'field' => 'Rows_Updated__c; DELETE' },
-            String.format(
-                System.Label.Core_Filter_ErrorUnknownField,
-                new List<Object>{ 'Rows_Updated__c; DELETE' }
-            )
-        );
+        System.runAs(TestUsers.admin()) {
+            expectRefusal(
+                new Map<String, Object>{ 'function' => 'average' },
+                System.Label.Core_Find_ErrorSummary
+            );
+            String runLogLabel = Schema.SObjectType.Import_Batch__c.fields.Run_Log__c.getLabel();
+            expectRefusal(
+                new Map<String, Object>{ 'function' => 'sum', 'field' => 'Run_Log__c' },
+                String.format(
+                    System.Label.Core_Find_ErrorSummaryField,
+                    new List<Object>{ runLogLabel }
+                )
+            );
+            expectRefusal(
+                new Map<String, Object>{ 'function' => 'count', 'groupBy' => 'Run_Log__c' },
+                String.format(
+                    System.Label.Core_Find_ErrorSummaryGroup,
+                    new List<Object>{ runLogLabel }
+                )
+            );
+            expectRefusal(
+                new Map<String, Object>{
+                    'function' => 'sum',
+                    'field' => 'Rows_Updated__c; DELETE'
+                },
+                String.format(
+                    System.Label.Core_Filter_ErrorUnknownField,
+                    new List<Object>{ 'Rows_Updated__c; DELETE' }
+                )
+            );
+        }
     }
 
     @IsTest
     static void theControllerSummarizesForAPersonWithFind() {
-        makeJobs();
-        User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
-        FindSummary.SummaryResult result;
+        System.runAs(TestUsers.admin()) {
+            makeJobs();
+            User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+            FindSummary.SummaryResult result;
 
-        System.runAs(maria) {
-            result = FindController.summarize(
-                query(new Map<String, Object>{ 'function' => 'count' })
+            System.runAs(maria) {
+                result = FindController.summarize(
+                    query(new Map<String, Object>{ 'function' => 'count' })
+                );
+            }
+
+            System.Assert.areEqual(1, result.lines.size(), 'One line');
+            System.Assert.isTrue(
+                Integer.valueOf(result.lines[0].value) <= 200,
+                'Counted with her own access'
             );
         }
-
-        System.Assert.areEqual(1, result.lines.size(), 'One line');
-        System.Assert.isTrue(
-            Integer.valueOf(result.lines[0].value) <= 200,
-            'Counted with her own access'
-        );
     }
 }
