@@ -57,6 +57,16 @@ public class GivingRollupTestData {
         TriggerHandler.clearRunClaims();
     }
 
+    /**
+     * Routes this test's rollups to BarnCRM's own engine (`RollupEngine`) instead of the vendored
+     * one, through `RollupService`, so the test still names no engine. The regression tests
+     * switched on in slice S5 call this first, because the engine behind `RollupService` is only
+     * swapped for everyone in slice S8; S8 removes this method and every call to it.
+     */
+    public static void useOwnEngine() {
+        RollupService.useOwnEngineInTests();
+    }
+
     /** The materialized definitions for these shipped keys, failing when any is missing. */
     public static List<Rollup_Definition__c> definitions(Set<String> keys) {
         List<Rollup_Definition__c> found = [

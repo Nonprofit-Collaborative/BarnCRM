@@ -13,6 +13,11 @@
  * than when it finishes (bug 5). The tests that encode the right answers are written now and
  * switched off, each naming the slice that switches it on (proposal migration step 3: these are
  * fixed in the new engine, not patched into the old one).
+ *
+ * Slice S5 switched on the target filter and record freshness tests. They run on BarnCRM's own
+ * engine: each calls `GivingRollupTestData.useOwnEngine()` first, which routes `RollupService` to
+ * `RollupEngine` for that test only, until slice S8 swaps the engine for everyone and removes the
+ * call.
  */
 @IsTest
 private class RollupRegressionTargetsTest {
@@ -34,15 +39,14 @@ private class RollupRegressionTargetsTest {
     // --------------------------------------------------------------------------- target overlap
 
     /**
-     * DISABLED until slice S5 (target filters). Add `@IsTest` back in that slice.
-     *
      * The Nolan household gives 500 in its own name and Ana, a member, gives 100. The household's
      * total giving is 600. Account total giving also reaches the household through Donor Account,
      * where it would count only the 500, and its target filter (not a household) is what keeps it
      * off this record.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aHouseholdsTotalIsTheHouseholdRollupsAnswer() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         insert new List<Gift__c>{
             GivingTestDataFactory.buildAccountGift(ana.AccountId, 500),
@@ -59,13 +63,12 @@ private class RollupRegressionTargetsTest {
     }
 
     /**
-     * DISABLED until slice S5 (target filters). Add `@IsTest` back in that slice.
-     *
      * The same household saving its own gift now: the real-time run of both rollups leaves the
      * household's own answer, 600, whichever runs last.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aHouseholdsOwnGiftSavedNowKeepsTheHouseholdAnswer() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         GivingRollupTestData.installShippedRollups();
 
@@ -81,15 +84,13 @@ private class RollupRegressionTargetsTest {
     }
 
     /**
-     * DISABLED until slice S5 (target filters). Add `@IsTest` back in that slice. It may already
-     * pass on today's engine; an org run decides, and if it does it is switched on at once.
-     *
      * Riverbend, an organization, gives 1000. Recalculating both total giving rollups leaves
      * Riverbend at 1000: the household rollup's target filter keeps it from writing an
      * organization at all, so it cannot reset the organization's total to zero.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void anOrganizationsTotalIsTheAccountRollupsAnswer() {
+        GivingRollupTestData.useOwnEngine();
         Account riverbend = GivingTestDataFactory.insertOrganization('Riverbend Manufacturing');
         insert GivingTestDataFactory.buildAccountGift(riverbend.Id, 1000);
         GivingRollupTestData.installShippedRollups();
@@ -153,15 +154,13 @@ private class RollupRegressionTargetsTest {
     }
 
     /**
-     * DISABLED until slice S5 (record freshness written with the totals). Add `@IsTest` back in
-     * that slice.
-     *
      * A recalculation stamps "Rollups last calculated" on every record it wrote, in the same save
      * as the totals, so the nightly run leaves every record saying when its numbers were last
      * made (bug 4).
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aRecalculationStampsTheRecordsItWrote() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         insert GivingTestDataFactory.buildGift(ana.Id, 100);
         GivingRollupTestData.installShippedRollups();

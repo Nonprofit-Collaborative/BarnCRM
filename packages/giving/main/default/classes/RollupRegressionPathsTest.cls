@@ -298,8 +298,9 @@ private class RollupRegressionPathsTest {
     }
 
     /**
-     * DISABLED until slice S5 (recompute, never add and subtract). Add `@IsTest` back in that
-     * slice.
+     * Switched on in slice S5, on BarnCRM's own engine: `GivingRollupTestData.useOwnEngine()`
+     * routes `RollupService` to `RollupEngine` for this test until slice S8 swaps the engine for
+     * everyone.
      *
      * Two hundred gifts from twenty donors are corrected in one save, as a data fix through the
      * data loader would. Every donor's total is the corrected one (plan Section 7.2).
@@ -311,8 +312,9 @@ private class RollupRegressionPathsTest {
      * delta handling of two bulk runs in one transaction, not the test. A recompute engine reads
      * every gift again and gives 300 whatever order or grouping the runs have.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void twoHundredCorrectionsInOneSaveAreAllCounted() {
+        GivingRollupTestData.useOwnEngine();
         List<String> names = new List<String>();
         for (Integer i = 0; i < 20; i++) {
             names.add('Donor' + i);

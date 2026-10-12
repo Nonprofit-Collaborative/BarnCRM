@@ -68,6 +68,23 @@ public with sharing class RollupService {
     @TestVisible
     private static Integer lastEngineCalls;
 
+    /**
+     * True when every call below goes to BarnCRM's own engine (`RollupEngine`) rather than the
+     * vendored one. Only a test can set it, through `useOwnEngineInTests`, so the regression
+     * suite can judge the new engine before slice S8 swaps it in for everyone; S8 removes the
+     * switch and the vendored calls together. A delete is not recalculated under the switch:
+     * counting after the delete, and collecting changes fully, is slice S6.
+     */
+    private static Boolean useOwnEngine = false;
+
+    /** Routes this test's rollups to BarnCRM's own engine. Does nothing outside a test. */
+    @NamespaceAccessible
+    public static void useOwnEngineInTests() {
+        if (Test.isRunningTest()) {
+            useOwnEngine = true;
+        }
+    }
+
     /** The modes a nightly run covers. */
     @NamespaceAccessible
     public static Set<String> scheduledModes() {
@@ -110,6 +127,10 @@ public with sharing class RollupService {
             REAL_TIME_MODES
         );
         if (definitions.isEmpty()) {
+            return;
+        }
+        if (useOwnEngine) {
+            runOwnEngine(definitions, changedRecords, oldRecords);
             return;
         }
         List<Rollup__mdt> metadata = new List<Rollup__mdt>();
@@ -250,6 +271,13 @@ public with sharing class RollupService {
         Set<Id> parentIds,
         String context
     ) {
+        if (useOwnEngine) {
+            lastParentIds = parentIds;
+            RollupEngine.Result result = parentIds == null
+                ? RollupEngine.recalculateEveryRecord(definitions)
+                : RollupEngine.recalculate(parentIds, definitions);
+            return result.ran;
+        }
         Map<String, List<Rollup__mdt>> metadataBySource = new Map<String, List<Rollup__mdt>>();
         List<Rollup__mdt> metadata = new List<Rollup__mdt>();
         List<Rollup_Definition__c> ran = new List<Rollup_Definition__c>();
@@ -299,6 +327,51 @@ public with sharing class RollupService {
             }
         }
         return ran;
+    }
+
+    /**
+     * A save under the test switch: the records each definition reaches, before and after the
+     * change, recalculated by `RollupEngine`, which stamps the records it writes. Plain lookups
+     * and household tokens only; slice S6 replaces this with full change collection.
+     */
+    private static void runOwnEngine(
+        List<Rollup_Definition__c> definitions,
+        List<SObject> changedRecords,
+        Map<Id, SObject> oldRecords
+    ) {
+        if (Trigger.isExecuting && Trigger.isDelete) {
+            return;
+        }
+        List<SObject> records = new List<SObject>(changedRecords);
+        if (oldRecords != null) {
+            records.addAll(oldRecords.values());
+        }
+        Set<Id> parentIds = new Set<Id>();
+        for (Rollup_Definition__c definition : definitions) {
+            RollupPath.Parsed path;
+            try {
+                path = RollupPath.parse(definition.Relationship_Path__c);
+            } catch (Exception refused) {
+                ErrorLogger.log(refused, CONTEXT_REAL_TIME, definition.Id);
+                continue;
+            }
+            for (Set<Id> reached : RollupPath.resolveTargets(path, records).values()) {
+                parentIds.addAll(reached);
+            }
+            for (RollupPath.Branch branch : path.branches) {
+                if (branch.needsHouseholdResolution() || branch.segments.size() != 1) {
+                    continue;
+                }
+                for (SObject record : records) {
+                    Object value = record.get(branch.segments[0]);
+                    if (value != null) {
+                        parentIds.add((Id) value);
+                    }
+                }
+            }
+        }
+        RollupEngine.Result result = RollupEngine.recalculate(parentIds, definitions);
+        stampAfterRun(result.ran, new Map<String, Set<Id>>());
     }
 
     private static Set<String> sourcesOf(List<Rollup_Definition__c> definitions) {

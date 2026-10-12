@@ -15,6 +15,10 @@
  * switched off, each naming the slice that switches it on. A disabled test found to pass on
  * today's engine is switched on at once.
  *
+ * Slice S5 switched on the household token tests. They run on BarnCRM's own engine: each calls
+ * `GivingRollupTestData.useOwnEngine()` first, which routes `RollupService` to `RollupEngine` for
+ * that test only, until slice S8 swaps the engine for everyone and removes the call.
+ *
  * The `Account__c > {Household}` alternative resolves a person stored as an account, which needs
  * a Person Account org; it is not covered here.
  */
@@ -108,13 +112,12 @@ private class RollupRegressionHouseholdsTest {
     // ------------------------------------------------------------------- household soft credits
 
     /**
-     * DISABLED until slice S5 (calculator: household tokens). Add `@IsTest` back in that slice.
-     *
      * Ana solicited Wei's gift. In contact mode her household's soft credit total and count
      * include her credit, reached through `Contact__c > {Household}`.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aSoftCreditLandsOnTheHouseholdInContactMode() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
             'Ana',
@@ -139,13 +142,12 @@ private class RollupRegressionHouseholdsTest {
     }
 
     /**
-     * DISABLED until slice S5 (calculator: household tokens). Add `@IsTest` back in that slice.
-     *
      * The same credit in junction mode, where `{Household}` is the membership row rather than the
      * contact's account: the same definition, the same answer.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aSoftCreditLandsOnTheHouseholdInJunctionMode() {
+        GivingRollupTestData.useOwnEngine();
         RecognitionTestData.useJunctionMembership();
         Account garcia = RecognitionTestData.household('The Garcia Family');
         Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
@@ -165,15 +167,14 @@ private class RollupRegressionHouseholdsTest {
     }
 
     /**
-     * DISABLED until slice S5 (calculator: household tokens). Add `@IsTest` back in that slice.
-     *
      * Ana gives 500 and Luis, in her household, is credited for it automatically. 200 of the gift
      * goes back, and the negative gift carries a negative credit for Luis (R-SC5). The household
      * soft credit total nets to 300 and the count stays at one, as the giving totals do
      * (ADR-0022, ADR-0023).
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aRefundedCreditNetsOutOfTheHouseholdTotal() {
+        GivingRollupTestData.useOwnEngine();
         RecognitionTestData.setAutomaticHouseholdCredits(true);
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
@@ -271,13 +272,12 @@ private class RollupRegressionHouseholdsTest {
     }
 
     /**
-     * DISABLED until slice S5 (calculator: household tokens). Add `@IsTest` back in that slice.
-     *
      * Two hundred soft credits, ten each for twenty solicitors in twenty households, recalculated
      * in one run. Every household is right (plan Section 7.2).
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void twoHundredSoftCreditsReachTwentyHouseholds() {
+        GivingRollupTestData.useOwnEngine();
         List<String> names = new List<String>();
         for (Integer i = 0; i < 20; i++) {
             names.add('Solicitor' + i);
