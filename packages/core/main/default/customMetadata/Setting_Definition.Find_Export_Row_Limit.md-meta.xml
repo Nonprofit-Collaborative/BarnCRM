@@ -34,4 +34,8 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">40.0</value>
   </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
 </CustomMetadata>
