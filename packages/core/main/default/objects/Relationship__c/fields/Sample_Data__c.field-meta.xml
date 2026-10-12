@@ -10,6 +10,6 @@
   </description>
   <inlineHelpText>
     Checked for connections between sample people created by the sample data loader. Remove sample data from
-    Nonprofit Settings to delete every record with this box checked.
+    Open Impact Settings to delete every record with this box checked.
   </inlineHelpText>
 </CustomField>

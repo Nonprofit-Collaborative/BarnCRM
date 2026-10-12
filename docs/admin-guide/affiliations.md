@@ -18,7 +18,7 @@ Affiliations is part of Core and is on as soon as Open Impact is installed. Ther
 to install, no Setup step, and no setting to choose: an affiliation means the same thing in
 every organization, so there is nothing to configure.
 
-On the **Automation** page in Nonprofit Settings you will see two rows for affiliations,
+On the **Automation** page in Open Impact Settings you will see two rows for affiliations,
 both switched on as they ship:
 
 - **Check affiliations before they are saved.** The rules: an affiliation names one person
@@ -35,12 +35,12 @@ They are two rows on purpose. Switching the upkeep off before a large import, wh
 usual reason to touch it, leaves every check running.
 
 To let your team see and manage affiliations, make sure they have one of the packaged access
-levels (Nonprofit Admin, Fundraising Staff, or Program Staff) on the **Access** page in
-Nonprofit Settings. Read Only users see affiliations and cannot change them.
+levels (Open Impact Admin, Fundraising Staff, or Program Staff) on the **Access** page in
+Open Impact Settings. Read Only users see affiliations and cannot change them.
 
 Affiliations appear in three places once you are set up: an **Affiliations** card on every
 person's record, an **Affiliations** card on every organization's record showing the people
-connected to it, and an **Affiliations** tab in the Nonprofit Hub app for reporting and list
+connected to it, and an **Affiliations** tab in the Open Impact app for reporting and list
 views. Every person also carries a **Primary Affiliation** field holding the one organization
 they are chiefly associated with, which you can put on a list view or a mail merge.
 
@@ -49,7 +49,7 @@ they are chiefly associated with, which you can put on a list view or a mail mer
 You are Maria. Your Development Director is preparing a corporate matching gift ask and needs
 to know who among your donors works where. Start from the sample data.
 
-1. Open the **Nonprofit Hub** app and choose **Households**. Open **The Garcia Family** and
+1. Open the **Open Impact** app and choose **Households**. Open **The Garcia Family** and
    choose **Harper Garcia**.
 2. Scroll to the **Affiliations** card. It is empty, and it says "No affiliations on file
    yet."
@@ -111,5 +111,5 @@ already has an affiliation with The Union Foundation as Program Officer covering
 Open AF-000123 to change it." End the first one before you start the second.
 
 **Looking for a setting to turn on.** There is not one. Affiliations behaves the same way in
-every organization, so nothing is exposed in Nonprofit Settings, and there is nothing you can
+every organization, so nothing is exposed in Open Impact Settings, and there is nothing you can
 get wrong by leaving it alone.

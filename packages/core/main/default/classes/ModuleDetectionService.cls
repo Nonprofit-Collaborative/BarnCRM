@@ -44,19 +44,6 @@ public with sharing class ModuleDetectionService {
         return objectExists(GIVING_FUND_OBJECT) && objectExists(GIVING_APPEAL_OBJECT);
     }
 
-    /**
-     * The fund object's API name, or null when it is not in this org. Resolved by describe,
-     * matching on the unqualified name so that a namespaced installation still answers.
-     */
-    public static String fundObjectName() {
-        return resolveObject(GIVING_FUND_OBJECT);
-    }
-
-    /** The appeal object's API name, or null when it is not in this org. */
-    public static String appealObjectName() {
-        return resolveObject(GIVING_APPEAL_OBJECT);
-    }
-
     /** True when the Import framework's staging object is in this org, so the Import tab is worth linking to. */
     public static Boolean isImportPresent() {
         return objectExists(IMPORT_BATCH_OBJECT);

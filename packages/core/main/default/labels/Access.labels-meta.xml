@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when removing the only remaining Nonprofit Admin</shortDescription>
-        <value>You cannot remove the last person from the Nonprofit Admin role. Give the role to someone else first.</value>
+        <value>You cannot remove the last person from the Open Impact Admin role. Give the role to someone else first.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorNoPermission</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when the user may not change roles</shortDescription>
-        <value>You do not have permission to change roles. The Manage Nonprofit Settings permission is required, and it comes with the Nonprofit Admin role.</value>
+        <value>You do not have permission to change roles. The Manage Open Impact Settings permission is required, and it comes with the Open Impact Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorRoleNotFound</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when the person is not allowed to read the roles at all</shortDescription>
-        <value>You can see this page but you cannot see who holds each role. Ask someone with the Nonprofit Admin role to tell you, or to give you that role.</value>
+        <value>You can see this page but you cannot see who holds each role. Ask someone with the Open Impact Admin role to tell you, or to give you that role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorUnexpected</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: notice shown to a user who may look but not change roles</shortDescription>
-        <value>You can see this page but you cannot change roles. Ask someone with the Nonprofit Admin role to make the change, or to give you that role.</value>
+        <value>You can see this page but you cannot change roles. Ask someone with the Open Impact Admin role to make the change, or to give you that role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_RemoveButton</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: warning shown before someone removes their own admin role</shortDescription>
-        <value>You are about to remove your own Nonprofit Admin role. You will lose access to Nonprofit Settings.</value>
+        <value>You are about to remove your own Open Impact Admin role. You will lose access to Open Impact Settings.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ToastErrorTitle</fullName>

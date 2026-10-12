@@ -3,7 +3,7 @@
   <description>
     For whoever schedules and tracks volunteers. Day to day work with people, households, and
     organizations, and with volunteer shifts and hours once the Volunteers module is turned on. Does
-    not include Nonprofit Settings.
+    not include Open Impact Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Volunteer Coordinator</label>

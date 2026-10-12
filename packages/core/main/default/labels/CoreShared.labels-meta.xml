@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation change not permitted</shortDescription>
-        <value>You do not have permission to change automation. Ask your administrator for the Manage Nonprofit Settings permission.</value>
+        <value>You do not have permission to change automation. Ask your administrator for the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Automation_NotFound</fullName>

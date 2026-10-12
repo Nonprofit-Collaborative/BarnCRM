@@ -2,8 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Default_Fund__c</fullName>
   <description>
-    The record identifier of the fund a gift is allocated to when nobody says otherwise. Written
-    only when the Giving module is present.
+    The record identifier of the fund a gift is allocated to when nobody says otherwise.
   </description>
   <externalId>false</externalId>
   <label>Default Fund</label>

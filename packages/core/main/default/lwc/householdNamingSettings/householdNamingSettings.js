@@ -157,7 +157,7 @@ export default class HouseholdNamingSettings extends LightningElement {
         this.errorMessage = undefined;
         this.toast(SAVED, 'success');
         // The Setup Assistant embeds this panel and listens for "save" to tick its naming
-        // step, the same event name setupStepIdentity dispatches for the same purpose.
+        // step, the same event name setupStepFields dispatches for the same purpose.
         this.dispatchEvent(new CustomEvent('save', { detail: { values } }));
       })
       .catch((error) => {

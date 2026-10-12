@@ -9,6 +9,6 @@
   </description>
   <inlineHelpText>
     Checked for households and organizations created by the sample data loader. Remove sample
-    data from Nonprofit Settings to delete every record with this box checked.
+    data from Open Impact Settings to delete every record with this box checked.
   </inlineHelpText>
 </CustomField>

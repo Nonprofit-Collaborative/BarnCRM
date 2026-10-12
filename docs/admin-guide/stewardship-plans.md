@@ -26,7 +26,7 @@ Three things to hold on to, because they are the questions people ask first:
 
 Everything is in the app. You never open Setup.
 
-Open **Nonprofit Settings**, choose the **Giving** section, and open **Stewardship plans**.
+Open **Open Impact Settings**, choose the **Giving** section, and open **Stewardship plans**.
 The page lists every plan you have written down, how many steps each one lays out, how many
 copies of it are running right now, and whether it is switched on.
 
@@ -67,7 +67,7 @@ laid out, and none of them changes when you edit it.
 
 ## A five-minute walkthrough
 
-1. Open **Nonprofit Settings**, **Giving**, **Stewardship plans**, and choose **New plan**.
+1. Open **Open Impact Settings**, **Giving**, **Stewardship plans**, and choose **New plan**.
    Call it "First gift welcome", key `first_gift_welcome`, started by **First gift**, no
    smallest gift. Leave **On** unchecked and save.
 2. Choose the plan in the list, then add three steps:
@@ -94,7 +94,7 @@ laid out, and none of them changes when you edit it.
   is still running. Mark the running one complete or cancelled first. This is what stops a
   donor getting the same three tasks every time they give.
 - **Expecting a bulk import to start hundreds of plans.** Switch stewardship off before a
-  bulk load, on the **Automation** page in Nonprofit Settings, and the records load quietly.
+  bulk load, on the **Automation** page in Open Impact Settings, and the records load quietly.
   There are two switches, one for gifts and one for commitments, so stopping a year of
   gifts does not stop the pledges your team enters by hand. Switching either back on does
   not catch up what it missed: a welcome for a gift from three weeks ago is not a welcome.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
-  <description>The households a nonprofit serves.</description>
+  <description>The households you serve.</description>
   <flexiPage>Households</flexiPage>
   <label>Households</label>
   <motif>Custom2: Sun</motif>

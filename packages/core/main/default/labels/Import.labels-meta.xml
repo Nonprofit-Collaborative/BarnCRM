@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: refused because the user lacks Manage Nonprofit Settings</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to import. Ask whoever set up your org for the Nonprofit Admin role.</value>
+        <value>You need the Manage Open Impact Settings permission to import. Ask whoever set up your org for the Open Impact Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogDryRunHeader</fullName>
@@ -502,7 +502,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import page: shown to a user without the permission</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to import. Ask whoever set up your org for the Nonprofit Admin role.</value>
+        <value>You need the Manage Open Impact Settings permission to import. Ask whoever set up your org for the Open Impact Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LoadingAltText</fullName>
@@ -606,7 +606,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import undo journal: kept, something was added since</shortDescription>
-        <value>Kept: something recorded after the import points at this record, such as a gift, an activity or a relationship.</value>
+        <value>Kept: something recorded after the import points at this record, such as an activity or a relationship.</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoKeptHasPeople</fullName>
@@ -806,7 +806,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what marking a file recurring does</shortDescription>
-        <value>The Nonprofit Hub lists regular files with the date each was last imported. Nothing is loaded automatically.</value>
+        <value>The Open Impact home page lists regular files with the date each was last imported. Nothing is loaded automatically.</value>
     </labels>
     <labels>
         <fullName>Core_Import_SourceNameLabel</fullName>
@@ -966,7 +966,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: donation matching help</shortDescription>
-        <value>When a gift pays a pledge or a recurring gift the donor already has, Open Impact can link the two. Leave the numbers empty to use Nonprofit Settings.</value>
+        <value>When a gift pays a pledge or a recurring gift the donor already has, Open Impact can link the two. Leave the numbers empty to use Open Impact Settings.</value>
     </labels>
     <labels>
         <fullName>Core_Import_DonationMatchingLabel</fullName>

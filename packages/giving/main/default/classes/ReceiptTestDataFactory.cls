@@ -101,10 +101,7 @@ public class ReceiptTestDataFactory {
         Nonprofit_Settings__c core = Nonprofit_Settings__c.getOrgDefaults();
         core.SetupOwnerId = UserInfo.getOrganizationId();
         core.Organization_Legal_Name__c = 'Hope For Homes';
-        core.Organization_EIN__c = '12-3456789';
         core.Organization_Address__c = '14 Bridge Street, Springfield';
-        core.Receipt_Signer_Name__c = 'Tom Alvarez';
-        core.Receipt_Signer_Title__c = 'Executive Director';
         upsert core;
 
         Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
@@ -112,6 +109,9 @@ public class ReceiptTestDataFactory {
         giving.Receipt_Number_Prefix__c = 'HFH';
         giving.Receipt_Next_Counter__c = 1;
         giving.Receipt_Place_Of_Issue__c = 'Springfield';
+        giving.Organization_EIN__c = '12-3456789';
+        giving.Receipt_Signer_Name__c = 'Tom Alvarez';
+        giving.Receipt_Signer_Title__c = 'Executive Director';
         upsert giving;
 
         insert new List<Receipt_Template__c>{

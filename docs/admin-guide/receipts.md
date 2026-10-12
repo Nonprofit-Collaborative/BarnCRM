@@ -17,11 +17,11 @@ it.
 
 ## How to turn it on
 
-Everything is on one page: **Nonprofit Hub, then Nonprofit Settings, then Receipts**.
+Everything is on one page: **Open Impact, then Open Impact Settings, then Receipts**.
 
 ### 1. Check your organization details
 
-The Organization section of Nonprofit Settings holds your legal name, your tax
+The Organization section of Open Impact Settings holds your legal name, your tax
 identification number, your address, your logo, your signature image, and the name and
 title of whoever signs your letters. A receipt prints these. If you completed the Setup
 Assistant they are already filled in. If your legal name is blank, receipts will not
@@ -96,7 +96,7 @@ sentences are what makes the document a valid receipt.
 On the Access page, **Giving Staff** and **Giving Admin** can issue, void and reissue
 receipts and start a run. Everyone with any Giving permission set can read receipts and open
 the stored files. **Nobody can edit or delete an issued receipt or its file**, including
-Nonprofit Admin. That is not an oversight, and there is no switch for it.
+Open Impact Admin. That is not an oversight, and there is no switch for it.
 
 **Who can open a receipt PDF, exactly.** The file is attached to the **Receipt** record, and
 for a single gift receipt to the **Gift** as well. It is not attached to the donor's household
@@ -110,17 +110,17 @@ not be in the Files list of a record that everybody reads.
 To get to a donor's documents, open the donor, then the **Receipts** related list, then the
 receipt, then the file on it.
 
-**Editing the letters needs the Nonprofit Admin role.** Writing the letter every donor
+**Editing the letters needs the Open Impact Admin role.** Writing the letter every donor
 receives is configuration, so saving a letter, switching one on, and restoring the shipped
-letters all need the Manage Nonprofit Settings permission, exactly like every other page in
-Nonprofit Settings. Issuing receipts does not: that is day to day work and needs only Giving
+letters all need the Manage Open Impact Settings permission, exactly like every other page in
+Open Impact Settings. Issuing receipts does not: that is day to day work and needs only Giving
 Staff.
 
 ## A five-minute walkthrough
 
 Start from the sample data.
 
-1. Open **Nonprofit Settings**, then **Receipts**. Set the prefix to `TEST`, leave the next
+1. Open **Open Impact Settings**, then **Receipts**. Set the prefix to `TEST`, leave the next
    counter at 1, and set the statement year to last year.
 2. Open **Receipt letters and year end statements**, and on the **Receipt templates** tab
    check that a letter of each kind is in use. If one is not, pick it and click **Use this
@@ -142,7 +142,7 @@ Start from the sample data.
    both files and compare them.
 7. Go to the **Receipts** tab and look at the two records. The voided one points at its
    replacement, the replacement points back at what it replaces.
-8. Back in Nonprofit Settings, under Receipts, choose **Receipt letters and year end
+8. Back in Open Impact Settings, under Receipts, choose **Receipt letters and year end
    statements** again, open the **Year end statements** tab, check
    the statement year, and click **Generate**. A run appears in the list below and counts up
    as it goes; **Refresh** updates it. When it finishes, open a household with several gifts

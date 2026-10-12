@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Section__c</fullName>
   <description>
-    The left navigation group this row belongs to in the Nonprofit Settings console, for example
+    The left navigation group this row belongs to in the Open Impact Settings console, for example
     Households, Automation, Access, Health.
   </description>
   <externalId>false</externalId>

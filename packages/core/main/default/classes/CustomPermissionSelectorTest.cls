@@ -1,8 +1,7 @@
 /**
  * Tests for CustomPermissionSelector (feature C-11, ADR-0024).
  *
- * The permission the finding exists for, `Override_Receipt_Lock`, ships in the Giving package
- * and a custom permission cannot be created with DML, so the selector is exercised two ways:
+ * A custom permission cannot be created with DML, so the selector is exercised two ways:
  * against a name no package ships, which is exactly the shape of a Platform-only org, and
  * against a permission Core does ship, granted to a user the test creates, which is the only
  * way to prove the four queries actually find a holder and name them.
@@ -37,35 +36,6 @@ private class CustomPermissionSelectorTest {
             0,
             holders.names.size(),
             'With no holders there are no names to print.'
-        );
-    }
-
-    @IsTest
-    static void theReceiptLockOverrideIsGrantedToNobodyByThePackage() {
-        List<CustomPermission> shipped = [
-            SELECT Id, NamespacePrefix
-            FROM CustomPermission
-            WHERE DeveloperName = :HealthCheckService.OVERRIDE_RECEIPT_LOCK
-        ];
-
-        CustomPermissionSelector.Holders holders = CustomPermissionSelector.holders(
-            HealthCheckService.OVERRIDE_RECEIPT_LOCK
-        );
-
-        System.assertEquals(
-            0,
-            holders.total,
-            shipped.isEmpty()
-                ? 'Giving is not deployed in this org, so the override permission does not ' +
-                  'exist and nobody can be holding it.'
-                : 'ADR-0024: the package ships Override Receipt Lock on no permission set and ' +
-                  'in no permission set group, so a freshly deployed org has no holders.'
-        );
-        System.assertEquals(
-            true,
-            holders.readable,
-            'Either way the question was answerable, which is what lets Health Check say ' +
-            'nothing rather than say nothing is wrong.'
         );
     }
 

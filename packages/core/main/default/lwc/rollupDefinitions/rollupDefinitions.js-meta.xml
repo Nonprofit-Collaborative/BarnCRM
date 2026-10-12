@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Rollups page of the Nonprofit Settings console: every total Open Impact keeps up to date,
+    The Rollups page of the Open Impact Settings console: every total Open Impact keeps up to date,
     what each one counts, when it was last calculated, and the nightly recalculation.
   </description>
   <isExposed>true</isExposed>

@@ -52,17 +52,18 @@ private class ModuleDetectionServiceTest {
     static void answersHonestlyOnACoreOnlyOrg() {
         Test.startTest();
         Boolean givingPresent = ModuleDetectionService.isGivingPresent();
-        String fund = ModuleDetectionService.fundObjectName();
-        String appeal = ModuleDetectionService.appealObjectName();
+        Boolean givingListed;
+        for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
+            if (module.name == 'Giving') {
+                givingListed = module.present;
+            }
+        }
         Test.stopTest();
 
         Assert.areEqual(
             givingPresent,
-            fund != null && appeal != null,
-            'The object names are given out exactly when the objects are there'
+            givingListed,
+            'The module list and the Giving check give the same answer'
         );
-        if (!givingPresent) {
-            Assert.isNull(fund, 'Core never names a Giving object that is not in the org');
-        }
     }
 }

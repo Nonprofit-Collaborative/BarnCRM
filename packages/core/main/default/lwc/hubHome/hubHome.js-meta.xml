@@ -2,9 +2,9 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <isExposed>true</isExposed>
-  <masterLabel>Nonprofit Hub Home</masterLabel>
+  <masterLabel>Open Impact Home</masterLabel>
   <description>
-    The Nonprofit Hub home page: welcome, setup checklist, paused automation banner, errors
+    The Open Impact home page: welcome, setup checklist, paused automation banner, errors
     to review, and quick links.
   </description>
   <targets>

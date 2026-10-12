@@ -61,7 +61,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * R-F1 and R-F4: the flag on the fund and the Default Fund key in Nonprofit Settings are two
+     * R-F1 and R-F4: the flag on the fund and the Default Fund key in Giving settings are two
      * faces of one decision, so marking a fund writes both. Otherwise the key silently wins and
      * ticking the box does nothing, which is what the funds guide promises it will not do.
      */
@@ -110,15 +110,14 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
      * case where dropping the flag should empty the key.
      */
     private Boolean stillTheStoredDefault(Set<Id> droppedDefaults) {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
-        String stored = settings == null ? null : settings.Default_Fund__c;
+        String stored = Giving_Settings__c.getOrgDefaults().Default_Fund__c;
         return String.isNotBlank(stored) && droppedDefaults.contains((Id) stored);
     }
 
     private void writeSettingsKey(Id fundId) {
         try {
             SettingsService.saveValues(
-                'Nonprofit_Settings__c',
+                'Giving_Settings__c',
                 new Map<String, Object>{
                     'Default_Fund__c' => fundId == null ? null : String.valueOf(fundId)
                 }

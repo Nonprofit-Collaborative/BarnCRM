@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule change refused without Manage Nonprofit Settings</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the Nonprofit Admin access level.</value>
+        <value>You need the Manage Open Impact Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the Open Impact Admin access level.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_ReadOnly</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Note shown to a user who can see the panel but not change it</shortDescription>
-        <value>You can see when the swap last ran. Changing the schedule needs the Manage Nonprofit Settings permission.</value>
+        <value>You can see when the swap last ran. Changing the schedule needs the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_RunNow</fullName>

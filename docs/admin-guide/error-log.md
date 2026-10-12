@@ -12,7 +12,7 @@ have fixed, so the list stays short and honest.
 
 ## What you will see in v0.1
 
-This page describes the finished feature. The Nonprofit Hub app and its home page, where
+This page describes the finished feature. The Open Impact app and its home page, where
 the tile lives, are built by feature C-03. Until then the Error Log tab is the way in, and
 the tile can be placed on any Lightning page. Everything else on this page works today.
 
@@ -23,14 +23,14 @@ something actually fails, so on a healthy organization the list is empty.
 
 You will find it in two places:
 
-- **The Nonprofit Hub home page.** A tile shows how many new errors are waiting and the
+- **The Open Impact home page.** A tile shows how many new errors are waiting and the
   five most recent, with the message and where it came from. Click any of them to open it,
   or click the tile heading to see the whole list.
-- **The Error Log tab** in the Nonprofit Hub app. This is the full list, and you can sort
+- **The Error Log tab** in the Open Impact app. This is the full list, and you can sort
   it, filter it, and build reports on it like any other list in Salesforce.
 
-Everyone with the Nonprofit Staff or Nonprofit Admin role can read the Error Log. Only the
-Nonprofit Admin role can change an entry's status.
+Everyone with the Open Impact Staff or Open Impact Admin role can read the Error Log. Only the
+Open Impact Admin role can change an entry's status.
 
 Errors are recorded whatever else is happening: turning an automation off, or pausing all
 automation, never stops the Error Log from recording a problem.
@@ -61,9 +61,9 @@ If nothing new has arrived, no email is sent at all.
 
 ### Switch it on
 
-1. Open **Nonprofit Settings** and click **Error Log** in the left navigation.
+1. Open **Open Impact Settings** and click **Error Log** in the left navigation.
 2. In **Digest recipients**, leave the box empty to send the digest to everyone who holds
-   the Manage Nonprofit Settings permission (the Nonprofit Admin role), or type the email
+   the Manage Open Impact Settings permission (the Open Impact Admin role), or type the email
    addresses of the people who should get it, separated by commas. Each address has to be
    the email address of an active user of your Salesforce: the digest is never sent to
    anyone outside it, and an address that is not a user's is refused when you save.
@@ -87,7 +87,7 @@ it.
 
 Maria has heard from a colleague that "something did not save this morning."
 
-1. Open the **Nonprofit Hub** app. On the home page, look at the **Error Log** tile. It
+1. Open the **Open Impact** app. On the home page, look at the **Error Log** tile. It
    says how many new errors there are, for example "3 new".
 2. Read the five most recent entries in the tile. Each line shows the message and where it
    came from, for example "Household naming".
@@ -116,7 +116,7 @@ Maria has heard from a colleague that "something did not save this morning."
   every day). Whoever administers your Salesforce can change the setting.
 - **Deactivating the person who scheduled the digest.** The digest runs as that person, so
   it stops. Health Check warns when a scheduled digest has not run for two days: open the
-  Error Log section of Nonprofit Settings, click **Stop**, then **Schedule** again as
+  Error Log section of Open Impact Settings, click **Stop**, then **Schedule** again as
   yourself.
 - **Marking entries Acknowledged and expecting them in the digest.** The digest counts only
   entries that are still New, because those are the ones nobody has looked at.

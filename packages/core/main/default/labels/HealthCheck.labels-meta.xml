@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown to a viewer who cannot see who else is in the org.</shortDescription>
-        <value>Who can get into the app, who can override the receipt lock, and how many errors nobody has read can only be answered by an administrator. Everything else in this report is accurate for everyone.</value>
+        <value>Who can get into the app, and how many errors nobody has read, can only be answered by an administrator. Everything else in this report is accurate for everyone.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AccessNeedsAdminTitle</fullName>
@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when the viewer cannot run the access checks.</shortDescription>
-        <value>Sign in as a Nonprofit Admin to see the access checks</value>
+        <value>Sign in as an Open Impact Admin to see the access checks</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationFix</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that the gift mirror lives in the Connect module.</shortDescription>
-        <value>This org has Agentforce Nonprofit gift objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own donor summaries to keep working alongside Open Impact, the mirror arrives with Connect in version 0.6.</value>
+        <value>This org has Agentforce Nonprofit Gift Transaction objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside Open Impact, the mirror arrives with the Connect module.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ConnectMissingTitle</fullName>
@@ -238,8 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: Setup and Open Impact fiscal year start months differ</shortDescription>
-        <value
-    >Open Impact starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total on a donor is measured from the first, and the packaged retention reports (LYBUNT, SYBUNT, new versus retained, conversion) are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
+        <value>Open Impact starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total Open Impact calculates is measured from the first, and reports grouped by fiscal year are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FiscalYearMismatchTitle</fullName>
@@ -399,7 +398,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that multiple currencies are not supported yet.</shortDescription>
-        <value>Open Impact does not convert between currencies yet. Nothing will break, but totals add up amounts as they were entered. Keep gift amounts in one currency until currency support ships.</value>
+        <value>Open Impact does not convert between currencies yet. Nothing will break, but totals add up amounts as they were entered. Keep amounts in one currency until currency support ships.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MultiCurrencyTitle</fullName>
@@ -439,7 +438,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that nobody holds the Nonprofit Admin role.</shortDescription>
-        <value>Nobody in this org has the Nonprofit Admin role, so nobody can change settings and parts of Open Impact will refuse to run. Assign it to yourself on the Access page.</value>
+        <value>Nobody in this org has the Open Impact Admin role, so nobody can change settings and parts of Open Impact will refuse to run. Assign it to yourself on the Access page.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoAdminTitle</fullName>
@@ -447,7 +446,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the missing administrator finding.</shortDescription>
-        <value>No one is assigned the Nonprofit Admin role</value>
+        <value>No one is assigned the Open Impact Admin role</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoFindings</fullName>
@@ -546,45 +545,12 @@
         <value>This org also has Nonprofit Cloud households, and Open Impact cannot see who belongs to those, so some of these may be in one.</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_OverrideLockDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: who holds the Override Receipt Lock permission</shortDescription>
-        <value
-    >The Override Receipt Lock permission lets a person change or delete a gift that already carries a receipt number. Open Impact grants it to nobody: it is meant to be assigned in Setup for one correction and taken away again. It is held by {0}. If nobody is correcting a receipted gift right now, remove it in Setup, Custom Permissions. Every change made with it is in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_OverrideLockFix</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that opens Custom Permissions in Setup from the override finding.</shortDescription>
-        <value>Open Custom Permissions in Setup</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_OverrideLockMoreNames</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: ends a list of permission holders longer than it shows</shortDescription>
-        <value>and {0} others</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_OverrideLockTitle</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check title: someone holds the Override Receipt Lock permission</shortDescription>
-        <value>Someone can override the receipt lock</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdContactDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: contacts with no account, in contact mode.</shortDescription>
-        <value>These contacts have no account, so they are in no household: their gifts count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>These contacts have no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail</fullName>
@@ -592,7 +558,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: people with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names these people, so they are in no household: their gifts count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>No current household membership names these people, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdTitle</fullName>
@@ -608,7 +574,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when someone without the permission tries to change a setting.</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to change this. Ask an administrator for the Nonprofit Admin role.</value>
+        <value>You need the Manage Open Impact Settings permission to change this. Ask an administrator for the Open Impact Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PersonAccountsDetected</fullName>
@@ -624,39 +590,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown to someone who can read the report but not act on it.</shortDescription>
-        <value>You can read this report but not change anything. Ask an administrator for the Manage Nonprofit Settings permission.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ReceiptFailedManyDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains that receipt generation has failed repeatedly.</shortDescription>
-        <value>{0} receipts are recorded as Void with the reason Generation failed, which means receipt generation has failed that many times and those donors are still waiting for their documents. Read the receipt entries in the Error Log, fix what they name, and run the receipts again. Leave the void records alone: they are what accounts for the numbers that were used.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ReceiptFailedManyTitle</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Title of the repeated receipt generation failure finding.</shortDescription>
-        <value>{0} receipts failed to generate</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ReceiptFailedOneDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains the single reconciled receipt number, which is ordinary.</shortDescription>
-        <value>One receipt is recorded as Void with the reason Generation failed. That is the record of a number that was handed out to a document which never generated, and a single one is ordinary rather than a problem. The Error Log says what went wrong, and the receipt can be run again once it is fixed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ReceiptFailedOneTitle</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Title of the single receipt generation failure finding.</shortDescription>
-        <value>One receipt number was used by a run that failed</value>
+        <value>You can read this report but not change anything. Ask an administrator for the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RecommendedModeLabel</fullName>
@@ -680,7 +614,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: shipped rollups missing. {0} count, {1} names.</shortDescription>
-        <value>Open Impact ships totals this org does not have: {1}. The fix creates each one exactly as shipped, and each starts calculating donor totals straight away. Your own totals are not touched.</value>
+        <value>Open Impact ships totals this org does not have: {1}. The fix creates each one exactly as shipped, and each starts calculating straight away. Your own totals are not touched.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupsMissingFix</fullName>
@@ -744,7 +678,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: automation switches missing. {0} count, {1} names.</shortDescription>
-        <value>These automations run but have no switch on the Automation page, so they cannot be turned off there: {1}. The fix creates each switch set to its shipped default, so nothing that runs now stops. An automation that enforces a rule, such as the receipt lock, is listed with its switch locked, because it always runs. Switches you already have keep their setting.</value>
+        <value>These automations run but have no switch on the Automation page, so they cannot be turned off there: {1}. The fix creates each switch set to its shipped default, so nothing that runs now stops. An automation that enforces a rule is listed with its switch locked, because it always runs. Switches you already have keep their setting.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SwitchesMissingFix</fullName>
@@ -816,7 +750,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that active users hold no Open Impact role.</shortDescription>
-        <value>{0} active users have a Salesforce license but none of the Open Impact roles, so the Nonprofit Hub is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use Open Impact.</value>
+        <value>{0} active users have a Salesforce license but none of the Open Impact roles, so the Open Impact app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use Open Impact.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_UsersWithoutAccessTitle</fullName>

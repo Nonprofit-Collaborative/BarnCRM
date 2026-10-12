@@ -20,8 +20,8 @@ every time a household's membership changes, every time an address is saved, and
 new person would otherwise get a household of their own. Health Check reads your org every
 time it runs.
 
-1. Open the **Nonprofit Hub** app.
-2. Click the **Nonprofit Settings** tab.
+1. Open the **Open Impact** app.
+2. Click the **Open Impact Settings** tab.
 3. Choose **Health** in the left navigation.
 4. Read the **What we found in your org** card. If your org has households built the
    Nonprofit Cloud way, the card says so and gives you the number it counted, as information:
@@ -41,7 +41,7 @@ that was never its to tidy.
 Maria has installed Open Impact into an org that has been running Nonprofit Cloud for two
 years. Her colleagues have been grouping families there the whole time.
 
-1. Maria opens the **Nonprofit Hub** app, clicks **Nonprofit Settings**, and chooses
+1. Maria opens the **Open Impact** app, clicks **Open Impact Settings**, and chooses
    **Health**.
 2. The **What we found in your org** card tells her that this org already has households
    built the Nonprofit Cloud way, and how many.

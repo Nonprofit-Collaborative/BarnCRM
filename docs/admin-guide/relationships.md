@@ -17,7 +17,7 @@ connection is current while the matching record says it ended two years ago.
 Relationships is part of Core and is on as soon as Open Impact is installed. There is
 nothing to install and no Setup step.
 
-1. Open the **Nonprofit Hub** app and choose **Nonprofit Settings**.
+1. Open the **Open Impact** app and choose **Open Impact Settings**.
 2. In the left navigation choose **Relationships**.
 3. Leave **Keep both sides of relationships in step** switched on, which is how it ships.
    Switch it off only if your organization deliberately keeps one side of every connection,
@@ -25,7 +25,7 @@ nothing to install and no Setup step.
    writing the same records.
 4. Choose **Save**. The change applies to the next relationship you save.
 
-On the **Automation** page in Nonprofit Settings you will see two rows for relationships
+On the **Automation** page in Open Impact Settings you will see two rows for relationships
 rather than one:
 
 - **Check relationships before saving.** The rules: a relationship is between two
@@ -40,11 +40,11 @@ They are two rows on purpose. Switching the upkeep off before a large import, wh
 usual reason to touch it, leaves every check running.
 
 To let your team see and manage relationships, make sure they have one of the packaged
-access levels (Nonprofit Admin, Fundraising Staff, or Program Staff) on the **Access** page
-in Nonprofit Settings. Read Only users see relationships and cannot change them.
+access levels (Open Impact Admin, Fundraising Staff, or Program Staff) on the **Access** page
+in Open Impact Settings. Read Only users see relationships and cannot change them.
 
 Relationships appear in two places once you are set up: a **Relationships** card on every
-person's record, and a **Relationships** tab in the Nonprofit Hub app for reporting and
+person's record, and a **Relationships** tab in the Open Impact app for reporting and
 list views.
 
 ### The types you can choose, and what the other side becomes
@@ -71,7 +71,7 @@ You are Maria. Your Executive Director wants to know which of your donors are re
 each other before the gala seating is decided, and the Garcia family keeps coming up. Start
 from the sample data.
 
-1. Open the **Nonprofit Hub** app and choose **Households**. Open **The Garcia Family** and
+1. Open the **Open Impact** app and choose **Households**. Open **The Garcia Family** and
    choose the person named **Harper Garcia**.
 2. Scroll to the **Relationships** card. It is empty, and it says "No relationships on file
    yet."
@@ -134,7 +134,7 @@ also stop the mirroring for one relationship only, without changing the setting 
 clear **Keep both sides in step** on that one record.
 
 **Nothing mirrors and you never touched the setting.** In releases before v0.3 the setting
-could be stored as off without anyone switching it off, if Nonprofit Settings had been saved
-for some other reason. Open Nonprofit Settings, Relationships, and check that **Keep both
+could be stored as off without anyone switching it off, if Open Impact Settings had been saved
+for some other reason. Open Open Impact Settings, Relationships, and check that **Keep both
 sides of a relationship in step** is on. Relationships entered while it was off stayed one
 sided: re-save one and its other side is written.

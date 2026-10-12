@@ -4,7 +4,7 @@
  */
 @IsTest
 private class AccessServiceTest {
-    private static final String FUNDRAISING_ROLE = 'Fundraising_Staff';
+    private static final String PROGRAM_ROLE = 'Program_Staff';
 
     /**
      * Builds an unassigned active user without inserting it.
@@ -65,66 +65,66 @@ private class AccessServiceTest {
 
     @IsTest
     static void assignRoleGivesThePersonTheRole() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
 
         Test.startTest();
-        AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.assignRole(david.Id, PROGRAM_ROLE);
         Test.stopTest();
 
         Assert.areEqual(
             1,
-            countAssignments(david.Id, FUNDRAISING_ROLE),
-            'David should hold the Fundraising Staff role once Maria has given it to him.'
+            countAssignments(david.Id, PROGRAM_ROLE),
+            'David should hold the Program Staff role once Maria has given it to him.'
         );
     }
 
     @IsTest
     static void assignRoleTwiceChangesNothingTheSecondTime() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
-        AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.assignRole(david.Id, PROGRAM_ROLE);
 
         Test.startTest();
-        AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.assignRole(david.Id, PROGRAM_ROLE);
         Test.stopTest();
 
         Assert.areEqual(
             1,
-            countAssignments(david.Id, FUNDRAISING_ROLE),
+            countAssignments(david.Id, PROGRAM_ROLE),
             'Giving David a role he already holds should leave exactly one assignment.'
         );
     }
 
     @IsTest
     static void removeRoleTakesTheRoleAway() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
-        AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.assignRole(david.Id, PROGRAM_ROLE);
 
         Test.startTest();
-        AccessService.removeRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.removeRole(david.Id, PROGRAM_ROLE);
         Test.stopTest();
 
         Assert.areEqual(
             0,
-            countAssignments(david.Id, FUNDRAISING_ROLE),
-            'David should not hold the Fundraising Staff role after Maria removes it.'
+            countAssignments(david.Id, PROGRAM_ROLE),
+            'David should not hold the Program Staff role after Maria removes it.'
         );
     }
 
     @IsTest
     static void removeRoleThePersonDoesNotHoldIsNotAnError() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
 
         Test.startTest();
-        AccessService.removeRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.removeRole(david.Id, PROGRAM_ROLE);
         Test.stopTest();
 
         Assert.areEqual(
             0,
-            countAssignments(david.Id, FUNDRAISING_ROLE),
+            countAssignments(david.Id, PROGRAM_ROLE),
             'Removing a role nobody holds should leave the org unchanged.'
         );
     }
@@ -179,7 +179,7 @@ private class AccessServiceTest {
 
     @IsTest
     static void assignRoleRefusesSomebodyWhoCanNoLongerSignIn() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
         david.IsActive = false;
         update david;
@@ -187,7 +187,7 @@ private class AccessServiceTest {
 
         Test.startTest();
         try {
-            AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+            AccessService.assignRole(david.Id, PROGRAM_ROLE);
             Assert.fail('A deactivated person should not be given a role.');
         } catch (AccessService.AccessException e) {
             message = e.getMessage();
@@ -201,7 +201,7 @@ private class AccessServiceTest {
         );
         Assert.areEqual(
             0,
-            countAssignments(david.Id, FUNDRAISING_ROLE),
+            countAssignments(david.Id, PROGRAM_ROLE),
             'A deactivated person should hold no role.'
         );
     }
@@ -249,17 +249,14 @@ private class AccessServiceTest {
             names.contains(AccessService.ADMIN_ROLE),
             'The Nonprofit Admin role should be one of the packaged roles.'
         );
-        Assert.isTrue(
-            names.contains(FUNDRAISING_ROLE),
-            'The Fundraising Staff role should be packaged.'
-        );
+        Assert.isTrue(names.contains(PROGRAM_ROLE), 'The Program Staff role should be packaged.');
     }
 
     @IsTest
     static void getAssignmentsListsThePeopleInEachRole() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
-        AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+        AccessService.assignRole(david.Id, PROGRAM_ROLE);
 
         Test.startTest();
         List<AccessService.RoleAssignments> assignments = AccessService.getAssignments();
@@ -267,21 +264,18 @@ private class AccessServiceTest {
 
         Boolean davidIsListed = false;
         for (AccessService.RoleAssignments entry : assignments) {
-            if (FUNDRAISING_ROLE.equals(entry.roleDeveloperName)) {
+            if (PROGRAM_ROLE.equals(entry.roleDeveloperName)) {
                 for (AccessService.UserSummary summary : entry.users) {
                     davidIsListed = davidIsListed || summary.userId == david.Id;
                 }
             }
         }
-        Assert.isTrue(
-            davidIsListed,
-            'David should appear under Fundraising Staff on the Access page.'
-        );
+        Assert.isTrue(davidIsListed, 'David should appear under Program Staff on the Access page.');
     }
 
     @IsTest
     static void aPersonWithoutThePermissionCannotChangeRoles() {
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
         User priya = insertUser('Priya', 'Nair');
         Boolean refused = false;
@@ -303,7 +297,7 @@ private class AccessServiceTest {
         Test.startTest();
         System.runAs(priya) {
             try {
-                AccessService.assignRole(david.Id, FUNDRAISING_ROLE);
+                AccessService.assignRole(david.Id, PROGRAM_ROLE);
             } catch (AccessService.AccessException e) {
                 refused = true;
             }
@@ -316,7 +310,7 @@ private class AccessServiceTest {
         );
         Assert.areEqual(
             0,
-            countAssignments(david.Id, FUNDRAISING_ROLE),
+            countAssignments(david.Id, PROGRAM_ROLE),
             'A refused attempt should leave no assignment behind.'
         );
     }
@@ -329,7 +323,7 @@ private class AccessServiceTest {
         // LICENSE_LIMIT_EXCEEDED rather than on anything this feature does. The
         // collection handling at 200 is proven without DML in
         // theAssignmentListIsBuiltInOneCollectionAtTwoHundred below.
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         List<User> staff = new List<User>();
         for (Integer i = 0; i < 5; i++) {
             staff.add(
@@ -342,14 +336,14 @@ private class AccessServiceTest {
         // Test.startTest resets the governor counters, so the count read inside the window
         // is already the count this call alone spent.
         Test.startTest();
-        AccessService.assignRole(staffIds, FUNDRAISING_ROLE);
+        AccessService.assignRole(staffIds, PROGRAM_ROLE);
         Integer dmlUsed = Limits.getDmlStatements();
         Test.stopTest();
 
         Integer assigned = [
             SELECT COUNT()
             FROM PermissionSetAssignment
-            WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :FUNDRAISING_ROLE
+            WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
         ];
         Assert.areEqual(5, assigned, 'All five people should have been given the role.');
         Assert.areEqual(1, dmlUsed, 'Five assignments should cost one DML statement, not five.');
@@ -399,7 +393,7 @@ private class AccessServiceTest {
     @IsTest
     static void severalPeopleHaveARoleTakenAwayInOneOperation() {
         // Five for the same license reason as the assignment test above.
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         List<User> staff = new List<User>();
         for (Integer i = 0; i < 5; i++) {
             staff.add(
@@ -408,19 +402,19 @@ private class AccessServiceTest {
         }
         insert staff;
         Set<Id> staffIds = new Map<Id, User>(staff).keySet();
-        AccessService.assignRole(staffIds, FUNDRAISING_ROLE);
+        AccessService.assignRole(staffIds, PROGRAM_ROLE);
 
         // Test.startTest resets the governor counters, so the count read inside the window
         // is already the count this call alone spent.
         Test.startTest();
-        AccessService.removeRole(staffIds, FUNDRAISING_ROLE);
+        AccessService.removeRole(staffIds, PROGRAM_ROLE);
         Integer dmlUsed = Limits.getDmlStatements();
         Test.stopTest();
 
         Integer assigned = [
             SELECT COUNT()
             FROM PermissionSetAssignment
-            WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :FUNDRAISING_ROLE
+            WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
         ];
         Assert.areEqual(0, assigned, 'All five assignments should have been removed.');
         Assert.areEqual(1, dmlUsed, 'Five removals should cost one DML statement, not five.');

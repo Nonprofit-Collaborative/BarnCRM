@@ -30,16 +30,16 @@ guess.
 
 Coexistence mode is always on: every org has a mode. What you do is confirm or change it.
 
-1. Open the **Nonprofit Hub** app.
-2. Click the **Nonprofit Settings** tab.
+1. Open the **Open Impact** app.
+2. Click the **Open Impact Settings** tab.
 3. Choose **General** in the left navigation.
 4. Find **Coexistence mode**. It shows the current mode and, underneath, what Open Impact
    detected in your org.
 5. Pick a mode and click **Save**.
 
-You need the **Manage Nonprofit Settings** permission to change it. If you do not have it,
+You need the **Manage Open Impact Settings** permission to change it. If you do not have it,
 the setting is visible but greyed out and the page tells you which permission to ask for.
-Everyone with the Nonprofit Admin role has it.
+Everyone with the Open Impact Admin role has it.
 
 There is nothing to do in Salesforce Setup. Detection happens inside the app.
 
@@ -48,7 +48,7 @@ There is nothing to do in Salesforce Setup. Detection happens inside the app.
 Maria has just installed Open Impact into her organization's Nonprofit Cloud org. Person
 Accounts are on, because that is how the org was set up for her two years ago.
 
-1. Maria opens the **Nonprofit Hub** app, clicks the **Nonprofit Settings** tab, and chooses
+1. Maria opens the **Open Impact** app, clicks the **Open Impact Settings** tab, and chooses
    **Health** in the left navigation.
 2. Health Check runs. The first card is **What we found in your org**.
 3. It reads **Person Accounts enabled. Agentforce Nonprofit objects detected.** Underneath,

@@ -23,7 +23,7 @@ once:
 
 1. Create at least one fund and mark it as the default (see the Funds page). A gift saved
    without a designation goes there.
-2. Open **Nonprofit Settings**, choose **Giving**, and check the settings on that page:
+2. Open **Open Impact Settings**, choose **Giving**, and check the settings on that page:
    **Default Fund**, **Default Appeal** (optional), and **Automatic Household Soft Credits**.
 
 Then give your fundraising staff the **Giving Staff** permission set, and give yourself
@@ -68,7 +68,7 @@ rather than in Open Impact, and every use of it is recorded.
 
 **What it is.** A custom permission called **Override Receipt Lock**. Open Impact ships it
 assigned to nobody: it is on no permission set and in no permission set group, so no role,
-including Nonprofit Admin, carries it. A user who holds it can save a change to a receipted
+including Open Impact Admin, carries it. A user who holds it can save a change to a receipted
 gift's amount, date, donor or receipt number, and can delete a receipted gift. Nobody else
 can, whatever else they are allowed to do.
 

@@ -17,13 +17,13 @@ removed and the values it changed are put back (section 5).
 
 ## 2. How to turn it on
 
-Nothing to turn on. The **Import** tab is in the Nonprofit Hub app for anyone with the
-**Manage Nonprofit Settings** permission. If you do not see the tab, ask whoever set up
-your org to give you the Nonprofit Admin role on the **Access** page.
+Nothing to turn on. The **Import** tab is in the Open Impact app for anyone with the
+**Manage Open Impact Settings** permission. If you do not see the tab, ask whoever set up
+your org to give you the Open Impact Admin role on the **Access** page.
 
 A few things are worth knowing before your first large file:
 
-1. Open **Nonprofit Settings** and choose **Import**.
+1. Open **Open Impact Settings** and choose **Import**.
 2. **Rows per chunk** controls how many rows are processed at a time. Leave it at 200.
    Lower it to 50 if your org has a lot of custom automation and an import fails with a
    limit error; raise it only if a very large file is running slowly and nothing else
@@ -46,7 +46,7 @@ Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-fr
 You need a CSV file or an Excel workbook (.xlsx). A small one is best for the first run: five
 or six rows.
 
-1. Open the **Import** tab. Select **Generic donor list**, then **Next**.
+1. Open the **Import** tab. Select **Generic contact list**, then **Next**.
 2. Select **Upload file** and choose your file. Open Impact reads the header row and shows
    you every column it found, with the first few values from the file underneath each one.
 3. Check the columns. Each column shows what Open Impact thinks it is, for example
@@ -157,7 +157,7 @@ What undo will not do, on purpose:
 An undo that stops part way, for example because of a limit error, shows **Undo failed**.
 Select **Undo** again: it finishes the job without repeating what it already did.
 
-**Days an import can be undone** in **Nonprofit Settings**, **Import**, sets the window, from
+**Days an import can be undone** in **Open Impact Settings**, **Import**, sets the window, from
 1 to 365 days. The window is fixed when an import is committed, so changing the setting only
 affects imports you commit afterwards.
 
@@ -172,7 +172,7 @@ keeps track of it for you.
    for example "Monthly processor export". The name is required while the box is ticked.
 3. Select **Next** and import the file as usual.
 
-The Nonprofit Hub home page then lists every recurring source with the date it was last
+The Open Impact home page then lists every recurring source with the date it was last
 imported, oldest first, and **Never** for one you have not loaded yet. When a date is older
 than you expect, that file has not been loaded this month.
 
@@ -232,8 +232,8 @@ counted them as would create, because a dry run saves nothing for the rule to ch
 
 **The run log says "Not loaded: you do not have access to" a field.** Your user may not
 edit that field, so its column was skipped on every row, in the dry run and in the commit, and
-the rest of each row loaded. The run log names each such field once. The Nonprofit Admin role
-lets you edit the standard fields import mappings use (see "Fields the Nonprofit Admin role
+the rest of each row loaded. The run log names each such field once. The Open Impact Admin role
+lets you edit the standard fields import mappings use (see "Fields the Open Impact Admin role
 can import" below), so this usually means a column mapped to some other field, or a user
 without that role. Ask your Salesforce administrator for edit access to the field and import
 the file again: the second import matches the people it already created and adds the
@@ -254,10 +254,10 @@ it installed, see [Importing gifts](gift-import.md).
 different total of gift amounts, from the control totals you typed. The run log gives both
 numbers. Fix the file or the totals and dry run again; the commit is refused until they agree.
 
-## Fields the Nonprofit Admin role can import
+## Fields the Open Impact Admin role can import
 
 Salesforce controls standard fields one by one, and a person with only a minimal profile
-could otherwise not write them. So the Nonprofit Admin permission set grants read and edit
+could otherwise not write them. So the Open Impact Admin permission set grants read and edit
 access to the standard fields the import mappings write:
 
 | Object | Fields |
@@ -270,7 +270,7 @@ Mailing Address and the rest) follows the contact fields of the same name, and a
 phone is the account's Phone.
 
 **Birthdate is sensitive.** It is granted so a migration file's birthdates are not lost, but
-your organization may not want everyone with Nonprofit Admin to see it. To withhold it, give
+your organization may not want everyone with Open Impact Admin to see it. To withhold it, give
 your administrators a permission set that does not include it, or ask your Salesforce
 administrator to remove Birthdate from a cloned role: the importer then skips the column and
 says so in the run log, and nothing else in Open Impact needs it.

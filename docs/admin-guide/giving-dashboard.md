@@ -22,7 +22,7 @@ else sees.
    dashboards that read that way, open the dashboard, choose **Edit**, and in **View
    dashboard as** choose a person who can see all gifts, usually the person who installed
    the package.
-3. Give people access. In Nonprofit Settings, open **Access** and assign the
+3. Give people access. In Open Impact Settings, open **Access** and assign the
    **Fundraising Staff** role, and then, in Salesforce Setup, the Giving module's
    **Giving Staff** or **Giving Read Only** permission set. The role does not carry the
    Giving permission sets yet, and without one of them a person cannot read gifts, so the
@@ -67,7 +67,7 @@ Do this as Tom, from the sample data, after at least a few gifts exist.
 this dashboard doesn't have permission to run reports." The dashboard reads as whoever is
 looking at it, so this is a permission problem, not a dashboard problem: that person cannot
 run reports or cannot read gifts. Assign them the Fundraising Staff or Read Only role in
-Nonprofit Settings under Access, and the Giving module's permission set in Setup. See
+Open Impact Settings under Access, and the Giving module's permission set in Setup. See
 step 3 above.
 
 **The numbers look too small.** The money charts count gifts with the status **Received**,

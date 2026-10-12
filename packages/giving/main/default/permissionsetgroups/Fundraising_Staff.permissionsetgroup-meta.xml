@@ -3,7 +3,7 @@
   <description>
     For development and fundraising staff. Day to day work with people, households, and
     organizations, and with giving records once the Giving module is turned on. Does not include
-    Nonprofit Settings.
+    Open Impact Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Fundraising Staff</label>

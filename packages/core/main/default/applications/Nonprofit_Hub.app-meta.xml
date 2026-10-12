@@ -37,14 +37,14 @@
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
-    The app a nonprofit works in every day: a home page that says what to do next, the people and
-    organizations it serves, and one page for every setting.
+    The app an organization works in every day: a home page that says what to do next, the people
+    and organizations it serves, and one page for every setting.
   </description>
   <formFactors>Large</formFactors>
   <formFactors>Small</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
-  <label>Nonprofit Hub</label>
+  <label>Open Impact</label>
   <navType>Standard</navType>
   <tabs>Nonprofit_Hub_Home</tabs>
   <tabs>Households</tabs>

@@ -53,7 +53,7 @@ as yourself and once as Jen, and compare the totals the page shows. If hers is l
 setting in Setup (her role, or the organization-wide default for gifts), not something Open
 Impact can change. The page says this beside the button.
 
-Open it from **Nonprofit Settings**, **Giving**, **Accounting export**, or search the App
+Open it from **Open Impact Settings**, **Giving**, **Accounting export**, or search the App
 Launcher for **Accounting Export**. There are no settings.
 
 The **Accounting Export** permission set includes **Post Gifts**, which shows the **Mark these

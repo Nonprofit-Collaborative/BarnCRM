@@ -1,7 +1,10 @@
 /**
  * Maria works through the guided assistant: she confirms how Open Impact fits her
- * Nonprofit Cloud org, fills in what her receipts need, skips the step that is waiting for
- * the Giving module, and starts again when she wants to.
+ * Nonprofit Cloud org, records her organization's name, answers the step a module adds,
+ * skips a step, and starts again when she wants to.
+ *
+ * Each test says which modules it runs with (`SetupAssistantTestExtension`), because Core is
+ * tested both on its own and with Giving beside it (ADR-0013, ADR-0059).
  *
  * The permission the assistant checks is granted in setup, so the saving tests assert the
  * saving path itself, and David's refusal is asserted once, under `System.runAs`.
@@ -32,18 +35,22 @@ private class SetupAssistantControllerTest {
     @IsTest
     static void opensWithEveryPanelItNeeds() {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        SetupAssistantTestExtension.useNone();
 
         Test.startTest();
         SetupAssistantController.SetupState state = SetupAssistantController.getState();
         Test.stopTest();
 
-        Assert.areEqual(8, state.stepsTotal, 'The plan describes eight setup steps');
-        Assert.areEqual(8, state.steps.size(), 'Every step is sent to the page at once');
+        Assert.areEqual(7, state.stepsTotal, 'Core alone has seven setup steps');
+        Assert.areEqual(7, state.steps.size(), 'Every step is sent to the page at once');
         Assert.isNotNull(state.coexistence, 'Step one needs what detection found');
-        Assert.isNotNull(state.giving, 'Step three needs to know whether Giving is here');
-        Assert.isNotNull(state.identity, 'Step five needs the values it is going to edit');
-        Assert.areEqual(6, state.modules.size(), 'Step six lists the six Open Impact packages');
-        Assert.isNotNull(state.roles, 'Step four needs the roles it can give out');
+        Assert.areEqual(
+            2,
+            stepByKey(state.steps, 'identity').fields.size(),
+            'The organization step carries the fields it is going to edit'
+        );
+        Assert.areEqual(6, state.modules.size(), 'The modules step lists the six packages');
+        Assert.isNotNull(state.roles, 'The access step needs the roles it can give out');
         Assert.isFalse(state.isComplete, 'A fresh org has not finished setup');
     }
 
@@ -119,116 +126,212 @@ private class SetupAssistantControllerTest {
     }
 
     @IsTest
-    static void savesTheOrganizationIdentityAndFinishesStepFive() {
+    static void savesTheOrganizationIdentityAndFinishesItsStep() {
         SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useNone();
 
         Test.startTest();
-        SetupAssistantController.SetupState state = SetupAssistantController.saveOrganizationIdentity(
+        SetupAssistantController.SetupState state = SetupAssistantController.saveStepValues(
+            'identity',
             new Map<String, Object>{
                 'Organization_Legal_Name__c' => 'Riverside Community Aid',
-                'Organization_EIN__c' => '12-3456789',
-                'Receipt_Signer_Name__c' => 'Ana Ruiz'
+                'Organization_Address__c' => '1 River Road'
             }
         );
         Test.stopTest();
 
+        SetupAssistantService.Step identity = stepByKey(state.steps, 'identity');
         Assert.areEqual(
             'Riverside Community Aid',
-            state.identity.get('Organization_Legal_Name__c'),
-            'The legal name is what receipts are printed with'
+            identity.fields[0].value,
+            'The field shows the legal name Maria saved'
         );
-        Assert.isTrue(
-            stepByKey(state.steps, 'identity').completed,
-            'A receipt needs the legal name, so that is what finishes the step'
-        );
+        Assert.isTrue(identity.completed, 'The legal name is what finishes the step');
     }
 
     @IsTest
-    static void refusesAnIdentitySaveWithNothingInIt() {
-        Boolean refused = false;
-
-        Test.startTest();
-        try {
-            SetupAssistantController.saveOrganizationIdentity(
-                new Map<String, Object>{ 'Not_A_Setting__c' => 'x' }
-            );
-        } catch (AuraHandledException e) {
-            refused = true;
-        }
-        Test.stopTest();
-
-        Assert.isTrue(refused, 'Only the seven identity keys are accepted, and nothing else');
-    }
-
-    /**
-     * Asked of the org the test runs in, because Core is tested both on its own and with
-     * Giving installed beside it (ADR-0013), and each org has one right answer.
-     */
-    @IsTest
-    static void refusesGivingDefaultsWhileTheGivingModuleIsAbsent() {
-        Boolean givingPresent = ModuleDetectionService.isGivingPresent();
+    static void refusesKeysTheStepDoesNotDeclare() {
+        SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useNone();
         Boolean refused = false;
         String message;
-        SetupAssistantController.SetupState state;
 
         Test.startTest();
         try {
-            state = SetupAssistantController.saveDefaults(null, null);
+            SetupAssistantController.saveStepValues(
+                'identity',
+                new Map<String, Object>{
+                    'Not_A_Setting__c' => 'x',
+                    'Household_Name_Pattern__c' => 'The {LastName} Family'
+                }
+            );
         } catch (AuraHandledException e) {
             refused = true;
             message = e.getMessage();
         }
         Test.stopTest();
 
-        if (givingPresent) {
-            Assert.isFalse(refused, 'With Giving installed the step is open: ' + message);
-            Assert.isFalse(
-                stepByKey(state.steps, 'funddefaults').completed,
-                'And saving no fund does not finish it'
-            );
-            return;
-        }
-        Assert.isTrue(refused, 'There is no fund to point at until Giving is installed');
+        Assert.isTrue(refused, 'Only the keys the step declares are accepted');
         Assert.areEqual(
-            System.Label.Core_SetupAssistant_GivingRequiredError,
+            System.Label.Core_SetupAssistant_NothingToSaveError,
             message,
-            'The message tells Maria to install the module'
+            'A setting on another step is not saved through this one'
         );
     }
 
     @IsTest
-    static void marksTheGivingStepUnavailableWhileGivingIsAbsent() {
-        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
-        Boolean givingPresent = ModuleDetectionService.isGivingPresent();
+    static void refusesTextLongerThanTheFieldAllows() {
+        SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useNone();
+        String message;
 
         Test.startTest();
-        SetupAssistantController.SetupState state = SetupAssistantController.getState();
+        try {
+            SetupAssistantController.saveStepValues(
+                'identity',
+                new Map<String, Object>{ 'Organization_Legal_Name__c' => 'x'.repeat(256) }
+            );
+        } catch (AuraHandledException e) {
+            message = e.getMessage();
+        }
+        Test.stopTest();
+
+        Assert.isNotNull(message, 'A name longer than the field allows is refused');
+        Assert.isTrue(message.contains('255'), 'The message says how long it may be');
+        Assert.isNull(savedLegalName(), 'Nothing was saved');
+    }
+
+    @IsTest
+    static void refusesTextNotInTheShapeTheFieldAsksFor() {
+        SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useSpanningTwoObjects();
+        String message;
+
+        Test.startTest();
+        try {
+            SetupAssistantController.saveStepValues(
+                'identity',
+                new Map<String, Object>{
+                    'Organization_Legal_Name__c' => 'Riverside Community Aid',
+                    SetupAssistantTestExtension.CODE_KEY => 'abc'
+                }
+            );
+        } catch (AuraHandledException e) {
+            message = e.getMessage();
+        }
         Test.stopTest();
 
         Assert.areEqual(
-            givingPresent,
-            stepByKey(state.steps, 'funddefaults').isAvailable,
-            givingPresent
-                ? 'Step three is offered once the Giving module is here'
-                : 'Step three waits for the Giving module'
+            SetupAssistantTestExtension.CODE_PATTERN_MESSAGE,
+            message,
+            'A value saved without the page, as after an upload, is checked on the server too'
         );
+        Assert.isNull(savedLegalName(), 'Nothing in the step was saved');
+    }
+
+    @IsTest
+    static void aStepSpanningTwoSettingsObjectsSavesAllOrNothing() {
+        SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useSpanningTwoObjects();
+        Boolean refused = false;
+
+        Test.startTest();
+        try {
+            SetupAssistantController.saveStepValues(
+                'identity',
+                new Map<String, Object>{
+                    'Organization_Legal_Name__c' => 'Riverside Community Aid',
+                    SetupAssistantTestExtension.CODE_KEY => 'RC-01'
+                }
+            );
+        } catch (AuraHandledException e) {
+            refused = true;
+        }
+        Test.stopTest();
+
+        Assert.isTrue(refused, 'The module settings object cannot be written here');
+        Assert.isNull(
+            savedLegalName(),
+            'The legal name, saved first, was rolled back with the failed half'
+        );
+    }
+
+    @IsTest
+    static void refusesAStepOnlyAnAbsentModuleShips() {
+        SetupAssistantTestExtension.useNone();
+        Boolean refused = false;
+
+        Test.startTest();
+        try {
+            SetupAssistantController.saveStepValues(
+                SetupAssistantTestExtension.STEP_KEY,
+                new Map<String, Object>{ SetupAssistantTestExtension.RECORD_KEY => null }
+            );
+        } catch (AuraHandledException e) {
+            refused = true;
+        }
+        Test.stopTest();
+
+        Assert.isTrue(refused, 'With the module absent its step does not exist');
+    }
+
+    @IsTest
+    static void savesAModuleStepAndFinishesIt() {
+        SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useThis();
+        Contact chosen = new Contact(LastName = 'Ruiz');
+        insert chosen;
+
+        Test.startTest();
+        SetupAssistantController.SetupState state = SetupAssistantController.saveStepValues(
+            SetupAssistantTestExtension.STEP_KEY,
+            new Map<String, Object>{ SetupAssistantTestExtension.RECORD_KEY => chosen.Id }
+        );
+        Test.stopTest();
+
+        Assert.areEqual(8, state.stepsTotal, 'The module step is counted');
         Assert.isTrue(
-            stepByKey(state.steps, 'coexistence').isAvailable,
-            'Every other step can be done on a Core only org'
+            stepByKey(state.steps, SetupAssistantTestExtension.STEP_KEY).completed,
+            'Choosing the record is what finishes the module step'
+        );
+    }
+
+    @IsTest
+    static void refusesARecordThatIsNotTheKindTheStepAsksFor() {
+        SettingDefinitionSelector.stubbedRows = identityRows();
+        SetupAssistantTestExtension.useThis();
+        String message;
+
+        Test.startTest();
+        try {
+            SetupAssistantController.saveStepValues(
+                SetupAssistantTestExtension.STEP_KEY,
+                new Map<String, Object>{
+                    SetupAssistantTestExtension.RECORD_KEY => UserInfo.getUserId()
+                }
+            );
+        } catch (AuraHandledException e) {
+            message = e.getMessage();
+        }
+        Test.stopTest();
+
+        Assert.areEqual(
+            System.Label.Core_SetupAssistant_WrongRecordTypeError,
+            message,
+            'A user identifier is not a contact, so it never becomes the default'
         );
     }
 
     @IsTest
     static void skipsAStepWithoutCountingItDone() {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        SetupAssistantTestExtension.useNone();
 
         Test.startTest();
-        SetupAssistantController.SetupState state = SetupAssistantController.skipStep(
-            'funddefaults'
-        );
+        SetupAssistantController.SetupState state = SetupAssistantController.skipStep('data');
         Test.stopTest();
 
-        SetupAssistantService.Step step = stepByKey(state.steps, 'funddefaults');
+        SetupAssistantService.Step step = stepByKey(state.steps, 'data');
         Assert.isTrue(step.skipped, 'The step is out of the way');
         Assert.isFalse(step.completed, 'Skipping is not finishing');
         Assert.areEqual(0, state.stepsCompleted, 'A skipped step does not count towards progress');
@@ -328,6 +431,7 @@ private class SetupAssistantControllerTest {
 
     @IsTest
     static void letsDavidReadTheStepsAndRefusesHisChanges() {
+        SetupAssistantTestExtension.useNone();
         User david = buildDavid();
         System.runAs(new User(Id = UserInfo.getUserId())) {
             insert david;
@@ -337,7 +441,7 @@ private class SetupAssistantControllerTest {
         Test.startTest();
         System.runAs(david) {
             SetupAssistantController.SetupState state = SetupAssistantController.getState();
-            Assert.areEqual(8, state.steps.size(), 'David sees the same eight steps');
+            Assert.areEqual(7, state.steps.size(), 'David sees the same seven steps');
             Assert.isFalse(state.canEdit, 'David may read the assistant but not change it');
             try {
                 SetupAssistantController.completeStep('modules');
@@ -355,39 +459,10 @@ private class SetupAssistantControllerTest {
         Assert.isTrue(refused, 'Finishing a step without the permission is refused');
     }
 
-    @IsTest
-    static void refusesARecordThatIsNotTheKindTheStepAsksFor() {
-        if (!ModuleDetectionService.isGivingPresent()) {
-            return;
-        }
-        Boolean refused = false;
-
-        Test.startTest();
-        try {
-            SetupAssistantController.saveDefaults(UserInfo.getUserId(), null);
-        } catch (AuraHandledException e) {
-            refused = true;
-        }
-        Test.stopTest();
-
-        Assert.isTrue(
-            refused,
-            'A user identifier is not a fund, so it never becomes the default fund'
-        );
-    }
-
     private static List<Setting_Definition__mdt> identityRows() {
         List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
         for (
-            String key : new List<String>{
-                'Organization_Legal_Name__c',
-                'Organization_EIN__c',
-                'Organization_Address__c',
-                'Receipt_Logo_Document_Id__c',
-                'Receipt_Signature_Document_Id__c',
-                'Receipt_Signer_Name__c',
-                'Receipt_Signer_Title__c'
-            }
+            String key : new List<String>{ 'Organization_Legal_Name__c', 'Organization_Address__c' }
         ) {
             rows.add(
                 new Setting_Definition__mdt(
@@ -400,6 +475,16 @@ private class SetupAssistantControllerTest {
             );
         }
         return rows;
+    }
+
+    /** What is actually stored, read past any cached org default. */
+    private static String savedLegalName() {
+        List<Nonprofit_Settings__c> rows = [
+            SELECT Organization_Legal_Name__c
+            FROM Nonprofit_Settings__c
+            WHERE SetupOwnerId = :UserInfo.getOrganizationId()
+        ];
+        return rows.isEmpty() ? null : rows[0].Organization_Legal_Name__c;
     }
 
     private static SetupAssistantService.Step stepByKey(

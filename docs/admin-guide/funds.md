@@ -19,7 +19,7 @@ Funds arrive with the Giving module. There is nothing to install separately.
    three. You can add more at any time.
 3. On the fund that should catch undesignated gifts, tick **Is Default**. Only one fund can
    be the default: ticking it on a second fund clears it on the first.
-4. Open **Nonprofit Settings**, choose **Giving**, and confirm **Default Fund** shows the
+4. Open **Open Impact Settings**, choose **Giving**, and confirm **Default Fund** shows the
    fund you just marked. Setting it in either place keeps the other in step.
 
 No Salesforce Setup step is needed.
@@ -48,7 +48,7 @@ You are David, and you are setting up funds before your first gift entry session
 ## Common mistakes
 
 - **No fund is marked as the default.** A gift entered without a designation then fails to
-  save with "No default fund is set. Open Nonprofit Settings, choose Giving, and pick the
+  save with "No default fund is set. Open Open Impact Settings, choose Giving, and pick the
   fund that undesignated gifts should go to." Fix it by ticking **Is Default** on one fund.
 - **Deleting a fund that has gifts.** Open Impact blocks it, because deleting a fund would
   make historical allocations meaningless. Untick **Active** instead: the fund stops being

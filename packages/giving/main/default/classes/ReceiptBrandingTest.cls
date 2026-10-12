@@ -44,10 +44,10 @@ private class ReceiptBrandingTest {
         insert version;
         Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id]
         .ContentDocumentId;
-        Nonprofit_Settings__c core = Nonprofit_Settings__c.getOrgDefaults();
-        core.SetupOwnerId = UserInfo.getOrganizationId();
-        core.Receipt_Logo_Document_Id__c = documentId;
-        upsert core;
+        Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+        giving.SetupOwnerId = UserInfo.getOrganizationId();
+        giving.Receipt_Logo_Document_Id__c = documentId;
+        upsert giving;
         ReceiptLogoSource.reset();
         return documentId;
     }
@@ -176,10 +176,10 @@ private class ReceiptBrandingTest {
      */
     @IsTest
     static void aLogoThatCannotBeFoundStillProducesADocument() {
-        Nonprofit_Settings__c core = Nonprofit_Settings__c.getOrgDefaults();
-        core.SetupOwnerId = UserInfo.getOrganizationId();
-        core.Receipt_Logo_Document_Id__c = '069000000000000AAA';
-        upsert core;
+        Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+        giving.SetupOwnerId = UserInfo.getOrganizationId();
+        giving.Receipt_Logo_Document_Id__c = '069000000000000AAA';
+        upsert giving;
         ReceiptLogoSource.reset();
 
         Test.startTest();

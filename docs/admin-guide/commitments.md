@@ -19,7 +19,7 @@ to a spreadsheet.
 Commitments come with the Giving module. When Giving is on, the Commitments and
 Installments tabs are in the app and no further step is required.
 
-Three settings control how the schedules behave. Open **Nonprofit Settings** and choose
+Three settings control how the schedules behave. Open **Open Impact Settings** and choose
 **Giving**; they sit in that section alongside the default fund and appeal:
 
 | Setting | What it does | Default |
@@ -36,7 +36,7 @@ create or change; existing schedules are left alone until you edit them.
 Commitments need three jobs to run overnight, and until you switch them on none of them
 runs. This is the step that makes a payment turn Overdue on its own.
 
-Open **Nonprofit Settings**, choose **Giving**, and choose **Open** on **Nightly jobs**.
+Open **Open Impact Settings**, choose **Giving**, and choose **Open** on **Nightly jobs**.
 The page opens with a line for each job, then one button.
 
 Choose **Schedule the nightly jobs**. Three jobs are scheduled at once:
@@ -72,7 +72,7 @@ Three things the page can tell you:
   jobs**.
 - **Scheduled, with a last run and a next run.** This is the normal state.
 - **Scheduled but has not run in more than 36 hours.** Something stopped the job. Open the
-  **Error Log** in Nonprofit Settings: a job that fails writes there and carries on with
+  **Error Log** in Open Impact Settings: a job that fails writes there and carries on with
   the rest of its work rather than stopping, so the log tells you which commitment or which
   payment is the problem.
 
@@ -80,8 +80,8 @@ Three things the page can tell you:
 marked Overdue is changed; the schedules simply stop being extended and payments stop
 turning Overdue.
 
-Scheduling and stopping need the **Manage Nonprofit Settings** permission, which comes with
-the Nonprofit Admin permission set. Somebody who has the Giving Admin permission set without
+Scheduling and stopping need the **Manage Open Impact Settings** permission, which comes with
+the Open Impact Admin permission set. Somebody who has the Giving Admin permission set without
 it can open the page and see whether the jobs are running; the buttons are disabled.
 
 The **payment schedule** card lives on a commitment's record page, and Open Impact ships a

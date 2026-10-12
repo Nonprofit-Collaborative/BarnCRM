@@ -3,7 +3,7 @@
   <description>
     For board members, auditors, and anyone who should be able to look but not change anything. Read
     access to people, households, organizations, and whatever the turned on modules add. No
-    editing, no deleting, no Nonprofit Settings.
+    editing, no deleting, no Open Impact Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Read Only</label>

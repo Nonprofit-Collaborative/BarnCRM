@@ -44,15 +44,11 @@ private class PermissionSetGroupSelectorTest {
         PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
 
         Test.startTest();
-        PermissionSetGroup groupRecord = selector.selectByDeveloperName('Fundraising_Staff');
+        PermissionSetGroup groupRecord = selector.selectByDeveloperName('Program_Staff');
         Test.stopTest();
 
-        Assert.isNotNull(groupRecord, 'The Fundraising Staff group ships with Open Impact Core.');
-        Assert.areEqual(
-            'Fundraising_Staff',
-            groupRecord.DeveloperName,
-            'The wrong group came back.'
-        );
+        Assert.isNotNull(groupRecord, 'The Program Staff group ships with Open Impact Core.');
+        Assert.areEqual('Program_Staff', groupRecord.DeveloperName, 'The wrong group came back.');
     }
 
     @IsTest

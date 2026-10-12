@@ -3,7 +3,7 @@
  */
 @IsTest
 private class PermissionSetAssignmentSelectorTest {
-    private static final String FUNDRAISING_ROLE = 'Fundraising_Staff';
+    private static final String PROGRAM_ROLE = 'Program_Staff';
 
     /**
      * Inserts one active user.
@@ -34,7 +34,7 @@ private class PermissionSetAssignmentSelectorTest {
 
     @IsTest
     static void selectByGroupIdsListsThePeopleInTheRole() {
-        PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
         insert new PermissionSetAssignment(
             AssigneeId = david.Id,
@@ -60,7 +60,7 @@ private class PermissionSetAssignmentSelectorTest {
 
     @IsTest
     static void selectByGroupIdsAndUserIdsFindsAnExistingAssignment() {
-        PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         User david = insertUser('David', 'Okafor');
         insert new PermissionSetAssignment(
             AssigneeId = david.Id,

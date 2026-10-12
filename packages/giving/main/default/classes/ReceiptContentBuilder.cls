@@ -85,11 +85,11 @@ public with sharing class ReceiptContentBuilder {
         }
         OrganizationDetails details = new OrganizationDetails();
         details.legalName = core.Organization_Legal_Name__c;
-        details.taxId = core.Organization_EIN__c;
+        details.taxId = giving.Organization_EIN__c;
         details.address = core.Organization_Address__c;
         details.placeOfIssue = giving.Receipt_Place_Of_Issue__c;
-        details.signerName = core.Receipt_Signer_Name__c;
-        details.signerTitle = core.Receipt_Signer_Title__c;
+        details.signerName = giving.Receipt_Signer_Name__c;
+        details.signerTitle = giving.Receipt_Signer_Title__c;
         return details;
     }
 

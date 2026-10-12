@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string" xml:space="preserve">Loads or removes the sample data set (200 households, 440 contacts, 25 organizations, 60 connections, 80 affiliations, and the Giving gifts, funds, appeals, pledges and tributes where Giving is installed). For scratch orgs, sandboxes, and demos, never production.</value>
+    <value xsi:type="xsd:string" xml:space="preserve">Loads or removes the sample data set (200 households, 440 contacts, 25 organizations, 60 connections, 80 affiliations, and sample records for each installed module). For scratch orgs, sandboxes, and demos, never production.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
