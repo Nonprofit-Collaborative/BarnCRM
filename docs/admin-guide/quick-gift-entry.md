@@ -95,7 +95,7 @@ hidden when **How it arrived** is In-kind.
 To try it, open an active pledge from the **Commitments** tab and note its donor and the
 amount and due date of its next payment. Enter a gift from that donor, of that amount, dated
 that day. The list chooses that payment and says it was suggested. Save, open the pledge
-again, and the payment is Received and the balance has gone down.
+again, and the payment is Paid and the balance has gone down.
 
 ## Common mistakes
 

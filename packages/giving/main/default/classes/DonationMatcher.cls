@@ -268,19 +268,11 @@ public with sharing class DonationMatcher {
                 commitment.Donor_Account__c == item.donorAccountId) ||
                 (household != null &&
                 commitment.Household__c == household);
-            if (
-                !sameDonor ||
-                claimed.contains(candidate.Id) ||
-                candidate.Due_Date__c == null ||
-                candidate.Expected_Amount__c == null
-            ) {
+            if (!sameDonor || claimed.contains(candidate.Id)) {
                 continue;
             }
-            Integer distance = Math.abs(item.giftDate.daysBetween(candidate.Due_Date__c));
-            if (
-                distance > windowDays ||
-                (candidate.Expected_Amount__c - item.amount).abs() > tolerance
-            ) {
+            Integer distance = distanceIfMatching(item.giftDate, item.amount, candidate);
+            if (distance == null) {
                 continue;
             }
             if (bestDistance == null || distance < bestDistance) {
@@ -291,6 +283,42 @@ public with sharing class DonationMatcher {
             }
         }
         return best;
+    }
+
+    /**
+     * The candidates a gift of this date and amount matches under R-DM3, in the order given,
+     * without R-DM4's choice between them: a gift entry screen shows them to a person, who
+     * decides (R-DM8). The candidates are the caller's, already narrowed to the donor.
+     */
+    public List<Installment__c> matching(
+        Date giftDate,
+        Decimal amount,
+        List<Installment__c> candidates
+    ) {
+        List<Installment__c> matched = new List<Installment__c>();
+        for (Installment__c candidate : candidates) {
+            if (distanceIfMatching(giftDate, amount, candidate) != null) {
+                matched.add(candidate);
+            }
+        }
+        return matched;
+    }
+
+    /** How many days the candidate's due date is from the gift's, or null when it does not match. */
+    private Integer distanceIfMatching(Date giftDate, Decimal amount, Installment__c candidate) {
+        if (
+            giftDate == null ||
+            amount == null ||
+            candidate.Due_Date__c == null ||
+            candidate.Expected_Amount__c == null
+        ) {
+            return null;
+        }
+        Integer distance = Math.abs(giftDate.daysBetween(candidate.Due_Date__c));
+        if (distance > windowDays || (candidate.Expected_Amount__c - amount).abs() > tolerance) {
+            return null;
+        }
+        return distance;
     }
 
     private static String describe(Installment__c installment) {

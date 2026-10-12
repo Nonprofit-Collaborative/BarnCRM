@@ -47,6 +47,65 @@ public with sharing class InstallmentSelector {
     }
 
     /**
+     * The installments still owed by the donors and households named (R-DM2): Scheduled,
+     * Overdue or Partially paid, on an Active or Paused commitment whose donor or household is
+     * one of them. No date bound: a gift entry screen lists them all for a person to choose
+     * from (R-DM8). Earliest due first.
+     */
+    public List<Installment__c> selectOpenForDonors(
+        Set<Id> donorIds,
+        Set<Id> householdIds,
+        Integer maximum
+    ) {
+        return [
+            SELECT
+                Id,
+                Name,
+                Sequence__c,
+                Due_Date__c,
+                Expected_Amount__c,
+                Status__c,
+                Commitment__c,
+                Commitment__r.Name,
+                Commitment__r.Type__c,
+                Commitment__r.Donor_Contact__c,
+                Commitment__r.Donor_Account__c,
+                Commitment__r.Household__c
+            FROM Installment__c
+            WHERE
+                Status__c IN ('Scheduled', 'Overdue', 'Partially paid')
+                AND Commitment__r.Status__c IN ('Active', 'Paused')
+                AND (Commitment__r.Donor_Contact__c IN :donorIds
+                OR Commitment__r.Donor_Account__c IN :donorIds
+                OR Commitment__r.Household__c IN :householdIds)
+            WITH USER_MODE
+            ORDER BY Due_Date__c, Name
+            LIMIT :maximum
+        ];
+    }
+
+    /**
+     * The installments named that are still owed (R-DM2's statuses, on an Active or Paused
+     * commitment), with the commitment's donor and household, for checking a choice at save.
+     */
+    public List<Installment__c> selectOpenByIds(Set<Id> installmentIds) {
+        return [
+            SELECT
+                Id,
+                Commitment__c,
+                Commitment__r.Donor_Contact__c,
+                Commitment__r.Donor_Account__c,
+                Commitment__r.Household__c
+            FROM Installment__c
+            WHERE
+                Id IN :installmentIds
+                AND Status__c IN ('Scheduled', 'Overdue', 'Partially paid')
+                AND Commitment__r.Status__c IN ('Active', 'Paused')
+            WITH USER_MODE
+        ];
+    }
+
+    /**
      * Still-scheduled installments whose due date is on or before the cutoff, for the daily
      * job. Rows already marked Overdue are deliberately outside the query: they already
      * carry the right status, and including them would let a backlog of old overdue rows
