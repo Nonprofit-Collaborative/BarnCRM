@@ -37,6 +37,10 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
+        // System mode, stated because API 67.0 would otherwise read in user mode: the staged
+        // rows are the package's own bookkeeping, written in system mode for the reason
+        // ADR-0021 gives, and this read only feeds that processing. The records a row makes
+        // are still written in user mode, and the class keeps the run's sharing.
         return Database.getQueryLocator(
             [
                 SELECT
@@ -56,6 +60,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                     Soft_Credit_Id__c
                 FROM Import_Row__c
                 WHERE Import_Batch__c = :owner
+                WITH SYSTEM_MODE
                 ORDER BY Row_Number__c ASC
             ]
         );

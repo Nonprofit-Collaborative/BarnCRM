@@ -57,6 +57,36 @@ private class RollupBatchTest {
     }
 
     @IsTest
+    static void theNightlyRunReadsEveryDefinitionWhoeverScheduledIt() {
+        List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>();
+        for (Integer i = 0; i < 200; i++) {
+            definitions.add(memberCount('Core_Bulk_' + i, RollupService.MODE_SCHEDULED, true));
+        }
+        definitions.add(memberCount('Core_Bulk_Real_Time', RollupService.MODE_REAL_TIME, true));
+        insert definitions;
+        // The job runs as whoever scheduled it. This user holds no packaged permission set, so a
+        // user-mode read (the API 67.0 default) would see no definitions at all.
+        User limited = TestDataFactory.createUser('Nolrollup', new List<String>());
+
+        Integer read = 0;
+        Test.startTest();
+        System.runAs(limited) {
+            Database.QueryLocatorIterator rows = new RollupBatch().start(null).iterator();
+            while (rows.hasNext()) {
+                rows.next();
+                read++;
+            }
+        }
+        Test.stopTest();
+
+        System.Assert.areEqual(
+            200,
+            read,
+            'Every scheduled definition is reconciled, whatever access the scheduler has'
+        );
+    }
+
+    @IsTest
     static void theScheduleIsStartedAndStoppedFromTheConsole() {
         Test.startTest();
         RollupScheduler.start();
