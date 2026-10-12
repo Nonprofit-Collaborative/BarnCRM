@@ -1,6 +1,6 @@
 /**
- * The Health Check questions about what this org is: what is installed alongside Open
- * Impact, which coexistence mode that implies, and whether the settings match it
+ * The Health Check questions about what this org is: what is installed alongside BarnCRM,
+ * which coexistence mode that implies, and whether the settings match it
  * (plan Section 4.8, feature C-11).
  *
  * These checks are the ones that run for everybody, because none of them asks a question
@@ -13,9 +13,18 @@
 public with sharing class HealthCheckOrgShapeChecks {
     /**
      * An Apex class the Connect package ships, used to tell whether Connect is installed
-     * without referencing it at compile time.
+     * without referencing it at compile time. It is the class Core already discovers for
+     * Connect's Health Check findings (`HealthCheckExtensions.EXTENSION_CLASSES`, ADR-0057),
+     * so the name is a contract Connect keeps anyway.
      */
-    private static final String CONNECT_MARKER_CLASS = 'ConnectService';
+    private static final String CONNECT_MARKER_CLASS = 'ConnectHealthCheckExtension';
+
+    /** Set by tests to see Connect as installed (true) or absent (false) without the package. */
+    @TestVisible
+    private static Boolean connectInstalledOverride;
+
+    /** Whether Connect is installed, looked up once per transaction. */
+    private static Boolean connectInstalled;
 
     /** What this org has installed, and the mode that shape recommends. */
     public class OrgShapeCheck implements HealthCheckService.Check {
@@ -59,7 +68,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         }
     }
 
-    /** How many Accounts are a native household and an Open Impact household at once. */
+    /** How many Accounts are a native household and a BarnCRM household at once. */
     public class NativeHouseholdCollisionCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return nativeHouseholdCollisionFinding();
@@ -289,7 +298,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         ) {
             return null;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         if (settings != null && settings.Auto_Create_Households__c == true) {
             return null;
         }
@@ -310,7 +319,7 @@ public with sharing class HealthCheckOrgShapeChecks {
     /**
      * How many households here are already the Salesforce Nonprofit Cloud way: an Account
      * carrying a native household group. Informational, because it is not a problem, it is
-     * mutual exclusion working (product-plan Section 11.2 item 9): Open Impact leaves these
+     * mutual exclusion working (product-plan Section 11.2 item 9): BarnCRM leaves these
      * households alone rather than renaming, re-greeting, or re-addressing them.
      */
     private static HealthCheckService.Finding nativeHouseholdsFinding(
@@ -335,10 +344,10 @@ public with sharing class HealthCheckOrgShapeChecks {
     }
 
     /**
-     * How many Accounts carry a native Nonprofit Cloud household group and the Open Impact
+     * How many Accounts carry a native Nonprofit Cloud household group and the BarnCRM
      * Household record type at once, the collision mutual exclusion exists to prevent
      * (product-plan Section 11.2 item 9). A warning, unlike the informational count above:
-     * such an Account is one where Open Impact used to write the name, greetings, or
+     * such an Account is one where BarnCRM used to write the name, greetings, or
      * address before this guard, and an administrator should look at it.
      */
     private static HealthCheckService.Finding nativeHouseholdCollisionFinding() {
@@ -362,7 +371,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         if (shape == null || shape.hasIndustriesNonprofit != true) {
             return null;
         }
-        if (Type.forName(CONNECT_MARKER_CLASS) != null) {
+        if (isConnectInstalled()) {
             return null;
         }
 
@@ -373,6 +382,34 @@ public with sharing class HealthCheckOrgShapeChecks {
             HealthCheckService.SEVERITY_INFO,
             HealthCheckService.CATEGORY_ORG_SHAPE
         );
+    }
+
+    private static Boolean isConnectInstalled() {
+        if (connectInstalledOverride != null) {
+            return connectInstalledOverride;
+        }
+        if (connectInstalled == null) {
+            connectInstalled = classExists(CONNECT_MARKER_CLASS);
+        }
+        return connectInstalled;
+    }
+
+    /**
+     * Whether an Apex class of this name is visible: in this package's namespace first, then
+     * with none (today, and unmanaged deploys). A class name is not an API name, so the prefix
+     * goes in without its `__` (dynamic-apex.md section 3).
+     */
+    @TestVisible
+    private static Boolean classExists(String className) {
+        String prefix = NamespaceUtil.prefix();
+        Type found = Type.forName(
+            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
+            className
+        );
+        if (found == null) {
+            found = Type.forName(className);
+        }
+        return found != null;
     }
 
     private static HealthCheckService.Finding multiCurrencyFinding(

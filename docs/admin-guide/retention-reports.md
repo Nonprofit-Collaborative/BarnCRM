@@ -12,7 +12,7 @@ says in writing exactly who it counts.
 - **First to Second Gift Conversion**: of the people whose first gift fell in a completed
   fiscal year, how many have given a second one.
 
-They arrive with the Giving package, in the same **Open Impact Giving** folder as the
+They arrive with the Giving package, in the same **BarnCRM Giving** folder as the
 dashboard reports, and they need no building and no filters set. They are ordinary
 Salesforce reports: open one, change a filter, save a copy of your own.
 
@@ -30,7 +30,7 @@ amount greater than zero. Two consequences, both deliberate:
 
 - **A gift that was refunded later is still a gift.** The donor gave. The money went back,
   and their total giving shows that, but they are not a person who never gave.
-- **A refund is never itself a gift.** Open Impact records a refund as a second gift for a
+- **A refund is never itself a gift.** BarnCRM records a refund as a second gift for a
   negative amount, so the amount test leaves it out. A refund dated this year of a gift made
   three years ago does not make its donor a this year donor.
 
@@ -40,7 +40,7 @@ follow, which is why these reports read those fields instead of reading last yea
 **LYBUNT** means Last Year But Unfortunately Not This year. A donor is on the list when their
 most recent qualifying gift falls in the last fiscal year. The year boundary is the fiscal
 year, not the calendar year, and it is the one set in Setup, which must match the fiscal year
-start month in Open Impact Settings (see step 1 below).
+start month in BarnCRM Settings (see step 1 below).
 
 The refund cases, spelled out because they are where other systems go wrong:
 
@@ -66,7 +66,7 @@ year:
 - **Retained**: they gave this fiscal year and last fiscal year.
 - **Reactivated**: they gave this fiscal year, their first gift was in an earlier year, and
   they gave nothing last fiscal year. This is the donor who gave two years ago, skipped last
-  year, and is back. Every system names this person differently. Open Impact calls them
+  year, and is back. Every system names this person differently. BarnCRM calls them
   reactivated, never new and never retained, and the report tells you which year they first
   gave so you can see how long they were away.
 
@@ -83,11 +83,11 @@ because they have not had the same amount of time.
 
 ## How to turn it on
 
-1. **Make the two fiscal years agree.** In Open Impact Settings, open the **Rollups** page and
+1. **Make the two fiscal years agree.** In BarnCRM Settings, open the **Rollups** page and
    read **Fiscal year start month**. Then, in Salesforce Setup, search for **Fiscal Year** and
    check that the org's
    fiscal year starts in the same month. Salesforce reports can only read the Setup value, and
-   the donor fields these reports rest on are calculated from the Open Impact Settings value, so
+   the donor fields these reports rest on are calculated from the BarnCRM Settings value, so
    if the two disagree the reports draw the year boundary in a different place from the donor
    record. This is the one setup step, and it takes a minute.
 2. **Run the rollups once.** On the same **Rollups** page, choose **Recalculate all**.
@@ -97,7 +97,7 @@ because they have not had the same amount of time.
 3. **Give people access.** Assign the Giving module's **Giving Staff** or **Giving Read Only**
    permission set in Setup, as for the dashboard. The report folder ships public read only, so
    the reports themselves need no sharing.
-4. Open the **Fundraising** app, choose **Reports**, then the **Open Impact Giving** folder.
+4. Open the **Fundraising** app, choose **Reports**, then the **BarnCRM Giving** folder.
 
 Nothing else in Setup is required. There is no new setting to configure: the reports carry
 their own definitions.
@@ -106,7 +106,7 @@ their own definitions.
 
 Do this after the sample data is loaded, or in an org with a couple of years of gifts.
 
-1. Open **Reports**, folder **Open Impact Giving**, and open **LYBUNT Donors**. Every row is a
+1. Open **Reports**, folder **BarnCRM Giving**, and open **LYBUNT Donors**. Every row is a
    donor to call. The list is sorted by what they gave last year, largest first, so the first
    twenty rows are the twenty conversations worth having first.
 2. Look at the **Rollups Last Calculated** column on any row. That is when this donor's
@@ -146,7 +146,7 @@ gift is dated in the future. Last Gift Date is the date on the gift, so a gift d
 month counts as next month, and until then the donor looks lapsed.
 
 **The year boundary looks wrong: a December gift landed in the wrong year.** The two fiscal
-years disagree. Setup's fiscal year decides which donors the report selects, and Open Impact
+years disagree. Setup's fiscal year decides which donors the report selects, and BarnCRM
 Settings' fiscal year start month decides what Giving Last Year and Gifts Last Year hold. The
 symptom is a donor on the LYBUNT list whose Giving This Year is not zero. Fix it with step 1
 of the setup above, then recalculate the rollups.

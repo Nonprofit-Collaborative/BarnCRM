@@ -54,7 +54,7 @@ public without sharing class ErrorLogEventHandler {
             // accepted, not suppressed).
             System.debug(
                 LoggingLevel.ERROR,
-                'Open Impact could not write an Error Log record from an event: ' +
+                'BarnCRM could not write an Error Log record from an event: ' +
                 failedToLog.getMessage()
             );
         }

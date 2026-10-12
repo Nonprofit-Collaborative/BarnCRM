@@ -1,5 +1,5 @@
 /**
- * The rollup engine, as the rest of Open Impact sees it.
+ * The rollup engine, as the rest of BarnCRM sees it.
  *
  * Everything a feature, a trigger, a batch or the console needs is here, and nothing outside this
  * package's `Rollup*` classes ever names the vendored engine (ADR-0015). Three things happen:

@@ -6,7 +6,7 @@ import RECOMMENDED from '@salesforce/label/c.Core_SetupAssistant_RecommendedLabe
 import MODE_LABEL from '@salesforce/label/c.Core_SetupAssistant_ModeLabel';
 import MODE_STANDALONE from '@salesforce/label/c.Core_SetupAssistant_ModeStandalone';
 import MODE_NPSP from '@salesforce/label/c.Core_SetupAssistant_ModeNpsp';
-import MODE_AGENTFORCE from '@salesforce/label/c.Core_SetupAssistant_ModeAgentforce';
+import MODE_NONPROFIT_CLOUD from '@salesforce/label/c.Core_SetupAssistant_ModeNonprofitCloud';
 import CONFIRM from '@salesforce/label/c.Core_SetupAssistant_ConfirmButton';
 
 const SHAPE_TEXT = {
@@ -18,11 +18,11 @@ const SHAPE_TEXT = {
 const MODE_TEXT = {
   Standalone: MODE_STANDALONE,
   NPSP: MODE_NPSP,
-  AgentforceNonprofit: MODE_AGENTFORCE
+  NonprofitCloud: MODE_NONPROFIT_CLOUD
 };
 
 /**
- * Step one: what Open Impact found in this org, in plain words, leading with the
+ * Step one: what BarnCRM found in this org, in plain words, leading with the
  * Nonprofit Cloud case, and the mode it recommends because of it.
  */
 export default class SetupStepCoexistence extends LightningElement {

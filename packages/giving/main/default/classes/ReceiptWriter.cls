@@ -4,7 +4,7 @@
  * DOCUMENTED EXCEPTION to the "user mode DML" rule (plan Section 4.13), under ADR-0021.
  *
  * ADR-0016 says issued receipts and their files are read only to everyone, and the packaged
- * permission sets say so: no role, including Nonprofit Admin, holds Create, Edit or Delete on
+ * permission sets say so: no role, including BarnCRM Admin, holds Create, Edit or Delete on
  * `Receipt__c`, `Receipt_Run__c` or `Receipt_Number_Sequence__c`. A user mode write would
  * therefore fail for every user in every org, including the one issuing the receipt. The package
  * writes these records; a person never does, which is the point.
@@ -14,7 +14,7 @@
  * 1. **Permission enforced before this class is reached.** `ReceiptService` and `ReceiptController`
  *    check `Issue_Receipts` before any call here. The one write that is not about issuing,
  *    `insertTemplates`, is reached only after `ReceiptTemplateService` has checked
- *    `Manage_Nonprofit_Settings` or `Issue_Receipts`, or from the post-install script, where there
+ *    `Manage_BarnCRM_Settings` or `Issue_Receipts`, or from the post-install script, where there
  *    is no running user to check (ADR-0034).
  * 2. **Inputs validated by the caller.** Every field written is computed by package code from
  *    records the running user was already allowed to read: amounts from gifts, numbers from the

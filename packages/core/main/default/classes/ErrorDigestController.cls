@@ -1,14 +1,14 @@
 /**
- * The error digest panel on the Error Log page of the Nonprofit Settings console (C-23).
+ * The error digest panel on the Error Log page of the BarnCRM Settings console (C-23).
  *
  * It answers what an administrator asks about a job that sends email: is it on, when does it
  * run next, when did it last run and what did it do, and who gets it. It carries the only two
- * ways a digest is ever sent, so the `Manage_Nonprofit_Settings` permission checked here is the
+ * ways a digest is ever sent, so the `Manage_BarnCRM_Settings` permission checked here is the
  * authorization for what the job does afterwards (ADR-0027, ADR-0038). Anybody who can open the
  * console can read the panel.
  */
 public with sharing class ErrorDigestController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
 
     /** Raised with a message the panel shows as it is. */
     public class ErrorDigestException extends Exception {
@@ -29,7 +29,7 @@ public with sharing class ErrorDigestController {
         /** The names of the people the next digest goes to. */
         @AuraEnabled
         public List<String> recipients;
-        /** True when nobody is listed, so it goes to everyone who administers Open Impact. */
+        /** True when nobody is listed, so it goes to everyone who administers BarnCRM. */
         @AuraEnabled
         public Boolean toAdministrators;
     }
@@ -72,7 +72,7 @@ public with sharing class ErrorDigestController {
     }
 
     private static DigestView currentView() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         DigestView view = new DigestView();
         view.canManage = canManage();
         view.nextRunAt = ErrorDigestScheduler.nextRunAt();

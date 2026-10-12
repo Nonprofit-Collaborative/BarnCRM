@@ -3,7 +3,7 @@
   <fullName>Receipt_Renderer__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>
-    Which renderer produces the PDF, as one of the keys Open Impact offers (Blob PDF, Visualforce),
+    Which renderer produces the PDF, as one of the keys BarnCRM offers (Blob PDF, Visualforce),
     never a class name. Leave it empty to use the one the package ships.
   </inlineHelpText>
   <label>Receipt Renderer</label>

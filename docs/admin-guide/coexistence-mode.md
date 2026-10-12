@@ -2,92 +2,112 @@
 
 ## What it does
 
-Open Impact can be the only fundraising system in your Salesforce org, or it can sit
-alongside something that is already there. Coexistence mode is the one setting that records
+BarnCRM can be the only system in your Salesforce org that keeps households, or it can sit
+alongside one that is already there. Coexistence mode is the one setting that records
 which situation you are in. In this version it is a record of what is installed: it does not
 read, adopt, or change any household data, and the only behaviour attached to it is that
-choosing Agentforce Nonprofit coexistence also switches household membership to the
-junction, because Person Accounts require that.
+choosing Nonprofit Cloud coexistence also switches household membership to the junction,
+because Person Accounts require that.
 
-Most organizations arriving at Open Impact are already on Salesforce Nonprofit Cloud
-(Agentforce Nonprofit), usually with Person Accounts turned on. That is the case Open Impact
-is built to land in, and it has its own mode. Open Impact reads your org the first time you
-open the Setup Assistant or the Health Check, proposes the matching mode, and asks you to
-confirm it. You can change it later, and nothing about it is permanent.
+Most organizations have nothing else in the org, and BarnCRM runs on its own: that is
+**Standalone**, and it is the only mode most orgs ever see. BarnCRM reads your org the first
+time you open the Setup Assistant or the Health Check, proposes the matching mode, and asks
+you to confirm it. You can change it later, and nothing about it is permanent.
 
-## The three modes
+## The modes
+
+BarnCRM offers only the modes that fit your org:
+
+- **Standalone** is offered in every org.
+- **NPSP coexistence** is offered only when the Nonprofit Success Pack (NPSP) is installed
+  in your org.
+- **Nonprofit Cloud coexistence** is offered only when Salesforce Nonprofit Cloud objects
+  are in your org.
+- The mode you saved is always offered, even if what it was chosen for is gone, so your
+  choice is never hidden.
+
+The Setup Assistant's first step and BarnCRM Settings offer the same list.
 
 | Mode | Choose it when | What it changes |
 |---|---|---|
-| **Agentforce Nonprofit coexistence** | Your org is on Nonprofit Cloud, or Person Accounts are turned on. This is the common case. | Household membership uses membership records rather than the person's account, so Person Accounts work properly and one person can belong to more than one household. Your Nonprofit Cloud objects are left alone. |
-| **Standalone** | Your org is new, or it has never had a fundraising package in it. This is the default in a fresh org. | Nothing, in this version. How households group people is the separate **household membership** setting, which Standalone leaves as it is. |
-| **NPSP coexistence** | The Nonprofit Success Pack is installed and you still want it working while you move. | Nothing, in this version. It records that NPSP is here. Open Impact builds its own households and leaves NPSP's records alone. Feeding NPSP's own totals arrives with the Connect module (v0.6). |
+| **Standalone** | Your org has no other household model. This is the default, and the recommendation in any org without NPSP or Nonprofit Cloud, including one with Person Accounts. | Nothing, in this version. How households group people is the separate **household membership** setting, which Standalone leaves as it is. In an org with Person Accounts, BarnCRM proposes junction membership (one membership record per person) because Person Accounts need it, but never overwrites a membership choice an administrator already made. |
+| **NPSP coexistence** (only with NPSP) | NPSP is installed and you still want it working while you move. | Nothing, in this version. It records that NPSP is here. BarnCRM builds its own households and leaves NPSP's records alone. Feeding NPSP's own totals arrives with the Connect module (v0.6). |
+| **Nonprofit Cloud coexistence** (only with Nonprofit Cloud) | Your org has Salesforce Nonprofit Cloud objects. | Household membership uses membership records rather than the person's account, so Person Accounts work properly and one person can belong to more than one household. Your Nonprofit Cloud objects are left alone. |
 
-If you are not sure, take the mode Open Impact proposes. It reads your org, it does not
-guess.
+BarnCRM recommends Nonprofit Cloud coexistence when it finds Nonprofit Cloud objects,
+otherwise NPSP coexistence when it finds NPSP, otherwise Standalone. If you are not sure,
+take the mode BarnCRM proposes. It reads your org, it does not guess.
 
 ## How to turn it on
 
 Coexistence mode is always on: every org has a mode. What you do is confirm or change it.
 
-1. Open the **Open Impact** app.
-2. Click the **Open Impact Settings** tab.
+1. Open the **BarnCRM** app.
+2. Click the **BarnCRM Settings** tab.
 3. Choose **General** in the left navigation.
-4. Find **Coexistence mode**. It shows the current mode and, underneath, what Open Impact
+4. Find **Coexistence mode**. It shows the current mode and, underneath, what BarnCRM
    detected in your org.
 5. Pick a mode and click **Save**.
 
-You need the **Manage Open Impact Settings** permission to change it. If you do not have it,
+You need the **Manage BarnCRM Settings** permission to change it. If you do not have it,
 the setting is visible but greyed out and the page tells you which permission to ask for.
-Everyone with the Open Impact Admin role has it.
+Everyone with the BarnCRM Admin role has it.
 
 There is nothing to do in Salesforce Setup. Detection happens inside the app.
 
 ## A five-minute walkthrough
 
-Maria has just installed Open Impact into her organization's Nonprofit Cloud org. Person
-Accounts are on, because that is how the org was set up for her two years ago.
+Maria has just installed BarnCRM into her organization's Salesforce org. Person Accounts
+are on, because that is how the org was set up for her two years ago, and nothing else that
+keeps households is installed.
 
-1. Maria opens the **Open Impact** app, clicks the **Open Impact Settings** tab, and chooses
+1. Maria opens the **BarnCRM** app, clicks the **BarnCRM Settings** tab, and chooses
    **Health** in the left navigation.
 2. Health Check runs. The first card is **What we found in your org**.
-3. It reads **Person Accounts enabled. Agentforce Nonprofit objects detected.** Underneath,
-   in plain language: this is a Nonprofit Cloud org, Open Impact supports it directly, and
-   the recommended mode is **Agentforce Nonprofit coexistence**.
+3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.
 4. Below the card there is a finding titled **Coexistence mode is not confirmed yet**, with
    the button **Use recommended mode**.
-5. Maria clicks **Use recommended mode**. The page saves Agentforce Nonprofit coexistence,
-   switches household membership to junction mode at the same time (Person Accounts require
-   it), re-runs itself, and the finding is replaced by **Coexistence mode matches your org**.
+5. Maria clicks **Use recommended mode**. The page saves Standalone, re-runs itself, and the
+   finding is replaced by **Coexistence mode matches your org**. Household membership is a
+   separate setting: because her org has Person Accounts, BarnCRM proposes a membership
+   record for each person, and never overwrites a membership choice already made.
 6. She chooses **General** in the left navigation and sees Coexistence mode set to
-   **Agentforce Nonprofit coexistence**. The change is in the settings history with her name
-   and the time.
+   **Standalone**. The list offers only Standalone, because her org has neither NPSP nor
+   Nonprofit Cloud. The change is in the settings history with her name and the time.
 
-Total time: about two minutes. If Maria disagrees with the recommendation, she picks a
-different mode in step 6 and saves. Nothing is locked.
+Total time: about two minutes. Nothing is locked.
 
-**If your org has the Nonprofit Success Pack instead**, the same walkthrough applies with
-different words: the card reads **NPSP detected** and the recommendation is **NPSP
-coexistence**. Household membership is left as it is, because only the Agentforce Nonprofit
-mode changes it.
+**If your org has NPSP or Nonprofit Cloud**, the same walkthrough applies with different
+words. With NPSP the card reads **NPSP detected** and the recommendation is **NPSP
+coexistence**; household membership is left as it is. With Nonprofit Cloud the card reads
+**Nonprofit Cloud objects detected** and the recommendation is **Nonprofit Cloud
+coexistence**, which switches household membership to junction mode at the same time.
 
 ## Common mistakes
 
 **Expecting the mode to sort out Person Accounts.** What matters in a Person Accounts org
-is the household membership setting, not the mode. Confirming Agentforce Nonprofit
-coexistence switches membership to the junction for you; choosing any other mode leaves the
-membership setting alone. Health Check reports the wrong membership setting in a Person
-Accounts org as an error with a one-click fix. Take the fix.
+is the household membership setting, not the mode. Confirming Nonprofit Cloud coexistence
+switches membership to the junction for you; any other mode leaves a membership setting you
+already chose alone. Health Check reports the wrong membership setting in a Person Accounts
+org as an error with a one-click fix. Take the fix.
+
+**Looking for a mode that is not in the list.** BarnCRM offers NPSP coexistence only when
+NPSP is installed, and Nonprofit Cloud coexistence only when Nonprofit Cloud objects are in
+the org. If you saved a mode earlier, it stays in the list. A mode you try to save that the
+org does not offer is refused with "{0} is not a coexistence mode. Choose one of the modes
+BarnCRM offers for this org.", with the mode you sent in place of {0}.
 
 **Changing the mode to fix something else.** Coexistence mode is about what is installed in
-your org, not about how you want households named or how gifts are entered. Those are their
-own settings. If a household is named wrongly, change the naming settings, not the mode.
+your org, not about how you want households named or how records are entered. Those are
+their own settings. If a household is named wrongly, change the naming settings, not the
+mode.
 
-**Expecting NPSP coexistence to take over your NPSP households.** It does not. Open Impact
-builds its own households in every mode, so an org with NPSP has NPSP's households and Open
-Impact's, and reconciling them is manual work in this version. Switching between NPSP
+**Expecting NPSP coexistence to take over your NPSP households.** It does not. BarnCRM
+builds its own households in every mode, so an org with NPSP has NPSP's households and
+BarnCRM's, and reconciling them is manual work in this version. Switching between NPSP
 coexistence and Standalone changes nothing about that either way.
 
 **Expecting the mode to move data.** Confirming a mode records what is in your org and, for
-Agentforce Nonprofit, sets household membership. It does not migrate anything, and it does
-not touch your Nonprofit Cloud or NPSP records. Importing your old data is a separate step in the Setup Assistant.
+Nonprofit Cloud coexistence, sets household membership. It does not migrate anything, and
+it does not touch your Nonprofit Cloud or NPSP records. Importing your old data is a
+separate step in the Setup Assistant.

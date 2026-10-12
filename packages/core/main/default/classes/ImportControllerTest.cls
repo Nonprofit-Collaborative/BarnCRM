@@ -17,7 +17,7 @@ private class ImportControllerTest {
      * rolls back at the same moment. The full explanation is on `ReceiptTestDataFactory.issuer`.
      */
     private static User importer() {
-        return TestDataFactory.createUser('Importer', new List<String>{ 'Nonprofit_Admin' });
+        return TestDataFactory.createUser('Importer', new List<String>{ 'BarnCRM_Admin' });
     }
 
     private static Import_Template__c permittedTemplate() {
@@ -34,10 +34,10 @@ private class ImportControllerTest {
         Test.startTest();
         try {
             ImportController.getTemplates();
-            Assert.fail('Importing needs the Manage Nonprofit Settings permission.');
+            Assert.fail('Importing needs the Manage BarnCRM Settings permission.');
         } catch (Exception e) {
             Assert.isTrue(
-                e.getMessage().contains('Manage Open Impact Settings'),
+                e.getMessage().contains('Manage BarnCRM Settings'),
                 'And says which permission and who to ask: ' + e.getMessage()
             );
         }
@@ -138,8 +138,8 @@ private class ImportControllerTest {
             'donors.csv',
             mapping.serialize(),
             ImportTemplateService.RULE_EMAIL,
-            '{"expectedCount": 12, "expectedAmount": 480.25, "saveDonationMatching": true, ' +
-            '"donationMatching": "Never match", "matchDateWindowDays": 10}'
+            '{"expectedCount": 12, "expectedAmount": 480.25, "savePaymentMatching": true, ' +
+            '"paymentMatching": "Never match", "matchDateWindowDays": 10}'
         );
         Test.stopTest();
 
@@ -152,11 +152,11 @@ private class ImportControllerTest {
         Assert.areEqual(12, saved.Expected_Count__c, 'With the control totals typed in.');
         Assert.isTrue(saved.Expected_Amount__c == 480.25, 'Both of them.');
         Import_Template__c matching = [
-            SELECT Donation_Matching__c, Match_Date_Window_Days__c
+            SELECT Payment_Matching__c, Match_Date_Window_Days__c
             FROM Import_Template__c
             WHERE Id = :template.Id
         ];
-        Assert.areEqual('Never match', matching.Donation_Matching__c, 'Donation matching is kept.');
+        Assert.areEqual('Never match', matching.Payment_Matching__c, 'Payment matching is kept.');
         Assert.areEqual(10, matching.Match_Date_Window_Days__c, 'With its window.');
         Assert.areEqual('donors.csv', view.fileName, 'With the name the administrator uploaded.');
         Assert.isTrue(
@@ -334,7 +334,7 @@ private class ImportControllerTest {
         ImportController.permissionOverride = false;
         try {
             ImportController.previewUndo(batch.Id);
-            Assert.fail('Undoing an import needs the Manage Nonprofit Settings permission.');
+            Assert.fail('Undoing an import needs the Manage BarnCRM Settings permission.');
         } catch (AuraHandledException expected) {
             Assert.areEqual(
                 Label.Core_Import_ErrorNoPermission,

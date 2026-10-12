@@ -7,12 +7,12 @@
  * a Setting Change, so the audit trail shows every pause with its end.
  *
  * `AutomationControl.pauseAll` schedules it for the moment the pause ends, after checking
- * `Manage_Nonprofit_Settings`; that check is the authorization for what the job does later, as
+ * `Manage_BarnCRM_Settings`; that check is the authorization for what the job does later, as
  * in ADR-0027. `resumeAll` and a second pause cancel it first, so there is never more than one.
  */
 public with sharing class AutomationResumeJob implements Schedulable {
     /** The name the job carries, so it can be found, replaced and cancelled. */
-    public static final String JOB_NAME = 'Open Impact Automation Resume';
+    public static final String JOB_NAME = 'BarnCRM Automation Resume';
 
     private static final String LOG_CONTEXT = 'Automation pause: automatic resume';
 

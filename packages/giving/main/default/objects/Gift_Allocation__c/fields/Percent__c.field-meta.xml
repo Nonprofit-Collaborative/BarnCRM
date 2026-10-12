@@ -3,7 +3,7 @@
   <fullName>Percent__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>
-    This allocation's share of the gift. Enter an amount or a percent: Open Impact works out the
+    This allocation's share of the gift. Enter an amount or a percent: BarnCRM works out the
     other one.
   </inlineHelpText>
   <label>Percent</label>

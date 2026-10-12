@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Expected_Amount__c</fullName>
-  <description>Control total: what the administrator expects the file's gift amounts to add up to. Optional. The dry run compares it with File Amount, and a commit is refused while they differ (R-IB10).</description>
+  <description>Control total: what the administrator expects the file's amounts to add up to. Optional. The dry run compares it with File Amount, and a commit is refused while they differ (R-IB10).</description>
   <externalId>false</externalId>
-  <inlineHelpText>What the file's gift amounts should add up to, from your deposit slip or processor report. Leave empty to skip the check.</inlineHelpText>
+  <inlineHelpText>What the file's amounts should add up to, from your deposit slip or processor report. Leave empty to skip the check.</inlineHelpText>
   <label>Expected Amount</label>
   <precision>16</precision>
   <required>false</required>

@@ -4,23 +4,23 @@
 
 ## 1. What it does
 
-If your donors and gifts are in Salesforce Nonprofit Cloud, Open Impact
+If your donors and gifts are in Salesforce Nonprofit Cloud, BarnCRM
 ships four ready-made import mappings that read Nonprofit Cloud's own exports: your people, and
 your gifts with the funds they were designated to. You export each file with Data Loader or
 Workbench, without renaming a column, and load it through the **Import** tab like any other
 file, with a dry run first and an undo afterwards.
 
-The mappings only name columns. Nothing in Open Impact depends on Nonprofit Cloud being
+The mappings only name columns. Nothing in BarnCRM depends on Nonprofit Cloud being
 installed, so they work the same whether you are moving to a new org or loading into the org
 Nonprofit Cloud is in.
 
 ## 2. How to turn it on
 
-Open Impact brings the person accounts mapping, and the Giving module brings the three gift
+BarnCRM brings the person accounts mapping, and the Giving module brings the three gift
 mappings. In an org that has never opened the **Import** tab they appear the first time it
 opens. In an org that already had the generic mappings, add them once from Health Check:
 
-1. Open the **Open Impact** app, click **Open Impact Settings** and choose **Health**.
+1. Open the **BarnCRM** app, click **BarnCRM Settings** and choose **Health**.
 2. The report opens (click **Re-run** if it is from earlier). A finding reads "4 shipped
    import templates are missing" (a higher number if other shipped mappings are missing too)
    and names them.
@@ -30,9 +30,9 @@ opens. In an org that already had the generic mappings, add them once from Healt
    **Nonprofit Cloud: gift transactions**, **Nonprofit Cloud: undesignated gifts**
    and **Nonprofit Cloud: organization gifts**.
 
-Before loading gifts, create in Open Impact every fund and appeal the gifts name, with the same
+Before loading gifts, create in BarnCRM every fund and appeal the gifts name, with the same
 names they have in Nonprofit Cloud (see [Funds](funds.md) and [Appeals](appeals.md)), and mark
-one fund as the default. A gift naming a fund or appeal Open Impact does not have is rejected
+one fund as the default. A gift naming a fund or appeal BarnCRM does not have is rejected
 in the dry run, naming it.
 
 ## 3. A five-minute walkthrough (as Maria)
@@ -72,7 +72,7 @@ names on several rows is created once either way, but only with the few details 
 has. With the people already loaded, every gift row finds its donor by email. An export of up
 to 500,000 rows can be dry run as one file; split anything larger.
 
-1. **Funds and appeals.** Create them in Open Impact by hand, with the names they have in
+1. **Funds and appeals.** Create them in BarnCRM by hand, with the names they have in
    Nonprofit Cloud (gift designations and campaigns). There is no import for them yet.
 2. **Check the gift statuses.** In Workbench or the Developer Console, run
    `SELECT Status, COUNT(Id) FROM GiftTransaction GROUP BY Status`. The queries below take the
@@ -140,7 +140,7 @@ to 500,000 rows can be dry run as one file; split anything larger.
    more than one line, keep the first, add the columns `Fund 2` and `Amount 2` (up to `Fund 5`
    and `Amount 5`), copy the other lines' designation and amount into them, and delete those
    lines. Section 5 says why.
-8. **Translate what does not match.** Payment methods: Open Impact reads Cash, Check, Card,
+8. **Translate what does not match.** Payment methods: BarnCRM reads Cash, Check, Card,
    ACH, Stock and In-kind, plus common words such as "Credit Card", "EFT" and "Wire Transfer".
    Any other value is rejected in the dry run, naming it and the values to use; use **Find and
    Replace** in the spreadsheet on that column.
@@ -163,7 +163,7 @@ file shape. The shapes differ in ways that matter:
   organization would make every person in the same file an organization too.
 - **Undesignated gifts have their own file** because they are missing from the designation
   export, which is the only export that says where a designated gift's money went.
-- **A split gift arrives as one line per designation.** Open Impact reads a split from one row
+- **A split gift arrives as one line per designation.** BarnCRM reads a split from one row
   (Fund 1 with Amount 1, Fund 2 with Amount 2, and so on). Each line on its own claims part of
   the gift is the whole gift, so the mapping loads a line's designation amount as **Amount 1**:
   the parts then do not add up to the gift, and the line is rejected where you can see it,
@@ -180,15 +180,15 @@ These are not loaded by the four mappings. Each has what to do in the meantime.
 | Gift commitments (pledges and recurring gifts) and their schedules | No import yet. Create each active commitment by hand ([Commitments](commitments.md)) before loading gifts. With **Match or create**, a gift dated near one of its scheduled payments pays it; older gifts load as gifts on their own. |
 | Soft credits | A soft credit loads only on the same row as a new gift, and Nonprofit Cloud exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | Tributes | Same: add them by hand to the gift ([Tributes](tributes.md)). |
-| Refunds and write-offs | The exports take paid gifts only. Record refunds in Open Impact after the gift is loaded ([Refunds](refunds.md)). |
+| Refunds and write-offs | The exports take paid gifts only. Record refunds in BarnCRM after the gift is loaded ([Refunds](refunds.md)). |
 | Additional addresses | Only the mailing address loads. Add seasonal and other addresses by hand ([Addresses](addresses.md)). |
 | Funds and appeals | Create them by hand first (section 4, step 1). |
 | An organization's details | A gift file creates an organization with its name only. Add its address and phone by hand. |
-| In-kind gifts (payment method In-kind) | Open Impact wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic gift list**, the value mapped to **Gift: fair market value**. |
+| In-kind gifts (payment method In-kind) | BarnCRM wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic gift list**, the value mapped to **Gift: fair market value**. |
 
 ## 7. Loading into the org Nonprofit Cloud is in
 
-If Open Impact is installed in the same org, your people are already there as person accounts.
+If BarnCRM is installed in the same org, your people are already there as person accounts.
 Skip step 3 of section 4: the gift files find each donor by email. Two things differ in an org
 that keeps people as person accounts:
 
@@ -196,8 +196,8 @@ that keeps people as person accounts:
   skipped, and the run log says "The mapping refers to Email, which this org does not have.
   Those values were skipped." Make sure every donor exists before loading gifts. The person
   accounts mapping is for loading into a new org, where people are stored as contacts.
-- An organization donor is found by name only if its account is an Open Impact organization.
-  A business account of another record type gets a new Open Impact organization of the same
+- An organization donor is found by name only if its account is a BarnCRM organization.
+  A business account of another record type gets a new BarnCRM organization of the same
   name. Check the dry run's "would create" count for organizations before you commit.
 
 ## 8. Common mistakes
@@ -224,10 +224,10 @@ scan afterwards ([Duplicates](duplicates.md)). A rule set to **Block** still rej
 with the rule's message.
 
 **Rows rejected with "No appeal is named ..." or "No fund is named ...".** The campaign or
-designation name is not an appeal or fund in Open Impact. Create it with exactly that name, or
+designation name is not an appeal or fund in BarnCRM. Create it with exactly that name, or
 correct the name in the file.
 
-**A column you set to Do not load is mapped again next time.** Open Impact's column library
+**A column you set to Do not load is mapped again next time.** BarnCRM's column library
 recognises some export headings on its own, for example a donor's name, and suggests them even
 after you have set them to **Do not load**. Check the column step on every load, or delete the
 column from the file.

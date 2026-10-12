@@ -1,12 +1,12 @@
 /**
  * The error digest's schedule (C-23, R-E5): one job every morning at 07:00, started and stopped
- * from the Error Log page of the Nonprofit Settings console, as ADR-0038 has the nightly jobs
+ * from the Error Log page of the BarnCRM Settings console, as ADR-0038 has the nightly jobs
  * started. The job decides for itself whether a digest is due, so changing the frequency from
  * daily to weekly never needs the schedule changed.
  */
 public with sharing class ErrorDigestScheduler implements Schedulable {
     /** The name the scheduled job carries, so the settings page can find it again. */
-    public static final String JOB_NAME = 'Open Impact Error Digest';
+    public static final String JOB_NAME = 'BarnCRM Error Digest';
 
     /**
      * Seven in the morning: after the nightly jobs (the last, donor levels, starts at 03:00), so

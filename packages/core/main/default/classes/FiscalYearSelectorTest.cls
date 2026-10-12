@@ -2,7 +2,7 @@
  * Tests for FiscalYearSelector (feature C-11, ADR-0025).
  *
  * The fiscal year in Setup cannot be changed from Apex, so the org side is read once for
- * real and injected everywhere else. The Open Impact side is deliberately the same call the
+ * real and injected everywhere else. The BarnCRM side is deliberately the same call the
  * rollup engine makes, which is what the mismatch finding depends on.
  */
 @IsTest
@@ -28,7 +28,7 @@ private class FiscalYearSelectorTest {
     }
 
     @IsTest
-    static void theOpenImpactFiscalYearIsTheOneTheRollupsUse() {
+    static void theBarnCRMFiscalYearIsTheOneTheRollupsUse() {
         SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
 
         System.assertEquals(

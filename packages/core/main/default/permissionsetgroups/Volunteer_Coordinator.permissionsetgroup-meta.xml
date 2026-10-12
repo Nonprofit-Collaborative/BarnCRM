@@ -3,9 +3,9 @@
   <description>
     For whoever schedules and tracks volunteers. Day to day work with people, households, and
     organizations, and with volunteer shifts and hours once the Volunteers module is turned on. Does
-    not include Open Impact Settings.
+    not include BarnCRM Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Volunteer Coordinator</label>
-  <permissionSets>Nonprofit_Staff</permissionSets>
+  <permissionSets>BarnCRM_Staff</permissionSets>
 </PermissionSetGroup>

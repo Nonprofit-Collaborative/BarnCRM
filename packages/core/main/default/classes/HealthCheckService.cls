@@ -1,5 +1,5 @@
 /**
- * Health Check: what this org looks like, whether Open Impact is set up to match, who can
+ * Health Check: what this org looks like, whether BarnCRM is set up to match, who can
  * get in, and what is currently in the way (plan Section 4.8, feature C-11).
  *
  * This class holds the vocabulary every check shares (the Finding, the severities, the
@@ -111,7 +111,7 @@ public with sharing class HealthCheckService {
     }
 
     /** The settings console tab that hosts every section a fix can point at. */
-    public static final String SETTINGS_TAB = 'Nonprofit_Settings';
+    public static final String SETTINGS_TAB = 'BarnCRM_Settings';
 
     /** The page state parameter that tells the console which section to open. */
     public static final String SECTION_STATE_PARAMETER = 'section';
@@ -123,12 +123,12 @@ public with sharing class HealthCheckService {
 
     /**
      * The developer names of the packaged permission set groups (the roles the Access page
-     * assigns) that mean "this person uses Open Impact", and the permission set that means
+     * assigns) that mean "this person uses BarnCRM", and the permission set that means
      * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
      */
-    public static final String GROUP_ADMIN = 'Nonprofit_Admin_Group';
-    public static final String PERMISSION_SET_ADMIN = 'Nonprofit_Admin';
-    public static final Set<String> NONPROFIT_GROUPS = new Set<String>{
+    public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
+    public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';
+    public static final Set<String> BARNCRM_GROUPS = new Set<String>{
         GROUP_ADMIN,
         'Fundraising_Staff',
         'Program_Staff',
@@ -140,10 +140,10 @@ public with sharing class HealthCheckService {
      * The packaged permission sets themselves. An administrator who assigned one of these
      * directly, rather than through a role, has still given that person the app.
      */
-    public static final Set<String> NONPROFIT_PERMISSION_SETS = new Set<String>{
+    public static final Set<String> BARNCRM_PERMISSION_SETS = new Set<String>{
         PERMISSION_SET_ADMIN,
-        'Nonprofit_Staff',
-        'Nonprofit_Read_Only'
+        'BarnCRM_Staff',
+        'BarnCRM_Read_Only'
     };
 
     /**
@@ -303,7 +303,7 @@ public with sharing class HealthCheckService {
     }
 
     /**
-     * How many people administer Open Impact, and how many active people cannot see it at
+     * How many people administer BarnCRM, and how many active people cannot see it at
      * all. Both are questions about the whole org, which is why only an administrator is
      * allowed to ask them.
      */
@@ -322,9 +322,9 @@ public with sharing class HealthCheckService {
         }
 
         public Integer usersWithoutAccess() {
-            Set<Id> assigned = UserAccessSelector.getAssignedUserIds(NONPROFIT_GROUPS);
+            Set<Id> assigned = UserAccessSelector.getAssignedUserIds(BARNCRM_GROUPS);
             assigned.addAll(
-                UserAccessSelector.getPermissionSetAssigneeIds(NONPROFIT_PERMISSION_SETS)
+                UserAccessSelector.getPermissionSetAssigneeIds(BARNCRM_PERMISSION_SETS)
             );
             return UserAccessSelector.countActiveStandardUsersExcluding(assigned);
         }
@@ -445,7 +445,7 @@ public with sharing class HealthCheckService {
         if (canManageSettings()) {
             steps.add(
                 new CheckStep(
-                    'nonprofit_admin',
+                    'admin_role',
                     new HealthCheckAccessChecks.NoAdminCheck(accessCounts())
                 )
             );
@@ -586,8 +586,8 @@ public with sharing class HealthCheckService {
      * A mode's name as an administrator sees it.
      */
     public static String modeLabel(String mode) {
-        if (CoexistenceService.MODE_AGENTFORCE_NONPROFIT.equals(mode)) {
-            return System.Label.Core_CoexistenceMode_AgentforceNonprofit;
+        if (CoexistenceService.MODE_NONPROFIT_CLOUD.equals(mode)) {
+            return System.Label.Core_CoexistenceMode_NonprofitCloud;
         }
         if (CoexistenceService.MODE_NPSP.equals(mode)) {
             return System.Label.Core_CoexistenceMode_Npsp;

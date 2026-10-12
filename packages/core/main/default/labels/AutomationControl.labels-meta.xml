@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation page empty state</shortDescription>
-        <value>Open Impact has not added any automation to this org yet.</value>
+        <value>BarnCRM has not added any automation to this org yet.</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_ErrorPrefix</fullName>
@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation page introduction</shortDescription>
-        <value>Everything Open Impact does for you in the background. Switch one off if it is getting in your way, or pause all of it while you load a spreadsheet.</value>
+        <value>Everything BarnCRM does for you in the background. Switch one off if it is getting in your way, or pause all of it while you load a spreadsheet.</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_OneHour</fullName>
@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation page read only notice</shortDescription>
-        <value>You can read this page but not change it. Ask your administrator for the Manage Open Impact Settings permission.</value>
+        <value>You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_ResumeButton</fullName>

@@ -17,7 +17,7 @@ Appeals arrive with the Giving module. There is nothing to install separately.
 1. Open the **Appeals** tab.
 2. Create one appeal per effort you want to measure. Do not create one per mailing list or
    per segment: an appeal you cannot report on is an appeal nobody fills in.
-3. If you want a particular appeal proposed on new gifts, open **Open Impact Settings**,
+3. If you want a particular appeal proposed on new gifts, open **BarnCRM Settings**,
    choose **Giving**, and set **Default Appeal**.
 
 No Salesforce Setup step is needed.
@@ -43,7 +43,7 @@ You are David, and the spring letter goes out on Monday.
 
 ## Common mistakes
 
-- **Making an appeal its own parent, or a loop.** Open Impact refuses the save with "An
+- **Making an appeal its own parent, or a loop.** BarnCRM refuses the save with "An
   appeal cannot be its own parent appeal." Choose the larger effort instead, or leave
   **Parent Appeal** empty.
 - **Expecting a parent's Total Raised to include its children.** It does not: a parent's

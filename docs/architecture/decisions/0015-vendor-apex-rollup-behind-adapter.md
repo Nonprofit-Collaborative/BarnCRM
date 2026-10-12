@@ -1,4 +1,4 @@
-# ADR-0015: Vendor apex-rollup as the aggregation core, behind an OpenImpact adapter
+# ADR-0015: Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter
 
 **Status:** Accepted (builder decision under ADR-0011; vendored as source, not a package dependency)
 **Date:** 2026-09-07

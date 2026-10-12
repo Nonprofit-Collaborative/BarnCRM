@@ -1,8 +1,8 @@
 /**
- * What Open Impact Core does for itself at install and at every upgrade.
+ * What BarnCRM Core does for itself at install and at every upgrade.
  *
  * Four things. The first is to make sure the person who installed the package can open
- * Nonprofit Settings. Without it nobody in the org holds the Manage Nonprofit Settings
+ * BarnCRM Settings. Without it nobody in the org holds the Manage BarnCRM Settings
  * custom permission, so the console opens read only for everyone, including the System
  * Administrator who installed it, because a custom permission is not implied by Modify All
  * Data. The only way out would be Salesforce Setup, which Principle 1 does not allow.
@@ -14,10 +14,10 @@
  * the install has committed, and does the rest itself. The job takes two steps, because the
  * platform makes the obvious one unreliable:
  *
- * 1. Assign the Nonprofit Admin permission set. A permission set has no calculation
+ * 1. Assign the BarnCRM Admin permission set. A permission set has no calculation
  *    status, so this works the moment the job runs. This is the step that matters: after
  *    it, the installer can use the app.
- * 2. Assign the Nonprofit Admin role, which is a permission set group. The platform
+ * 2. Assign the BarnCRM Admin role, which is a permission set group. The platform
  *    recalculates packaged groups in the background after an install and refuses to assign
  *    one while that is running, which is the usual state in the first minutes. So this is
  *    attempted, and if the group is not ready the job waits and tries again a few times.
@@ -133,8 +133,8 @@ public with sharing class CorePostInstall implements InstallHandler {
     }
 
     /**
-     * Queues the job that gives the installer the Nonprofit Admin permission set and then the
-     * Nonprofit Admin role. Queued rather than done here because both are setup object writes
+     * Queues the job that gives the installer the BarnCRM Admin permission set and then the
+     * BarnCRM Admin role. Queued rather than done here because both are setup object writes
      * and this transaction has already written ordinary records (see the class comment).
      *
      * @param installerId the person who installed or upgraded the package

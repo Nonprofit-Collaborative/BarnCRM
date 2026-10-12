@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>How sample data arrives in the flexible membership mode</shortDescription>
-        <value>This org uses the flexible way of belonging to a household, so each sample person is joined to their household by a household member record, exactly as your own people are. The sample people themselves are loaded as contacts: Open Impact never creates person accounts, so if your org stores people as accounts the sample set shows you households of contacts.</value>
+        <value>This org uses the flexible way of belonging to a household, so each sample person is joined to their household by a household member record, exactly as your own people are. The sample people themselves are loaded as contacts: BarnCRM never creates person accounts, so if your org stores people as accounts the sample set shows you households of contacts.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_HouseholdsLabel</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Missing permission error</shortDescription>
-        <value>You need the Manage Open Impact Settings permission to do this.</value>
+        <value>You need the Manage BarnCRM Settings permission to do this.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_OrganizationsLabel</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Read-only message for users without the permission</shortDescription>
-        <value>You need the Manage Open Impact Settings permission to load or remove sample data.</value>
+        <value>You need the Manage BarnCRM Settings permission to load or remove sample data.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_RecordTypeMissing</fullName>

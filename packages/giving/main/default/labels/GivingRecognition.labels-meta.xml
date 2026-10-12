@@ -54,7 +54,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Amount and percent disagree</shortDescription>
-    <value>Enter an amount or a percent, not both. Open Impact works the other one out from the gift.</value>
+    <value>Enter an amount or a percent, not both. BarnCRM works the other one out from the gift.</value>
   </labels>
   <labels>
     <fullName>Giving_SoftCredit_CustomRoleRequired</fullName>
@@ -126,7 +126,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Automatic credit explanation</shortDescription>
-    <value>Open Impact created this credit from the household and keeps it up to date. Change the gift, or who is in the household, and it follows.</value>
+    <value>BarnCRM created this credit from the household and keeps it up to date. Change the gift, or who is in the household, and it follows.</value>
   </labels>
   <labels>
     <fullName>Giving_SoftCredits_Cancel</fullName>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Coexistence_Mode__c</fullName>
+  <defaultValue>&quot;Standalone&quot;</defaultValue>
+  <description>How this org coexists with what is already installed: Standalone, or a mode for another household product BarnCRM detects in the org. Text rather than a picklist because custom settings do not support picklists (ADR-0019).</description>
+  <inlineHelpText>How BarnCRM works alongside what you already have.</inlineHelpText>
+  <label>Coexistence Mode</label>
+  <length>40</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

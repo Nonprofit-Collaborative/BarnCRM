@@ -2,7 +2,7 @@
  * Test users for the Health Check and coexistence tests (features C-07 and C-11).
  *
  * Two people appear in these tests: Maria, the operations manager, who holds the Manage
- * Nonprofit Settings permission, and Priya, the program coordinator, who does not and who is
+ * BarnCRM Settings permission, and Priya, the program coordinator, who does not and who is
  * the reason the access checks are gated at all.
  *
  * The permission comes from the packaged custom permission, not from a copy of it, and its
@@ -11,17 +11,17 @@
  */
 @IsTest
 public class HealthCheckTestHelper {
-    /** The packaged role an administrator of Open Impact is given (admin guide, Access). */
-    private static final String NONPROFIT_ADMIN = HealthCheckService.PERMISSION_SET_ADMIN;
+    /** The packaged role an administrator of BarnCRM is given (admin guide, Access). */
+    private static final String ADMIN_PERMISSION_SET = HealthCheckService.PERMISSION_SET_ADMIN;
 
     /**
-     * Maria: a user holding the Manage Nonprofit Settings custom permission, and the packaged
-     * Nonprofit Admin permission set that carries it in a real org.
+     * Maria: a user holding the Manage BarnCRM Settings custom permission, and the packaged
+     * BarnCRM Admin permission set that carries it in a real org.
      *
      * Both, because the permission alone does not describe anybody. The custom permission is
      * what the settings console and Health Check check, so a test that only granted that would
      * still exercise the gate, but it would exercise it as a user who cannot exist: the admin
-     * guide tells Maria to ask for the Nonprofit Admin role, and that role is what gives her
+     * guide tells Maria to ask for the BarnCRM Admin role, and that role is what gives her
      * create access on Setting Change, which every audited settings save writes in user mode
      * (ADR-0021 keeps the audit trail in user mode on purpose). Without it these tests failed
      * on the audit row rather than on anything they were written to check.
@@ -35,19 +35,19 @@ public class HealthCheckTestHelper {
         ];
         System.assert(
             !permissions.isEmpty(),
-            'The Manage Nonprofit Settings custom permission is not in this org. It ships with ' +
+            'The Manage BarnCRM Settings custom permission is not in this org. It ships with ' +
             'the settings console (C-03), which has to merge before these tests mean anything.'
         );
 
         List<PermissionSet> packaged = [
             SELECT Id
             FROM PermissionSet
-            WHERE Name = :NONPROFIT_ADMIN
+            WHERE Name = :ADMIN_PERMISSION_SET
             LIMIT 1
         ];
         System.assert(
             !packaged.isEmpty(),
-            'The Nonprofit Admin permission set is not in this org. It is the role the admin ' +
+            'The BarnCRM Admin permission set is not in this org. It is the role the admin ' +
                 'guide tells Maria to ask for, and it carries the object access an audited ' +
                 'settings save needs, so these tests are about nobody without it.'
         );
@@ -106,7 +106,7 @@ public class HealthCheckTestHelper {
             Email = alias + '@example.invalid',
             EmailEncodingKey = 'UTF-8',
             FirstName = alias.capitalize(),
-            LastName = 'Nonprofit',
+            LastName = 'Tester',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
             ProfileId = UserInfo.getProfileId(),

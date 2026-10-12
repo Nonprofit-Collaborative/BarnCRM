@@ -2,7 +2,7 @@
 
 ## What it does
 
-Open Impact records fundraising efforts as appeals. Salesforce has its own object for the
+BarnCRM records fundraising efforts as appeals. Salesforce has its own object for the
 same idea, the Campaign, and many tools only understand that one: Campaign Members, email
 marketing apps, event tools, and the Campaign reports your team may already use.
 
@@ -41,10 +41,10 @@ Campaigns, and the Campaign sync page says so.
 
 1. Give yourself the **Campaign Sync** permission set. Until the Module Manager arrives,
    module permission sets are assigned in Setup.
-2. Open **Open Impact Settings**, choose **Giving**, and switch on **Copy appeals to
+2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.
 3. Still in **Giving**, open **Campaign sync**. It shows how many appeals have a Campaign.
-   Click **Sync all appeals** once, so the appeals you already had get their Campaigns.
+   It counts up to 10,000 appeals; past that a number reads `10000+`. Click **Sync all appeals** once, so the appeals you already had get their Campaigns.
 
 **Who gets a Campaign when they save an appeal.** The Campaign is created with the access of
 the person saving the appeal. Salesforce only lets someone create Campaigns when their user
@@ -57,12 +57,12 @@ appeals**. Choose one:
   and edit access; or
 - leave their access as it is, and click **Sync all appeals** after a batch of new appeals.
 
-Clicking **Sync all appeals** needs the Manage Open Impact Settings permission (the Open Impact
+Clicking **Sync all appeals** needs the Manage BarnCRM Settings permission (the BarnCRM
 Admin permission set has it) as well as Campaign access.
 
-**Two switches, one of them in charge.** **Copy appeals to Campaigns** in Open Impact Settings
+**Two switches, one of them in charge.** **Copy appeals to Campaigns** in BarnCRM Settings
 is the switch that decides whether Campaign sync is on. The **Campaign sync** row on the
-Automation page is the pause every Open Impact automation has. It stops only the copy made
+Automation page is the pause every BarnCRM automation has. It stops only the copy made
 when an appeal is saved, and it does nothing while **Copy appeals to Campaigns** is off. Leave
 it on, and use **Copy appeals to Campaigns** to turn the feature on or off. **Sync all
 appeals** follows **Copy appeals to Campaigns** alone.
@@ -78,7 +78,7 @@ time, as Data Loader does by default, is copied as usual.
 Do this as Maria, in an org that has Campaigns, with the sample data loaded and Campaign
 sync switched on as above.
 
-1. Open **Open Impact Settings**, **Giving**, **Campaign sync**. Note the numbers: for
+1. Open **BarnCRM Settings**, **Giving**, **Campaign sync**. Note the numbers: for
    example `0 of 6 appeals have a Campaign.`
 2. Click **Sync all appeals**. The page says the sync has started. Wait a minute and reload
    the page: every appeal now has a Campaign.

@@ -3,7 +3,7 @@
     <fullName>Last_Calculated__c</fullName>
     <description>When this rollup last completed a calculation, of any scope. Written by the rollup engine, never by hand.</description>
     <externalId>false</externalId>
-    <inlineHelpText>When this number was last calculated. Set by Open Impact.</inlineHelpText>
+    <inlineHelpText>When this number was last calculated. Set by BarnCRM.</inlineHelpText>
     <label>Last Calculated</label>
     <required>false</required>
     <trackHistory>false</trackHistory>

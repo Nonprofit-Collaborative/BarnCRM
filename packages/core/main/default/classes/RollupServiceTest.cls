@@ -1,10 +1,10 @@
 /**
- * The engine as the rest of Open Impact sees it: materializing shipped defaults, running a
+ * The engine as the rest of BarnCRM sees it: materializing shipped defaults, running a
  * definition, and stamping freshness.
  *
  * These tests have not been executed: no Salesforce org exists in this environment. The engine
  * itself is stood down with `RollupService.skipEngine`, because what is being asserted here is
- * Open Impact's side of ADR-0015: which definitions are selected, what metadata they become, and
+ * BarnCRM's side of ADR-0015: which definitions are selected, what metadata they become, and
  * what is stamped afterwards. The engine's own behaviour is upstream's, and upstream tests it.
  */
 @IsTest
@@ -42,7 +42,7 @@ private class RollupServiceTest {
         // right to refuse a mode the shipped row does not offer, and what is being measured
         // here is what the reader does with a stored value that is wrong anyway, which is how
         // an org upgraded from an older row would arrive.
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Rollup_Mode_Default__c = 'Nonsense';
         TestDataFactory.saveSettings(settings);
 

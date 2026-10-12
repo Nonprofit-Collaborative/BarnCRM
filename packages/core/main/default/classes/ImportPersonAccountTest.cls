@@ -295,8 +295,8 @@ private class ImportPersonAccountTest {
             ProfileId = [SELECT Id FROM Profile WHERE Name = 'Minimum Access - Salesforce' LIMIT 1]
             .Id,
             LastName = 'Mailonly',
-            Email = 'mailonly@openimpact.test.invalid',
-            Username = 'mailonly' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'mailonly@barncrm.test.invalid',
+            Username = 'mailonly' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'mailonly',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

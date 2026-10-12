@@ -1,5 +1,5 @@
 {
-  "orgName": "Open Impact Nonprofit Cloud",
+  "orgName": "BarnCRM Nonprofit Cloud",
   "edition": "Enterprise",
   "hasSampleData": false,
   "features": ["PersonAccounts", "EnableSetPasswordInApi", "NonprofitCloud"],

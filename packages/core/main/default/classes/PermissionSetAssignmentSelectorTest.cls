@@ -20,7 +20,7 @@ private class PermissionSetAssignmentSelectorTest {
             LastName = lastName,
             Alias = 'oi' + suffix.right(6),
             Email = firstName.toLowerCase() + '.' + suffix + '@example.invalid',
-            Username = firstName.toLowerCase() + '.' + suffix + '@openimpact.test.invalid',
+            Username = firstName.toLowerCase() + '.' + suffix + '@barncrm.test.invalid',
             ProfileId = standardProfile.Id,
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

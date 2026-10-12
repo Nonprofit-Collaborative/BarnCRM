@@ -1,5 +1,5 @@
 /**
- * Core has to run on an org where no other Open Impact package is installed, so detection
+ * Core has to run on an org where no other BarnCRM package is installed, so detection
  * answers honestly and nothing static ever names another package's schema.
  */
 @IsTest
@@ -7,17 +7,63 @@ private class ModuleDetectionServiceTest {
     @IsTest
     static void listsTheSixPackagesAndSaysWhichAreHere() {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        ModuleDetectionService.givingPresentOverride = true;
 
         Test.startTest();
         List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
         Test.stopTest();
 
-        Assert.areEqual(6, modules.size(), 'Open Impact is six packages');
+        Assert.areEqual(6, modules.size(), 'With Giving here, all six packages are offered');
         Assert.areEqual('Core', modules[0].name, 'Core comes first and is always here');
         Assert.isTrue(modules[0].present, 'Core is the package this code is in');
         for (ModuleDetectionService.ModuleInfo module : modules) {
-            Assert.isNotNull(module.docsUrl, 'Every module says where to read what it does');
+            Assert.isTrue(
+                module.docsUrl.endsWith('/README.md'),
+                'Every module links to its own README, not to the product plan: ' + module.docsUrl
+            );
         }
+    }
+
+    @IsTest
+    static void offersOnlyCoreAndVolunteersWithoutGiving() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        ModuleDetectionService.givingPresentOverride = false;
+
+        Test.startTest();
+        List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
+        Test.stopTest();
+
+        List<String> names = new List<String>();
+        for (ModuleDetectionService.ModuleInfo module : modules) {
+            names.add(module.name);
+        }
+        Assert.areEqual(
+            new List<String>{ 'Core', 'Volunteers' },
+            names,
+            'An org without Giving is offered the modules that fit every organization only'
+        );
+    }
+
+    @IsTest
+    static void listsAnInstalledModuleEvenWithoutGiving() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+            new Setting_Definition__mdt(
+                Setting_Key__c = 'Program_Setting__c',
+                Settings_Object__c = 'Program_Settings__c',
+                Section__c = 'Programs',
+                Module__c = 'Programs',
+                Data_Type__c = 'Text'
+            )
+        };
+        ModuleDetectionService.givingPresentOverride = false;
+
+        Test.startTest();
+        List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
+        Test.stopTest();
+
+        Assert.areEqual(3, modules.size(), 'Core, Volunteers and the module that is installed');
+        Assert.areEqual('Programs', modules[2].name, 'An installed module is never hidden');
+        Assert.isTrue(modules[2].present, 'And it is shown as here');
     }
 
     @IsTest
@@ -52,7 +98,7 @@ private class ModuleDetectionServiceTest {
     static void answersHonestlyOnACoreOnlyOrg() {
         Test.startTest();
         Boolean givingPresent = ModuleDetectionService.isGivingPresent();
-        Boolean givingListed;
+        Boolean givingListed = false;
         for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
             if (module.name == 'Giving') {
                 givingListed = module.present;

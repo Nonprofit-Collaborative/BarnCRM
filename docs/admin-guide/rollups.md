@@ -2,23 +2,27 @@
 
 ## What it does
 
-Rollups are the totals that appear on a household, a person, an organization, a fund, an
-appeal, a pledge, or a scheduled payment without anyone adding them up: total giving,
-first and last gift, largest gift, gift count, giving this year and the two years before
-it, pledge balance, soft credit totals, what a fund and an appeal have raised, what has
-been paid against a pledge.
+Rollups are the totals that appear on a household, a person, an organization, or another
+record without anyone adding them up: a count, a sum, a first or last date, a largest
+value. BarnCRM Core runs the rollup engine; the totals themselves are shipped by the
+modules that own the records being counted, and with the Giving module installed they
+include total giving, gift counts and dates, pledge balances and what a fund and an appeal
+have raised.
 
 The member count on a household is not one of them. It looks like a rollup and it is kept
 up to date for you, but it is maintained by the household automation every time somebody
 joins or leaves, so it is not on the Rollups page and Recalculate does not touch it. If a
 member count looks wrong, the Households page is where to fix it.
 
-Open Impact calculates them for you and shows you when each one was last calculated, so
+BarnCRM calculates them for you and shows you when each one was last calculated, so
 you never have to guess whether a number on a record is current. If the calculation has
 not run recently, the Hub says so on the home page rather than leaving a stale number
 looking fresh.
 
-## What Open Impact calculates for you
+## What BarnCRM calculates for you (with Giving)
+
+This section applies only when the Giving module is installed. Core on its own ships no
+totals, so its Rollups page lists only rollups you add yourself.
 
 Every total below is created when you install the module that owns it, switched on and
 ready to calculate, and every one of them can then be switched to another mode, made
@@ -65,7 +69,7 @@ about a number that looks wrong:
   once its status is Received, Refunded, or Written off: the three statuses that mean the
   money actually moved. Refunded and Written off are in that list on purpose, and the next
   point says why.
-- **A refunded gift stays in the count and leaves the total.** Open Impact records a
+- **A refunded gift stays in the count and leaves the total.** BarnCRM records a
   refund as a second gift for a negative amount rather than editing or deleting the
   original, so the two cancel out. A donor who gave $250 and had all of it back shows
   **1 gift** and **$0 total giving**. That is deliberate: they did give, once, and the
@@ -87,14 +91,14 @@ about a number that looks wrong:
 
 ## How to turn it on
 
-Most of it is already on. Installing a module creates its rollups: the giving totals
-arrive with the Giving module, active and ready to calculate, and an upgrade adds anything
-newly shipped without touching a rollup you have changed. An org with Core alone has no
-giving totals because it has no gifts, and they appear when the Giving module is installed.
+Most of it is already on. Installing a module creates its rollups, active and ready to
+calculate (with Giving, the giving totals), and an upgrade adds anything newly shipped
+without touching a rollup you have changed. An org with Core alone starts with no shipped
+totals.
 
 One step is left for you, and nothing in the app does it on your behalf:
 
-1. Open the **Open Impact** app and choose the **Open Impact Settings** tab.
+1. Open the **BarnCRM** app and choose the **BarnCRM Settings** tab.
 2. Choose **Rollups** in the left navigation. You should see every total listed above, one
    row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
@@ -112,7 +116,7 @@ already writes is not created, so the two never overwrite each other's total. Pr
 install-time step failed and the Error Log will say why, or if a rollup you need is not
 listed.
 
-It is also the reason to switch a rollup off rather than delete it. Open Impact cannot
+It is also the reason to switch a rollup off rather than delete it. BarnCRM cannot
 tell a rollup you deleted on purpose from one that has never existed, so a deleted rollup
 comes back the next time the package is upgraded or the next time somebody presses this
 button. Clearing the **Active** box is the durable way to say no to a total: an inactive
@@ -127,18 +131,19 @@ Two settings on the same page change how every rollup behaves:
 - **Default rollup mode** decides how a newly created rollup starts out: Real time,
   Scheduled, or Both.
 
-You need the **Manage Open Impact Settings** permission to change any of this. Without it,
+You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
 the Rollups page still opens and still shows every total and its last calculated time; the
 controls are simply read only.
 
 ## A five-minute walkthrough
 
-Do this as Maria, with the sample data loaded.
+Do this as Maria, with the sample data loaded. Steps 2 to 5 use the giving totals, so they
+need the Giving module; with Core alone, do them on a rollup you have added.
 
-1. Open the **Open Impact** app. On the home page, find the **Rollups** tile. It reads
+1. Open the **BarnCRM** app. On the home page, find the **Rollups** tile. It reads
    "Rollups last completed" with a time. If it has been more than 36 hours, the tile turns
    into a warning and offers a link to the Rollups page. Click that link, or open
-   **Open Impact Settings** and choose **Rollups**.
+   **BarnCRM Settings** and choose **Rollups**.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
    Each row says what the number means in plain language, what it counts ("SUM Amount__c
    on Gift__c"), where it shows ("Account.Total_Giving__c"), its mode, and when it was
@@ -161,22 +166,22 @@ Do this as Maria, with the sample data loaded.
 
 ## Common mistakes
 
-**Typing over a total by hand.** The giving totals are calculated fields, and so is the
+**Typing over a total by hand.** The totals are calculated fields, and so is the
 member count, though that one is maintained by the household automation rather than here. If you edit one on a record, the next calculation overwrites what you typed and
-your change disappears without a message. If a total looks wrong, the gift records behind
+your change disappears without a message. If a total looks wrong, the records behind
 it are wrong; fix those and recalculate. If you need a number the rollups do not
 calculate, add your own field rather than borrowing one of these.
 
-**Expecting a soft credit to show in total giving.** It never will. A spouse recognized on
+**Expecting a soft credit to show in total giving (with Giving).** It never will. A spouse recognized on
 a household gift has it in **Total soft credits**, and the person who actually gave has it
 in **Total giving**. Adding the two together double counts the gift, which is why they are
 two numbers and not one. Report on whichever answers your question, and say which one you
 used.
 
 **Expecting a nightly total to change immediately.** A rollup in **Scheduled** mode is
-recalculated once a night, so a gift entered this afternoon does not move it until
+recalculated once a night, so a record entered this afternoon does not move it until
 tomorrow morning. That is what the last calculated time is there to tell you. If a total
-needs to be right the moment a gift is saved, set it to **Real time** or **Both**.
+needs to be right the moment a record is saved, set it to **Real time** or **Both**.
 
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is
@@ -205,6 +210,11 @@ For report builders only. Nothing on this page requires you to know these.
 | Rollups last calculated, on a record | `Rollups_Last_Calculated__c` |
 | Last calculated, on the Rollups page | `Last_Calculated__c` on Rollup Definition |
 | Member count on a household, maintained by the household automation rather than by a rollup | `Member_Count__c` |
+
+With Giving installed:
+
+| What you see | Field |
+|---|---|
 | Total giving, on an account or a contact | `Total_Giving__c` |
 | Gift count, on an account or a contact | `Gift_Count__c` |
 | First gift date | `First_Gift_Date__c` |

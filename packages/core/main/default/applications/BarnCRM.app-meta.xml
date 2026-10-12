@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households and organizations</comment>
+    <content>Account_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Households and organizations</comment>
+    <content>Account_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Account</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People</comment>
+    <content>Contact_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People</comment>
+    <content>Contact_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <brand>
+    <headerColor>#1B5E20</headerColor>
+    <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+  </brand>
+  <description>
+    The app an organization works in every day: a home page that says what to do next, the people
+    and organizations it serves, and one page for every setting.
+  </description>
+  <formFactors>Large</formFactors>
+  <formFactors>Small</formFactors>
+  <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+  <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <label>BarnCRM</label>
+  <navType>Standard</navType>
+  <tabs>BarnCRM_Home</tabs>
+  <tabs>Households</tabs>
+  <tabs>standard-Contact</tabs>
+  <tabs>Organizations</tabs>
+  <tabs>Import</tabs>
+  <tabs>BarnCRM_Settings</tabs>
+  <tabs>Error_Log__c</tabs>
+  <uiType>Lightning</uiType>
+</CustomApplication>

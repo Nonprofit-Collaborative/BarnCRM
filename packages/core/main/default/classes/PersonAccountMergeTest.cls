@@ -140,7 +140,7 @@ private class PersonAccountMergeTest {
     // ------------------------------------------------------------------------------ helpers
 
     private static void settingsThatTidyEmptyHouseholds() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Auto_Create_Households__c = false;

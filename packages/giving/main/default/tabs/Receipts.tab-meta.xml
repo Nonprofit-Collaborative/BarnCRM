@@ -2,7 +2,7 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     The receipt letters donors read, and the button that generates this year's statements. The tax
-    wording is added by Open Impact and is not editable here.
+    wording is added by BarnCRM and is not editable here.
   </description>
   <flexiPage>Receipts</flexiPage>
   <label>Receipts</label>

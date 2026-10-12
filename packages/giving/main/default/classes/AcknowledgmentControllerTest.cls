@@ -23,7 +23,7 @@ private class AcknowledgmentControllerTest {
             'Everything else',
             100,
             AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'Open_Impact_Thank_You'
+            'BarnCRM_Thank_You'
         );
         insert new List<Acknowledgment_Rule__c>{ major, everything };
     }
@@ -96,7 +96,7 @@ private class AcknowledgmentControllerTest {
             'Typo',
             10,
             AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'Open Impact: thank you for your gift'
+            'BarnCRM: thank you for your gift'
         );
         insert wrong;
 

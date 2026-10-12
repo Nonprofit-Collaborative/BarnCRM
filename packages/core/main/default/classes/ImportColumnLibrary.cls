@@ -2,7 +2,7 @@
  * The library of column names automatic mapping suggests from (plan Section 4.9).
  *
  * A header is normalized (lower case, punctuation and spacing removed) and looked up. The
- * entries cover what actually appears at the top of a nonprofit's spreadsheet: the wording
+ * entries cover what actually appears at the top of an organization's spreadsheet: the wording
  * used by NPSP exports, by the common payment processors, and by a list somebody typed
  * themselves. A header nobody recognizes is suggested as "do not load", never guessed at,
  * because a wrong guess that looks confident is worse than an empty box.
@@ -24,7 +24,7 @@ public with sharing class ImportColumnLibrary {
      */
     private static Map<String, String> knownTargets;
 
-    /** The target Open Impact suggests for one header, or null when it recognizes none. */
+    /** The target BarnCRM suggests for one header, or null when it recognizes none. */
     @NamespaceAccessible
     public static String suggest(String header) {
         if (String.isBlank(header)) {

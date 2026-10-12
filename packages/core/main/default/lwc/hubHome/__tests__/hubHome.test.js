@@ -74,7 +74,7 @@ function model(overrides) {
       {
         key: 'coexistence',
         position: 1,
-        label: 'Confirm how Open Impact fits your existing org',
+        label: 'Confirm how BarnCRM fits your existing org',
         description: 'Person Accounts orgs use the junction model.',
         targetType: 'Settings',
         target: 'General',
@@ -141,6 +141,14 @@ describe('c-hub-home', () => {
     expect(element.shadowRoot.querySelector('[data-id="error-count"]').textContent).toBe('3');
     const link = element.shadowRoot.querySelector('a[href="/lightning/o/Error_Log__c/list"]');
     expect(link).not.toBeNull();
+  });
+
+  it('says the cap with a plus when there are more errors than the tile counts', async () => {
+    getHomeModel.mockResolvedValue(model({ newErrorCount: 999, newErrorCountCapped: true }));
+    const element = build();
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="error-count"]').textContent).toBe('999+');
   });
 
   it('says setup completed when the install logged nothing', async () => {

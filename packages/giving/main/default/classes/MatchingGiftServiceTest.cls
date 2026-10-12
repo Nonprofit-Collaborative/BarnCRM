@@ -57,7 +57,7 @@ private class MatchingGiftServiceTest {
         System.assertEquals(
             data.employerGift.Id,
             employeeGift.Matched_Gift__c,
-            'Open Impact fills in the other side of the link'
+            'BarnCRM fills in the other side of the link'
         );
         System.assertEquals(
             1,

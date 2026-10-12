@@ -11,7 +11,7 @@
  */
 @IsTest
 private class HealthCheckFixesTest {
-    private static final String TEST_JOB_NAME = 'Open Impact Rollups (HealthCheckFixesTest)';
+    private static final String TEST_JOB_NAME = 'BarnCRM Rollups (HealthCheckFixesTest)';
 
     private static Rollup_Definition_Default__mdt memberCountDefault(String mode) {
         return new Rollup_Definition_Default__mdt(

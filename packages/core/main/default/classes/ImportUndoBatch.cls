@@ -464,11 +464,27 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         return fields == null ? new Map<String, Object>() : (Map<String, Object>) fields;
     }
 
+    /** Field maps by lower-case object name, described once per transaction. */
+    private static Map<String, Map<String, Schema.SObjectField>> fieldMaps = new Map<String, Map<String, Schema.SObjectField>>();
+
+    /**
+     * The object's field map. It is asked for once per journal entry inside the restore loop,
+     * so the global describe and the object describe are taken once and kept
+     * (dynamic-apex.md section 5).
+     */
+    @TestVisible
     private static Map<String, Schema.SObjectField> fieldMap(String objectName) {
-        return Schema.getGlobalDescribe()
-            .get(objectName)
-            .getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap();
+        String key = objectName.toLowerCase();
+        if (!fieldMaps.containsKey(key)) {
+            fieldMaps.put(
+                key,
+                Schema.getGlobalDescribe()
+                    .get(objectName)
+                    .getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .fields.getMap()
+            );
+        }
+        return fieldMaps.get(key);
     }
 
     /**
@@ -624,7 +640,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      * Why each of these records is not the import's to delete (R-IB9): it was edited or had an
      * activity logged since; anything created since points at it through any reference the org
      * can filter on; or, for a household or an organization, a person is still on it or
-     * something outside Open Impact depends on it (ADR-0036).
+     * something outside BarnCRM depends on it (ADR-0036).
      */
     private Map<Id, String> reasonsToKeep(Set<Id> ids, Schema.SObjectType type) {
         Map<Id, String> keep = new Map<Id, String>();

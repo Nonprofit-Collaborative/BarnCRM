@@ -2,7 +2,7 @@
 
 ## What it does
 
-When something goes wrong inside Open Impact, it writes down what happened in plain
+When something goes wrong inside BarnCRM, it writes down what happened in plain
 language and puts it somewhere you can read it. That is the Error Log. Instead of a
 technical failure disappearing into a log file only a developer can open, you get a list
 of entries that say what went wrong, which record it happened on, and what to do about it.
@@ -12,25 +12,25 @@ have fixed, so the list stays short and honest.
 
 ## What you will see in v0.1
 
-This page describes the finished feature. The Open Impact app and its home page, where
+This page describes the finished feature. The BarnCRM app and its home page, where
 the tile lives, are built by feature C-03. Until then the Error Log tab is the way in, and
 the tile can be placed on any Lightning page. Everything else on this page works today.
 
 ## How to turn it on
 
-The Error Log is on as soon as Open Impact is installed. Nothing is recorded unless
+The Error Log is on as soon as BarnCRM is installed. Nothing is recorded unless
 something actually fails, so on a healthy organization the list is empty.
 
 You will find it in two places:
 
-- **The Open Impact home page.** A tile shows how many new errors are waiting and the
+- **The BarnCRM home page.** A tile shows how many new errors are waiting and the
   five most recent, with the message and where it came from. Click any of them to open it,
   or click the tile heading to see the whole list.
-- **The Error Log tab** in the Open Impact app. This is the full list, and you can sort
+- **The Error Log tab** in the BarnCRM app. This is the full list, and you can sort
   it, filter it, and build reports on it like any other list in Salesforce.
 
-Everyone with the Open Impact Staff or Open Impact Admin role can read the Error Log. Only the
-Open Impact Admin role can change an entry's status.
+Everyone with the BarnCRM Staff or BarnCRM Admin role can read the Error Log. Only the
+BarnCRM Admin role can change an entry's status.
 
 Errors are recorded whatever else is happening: turning an automation off, or pausing all
 automation, never stops the Error Log from recording a problem.
@@ -38,7 +38,7 @@ automation, never stops the Error Log from recording a problem.
 ## The error digest email
 
 If nobody opens the Hub for a few days, nobody sees the tile. The error digest fixes that:
-once a day (or once a week), Open Impact emails a short summary of the new entries to the
+once a day (or once a week), BarnCRM emails a short summary of the new entries to the
 people who look after it. It is off until you switch it on.
 
 What the email says:
@@ -61,9 +61,9 @@ If nothing new has arrived, no email is sent at all.
 
 ### Switch it on
 
-1. Open **Open Impact Settings** and click **Error Log** in the left navigation.
+1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
 2. In **Digest recipients**, leave the box empty to send the digest to everyone who holds
-   the Manage Open Impact Settings permission (the Open Impact Admin role), or type the email
+   the Manage BarnCRM Settings permission (the BarnCRM Admin role), or type the email
    addresses of the people who should get it, separated by commas. Each address has to be
    the email address of an active user of your Salesforce: the digest is never sent to
    anyone outside it, and an address that is not a user's is refused when you save.
@@ -87,7 +87,7 @@ it.
 
 Maria has heard from a colleague that "something did not save this morning."
 
-1. Open the **Open Impact** app. On the home page, look at the **Error Log** tile. It
+1. Open the **BarnCRM** app. On the home page, look at the **Error Log** tile. It
    says how many new errors there are, for example "3 new".
 2. Read the five most recent entries in the tile. Each line shows the message and where it
    came from, for example "Household naming".
@@ -116,7 +116,7 @@ Maria has heard from a colleague that "something did not save this morning."
   every day). Whoever administers your Salesforce can change the setting.
 - **Deactivating the person who scheduled the digest.** The digest runs as that person, so
   it stops. Health Check warns when a scheduled digest has not run for two days: open the
-  Error Log section of Open Impact Settings, click **Stop**, then **Schedule** again as
+  Error Log section of BarnCRM Settings, click **Stop**, then **Schedule** again as
   yourself.
 - **Marking entries Acknowledged and expecting them in the digest.** The digest counts only
   entries that are still New, because those are the ones nobody has looked at.
@@ -127,7 +127,7 @@ Maria has heard from a colleague that "something did not save this morning."
   you. The technical detail underneath is for a support request, and it will not tell you
   anything about your data that the message does not already say.
 - **Expecting an entry for a mistake you made in a spreadsheet.** The Error Log records
-  failures inside Open Impact, not every data problem. A person imported with the wrong
+  failures inside BarnCRM, not every data problem. A person imported with the wrong
   address is a data question, not an error, and it will not appear here.
 - **Assuming an empty list means nothing has failed.** If automation is paused, the work
   that would have failed is not running at all. Check the automation banner on the home

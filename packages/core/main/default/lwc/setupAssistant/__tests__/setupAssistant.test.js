@@ -39,7 +39,7 @@ jest.mock(
 );
 
 const STEP_DEFINITIONS = [
-  ['coexistence', 'Confirm how Open Impact fits your existing org', 'Setting'],
+  ['coexistence', 'Confirm how BarnCRM fits your existing org', 'Setting'],
   ['naming', 'Confirm how households are named', 'Setting'],
   ['moduledefaults', 'Choose a default contact', 'Setting'],
   ['access', 'Give your colleagues access', 'Action'],
@@ -100,13 +100,13 @@ function state(overrides = {}) {
     elapsedMinutes: 21,
     coexistence: {
       detectedShape: 'PersonAccounts',
-      recommendedMode: 'AgentforceNonprofit',
+      recommendedMode: 'NonprofitCloud',
       currentMode: null,
-      modes: ['Standalone', 'NPSP', 'AgentforceNonprofit']
+      modes: ['Standalone', 'NPSP', 'NonprofitCloud']
     },
     modules: [{ name: 'Core', present: true, docsUrl: 'https://example.invalid/core' }],
     roles: [
-      { developerName: 'Nonprofit_Admin', label: 'Open Impact Admin' },
+      { developerName: 'BarnCRM_Admin', label: 'BarnCRM Admin' },
       { developerName: 'Program_Staff', label: 'Program Staff' }
     ],
     importAvailable: false,
@@ -173,7 +173,7 @@ describe('c-setup-assistant', () => {
     click(element, 'back');
     await settle();
     expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
-      'Confirm how Open Impact fits your existing org'
+      'Confirm how BarnCRM fits your existing org'
     );
   });
 
@@ -183,10 +183,10 @@ describe('c-setup-assistant', () => {
 
     element.shadowRoot
       .querySelector('c-setup-step-coexistence')
-      .dispatchEvent(new CustomEvent('confirm', { detail: { mode: 'AgentforceNonprofit' } }));
+      .dispatchEvent(new CustomEvent('confirm', { detail: { mode: 'NonprofitCloud' } }));
     await settle();
 
-    expect(applyCoexistence).toHaveBeenCalledWith({ mode: 'AgentforceNonprofit' });
+    expect(applyCoexistence).toHaveBeenCalledWith({ mode: 'NonprofitCloud' });
   });
 
   it('skips a step without marking it done', async () => {
@@ -280,7 +280,7 @@ describe('c-setup-assistant', () => {
 
     const options = element.shadowRoot.querySelector('lightning-combobox').options;
     expect(options).toEqual([
-      { label: 'Open Impact Admin', value: 'Nonprofit_Admin' },
+      { label: 'BarnCRM Admin', value: 'BarnCRM_Admin' },
       { label: 'Program Staff', value: 'Program_Staff' }
     ]);
   });
@@ -295,7 +295,7 @@ describe('c-setup-assistant', () => {
     // The Hub asked for the assistant, so it opens on step one rather than the summary.
     expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
-      'Confirm how Open Impact fits your existing org'
+      'Confirm how BarnCRM fits your existing org'
     );
     await STEP_DEFINITIONS.reduce(
       (chain) =>
@@ -419,7 +419,7 @@ describe('c-setup-assistant', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
-      'Confirm how Open Impact fits your existing org'
+      'Confirm how BarnCRM fits your existing org'
     );
   });
 
@@ -469,7 +469,7 @@ describe('c-setup-assistant', () => {
 
     expect(resetSetup).toHaveBeenCalled();
     expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
-      'Confirm how Open Impact fits your existing org'
+      'Confirm how BarnCRM fits your existing org'
     );
   });
 

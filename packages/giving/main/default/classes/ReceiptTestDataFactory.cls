@@ -85,7 +85,7 @@ public class ReceiptTestDataFactory {
     public static User issuer() {
         return TestDataFactory.createUserOnTheRunningUsersProfile(
             'Issuer',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
@@ -98,7 +98,7 @@ public class ReceiptTestDataFactory {
     public static RecordingRenderer setUpReceipting() {
         GivingTestDataFactory.ensureDefaultFund();
 
-        Nonprofit_Settings__c core = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
         core.SetupOwnerId = UserInfo.getOrganizationId();
         core.Organization_Legal_Name__c = 'Hope For Homes';
         core.Organization_Address__c = '14 Bridge Street, Springfield';
@@ -130,7 +130,7 @@ public class ReceiptTestDataFactory {
         };
 
         ReceiptService.issuePermission = true;
-        // Maria configures Open Impact, so the tests that edit a letter run as somebody who may.
+        // Maria configures BarnCRM, so the tests that edit a letter run as somebody who may.
         // A custom permission cannot be granted to the user a test runs as without assigning a
         // permission set, which would make every receipting test a test of that assignment.
         ReceiptTemplateService.managePermission = true;

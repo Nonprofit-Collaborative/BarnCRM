@@ -312,7 +312,7 @@ private class SoftCreditServiceTest {
      * relationship, so deleting the gift would take its credits with it whatever this package
      * does, and a test that deleted the gift would pass with the whole removal path deleted.
      * What the method promises, and what nothing else does for it, is that it removes the
-     * credits Open Impact created while leaving the ones a person entered (R-SC6).
+     * credits BarnCRM created while leaving the ones a person entered (R-SC6).
      */
     @IsTest
     static void removesTheAutomaticCreditsAndLeavesTheOnesStaffEnteredAlone() {
@@ -359,7 +359,7 @@ private class SoftCreditServiceTest {
         System.assertEquals(
             0,
             automaticIn(remaining).size(),
-            'Every credit Open Impact created for the gift is gone'
+            'Every credit BarnCRM created for the gift is gone'
         );
     }
 

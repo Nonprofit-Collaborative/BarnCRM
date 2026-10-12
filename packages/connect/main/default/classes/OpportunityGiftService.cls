@@ -4,7 +4,7 @@
  *
  * Called only by `OpportunityMirrorBatch`, one chunk at a time, as the person who started or
  * scheduled the run. Connect cannot hold a trigger on Opportunity (ADR-0013), so a run is how an
- * online gift written as an Opportunity reaches Open Impact.
+ * online gift written as an Opportunity reaches BarnCRM.
  *
  * Gifts are ordinary gifts inserted in user mode with partial success, carrying the Opportunity
  * ID in the insert itself, so the unique attribute stops a second gift even when two runs

@@ -2,7 +2,7 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
   <allowInChatterGroups>false</allowInChatterGroups>
   <deploymentStatus>Deployed</deploymentStatus>
-  <description>A connection between two people, such as spouses, a parent and a child, or two colleagues. Open Impact keeps the other side of the connection in step, so a relationship is entered once and read from both people.</description>
+  <description>A connection between two people, such as spouses, a parent and a child, or two colleagues. BarnCRM keeps the other side of the connection in step, so a relationship is entered once and read from both people.</description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>
   <enableFeeds>false</enableFeeds>

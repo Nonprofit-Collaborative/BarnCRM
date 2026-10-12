@@ -2,7 +2,7 @@
  * Reads and writes the org's settings.
  *
  * Each package owns a protected hierarchy custom setting (ADR-0017): Core's is
- * `Nonprofit_Settings__c` and a module ships its own, named on its Setting Definition rows.
+ * `BarnCRM_Settings__c` and a module ships its own, named on its Setting Definition rows.
  * Every write is validated against that object's own schema and against the shipped rows, is
  * audited as a Setting Change record, and clears the cached copy so the next transaction sees
  * the new value (canonical model Section 12, R-N3).
@@ -15,12 +15,12 @@ public with sharing class SettingsService {
      * registered.
      */
     @NamespaceAccessible
-    public static final String CORE_SETTINGS_OBJECT = Nonprofit_Settings__c.SObjectType.getDescribe(
+    public static final String CORE_SETTINGS_OBJECT = BarnCRM_Settings__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         )
         .getLocalName();
 
-    private static final String CACHE_PARTITION = 'local.NonprofitSettings';
+    private static final String CACHE_PARTITION = 'local.BarnCRMSettings';
     private static final String CACHE_KEY = 'orgDefaults';
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
@@ -30,7 +30,7 @@ public with sharing class SettingsService {
      *
      * A checkbox field can declare `<defaultValue>true</defaultValue>`, and that default is what
      * the platform applies when a record is created through the user interface. It is not what
-     * Apex reads. `Nonprofit_Settings__c.getOrgDefaults()` on an org that has never saved its
+     * Apex reads. `BarnCRM_Settings__c.getOrgDefaults()` on an org that has never saved its
      * settings returns a materialized record with every checkbox false, not null and not the
      * shipped default, so a feature that ships on reads as switched off on every fresh install
      * and does nothing at all, silently. That is what happened to the relationship reciprocal
@@ -38,19 +38,19 @@ public with sharing class SettingsService {
      *
      * The default is applied to the record only while the org has never saved one. From the
      * first save onwards the stored value governs, including a deliberate false, and the first
-     * save carries these defaults into the record it creates, because `applyValues` clones the
-     * record this method returns. So an administrator who saves some unrelated setting does not
-     * silently switch a shipped feature off.
+     * save carries these defaults into the record it creates, because every first save starts
+     * from `firstSaveRecord` (OrgSettingsSystemWriter). So an administrator who saves some
+     * unrelated setting does not silently switch a shipped feature off.
      *
      * A field belongs here when it ships on. `scripts/ci/check-setting-defaults.py` fails the
      * build when a checkbox that ships on is missing from it (ADR-0035).
      */
     private static final Map<Schema.SObjectField, Boolean> SHIPPED_DEFAULTS = new Map<Schema.SObjectField, Boolean>{
-        Nonprofit_Settings__c.Relationship_Auto_Reciprocal__c => true,
-        Nonprofit_Settings__c.Auto_Create_Households__c => true
+        BarnCRM_Settings__c.Relationship_Auto_Reciprocal__c => true,
+        BarnCRM_Settings__c.Auto_Create_Households__c => true
     };
 
-    private static Nonprofit_Settings__c cachedSettings;
+    private static BarnCRM_Settings__c cachedSettings;
     private static Map<String, SObject> cachedOrgDefaults = new Map<String, SObject>();
     private static Map<String, Map<String, Schema.SObjectField>> cachedFields = new Map<String, Map<String, Schema.SObjectField>>();
 
@@ -65,16 +65,16 @@ public with sharing class SettingsService {
      * shipped defaults (see `SHIPPED_DEFAULTS`).
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c getSettings() {
+    public static BarnCRM_Settings__c getSettings() {
         if (cachedSettings != null) {
             return cachedSettings;
         }
-        Nonprofit_Settings__c fromCache = readCache();
+        BarnCRM_Settings__c fromCache = readCache();
         if (fromCache != null) {
             cachedSettings = fromCache;
             return cachedSettings;
         }
-        cachedSettings = withShippedDefaults(Nonprofit_Settings__c.getOrgDefaults());
+        cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
         writeCache(cachedSettings);
         return cachedSettings;
     }
@@ -84,7 +84,7 @@ public with sharing class SettingsService {
      * record exactly as the org left it. An unsaved hierarchy custom setting has no Id, which is
      * what tells the two apart.
      */
-    private static Nonprofit_Settings__c withShippedDefaults(Nonprofit_Settings__c record) {
+    private static BarnCRM_Settings__c withShippedDefaults(BarnCRM_Settings__c record) {
         if (record == null || record.Id != null) {
             return record;
         }
@@ -106,7 +106,9 @@ public with sharing class SettingsService {
         if (String.isBlank(key)) {
             return false;
         }
-        Schema.SObjectType type = Schema.getGlobalDescribe().get(objectName(settingsObject));
+        // Called once per Setting Definition row by SettingsController.toSetting, so the type
+        // and its fields come from the per-transaction caches, never a fresh describe.
+        Schema.SObjectType type = typeByName(objectName(settingsObject));
         return type != null && fieldsByLocalName(type).containsKey(key.trim().toLowerCase());
     }
 
@@ -124,12 +126,12 @@ public with sharing class SettingsService {
     }
 
     /**
-     * Saves the given Core values, keyed by the API name of the Nonprofit Settings field.
+     * Saves the given Core values, keyed by the API name of the BarnCRM Settings field.
      * Only keys that exist on the object and are listed in a Setting Definition row are
      * accepted. Returns the refreshed Core settings.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c saveValues(Map<String, Object> values) {
+    public static BarnCRM_Settings__c saveValues(Map<String, Object> values) {
         applyValues(CORE_SETTINGS_OBJECT, values, true);
         return getSettings();
     }
@@ -149,27 +151,34 @@ public with sharing class SettingsService {
      * which has no Setting Definition row because it is not an editable setting.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c saveSystemValue(String key, Object value) {
+    public static BarnCRM_Settings__c saveSystemValue(String key, Object value) {
         applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false);
         return getSettings();
     }
 
+    /**
+     * Validates the given values, then saves only the ones that differ from what is stored.
+     *
+     * The comparison is made against the stored record, read under a lock that holds until this
+     * transaction ends, not against the cached copy: a cached copy can predate another person's
+     * save, and comparing against it would audit the wrong old value. Only the changed keys are
+     * written (OrgSettingsSystemWriter), so a key another person saved in the meantime is never
+     * written back as this transaction first read it.
+     */
     private static SObject applyValues(
         String settingsObject,
         Map<String, Object> values,
         Boolean requireDefinition
     ) {
         Schema.SObjectType type = settingsType(settingsObject);
-        SObject record = orgDefault(type);
         if (values == null || values.isEmpty()) {
-            return record;
+            return orgDefault(type);
         }
         String objectName = localName(type);
         Map<String, Setting_Definition__mdt> rows = definitionsByKey(objectName);
-        record = record.clone(true, true, true, true);
-        if (record.Id == null) {
-            record.put(SETUP_OWNER, UserInfo.getOrganizationId());
-        }
+        SObject storedRecord = OrgSettingsSystemWriter.lockStored(type);
+        SObject record = storedRecord != null ? storedRecord : orgDefault(type);
+        Map<Schema.SObjectField, Object> changed = new Map<Schema.SObjectField, Object>();
         List<Setting_Change__c> changes = new List<Setting_Change__c>();
         Datetime changedAt = System.now();
         for (String key : values.keySet()) {
@@ -190,7 +199,7 @@ public with sharing class SettingsService {
             }
             refuseIfMembershipDataWouldBeStranded(token, oldText, newText);
             refuseIfDigestRecipientsAreNotUsers(token, newText);
-            record.put(token, newValue);
+            changed.put(token, newValue);
             changes.add(
                 new Setting_Change__c(
                     Setting_Name__c = objectName + '.' + localName,
@@ -204,14 +213,10 @@ public with sharing class SettingsService {
         if (changes.isEmpty()) {
             return record;
         }
-        Boolean firstSave = record.Id == null;
-        SettingsWriter.saveOrgDefault(record);
-        if (firstSave && isCoreSettings(type)) {
-            SettingsWriter.saveOrgDefault(blanksKeptBlank(type, record));
-        }
+        SettingsWriter.saveOrgDefault(type, storedRecord, changed);
         Database.insert(changes, AccessLevel.USER_MODE);
         clearCaches();
-        return record;
+        return orgDefault(type);
     }
 
     /**
@@ -227,7 +232,7 @@ public with sharing class SettingsService {
         String oldText,
         String newText
     ) {
-        if (token != Nonprofit_Settings__c.Household_Membership_Mode__c) {
+        if (token != BarnCRM_Settings__c.Household_Membership_Mode__c) {
             return;
         }
         String refusal = CoexistenceService.membershipChangeRefusal(oldText, newText);
@@ -244,7 +249,7 @@ public with sharing class SettingsService {
         Schema.SObjectField token,
         String newText
     ) {
-        if (token != Nonprofit_Settings__c.Error_Digest_Recipients__c) {
+        if (token != BarnCRM_Settings__c.Error_Digest_Recipients__c) {
             return;
         }
         String refusal = ErrorDigestRecipients.refusal(newText);
@@ -334,10 +339,50 @@ public with sharing class SettingsService {
      * `getOrgDefaults()` instead would store every shipped-on feature as switched off.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c firstSaveRecord() {
+    public static BarnCRM_Settings__c firstSaveRecord() {
         return withShippedDefaults(
-            new Nonprofit_Settings__c(SetupOwnerId = UserInfo.getOrganizationId())
+            new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId())
         );
+    }
+
+    /**
+     * The same for any settings object. Core's gets `SHIPPED_DEFAULTS`. A module's gets the
+     * checkbox defaults its own field metadata declares, because Core cannot name a module's
+     * fields (ADR-0059) and the module's readers already treat an unsaved checkbox as its
+     * shipped value. Without this, a module's first save (a nightly job recording its run, say)
+     * stored every checkbox nobody touched as false, and switched off the features that ship
+     * on (ADR-0035, "the second half of the same trap").
+     *
+     * Only checkboxes are taken from the declared defaults. Every other field is left unset, as
+     * it was before, so this changes nothing but the one value a record cannot leave blank.
+     */
+    @NamespaceAccessible
+    public static SObject firstSaveRecord(Schema.SObjectType type) {
+        if (isCoreSettings(type)) {
+            return firstSaveRecord();
+        }
+        SObject record = type.newSObject();
+        record.put(SETUP_OWNER, UserInfo.getOrganizationId());
+        SObject declared = type.newSObject(null, true);
+        for (Schema.SObjectField field : checkboxFields(type)) {
+            Object shipped = declared.get(field);
+            if (shipped != null) {
+                record.put(field, shipped);
+            }
+        }
+        return record;
+    }
+
+    /** The custom checkbox fields of a settings object, from the cached field map. */
+    private static List<Schema.SObjectField> checkboxFields(Schema.SObjectType type) {
+        List<Schema.SObjectField> checkboxes = new List<Schema.SObjectField>();
+        for (Schema.SObjectField field : fieldsByLocalName(type).values()) {
+            Schema.DescribeFieldResult describe = field.getDescribe();
+            if (describe.isCustom() && describe.getType() == Schema.DisplayType.BOOLEAN) {
+                checkboxes.add(field);
+            }
+        }
+        return checkboxes;
     }
 
     /**
@@ -356,7 +401,7 @@ public with sharing class SettingsService {
     }
 
     private static Boolean isCoreSettings(Schema.SObjectType type) {
-        return type == Nonprofit_Settings__c.SObjectType;
+        return type == BarnCRM_Settings__c.SObjectType;
     }
 
     /**
@@ -375,12 +420,22 @@ public with sharing class SettingsService {
         if (type == null) {
             throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
         }
+        if (checkedSettingsTypes.contains(type)) {
+            return type;
+        }
         Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         if (!describe.isCustomSetting() || !describe.fields.getMap().containsKey(SETUP_OWNER)) {
             throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
         }
+        checkedSettingsTypes.add(type);
         return type;
     }
+
+    /** Settings objects already described and found to be hierarchy settings, this transaction. */
+    private static Set<Schema.SObjectType> checkedSettingsTypes = new Set<Schema.SObjectType>();
+
+    /** Objects by trimmed lower-case name, null when absent, looked up once per transaction. */
+    private static Map<String, Schema.SObjectType> typesByName = new Map<String, Schema.SObjectType>();
 
     private static String objectName(String settingsObject) {
         return String.isBlank(settingsObject) ? CORE_SETTINGS_OBJECT : settingsObject.trim();
@@ -396,8 +451,15 @@ public with sharing class SettingsService {
         if (String.isBlank(apiName)) {
             return null;
         }
+        String cacheKey = apiName.trim().toLowerCase();
+        if (!typesByName.containsKey(cacheKey)) {
+            typesByName.put(cacheKey, describeTypeByName(apiName.trim()));
+        }
+        return typesByName.get(cacheKey);
+    }
+
+    private static Schema.SObjectType describeTypeByName(String name) {
         Map<String, Schema.SObjectType> globals = Schema.getGlobalDescribe();
-        String name = apiName.trim();
         Schema.SObjectType type = globals.get(name);
         if (type != null) {
             return type;
@@ -434,7 +496,7 @@ public with sharing class SettingsService {
         try {
             partition.remove(CACHE_KEY);
         } catch (Exception e) {
-            ErrorLogger.log(e, 'Open Impact Settings cache');
+            ErrorLogger.log(e, 'BarnCRM Settings cache');
         }
     }
 
@@ -462,11 +524,12 @@ public with sharing class SettingsService {
     }
 
     private static Map<String, Schema.SObjectField> fieldsByLocalName(Schema.SObjectType type) {
-        Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-        String name = describe.getName();
+        // The token's own name, so a cached object is answered without describing it again.
+        String name = String.valueOf(type);
         if (cachedFields.containsKey(name)) {
             return cachedFields.get(name);
         }
+        Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         Map<String, Schema.SObjectField> fields = new Map<String, Schema.SObjectField>();
         for (Schema.SObjectField token : describe.fields.getMap().values()) {
             fields.put(token.getDescribe().getLocalName().toLowerCase(), token);
@@ -587,19 +650,19 @@ public with sharing class SettingsService {
         }
     }
 
-    private static Nonprofit_Settings__c readCache() {
+    private static BarnCRM_Settings__c readCache() {
         Cache.OrgPartition partition = partition();
         if (partition == null) {
             return null;
         }
         try {
-            return (Nonprofit_Settings__c) partition.get(CACHE_KEY);
+            return (BarnCRM_Settings__c) partition.get(CACHE_KEY);
         } catch (Exception e) {
             return null;
         }
     }
 
-    private static void writeCache(Nonprofit_Settings__c record) {
+    private static void writeCache(BarnCRM_Settings__c record) {
         Cache.OrgPartition partition = partition();
         if (partition == null || record == null) {
             return;
@@ -607,7 +670,7 @@ public with sharing class SettingsService {
         try {
             partition.put(CACHE_KEY, record);
         } catch (Exception e) {
-            ErrorLogger.log(e, 'Open Impact Settings cache');
+            ErrorLogger.log(e, 'BarnCRM Settings cache');
         }
     }
 
@@ -619,21 +682,12 @@ public with sharing class SettingsService {
     private static final Set<String> COEXISTENCE_MODES = new Set<String>{
         'Standalone',
         'NPSP',
-        'AgentforceNonprofit'
+        'NonprofitCloud'
     };
     private static final Set<String> MEMBERSHIP_MODES = new Set<String>{ 'Contact', 'Junction' };
 
     private static String storedOrDefault(String stored, Set<String> allowed, String fallback) {
         return String.isNotBlank(stored) && allowed.contains(stored) ? stored : fallback;
-    }
-
-    /**
-     * A fresh copy of the org level settings to write to. Never the cached instance, so that a
-     * failed write cannot leave a half-changed value in this transaction's cache.
-     */
-    @NamespaceAccessible
-    public static Nonprofit_Settings__c getSettingsForUpdate() {
-        return Nonprofit_Settings__c.getOrgDefaults();
     }
 
     /**

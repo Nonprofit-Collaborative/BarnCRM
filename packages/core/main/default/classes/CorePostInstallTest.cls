@@ -1,6 +1,6 @@
 /**
- * Tests for CorePostInstall and its retry job: Maria installs Open Impact and can use
- * Nonprofit Settings straight away, the shipped rollups are in the org when she gets there,
+ * Tests for CorePostInstall and its retry job: Maria installs BarnCRM and can use
+ * BarnCRM Settings straight away, the shipped rollups are in the org when she gets there,
  * an upgrade changes nothing, the role follows when the platform has finished preparing it,
  * and nothing here ever breaks an install.
  */
@@ -12,7 +12,7 @@ private class CorePostInstallTest {
     private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
 
     /**
-     * The Nonprofit Admin group as the platform leaves it in the minutes after an install:
+     * The BarnCRM Admin group as the platform leaves it in the minutes after an install:
      * present, but still being calculated, so it cannot be assigned yet.
      *
      * Built by deserializing rather than by construction because Status is written by the
@@ -37,13 +37,13 @@ private class CorePostInstallTest {
      * Not the running user, because the running user is shared. Test classes run in parallel
      * as the same person, and a PermissionSetAssignment for a given person and group is one
      * row whoever inserts it: when another class (SetupAssistantControllerTest, for one) gives
-     * the running user the Nonprofit Admin role at the same moment as the job here, one of
+     * the running user the BarnCRM Admin role at the same moment as the job here, one of
      * the two inserts is refused, the job logs the refusal as it should, and the role count
      * here reads 0. A person nobody else can see has no such neighbour. It also means the
      * permission set assertions prove the install gave it, rather than finding the one the
      * test org's run script assigned to the running user beforehand.
      *
-     * @return the installer's Id, holding no Open Impact access yet
+     * @return the installer's Id, holding no BarnCRM access yet
      */
     private static Id newInstaller() {
         return TestDataFactory.createUser('Installer', new List<String>()).Id;
@@ -120,7 +120,7 @@ private class CorePostInstallTest {
         Assert.areEqual(
             1,
             countPermissionSetAssignments(installer),
-            'The person who installs the package should hold the Nonprofit Admin permission set.'
+            'The person who installs the package should hold the BarnCRM Admin permission set.'
         );
     }
 
@@ -316,7 +316,7 @@ private class CorePostInstallTest {
             'Giving up quietly still means leaving Maria a note in the Error Log.'
         );
         Assert.isTrue(
-            logged[0].Technical_Detail__c.contains('Nonprofit Admin role'),
+            logged[0].Technical_Detail__c.contains('BarnCRM Admin role'),
             'The note names the role that was never handed out, so Maria knows what to finish.'
         );
     }
@@ -614,7 +614,7 @@ private class CorePostInstallTest {
         Test.stopTest();
 
         Assert.areEqual(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_STANDALONE,
             CoexistenceService.getCurrentMode(),
             'A fresh install takes the mode detection recommends, so Maria is not asked first.'
         );
@@ -739,7 +739,7 @@ private class CorePostInstallTest {
     }
 
     /**
-     * Counts how many rows link a person to the Nonprofit Admin permission set.
+     * Counts how many rows link a person to the BarnCRM Admin permission set.
      *
      * @param userId the person
      * @return the number of assignment rows
@@ -757,7 +757,7 @@ private class CorePostInstallTest {
     }
 
     /**
-     * Counts how many rows link a person to the Nonprofit Admin role.
+     * Counts how many rows link a person to the BarnCRM Admin role.
      *
      * @param userId the person
      * @return the number of assignment rows

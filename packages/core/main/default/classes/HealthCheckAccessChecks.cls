@@ -1,5 +1,5 @@
 /**
- * The Health Check questions about people: who administers Open Impact and who cannot see
+ * The Health Check questions about people: who administers BarnCRM and who cannot see
  * it at all (plan Section 4.8, feature C-11). Who holds Giving's receipt lock override is
  * Giving's question, asked through its Health Check extension (ADR-0059).
  *
@@ -13,7 +13,7 @@
  * it here: same keys, same severities, same categories, same labels, same fix targets.
  */
 public with sharing class HealthCheckAccessChecks {
-    /** Whether anybody at all can administer Open Impact. */
+    /** Whether anybody at all can administer BarnCRM. */
     public class NoAdminCheck implements HealthCheckService.Check {
         private final HealthCheckService.AccessCounts counts;
 
@@ -64,7 +64,7 @@ public with sharing class HealthCheckAccessChecks {
         }
 
         return new HealthCheckService.Finding(
-                'no_nonprofit_admin',
+                'no_admin',
                 System.Label.Core_HealthCheck_NoAdminTitle,
                 System.Label.Core_HealthCheck_NoAdminDetail,
                 HealthCheckService.SEVERITY_ERROR,

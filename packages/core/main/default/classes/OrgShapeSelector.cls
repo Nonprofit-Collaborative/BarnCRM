@@ -62,7 +62,7 @@ public with sharing class OrgShapeSelector {
      * mistakes do not cost the same, which is the reasoning ADR-0036 uses for the delete
      * guard and the reason to repeat it here. A false negative tells a later guard that this
      * org has no native households, and the guard then silently opens, renames and tidies up
-     * a household Open Impact does not own. A false positive only makes that guard cautious
+     * a household BarnCRM does not own. A false positive only makes that guard cautious
      * about an org that had nothing to protect.
      *
      * This is a count of the org, asked once per transaction by the detector. It is not the

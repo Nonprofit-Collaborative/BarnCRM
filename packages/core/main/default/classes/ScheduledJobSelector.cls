@@ -1,7 +1,7 @@
 /**
  * Finds a scheduled Apex job by the name it was scheduled under.
  *
- * Every job Open Impact schedules carries a fixed name, so pressing a button twice finds the
+ * Every job BarnCRM schedules carries a fixed name, so pressing a button twice finds the
  * job that is already there instead of relying on the duplicate name exception (ADR-0038).
  * The two setup objects are read in system mode, as `SeasonalAddressScheduler` reads them: an
  * administrator without View Setup must still see whether a job the package owns is running,

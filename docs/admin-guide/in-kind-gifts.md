@@ -3,7 +3,7 @@
 ## What it does
 
 An in-kind gift is a gift of goods or services rather than money: a donated minibus, a case
-of wine for the auction, a lawyer's afternoon, twenty turkeys at Thanksgiving. Open Impact
+of wine for the auction, a lawyer's afternoon, twenty turkeys at Thanksgiving. BarnCRM
 records it as a gift like any other, with the donor, the date, the appeal it came in on and
 the fund it was designated to, plus two things only an in-kind gift has: a **description** of
 what arrived, and a **fair market value** that your organization records for its own
@@ -35,11 +35,11 @@ Two things are worth doing once, so that the numbers are visible where people lo
 1. Put **In-kind value** and **In-kind gift count** on your household, organization and
    person record pages, beside **Total giving**. Add them to a field section of the record
    page in the Lightning App Builder, in the same place you added the other giving totals
-   (or to your page layouts, if your org uses its own record pages): Open Impact ships the
+   (or to your page layouts, if your org uses its own record pages): BarnCRM ships the
    fields but does not place them for you. Put them next to total giving rather than under it. A
    reader who sees one number without the other reads the one they see as everything the
    donor gave, which is the whole mistake this feature exists to prevent.
-2. Open **Open Impact Settings**, then **Giving**, then **Rollups**, and choose **Recalculate
+2. Open **BarnCRM Settings**, then **Giving**, then **Rollups**, and choose **Recalculate
    now** after your first in-kind gifts are entered, unless you are content to wait for the
    nightly run. In-kind value and in-kind gift count are maintained by the same rollup engine
    as every other total on those records.
@@ -59,7 +59,7 @@ Pending and Cancelled gifts are left out.
 4. Fill in **Fair market value**: what your organization values it at, for your own
    reporting. Leave it empty if you do not have a figure yet, and add it later.
 
-Open Impact refuses the entries that would produce a wrong record or a wrong receipt:
+BarnCRM refuses the entries that would produce a wrong record or a wrong receipt:
 
 - An in-kind gift with an amount that is not zero, because that figure would land in the
   donor's total giving and in the money on your dashboard.
@@ -78,7 +78,7 @@ statements](receipts.md)). On the document:
 - Where your letter asks for the amount, the receipt says "the goods or services described
   below" instead of a figure, and a line under the letter states in plain words that no value
   has been stated.
-- Below that, Open Impact prints the description you typed, followed by the sentence that
+- Below that, BarnCRM prints the description you typed, followed by the sentence that
   says the organization has not placed a value on the gift and that valuing donated property
   is the donor's responsibility.
 - On a year-end statement, the gift is a line with its date, its type and its status, and the
@@ -98,7 +98,7 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
    just looked at is in the second number and not the first, and its gift count is separate
    too. This is the thing to be able to explain to a colleague: the two numbers answer two
    different questions.
-3. Now enter one yourself. Open **Quick Gift Entry** (it is on the Open Impact app, and on
+3. Now enter one yourself. Open **Quick Gift Entry** (it is on the BarnCRM app, and on
    every household and person page).
 4. Choose the donor, leave the date at today, and set **How it arrived** to **In-kind**. The
    amount box disappears and two boxes take its place.
@@ -134,13 +134,13 @@ fair market value and setting the amount to zero, and recalculate the rollups af
 
 **Putting a value on the receipt anyway, by typing it into your letter.** You cannot type a
 donor's number into a packaged letter, but you can write "we valued your gift at" and a merge
-token into the template. Do not. The sentence Open Impact adds says the organization has not
+token into the template. Do not. The sentence BarnCRM adds says the organization has not
 placed a value on the gift, and a letter that contradicts it in the paragraph above is worse
 than either sentence alone.
 
 **Recording one gift when there were two.** A donor who buys a 500 dollar table at your gala
 and also donates the centrepieces has given you two gifts, not one: a 500 dollar cash gift
-and an in-kind gift. Open Impact will not let one record be part money and part goods, and
+and an in-kind gift. BarnCRM will not let one record be part money and part goods, and
 trying to blend them produces a receipt that is wrong in both directions. Enter two gifts,
 each with its own receipt.
 

@@ -4,7 +4,7 @@
 
 Donor levels put your organization's own names on your donors: Friend, Sustainer,
 Leadership Circle, whatever your ladder calls them. You set the rungs and the amount each
-one starts at, and Open Impact keeps every household, organization, and person on the
+one starts at, and BarnCRM keeps every household, organization, and person on the
 right rung as their giving changes, without anybody running a report or updating a field.
 
 Each donor record also keeps the level they were on before and the date they moved, so
@@ -19,7 +19,7 @@ printed next to it can never disagree.
 
 Everything is in the app. You never open Setup.
 
-1. Open **Open Impact Settings**, then **Giving**.
+1. Open **BarnCRM Settings**, then **Giving**.
 2. Open **Donor levels**. This is the page that shows your ladder.
 3. Choose **New level** and create your first rung. Each rung has:
    - a **name**, the one you use with donors and on your donor wall;
@@ -33,7 +33,7 @@ Everything is in the app. You never open Setup.
    - **active**, which is on for a new rung.
 4. Repeat until your ladder is complete. There is no limit and no required number of
    rungs; four or five is usual.
-5. Back in **Open Impact Settings**, then **Giving**, set **Donor level source**. This is
+5. Back in **BarnCRM Settings**, then **Giving**, set **Donor level source**. This is
    the total your ladder is measured on:
    - **Total giving**, everything the donor has ever given. This is the default and the
      safe choice: it never resets.
@@ -54,9 +54,9 @@ announce: your fiscal year turning over, and a ladder you edited.
 
 ## A five-minute walkthrough
 
-Start with the sample data loaded (Open Impact Settings, then Sample data).
+Start with the sample data loaded (BarnCRM Settings, then Sample data).
 
-1. Open **Open Impact Settings**, then **Giving**, then **Donor levels**. The ladder is
+1. Open **BarnCRM Settings**, then **Giving**, then **Donor levels**. The ladder is
    empty.
 2. Choose **New level**. Name it `Friend`, minimum `100`, maximum `1000`. Save.
 3. Choose **New level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
@@ -89,7 +89,7 @@ totals and not in-kind value, so the honest way to do it is to recognize those d
 alongside the ladder rather than on it. See [In-kind gifts](in-kind-gifts.md).
 
 **Nobody has a level after you build the ladder.** Two causes. Either **Donor levels** is
-still off in Open Impact Settings, or you have not pressed **Recalculate now**. Editing the
+still off in BarnCRM Settings, or you have not pressed **Recalculate now**. Editing the
 ladder does not reassign anybody by itself: a donor moves when their giving changes, or
 when the nightly pass runs, or when you recalculate. Press the button after every change
 to the ladder.
@@ -103,7 +103,7 @@ gaps. Rungs that overlap are not an error either: the higher rung wins.
 intended. The level says what the donor's current total earns, because a level that
 disagreed with the total on the same page would be worse than no level. The rung they left
 stays in **Previous donor level** and the date is on the record. If your organization
-awards a level permanently, record that on the donor rather than expecting Open Impact to
+awards a level permanently, record that on the donor rather than expecting BarnCRM to
 hold a number it can no longer see.
 
 **Deleting a rung wipes it from the donors who held it.** Deleting a level record removes
@@ -117,5 +117,5 @@ anything in it yet. That is correct for an annual society and startling if you d
 mean it. If you want a ladder that never resets, the source is **Total giving**.
 
 **Wanting a window we do not offer, such as the last twelve months.** A level can only be
-measured on a total Open Impact already keeps. If you need a different window, add the
+measured on a total BarnCRM already keeps. If you need a different window, add the
 rollup you want on the Rollups page first; the level source then has a number to read.

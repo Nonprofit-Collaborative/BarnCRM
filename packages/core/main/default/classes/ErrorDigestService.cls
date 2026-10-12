@@ -1,6 +1,6 @@
 /**
  * The error digest (C-23, canonical model R-E5, ADR-0055): one short email to each of the
- * people who look after Open Impact, counting the Error Log entries that arrived since the last
+ * people who look after BarnCRM, counting the Error Log entries that arrived since the last
  * digest and are still New.
  *
  * What it may say is the point of the design. It counts entries by source and by severity and
@@ -75,7 +75,7 @@ public with sharing class ErrorDigestService {
         Datetime runAt = System.now();
         // Locked until this run ends, so Send now and the scheduled run take turns: the second
         // reads the window the first moved, and never sends the same entries again.
-        Nonprofit_Settings__c settings = OrgSettingsSystemWriter.lockStored();
+        BarnCRM_Settings__c settings = OrgSettingsSystemWriter.lockStored();
         if (settings == null) {
             settings = SettingsService.getSettings();
         }

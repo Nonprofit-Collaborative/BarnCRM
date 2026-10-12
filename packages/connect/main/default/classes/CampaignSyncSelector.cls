@@ -66,12 +66,21 @@ public with sharing class CampaignSyncSelector {
         return query + ' ORDER BY CreatedDate, Id';
     }
 
-    /** How many appeals the running user can see, and how many of them have a Campaign. */
-    public static Integer countAppeals(Boolean linkedOnly) {
+    /**
+     * How many appeals the running user can see, or how many of them have a Campaign, read up
+     * to `readUpTo` rows so a large org never spends its query rows on a count.
+     */
+    public static Integer countAppeals(Boolean linkedOnly, Integer readUpTo) {
         if (linkedOnly == true) {
-            return [SELECT COUNT() FROM Appeal__c WHERE Campaign_Id__c != NULL WITH USER_MODE];
+            return [
+                SELECT COUNT()
+                FROM Appeal__c
+                WHERE Campaign_Id__c != NULL
+                WITH USER_MODE
+                LIMIT :readUpTo
+            ];
         }
-        return [SELECT COUNT() FROM Appeal__c WITH USER_MODE];
+        return [SELECT COUNT() FROM Appeal__c WITH USER_MODE LIMIT :readUpTo];
     }
 
     /** True while a Sync all appeals job is queued or running. */

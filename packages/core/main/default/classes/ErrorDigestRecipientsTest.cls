@@ -6,18 +6,18 @@
 @IsTest
 private class ErrorDigestRecipientsTest {
     private static User maria() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
-    private static Nonprofit_Settings__c settings() {
-        return Nonprofit_Settings__c.getOrgDefaults();
+    private static BarnCRM_Settings__c settings() {
+        return BarnCRM_Settings__c.getOrgDefaults();
     }
 
     @IsTest
     static void theDefaultRecipientsAreTheAdministrators() {
         TestDataFactory.defaultSettings();
         User admin = maria();
-        User staff = TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        User staff = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
         List<User> recipients;
         System.runAs(admin) {
@@ -27,14 +27,14 @@ private class ErrorDigestRecipientsTest {
         }
 
         Set<Id> ids = new Map<Id, User>(recipients).keySet();
-        Assert.isTrue(ids.contains(admin.Id), 'Maria holds Manage Nonprofit Settings.');
+        Assert.isTrue(ids.contains(admin.Id), 'Maria holds Manage BarnCRM Settings.');
         Assert.isFalse(ids.contains(staff.Id), 'David does not.');
     }
 
     @IsTest
     static void anAddressThatIsNotAUserIsRefusedWhenSaved() {
         TestDataFactory.defaultSettings();
-        TestDataFactory.createUser('Jen', new List<String>{ 'Nonprofit_Staff' });
+        TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Staff' });
         User admin = maria();
 
         System.runAs(admin) {
@@ -42,7 +42,7 @@ private class ErrorDigestRecipientsTest {
             try {
                 SettingsService.saveValues(
                     new Map<String, Object>{
-                        'Error_Digest_Recipients__c' => 'Jen@openimpact.example.invalid, donor@example.com'
+                        'Error_Digest_Recipients__c' => 'Jen@barncrm.example.invalid, donor@example.com'
                     }
                 );
                 Assert.fail('An address outside the org must be refused.');
@@ -58,14 +58,14 @@ private class ErrorDigestRecipientsTest {
             }
             SettingsService.saveValues(
                 new Map<String, Object>{
-                    'Error_Digest_Recipients__c' => 'Jen@openimpact.example.invalid'
+                    'Error_Digest_Recipients__c' => 'Jen@barncrm.example.invalid'
                 }
             );
             Test.stopTest();
         }
 
         Assert.areEqual(
-            'Jen@openimpact.example.invalid',
+            'Jen@barncrm.example.invalid',
             settings().Error_Digest_Recipients__c,
             'A user of the org is accepted.'
         );
@@ -78,14 +78,14 @@ private class ErrorDigestRecipientsTest {
 
     @IsTest
     static void listedUsersAreFoundByEmailInTheOrderListed() {
-        User jen = TestDataFactory.createUser('Jen', new List<String>{ 'Nonprofit_Staff' });
+        User jen = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Staff' });
         User admin = maria();
 
         List<User> recipients;
         System.runAs(admin) {
             Test.startTest();
             recipients = ErrorDigestRecipients.resolve(
-                'JEN@openimpact.example.invalid; Maria@openimpact.example.invalid'
+                'JEN@barncrm.example.invalid; Maria@barncrm.example.invalid'
             );
             Test.stopTest();
         }
@@ -97,13 +97,13 @@ private class ErrorDigestRecipientsTest {
 
     @IsTest
     static void anInactiveUserIsNotARecipient() {
-        User gone = TestDataFactory.createUser('Former', new List<String>{ 'Nonprofit_Staff' });
+        User gone = TestDataFactory.createUser('Former', new List<String>{ 'BarnCRM_Staff' });
         System.runAs(new User(Id = UserInfo.getUserId())) {
             update new User(Id = gone.Id, IsActive = false);
         }
 
         Test.startTest();
-        String refusal = ErrorDigestRecipients.refusal('Former@openimpact.example.invalid');
+        String refusal = ErrorDigestRecipients.refusal('Former@barncrm.example.invalid');
         Test.stopTest();
 
         Assert.isNotNull(refusal, 'A deactivated user cannot receive the digest.');
@@ -112,12 +112,9 @@ private class ErrorDigestRecipientsTest {
     @IsTest
     static void theDigestStopsAtItsRecipientCap() {
         Assert.areEqual(50, ErrorDigestRecipients.MAX_RECIPIENTS, 'Fifty people at most.');
-        User first = TestDataFactory.createUser('Capfirst', new List<String>{ 'Nonprofit_Staff' });
-        User second = TestDataFactory.createUser(
-            'Capsecond',
-            new List<String>{ 'Nonprofit_Staff' }
-        );
-        User third = TestDataFactory.createUser('Capthird', new List<String>{ 'Nonprofit_Staff' });
+        User first = TestDataFactory.createUser('Capfirst', new List<String>{ 'BarnCRM_Staff' });
+        User second = TestDataFactory.createUser('Capsecond', new List<String>{ 'BarnCRM_Staff' });
+        User third = TestDataFactory.createUser('Capthird', new List<String>{ 'BarnCRM_Staff' });
         ErrorDigestRecipients.recipientCap = 2;
 
         Test.startTest();

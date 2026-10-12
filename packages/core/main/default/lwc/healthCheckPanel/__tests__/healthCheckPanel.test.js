@@ -56,12 +56,12 @@ function agentforceReport(overrides = {}) {
     canManageSettings: true,
     modeNeedsAttention: true,
     currentModeLabel: 'not confirmed yet',
-    recommendedModeLabel: 'Agentforce Nonprofit coexistence',
-    orgShapeSummary: 'Person Accounts enabled. Agentforce Nonprofit objects detected.',
+    recommendedModeLabel: 'Nonprofit Cloud coexistence',
+    orgShapeSummary: 'Person Accounts enabled. Nonprofit Cloud objects detected.',
     orgShape: { hasPersonAccounts: true, hasIndustriesNonprofit: true },
     // Both come from Apex, which computes them from the running namespace. Unmanaged, which
     // is what the scratch orgs are, they look like this.
-    settingsTabApiName: 'Nonprofit_Settings',
+    settingsTabApiName: 'BarnCRM_Settings',
     sectionStateKey: 'c__section',
     findings: [
       {
@@ -92,8 +92,8 @@ function agentforceReport(overrides = {}) {
         fixTarget: 'action:enableAutomaticHouseholds'
       },
       {
-        key: 'no_nonprofit_admin',
-        title: 'No one is assigned the Nonprofit Admin role',
+        key: 'no_admin',
+        title: 'No one is assigned the BarnCRM Admin role',
         detail: 'Nobody has the role.',
         severity: 'Error',
         category: 'Access',
@@ -103,7 +103,7 @@ function agentforceReport(overrides = {}) {
       {
         key: 'shipped_rollups_missing',
         title: '2 shipped rollups are missing',
-        detail: 'Open Impact ships totals this org does not have: Total Gifts, Last Gift Date.',
+        detail: 'BarnCRM ships totals this org does not have: Total Gifts, Last Gift Date.',
         severity: 'Warning',
         category: 'Settings',
         fixLabel: 'Restore shipped rollups',
@@ -321,7 +321,7 @@ describe('c-health-check-panel', () => {
             category: 'Settings',
             fixLabel: 'Restore import templates',
             fixTarget: 'action:restoreImportTemplates',
-            fixScope: ['Generic donor list']
+            fixScope: ['Generic contact list']
           }
         ]
       })
@@ -431,7 +431,7 @@ describe('c-health-check-panel', () => {
     expect(handler.mock.calls[0][0].detail.section).toBe('Access');
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'Nonprofit_Settings' },
+      attributes: { apiName: 'BarnCRM_Settings' },
       state: { c__section: 'Access' }
     });
   });
@@ -453,7 +453,7 @@ describe('c-health-check-panel', () => {
   it('uses the namespaced tab and state key the report supplies', async () => {
     getReport.mockResolvedValue(
       agentforceReport({
-        settingsTabApiName: 'example__Nonprofit_Settings',
+        settingsTabApiName: 'example__BarnCRM_Settings',
         sectionStateKey: 'example__section'
       })
     );
@@ -465,7 +465,7 @@ describe('c-health-check-panel', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
-      attributes: { apiName: 'example__Nonprofit_Settings' },
+      attributes: { apiName: 'example__BarnCRM_Settings' },
       state: { example__section: 'Access' }
     });
   });

@@ -1,7 +1,7 @@
 /**
- * Builds, in a test, the access a person needs to change settings: the Manage Nonprofit
+ * Builds, in a test, the access a person needs to change settings: the Manage BarnCRM
  * Settings custom permission plus create and read on the audit object, which is what the
- * packaged Nonprofit Admin permission set grants in a real org.
+ * packaged BarnCRM Admin permission set grants in a real org.
  *
  * Used from `@TestSetup` so that the permission set and its assignment are committed before a
  * test method runs, which also keeps setup objects out of the same transaction as the custom
@@ -9,7 +9,7 @@
  */
 @IsTest
 public class SettingsTestPermissions {
-    private static final String CUSTOM_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String CUSTOM_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final List<String> AUDIT_FIELDS = new List<String>{
         'Setting_Name__c',
         'Old_Value__c',
@@ -71,8 +71,8 @@ public class SettingsTestPermissions {
             FirstName = firstName,
             LastName = lastName,
             Alias = alias,
-            Email = alias + '.openimpact@example.com',
-            Username = alias + '.openimpact.' + DateTime.now().getTime() + '@example.com',
+            Email = alias + '.barncrm@example.com',
+            Username = alias + '.barncrm.' + DateTime.now().getTime() + '@example.com',
             ProfileId = standard.Id,
             TimeZoneSidKey = 'America/New_York',
             LocaleSidKey = 'en_US',

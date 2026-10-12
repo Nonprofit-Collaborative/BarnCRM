@@ -1,5 +1,5 @@
 /**
- * Maria works through the guided assistant: she confirms how Open Impact fits her
+ * Maria works through the guided assistant: she confirms how BarnCRM fits her
  * Nonprofit Cloud org, records her organization's name, answers the step a module adds,
  * skips a step, and starts again when she wants to.
  *
@@ -36,6 +36,7 @@ private class SetupAssistantControllerTest {
     static void opensWithEveryPanelItNeeds() {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
         SetupAssistantTestExtension.useNone();
+        ModuleDetectionService.givingPresentOverride = false;
 
         Test.startTest();
         SetupAssistantController.SetupState state = SetupAssistantController.getState();
@@ -49,13 +50,17 @@ private class SetupAssistantControllerTest {
             stepByKey(state.steps, 'identity').fields.size(),
             'The organization step carries the fields it is going to edit'
         );
-        Assert.areEqual(6, state.modules.size(), 'The modules step lists the six packages');
+        Assert.areEqual(
+            2,
+            state.modules.size(),
+            'Core alone is offered Core and Volunteers, not the modules that need Giving'
+        );
         Assert.isNotNull(state.roles, 'The access step needs the roles it can give out');
         Assert.isFalse(state.isComplete, 'A fresh org has not finished setup');
     }
 
     @IsTest
-    static void leadsWithTheNonprofitCloudCase() {
+    static void personAccountsAloneAreOfferedStandaloneOnly() {
         OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
         shape.hasPersonAccounts = true;
         SetupAssistantService.stubbedShape = shape;
@@ -67,12 +72,43 @@ private class SetupAssistantControllerTest {
         Assert.areEqual(
             SetupAssistantService.SHAPE_PERSON_ACCOUNTS,
             state.coexistence.detectedShape,
-            'An org with Person Accounts is recognised as the Nonprofit Cloud case'
+            'An org with Person Accounts is recognised by its shape'
         );
         Assert.areEqual(
-            SetupAssistantService.MODE_AGENTFORCE,
+            SetupAssistantService.MODE_STANDALONE,
             state.coexistence.recommendedMode,
-            'That org is recommended Agentforce Nonprofit coexistence (plan Section 4.5)'
+            'With no other product detected the recommendation names none'
+        );
+        Assert.areEqual(
+            new List<String>{ SetupAssistantService.MODE_STANDALONE },
+            state.coexistence.modes,
+            'And no product mode is offered: neither NPSP nor Nonprofit Cloud is in this org'
+        );
+    }
+
+    @IsTest
+    static void nonprofitCloudIsOfferedWhereItsObjectsAreFound() {
+        OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+        shape.hasPersonAccounts = true;
+        shape.hasIndustriesNonprofit = true;
+        SetupAssistantService.stubbedShape = shape;
+
+        Test.startTest();
+        SetupAssistantController.SetupState state = SetupAssistantController.getState();
+        Test.stopTest();
+
+        Assert.areEqual(
+            SetupAssistantService.MODE_NONPROFIT_CLOUD,
+            state.coexistence.recommendedMode,
+            'Nonprofit Cloud objects mean Nonprofit Cloud coexistence (plan Section 4.5)'
+        );
+        Assert.areEqual(
+            new List<String>{
+                SetupAssistantService.MODE_STANDALONE,
+                SetupAssistantService.MODE_NONPROFIT_CLOUD
+            },
+            state.coexistence.modes,
+            'Standalone and the detected product, and not NPSP, which is not here'
         );
     }
 
@@ -123,6 +159,23 @@ private class SetupAssistantControllerTest {
         Test.stopTest();
 
         Assert.isTrue(refused, 'A mode outside the three the plan names is refused');
+    }
+
+    @IsTest
+    static void refusesAProductModeWhereThatProductIsNotFound() {
+        SetupAssistantService.stubbedShape = new OrgShapeDetector.OrgShape();
+        Boolean refused = false;
+
+        Test.startTest();
+        try {
+            SetupAssistantController.applyCoexistence(SetupAssistantService.MODE_NONPROFIT_CLOUD);
+        } catch (AuraHandledException e) {
+            refused = true;
+        }
+        Test.stopTest();
+
+        Assert.isTrue(refused, 'Nonprofit Cloud coexistence is not offered, so it is not accepted');
+        Assert.isNull(CoexistenceService.getCurrentMode(), 'And nothing was saved');
     }
 
     @IsTest
@@ -467,7 +520,7 @@ private class SetupAssistantControllerTest {
             rows.add(
                 new Setting_Definition__mdt(
                     Setting_Key__c = key,
-                    Settings_Object__c = 'Nonprofit_Settings__c',
+                    Settings_Object__c = 'BarnCRM_Settings__c',
                     Section__c = 'Organization',
                     Module__c = 'Core',
                     Data_Type__c = 'Text'
@@ -479,9 +532,9 @@ private class SetupAssistantControllerTest {
 
     /** What is actually stored, read past any cached org default. */
     private static String savedLegalName() {
-        List<Nonprofit_Settings__c> rows = [
+        List<BarnCRM_Settings__c> rows = [
             SELECT Organization_Legal_Name__c
-            FROM Nonprofit_Settings__c
+            FROM BarnCRM_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
         ];
         return rows.isEmpty() ? null : rows[0].Organization_Legal_Name__c;

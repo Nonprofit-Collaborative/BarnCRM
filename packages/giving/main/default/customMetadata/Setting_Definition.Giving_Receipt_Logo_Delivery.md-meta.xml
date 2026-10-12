@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How the logo image reaches the PDF: File download, Embedded image, or Document server. Leave it empty unless your logo does not print, or unless Open Impact support asks you to change it: empty means the route the product ships with, which is File download.</value>
+    <value xsi:type="xsd:string">How the logo image reaches the PDF: File download, Embedded image, or Document server. Leave it empty unless your logo does not print, or unless BarnCRM support asks you to change it: empty means the route the product ships with, which is File download.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

@@ -50,10 +50,9 @@ sets are assigned in Setup.
 **The file holds the gifts the person running it can see**, the same as any report. Gifts
 are private by default, so check that Jen can see all of them: export the same month once
 as yourself and once as Jen, and compare the totals the page shows. If hers is lower, her visibility is a sharing
-setting in Setup (her role, or the organization-wide default for gifts), not something Open
-Impact can change. The page says this beside the button.
+setting in Setup (her role, or the organization-wide default for gifts), not something BarnCRM can change. The page says this beside the button.
 
-Open it from **Open Impact Settings**, **Giving**, **Accounting export**, or search the App
+Open it from **BarnCRM Settings**, **Giving**, **Accounting export**, or search the App
 Launcher for **Accounting Export**. There are no settings.
 
 The **Accounting Export** permission set includes **Post Gifts**, which shows the **Mark these

@@ -127,7 +127,13 @@ private class HealthCheckServiceTest {
     @IsTest
     static void contactMembershipWithPersonAccountsIsAnError() {
         OrgShapeDetector.overrideShape = shape(false, true, false, false);
-        CoexistenceService.setMode(CoexistenceService.MODE_STANDALONE);
+        // Saved straight through the settings write: CoexistenceService would now propose
+        // the junction alongside the mode in a Person Accounts org, which is the fix itself.
+        SettingsService.saveValues(
+            new Map<String, Object>{
+                CoexistenceService.KEY_COEXISTENCE_MODE => CoexistenceService.MODE_STANDALONE
+            }
+        );
 
         HealthCheckService.Finding finding = find(
             HealthCheckService.run(),
@@ -236,7 +242,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void junctionMembershipWithPersonAccountsIsNotReported() {
         OrgShapeDetector.overrideShape = shape(false, true, false, false);
-        CoexistenceService.setMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+        CoexistenceService.setMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
 
         System.assertEquals(
             null,
@@ -297,7 +303,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void contactMembershipWithAutomaticHouseholdsOffIsNotReported() {
         OrgShapeDetector.overrideShape = shape(false, false, false, false);
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Auto_Create_Households__c = false;
@@ -313,6 +319,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void industriesObjectsWithoutConnectAreReported() {
         OrgShapeDetector.overrideShape = shape(false, false, true, false);
+        HealthCheckOrgShapeChecks.connectInstalledOverride = false;
 
         HealthCheckService.Finding finding = find(
             HealthCheckService.run(),
@@ -329,6 +336,35 @@ private class HealthCheckServiceTest {
             null,
             finding.fixTarget,
             'There is nothing to click: Connect is a separate install in v0.6.'
+        );
+    }
+
+    @IsTest
+    static void industriesObjectsWithConnectInstalledAreNotReported() {
+        OrgShapeDetector.overrideShape = shape(false, false, true, false);
+        HealthCheckOrgShapeChecks.connectInstalledOverride = true;
+
+        System.assertEquals(
+            null,
+            find(HealthCheckService.run(), 'connect_module_absent'),
+            'With Connect installed there is nothing to suggest.'
+        );
+    }
+
+    /**
+     * The real lookup, not the seam: a class that ships is found, namespace first or bare, and
+     * one that does not is absent. Core's own class stands in for Connect's, which Core's tests
+     * cannot rely on.
+     */
+    @IsTest
+    static void connectDetectionFindsAClassThatShipsAndNotOneThatDoesNot() {
+        System.assert(
+            HealthCheckOrgShapeChecks.classExists('HealthCheckOrgShapeChecks'),
+            'A class that ships is found.'
+        );
+        System.assert(
+            !HealthCheckOrgShapeChecks.classExists('ConnectService'),
+            'The old marker names a class nothing ships.'
         );
     }
 
@@ -361,15 +397,12 @@ private class HealthCheckServiceTest {
             OrgShapeDetector.overrideShape = shape(false, false, false, false);
             HealthCheckService.accessCountsOverride = new FixedAccessCounts(0, 0);
 
-            HealthCheckService.Finding finding = find(
-                HealthCheckService.run(),
-                'no_nonprofit_admin'
-            );
+            HealthCheckService.Finding finding = find(HealthCheckService.run(), 'no_admin');
 
             System.assertNotEquals(
                 null,
                 finding,
-                'An org where nobody can administer Open Impact is told so.'
+                'An org where nobody can administer BarnCRM is told so.'
             );
             System.assertEquals(
                 HealthCheckService.SEVERITY_ERROR,
@@ -396,7 +429,7 @@ private class HealthCheckServiceTest {
 
             System.assertEquals(
                 null,
-                find(findings, 'no_nonprofit_admin'),
+                find(findings, 'no_admin'),
                 'One administrator is enough: there is nothing to say about it.'
             );
             System.assertEquals(
@@ -417,7 +450,7 @@ private class HealthCheckServiceTest {
         ];
         System.assert(
             !packaged.isEmpty(),
-            'The Nonprofit Admin permission set is not in this org. It ships with the access ' +
+            'The BarnCRM Admin permission set is not in this org. It ships with the access ' +
             'feature (C-06), which has to merge before this test means anything.'
         );
 
@@ -437,7 +470,7 @@ private class HealthCheckServiceTest {
 
             System.assertEquals(
                 null,
-                find(HealthCheckService.run(), 'no_nonprofit_admin'),
+                find(HealthCheckService.run(), 'no_admin'),
                 'Someone given the admin permission set by hand is still an administrator.'
             );
         }
@@ -483,7 +516,7 @@ private class HealthCheckServiceTest {
 
             System.assertEquals(
                 null,
-                find(findings, 'no_nonprofit_admin'),
+                find(findings, 'no_admin'),
                 'Priya sees her own assignments and nothing else, so the count would be wrong.'
             );
             System.assertEquals(
@@ -522,7 +555,7 @@ private class HealthCheckServiceTest {
         // The pause is not an editable setting with a shipped Setting Definition row: Maria sets
         // it from the Automation panel, and the settings service rightly refuses a key no row
         // names. The factory writes the same field the way the product does.
-        Nonprofit_Settings__c paused = TestDataFactory.pausedSettings(2);
+        BarnCRM_Settings__c paused = TestDataFactory.pausedSettings(2);
         // A pause set from the page has its resume scheduled with it (R-A5).
         AutomationResumeJob.scheduleAt(paused.Automation_Paused_Until__c);
 
@@ -582,7 +615,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void aScheduledDigestThatStoppedRunningIsAWarning() {
         OrgShapeDetector.overrideShape = shape(false, false, false, false);
-        Nonprofit_Settings__c settings = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
         settings.Error_Digest_Last_Run__c = System.now()
             .addDays(-HealthCheckSettingsChecks.DIGEST_STALE_DAYS - 1);
         TestDataFactory.saveSettings(settings);
@@ -602,7 +635,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void aDigestThatRanTodayOrIsNotScheduledIsNotReported() {
         OrgShapeDetector.overrideShape = shape(false, false, false, false);
-        Nonprofit_Settings__c settings = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
         settings.Error_Digest_Last_Run__c = System.now()
             .addDays(-HealthCheckSettingsChecks.DIGEST_STALE_DAYS - 1);
         TestDataFactory.saveSettings(settings);
@@ -668,7 +701,7 @@ private class HealthCheckServiceTest {
             Status__c = 'New'
         );
         // Counting the Error Log needs read on the object and on Status, which is what the
-        // packaged Nonprofit Admin permission set gives Maria, and mariaWithManageSettings
+        // packaged BarnCRM Admin permission set gives Maria, and mariaWithManageSettings
         // now assigns it because every audited settings save needs it too. Without that
         // access the selector keeps its promise and says nothing, which is what this test
         // used to be measuring.
@@ -693,6 +726,53 @@ private class HealthCheckServiceTest {
         }
     }
 
+    /**
+     * A flooded Error Log is counted only up to the cap, so the count cannot spend the
+     * transaction's query rows, and the finding says "N or more" instead of a number it did
+     * not read.
+     */
+    @IsTest
+    static void aFloodedErrorLogIsCountedOnlyToTheCap() {
+        List<Error_Log__c> flood = new List<Error_Log__c>();
+        for (Integer i = 0; i < 200; i++) {
+            flood.add(
+                new Error_Log__c(
+                    Timestamp__c = System.now(),
+                    Context__c = 'Health Check test',
+                    Message__c = 'Entry ' + i,
+                    Severity__c = 'Error',
+                    Status__c = 'New'
+                )
+            );
+        }
+        insert flood;
+        HealthCheckSettingsChecks.errorLogCap = 150;
+        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+        System.runAs(maria) {
+            OrgShapeDetector.overrideShape = shape(false, false, false, false);
+            Integer rowsBefore = Limits.getQueryRows();
+            HealthCheckService.Finding finding = new HealthCheckSettingsChecks.ErrorLogCheck()
+                .run();
+            Integer rowsSpent = Limits.getQueryRows() - rowsBefore;
+
+            System.assertNotEquals(null, finding, 'The flood is still a finding.');
+            String counted = String.format(
+                System.Label.Core_HealthCheck_CountOrMore,
+                new List<Object>{ (150).format() }
+            );
+            System.assert(
+                finding.title.contains(counted),
+                'The title says "150 or more", not a number it did not count: ' + finding.title
+            );
+            System.assert(finding.detail.contains(counted), 'So does the detail.');
+            System.assert(
+                rowsSpent <= 151,
+                'The count read at most the cap plus one rows, not all 200: ' + rowsSpent
+            );
+        }
+    }
+
     @IsTest
     static void noUnreadErrorsMeansNoFinding() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
@@ -709,6 +789,41 @@ private class HealthCheckServiceTest {
     }
 
     @IsTest
+    static void aFloodedErrorLogIsCountedUpToTheCap() {
+        List<Error_Log__c> errors = new List<Error_Log__c>();
+        for (Integer i = 0; i < 3; i++) {
+            errors.add(
+                new Error_Log__c(
+                    Timestamp__c = System.now(),
+                    Context__c = 'Health Check test',
+                    Message__c = 'Something went wrong.',
+                    Severity__c = 'Error',
+                    Status__c = 'New'
+                )
+            );
+        }
+        insert errors;
+        HealthCheckSettingsChecks.errorLogCap = 2;
+        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+        System.runAs(maria) {
+            OrgShapeDetector.overrideShape = shape(false, false, false, false);
+
+            HealthCheckService.Finding finding = find(HealthCheckService.run(), 'error_log_new');
+
+            System.assertNotEquals(null, finding, 'Past the cap there is still a finding.');
+            String counted = String.format(
+                System.Label.Core_HealthCheck_CountOrMore,
+                new List<Object>{ (2).format() }
+            );
+            System.assert(
+                finding.title.contains(counted),
+                'Past the cap the full run says "2 or more": ' + finding.title
+            );
+        }
+    }
+
+    @IsTest
     static void twoFiscalYearsThatDisagreeAreReportedWithBothMonths() {
         OrgShapeDetector.overrideShape = shape(false, false, false, false);
         SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
@@ -720,13 +835,13 @@ private class HealthCheckServiceTest {
         System.assertNotEquals(
             null,
             finding,
-            'ADR-0025: the rollups are computed from the Nonprofit Settings month and the ' +
+            'ADR-0025: the rollups are computed from the BarnCRM Settings month and the ' +
                 'retention reports from the Setup month, so a disagreement makes every year based ' +
                 'number wrong in a way nobody notices.'
         );
         System.assert(
             finding.detail.contains(FiscalYearSelector.monthName(7)),
-            'The finding names the month Open Impact uses. Detail was: ' + finding.detail
+            'The finding names the month BarnCRM uses. Detail was: ' + finding.detail
         );
         System.assert(
             finding.detail.contains(FiscalYearSelector.monthName(1)),
@@ -1023,9 +1138,9 @@ private class HealthCheckServiceTest {
             'Standalone has a name a person recognizes.'
         );
         System.assertEquals(
-            System.Label.Core_CoexistenceMode_AgentforceNonprofit,
-            HealthCheckService.modeLabel(CoexistenceService.MODE_AGENTFORCE_NONPROFIT),
-            'Agentforce Nonprofit coexistence has a name a person recognizes.'
+            System.Label.Core_CoexistenceMode_NonprofitCloud,
+            HealthCheckService.modeLabel(CoexistenceService.MODE_NONPROFIT_CLOUD),
+            'Nonprofit Cloud coexistence has a name a person recognizes.'
         );
     }
 
@@ -1091,7 +1206,7 @@ private class HealthCheckServiceTest {
 
     /**
      * Informational: an org with native Nonprofit Cloud households is told how many, and
-     * that Open Impact leaves them alone (product-plan Section 11.2 item 9).
+     * that BarnCRM leaves them alone (product-plan Section 11.2 item 9).
      */
     @IsTest
     static void anOrgWithNativeHouseholdsReportsHowManyInformationally() {
@@ -1138,7 +1253,7 @@ private class HealthCheckServiceTest {
     }
 
     /**
-     * Warning: an Account that is an Open Impact household and a native Nonprofit Cloud
+     * Warning: an Account that is a BarnCRM household and a native Nonprofit Cloud
      * household at once, the collision mutual exclusion exists to prevent.
      */
     @IsTest

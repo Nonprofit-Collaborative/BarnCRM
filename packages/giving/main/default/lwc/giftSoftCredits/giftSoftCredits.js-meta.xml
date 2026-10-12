@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     The soft credits on a gift: who else is recognized for it, why, and for how much, with the
-    ones Open Impact created marked as automatic. Staff add and remove their own credits here.
+    ones BarnCRM created marked as automatic. Staff add and remove their own credits here.
   </description>
   <isExposed>true</isExposed>
   <masterLabel>Gift Soft Credits</masterLabel>

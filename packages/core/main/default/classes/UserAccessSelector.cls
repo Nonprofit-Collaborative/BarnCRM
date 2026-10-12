@@ -1,5 +1,5 @@
 /**
- * Queries about who can actually use Open Impact, for the access findings in Health Check
+ * Queries about who can actually use BarnCRM, for the access findings in Health Check
  * (plan Section 4.8). All SOQL for that question lives here (plan Section 7.1).
  *
  * Queries run in user mode: Health Check reports what the person running it can see, and the

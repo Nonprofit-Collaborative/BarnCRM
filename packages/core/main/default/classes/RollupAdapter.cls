@@ -1,5 +1,5 @@
 /**
- * Turns Open Impact's rollup configuration into the shape the vendored engine understands.
+ * Turns BarnCRM's rollup configuration into the shape the vendored engine understands.
  *
  * This class is the whole of ADR-0015's promise. `Rollup_Definition__c` is the system of record
  * and the only rollup configuration an administrator ever sees; the vendored engine's own
@@ -78,7 +78,7 @@ public with sharing class RollupAdapter {
         }
         meta.CalcItemWhereClause__c = whereClauseFor(definition);
         meta.IsDisabled__c = definition.Active__c != true;
-        // Open Impact's own Active checkbox is the switch an administrator uses, so the engine's
+        // BarnCRM's own Active checkbox is the switch an administrator uses, so the engine's
         // separate custom setting is never in the way of a definition this package is running.
         meta.ShouldRunWithoutCustomSettingEnabled__c = true;
 
@@ -240,7 +240,7 @@ public with sharing class RollupAdapter {
      */
     private static String developerNameFor(Rollup_Definition__c definition) {
         return String.isBlank(definition.Definition_Key__c)
-            ? 'Open_Impact_Rollup'
+            ? 'BarnCRM_Rollup'
             : definition.Definition_Key__c;
     }
 }

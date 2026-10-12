@@ -8,7 +8,7 @@
  *
  * So these tests are about David, who cannot change a receipted gift however he tries, and about
  * the one afternoon Maria is given the override permission in Setup to correct a receipt that
- * was issued against the wrong donor, and finds that Open Impact wrote down what she did.
+ * was issued against the wrong donor, and finds that BarnCRM wrote down what she did.
  */
 @IsTest
 private class GiftReceiptLockHandlerTest {
@@ -60,7 +60,7 @@ private class GiftReceiptLockHandlerTest {
     private static User userHoldingTheOverride() {
         User maria = TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
         grantInSetup(maria, true);
         return maria;
@@ -237,7 +237,7 @@ private class GiftReceiptLockHandlerTest {
 
         Assert.isTrue(
             refusal != null && refusal.contains(Label.Giving_Gift_ReceiptLocked),
-            'The pause stops Open Impact filling things in, never stops it refusing something.'
+            'The pause stops BarnCRM filling things in, never stops it refusing something.'
         );
         Assert.areEqual(
             250,
@@ -382,7 +382,7 @@ private class GiftReceiptLockHandlerTest {
     private static User fundraiser() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 

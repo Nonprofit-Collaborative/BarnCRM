@@ -544,7 +544,7 @@ private class HouseholdMergeServiceTest {
 
     @IsTest
     static void theEmptiedHouseholdStaysWhenTheOrgSaysSo() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Delete_Empty_Households__c = false;
@@ -785,8 +785,8 @@ private class HouseholdMergeServiceTest {
         User reader = new User(
             ProfileId = readOnly.Id,
             LastName = 'Reader',
-            Email = 'reader@openimpact.test.invalid',
-            Username = 'reader' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'reader@barncrm.test.invalid',
+            Username = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'reader',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

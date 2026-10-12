@@ -1,5 +1,5 @@
 name: Feature request
-description: Propose a new feature or enhancement for Open Impact.
+description: Propose a new feature or enhancement for BarnCRM.
 title: '[Feature]: '
 labels: ['enhancement']
 body:
@@ -30,7 +30,7 @@ body:
     id: proposed-solution
     attributes:
       label: Proposed solution
-      description: What should Open Impact do?
+      description: What should BarnCRM do?
     validations:
       required: true
 

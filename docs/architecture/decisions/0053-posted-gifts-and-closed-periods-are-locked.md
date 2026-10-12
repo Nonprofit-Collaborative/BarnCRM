@@ -10,7 +10,7 @@ to Giving"); builder decision under plan Section 9.3, following ADR-0024 and ADR
 
 Jen, the bookkeeper, exports the month's gifts (X-04, ADR-0051) and imports them into the
 accounting system. From then on the books hold those rows. If a gift in them is edited,
-deleted, or a new gift is dated into that month, Open Impact and the books disagree and nothing
+deleted, or a new gift is dated into that month, BarnCRM and the books disagree and nothing
 says so. The plan names two controls: a flag on each gift that is in the books, and a date up to
 which the books are closed.
 

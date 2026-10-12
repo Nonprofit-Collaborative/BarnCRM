@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation handler unavailable</shortDescription>
-        <value>Open Impact could not start one of its automations ({0}), so it was skipped. Everything else ran as usual. Send this entry to whoever supports your Salesforce.</value>
+        <value>BarnCRM could not start one of its automations ({0}), so it was skipped. Everything else ran as usual. Send this entry to whoever supports your Salesforce.</value>
     </labels>
     <labels>
         <fullName>Core_Automation_NameRequired</fullName>
@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation change not permitted</shortDescription>
-        <value>You do not have permission to change automation. Ask your administrator for the Manage Open Impact Settings permission.</value>
+        <value>You do not have permission to change automation. Ask your administrator for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Automation_NotFound</fullName>
@@ -54,15 +54,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation unexpected error</shortDescription>
-        <value>Something went wrong while Open Impact was updating this record, so the record was not saved. The details are in the Error Log. Try again, and if it keeps happening, send the newest Error Log entry to whoever supports your Salesforce.</value>
+        <value>Something went wrong while BarnCRM was updating this record, so the record was not saved. The details are in the Error Log. Try again, and if it keeps happening, send the newest Error Log entry to whoever supports your Salesforce.</value>
     </labels>
     <labels>
-        <fullName>Core_CoexistenceMode_AgentforceNonprofit</fullName>
+        <fullName>Core_CoexistenceMode_NonprofitCloud</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>The name of the Agentforce Nonprofit coexistence mode.</shortDescription>
-        <value>Agentforce Nonprofit coexistence</value>
+        <shortDescription>The name of the coexistence mode for an org with Salesforce gift objects.</shortDescription>
+        <value>Nonprofit Cloud coexistence</value>
     </labels>
     <labels>
         <fullName>Core_CoexistenceMode_InvalidMode</fullName>
@@ -70,14 +70,14 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when a coexistence mode value is not one of the three.</shortDescription>
-        <value>{0} is not a coexistence mode. Choose Standalone, NPSP coexistence, or Agentforce Nonprofit coexistence.</value>
+        <value>{0} is not a coexistence mode. Choose one of the modes BarnCRM offers for this org.</value>
     </labels>
     <labels>
         <fullName>Core_CoexistenceMode_Npsp</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>The name of the NPSP coexistence mode.</shortDescription>
+        <shortDescription>The name of the coexistence mode for an org with a detected household package.</shortDescription>
         <value>NPSP coexistence</value>
     </labels>
     <labels>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error log default message</shortDescription>
-        <value>Open Impact hit a problem it did not expect. The technical detail on this entry is what a support contact needs to work out why.</value>
+        <value>BarnCRM hit a problem it did not expect. The technical detail on this entry is what a support contact needs to work out why.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_Acknowledge</fullName>

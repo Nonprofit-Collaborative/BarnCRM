@@ -3,7 +3,7 @@
 ## What it does
 
 Once Jen has put last month's gifts into the accounting system, those gifts have to stay the
-way they were when she took them. Open Impact gives her two controls:
+way they were when she took them. BarnCRM gives her two controls:
 
 - **Posted to accounting.** After she downloads the accounting export, one click marks those
   gifts as posted. A posted gift's date, amount, donor, payment method, reference and funds
@@ -34,8 +34,8 @@ a gift posted or closes a period.
   [Accounting Export](accounting-export.md)). The **Accounting Export** permission set includes
   the **Post Gifts** permission, so Jen can mark gifts posted and unpost them. **Giving Admin**
   includes it too.
-- **Closing a period** is in **Open Impact Settings**, **Giving**, **Accounting periods**, for
-  anyone with the **Manage Open Impact Settings** permission and the **Giving Admin** permission
+- **Closing a period** is in **BarnCRM Settings**, **Giving**, **Accounting periods**, for
+  anyone with the **Manage BarnCRM Settings** permission and the **Giving Admin** permission
   set. Choose **Open**, and the Accounting Periods page shows the date the books are closed
   through. The latest date it takes is the day before yesterday: a refund is dated today, and
   today has to stay open for it in every time zone your staff work in.
@@ -57,15 +57,15 @@ sets, and David with **Giving Staff**.
    `No gifts in this range.`: every gift in last month is now posted.
 4. Open one of those gifts. The **Posting** card on the right says when it was posted and by
    whom.
-5. As David, open the same gift, change its **Amount**, and save. Open Impact refuses:
+5. As David, open the same gift, change its **Amount**, and save. BarnCRM refuses:
    `This gift has been posted to accounting...`. Change the **Acknowledgment Status** instead: that
    saves.
 6. As David, click **Refund or Write Off** on the gift and refund 10. It works: the refund is a
    new gift dated today and is not posted. It will be in this month's export.
-7. As Maria, open **Open Impact Settings**, **Giving**, **Accounting periods**, **Open**. Set **Books
+7. As Maria, open **BarnCRM Settings**, **Giving**, **Accounting periods**, **Open**. Set **Books
    closed through** to the last day of last month (on the 1st or 2nd, the month before) and click
    **Save**. The page shows the new date.
-8. As David, open **Quick Gift Entry** and enter a gift dated in last month. Open Impact refuses:
+8. As David, open **Quick Gift Entry** and enter a gift dated in last month. BarnCRM refuses:
    `The books are closed through...`. Date it today and it saves.
 9. As Jen, open the posted gift from step 4 and click **Unpost** on the Posting card. Type a
    reason and confirm. The card now says the gift is not posted, and that it is still locked
@@ -110,7 +110,7 @@ gave a gift in the books stays too, because deleting a household deletes its mem
 **Sample data after closing a period.** Sample gifts dated in a closed period cannot be loaded or
 removed. Load and remove sample data before you close your first period.
 
-**Reopening a period, or changing a locked gift.** Neither can be done from inside Open Impact on
+**Reopening a period, or changing a locked gift.** Neither can be done from inside BarnCRM on
 purpose: a closed month that anyone with settings access can reopen is not closed. When it
 really has to happen, for example an auditor's adjustment:
 

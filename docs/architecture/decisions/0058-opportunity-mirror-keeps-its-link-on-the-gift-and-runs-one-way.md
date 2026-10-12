@@ -201,7 +201,7 @@ new here.
   as a gift in NPSP's number of gifts though it lowers the total, and an in-kind gift's
   Opportunity has a zero Amount and counts too. Accepted: the totals net exactly, and the counts
   are NPSP's to define.
-- For a donor stored as a contact, the Opportunity's Account is the Open Impact household. In an
+- For a donor stored as a contact, the Opportunity's Account is the BarnCRM household. In an
   org running NPSP alongside, that is not the NPSP household account until household adoption
   (plan Section 4.5) ships, so NPSP household rollups do not see these Opportunities.
 - A Donation record type whose sales process does not include the chosen won or lost stage makes

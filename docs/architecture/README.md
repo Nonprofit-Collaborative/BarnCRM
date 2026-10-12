@@ -1,6 +1,6 @@
 # Architecture
 
-This folder holds the durable technical record for Open Impact: the platform-neutral
+This folder holds the durable technical record for BarnCRM: the platform-neutral
 data specification and the decisions that produced the code. The product plan
 (`docs/product-plan.md`) says what we are building and why. This folder says how it is
 shaped, and it is the place a contributor or an AI agent reads before writing metadata

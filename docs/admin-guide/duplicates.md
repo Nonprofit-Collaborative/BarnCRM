@@ -6,7 +6,7 @@ Finds people and households that are in your database twice, and helps you deal 
 pair at a time. Salesforce does the finding, with the duplicate rules every org starts with:
 it warns the person typing that somebody similar already exists. What Salesforce does not do
 in most editions is look through the records you already have, so a spreadsheet imported last
-year is never checked against itself. Open Impact adds that scan, lists every pair on one page,
+year is never checked against itself. BarnCRM adds that scan, lists every pair on one page,
 and puts the household merge one click away.
 
 Nothing is ever merged or deleted for you. Every merge is a pair you looked at and confirmed.
@@ -14,21 +14,21 @@ Nothing is ever merged or deleted for you. Every merge is a pair you looked at a
 ## How to turn it on
 
 There is nothing to install. Salesforce switches on its standard duplicate rules for people
-and accounts in every new org, and Open Impact uses them. There is one Setup step, because of a
+and accounts in every new org, and BarnCRM uses them. There is one Setup step, because of a
 Salesforce licensing rule:
 
 **Who can review duplicates.** Salesforce keeps possible duplicates in records called duplicate
 record sets, and gives access to them only to users with a **Sales Cloud or Service Cloud
-license**. No other license can have it, Salesforce Platform included. So Open Impact puts that
-access in its own permission set, **Open Impact Duplicate Review**, which is in no role. In Setup,
+license**. No other license can have it, Salesforce Platform included. So BarnCRM puts that
+access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In Setup,
 open **Users**, choose each person who will review duplicates, and under **Permission Set
-Assignments** add **Open Impact Duplicate Review**. Salesforce refuses the assignment for a user
+Assignments** add **BarnCRM Duplicate Review**. Salesforce refuses the assignment for a user
 without one of those licenses. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
 
-1. Open the **Open Impact** app and choose **Open Impact Settings**.
+1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Households**, and scroll to **Duplicates**.
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
@@ -49,7 +49,7 @@ on purpose: open any sample person, note their email address, and create a new c
 the same first name, last name and email. Salesforce warns you that a similar record exists;
 choose to save anyway.
 
-1. Open **Open Impact Settings**, choose **Households**, and scroll to **Duplicates**.
+1. Open **BarnCRM Settings**, choose **Households**, and scroll to **Duplicates**.
 2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
 3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
@@ -57,10 +57,10 @@ choose to save anyway.
 4. Choose the person's name to open their record. On the right of the page the **Potential
    Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
    merge**, pick the values to keep, and confirm. This is Salesforce's own merge, and it keeps
-   the gifts, activities and files of both. Open Impact then adds the kept person to any
-   household the other one belonged to, and recalculates their giving totals straight away.
-   A household the other person leaves empty is kept, not deleted, because gifts are credited
-   to it: merge it into the kept person's household with **Merge households** (step 6).
+   the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
+   kept person to any household the other one belonged to, and recalculates their totals
+   straight away. A household the other person leaves empty is kept, not deleted, because
+   records can still point at it: merge it into the kept person's household with **Merge households** (step 6).
 5. Back on the Duplicates panel, refresh. The pair is gone.
 6. If the scan found two households, choose **Merge households** on the pair. You see the two
    side by side, the fields where they disagree, and which one is kept. Choose the household to
@@ -87,7 +87,7 @@ matching rule in Setup, and scan again.
 organizations with Salesforce's own tools.
 
 **A pair of person accounts never appears either.** If your org stores people as person
-accounts, merge two of them with Salesforce's own account merge. Open Impact handles it as it
+accounts, merge two of them with Salesforce's own account merge. BarnCRM handles it as it
 does a merge of two contacts: the kept person joins every household the other one belonged
 to, each household keeps its primary member, an emptied household is kept, and the kept
 person's totals are recalculated straight away.
@@ -98,12 +98,12 @@ the members, recalculates the totals and renames the household; Salesforce's own
 does none of that, which is why the household record page does not offer it.
 
 **A colleague sees the panel but the buttons are missing.** Scanning, dismissing and merging
-from this panel need the Manage Open Impact Settings permission, which the Open Impact Admin
-permission set grants, and access to duplicate record sets, which the Open Impact Duplicate Review
+from this panel need the Manage BarnCRM Settings permission, which the BarnCRM Admin
+permission set grants, and access to duplicate record sets, which the BarnCRM Duplicate Review
 permission set grants.
 
 **The panel says suggestions need access to duplicate record sets.** The person
-viewing it does not have Open Impact Duplicate Review, or has a license that cannot have it.
+viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.
 Assign the permission set in Setup (see How to turn it on). A Salesforce Platform user cannot
 be given it at all; ask a colleague with a Sales Cloud or Service Cloud license to review.
 
@@ -112,8 +112,8 @@ example because a duplicate rule was switched off during the scan, or could not 
 suggestions. The details are in the **Error Log**, under the context "Duplicate scan". Fix the
 cause and scan again: pairs already found are not suggested twice.
 
-**After merging two people, an empty household is left.** That is on purpose. Gifts given
-while the other person lived there still name that household. Until you merge it, Health Check
+**After merging two people, an empty household is left.** That is on purpose. Records made
+while the other person lived there (with Giving, their gifts) still name that household. Until you merge it, Health Check
 lists it under **Households have nobody in them**. Merge it into the kept person's household
 from this panel or with **Merge or split** on the household's page.
 

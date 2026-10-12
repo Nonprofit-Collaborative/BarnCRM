@@ -1,8 +1,8 @@
 {
-  "name": "open-impact",
+  "name": "barncrm",
   "private": true,
   "version": "0.1.0",
-  "description": "Open Impact: free open source Salesforce managed packages for small nonprofits.",
+  "description": "BarnCRM: free open source Salesforce managed packages for small nonprofits.",
   "scripts": {
     "lint": "eslint \"packages/**/lwc/**/*.js\" --no-error-on-unmatched-pattern",
     "lint:fix": "eslint \"packages/**/lwc/**/*.js\" --fix --no-error-on-unmatched-pattern",
@@ -12,6 +12,7 @@
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "check:namespace": "bash scripts/ci/check-namespace.sh",
     "check:standard-objects": "bash scripts/ci/check-standard-objects.sh",
+    "check:person-account-fields": "python3 scripts/ci/check-person-account-fields.py",
     "check:object-allowlist": "python3 scripts/ci/check-object-allowlist.py",
     "check:custom-metadata": "python3 scripts/ci/check-custom-metadata.py",
     "check:symlinks": "bash scripts/ci/check-symlinks.sh",
@@ -22,6 +23,7 @@
     "check:record-pages-assigned": "python3 scripts/ci/check-record-pages-assigned.py",
     "check:canonical-model": "python3 scripts/ci/check-canonical-model.py",
     "check:setting-defaults": "python3 scripts/ci/check-setting-defaults.py",
+    "check:setting-object-explicit": "python3 scripts/ci/check-setting-object-explicit.py",
     "precommit": "lint-staged",
     "check:apex": "bash scripts/ci/check-apex-offline.sh",
     "check:analyzer": "sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2"

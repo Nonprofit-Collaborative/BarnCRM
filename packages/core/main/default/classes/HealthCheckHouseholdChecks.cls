@@ -38,7 +38,7 @@ public with sharing class HealthCheckHouseholdChecks {
 
     private static HealthCheckService.Finding peopleWithoutHouseholdFinding() {
         Id householdType = HouseholdService.householdRecordTypeId();
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         Boolean expected = settings != null && settings.Auto_Create_Households__c == true;
         if (householdType == null || !expected) {
             return null;
@@ -107,7 +107,7 @@ public with sharing class HealthCheckHouseholdChecks {
     /**
      * One finding for a count of orphans, or null when there are none. No fix: the links are
      * the records to open. In an org that also has Nonprofit Cloud households the detail says
-     * that some may belong to one, because Open Impact cannot see that membership (R-H12).
+     * that some may belong to one, because BarnCRM cannot see that membership (R-H12).
      */
     private static HealthCheckService.Finding orphanFinding(
         String key,

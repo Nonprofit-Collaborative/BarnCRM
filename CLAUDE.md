@@ -1,4 +1,4 @@
-# Open Impact: Claude Code instructions
+# BarnCRM: Claude Code instructions
 
 Read the product plan before any work. Its canonical copy is the BMemory document `specification/open-impact-product-plan.md`; `docs/product-plan.md` is a mirror refreshed from it. When a document exists in BMemory, read and update the BMemory version first, then refresh the repo copy; never edit the repo copy alone. The plan is the single source of truth (Section 1.3 principles, Section 4 settled architecture, Section 9 working agreements, Section 12 decision log). Settled decisions are not re-opened without an ADR in `docs/architecture/decisions/`.
 

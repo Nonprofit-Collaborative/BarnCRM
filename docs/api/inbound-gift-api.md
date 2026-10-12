@@ -1,7 +1,7 @@
 # Inbound Gift API reference
 
 For developers connecting a payment processor, online giving page or integration platform
-to Open Impact (feature X-03). The administrator's side, including the user and sign-in
+to BarnCRM (feature X-03). The administrator's side, including the user and sign-in
 setup, is in the admin guide: [Inbound Gift API](../admin-guide/inbound-gift-api.md). The
 decisions behind this shape are in ADR-0051.
 
@@ -22,8 +22,8 @@ package source is deployed without one (a development or test org) the path is
 
 Authenticate with OAuth 2.0 as the integration user the administrator created, for example
 with the client credentials flow of an External Client App. The user needs the Inbound Gift
-API permission set and no other Open Impact set. Without it Salesforce answers `403` before
-Open Impact sees the request.
+API permission set and no other BarnCRM set. Without it Salesforce answers `403` before
+BarnCRM sees the request.
 
 One request records one gift. Sending the same request again is always safe.
 
@@ -114,7 +114,7 @@ an invalid amount ([`response-invalid-field.json`](samples/response-invalid-fiel
 ## The Flow action
 
 Inside Salesforce, the same thing is the **Record Inbound Gift** action in Flow Builder, in
-the Open Impact category. Its inputs are the request fields above (labelled External Id,
+the BarnCRM category. Its inputs are the request fields above (labelled External Id,
 Amount, Payment Method, Gift Date, Payment Reference, Donor Id, Donor Email, Fund
 Accounting Code, Fund Id, Appeal Id) and its outputs are Outcome, Gift Id, Error Code and
 Message, with the same values and the same rules. A rejected gift does not fail the flow:

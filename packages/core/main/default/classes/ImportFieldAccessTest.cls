@@ -1,9 +1,9 @@
 /**
  * What an import does with a column the importing user may not write: it is skipped, and the
- * run log says so, once per field. And what the Nonprofit Admin role lets an importer write:
+ * run log says so, once per field. And what the BarnCRM Admin role lets an importer write:
  * the opt-out flags, which a migration file carries and which must never be dropped quietly.
  *
- * Both tests run as a user on the Minimum Access profile holding Nonprofit Admin, so what is
+ * Both tests run as a user on the Minimum Access profile holding BarnCRM Admin, so what is
  * proved is what the permission set grants, not what a system administrator profile allows.
  */
 @IsTest
@@ -11,7 +11,7 @@ private class ImportFieldAccessTest {
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 
-    /** A field Nonprofit Admin does not grant, standing for any the importer cannot write. */
+    /** A field BarnCRM Admin does not grant, standing for any the importer cannot write. */
     private static final String UNGRANTED_ATTRIBUTE = 'AssistantName';
 
     private static User importer() {
@@ -24,8 +24,8 @@ private class ImportFieldAccessTest {
         User person = new User(
             ProfileId = minimum.Id,
             LastName = 'Fieldaccess',
-            Email = 'fieldaccess@openimpact.test.invalid',
-            Username = 'fieldaccess' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'fieldaccess@barncrm.test.invalid',
+            Username = 'fieldaccess' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'fldacc',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',
@@ -36,7 +36,7 @@ private class ImportFieldAccessTest {
             insert person;
             insert new PermissionSetAssignment(
                 AssigneeId = person.Id,
-                PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'Nonprofit_Admin']
+                PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'BarnCRM_Admin']
                 .Id
             );
         }
@@ -144,7 +144,7 @@ private class ImportFieldAccessTest {
     }
 
     @IsTest
-    static void aNonprofitAdminLoadsTheOptOuts() {
+    static void aBarnCrmAdminLoadsTheOptOuts() {
         given();
         User person = importer();
         ImportRowProcessor.Outcome committed;
@@ -165,7 +165,7 @@ private class ImportFieldAccessTest {
         }
         Assert.isFalse(
             committed.notes.contains(noAccessNote(Contact.HasOptedOutOfEmail)),
-            'Nonprofit Admin may write the opt-outs, so none is reported skipped.'
+            'BarnCRM Admin may write the opt-outs, so none is reported skipped.'
         );
         Assert.isFalse(
             committed.notes.contains(noAccessNote(Contact.DoNotCall)),

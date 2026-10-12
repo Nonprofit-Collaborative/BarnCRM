@@ -1,6 +1,6 @@
-# Open Impact Core
+# BarnCRM Core
 
-Core is the foundation package. Every other Open Impact module depends on it, and it depends on
+Core is the foundation package. Every other BarnCRM module depends on it, and it depends on
 nothing else. It contains no Opportunity, Campaign, Case, Lead, Person Account, or Industries
 object references: those live only in the Connect module, behind dynamic Apex.
 
@@ -9,17 +9,17 @@ object references: those live only in the Connect module, behind dynamic Apex.
 - **Constituent model**: Contacts, Accounts (Household and Organization record types),
   Household membership (contact mode and junction mode via `HouseholdService`),
   Relationships, Affiliations, and Addresses (`Address__c`).
-- **Open Impact app**: the Lightning app and its tabs (Home, Households, Contacts,
-  Organizations, Import, Reports, Open Impact Settings). Module-specific tabs (Gifts, Volunteers,
-  Programs, Funders) are added by those packages when installed.
-- **Settings framework**: the Open Impact Settings console (LWC-based), protected hierarchy
+- **BarnCRM app**: the Lightning app and its tabs (Home, Households, Contacts,
+  Organizations, Import, Reports, BarnCRM Settings). Each module adds its own tabs (Volunteers, for
+  example) when it is installed.
+- **Settings framework**: the BarnCRM Settings console (LWC-based), protected hierarchy
   Custom Settings for simple toggles, custom objects for structured configuration, and Custom
   Metadata Types for package-shipped defaults. The console's rows come from
   `Setting_Definition__mdt`, so a feature adds its settings to the console by shipping rows
   rather than by editing the console.
 
   **Platform Cache is optional.** `SettingsService` uses an org cache partition named
-  `NonprofitSettings` when one exists and a per-transaction static cache when it does not,
+  `BarnCRMSettings` when one exists and a per-transaction static cache when it does not,
   so Core runs unchanged on an org with no cache allocation. The package ships no partition
   file: an org that wants the cross-transaction cache creates the partition in Setup and
   allocates it a few megabytes. Either way a change takes effect on the next transaction,
@@ -103,7 +103,7 @@ the same in both places.
 The dispatcher works out which context it is in, then checks three things before it invokes
 anything: a per transaction
 bypass (`AutomationControl.bypass(name)`), the org wide pause
-(`Nonprofit_Settings__c.Automation_Paused_Until__c`), and the automation's own switch (a row on
+(`BarnCRM_Settings__c.Automation_Paused_Until__c`), and the automation's own switch (a row on
 `Automation_Setting__c`, keyed by the registry's developer name). Anything a handler throws is
 written to the Error Log first, then reported to the person saving the record: `addError` with a
 plain language message in a before context, a rethrow in an after context.
@@ -137,7 +137,7 @@ two handlers, their triggers, and their `Automation_Registry__mdt` records in on
 
 `CorePostInstall` implements `InstallHandler`. It runs after the package is installed and
 after every upgrade, and it does two things: it makes sure the installing user can open
-Open Impact Settings, and it creates the Rollup Definitions the packages ship.
+BarnCRM Settings, and it creates the Rollup Definitions the packages ship.
 
 Without the first, a fresh install leaves the console read only for everybody, including
 the System Administrator who installed it, because a custom permission is not implied by
@@ -145,10 +145,10 @@ Modify All Data.
 
 That takes two steps, because the platform makes the obvious one unreliable:
 
-1. **Assign the `Nonprofit_Admin` permission set.** A permission set has no calculation
+1. **Assign the `BarnCRM_Admin` permission set.** A permission set has no calculation
    status, so this works the moment the install finishes. This is the step that matters:
    after it, the installer can use the app.
-2. **Assign the `Nonprofit_Admin_Group` permission set group**, which is the role the
+2. **Assign the `BarnCRM_Admin_Group` permission set group**, which is the role the
    Access page shows. Salesforce recalculates packaged groups in the background after an
    install and refuses to assign one while that is running, which is the usual state in the
    first minutes, so this is attempted and, if the group is not ready,
@@ -193,7 +193,7 @@ a source deployment runs no post-install script.
 
 Core carries one third party dependency, as source rather than as a package: the
 [apex-rollup](https://github.com/jamessimone/apex-rollup) aggregation engine (MIT, James Simone),
-under `packages/core/vendor/apex-rollup/`. It is driven through an adapter Open Impact owns, and
+under `packages/core/vendor/apex-rollup/`. It is driven through an adapter BarnCRM owns, and
 `Rollup_Definition__c` stays the only rollup configuration an administrator ever sees.
 
 - **What was taken, what was changed, and how to take a newer version:**

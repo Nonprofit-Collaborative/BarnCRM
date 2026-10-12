@@ -8,7 +8,7 @@
  * controllers were written, which is the gap recorded in
  * `packages/giving/integration/g-03-g-06.permissions.md`.
  *
- * The three people are the ones the admin guide is written for: Maria configures Open Impact,
+ * The three people are the ones the admin guide is written for: Maria configures BarnCRM,
  * David enters the gifts, and Tom sits on the board and may look but not touch. Each of them is
  * given the Core set and the Giving set that the shipped permission set group pairs, because
  * that pairing is what a real org assigns; a Giving set alone carries no access to the people
@@ -26,12 +26,12 @@ private class GivingUserModeTest {
     private static final String TRIBUTE_IN_HONOR_OF = 'In honor of';
 
     /**
-     * Maria, who configures Open Impact.
+     * Maria, who configures BarnCRM.
      */
     private static User administrator() {
         return TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
@@ -41,7 +41,7 @@ private class GivingUserModeTest {
     private static User fundraiser() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 
@@ -51,7 +51,7 @@ private class GivingUserModeTest {
     private static User boardMember() {
         return TestDataFactory.createUser(
             'Tom',
-            new List<String>{ 'Nonprofit_Read_Only', 'Giving_Read_Only' }
+            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
         );
     }
 

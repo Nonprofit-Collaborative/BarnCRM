@@ -178,8 +178,8 @@ private class ImportMatcherTest {
             ProfileId = [SELECT Id FROM Profile WHERE Name = 'Minimum Access - Salesforce' LIMIT 1]
             .Id,
             LastName = 'Noread',
-            Email = 'noread@openimpact.test.invalid',
-            Username = 'noread' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'noread@barncrm.test.invalid',
+            Username = 'noread' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'noread',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',
@@ -211,6 +211,22 @@ private class ImportMatcherTest {
                 .contains(Contact.MailingPostalCode.getDescribe().getLabel()),
             'So is the postal code.'
         );
+    }
+
+    /**
+     * `firstNameOf` asks this once per matched row, so the account describe is cached: every
+     * row gets the same answer, case-insensitively, for a field that exists and one that does not.
+     */
+    @IsTest
+    static void accountFieldPresenceIsAnsweredFromOneDescribe() {
+        for (Integer row = 0; row < 200; row++) {
+            Assert.isTrue(ImportMatcher.accountHasField('Name'), 'Every account has a name');
+            Assert.isTrue(ImportMatcher.accountHasField('NAME'), 'Field names ignore case');
+            Assert.isFalse(
+                ImportMatcher.accountHasField('Not_A_Field__c'),
+                'A field the org lacks is absent on every row'
+            );
+        }
     }
 
     /** The keys a lookup was asked for, leaving out each one narrowed to a first name. */

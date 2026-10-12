@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value xsi:type="xsd:string">Blob PDF:The engine Open Impact ships;Visualforce:The fallback engine, only if support asks</value>
+    <value xsi:type="xsd:string">Blob PDF:The engine BarnCRM ships;Visualforce:The fallback engine, only if support asks</value>
   </values>
   <values>
     <field>Sort_Order__c</field>
@@ -32,7 +32,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Which engine turns a receipt into a PDF. Leave it empty unless Open Impact support asks you to change it: empty means the one the product ships with.</value>
+    <value xsi:type="xsd:string">Which engine turns a receipt into a PDF. Leave it empty unless BarnCRM support asks you to change it: empty means the one the product ships with.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

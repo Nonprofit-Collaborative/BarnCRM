@@ -109,7 +109,7 @@ SYSTEM_TYPES = {
 
 # Standard objects any package may name. One line per object, and the line says what
 # breaks without it. Adding a name here is a product decision: it is a promise that every
-# org Open Impact claims to support has this object.
+# org BarnCRM claims to support has this object.
 ALLOWED = {
     "Account": "the constituent and household record, plan Section 4.3. Core cannot exist without it.",
     "Contact": "the person record, plan Section 4.3. Same.",
@@ -146,7 +146,7 @@ ALLOWED = {
 
 # Standard objects only the vendored rollup engine names (ADR-0015,
 # packages/core/vendor/apex-rollup/VENDOR.md). Everything here is upstream's own test
-# fixture, never reached from Open Impact code: RollupAdapter is the only caller of the
+# fixture, never reached from BarnCRM code: RollupAdapter is the only caller of the
 # engine and it names none of these. They are listed rather than excluded so that an
 # upstream upgrade introducing a new one fails this check.
 #
@@ -262,7 +262,7 @@ def main():
         print("", file=sys.stderr)
         print("A standard object that a subscriber org may not have is a compile error,", file=sys.stderr)
         print("and one compile error refuses the whole package (ADR-0013).", file=sys.stderr)
-        print("If the object is present on every org Open Impact supports, add it to", file=sys.stderr)
+        print("If the object is present on every org BarnCRM supports, add it to", file=sys.stderr)
         print("ALLOWED in scripts/ci/check-object-allowlist.py with the reason. If it", file=sys.stderr)
         print("arrived with an upstream vendor upgrade, add it to VENDOR_ONLY and record", file=sys.stderr)
         print("it in packages/core/vendor/apex-rollup/VENDOR.md.", file=sys.stderr)

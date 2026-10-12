@@ -140,7 +140,7 @@ Scores: 2 = meets it, 1 = partial or needs work, 0 = fails. Weight 3 = hard requ
 | **Weighted total (max 76)** | | **65** | **28** | **32** |
 
 ## Recommendation
-**Vendor apex-rollup as source into Core, behind a thin OpenImpact adapter.** It is the only candidate that is
+**Vendor apex-rollup as source into Core, behind a thin BarnCRM adapter.** It is the only candidate that is
 namespace-proven, deploy-free at runtime, dependency-free, multi-hop capable and fiscal-year aware. The 12
 standard-object references and the sharing posture are bounded, nameable patches, not architecture problems.
 Building our own would mean reimplementing `RollupRelationshipFieldFinder`, `RollupDateLiteral` and

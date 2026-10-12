@@ -18,7 +18,7 @@ private class ImportBatchServiceTest {
 
     @IsTest
     static void createsABatchWithTheOrgChunkSize() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Import_Chunk_Size__c = 50;
         TestDataFactory.saveSettings(settings);
         Import_Template__c template = newTemplate();
@@ -34,7 +34,7 @@ private class ImportBatchServiceTest {
 
     @IsTest
     static void fallsBackToTheDefaultChunkSizeWhenTheSettingIsNonsense() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Import_Chunk_Size__c = 0;
         TestDataFactory.saveSettings(settings);
         Test.startTest();
@@ -530,7 +530,7 @@ private class ImportBatchServiceTest {
 
     @IsTest
     static void theUndoWindowIsStampedFromTheSettingAtCommit() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Import_Undo_Retention_Days__c = 7;
         TestDataFactory.saveSettings(settings);
         Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
@@ -548,7 +548,7 @@ private class ImportBatchServiceTest {
 
     @IsTest
     static void aNonsenseUndoWindowFallsBackAndALongOneIsHeldAtAYear() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Import_Undo_Retention_Days__c = 0;
         TestDataFactory.saveSettings(settings);
         Assert.areEqual(

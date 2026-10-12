@@ -3,12 +3,12 @@
   <fullName>Amount_Or_Percent_Required</fullName>
   <active>true</active>
   <description>
-    R-GA1: an allocation is entered as an amount or as a percent, and Open Impact works out the
+    R-GA1: an allocation is entered as an amount or as a percent, and BarnCRM works out the
     other one.
   </description>
   <errorConditionFormula>AND(ISBLANK(Amount__c), ISBLANK(Percent__c))</errorConditionFormula>
   <errorDisplayField>Amount__c</errorDisplayField>
   <errorMessage>
-    Enter an amount or a percent for this allocation. Open Impact works out the other one.
+    Enter an amount or a percent for this allocation. BarnCRM works out the other one.
   </errorMessage>
 </ValidationRule>

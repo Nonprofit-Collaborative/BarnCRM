@@ -4,7 +4,7 @@
   <deleteConstraint>SetNull</deleteConstraint>
   <description>
     The honor or memorial this gift was given under. The tribute's own gift reference is the
-    authoritative link; this one is a mirror Open Impact maintains so that gift list views,
+    authoritative link; this one is a mirror BarnCRM maintains so that gift list views,
     reports, and the receipt merge see the tribute without a subquery (R-G8).
   </description>
   <externalId>false</externalId>

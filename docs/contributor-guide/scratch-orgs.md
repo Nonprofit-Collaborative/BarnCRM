@@ -1,6 +1,6 @@
 # Scratch orgs
 
-Open Impact is verified against five org shapes, matching the license and package
+BarnCRM is verified against five org shapes, matching the license and package
 configurations described in the product plan (Section 4.2). Each shape has a scratch org
 definition in `config/scratch-defs/`. Four of them any Dev Hub can create; the fifth needs
 an entitlement, and is described below.
@@ -70,7 +70,7 @@ usable rather than empty.
 
 **Two settings make it behave like an Agentforce Nonprofit org**, and both are set in the app
 rather than by the script, because walking through them is itself worth testing. Open the
-Open Impact app; the Setup Assistant offers the coexistence mode it detected. Set it to
+BarnCRM app; the Setup Assistant offers the coexistence mode it detected. Set it to
 Agentforce Nonprofit coexistence, which moves household membership to the junction records
 that person accounts need in the same save. Health Check will then report an org shape that
 matches the mode. What still differs from a real Nonprofit Cloud org is that its objects are
@@ -146,7 +146,7 @@ Instead, `create-scratch-org.sh` verifies Platform-only compatibility two ways:
 2. **A runtime license check**, for the platform-only shape only: the script creates a user with
    the "Salesforce Platform" user license and the "Standard Platform User" profile (using
    `config/users/platform-user.json`, username
-   `platformuser@<alias>.openimpact.test`), then assigns every permission set found under
+   `platformuser@<alias>.barncrm.test`), then assigns every permission set found under
    `packages/core/main/default/permissionsets` to that user with
    `sf org assign permset --on-behalf-of`. The "Standard Platform User" profile cannot see
    Sales/Service objects at all, so if a Core permission set were to grant field- or

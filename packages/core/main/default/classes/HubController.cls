@@ -1,5 +1,5 @@
 /**
- * The Nonprofit Hub home page's Apex surface: how far setup has got, whether automation is
+ * The BarnCRM home page's Apex surface: how far setup has got, whether automation is
  * paused, and how many errors nobody has looked at.
  *
  * The steps themselves belong to the Setup Assistant, which loads them itself, so the home
@@ -11,8 +11,8 @@
  * page.
  */
 public with sharing class HubController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
-    private static final String ERROR_CONTEXT = 'Open Impact home';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
+    private static final String ERROR_CONTEXT = 'BarnCRM home';
 
     public class HomeModel {
         @AuraEnabled
@@ -21,6 +21,9 @@ public with sharing class HubController {
         public Boolean automationPaused;
         @AuraEnabled
         public Integer newErrorCount;
+        /** True when there are more new errors than `newErrorCount`, the most the tile counts. */
+        @AuraEnabled
+        public Boolean newErrorCountCapped;
         @AuraEnabled
         public Integer stepsCompleted;
         @AuraEnabled
@@ -70,7 +73,9 @@ public with sharing class HubController {
         model.stepsTotal = steps.size();
         model.stepsCompleted = SetupAssistantService.countCompleted(steps);
         model.automationPaused = readAutomationPaused();
-        model.newErrorCount = readNewErrorCount();
+        Integer newErrors = readNewErrorCount();
+        model.newErrorCountCapped = newErrors > HubErrorCountSelector.cap();
+        model.newErrorCount = model.newErrorCountCapped ? HubErrorCountSelector.cap() : newErrors;
         readRollupFreshness(model);
         readSeasonalAddressRun(model);
         model.recurringSources = readRecurringSources();

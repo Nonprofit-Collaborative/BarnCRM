@@ -1,7 +1,7 @@
 /**
  * The scan that finds the duplicates that were already there (C-20, canonical model R-DP3).
  *
- * A duplicate rule runs only when somebody saves a record, so the day Open Impact is installed
+ * A duplicate rule runs only when somebody saves a record, so the day BarnCRM is installed
  * the platform has never compared last year's imported spreadsheet with itself. The platform's
  * answer, a duplicate job, exists only in the two largest editions. This batch asks the
  * platform to evaluate the org's own active rules against records that already exist, fifty at

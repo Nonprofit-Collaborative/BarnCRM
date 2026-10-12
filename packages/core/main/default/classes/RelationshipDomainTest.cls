@@ -1,5 +1,5 @@
 /**
- * The rules a relationship has to pass before it is saved, and the two values Open Impact
+ * The rules a relationship has to pass before it is saved, and the two values BarnCRM
  * fills in.
  *
  * NOT EXECUTED. No Salesforce org exists in the environment these were written in, so every
@@ -86,7 +86,7 @@ private class RelationshipDomainTest {
     static void refusesEnteringTheOtherSideByHandBecauseItIsAlreadyThere() {
         RelationshipTestDataFactory.quietOtherAutomations();
         List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-        // Open Impact writes the other side, so entering it by hand is a duplicate of that.
+        // BarnCRM writes the other side, so entering it by hand is a duplicate of that.
         insert RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 
         Test.startTest();

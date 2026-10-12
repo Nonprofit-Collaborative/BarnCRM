@@ -4,26 +4,26 @@
 
 A soft credit is recognition for a gift someone influenced but did not legally give: a
 spouse who shares the household's giving, the board member who asked, the honoree a
-memorial gift remembers. Open Impact keeps soft credits separate from the money, so your
+memorial gift remembers. BarnCRM keeps soft credits separate from the money, so your
 receipts and your bank reconciliation stay exactly right while your donor lists still show
 everyone who deserves the thank you.
 
-Open Impact can also do the most common one for you. When a gift arrives from one member
+BarnCRM can also do the most common one for you. When a gift arrives from one member
 of a household, every other current member of that household is soft credited
 automatically, so a phone call to Luis Garcia about "your family's giving" is never a
 surprise to him.
 
 ## How to turn it on
 
-1. Open **Open Impact Settings** and choose **Giving**.
-2. Find **Automatic household soft credits**. It is on when you install Open Impact.
+1. Open **BarnCRM Settings** and choose **Giving**.
+2. Find **Automatic household soft credits**. It is on when you install BarnCRM.
 3. Leave it on if your organization thanks and reports on households. Turn it off if you
    want soft credits only where a person entered one by hand.
 
 That is the whole setting. Nothing here needs Salesforce Setup.
 
 One piece of first-time setup does: the **Soft credits** panel lives on a gift's record
-page, and Open Impact ships a page called **Gift Record Page** with the panel already on
+page, and BarnCRM ships a page called **Gift Record Page** with the panel already on
 it. Assign it once, as your org default for Gift, and every gift shows the panel from then
 on. If your organization has built a gift record page of its own, add the **Gift Soft
 Credits** component to that page instead.
@@ -104,4 +104,4 @@ Garcia household: Harper Garcia, her spouse Luis Garcia, and their son Diego.
 | The person or organization credited | Contact, Account |
 | Why they are credited | Role, Custom role |
 | How much they are recognized for | Amount, Percent |
-| Created and maintained by Open Impact | Is automatic |
+| Created and maintained by BarnCRM | Is automatic |

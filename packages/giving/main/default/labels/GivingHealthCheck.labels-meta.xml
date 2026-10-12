@@ -55,8 +55,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: who holds the Override Receipt Lock permission</shortDescription>
-        <value
-    >The Override Receipt Lock permission lets a person change or delete a gift that already carries a receipt number. Open Impact grants it to nobody: it is meant to be assigned in Setup for one correction and taken away again. It is held by {0}. If nobody is correcting a receipted gift right now, remove it in Setup, Custom Permissions. Every change made with it is in the Error Log.</value>
+        <value>The Override Receipt Lock permission lets a person change or delete a gift that already carries a receipt number. BarnCRM grants it to nobody: it is meant to be assigned in Setup for one correction and taken away again. It is held by {0}. If nobody is correcting a receipted gift right now, remove it in Setup, Custom Permissions. Every change made with it is in the Error Log.</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockFix</fullName>

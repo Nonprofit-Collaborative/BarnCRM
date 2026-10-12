@@ -76,6 +76,6 @@ else.**
 - The donor level page keeps its own Recalculate now button, so the Nightly Jobs page's Run now
   starts the top up and the overdue pass only, rather than carrying a second button for
   something that already has one.
-- Three of the five nightly jobs Open Impact ships are now started this way. If a fourth
+- Three of the five nightly jobs BarnCRM ships are now started this way. If a fourth
   appears, the shared shape is worth extracting; two is a coincidence and three is a pattern
   worth naming, not yet worth a framework.

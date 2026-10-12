@@ -62,8 +62,8 @@ function model(canEdit) {
         settings: [
           {
             key: 'Coexistence_Mode__c',
-            label: 'How Open Impact fits your org',
-            description: 'Set after Open Impact looks at your org.',
+            label: 'How BarnCRM fits your org',
+            description: 'Set after BarnCRM looks at your org.',
             dataType: 'Picklist',
             section: 'General',
             component: null,
@@ -72,7 +72,7 @@ function model(canEdit) {
             checked: false,
             options: [
               { label: 'On its own', value: 'Standalone' },
-              { label: 'Alongside Nonprofit Cloud', value: 'AgentforceNonprofit' }
+              { label: 'Alongside Nonprofit Cloud', value: 'NonprofitCloud' }
             ]
           }
         ]
@@ -102,10 +102,10 @@ function model(canEdit) {
           {
             key: 'Health_Check_Panel',
             label: 'Health check',
-            description: 'What Open Impact found in your org.',
+            description: 'What BarnCRM found in your org.',
             dataType: 'Component',
             section: 'Health',
-            settingsObject: 'Nonprofit_Settings__c',
+            settingsObject: 'BarnCRM_Settings__c',
             component: 'notAComponentInThisBuild',
             navigationTarget: null,
             helpUrl: null,

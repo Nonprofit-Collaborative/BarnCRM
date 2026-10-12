@@ -592,10 +592,12 @@ public with sharing class CommitmentService {
      * bare timestamp says the job woke up, not that it did any work (R-IN5).
      */
     public static void recordTopUpRun(Datetime completedAt, String summary) {
-        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-        settings.Installment_Top_Up_Last_Run__c = completedAt;
-        settings.Installment_Top_Up_Last_Run_Summary__c = summary;
-        saveSettings(settings);
+        saveRunRecord(
+            new Map<Schema.SObjectField, Object>{
+                Giving_Settings__c.Installment_Top_Up_Last_Run__c => completedAt,
+                Giving_Settings__c.Installment_Top_Up_Last_Run_Summary__c => summary
+            }
+        );
     }
 
     /**
@@ -604,20 +606,23 @@ public with sharing class CommitmentService {
      * ran at all, which is the state every org was in before ADR-0038 (R-IN5).
      */
     public static void recordOverdueRun(Datetime completedAt, String summary) {
-        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-        settings.Installment_Overdue_Last_Run__c = completedAt;
-        settings.Installment_Overdue_Last_Run_Summary__c = summary;
-        saveSettings(settings);
+        saveRunRecord(
+            new Map<Schema.SObjectField, Object>{
+                Giving_Settings__c.Installment_Overdue_Last_Run__c => completedAt,
+                Giving_Settings__c.Installment_Overdue_Last_Run_Summary__c => summary
+            }
+        );
     }
 
-    private static void saveSettings(Giving_Settings__c settings) {
-        List<Giving_Settings__c> records = new List<Giving_Settings__c>{ settings };
-        if (settings.Id == null) {
-            settings.SetupOwnerId = UserInfo.getOrganizationId();
-            Database.insert(records, true, AccessLevel.USER_MODE);
-        } else {
-            Database.update(records, true, AccessLevel.USER_MODE);
-        }
+    /**
+     * Saves a job's run record on the Giving settings, through the system mode writer the other
+     * run records use (ADR-0021, ADR-0027): the protected setting cannot be granted to the
+     * person the job runs as, and these keys are package-owned. Only the given keys are written,
+     * on the locked stored record, and a first save keeps the checkboxes that ship on, where a
+     * save starting from `getOrgDefaults()` stored them as false.
+     */
+    private static void saveRunRecord(Map<Schema.SObjectField, Object> values) {
+        OrgSettingsSystemWriter.save(Giving_Settings__c.SObjectType, values);
     }
 
     // ---------------------------------------------------------------------- helpers

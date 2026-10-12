@@ -20,7 +20,7 @@ private class AcknowledgmentRuleMatchTest {
             'Everything else',
             100,
             AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'Open_Impact_Thank_You'
+            'BarnCRM_Thank_You'
         );
         return new List<Acknowledgment_Rule__c>{ major, everything };
     }
@@ -80,7 +80,7 @@ private class AcknowledgmentRuleMatchTest {
             'Mid range',
             10,
             AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'Open_Impact_Thank_You'
+            'BarnCRM_Thank_You'
         );
         banded.Minimum_Amount__c = 100;
         banded.Maximum_Amount__c = 1000;
@@ -113,7 +113,7 @@ private class AcknowledgmentRuleMatchTest {
             'Anything',
             20,
             AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'Open_Impact_Thank_You'
+            'BarnCRM_Thank_You'
         );
         List<Acknowledgment_Rule__c> rules = new List<Acknowledgment_Rule__c>{ typed, anyType };
 

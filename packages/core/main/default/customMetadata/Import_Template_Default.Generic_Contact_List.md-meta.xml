@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Generic contact list</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">generic_contact_list</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">A list of people with their contact details: first name, last name, email, phone, address, and optionally the household or organization they belong to. Start here when your file is a mailing list or a membership list.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 1, "columns": [{"source": "First Name", "target": "Contact1.FirstName"}, {"source": "Last Name", "target": "Contact1.LastName"}, {"source": "Email", "target": "Contact1.Email"}, {"source": "Phone", "target": "Contact1.Phone"}, {"source": "Street", "target": "Contact1.MailingStreet"}, {"source": "City", "target": "Contact1.MailingCity"}, {"source": "State", "target": "Contact1.MailingState"}, {"source": "Postal Code", "target": "Contact1.MailingPostalCode"}, {"source": "Country", "target": "Contact1.MailingCountry"}, {"source": "Household Name", "target": "Household.Name"}, {"source": "Organization", "target": "Organization.Name"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

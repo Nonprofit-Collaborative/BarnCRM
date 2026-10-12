@@ -4,7 +4,7 @@
 
 Addresses gives every household, organization, and person one place to keep all of the
 places they receive mail, instead of a single set of address boxes that gets overwritten
-every time someone moves. One address is marked the default, and Open Impact copies that
+every time someone moves. One address is marked the default, and BarnCRM copies that
 one into the standard address boxes on the household, the organization, or the person, so
 mail merges, reports, letter templates, and any other app you use keep reading the address
 they have always read.
@@ -17,20 +17,20 @@ their household.
 A winter address does not have to be moved by hand. A **seasonal** address carries the dates
 it is used, and a nightly job makes it the address in use on the day its season starts and
 puts the previous address back on the day the season ends. The job records when it last ran
-and what it did, in two places you can see without leaving the app: the Open Impact home
-page and the Addresses page of Open Impact Settings. A nightly job you cannot see is a nightly
+and what it did, in two places you can see without leaving the app: the BarnCRM home
+page and the Addresses page of BarnCRM Settings. A nightly job you cannot see is a nightly
 job you cannot trust, which is why the last run is shown rather than assumed.
 
 ## How to turn it on
 
-Addresses is part of Core and is on as soon as Open Impact is installed. There is nothing
+Addresses is part of Core and is on as soon as BarnCRM is installed. There is nothing
 to install and no Setup step. Two things are worth setting once.
 
-1. Open the **Open Impact** app and choose **Open Impact Settings**.
+1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Addresses**.
 3. Set **When a person's address is edited** to the behavior your organization wants:
    - **Update household** (the default): editing one person's address moves the whole
-     household, which is what most nonprofits want, because a household shares a mailbox.
+     household, which is what most organizations want, because a household shares a mailbox.
    - **Create personal address**: editing one person's address gives that person an
      address of their own and leaves the rest of the household where it is. Choose this if
      you often track students away at school, adult children at a parent's household, or
@@ -47,11 +47,11 @@ Then switch on the seasonal address swap, which is off until you switch it on.
    works. Refresh the page after a minute: **Seasonal addresses last swapped** shows the time
    it finished and a sentence saying how many addresses moved.
 
-You need the **Manage Open Impact Settings** permission, which the Open Impact Admin access level
+You need the **Manage BarnCRM Settings** permission, which the BarnCRM Admin access level
 gives you, to use those two buttons. Everyone else sees the same last run and cannot change
 the schedule.
 
-There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and Open Impact
+There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
 does not ask you to do that: the button on this page is the supported way to schedule the
 swap, now and after the Module Manager arrives in a later release. The Module Manager will
 switch whole modules on and off; the seasonal swap belongs to Core, which is always on, so it
@@ -68,11 +68,12 @@ Two things to know about the schedule.
   is written to the Error Log instead of going through quietly.
 
 To let your team see and manage addresses, make sure they have one of the packaged access
-levels (Open Impact Admin, Fundraising Staff, or Program Staff) on the **Access** page in
-Open Impact Settings. Read Only users can see addresses and cannot change them.
+levels (BarnCRM Admin, Program Staff, or Volunteer Coordinator, or Fundraising Staff with
+Giving) on the **Access** page in
+BarnCRM Settings. Read Only users can see addresses and cannot change them.
 
 Addresses appear in two places once you are set up: an **Addresses** card on every
-household, organization, and person record, and an **Addresses** tab in the Open Impact
+household, organization, and person record, and an **Addresses** tab in the BarnCRM
 app for reporting and list views.
 
 ## A five-minute walkthrough
@@ -80,9 +81,9 @@ app for reporting and list views.
 You are Maria. The Garcia household spends January to March in Arizona and the rest of the
 year at home, and letters have been going to the wrong place. Start from the sample data.
 
-1. Open the **Open Impact** app and choose **Households**. Open **The Garcia Family**.
+1. Open the **BarnCRM** app and choose **Households**. Open **The Garcia Family**.
 2. Scroll to the **Addresses** card. You will see one address already there, of type
-   **Home**, with a **Default** badge on it. Open Impact created it from the address that
+   **Home**, with a **Default** badge on it. BarnCRM created it from the address that
    was already in the household's standard address boxes when the household was created,
    so nothing you had was lost.
 3. Choose **Add address** on the card. Fill in:
@@ -121,7 +122,7 @@ just different organizations.
 Still the Garcia household, and still five minutes. This time you are proving to yourself
 that the nightly job really works, before the winter mailing goes out.
 
-1. Open **Open Impact Settings** and choose **Addresses**. Under **Seasonal address swap**,
+1. Open **BarnCRM Settings** and choose **Addresses**. Under **Seasonal address swap**,
    choose **Schedule the nightly swap** if it is not already scheduled.
 2. Open **The Garcia Family** and look at the **Addresses** card. The Arizona address you
    added is of type **Seasonal** and reads "Used from January 1 to March 31". The **Default**
@@ -129,7 +130,7 @@ that the nightly job really works, before the winter mailing goes out.
 3. Change the Arizona address's dates so that today falls inside them: set **Seasonal Start
    Month** and **Seasonal Start Day** to yesterday's month and day, and the end month and day
    to a date next month. Save.
-4. Go back to **Open Impact Settings**, **Addresses**, and choose **Run the swap now**.
+4. Go back to **BarnCRM Settings**, **Addresses**, and choose **Run the swap now**.
 5. Wait a minute and refresh the page. **Seasonal addresses last swapped** now shows a time a
    minute ago and reads "1 moved to a seasonal address, 0 moved back, 0 could not be changed."
 6. Open **The Garcia Family** again. The **Default** badge is on the Arizona address, the
@@ -138,7 +139,7 @@ that the nightly job really works, before the winter mailing goes out.
 7. Now set the Arizona address's end date to yesterday, save, and choose **Run the swap now**
    again. The summary reads "0 moved to a seasonal address, 1 moved back", the badge is back
    on the home address, and the household's address boxes read Springfield again.
-8. Open the **Open Impact** home page. The **Seasonal addresses last swapped** tile shows
+8. Open the **BarnCRM** home page. The **Seasonal addresses last swapped** tile shows
    the same time and the same sentence. That tile is where you will notice, on an ordinary
    morning, if the job has stopped running.
 
@@ -148,10 +149,10 @@ and back home on April 1. Do not split it into two addresses.
 
 ## Common mistakes
 
-**Editing the standard address boxes directly in a third party app.** Open Impact treats
+**Editing the standard address boxes directly in a third party app.** BarnCRM treats
 the address records as the truth and copies the default into the standard address boxes. If
 a third party app, a data loader, or an integration writes straight into the standard
-boxes, Open Impact will put the default address back the next time that address record is
+boxes, BarnCRM will put the default address back the next time that address record is
 saved, and the edit will look like it vanished. Make the change
 on the address card instead, or mark a new address as the default. This is also why address
 verification apps should be pointed at the address records.
@@ -170,7 +171,7 @@ range: enter it exactly that way, do not split it into two addresses.
 **Putting an organization or another household in a household.** In an org that stores
 people as person accounts, an address is copied into a household member's own mailing boxes.
 A member that is not a person, for example an organization record that has been added to a
-household by mistake, has no mailing boxes to copy into, so Open Impact skips it and copies
+household by mistake, has no mailing boxes to copy into, so BarnCRM skips it and copies
 the address to everyone else. The address still saves. If someone should have received the
 address and did not, check that they are a person rather than an organization.
 
@@ -180,7 +181,7 @@ person you get "An address belongs to one household, one organization, or one pe
 Choose only one." Clear the one you did not mean. If you want a person to have their own
 address inside a household, put the person on it and leave the household blank.
 
-**Deleting the default address.** You can delete it, and Open Impact promotes the most
+**Deleting the default address.** You can delete it, and BarnCRM promotes the most
 recently created remaining address to default so the household is never left with no
 address in its standard boxes. If the household has only one address, deleting it leaves
 the standard address boxes as they were and nothing is promoted. Prefer adding a new
@@ -188,13 +189,13 @@ address and marking it default over deleting the old one: the old address is the
 where a mailing actually went.
 
 **Expecting the swap to happen without scheduling it.** Entering seasonal dates is not enough:
-the nightly job has to be scheduled once, on the Addresses page of Open Impact Settings. Until
+the nightly job has to be scheduled once, on the Addresses page of BarnCRM Settings. Until
 you do that, the page says so in as many words and the Hub tile says the swap has not run. If
 the tile ever says the swap is scheduled but has not run in more than 36 hours, choose
 **Run the swap now** and check the Error Log.
 
 **Two seasonal addresses covering the same day.** If a household has a November to March
-address and a December to February address, both cover Christmas. Open Impact uses the one
+address and a December to February address, both cover Christmas. BarnCRM uses the one
 that was added first, so the answer does not change from night to night, and writes a warning
 to the Error Log naming the address. Fix the dates so that only one seasonal address covers
 each day.

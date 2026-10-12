@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <customObject>true</customObject>
-  <description>The list of problems Open Impact has recorded, in plain language.</description>
+  <description>The list of problems BarnCRM has recorded, in plain language.</description>
   <label>Error Log</label>
   <motif>Custom48: Bell</motif>
 </CustomTab>

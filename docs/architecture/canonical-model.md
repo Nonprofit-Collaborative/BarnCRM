@@ -6,7 +6,7 @@
 
 ## 1. Purpose
 
-This document is the platform-neutral specification of the Open Impact data model. It
+This document is the platform-neutral specification of the BarnCRM data model. It
 defines entities, attributes, relationships, and business rules in ordinary language,
 independent of Salesforce. Each entity then cites the Salesforce metadata that
 implements it.
@@ -30,8 +30,17 @@ It exists for three reasons (plan Section 4.4):
    Section 9.3).
 4. Attribute names here are human names. Salesforce API names appear only in the
    implementation subsection of each entity.
-5. Labels use nonprofit language, not Salesforce language: "Gift" not "Donation
-   Transaction," "Fund" not "General Accounting Unit" (plan Section 7.1).
+5. Labels use plain language, not Salesforce language, and Core's labels are neutral: no
+   Core label, help text, option, message or seeded record says "nonprofit" or uses
+   nonprofit-only vocabulary (gift, donor, donation, grant, fundraising, receipt, pledge,
+   appeal), because Core alone is the Community Suite. The exceptions are text shown only
+   when Giving (or another module) is installed; the names of Salesforce products (NPSP,
+   Nonprofit Cloud, Gift Transaction) shown only when Core detects that product in the org;
+   import column aliases that only match file headers; and the Nonprofit Edition choice
+   (C-30). Giving's labels use giving language: "Gift" not "Donation Transaction," "Fund"
+   not "General Accounting Unit" (plan Section 7.1). See ADR-0062
+   (`decisions/0062-core-names-other-products-only-when-detected.md`), which amends ADR-0059
+   decision 5.
 
 ## 3. Versioning
 
@@ -120,7 +129,7 @@ does.
 | Custom Name | boolean | yes (defaults false) | When true, Name, Formal Greeting, and Informal Greeting are never recomputed; the staff member's wording stands. |
 | Primary Contact | reference(Contact) | no | The household member who receives correspondence when only one person can be named. In junction mode it mirrors the primary member (R-M3), and a person stored as a Person Account is named by their person contact. |
 | Member Count | integer | computed | The number of current (not ended, not deceased-excluded) members of the household. |
-| Anniversary | date | no | A household-level date the nonprofit stewards, most often a wedding anniversary. |
+| Anniversary | date | no | A household-level date the organization keeps, most often a wedding anniversary. |
 | Record Type | picklist(Household, Organization) | yes | Distinguishes a household from an organization; a Household always carries Household. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
@@ -248,8 +257,8 @@ names is deleted.
 **R-H12 Reparenting and empty households.** Moving a contact to a different household
 recalculates both households' member counts and, once Giving is installed, their giving
 rollups. The vacated household is deleted when it is empty, `Delete_Empty_Households__c`
-is on, and nothing outside Open Impact depends on the account (ADR-0036). "Empty" is
-measured in Open Impact's own membership, which is the only membership Open Impact can
+is on, and nothing outside BarnCRM depends on the account (ADR-0036). "Empty" is
+measured in BarnCRM's own membership, which is the only membership BarnCRM can
 see, so a household that also carries a Salesforce Nonprofit Cloud household group or its
 membership rows reads as empty here while being anything but. The account is the master of
 that group, so deleting the account would destroy it rather than orphan it. A household
@@ -412,9 +421,9 @@ code never branches on membership mode.
 
 ### Definition
 
-A person the nonprofit knows: a donor, a household member, a volunteer, a program
-participant, a board member, or a staff contact at an organization. The Contact is the
-person; the Household is how the nonprofit addresses and credits them.
+A person the organization knows: a member, a household member, a volunteer, a program
+participant, a board member, a donor (with Giving), or a staff contact at an organization.
+The Contact is the person; the Household is how the organization addresses and credits them.
 
 ### Attributes
 
@@ -434,7 +443,7 @@ address fields are used as the platform provides them.
 | Personal Email | email | no | The person's own email address, the one they read at home. |
 | Work Email | email | no | The email address this person uses at work. |
 | Alternate Email | email | no | A third email address for a person who has one, for example a seasonal or a school address. |
-| Preferred Email | picklist(Personal, Work, Alternate) | no | Which of the three addresses the nonprofit should write to. Leaving it empty means the org is not using the three addresses at all. |
+| Preferred Email | picklist(Personal, Work, Alternate) | no | Which of the three addresses the organization should write to. Leaving it empty means the org is not using the three addresses at all. |
 | Employer | reference(Organization) | no | The organization this person works for, used to recognize the employer when a matching gift arrives (G-10). |
 | Household | reference(Household) | conditional | The household this person belongs to; in contact mode this is the person's Account. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
@@ -539,7 +548,7 @@ partner. Organizations are not households and never carry household naming or gr
 |---|---|---|---|
 | Name | text | yes | The organization's legal or commonly used name, entered by staff and never computed. |
 | Record Type | picklist(Household, Organization) | yes | Always Organization for this entity. |
-| Primary Contact | reference(Contact) | no | The person the nonprofit deals with at this organization. |
+| Primary Contact | reference(Contact) | no | The person you deal with at this organization. |
 | Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
 ### Relationships
@@ -622,7 +631,7 @@ about the entries created since the window the last digest covered that are stil
 how many, how many by Context and by Severity, and the newest 25 by record name with a link
 to each, plus a link to the whole list. It never carries Message, Technical Detail or
 Record Reference, so it holds less about a donor than the entries themselves. It goes only
-to active users of the org (those holding Manage Nonprofit Settings, or those whose email
+to active users of the org (those holding Manage BarnCRM Settings, or those whose email
 addresses the administrator lists), at most 50 of them, addressed to each user record so
 that it does not count against the daily limit on email sent to addresses. A run that finds
 nothing new sends nothing. One daily job, started and stopped in the settings console,
@@ -634,7 +643,7 @@ digest that is scheduled but has not run for two days is a Health Check warning 
 
 ### Salesforce implementation
 
-- **Object:** `Error_Log__c`, surfaced as an admin-only tab in the Nonprofit Hub app. The
+- **Object:** `Error_Log__c`, surfaced as an admin-only tab in the BarnCRM app. The
   record name is the auto number `ERR-{000000}`.
 - **Fields:** `Timestamp__c` (DateTime), `User__c` (Lookup to User), `Context__c` (Text),
   `Record_Reference__c` (Text), `Object_Name__c` (Text), `Message__c` (Long Text Area),
@@ -666,7 +675,7 @@ calling anyone.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Automation Name | text | yes | The stable identifier of the automation, matching its entry in the shipped registry. |
-| Description | long text | yes | What this automation does, in the language a nonprofit administrator uses. |
+| Description | long text | yes | What this automation does, in the language an administrator uses. |
 | Enabled | boolean | yes (defaults true) | Whether the automation runs; unchecking it bypasses the handler. |
 | Always Runs | boolean | yes (defaults false) | Whether this automation enforces a rule rather than providing a convenience. An automation marked this way runs whatever the switch, the pause and the bypass say, and its switch is shown off and disabled in the console (ADR-0024). |
 | Handler Class | text | no | The packaged code the dispatcher runs for this automation, copied from the shipped registry. |
@@ -720,7 +729,7 @@ automation (R-A4).
   `Is_Package_Default__c` (Checkbox). The record name holds the automation's label as the
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
-- **Org-level pause:** `Nonprofit_Settings__c.Automation_Paused_Until__c`.
+- **Org-level pause:** `BarnCRM_Settings__c.Automation_Paused_Until__c`.
 - **Service:** `AutomationControl`, `TriggerDispatcher`.
 
 ---
@@ -768,7 +777,7 @@ text would refuse the package's own writes.
 
 ---
 
-## 12. Nonprofit Settings
+## 12. BarnCRM Settings
 
 ### Definition
 
@@ -778,9 +787,9 @@ settings console can write them synchronously and so that they are cacheable (De
 D-06).
 
 Core is neutral (plan Section 4.1, C-29, ADR-0059): a key lives here only if Core reads it or
-it means the same thing to any organization. The console and the object are labelled **Open
-Impact Settings**; the API name `Nonprofit_Settings__c` is unchanged until the product name
-pass (ADR-0059 decision 6). Seven keys this section listed before v0.6, the tax
+it means the same thing to any organization. The console and the object are labelled **BarnCRM
+Settings**, and its API name is `BarnCRM_Settings__c` (it was `Nonprofit_Settings__c` until
+the API name pass, ADR-0063, which supersedes ADR-0059 decision 6). Seven keys this section listed before v0.6, the tax
 identification number, the four receipt signer and file keys, and the default fund and
 appeal, are read only by Giving and moved to `Giving_Settings__c` (Section 21A) in C-29, with
 their API names and definitions unchanged.
@@ -792,7 +801,7 @@ may add keys, and must add them here first.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Coexistence_Mode__c` | picklist(Standalone, NPSP, AgentforceNonprofit) | Standalone | How this org coexists with what is already installed; set by the Setup Assistant after automatic detection and confirmable later (plan Section 4.5). |
+| `Coexistence_Mode__c` | picklist(Standalone, NPSP, NonprofitCloud) | Standalone | How this org coexists with what is already installed; set by the Setup Assistant after automatic detection and confirmable later (plan Section 4.5). Shown as Standalone, NPSP coexistence and Nonprofit Cloud coexistence. Standalone is always offered; NPSP coexistence only when `OrgShapeDetector` finds NPSP (`hasNpsp`); Nonprofit Cloud coexistence only when it finds Nonprofit Cloud objects (`hasIndustriesNonprofit`); the saved value is always offered. The Setup Assistant and the console offer the same list. Recommended: Nonprofit Cloud coexistence, else NPSP coexistence, else Standalone (ADR-0062). |
 | `Household_Membership_Mode__c` | picklist(Contact, Junction) | Contact | Whether household membership uses the Contact's Account reference or the Household Member junction. |
 | `Auto_Create_Households__c` | boolean | true | Whether saving a new person who belongs to no household creates one automatically. Governs both membership modes, and both objects a person can be stored on (R-H1, R-H2). |
 | `Delete_Empty_Households__c` | boolean | true | Whether a household left with no members is deleted. |
@@ -848,7 +857,7 @@ The commitment keys (`Installment_Generation_Horizon_Months__c`,
 `Installment_Overdue_Grace_Days__c`, `Auto_Apply_Gifts_To_Installments__c`, and the
 nightly run stamps listed in Section 21A) and `Automatic_Household_Soft_Credits__c` are
 Giving keys and live on `Giving_Settings__c`, the Giving package's own protected hierarchy
-custom setting, not on `Nonprofit_Settings__c`: a dependent package cannot add fields to
+custom setting, not on `BarnCRM_Settings__c`: a dependent package cannot add fields to
 an object Core owns (ADR-0017). They are listed here because this section is the whole
 settings inventory, and the settings console reads every registered settings object
 through `Setting_Definition__mdt`, so an admin sees one console whichever object holds
@@ -869,7 +878,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage Open Impact Settings. |
+| `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage BarnCRM Settings. |
 | `Error_Digest_Frequency__c` | picklist(Daily, Weekly) | Daily | How often the error digest may be sent. Stored as text (ADR-0019); empty reads as Daily. |
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
@@ -892,7 +901,7 @@ definition.
 
 ### Salesforce implementation
 
-- **Custom setting:** `Nonprofit_Settings__c`, hierarchy, protected.
+- **Custom setting:** `BarnCRM_Settings__c`, hierarchy, protected.
 - **Picklist keys are stored as text.** Custom settings do not support picklist fields on
   the platform, so `Coexistence_Mode__c` and `Household_Membership_Mode__c` are Text
   fields holding one of the values listed above, validated by `SettingsService` rather
@@ -900,8 +909,8 @@ definition.
   value. Recorded as ADR-0019.
 - **Service:** `SettingsService`, with the console LWCs `settingsConsole`,
   `settingsSearch`, `householdNamingSettings`.
-- **Permission:** editing requires the `Manage_Nonprofit_Settings` custom permission, labelled
-  Manage Open Impact Settings; users without it see a read-only view naming the permission.
+- **Permission:** editing requires the `Manage_BarnCRM_Settings` custom permission, labelled
+  Manage BarnCRM Settings; users without it see a read-only view naming the permission.
 
 ---
 
@@ -914,7 +923,7 @@ This is how upgrade safety (Principle 6) is achieved (Decision D-06).
 
 ### Setting Definition
 
-`Setting_Definition__mdt`: the catalog of everything the Nonprofit Settings console shows,
+`Setting_Definition__mdt`: the catalog of everything the BarnCRM Settings console shows,
 one row per setting or per section that a component renders, so that a feature adds its
 settings to the console by shipping rows rather than by editing the console.
 
@@ -923,7 +932,7 @@ settings to the console by shipping rows rather than by editing the console.
 | DeveloperName | text | The stable identifier of this console row. |
 | Label | text | The setting's name as the admin sees it in the console. |
 | `Setting_Key__c` | text (80) | The API name of the settings field this row edits; blank for rows that render a component instead of a single value. |
-| `Settings_Object__c` | text (80), default `Nonprofit_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). |
+| `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example Households, Automation, Access, Health. |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
 | `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Component) | How the console renders and validates this row. |
@@ -1041,7 +1050,7 @@ objects, and the defaults the package ships for them are custom metadata materia
 install (Section 13).
 
 The fourth v0.2 Core feature, the full Setup Assistant (C-12), adds no entity. Its
-resumable checklist records step completion in the Nonprofit Settings key
+resumable checklist records step completion in the BarnCRM Settings key
 `Setup_Assistant_Steps_Complete__c` (Section 12), and its "pick default fund and appeal"
 step writes `Default_Fund__c` and `Default_Appeal__c` in the same place.
 
@@ -1060,7 +1069,7 @@ never types SOQL (plan Section 2.3).
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | The rollup's name as the admin sees it, for example "Household total giving". |
-| Description | long text | no | What this number means, in the language a nonprofit administrator uses. |
+| Description | long text | no | What this number means, in the language an administrator uses. |
 | Definition Key | text | yes | The stable identifier of this rollup, matching the shipped default it came from; unique. |
 | Source Entity | text | yes | The entity whose records are aggregated, for example Gift. |
 | Target Entity | text | yes | The entity that carries the calculated number, for example Household. |
@@ -1239,7 +1248,7 @@ Maria load the same payment processor export every month without rebuilding the 
 
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
-| Name | text | yes | The template's name as the admin sees it, for example "Generic donor list". |
+| Name | text | yes | The template's name as the admin sees it, for example "Generic contact list". |
 | Description | long text | no | What kind of file this template reads, with an example of its columns. |
 | Template Key | text | yes | The stable identifier of this template, matching the shipped default it came from; unique. |
 | Column Mapping | long text | yes | The mapping from source column names to canonical targets, held as a mapping document (see R-IT1). |
@@ -1251,7 +1260,7 @@ Maria load the same payment processor export every month without rebuilding the 
 | Source Name | text | conditional | The named source of a recurring feed, for example "Monthly processor export"; required when Is Recurring is true. |
 | Last Import Date | date | computed | The date a batch using this template last completed, shown on the Hub. |
 | Active | boolean | yes (defaults true) | Whether the template is offered in the import wizard. |
-| Donation Matching | picklist(Always create, Match or create, Match only, Never match) | no | How a gift on a row is matched to a payment the donor already owes; empty means Match or create (R-IT7, R-DM5). |
+| Payment Matching | picklist(Always create, Match or create, Match only, Never match) | no | Whether an imported record pays a scheduled payment it matches (used by modules that load payments; with Giving, a gift matched to a payment the donor already owes); empty means Match or create (R-IT7, R-DM5). |
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
 
@@ -1324,20 +1333,22 @@ the mapping loads a gift; an empty value means the org's default (ADR-0052). A c
 read them: it runs under the values its dry run recorded on the batch (R-IB11, R-DM7), so a
 template edited after the dry run changes the next dry run, not the commit.
 
-**R-IT5 What ships.** Core ships a generic donor list template and a generic gift list
-template (v0.2). The migration templates (v0.5) are rows of the same type, placed by what
-they load: a template that loads only people and organizations ships from Core, so an org
-with only Core installed can use it, and a template that loads any gift target ships from
-Giving, the way Giving ships its rollup definition defaults. Each has a sample export in
+**R-IT5 What ships.** Core ships the generic contact list template (v0.2); Giving ships the
+generic gift list template. The migration templates (v0.5) are rows of the same type, and
+all of them ship from Giving, the way Giving ships its rollup definition defaults, so they
+are created only in an org that has Giving. That includes the two that load only people,
+because they name nonprofit products, which Core shows only where they apply (rule 5), and
+detecting the old product would be the wrong gate: a migration usually goes into a fresh org where it is
+not installed (ADR-0062). Each has a sample export in
 `docs/admin-guide/samples/` that `check-custom-metadata.py` compares with its headings.
 
 | Template Key | Package | Reads |
 |---|---|---|
-| `npc_person_accounts` | Core | An export of Nonprofit Cloud person accounts |
+| `npc_person_accounts` | Giving | An export of Nonprofit Cloud person accounts |
 | `npc_gift_transactions` | Giving | An export of gift transaction designations whose donor is a person, one row per designation |
 | `npc_organization_gifts` | Giving | The same export whose donor is not a person |
 | `npc_undesignated_gifts` | Giving | An export of gift transactions with no designation |
-| `npsp_contacts` | Core | An export of NPSP contacts |
+| `npsp_contacts` | Giving | An export of NPSP contacts |
 | `npsp_payments` | Giving | An export of paid NPSP payments whose opportunity's account is individual |
 | `npsp_organization_payments` | Giving | The same export whose account is not individual |
 
@@ -1366,7 +1377,7 @@ from Nonprofit Cloud", section 5).
 | Source Name | `Source_Name__c` | Text |
 | Last Import Date | `Last_Import_Date__c` | Date |
 | Active | `Active__c` | Checkbox |
-| Donation Matching | `Donation_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
+| Payment Matching (labelled Donation Matching, API name `Donation_Matching__c`, before v0.6) | `Payment_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
 
@@ -2486,7 +2497,7 @@ Added by acknowledgments (G-12, ADR-0032).
 | `Acknowledgments_Last_Run__c` | datetime | empty | When the last acknowledgment send finished, shown read only on the Acknowledgments page (R-AK12). |
 | `Acknowledgments_Last_Run_Summary__c` | text | empty | What that run did, in one sentence, because a bare timestamp says the job woke up and not that it sent anything (R-AK12). |
 Added by receipting (G-13). The organization's legal name and address, which a receipt
-prints, are Core keys on `Nonprofit_Settings__c` (Section 12): any organization has them. The
+prints, are Core keys on `BarnCRM_Settings__c` (Section 12): any organization has them. The
 tax identification number, the logo, the signature and the signer's name and title were Core
 keys until v0.6 and are Giving keys now (see the v0.6 table below).
 
@@ -2521,7 +2532,7 @@ Definition row, so the console's generic save cannot write it past the page's ch
 |---|---|---|---|
 | `Books_Closed_Through__c` | date | empty | The last day of the latest closed accounting period; empty means no period is closed. Gifts in the books dated on or before it are locked (R-G14). It is at least two days before today (so today is open in every time zone) and moves only forward; moving it back or clearing it needs `Override_Posting_Lock` and writes an Error Log entry at Warning. Every change is a Setting Change. |
 
-Moved from `Nonprofit_Settings__c` by C-29 (ADR-0059), API names unchanged. The Setup Assistant
+Moved from `BarnCRM_Settings__c` by C-29 (ADR-0059), API names unchanged. The Setup Assistant
 writes them through the steps Giving contributes, and the console shows them in the sections
 it showed them in before.
 
@@ -2543,7 +2554,7 @@ only by adding a row to the table above in the pull request that adds the field 
 R-N5 apply unchanged).
 
 **R-GS2 One console, several settings objects.** The Giving keys appear in the same
-Open Impact Settings console as the Core keys, in the Giving section (the moved receipt
+BarnCRM Settings console as the Core keys, in the Giving section (the moved receipt
 identity keys in the Organization section, beside the legal name they print with). The console reaches
 them because each shipped `Setting_Definition__mdt` row names its settings object, so an
 administrator never learns that there is more than one place the values are stored.
@@ -3449,13 +3460,13 @@ proof rather than invisible on the donor's copy.
 the sentences R-RC7 requires. A template that also types them produces them twice, which is
 the administrator's to fix, and a template that omits them still produces a valid receipt.
 
-**R-RT4 The shipped letters arrive at install, and writing one needs Manage Nonprofit
+**R-RT4 The shipped letters arrive at install, and writing one needs Manage BarnCRM
 Settings.** `Receipt_Template_Default__mdt` is materialized by the Giving post-install script,
 at install and at every upgrade, creating only what the org does not have (ADR-0029). The
 Receipts page carries a Restore the shipped letters action for an install whose step failed,
 and issuing a receipt with no letter of that kind materializes the shipped one under
 `Issue_Receipts`. Saving a body, switching a letter on, and restoring the shipped letters all
-check `Manage_Nonprofit_Settings` and write in user mode (ADR-0034).
+check `Manage_BarnCRM_Settings` and write in user mode (ADR-0034).
 
 ### Salesforce implementation
 
@@ -3723,7 +3734,7 @@ happened without finding the run record.
   `AcknowledgmentLetterMerge`, and `AcknowledgmentController` for the page.
 - **Custom permission:** `Send_Acknowledgments`, granted to Giving Admin and Giving Staff.
 - **Page:** LWC `acknowledgments` on the `Acknowledgments` tab and flexipage, reached from
-  the Giving section of the Nonprofit Settings console by navigation (ADR-0020).
+  the Giving section of the BarnCRM Settings console by navigation (ADR-0020).
 
 ---
 
@@ -4263,7 +4274,7 @@ recorded values, or values that cannot be read, falls back to the template.
   a run that matches hundreds of thousands of scheduled payments is the remaining heap limit.
 - **Settings keys** (on `Giving_Settings__c`, Section 21A):
   `Donation_Match_Date_Window_Days__c`, `Donation_Match_Amount_Tolerance__c`.
-- **Template attributes** (on `Import_Template__c`, Section 15): `Donation_Matching__c`,
+- **Template attributes** (on `Import_Template__c`, Section 15): `Payment_Matching__c`,
   `Match_Date_Window_Days__c`, `Match_Amount_Tolerance__c`.
 
 ---
@@ -4816,8 +4827,8 @@ person already made is not asked again the next time the scan runs.
 
 Nothing else about duplicates is stored here. The suggestions themselves are platform
 records: the platform's duplicate rules write a Duplicate Record Set and its Duplicate Record
-Items, and the Open Impact scan writes the same two standard objects for duplicates that were
-already in the org before anybody looked. Open Impact adds no object for a suggestion, no
+Items, and the BarnCRM scan writes the same two standard objects for duplicates that were
+already in the org before anybody looked. BarnCRM adds no object for a suggestion, no
 matching logic of its own, and no copy of what the platform found (R-DP1).
 
 ### Attributes
@@ -4836,17 +4847,17 @@ matching logic of its own, and no copy of what the platform found (R-DP1).
 
 ### Rules
 
-**R-DP1 The platform detects, Open Impact reviews.** What counts as the same person or the
+**R-DP1 The platform detects, BarnCRM reviews.** What counts as the same person or the
 same household is decided by the org's own active duplicate rules for Contact and Account,
-and nothing else. Open Impact ships no matching rule and no duplicate rule (ADR-0050): every
+and nothing else. BarnCRM ships no matching rule and no duplicate rule (ADR-0050): every
 org starts with the platform's standard rules for both objects switched on, and an
 administrator's own rules are used exactly as written. No packaged code compares two records
 field by field to decide whether they are duplicates.
 
-**R-DP2 Only pairs Open Impact can act on are proposed.** A suggestion is two people, or two
+**R-DP2 Only pairs BarnCRM can act on are proposed.** A suggestion is two people, or two
 households. A pair of accounts where either side is not a household (an organization, or a
 person stored as an account) is passed over, because the household merge (R-H13) is the only
-account merge Open Impact performs and a suggestion nobody can act on here is noise.
+account merge BarnCRM performs and a suggestion nobody can act on here is noise.
 
 **R-DP3 The scan finds what the rules would have found.** A duplicate rule runs when a record
 is saved, so records already in the org, and records saved past an alert, are never compared
@@ -4854,7 +4865,7 @@ with each other. The scan asks the platform to evaluate its active duplicate rul
 the people and households that already exist, fifty records at a time, and writes a
 Duplicate Record Set of exactly two items for each new pair it is given back. It never
 proposes a pair that is already in a suggestion, and never one that has been dismissed. It is
-started by a person from Nonprofit Settings and is not scheduled. It refuses to start when no
+started by a person from BarnCRM Settings and is not scheduled. It refuses to start when no
 duplicate rule for Contact or Account is active, because a scan with nothing to evaluate would
 report a clean org rather than an org nobody is checking.
 
@@ -4885,7 +4896,7 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
   read with `DuplicateRule`. They are read and written in user mode, so a reviewer is never
   shown a pair containing a record they cannot see. Salesforce licenses them only to Sales
   Cloud and Service Cloud users, so no Core role grants them: the optional permission set
-  `Nonprofit_Duplicate_Review` does, and the panel says so to anyone without it (ADR-0050).
+  `BarnCRM_Duplicate_Review` does, and the panel says so to anyone without it (ADR-0050).
 - **People merges** are the platform's. When a contact, or a person stored as an account, is
   deleted by a merge (`MasterRecordId` filled in `after delete`), its memberships are
   recreated on the survivor in junction mode (all or none; only current rows count as already
@@ -4905,7 +4916,7 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
   carry it, so a household is never merged past R-H13.
 - **Service:** `DuplicateService`, `DuplicateSelector`, `DuplicateScanBatch`,
   `DuplicateController`. The review page is the `duplicateReview` panel on the Households page
-  of Nonprofit Settings.
+  of BarnCRM Settings.
 
 ---
 
@@ -4946,12 +4957,12 @@ and plan Section 4.2 forbid.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Campaign_Sync_Enabled__c` | boolean | false | Whether saving an appeal creates or updates its Campaign. Off at install, because an org that has Campaigns of its own must decide before Open Impact adds more (R-CS1). |
+| `Campaign_Sync_Enabled__c` | boolean | false | Whether saving an appeal creates or updates its Campaign. Off at install, because an org that has Campaigns of its own must decide before BarnCRM adds more (R-CS1). |
 
 ### Rules
 
 **R-CS1 Off until switched on.** Campaign sync does nothing until an administrator turns it
-on in Nonprofit Settings. It also does nothing where the org has no Campaign object (a
+on in BarnCRM Settings. It also does nothing where the org has no Campaign object (a
 Platform-only org), and the Campaign sync page says so rather than offering a switch that
 cannot work. It is a registered automation on Appeal (`Campaign_Sync`), so it can also be
 paused or switched off like any other (ADR-0040). The setting is authoritative: it says
@@ -4973,7 +4984,7 @@ Campaign ID is stored with the appeal and never in a second save. A Campaign who
 already match is not updated.
 
 **R-CS4 In the saver's own access.** The Campaign is written in user mode, with the access
-of the person saving the appeal. Campaign is a standard object Open Impact does not own, so
+of the person saving the appeal. Campaign is a standard object BarnCRM does not own, so
 an elevated write (ADR-0021) is not available for it. Someone who cannot create or edit
 Campaigns (in Salesforce that needs the Marketing User box on their user record as well as
 Campaign permissions) still saves the appeal; the appeal simply stays without a Campaign.
@@ -4992,11 +5003,11 @@ them to Sync all appeals.
 many do not, and offers **Sync all appeals**, which runs R-CS2 over every appeal the person
 can see, in the background, as that person. It is how the appeals that existed before the
 feature was turned on get their Campaigns, and how appeals saved by someone without Campaign
-access (R-CS4) are caught up. It needs the Manage Nonprofit Settings permission, and only one
+access (R-CS4) are caught up. It needs the Manage BarnCRM Settings permission, and only one
 runs at a time.
 
 **R-CS7 Never deleted.** Deleting an appeal leaves its Campaign in place, with its members
-and history; restoring the appeal restores the link. Open Impact never deletes a Campaign it
+and history; restoring the appeal restores the link. BarnCRM never deletes a Campaign it
 did not just create. The one deletion is Sync all appeals undoing its own work: a Campaign it
 created for an appeal whose Campaign ID it then could not store is deleted in the same run, so
 the next run does not make a second one. A Campaign it cannot delete is named in a Warning.
@@ -5029,7 +5040,7 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 - **Service:** `CampaignSyncService` (the copy), `CampaignSyncSelector` (appeal and Campaign
   reads, Campaign by dynamic query only), `CampaignSyncBatch` (R-CS6),
   `CampaignSyncController` and the `campaignSync` page reached from the Giving section of
-  Nonprofit Settings. Permission set: `Campaign_Sync`.
+  BarnCRM Settings. Permission set: `Campaign_Sync`.
 
 ## 29C. Opportunity Mirror
 
@@ -5069,7 +5080,7 @@ stop Connect installing on an org without Opportunity (ADR-0013).
 ### Rules
 
 **R-OM1 One direction, off until chosen.** The mirror does nothing until an administrator
-chooses a direction in Nonprofit Settings, and one setting holds the choice, so two directions
+chooses a direction in BarnCRM Settings, and one setting holds the choice, so two directions
 can never be active at once. It also does nothing where the org has no Opportunity object, and
 the Opportunity mirror page says so. The Gifts to Opportunities copy made on save is a
 registered automation on Gift (`Opportunity_Mirror`), so it can be paused or switched off like
@@ -5078,7 +5089,7 @@ any other (ADR-0040); the setting is authoritative, and the runs of R-OM8 follow
 **R-OM2 Which gifts are copied.** In Gifts to Opportunities, a gift gets an Opportunity when it
 counts in the giving totals: Status Received, Refunded or Written off (ADR-0022). That includes
 the negative gift recording a refund or a write-off, whose Opportunity has a negative Amount,
-so an NPSP total nets exactly as the Open Impact total does, and an in-kind gift, whose Amount
+so an NPSP total nets exactly as the BarnCRM total does, and an in-kind gift, whose Amount
 is zero (R-G12). A Pending or Cancelled gift gets no Opportunity. A copied gift that moves to
 Cancelled keeps its Opportunity, moved to the lost stage; one that moves back to Pending keeps
 its Opportunity at the stage it has (R-OM3). Neither is ever deleted.
@@ -5087,7 +5098,7 @@ its Opportunity at the stage it has (R-OM3). Neither is ever deleted.
 won stage for a gift in the totals, the lost stage for a Cancelled gift, and the Opportunity's
 own stage left as it is for a Pending gift, so linking an open Opportunity to a pledge never
 closes it; Donor Account to Account, or Household when the donor is a person stored as a
-contact (the Open Impact household, which in an org running NPSP alongside is not the NPSP
+contact (the BarnCRM household, which in an org running NPSP alongside is not the NPSP
 household); the appeal's Campaign ID (Section 29B) to Campaign, when it names a Campaign and the
 saver may read Campaigns and the appeal's Campaign ID (otherwise Campaign is left as it is,
 never cleared); and the donor person as the primary Contact Role (Donor
@@ -5108,7 +5119,7 @@ written, so its identifier is stored with the gift and never in a second save. A
 whose values already match is not updated.
 
 **R-OM5 In the saver's own access.** Opportunities and Contact Roles are written in user mode,
-with the access of the person saving the gift. Opportunity is a standard object Open Impact does
+with the access of the person saving the gift. Opportunity is a standard object BarnCRM does
 not own, so an elevated write (ADR-0021) is not available for it. The copy needs Opportunity
 create and edit, and nothing else: the Opportunity ID is written onto the gift being saved by
 the automation itself, so a person without the Opportunity Mirror permission set, who cannot
@@ -5150,7 +5161,7 @@ Gifts to Opportunities it copies every gift in the totals that has no Opportunit
 how the gifts that existed before the mirror was turned on, and those saved by someone without
 Opportunity access, are caught up, and every linked gift changed since the last completed run
 started, which puts right a change whose copy was skipped; in Opportunities to Gifts it applies
-R-OM7. Starting a run or the schedule needs the Manage Nonprofit Settings permission, and only
+R-OM7. Starting a run or the schedule needs the Manage BarnCRM Settings permission, and only
 one run is in progress at a time. A run executes as the person who started or scheduled it, in
 user mode. While automation is paused (ADR-0055) or the `Opportunity_Mirror` switch is off, a
 run does nothing and writes one Info entry saying so, checked when it starts and before each
@@ -5164,8 +5175,7 @@ more than two days (ADR-0055 point 7).
 delete names the gifts and their Opportunities; the reconciliation page then shows each as a
 won Opportunity without a gift, for the administrator to decide. In Opportunities to Gifts the
 next run makes a new gift from such an Opportunity while it is still won, and the Warning says
-so. Open
-Impact never deletes an Opportunity it did not just create. The one deletion is a run undoing
+so. BarnCRM never deletes an Opportunity it did not just create. The one deletion is a run undoing
 its own work: an Opportunity it created for a gift whose Opportunity ID it then could not store
 is deleted in the same run, so the next run does not make a second one, and one it cannot delete
 is named in a Warning. A linked Opportunity that has been deleted, or that the person saving
@@ -5219,7 +5229,7 @@ only, because a gift is never edited from its Opportunity.
   Opportunity reads, Opportunity by dynamic query only), `OpportunityMirrorBatch` and
   `OpportunityMirrorSchedulable` (R-OM8), `OpportunityMirrorReconciliation` (R-OM11),
   `OpportunityMirrorController` and the `opportunityMirror` page reached from the Giving section
-  of Nonprofit Settings, `ConnectSettingsWriter` (the runs' record of their last completed run)
+  of BarnCRM Settings, `ConnectSettingsWriter` (the runs' record of their last completed run)
   and `ConnectHealthCheckExtension` (the stale run finding, through the ADR-0057 seam).
   Permission set: `Opportunity_Mirror`, which also carries the custom permission
   `Use_Opportunity_Mirror`: the page's reads require it, and the console shows the page's row
@@ -5340,7 +5350,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.4 | 2026-09-15 | X-09 native household guards (product-plan Section 11.2 item 9, mutual exclusion). No object or field added. `HouseholdSelector.nativeHouseholdAccountsAmong` is the single predicate, built on the existing ADR-0036 delete guard probe and short circuited by `OrgShapeDetector.hasNativeHouseholdGroups`, that every guard below asks. The naming batch and the naming path in `HouseholdService.afterMembershipChange` leave out an Account that already carries a native Nonprofit Cloud household group and count what they skipped. Automatic household creation, in both membership modes, does not make a second household for a person already linked to one, by the weaker but safe rule of asking the person's own Account. `AddressService` never writes the billing or person mailing fields of such an Account, from a default address or by propagation to its members. Health Check gains an informational finding naming how many native households were found, and a warning naming how many Accounts carry both household models at once, from a new `HouseholdSelector.nativeHouseholdCollisionCount` probe. No migration and no sync: an Account with both models keeps whatever name, greetings and address it already has until an administrator settles it on one model. |
 | v0.5 | 2026-09-23 | G-17 gift batch entry (ADR-0045). Two objects added: `Gift_Batch__c` (Section 25L) and its master-detail child `Gift_Batch_Row__c` (25M), with rules R-GB1 to R-GB6 and R-GR1 to R-GR4. The batch holds the control total and four defaults; a line holds only what varies, and its empty values are resolved from the batch at posting (R-GB1). The entered total is computed, never stored (R-GB2). Posting locks the batch, refuses an unbalanced or already posted batch, inserts ordinary gifts in user mode, and rolls everything back if any line fails. Status and a line's Gift are written only by posting; validation rules keep a posted batch and its lines unchanged. No trigger and no registry entry. The import framework is not used: ADR-0045 records why. No field added to an existing object. Gift Batch leaves Section 30. |
 | v0.5 | 2026-09-23 | C-21 Health Check v2 (ADR-0048). No object, field, settings key or rollup row added. Health Check reads state the model already defines: shipped rollup definitions, automation switch rows and import templates not yet materialized from their shipped defaults (Section 13), the nightly rollup run when an active definition is in Scheduled or Both mode (Section 14). Recorded against R-A2: an `Automation_Setting__c` row whose registry entry is no longer shipped is left alone, because no fix deletes a record. `Automation_Setting__c` rows are now materialized by Core's and Giving's post-install scripts, one per shipped registry entry not yet present, never touching an existing row (before C-21 nothing created them). Recorded against R-R6: a shipped rollup default is not materialized when an active, administrator-made definition (`Is_Package_Default__c` false) already writes the same target entity and attribute; shipped defaults are not counted against each other, because household and organization pairs write one attribute for different accounts. Health Check detects orphans without changing them (cleanup is C-28): a person in no household, reported only while `Auto_Create_Households__c` is on (R-C1), which in contact mode is a Contact with no Account (a Contact whose Account is an Organization belongs to it, Section 7) and in junction mode a Contact or person account with no current Household Member row (R-M2, R-M4; a Contact whose Account is a Household is left to the membership check); and a Household with no current member (in contact mode no Contact on it, in junction mode no current row naming a person). Person accounts are recognised by the org's person record types, never by a person account field. |
-| v0.5 | 2026-09-23 | C-20 duplicate detection (ADR-0050). One object added, `Duplicate_Dismissal__c` (Section 29A) with `Pair_Key__c` and `Reason__c`, which holds a decision rather than a finding. Detection is the org's own active duplicate rules; Open Impact ships none, and the suggestions are the standard `DuplicateRecordSet` and `DuplicateRecordItem` records. A scan started from Nonprofit Settings evaluates those rules against the people and households already in the org. Rules R-DP1 to R-DP5 added. |
+| v0.5 | 2026-09-23 | C-20 duplicate detection (ADR-0050). One object added, `Duplicate_Dismissal__c` (Section 29A) with `Pair_Key__c` and `Reason__c`, which holds a decision rather than a finding. Detection is the org's own active duplicate rules; BarnCRM ships none, and the suggestions are the standard `DuplicateRecordSet` and `DuplicateRecordItem` records. A scan started from Nonprofit Settings evaluates those rules against the people and households already in the org. Rules R-DP1 to R-DP5 added. |
 | v0.6 | 2026-09-23 | X-03, X-04 and X-06, the Connect integration surface (ADR-0051). No object or field added. R-G7 is reworded: the inbound gift API answers a resend with the gift already recorded and never edits it, and refuses a resend whose amount differs. The accounting export reads `Gift__c`, `Gift_Allocation__c` and `Fund__c` and writes nothing: the posting flag plan Section 4.12 names belongs to G-20 in Giving, and no Connect object records export runs. Section 30 notes that X-03 and X-04 add no Connect entity. |
 | v0.6 | 2026-09-24 | X-02 Campaign sync (ADR-0056, Campaign sync keeps its link on the appeal). New Part F and Section 29B, rules R-CS1 to R-CS8. `Appeal__c` gains `Campaign_Id__c` (Text 18, unique, external ID), shipped by Connect rather than Giving, because Giving may not name Campaign and a lookup to Campaign would stop Connect installing where Campaign is absent. New custom setting `Connect_Settings__c` with `Campaign_Sync_Enabled__c` (default off). New automation `Campaign_Sync` on Appeal. No object added. R-AP4 points at Section 29B. Review changes of 2026-09-25: R-CS1 names the setting as the authoritative switch; R-CS4 logs a saver without access once, on create; R-CS5 writes refusals in one statement and skips a save too large to copy; R-CS7 lets Sync all appeals delete a Campaign it created and could not link. |
 | v0.6 | 2026-09-25 | X-01 Opportunity mirror (ADR-0058). New Section 29C, rules R-OM1 to R-OM11. `Gift__c` gains `Opportunity_Id__c` (Text 18, unique, external ID), shipped by Connect for the reason Section 29B gives. `Connect_Settings__c` gains `Opportunity_Mirror_Direction__c` (one direction or Off, empty reads as Off) and `Opportunity_Mirror_Start__c`. New automation `Opportunity_Mirror` on Gift. No object added. R-G10 names the attribute. Review changes of 2026-09-25: R-OM3 leaves a Pending gift's stage alone and omits Campaign where the saver cannot read it; R-OM5 needs only Opportunity create and edit; R-OM6 requires half the query and DML limits unspent and caps the distinct messages; R-OM7 gains an optional record type list (`Opportunity_Mirror_Record_Types__c`) and reads the start date in the org's time zone; R-OM8 rechecks linked gifts changed since the last completed run, skips a run while automation is paused or the switch is off, records the last completed run (`Opportunity_Mirror_Last_Run__c`, `Opportunity_Mirror_Last_Summary__c`) and has a Health Check finding; R-OM9 warns when a linked gift is deleted; R-OM11 caps its counts and refuses a viewer without read access. Setting Definition gains `Required_Permission__c`, and `HealthCheckExtensions` looks up Connect's extension as well as Giving's (ADR-0057 amended). |
@@ -5363,7 +5373,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Error Log | Core | v0.1 | 9 |
 | Automation Setting | Core | v0.1 | 10 |
 | Setting Change | Core | v0.1 | 11 |
-| Nonprofit Settings | Core | v0.1, extended v0.2, v0.3, v0.5 and v0.6 | 12 |
+| BarnCRM Settings | Core | v0.1, extended v0.2, v0.3, v0.5 and v0.6 | 12 |
 | Naming Pattern (shipped default) | Core | v0.1 | 13 |
 | Automation Registry (shipped default) | Core | v0.1 | 13 |
 | Rollup Definition | Core | v0.2 | 14 |
@@ -5419,7 +5429,7 @@ so nothing below that is nonprofit-specific ships in Core.
 
 | Component | Package | Mechanism |
 |---|---|---|
-| Hub app (labelled Open Impact), Home, Households, Organizations, Import and Settings tabs | Core | Metadata |
+| Hub app (labelled BarnCRM), Home, Households, Organizations, Import and Settings tabs | Core | Metadata |
 | Fundraising app (the nonprofit app) and its tabs | Giving | Metadata (ADR-0018) |
 | Setup Assistant: seven neutral steps (fit, naming, access, identity, modules, data, check) | Core | `SetupAssistantService` |
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
@@ -5427,11 +5437,11 @@ so nothing below that is nonprofit-specific ships in Core.
 | Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
 | Roles: Admin, Program Staff, Volunteer Coordinator, Read Only | Core | Permission set groups |
 | Role: Fundraising Staff | Giving | Permission set group |
-| Custom permission Manage Open Impact Settings | Core | Metadata |
+| Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
-and Agentforce Nonprofit orgs: the Gift Transaction mirror is v0.6, brought forward from
+orgs: the Gift Transaction mirror is v0.6, brought forward from
 v0.9, and NPSP household adoption is v0.9, moved back from v0.6. The plan's roadmap table
 is the place that reprioritization is recorded permanently; this table follows it.
 | v0.1 | 2026-09-07 | C-03: added the shipped-defaults type Setting Definition (Section 13), which drives the Nonprofit Settings console, and the Nonprofit Settings key `Setup_Steps_Completed__c` (Section 12), which records Setup Assistant progress. |
@@ -5456,4 +5466,8 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.5 | 2026-09-24 | C-14 dry run at scale. `Import_Row__c` gains `Person_1_Key__c`, `Person_2_Key__c`, `Person_1_Name_Key__c`, `Person_2_Name_Key__c`, `Organization_Key__c` and `Processor_Key__c`, indexed digests a dry run writes on the row that would create a record or load an external ID. R-IB12 and R-IR6: the digests are looked up per chunk instead of carried in the batch's state, so a dry run's heap no longer grows with the rows before the chunk. |
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
-| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled Open Impact Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-10-12 | Neutral Core wording (ADR-0062). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
+| v0.6 | 2026-10-12 | API name pass (ADR-0063). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
+| v0.6 | 2026-10-12 | API name pass, access and navigation (ADR-0063). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
+| v0.6 | 2026-10-12 | API name pass, stored values and the import field (ADR-0063). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |

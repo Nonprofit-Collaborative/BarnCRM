@@ -33,16 +33,16 @@ the one you chose to keep, so merging two households that both happen to have no
 them leaves you with one empty household rather than with none.
 
 **What happens to the empty household after a split.** If "Delete a household when the last
-person leaves" is on (Open Impact Settings, Households), a household that a split empties is
+person leaves" is on (BarnCRM Settings, Households), a household that a split empties is
 deleted for you. If it is off, the empty household stays and you delete it yourself. The
 setting is on when Core is installed.
 
 **Where the button is.** Core ships the placement, not just the action: the **Merge or
 split** action sits in the action bar of the packaged Account record page, on households
-only, and the Open Impact app opens households on that page, on the desktop and on the
+only, and the BarnCRM app opens households on that page, on the desktop and on the
 phone. So the button is there on a fresh install, with nothing to wire up in the Lightning
 App Builder. If you do not see it, the two usual reasons are that you are looking at the
-record outside the **Open Impact** app (another app can carry its own record page
+record outside the **BarnCRM** app (another app can carry its own record page
 assignment), or that somebody has since overridden the assignment in the Lightning App
 Builder.
 
@@ -52,7 +52,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
 
 ### Merging two households
 
-1. Open the **Open Impact** app and click the **Households** tab.
+1. Open the **BarnCRM** app and click the **Households** tab.
 2. Open **The Garcia Family**. Note that Harper, Luis and Diego Garcia are its members.
    The sample data ships one Garcia household, so to follow the merge make a second one
    first: a household named Garcia with a member or two in it, standing in for the
@@ -75,7 +75,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
    away, and that a merge cannot be undone. Read it, then click **Merge households**.
 8. You land on the surviving household. It lists all of the members from both households,
    the member count is right, and the name has been recalculated from the members unless you
-   chose to keep a custom name. Every gift, letter, file, and note from the duplicate is now
+   chose to keep a custom name. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
 
 ### Splitting a member out
@@ -119,19 +119,19 @@ message is "You need edit access to both households to merge them."
 **"After the merge the household name is not what I chose."**
 If you left the "custom name" box unchecked, the name is recalculated from the members after
 the merge, which is usually what you want: the household now holds more people. To keep the
-exact name you chose, tick the custom name option in the comparison. That tells Open Impact
+exact name you chose, tick the custom name option in the comparison. That tells BarnCRM
 to stop recalculating this household's name and greetings, and your wording stands.
 
 **"I split someone out and the old household disappeared."**
 The person you moved was the last one in it, and "Delete a household when the last person
-leaves" is on. Turn that setting off in Open Impact Settings if you would rather keep empty
+leaves" is on. Turn that setting off in BarnCRM Settings if you would rather keep empty
 households and their giving history.
 
 ## Where the record of a merge lives
 
 Salesforce records account merges itself. The surviving household's history shows the merge
 and who did it, and the records that moved carry their own history, so a merge is auditable
-without Open Impact writing a second log of its own. Open Impact does not add an Error Log
+without BarnCRM writing a second log of its own. BarnCRM does not add an Error Log
 entry for a successful merge, only for one that fails.
 
 ## Field reference

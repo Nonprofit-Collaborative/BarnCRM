@@ -1,5 +1,5 @@
 /**
- * The org's coexistence mode: how Open Impact behaves next to whatever is already installed
+ * The org's coexistence mode: how BarnCRM behaves next to whatever is already installed
  * (plan Section 4.5). One org-level setting, proposed by detection and confirmed by an
  * administrator, changeable at any time.
  *
@@ -10,7 +10,7 @@
 public with sharing class CoexistenceService {
     public static final String MODE_STANDALONE = 'Standalone';
     public static final String MODE_NPSP = 'NPSP';
-    public static final String MODE_AGENTFORCE_NONPROFIT = 'AgentforceNonprofit';
+    public static final String MODE_NONPROFIT_CLOUD = 'NonprofitCloud';
 
     public static final String MEMBERSHIP_CONTACT = 'Contact';
     public static final String MEMBERSHIP_JUNCTION = 'Junction';
@@ -19,19 +19,19 @@ public with sharing class CoexistenceService {
     public static final String KEY_MEMBERSHIP_MODE = 'Household_Membership_Mode__c';
 
     /** The custom permission that gates changing the mode. */
-    public static final String MANAGE_SETTINGS = 'Manage_Nonprofit_Settings';
+    public static final String MANAGE_SETTINGS = 'Manage_BarnCRM_Settings';
 
     private static final Set<String> VALID_MODES = new Set<String>{
         MODE_STANDALONE,
         MODE_NPSP,
-        MODE_AGENTFORCE_NONPROFIT
+        MODE_NONPROFIT_CLOUD
     };
 
     /**
      * The mode this org is running in, or null when nobody has confirmed one yet.
      */
     public static String getCurrentMode() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         String mode = settings == null ? null : settings.Coexistence_Mode__c;
         return String.isBlank(mode) ? null : mode;
     }
@@ -40,7 +40,7 @@ public with sharing class CoexistenceService {
      * How household membership is stored, defaulting to contact mode when unset.
      */
     public static String getMembershipMode() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         String mode = settings == null ? null : settings.Household_Membership_Mode__c;
         return String.isBlank(mode) ? MEMBERSHIP_CONTACT : mode;
     }
@@ -50,7 +50,7 @@ public with sharing class CoexistenceService {
      * default, read as contact mode, and it is the only state detection is allowed to change.
      */
     public static Boolean membershipModeChosen() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings != null && String.isNotBlank(settings.Household_Membership_Mode__c);
     }
 
@@ -58,8 +58,9 @@ public with sharing class CoexistenceService {
      * Set the mode from detection, but only when the org has not chosen one. An
      * administrator's choice is never overwritten. Returns the mode in force afterward.
      *
-     * Agentforce Nonprofit implies junction membership: in a Person Accounts org the person
-     * is an account, so contact mode cannot express a household. The two values are written
+     * Nonprofit Cloud coexistence, and any org with Person Accounts, implies junction
+     * membership: the person is an account, so contact mode cannot express a household. The
+     * two values are written
      * together, in one save, so the org is never briefly in an impossible state. The
      * membership half is only proposed, like the rest: an administrator who already chose the
      * simple way keeps it, and Health Check says so if people stored as accounts appear.
@@ -91,17 +92,62 @@ public with sharing class CoexistenceService {
     }
 
     /**
+     * The modes this org is offered, in the order a person reads them
+     * (ADR-0062). Standalone always; a mode named
+     * after another Salesforce product only when detection finds that product, because Core
+     * names no other product in an org that does not have it. The mode already saved is
+     * always included, so a choice made earlier is never hidden from the person who made it.
+     */
+    public static List<String> availableModes(OrgShapeDetector.OrgShape shape) {
+        String current = getCurrentMode();
+        List<String> modes = new List<String>{ MODE_STANDALONE };
+        if ((shape != null && shape.hasNpsp == true) || MODE_NPSP.equals(current)) {
+            modes.add(MODE_NPSP);
+        }
+        if (
+            (shape != null && shape.hasIndustriesNonprofit == true) ||
+            MODE_NONPROFIT_CLOUD.equals(current)
+        ) {
+            modes.add(MODE_NONPROFIT_CLOUD);
+        }
+        return modes;
+    }
+
+    /** The same, for the shape detection reports for this org. */
+    public static List<String> availableModes() {
+        OrgShapeDetector.OrgShape shape;
+        try {
+            shape = OrgShapeDetector.detect();
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'BarnCRM coexistence modes');
+        }
+        return availableModes(shape);
+    }
+
+    /**
      * The coexistence mode to write, with junction membership alongside it when the mode
-     * calls for that and nobody has chosen a way of belonging yet. A choice already made is
+     * or the org calls for that and nobody has chosen a way of belonging yet: Nonprofit Cloud
+     * coexistence, or any mode in an org with Person Accounts. A choice already made is
      * left alone, whichever way it went: forcing the junction over an explicit choice would
      * also be the destructive switch the settings write refuses.
      */
     private static Map<String, Object> withMembership(String mode) {
         Map<String, Object> values = new Map<String, Object>{ KEY_COEXISTENCE_MODE => mode };
-        if (MODE_AGENTFORCE_NONPROFIT.equals(mode) && !membershipModeChosen()) {
+        Boolean needsJunction = MODE_NONPROFIT_CLOUD.equals(mode) || hasPersonAccounts();
+        if (needsJunction && !membershipModeChosen()) {
             values.put(KEY_MEMBERSHIP_MODE, MEMBERSHIP_JUNCTION);
         }
         return values;
+    }
+
+    private static Boolean hasPersonAccounts() {
+        try {
+            OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
+            return shape != null && shape.hasPersonAccounts == true;
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'BarnCRM coexistence modes');
+            return false;
+        }
     }
 
     /**
@@ -223,11 +269,11 @@ public with sharing class CoexistenceService {
 
     /**
      * Change the mode on behalf of the person asking, which is what the settings console and
-     * Health Check do. Unlike setMode, this refuses anyone without the Manage Nonprofit
+     * Health Check do. Unlike setMode, this refuses anyone without the Manage BarnCRM
      * Settings permission: the coexistence mode governs how the whole package behaves, so it
      * is an administrator's decision even where the calling code forgot to say so.
      *
-     * Agentforce Nonprofit brings junction household membership with it, in the same audited
+     * Nonprofit Cloud brings junction household membership with it, in the same audited
      * save, because in a Person Accounts org the person is an account and contact membership
      * cannot express a household.
      */

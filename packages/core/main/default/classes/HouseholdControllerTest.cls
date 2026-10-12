@@ -144,7 +144,7 @@ private class HouseholdControllerTest {
 
     @IsTest
     static void thePageOpensOnTheSavedPatterns() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Household_Name_Pattern__c = '{LastName} Household';
@@ -265,8 +265,8 @@ private class HouseholdControllerTest {
         User reader = new User(
             ProfileId = readOnly.Id,
             LastName = 'Reader',
-            Email = 'reader@openimpact.test.invalid',
-            Username = 'reader' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'reader@barncrm.test.invalid',
+            Username = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'reader',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

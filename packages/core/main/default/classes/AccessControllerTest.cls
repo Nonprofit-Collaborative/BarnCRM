@@ -1,6 +1,6 @@
 /**
  * Tests for AccessController: what the Access page gets back when Maria uses it, and
- * what David gets back when he opens it without the Manage Nonprofit Settings permission.
+ * what David gets back when he opens it without the Manage BarnCRM Settings permission.
  */
 @IsTest
 private class AccessControllerTest {
@@ -21,7 +21,7 @@ private class AccessControllerTest {
             LastName = lastName,
             Alias = 'oi' + suffix.right(6),
             Email = firstName.toLowerCase() + '.' + suffix + '@example.invalid',
-            Username = firstName.toLowerCase() + '.' + suffix + '@openimpact.test.invalid',
+            Username = firstName.toLowerCase() + '.' + suffix + '@barncrm.test.invalid',
             ProfileId = standardProfile.Id,
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',
@@ -34,10 +34,10 @@ private class AccessControllerTest {
     }
 
     /**
-     * Creates Maria: a person who holds the Nonprofit Admin role, and therefore the
-     * Manage Nonprofit Settings custom permission that the Access page requires.
+     * Creates Maria: a person who holds the BarnCRM Admin role, and therefore the
+     * Manage BarnCRM Settings custom permission that the Access page requires.
      *
-     * @return the inserted user, already in the Nonprofit Admin role
+     * @return the inserted user, already in the BarnCRM Admin role
      */
     private static User insertAdminUser() {
         PermissionSetGroup adminGroup = TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
@@ -62,7 +62,7 @@ private class AccessControllerTest {
 
         Assert.isFalse(
             result.canManage,
-            'David has no Manage Nonprofit Settings permission, so the page opens read only for him.'
+            'David has no Manage BarnCRM Settings permission, so the page opens read only for him.'
         );
         // Read only means read, not blank. Either David can see the roles, or the page
         // tells him why he cannot. What it must never do is come back empty and silent.
@@ -87,7 +87,7 @@ private class AccessControllerTest {
         Assert.isTrue(result.success, 'Maria should be able to open the Access page.');
         Assert.isTrue(
             result.canManage,
-            'Maria holds the Nonprofit Admin role, so she may change roles.'
+            'Maria holds the BarnCRM Admin role, so she may change roles.'
         );
         Assert.isNotNull(result.roles, 'The page needs the list of roles.');
         Assert.isNotNull(result.assignments, 'The page needs to know who holds each role.');
@@ -204,7 +204,7 @@ private class AccessControllerTest {
         }
         Test.stopTest();
 
-        Assert.isFalse(result.success, 'A role Open Impact does not ship should be refused.');
+        Assert.isFalse(result.success, 'A role BarnCRM does not ship should be refused.');
         Assert.areEqual(
             AccessController.ERROR_FAILED,
             result.errorCode,

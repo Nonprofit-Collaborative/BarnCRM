@@ -1,5 +1,5 @@
 /**
- * Reports what is installed in this org, so that Open Impact can recommend a coexistence
+ * Reports what is installed in this org, so that BarnCRM can recommend a coexistence
  * mode (plan Section 4.5) and Health Check can tell an administrator what it found
  * (plan Section 4.8).
  *
@@ -119,16 +119,23 @@ public with sharing class OrgShapeDetector {
     }
 
     /**
-     * The coexistence mode this org shape calls for (plan Section 4.5). Agentforce Nonprofit
+     * The coexistence mode this org shape calls for (plan Section 4.5). Nonprofit Cloud
      * wins over NPSP: an org with both is a Nonprofit Cloud org that also has the older
-     * package in it, and Person Accounts decide how households have to be built.
+     * package in it. A mode named after a product is recommended only where that product is
+     * detected (ADR-0062), so an org with Person
+     * Accounts and neither product is Standalone; its people still get junction membership
+     * (CoexistenceService.withMembership).
      */
     public static String recommendedCoexistenceMode() {
-        OrgShape shape = detect();
-        if (shape.hasIndustriesNonprofit == true || shape.hasPersonAccounts == true) {
-            return CoexistenceService.MODE_AGENTFORCE_NONPROFIT;
+        return recommendedCoexistenceMode(detect());
+    }
+
+    /** The same rule for a given shape, so the Setup Assistant can ask it of its own. */
+    public static String recommendedCoexistenceMode(OrgShape shape) {
+        if (shape != null && shape.hasIndustriesNonprofit == true) {
+            return CoexistenceService.MODE_NONPROFIT_CLOUD;
         }
-        if (shape.hasNpsp == true) {
+        if (shape != null && shape.hasNpsp == true) {
             return CoexistenceService.MODE_NPSP;
         }
         return CoexistenceService.MODE_STANDALONE;

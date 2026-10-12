@@ -45,10 +45,10 @@ const SEVERITY_DISPLAY = {
 const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
 
 /**
- * Health Check: what Open Impact found in this org and what to do about it (feature C-11).
+ * Health Check: what BarnCRM found in this org and what to do about it (feature C-11).
  *
  * The panel is readable by anyone. The Fix buttons appear only when the report says the
- * viewer holds the Manage Nonprofit Settings permission, which Apex checks again before it
+ * viewer holds the Manage BarnCRM Settings permission, which Apex checks again before it
  * changes anything.
  *
  * A fix that changes something (an "action:" target) never runs on the first click: the

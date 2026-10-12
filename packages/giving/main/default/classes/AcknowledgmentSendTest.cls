@@ -17,7 +17,7 @@ private class AcknowledgmentSendTest {
             'Everything else',
             100,
             AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'Open_Impact_Thank_You'
+            'BarnCRM_Thank_You'
         );
         insert rule;
         return rule;
@@ -163,7 +163,7 @@ private class AcknowledgmentSendTest {
             'The row says it went.'
         );
         Assert.areEqual(
-            'Open_Impact_Thank_You',
+            'BarnCRM_Thank_You',
             rows[0].Template__c,
             'The row keeps the template that was used, because the template will be rewritten ' +
             'and the question later is which letter this donor got.'

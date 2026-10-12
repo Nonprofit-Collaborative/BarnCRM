@@ -22,7 +22,7 @@ was one `Setting_Change__c` row saying an automation had been toggled.
 
 That is not a hole in the code. It is the automation framework working exactly as designed,
 applied to a rule that should never have been in its scope. The framework exists so an
-administrator can stop Open Impact filling things in while they load or correct data in
+administrator can stop BarnCRM filling things in while they load or correct data in
 bulk. Receipt immutability is not a convenience of that kind: it is what a gift record
 means, and a pause aimed at a bulk import silently opened it for every user in the org.
 
@@ -78,7 +78,7 @@ The escalation ADR-0010 called for was therefore made, and the owner decided.
 ## Consequences
 
 - The receipt lock is no longer suspended by "Pause all automation", which changes what that
-  button does. `automation-control.md` says so: the pause stops Open Impact filling things
+  button does. `automation-control.md` says so: the pause stops BarnCRM filling things
   in, and never stops it refusing something.
 - Package code that legitimately writes to gifts inside `AutomationControl.bypass` is now
   subject to the lock. That is correct, and nothing in Giving edits a receipted gift's

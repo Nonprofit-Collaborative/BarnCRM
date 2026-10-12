@@ -23,7 +23,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0012](0012-trunk-based-development.md) | Trunk-based development with squash merges and an always-releasable main | Accepted |
 | [0013](0013-platform-only-org-shape-verification.md) | How the Platform-only org shape is provisioned and verified | Accepted |
 | [0014](0014-cross-package-references-as-record-identifiers.md) | Core holds Giving record identifiers, not lookups | Accepted |
-| [0015](0015-vendor-apex-rollup-behind-adapter.md) | Vendor apex-rollup as the aggregation core, behind an OpenImpact adapter | Accepted |
+| [0015](0015-vendor-apex-rollup-behind-adapter.md) | Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter | Accepted |
 | [0016](0016-receipt-pdf-rendering.md) | Receipt PDFs are rendered by the Visualforce PDF rendering service, called from Apex | Proposed |
 | [0017](0017-cross-package-mechanisms.md) | Cross-package mechanisms under one namespace: NamespaceAccessible, per-package settings objects, registry-driven trigger dispatch | Accepted |
 | [0018](0018-module-tabs-and-apps.md) | Each module ships its own Lightning app; the Hub links to the module apps | Accepted |
@@ -44,7 +44,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0033](0033-receipt-numbers-come-only-from-the-sequence.md) | A receipt number comes only from the sequence, so the field is package written | Accepted |
 | [0034](0034-receipt-document-access-and-template-writes.md) | A receipt document is reached only through the records a Giving permission set governs | Accepted |
 | [0035](0035-shipped-setting-defaults-are-applied-in-apex.md) | A setting that ships switched on is switched on in Apex, not by its field default | Accepted |
-| [0036](0036-empty-household-delete-guard.md) | An empty household is deleted only when nothing outside Open Impact depends on it | Accepted |
+| [0036](0036-empty-household-delete-guard.md) | An empty household is deleted only when nothing outside BarnCRM depends on it | Accepted |
 | [0037](0037-junction-mode-creates-households-automatically.md) | Junction mode creates a household for a new person, under the one setting that already says so | Accepted |
 | [0038](0038-giving-nightly-jobs-are-scheduled-from-the-settings-console.md) | The Giving nightly jobs are scheduled from the settings console | Accepted |
 | [0039](0039-health-check-findings-are-grouped-by-the-question-they-ask.md) | Health Check findings are grouped by the question they ask, not registered one by one | Accepted |
@@ -58,7 +58,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0047](0047-data-management-scope.md) | Data management runs in the org, compiles queries from a document, and is phased | Accepted |
 | [0048](0048-health-check-fixes-create-or-set-never-delete.md) | Health Check fix buttons create or set, never delete, and ask first | Accepted (builder decision) |
 | [0049](0049-xlsx-read-in-the-browser-without-sheetjs.md) | Excel workbooks are read in the browser without SheetJS | Accepted (builder decision) |
-| [0050](0050-duplicates-use-the-orgs-own-duplicate-rules.md) | Duplicate detection uses the org's own duplicate rules, and Open Impact ships none | Accepted (builder decision) |
+| [0050](0050-duplicates-use-the-orgs-own-duplicate-rules.md) | Duplicate detection uses the org's own duplicate rules, and BarnCRM ships none | Accepted (builder decision) |
 | [0051](0051-inbound-gift-api-and-accounting-export.md) | The inbound gift API keeps a small permanent surface, and the accounting export marks nothing | Accepted |
 | [0052](0052-gift-import-and-donation-matching.md) | Gift import through the entity processor seam, and donation matching | Accepted (builder decision) |
 | [0053](0053-posted-gifts-and-closed-periods-are-locked.md) | Posted gifts and closed periods are locked by a rule that always runs | Accepted (builder decision) |
@@ -68,6 +68,10 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0057](0057-health-check-extension-for-dependent-packages.md) | A Health Check extension seam lets a dependent package add findings without Core depending on it | Accepted (builder decision) |
 | [0058](0058-opportunity-mirror-keeps-its-link-on-the-gift-and-runs-one-way.md) | The Opportunity mirror keeps its link on the gift, runs one way at a time, and reconciles on a page | Accepted (builder decision) |
 | [0059](0059-core-is-neutral.md) | Core is neutral: the nonprofit app, wording, giving and receipt settings and Setup Assistant steps live in Giving | Accepted (builder decision) |
+| [0060](0060-product-name-is-barncrm.md) | The product name is BarnCRM (supersedes the name part of ADR-0001) | Accepted (owner decision) |
+| [0061](0061-module-settings-first-save-takes-checkbox-defaults-from-metadata.md) | A module's first settings save takes its checkbox defaults from field metadata | Accepted (builder decision) |
+| [0062](0062-core-names-other-products-only-when-detected.md) | Core shows nonprofit wording and other products' names only where they apply (amends ADR-0059 decision 5) | Accepted (owner decision) |
+| [0063](0063-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

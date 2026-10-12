@@ -1,5 +1,5 @@
 /**
- * The adapter ADR-0015 asks for: an Open Impact rollup expressed to the vendored engine, with the
+ * The adapter ADR-0015 asks for: a BarnCRM rollup expressed to the vendored engine, with the
  * administrator never seeing the engine's own configuration.
  *
  * These tests have not been executed: no Salesforce org exists in this environment, so nothing
@@ -56,7 +56,7 @@ private class RollupAdapterTest {
         System.Assert.areEqual('SUM', meta.RollupOperation__c, 'The aggregate is the operation');
         System.Assert.isTrue(
             meta.ShouldRunWithoutCustomSettingEnabled__c,
-            'Open Impact Active is the switch, not the engine custom setting'
+            'BarnCRM Active is the switch, not the engine custom setting'
         );
         System.Assert.isFalse(meta.IsDisabled__c, 'An active definition is not disabled');
     }

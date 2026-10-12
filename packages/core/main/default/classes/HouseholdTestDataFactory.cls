@@ -11,8 +11,8 @@ public class HouseholdTestDataFactory {
      * Org level settings with the shipped defaults, so that a test never depends on what
      * another test left behind.
      */
-    public static Nonprofit_Settings__c settings(String membershipMode) {
-        Nonprofit_Settings__c record = Nonprofit_Settings__c.getOrgDefaults();
+    public static BarnCRM_Settings__c settings(String membershipMode) {
+        BarnCRM_Settings__c record = BarnCRM_Settings__c.getOrgDefaults();
         record.Household_Membership_Mode__c = membershipMode;
         record.Auto_Create_Households__c = true;
         record.Delete_Empty_Households__c = true;
@@ -32,8 +32,8 @@ public class HouseholdTestDataFactory {
      * their own first (R-H2, ADR-0037), so it is switched off rather than worked around.
      * The tests of automatic creation itself use the shipped settings.
      */
-    public static Nonprofit_Settings__c junctionSettingsWithoutAutomaticHouseholds() {
-        Nonprofit_Settings__c record = settings(MODE_JUNCTION);
+    public static BarnCRM_Settings__c junctionSettingsWithoutAutomaticHouseholds() {
+        BarnCRM_Settings__c record = settings(MODE_JUNCTION);
         record.Auto_Create_Households__c = false;
         return save(record);
     }
@@ -44,7 +44,7 @@ public class HouseholdTestDataFactory {
      * already read the settings in the same transaction is silently ignored: SettingsService
      * holds the first answer for the rest of the transaction.
      */
-    public static Nonprofit_Settings__c save(Nonprofit_Settings__c record) {
+    public static BarnCRM_Settings__c save(BarnCRM_Settings__c record) {
         upsert record;
         SettingsService.clearCaches();
         return record;
@@ -112,8 +112,8 @@ public class HouseholdTestDataFactory {
             ProfileId = standard.Id,
             LastName = 'Tester',
             Alias = 'tstr',
-            Email = unique + '@openimpact.test',
-            Username = unique + '@openimpact.test.invalid',
+            Email = unique + '@barncrm.test',
+            Username = unique + '@barncrm.test.invalid',
             EmailEncodingKey = 'UTF-8',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',

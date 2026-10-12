@@ -179,7 +179,7 @@ private class ErrorLoggerTest {
             [
                 SELECT COUNT()
                 FROM Error_Log__c
-                WHERE Severity__c = 'Error' AND Context__c = 'Open Impact'
+                WHERE Severity__c = 'Error' AND Context__c = 'BarnCRM'
             ],
             'An unrecognized severity is recorded as an error, under a default context.'
         );
@@ -225,9 +225,9 @@ private class ErrorLoggerTest {
         // (canonical model rule R-E4). The person who hits the failure is David doing the day job,
         // whose access comes from the packaged permission set and not from a system administrator
         // profile, so the log runs inside System.runAs him: publishing is governed by Create on
-        // the event, and if Nonprofit Staff did not carry it the writer would silently fall back
+        // the event, and if BarnCRM Staff did not carry it the writer would silently fall back
         // to the direct insert and the entry would go down with the rollback.
-        User david = TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
         Test.startTest();
         Savepoint beforeTheFailure = Database.setSavepoint();

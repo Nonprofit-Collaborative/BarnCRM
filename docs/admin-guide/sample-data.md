@@ -2,11 +2,16 @@
 
 ## 1. What it does
 
-Sample data fills your org with a realistic demo dataset. Use it to see Open Impact working
-with real-looking names, addresses and giving before you import your own list, to train a
+Sample data fills your org with a realistic demo dataset. Use it to see BarnCRM working
+with real-looking names and addresses before you import your own list, to train a
 new colleague, or to try a setting change (for example a household naming pattern) against
 data that already has the variety your real list has. You can remove every sample record in
 one action when you are done with it.
+
+Sample data is never loaded for you. Installing or upgrading BarnCRM does not load it, the
+Setup Assistant does not load it unless you choose to, and no scheduled job loads it. It
+arrives only when someone with the **Manage BarnCRM Settings** permission selects **Load
+Sample Data** (developers' scratch-org scripts load it too, in their own test orgs).
 
 What loads, exactly:
 
@@ -14,9 +19,11 @@ What loads, exactly:
 |---|---|---|
 | Households | 200 | Shared surnames, different surnames, hyphenated names, single-person households, ten three-generation households, five with a deceased member, three with a custom name |
 | People | 440 | Heads, partners, children, a few with preferred names |
-| Organizations | 25 | Foundations, local businesses, churches, a school district |
+| Organizations | 25 | Local businesses, schools and a college, Rotary clubs, two foundations and a church |
 | Connections | 60 | Parents, siblings, friends, colleagues and grandparents in different households, a few marked Former; the other side of each one is created by the connection rules, as it would be for a connection you enter |
 | Affiliations | 80 | Board members, employees, volunteers and owners, one primary each, a quarter of them Former |
+
+### With Giving installed
 
 With the **Giving** package installed, the same action also loads:
 
@@ -46,15 +53,15 @@ has to stay removable.
 
 ## 2. How to turn it on
 
-1. Open **Open Impact Settings**.
+1. Open **BarnCRM Settings**.
 2. In the **General** section, find **Sample Data** and open it. If you do not see it,
    type "sample" in the settings search box.
 3. Read the warning, then select **Load Sample Data**.
 4. Confirm in the dialog. Loading runs in the background; the card shows progress and
    updates automatically until it finishes. With Giving installed there are several
    thousand records to write, so allow a few minutes rather than one.
-5. When it says **Loaded**, open **Open Impact Settings > Rollups** and select
-   **Recalculate**. Giving totals (total giving, this year, largest gift, fund and appeal
+5. With Giving installed: when it says **Loaded**, open **BarnCRM Settings > Rollups** and
+   select **Recalculate**. Giving totals (total giving, this year, largest gift, fund and appeal
    totals) are worked out by the nightly rollup run rather than as each gift is saved, so
    until you recalculate, or until tonight, those fields are empty while the gift records
    themselves are all there.
@@ -63,23 +70,23 @@ If you came here from the Setup Assistant, the same **Sample Data** step takes y
 this screen. Loading sample data is entirely optional; skipping it does not block any
 other step.
 
-You need the **Manage Open Impact Settings** permission to load or remove sample data.
+You need the **Manage BarnCRM Settings** permission to load or remove sample data.
 Without it, the card is read only and tells you who to ask.
 
 Sample data loads whichever way your org tracks household membership. In the simple way,
-each sample person carries their household on their own record. In the flexible way (the
-Agentforce Nonprofit coexistence mode, which Nonprofit Cloud orgs get), each sample person
+each sample person carries their household on their own record. In the flexible way (one
+membership record per person, which every org with Person Accounts uses), each sample person
 is joined to their household by a household member record, exactly as your own people are,
 and the card says so before you load.
 
 One difference to expect in an org that stores people as accounts: the sample people arrive
-as contacts. Open Impact never creates person accounts, so the sample set shows you
+as contacts. BarnCRM never creates person accounts, so the sample set shows you
 households of contacts. Everything else behaves as it will with your own data: the same
 household records, names, greetings, member counts, and Members panel.
 
 ## 3. A five-minute walkthrough (as Maria)
 
-1. Open **Open Impact Settings**, go to **Sample Data**, and select **Load Sample Data**.
+1. Open **BarnCRM Settings**, go to **Sample Data**, and select **Load Sample Data**.
    Confirm the dialog. Wait for the card to show **Loaded**, with counts for households,
    contacts, organizations, connections, affiliations, and, with Giving installed, gifts.
 2. Open the **Households** tab. Use the list view search to find "Garcia" and open
@@ -95,19 +102,19 @@ household records, names, greetings, member counts, and Members panel.
 5. Still on **Households**, search for "Staff Household". This is the sample data's own
    staff family: Maria, David, Priya, Tom, Jen, and Sam appear here as contacts, so you
    can find a familiar name while you are learning the app.
-6. Open the **Gifts** tab and sort by amount. Open the largest gift and look at its
+6. With Giving installed, open the **Gifts** tab and sort by amount. Open the largest gift and look at its
    allocations: most gifts sit in one fund, some are split across two. Then filter the list
    view by **Status** equals Refunded to find the refunded gift, and open it: its own amount
    is unchanged and a linked negative gift reverses it, which is how a refund is recorded
    here and why the donor's total reads as zero for that gift rather than twice over.
-7. Open the **Commitments** tab, sort by **Status**, and open an Active monthly commitment.
+7. With Giving installed, open the **Commitments** tab, sort by **Status**, and open an Active monthly commitment.
    Its installments are generated from the schedule and the ones a gift has paid are marked
    Paid. One monthly donor in the set has three installments marked Overdue: that is the
    lapsed recurring donor a fundraiser would want to call this week.
-8. Open the **Giving Overview** dashboard. If the numbers are empty, go to **Open Impact
+8. With Giving installed, open the **Giving Overview** dashboard. If the numbers are empty, go to **BarnCRM
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
-9. Return to **Open Impact Settings**, **Sample Data**, and select **Remove Sample Data**.
+9. Return to **BarnCRM Settings**, **Sample Data**, and select **Remove Sample Data**.
    Confirm the dialog. The card returns to **Not loaded** and every record the loader
    created is gone: households, contacts, organizations, connections, affiliations, and the
    gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
@@ -118,7 +125,7 @@ household records, names, greetings, member counts, and Members panel.
 
 - **Loading sample data into a production org.** Sample data is meant for scratch orgs,
   sandboxes, and demos, never for the org your organization runs on day to day. The
-  warning on the Sample Data card says so before you confirm; if you see real donor
+  warning on the Sample Data card says so before you confirm; if you see real
   records in a report next to "Garcia Family" or "Staff Household," you loaded it by
   mistake. Remove it right away with **Remove Sample Data**, and audit any receipts,
   exports, or emails sent while it was present.
@@ -130,19 +137,19 @@ household records, names, greetings, member counts, and Members panel.
 - **Assuming removal is instant.** Removal deletes several thousand records with Giving
   installed and takes a few seconds; wait for the card to confirm **Not loaded** before
   assuming it is done.
-- **Expecting the giving totals to appear straight away.** The gifts are all there the
+- **Expecting the giving totals to appear straight away (with Giving).** The gifts are all there the
   moment the load finishes, but the totals on households, people, funds and appeals are
-  worked out by the rollup run. Recalculate from **Open Impact Settings > Rollups**, or wait
+  worked out by the rollup run. Recalculate from **BarnCRM Settings > Rollups**, or wait
   for tonight.
-- **Reporting on sample gifts as if the dates were fixed.** Gift dates are counted back
+- **Reporting on sample gifts as if the dates were fixed (with Giving).** Gift dates are counted back
   from the day you loaded the set, so two orgs loaded on different days hold different
   dates. That is deliberate: it keeps "this year" full whenever you load.
-- **Expecting sample person accounts in an Agentforce Nonprofit org.** The sample people
+- **Expecting sample person accounts in an org that stores people as accounts.** The sample people
   are contacts even where your own people are stored as accounts. That is a limit of the
   sample set, not of households: the households, memberships, names, greetings, and counts
   all work the same way they will with your own records.
 - **Not having the permission.** If the **Load Sample Data** button does not appear, you
-  are missing **Manage Open Impact Settings**. Ask an administrator to grant it from the
+  are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.
 
 ## Reference
@@ -151,7 +158,7 @@ household records, names, greetings, member counts, and Members panel.
 |---|---|
 | Sample Data checkbox on households, contacts, and organizations | `Sample_Data__c` on Account and Contact |
 | Sample Data checkbox on connections and affiliations | `Sample_Data__c` on `Relationship__c` and `Affiliation__c` |
-| Sample Data checkbox on gifts, funds, appeals and commitments | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c` and `Commitment__c` |
+| Sample Data checkbox on gifts, funds, appeals and commitments (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c` and `Commitment__c` |
 | The key that ties a sample gift to the person who gave it | `Sample_Data_Key__c` on Account and Contact |
 | The join between a sample person and their household, flexible mode only | `Household_Member__c`, removed with the household it belongs to |
 | Allocations, soft credits and tributes on a sample gift | Details of the gift, removed with it; they carry no checkbox of their own |

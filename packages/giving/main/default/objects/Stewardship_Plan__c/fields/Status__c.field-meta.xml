@@ -3,7 +3,7 @@
   <fullName>Status__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>
-    Where this sequence stands. Open Impact does not close a plan for you: mark it complete when
+    Where this sequence stands. BarnCRM does not close a plan for you: mark it complete when
     the work is done.
   </inlineHelpText>
   <label>Status</label>

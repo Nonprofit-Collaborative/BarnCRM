@@ -4,7 +4,7 @@
  * Jen has put last month into the books. David cannot change what she holds, add to it, or take
  * from it, however he tries, and a pause of all automation does not help him. He can still
  * refund, thank and receipt. The one afternoon Maria holds Override Posting Lock, she can make an
- * auditor's correction, and Open Impact writes down what she did.
+ * auditor's correction, and BarnCRM writes down what she did.
  */
 @IsTest
 private class GiftPostingLockTest {
@@ -388,7 +388,7 @@ private class GiftPostingLockTest {
         Assert.areEqual(
             closedGiftMessage(),
             refusal,
-            'The pause stops Open Impact filling things in, never stops it refusing something.'
+            'The pause stops BarnCRM filling things in, never stops it refusing something.'
         );
     }
 
@@ -524,7 +524,7 @@ private class GiftPostingLockTest {
     private static User maria() {
         User maria = TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             PermissionSet granted = new PermissionSet(

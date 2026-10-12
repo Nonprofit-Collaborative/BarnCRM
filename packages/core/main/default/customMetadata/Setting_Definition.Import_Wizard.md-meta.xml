@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Load a spreadsheet of people, households and organizations. Open Impact suggests what each column means, shows you exactly what would happen before anything is written, and then tells you what did happen, row by row.</value>
+    <value xsi:type="xsd:string">Load a spreadsheet of people, households and organizations. BarnCRM suggests what each column means, shows you exactly what would happen before anything is written, and then tells you what did happen, row by row.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -37,5 +37,9 @@
   <values>
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">10.0</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
   </values>
 </CustomMetadata>

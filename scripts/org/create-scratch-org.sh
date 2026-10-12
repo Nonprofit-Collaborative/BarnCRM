@@ -79,7 +79,7 @@ if [[ ! -f "$DEF_FILE" ]]; then
 fi
 
 if [[ -z "$ALIAS" ]]; then
-  ALIAS="openimpact-${SHAPE}"
+  ALIAS="barncrm-${SHAPE}"
 fi
 
 # Salesforce caps a scratch org at 30 days and deletes it when it expires. Catching a
@@ -154,7 +154,7 @@ if [[ "$SHAPE" == "platform-only" ]]; then
   sf org create user --definition-file "$PLATFORM_USER_DEF" --target-org "$ALIAS"
   rm -f "$PLATFORM_USER_DEF"
 
-  PLATFORM_USERNAME="platformuser@${ALIAS}.openimpact.test"
+  PLATFORM_USERNAME="platformuser@${ALIAS}.barncrm.test"
 
   if [[ "$FOUND_PERMSET" -eq 1 ]]; then
     for PS_FILE in "$PERMSET_DIR"/*.permissionset-meta.xml; do

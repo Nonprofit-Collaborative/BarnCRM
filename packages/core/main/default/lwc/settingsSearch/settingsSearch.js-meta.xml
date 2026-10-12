@@ -3,5 +3,5 @@
   <apiVersion>67.0</apiVersion>
   <isExposed>false</isExposed>
   <masterLabel>Settings Search</masterLabel>
-  <description>Searches every Open Impact setting by name, description, or section.</description>
+  <description>Searches every BarnCRM setting by name, description, or section.</description>
 </LightningComponentBundle>

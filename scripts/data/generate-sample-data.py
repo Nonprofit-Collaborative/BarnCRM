@@ -162,24 +162,28 @@ SPOUSE_AGE_SPREAD = 12
 # uses this pool instead, keeping that name unique in the sample set.
 SURNAME_POOL = [s for s in SURNAMES if s != "Garcia"]
 
+# Core's sample data is neutral (ADR-0062):
+# mostly businesses, schools and clubs, with one foundation and one church among them, as
+# any organization's contact list has. Keep exactly eleven templates: the generator's draws
+# depend on the list's length, and changing it would reshuffle every later record.
 ORG_NAME_TEMPLATES = [
-    ("foundation", "{word} Family Foundation"),
-    ("foundation", "The {word} Foundation"),
-    ("foundation", "{word} Community Foundation"),
     ("business", "{word} & {word2} LLC"),
     ("business", "{word} Hardware"),
     ("business", "{word} Consulting Group"),
     ("business", "{word} Coffee Roasters"),
-    ("church", "{word} Community Church"),
-    ("church", "St. {word} Parish"),
-    ("church", "{word} Congregation"),
+    ("business", "{word} Credit Union"),
+    ("business", "{word} Family Dental"),
     ("school", "{word} County School District"),
+    ("school", "{word} Community College"),
+    ("club", "{word} Rotary Club"),
+    ("foundation", "The {word} Foundation"),
+    ("church", "{word} Community Church"),
 ]
 ORG_WORDS = [
     "Cedar Valley", "Riverside", "Hilltop", "Northgate", "Bright Horizons",
-    "Willowbrook", "Union", "Heritage", "Lakeside", "Franklin", "Grace",
-    "Trinity", "Mercy", "Unity", "Founders", "Evergreen", "Summit",
-    "Meridian", "Cornerstone", "Fellowship", "Harborview", "Ashford",
+    "Willowbrook", "Bayview", "Heritage", "Lakeside", "Franklin", "Oakwood",
+    "Pinecrest", "Maple Ridge", "Unity", "Founders", "Evergreen", "Summit",
+    "Meridian", "Cornerstone", "Stonebridge", "Harborview", "Ashford",
 ]
 
 
@@ -188,7 +192,7 @@ def pick_first_name(rng, gender):
 
 
 # Children below this age get no salutation and no email address of their own:
-# a nonprofit does not address a nine year old as "Mr." or mail them directly.
+# an organization does not address a nine year old as "Mr." or mail them directly.
 MINOR_COURTESY_AGE = 13
 
 REFERENCE_YEAR = 2026
@@ -745,8 +749,8 @@ def build_organizations(rng):
 # ship in the Core payload beside the households they connect. Relationships are
 # deliberately between people in different households: two people in the same
 # household are already connected by the household itself, and the panel a
-# fundraiser wants is the one showing the daughter who gives from her own
-# address, the friend who introduced the donor, the colleague on the board.
+# person wants is the one showing the daughter who lives at her own address,
+# the friend who introduced them, the colleague on the board.
 # ---------------------------------------------------------------------------
 
 RELATIONSHIP_SHAPES = [
@@ -759,11 +763,11 @@ RELATIONSHIP_SHAPES = [
 ]
 
 RELATIONSHIP_DESCRIPTIONS = {
-    "Parent": "Gives from her own household; the two records are stewarded together.",
+    "Parent": "Lives in her own household; the two keep in close touch.",
     "Sibling": "Introduced by their sibling at the spring event.",
-    "Friend": "Long-standing friendship; the two often give in the same appeal.",
+    "Friend": "Long-standing friendship; the two often come to the same events.",
     "Colleague": "They serve on the finance committee together.",
-    "Grandparent": "Funds the grandchild's scholarship every year.",
+    "Grandparent": "Pays toward the grandchild's tuition every year.",
     "Other": "Met through the volunteer programme.",
 }
 
@@ -774,7 +778,7 @@ AFFILIATION_ROLES = [
     ("Executive Director", 0.06),
     ("Owner", 0.08),
     ("Member", 0.16),
-    ("Grant Officer", 0.08),
+    ("Partnerships Manager", 0.08),
 ]
 
 RELATIONSHIP_COUNT = 60

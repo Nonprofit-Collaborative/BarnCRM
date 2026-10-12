@@ -148,7 +148,7 @@ public with sharing class SoftCreditService {
     }
 
     /**
-     * Removes every credit Open Impact created for these gifts, and leaves alone every credit a
+     * Removes every credit BarnCRM created for these gifts, and leaves alone every credit a
      * person entered by hand (R-SC6).
      *
      * One caller: `GiftSoftCreditHandler.beforeDelete`. This docstring used to claim the matching

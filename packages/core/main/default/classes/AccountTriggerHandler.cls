@@ -83,8 +83,8 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         }
         if (!released.isEmpty()) {
             // Mutual exclusion (product-plan Section 11.2 item 9): clearing Custom Name on a
-            // household that Nonprofit Cloud manages natively must not hand its name to Open
-            // Impact's naming, the same guard the other two naming callers apply.
+            // household that Nonprofit Cloud manages natively must not hand its name to
+            // BarnCRM's naming, the same guard the other two naming callers apply.
             released.removeAll(HouseholdSelector.nativeHouseholdAccountsAmong(released));
             HouseholdNamingService.applyNaming(released);
         }
@@ -291,7 +291,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         if (!handlesPeople()) {
             return;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         if (settings == null || settings.Auto_Create_Households__c != true) {
             return;
         }

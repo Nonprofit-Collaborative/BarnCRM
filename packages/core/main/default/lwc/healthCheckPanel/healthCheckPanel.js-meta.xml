@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <isExposed>true</isExposed>
   <masterLabel>Health Check</masterLabel>
-  <description>What Open Impact found in this org, and what to do about it.</description>
+  <description>What BarnCRM found in this org, and what to do about it.</description>
   <targets>
     <target>lightning__AppPage</target>
     <target>lightning__HomePage</target>

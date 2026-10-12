@@ -158,7 +158,7 @@ private class HouseholdPrimaryContactTest {
             // Proven on every shape by the test above; this one needs real person accounts.
             return;
         }
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         // Kept when emptied, so the household is still there for the person to come back to.

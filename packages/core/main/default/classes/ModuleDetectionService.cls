@@ -1,5 +1,5 @@
 /**
- * Which Open Impact packages are in this org, and what their objects are called.
+ * Which BarnCRM packages are in this org, and what their objects are called.
  *
  * Core never references another package's schema statically (ADR-0009, plan Section 4.2):
  * every name below is a describe probe held as a string, and every caller has to cope with
@@ -18,7 +18,23 @@ public with sharing class ModuleDetectionService {
     private static final String MODULE_CORE = 'Core';
     private static final String MODULE_GIVING = 'Giving';
 
-    private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/OpenImpact/blob/main/docs/product-plan.md';
+    /** Each module's own README, which says what the module is without assuming a suite. */
+    private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/packages/';
+
+    /**
+     * The modules every organization is offered (ADR-0046: the Community Suite is Core with
+     * the modules that fit). The others are offered only once Giving is installed, since
+     * until the suite choice exists (C-30) Giving being here is what says the org is a
+     * nonprofit (ADR-0062).
+     */
+    private static final Set<String> OFFERED_TO_EVERY_ORG = new Set<String>{
+        MODULE_CORE,
+        'Volunteers'
+    };
+
+    /** Stands in for the Giving probe in tests, whose answer otherwise depends on the org. */
+    @TestVisible
+    private static Boolean givingPresentOverride;
 
     /** One row of the module list the Setup Assistant shows in step six. */
     public class ModuleInfo {
@@ -38,6 +54,9 @@ public with sharing class ModuleDetectionService {
      * appeal object is not mistaken for Giving.
      */
     public static Boolean isGivingPresent() {
+        if (givingPresentOverride != null) {
+            return givingPresentOverride;
+        }
         if (announcedModules().contains(MODULE_GIVING.toLowerCase())) {
             return true;
         }
@@ -49,25 +68,30 @@ public with sharing class ModuleDetectionService {
         return objectExists(IMPORT_BATCH_OBJECT);
     }
 
-    /** The six Open Impact packages, each saying whether it is in this org. */
+    /**
+     * The BarnCRM packages this org is offered, each saying whether it is here. Every org sees
+     * Core and Volunteers; the rest are listed once Giving is installed, and any module that
+     * is already installed is always listed.
+     */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
-        List<ModuleInfo> modules = new List<ModuleInfo>();
-        modules.add(module(MODULE_CORE, true, '#51-core-package'));
-        modules.add(
-            module(
-                MODULE_GIVING,
-                isGivingPresent() || announced.contains(MODULE_GIVING.toLowerCase()),
-                '#52-giving-package'
-            )
-        );
-        modules.add(
-            module('Volunteers', announced.contains('volunteers'), '#53-volunteers-package')
-        );
-        modules.add(module('Programs', announced.contains('programs'), '#54-programs-package'));
-        modules.add(module('Funders', announced.contains('funders'), '#55-funders-package'));
-        modules.add(module('Connect', announced.contains('connect'), '#56-connect-package'));
-        return modules;
+        Boolean givingPresent =
+            isGivingPresent() || announced.contains(MODULE_GIVING.toLowerCase());
+        List<ModuleInfo> all = new List<ModuleInfo>{
+            module(MODULE_CORE, true, 'core'),
+            module(MODULE_GIVING, givingPresent, 'giving'),
+            module('Volunteers', announced.contains('volunteers'), 'volunteers'),
+            module('Programs', announced.contains('programs'), 'programs'),
+            module('Funders', announced.contains('funders'), 'funders'),
+            module('Connect', announced.contains('connect'), 'connect')
+        };
+        List<ModuleInfo> offered = new List<ModuleInfo>();
+        for (ModuleInfo info : all) {
+            if (givingPresent || info.present || OFFERED_TO_EVERY_ORG.contains(info.name)) {
+                offered.add(info);
+            }
+        }
+        return offered;
     }
 
     /** The modules that have shipped settings console rows naming themselves. */
@@ -80,16 +104,16 @@ public with sharing class ModuleDetectionService {
                 }
             }
         } catch (Exception e) {
-            ErrorLogger.log(e, 'Open Impact module detection');
+            ErrorLogger.log(e, 'BarnCRM module detection');
         }
         return names;
     }
 
-    private static ModuleInfo module(String name, Boolean present, String anchor) {
+    private static ModuleInfo module(String name, Boolean present, String folder) {
         ModuleInfo info = new ModuleInfo();
         info.name = name;
         info.present = present;
-        info.docsUrl = DOCS_BASE + anchor;
+        info.docsUrl = DOCS_BASE + folder + '/README.md';
         return info;
     }
 
