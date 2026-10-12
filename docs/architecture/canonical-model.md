@@ -3234,11 +3234,12 @@ charity describes the property and the donor values it.
 
 **R-RC13 What the document is branded with, and what it is valid without.** Every document
 prints the organization's legal name and address and its tax identification number. The name
-and address come from the template where the template placed the token for them, and from a
-block the package prints above the letter where it did not, on the same reasoning as the gift
-lines of R-RC8: an administrator who deletes the letterhead out of a template has not thereby
-issued a receipt with no organization on it. The tax identification number prints in the
-signature block.
+and address are the letterhead, and the letterhead is code, not template (ADR-NEXT,
+`NEXT-receipt-letters-are-edited-as-rich-text.md`): the package prints them in a block above
+the letter whatever the letter says, so an administrator editing the letter can neither delete
+nor misplace them. A letter saved before that decision still carries its own letterhead block
+(`class="letterhead"`); while it does, the package prints the logo only, and the letter's
+block prints the name. The tax identification number prints in the signature block.
 
 The logo is optional, is printed only when the organization has uploaded one and left the
 Print Logo On Receipts setting on, and is sized by one setting.

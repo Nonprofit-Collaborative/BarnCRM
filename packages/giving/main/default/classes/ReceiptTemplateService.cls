@@ -131,7 +131,78 @@ public with sharing class ReceiptTemplateService {
         );
     }
 
+    /**
+     * The letter as the editor shows it: the stored body without the letterhead block the
+     * shipped letters used to open with (ADR-NEXT point 3). The package prints the letterhead
+     * itself now, so the editor never offers it, and the next save stores the letter without it.
+     * A body without that block is returned unchanged.
+     */
+    public static String letterOf(String body) {
+        if (
+            String.isBlank(body) || !body.contains(ReceiptContentBuilder.LEGACY_LETTERHEAD_MARKER)
+        ) {
+            return body;
+        }
+        Matcher found = LEGACY_LETTERHEAD.matcher(body);
+        if (!found.find()) {
+            return body;
+        }
+        return (body.substring(0, found.start()) + body.substring(found.end())).trim();
+    }
+
+    /**
+     * The draft letter filled in for a sample gift, as the page previews it (ADR-NEXT point 5).
+     *
+     * It goes through the same `ReceiptContentBuilder` path as a real receipt, so the preview
+     * shows the letterhead, the tax sentences and the signature the document will carry. It
+     * writes nothing, consumes no receipt number and creates no file: the gifts exist only in
+     * memory. What comes back is the inside of the document's body, because the page shows it
+     * as formatted text rather than as a page of its own.
+     */
+    public static String preview(String receiptType, String body) {
+        if (String.isBlank(body)) {
+            throw new ReceiptTemplateException(Label.Giving_Receipt_EmptyTemplate);
+        }
+        Date today = Date.today();
+        String donor = Label.Giving_Receipt_PreviewDonor;
+        String sampleNumber = Label.Giving_Receipt_PreviewNumber;
+        String html;
+        if (ReceiptNumberSequence.TYPE_STATEMENT.equals(receiptType)) {
+            html = ReceiptContentBuilder.forStatement(
+                donor,
+                new List<Gift__c>{ sampleGift(100, today), sampleGift(250, today) },
+                sampleNumber,
+                today.year(),
+                today,
+                body
+            );
+        } else {
+            html = ReceiptContentBuilder.forGift(
+                sampleGift(100, today),
+                donor,
+                sampleNumber,
+                today,
+                body
+            );
+        }
+        return html.substringAfter('<body>').substringBeforeLast('</body>');
+    }
+
     // ----------------------------------------------------------------------- internals
+
+    private static final Pattern LEGACY_LETTERHEAD = Pattern.compile(
+        '(?s)<div class="letterhead">.*?</div>\\s*'
+    );
+
+    /** A cash gift with nothing given in return, held in memory only. */
+    private static Gift__c sampleGift(Decimal amount, Date giftDate) {
+        return new Gift__c(
+            Amount__c = amount,
+            Gift_Date__c = giftDate,
+            Type__c = 'Cash',
+            Status__c = 'Received'
+        );
+    }
 
     /**
      * Read once per transaction: the answer cannot change inside one.
