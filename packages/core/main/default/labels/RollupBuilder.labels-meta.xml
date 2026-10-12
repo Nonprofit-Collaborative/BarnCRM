@@ -368,4 +368,308 @@
         <shortDescription>Filter comparison: not in a list.</shortDescription>
         <value>is none of</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Step1</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder step 1 title.</shortDescription>
+        <value>Where should the number appear?</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Step2</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder step 2 title.</shortDescription>
+        <value>What should be counted?</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Step3</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder step 3 title.</shortDescription>
+        <value>How should it be calculated?</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Step4</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder step 4 title.</shortDescription>
+        <value>Which records count?</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Step5</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder step 5 title.</shortDescription>
+        <value>Check and save</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TargetObject</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 label: the kind of record that shows the total.</shortDescription>
+        <value>Record that shows the total</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TargetField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 label: the field that shows the total.</shortDescription>
+        <value>Field that shows the total</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TargetFieldHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 help for the field list.</shortDescription>
+        <value>Only fields BarnCRM can write are listed. If the field you need does not exist, create a Number or Currency field in Setup, then come back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_FilledBy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 1 field option already filled by a rollup. {0} field, {1} rollup.</shortDescription>
+        <value>{0} (filled by {1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Source</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 2 label: the records counted and how they link.</shortDescription>
+        <value>Records to count</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Aggregate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the calculation.</shortDescription>
+        <value>Calculation</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_SourceField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the field calculated.</shortDescription>
+        <value>Field to calculate</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_OrderBy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the field that decides which record comes first.</shortDescription>
+        <value>Which record comes first, by</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Delimiter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: what separates a text list's values.</shortDescription>
+        <value>Separate the values with</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Window</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the time window.</shortDescription>
+        <value>Time window</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WindowAll</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Time window option: all time.</shortDescription>
+        <value>All time</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WindowThisYear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Time window option: this fiscal year.</shortDescription>
+        <value>This fiscal year</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WindowLastYear</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Time window option: last fiscal year.</shortDescription>
+        <value>Last fiscal year</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WindowTwoYears</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Time window option: two fiscal years ago.</shortDescription>
+        <value>Two fiscal years ago</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WindowDate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 3 label: the date that decides the fiscal year.</shortDescription>
+        <value>Date that decides the year</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_CurrencyWarning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Multi-currency warning on a total of amounts into a currency field.</shortDescription>
+        <value>This org uses more than one currency. Totals are converted to each record's currency at today's rates, not the rate on the gift date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NumberWarning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Multi-currency warning on a total of amounts into a number field.</shortDescription>
+        <value>This field is a number, not a currency, so the total is shown in the corporate currency.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Filter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 label: the conditions on the counted records.</shortDescription>
+        <value>Conditions</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TargetFilter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 4 label: the conditions on the records that show the total.</shortDescription>
+        <value>Only for some records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Name</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 label: the rollup's name.</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Description</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 label: the rollup's description.</shortDescription>
+        <value>What this number means</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Summary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5 sentence. {0} calculation, {1} records counted, {2} target.</shortDescription>
+        <value>{0} of {1}, shown in {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Back</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button: previous step.</shortDescription>
+        <value>Back</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Next</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button: next step.</shortDescription>
+        <value>Next</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Cancel</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button: leave without saving.</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Save</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button: save.</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_SaveAndCalculate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button: save and start the recalculation.</shortDescription>
+        <value>Save and calculate now</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Title</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the Rollup Builder page.</shortDescription>
+        <value>Rollup Builder</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_New</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Builder button: create a rollup.</shortDescription>
+        <value>New rollup</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Edit</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row button: edit this rollup in the Builder.</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Copy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row button: copy this rollup in the Builder.</shortDescription>
+        <value>Copy</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_CopyOf</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of a copied rollup. {0} is the original name.</shortDescription>
+        <value>Copy of {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Open</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Link from the Rollups settings page to the Builder.</shortDescription>
+        <value>Open the Rollup Builder</value>
+    </labels>
 </CustomLabels>

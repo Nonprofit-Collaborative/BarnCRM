@@ -97,6 +97,9 @@ public with sharing class RollupBuilderController {
         public String sourceObject { get; set; }
         @AuraEnabled
         public String relationshipPath { get; set; }
+        /** The counted records' plural name, for the filter sentence: "Gifts". */
+        @AuraEnabled
+        public String recordsLabel { get; set; }
     }
 
     /** What the Builder needs before step 1. */
@@ -532,6 +535,7 @@ public with sharing class RollupBuilderController {
                 ? reference.getName()
                 : reference.getName() + ' > ' + token;
             option.value = option.sourceObject + '|' + option.relationshipPath;
+            option.recordsLabel = childType.getLabelPlural();
             option.label = String.format(
                 token == null
                     ? Label.Core_RollupBuilder_SourceBy

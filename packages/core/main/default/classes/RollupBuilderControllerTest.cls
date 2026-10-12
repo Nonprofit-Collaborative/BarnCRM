@@ -120,6 +120,10 @@ private class RollupBuilderControllerTest {
         ) {
             values.add(option.value.toLowerCase());
             throughHousehold |= option.relationshipPath.endsWith(RollupPath.TOKEN_HOUSEHOLD);
+            System.Assert.isTrue(
+                String.isNotBlank(option.recordsLabel),
+                'Each option names its records for the filter sentence'
+            );
         }
 
         System.Assert.isTrue(values.contains('account|parentid'), 'Child organizations count');
