@@ -55,7 +55,9 @@ public with sharing class AccountingPeriodController {
             if (!canManage()) {
                 throw new AccountingPeriodException(Label.Giving_Periods_PermissionRequired);
             }
-            Date current = GiftPostingLock.closedThrough();
+            // Locked, so whether this save reopens a period, and the audit row's old value, are
+            // decided from what is stored, not from a value another person replaced a moment ago.
+            Date current = AccountingPeriodWriter.lockedClosedThrough();
             if (closeDate == current) {
                 return currentView();
             }
