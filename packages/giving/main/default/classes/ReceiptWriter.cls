@@ -14,7 +14,7 @@
  * 1. **Permission enforced before this class is reached.** `ReceiptService` and `ReceiptController`
  *    check `Issue_Receipts` before any call here. The one write that is not about issuing,
  *    `insertTemplates`, is reached only after `ReceiptTemplateService` has checked
- *    `Manage_Nonprofit_Settings` or `Issue_Receipts`, or from the post-install script, where there
+ *    `Manage_BarnCRM_Settings` or `Issue_Receipts`, or from the post-install script, where there
  *    is no running user to check (ADR-0034).
  * 2. **Inputs validated by the caller.** Every field written is computed by package code from
  *    records the running user was already allowed to read: amounts from gifts, numbers from the

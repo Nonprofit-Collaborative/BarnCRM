@@ -9,8 +9,8 @@ private class ErrorDigestRecipientsTest {
         return TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
     }
 
-    private static Nonprofit_Settings__c settings() {
-        return Nonprofit_Settings__c.getOrgDefaults();
+    private static BarnCRM_Settings__c settings() {
+        return BarnCRM_Settings__c.getOrgDefaults();
     }
 
     @IsTest

@@ -6,7 +6,7 @@
  * name a module's settings object statically. The query is built from describe results and
  * bound parameters only.
  *
- * It runs in system mode, the same access `Nonprofit_Settings__c.getOrgDefaults()` gives Core's
+ * It runs in system mode, the same access `BarnCRM_Settings__c.getOrgDefaults()` gives Core's
  * own settings. A setting is org configuration that package code reads on behalf of whoever is
  * saving (a fundraiser's gift save asks whether household members are credited), and a
  * protected custom setting cannot be granted to a subscriber user, so a user mode read failed

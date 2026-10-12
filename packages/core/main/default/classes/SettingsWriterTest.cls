@@ -29,7 +29,7 @@ private class SettingsWriterTest {
         Test.startTest();
         System.runAs(maria) {
             SettingsWriter.saveOrgDefault(
-                Nonprofit_Settings__c.SObjectType,
+                BarnCRM_Settings__c.SObjectType,
                 null,
                 patternChange('The {LastName} Family')
             );
@@ -43,7 +43,7 @@ private class SettingsWriterTest {
         );
         Assert.areEqual(
             'The {LastName} Family',
-            Nonprofit_Settings__c.getOrgDefaults().Household_Name_Pattern__c,
+            BarnCRM_Settings__c.getOrgDefaults().Household_Name_Pattern__c,
             'What she saved is what the org now runs on'
         );
     }
@@ -57,7 +57,7 @@ private class SettingsWriterTest {
         System.runAs(david) {
             try {
                 SettingsWriter.saveOrgDefault(
-                    Nonprofit_Settings__c.SObjectType,
+                    BarnCRM_Settings__c.SObjectType,
                     null,
                     patternChange('The {LastName} Clan')
                 );
@@ -78,9 +78,9 @@ private class SettingsWriterTest {
     @IsTest
     static void ignoresNothingToSave() {
         Test.startTest();
-        SettingsWriter.saveOrgDefault(Nonprofit_Settings__c.SObjectType, null, null);
+        SettingsWriter.saveOrgDefault(BarnCRM_Settings__c.SObjectType, null, null);
         SettingsWriter.saveOrgDefault(
-            Nonprofit_Settings__c.SObjectType,
+            BarnCRM_Settings__c.SObjectType,
             null,
             new Map<Schema.SObjectField, Object>()
         );
@@ -88,7 +88,7 @@ private class SettingsWriterTest {
 
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM Nonprofit_Settings__c],
+            [SELECT COUNT() FROM BarnCRM_Settings__c],
             'Nothing to save writes nothing and raises nothing'
         );
     }
@@ -99,13 +99,13 @@ private class SettingsWriterTest {
      */
     @IsTest
     static void savesOnlyTheChangedKeyOverTheStoredRecord() {
-        insert new Nonprofit_Settings__c(
+        insert new BarnCRM_Settings__c(
             SetupOwnerId = UserInfo.getOrganizationId(),
             Household_Name_Pattern__c = 'The {LastName} Family',
             Relationship_Auto_Reciprocal__c = true
         );
-        Nonprofit_Settings__c stored = OrgSettingsSystemWriter.lockStored();
-        Nonprofit_Settings__c theirs = new Nonprofit_Settings__c(
+        BarnCRM_Settings__c stored = OrgSettingsSystemWriter.lockStored();
+        BarnCRM_Settings__c theirs = new BarnCRM_Settings__c(
             Id = stored.Id,
             Relationship_Auto_Reciprocal__c = false
         );
@@ -115,16 +115,16 @@ private class SettingsWriterTest {
         Test.startTest();
         System.runAs(maria) {
             SettingsWriter.saveOrgDefault(
-                Nonprofit_Settings__c.SObjectType,
+                BarnCRM_Settings__c.SObjectType,
                 stored,
                 patternChange('{LastName} Household')
             );
         }
         Test.stopTest();
 
-        Nonprofit_Settings__c saved = [
+        BarnCRM_Settings__c saved = [
             SELECT Household_Name_Pattern__c, Relationship_Auto_Reciprocal__c
-            FROM Nonprofit_Settings__c
+            FROM BarnCRM_Settings__c
             WHERE Id = :stored.Id
         ];
         Assert.areEqual(
@@ -140,7 +140,7 @@ private class SettingsWriterTest {
 
     private static Map<Schema.SObjectField, Object> patternChange(String pattern) {
         return new Map<Schema.SObjectField, Object>{
-            Nonprofit_Settings__c.Household_Name_Pattern__c => pattern
+            BarnCRM_Settings__c.Household_Name_Pattern__c => pattern
         };
     }
 }

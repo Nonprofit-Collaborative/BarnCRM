@@ -98,7 +98,7 @@ public class ReceiptTestDataFactory {
     public static RecordingRenderer setUpReceipting() {
         GivingTestDataFactory.ensureDefaultFund();
 
-        Nonprofit_Settings__c core = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
         core.SetupOwnerId = UserInfo.getOrganizationId();
         core.Organization_Legal_Name__c = 'Hope For Homes';
         core.Organization_Address__c = '14 Bridge Street, Springfield';

@@ -21,7 +21,7 @@ private class AutomationResumeJobTest {
     }
 
     private static Datetime storedPause() {
-        return Nonprofit_Settings__c.getOrgDefaults().Automation_Paused_Until__c;
+        return BarnCRM_Settings__c.getOrgDefaults().Automation_Paused_Until__c;
     }
 
     @IsTest

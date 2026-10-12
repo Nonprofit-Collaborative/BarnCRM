@@ -9,7 +9,7 @@
  */
 @IsTest
 public class SettingsTestPermissions {
-    private static final String CUSTOM_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String CUSTOM_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final List<String> AUDIT_FIELDS = new List<String>{
         'Setting_Name__c',
         'Old_Value__c',

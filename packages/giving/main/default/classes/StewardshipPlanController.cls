@@ -15,7 +15,7 @@
  * read, and `runningPlans` on each template is the number that edit will not reach.
  */
 public with sharing class StewardshipPlanController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Stewardship plans page';
 
     public class PageModel {

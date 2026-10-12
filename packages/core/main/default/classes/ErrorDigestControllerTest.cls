@@ -53,7 +53,7 @@ private class ErrorDigestControllerTest {
             Test.stopTest();
         }
 
-        Nonprofit_Settings__c after = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c after = BarnCRM_Settings__c.getOrgDefaults();
         Assert.isNotNull(after.Error_Digest_Last_Run__c, 'The job ran the digest.');
         Assert.isTrue(
             after.Error_Digest_Last_Run_Summary__c.startsWith(
@@ -94,7 +94,7 @@ private class ErrorDigestControllerTest {
 
         Assert.isTrue(digestJobs().isEmpty(), 'Nothing was scheduled.');
         Assert.isNull(
-            Nonprofit_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c,
+            BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c,
             'And nothing was sent.'
         );
     }

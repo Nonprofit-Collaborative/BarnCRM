@@ -19,7 +19,7 @@ public with sharing class CoexistenceService {
     public static final String KEY_MEMBERSHIP_MODE = 'Household_Membership_Mode__c';
 
     /** The custom permission that gates changing the mode. */
-    public static final String MANAGE_SETTINGS = 'Manage_Nonprofit_Settings';
+    public static final String MANAGE_SETTINGS = 'Manage_BarnCRM_Settings';
 
     private static final Set<String> VALID_MODES = new Set<String>{
         MODE_STANDALONE,
@@ -31,7 +31,7 @@ public with sharing class CoexistenceService {
      * The mode this org is running in, or null when nobody has confirmed one yet.
      */
     public static String getCurrentMode() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         String mode = settings == null ? null : settings.Coexistence_Mode__c;
         return String.isBlank(mode) ? null : mode;
     }
@@ -40,7 +40,7 @@ public with sharing class CoexistenceService {
      * How household membership is stored, defaulting to contact mode when unset.
      */
     public static String getMembershipMode() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         String mode = settings == null ? null : settings.Household_Membership_Mode__c;
         return String.isBlank(mode) ? MEMBERSHIP_CONTACT : mode;
     }
@@ -50,7 +50,7 @@ public with sharing class CoexistenceService {
      * default, read as contact mode, and it is the only state detection is allowed to change.
      */
     public static Boolean membershipModeChosen() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings != null && String.isNotBlank(settings.Household_Membership_Mode__c);
     }
 

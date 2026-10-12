@@ -3,7 +3,7 @@
     <label>Rollups</label>
     <protected>true</protected>
     <values><field>Setting_Key__c</field><value xsi:nil="true" /></values>
-    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Nonprofit_Settings__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">BarnCRM_Settings__c</value></values>
     <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
     <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Component</value></values>

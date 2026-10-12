@@ -68,7 +68,7 @@ both computed in its constructor, and `healthCheckPanel` navigates with the two 
 report gave it. Nothing has to change in either place when the namespace is registered.
 
 Apex referring to its own packaged metadata does not need any of this: the compiler resolves
-`Nonprofit_Settings__c` inside the package regardless of namespace. Only names that cross into
+`BarnCRM_Settings__c` inside the package regardless of namespace. Only names that cross into
 strings, URLs, page state, or metadata lookups do.
 
 ## A note on `config/scratch-defs/person-accounts.json`

@@ -221,7 +221,7 @@ public with sharing class RollupController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission('Manage_Nonprofit_Settings');
+        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
     }
 
     private static void requirePermission() {

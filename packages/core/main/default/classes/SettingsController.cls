@@ -4,7 +4,7 @@
  */
 @NamespaceAccessible
 public with sharing class SettingsController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String HELP_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/';
     private static final String TYPE_COMPONENT = 'Component';
     private static final String TYPE_CHECKBOX = 'Checkbox';

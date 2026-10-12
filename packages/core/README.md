@@ -19,7 +19,7 @@ object references: those live only in the Connect module, behind dynamic Apex.
   rather than by editing the console.
 
   **Platform Cache is optional.** `SettingsService` uses an org cache partition named
-  `NonprofitSettings` when one exists and a per-transaction static cache when it does not,
+  `BarnCRMSettings` when one exists and a per-transaction static cache when it does not,
   so Core runs unchanged on an org with no cache allocation. The package ships no partition
   file: an org that wants the cross-transaction cache creates the partition in Setup and
   allocates it a few megabytes. Either way a change takes effect on the next transaction,
@@ -103,7 +103,7 @@ the same in both places.
 The dispatcher works out which context it is in, then checks three things before it invokes
 anything: a per transaction
 bypass (`AutomationControl.bypass(name)`), the org wide pause
-(`Nonprofit_Settings__c.Automation_Paused_Until__c`), and the automation's own switch (a row on
+(`BarnCRM_Settings__c.Automation_Paused_Until__c`), and the automation's own switch (a row on
 `Automation_Setting__c`, keyed by the registry's developer name). Anything a handler throws is
 written to the Error Log first, then reported to the person saving the record: `addError` with a
 plain language message in a before context, a rethrow in an after context.

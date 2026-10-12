@@ -3,11 +3,11 @@
  *
  * It answers the three questions an administrator has about a nightly job, in this order: is it
  * switched on, when did it last run, and what did it do. It also carries the only supported way
- * the jobs are ever started or stopped, so the `Manage_Nonprofit_Settings` permission checked
+ * the jobs are ever started or stopped, so the `Manage_BarnCRM_Settings` permission checked
  * here is the authorization for everything the runs do afterwards.
  */
 public with sharing class GivingJobsController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Giving nightly jobs page';
 
     /**

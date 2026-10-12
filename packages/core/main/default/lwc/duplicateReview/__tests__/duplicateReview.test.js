@@ -21,7 +21,7 @@ jest.mock('@salesforce/apex/DuplicateController.previewMerge', () => ({ default:
 jest.mock('@salesforce/apex/DuplicateController.mergeHouseholds', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/customPermission/Manage_Nonprofit_Settings', () => ({ default: true }), {
+jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
 jest.mock(

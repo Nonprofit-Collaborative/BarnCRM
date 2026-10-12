@@ -2,7 +2,7 @@
  * Reads and writes the org's settings.
  *
  * Each package owns a protected hierarchy custom setting (ADR-0017): Core's is
- * `Nonprofit_Settings__c` and a module ships its own, named on its Setting Definition rows.
+ * `BarnCRM_Settings__c` and a module ships its own, named on its Setting Definition rows.
  * Every write is validated against that object's own schema and against the shipped rows, is
  * audited as a Setting Change record, and clears the cached copy so the next transaction sees
  * the new value (canonical model Section 12, R-N3).
@@ -15,12 +15,12 @@ public with sharing class SettingsService {
      * registered.
      */
     @NamespaceAccessible
-    public static final String CORE_SETTINGS_OBJECT = Nonprofit_Settings__c.SObjectType.getDescribe(
+    public static final String CORE_SETTINGS_OBJECT = BarnCRM_Settings__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         )
         .getLocalName();
 
-    private static final String CACHE_PARTITION = 'local.NonprofitSettings';
+    private static final String CACHE_PARTITION = 'local.BarnCRMSettings';
     private static final String CACHE_KEY = 'orgDefaults';
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
@@ -30,7 +30,7 @@ public with sharing class SettingsService {
      *
      * A checkbox field can declare `<defaultValue>true</defaultValue>`, and that default is what
      * the platform applies when a record is created through the user interface. It is not what
-     * Apex reads. `Nonprofit_Settings__c.getOrgDefaults()` on an org that has never saved its
+     * Apex reads. `BarnCRM_Settings__c.getOrgDefaults()` on an org that has never saved its
      * settings returns a materialized record with every checkbox false, not null and not the
      * shipped default, so a feature that ships on reads as switched off on every fresh install
      * and does nothing at all, silently. That is what happened to the relationship reciprocal
@@ -46,11 +46,11 @@ public with sharing class SettingsService {
      * build when a checkbox that ships on is missing from it (ADR-0035).
      */
     private static final Map<Schema.SObjectField, Boolean> SHIPPED_DEFAULTS = new Map<Schema.SObjectField, Boolean>{
-        Nonprofit_Settings__c.Relationship_Auto_Reciprocal__c => true,
-        Nonprofit_Settings__c.Auto_Create_Households__c => true
+        BarnCRM_Settings__c.Relationship_Auto_Reciprocal__c => true,
+        BarnCRM_Settings__c.Auto_Create_Households__c => true
     };
 
-    private static Nonprofit_Settings__c cachedSettings;
+    private static BarnCRM_Settings__c cachedSettings;
     private static Map<String, SObject> cachedOrgDefaults = new Map<String, SObject>();
     private static Map<String, Map<String, Schema.SObjectField>> cachedFields = new Map<String, Map<String, Schema.SObjectField>>();
 
@@ -65,16 +65,16 @@ public with sharing class SettingsService {
      * shipped defaults (see `SHIPPED_DEFAULTS`).
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c getSettings() {
+    public static BarnCRM_Settings__c getSettings() {
         if (cachedSettings != null) {
             return cachedSettings;
         }
-        Nonprofit_Settings__c fromCache = readCache();
+        BarnCRM_Settings__c fromCache = readCache();
         if (fromCache != null) {
             cachedSettings = fromCache;
             return cachedSettings;
         }
-        cachedSettings = withShippedDefaults(Nonprofit_Settings__c.getOrgDefaults());
+        cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
         writeCache(cachedSettings);
         return cachedSettings;
     }
@@ -84,7 +84,7 @@ public with sharing class SettingsService {
      * record exactly as the org left it. An unsaved hierarchy custom setting has no Id, which is
      * what tells the two apart.
      */
-    private static Nonprofit_Settings__c withShippedDefaults(Nonprofit_Settings__c record) {
+    private static BarnCRM_Settings__c withShippedDefaults(BarnCRM_Settings__c record) {
         if (record == null || record.Id != null) {
             return record;
         }
@@ -131,7 +131,7 @@ public with sharing class SettingsService {
      * accepted. Returns the refreshed Core settings.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c saveValues(Map<String, Object> values) {
+    public static BarnCRM_Settings__c saveValues(Map<String, Object> values) {
         applyValues(CORE_SETTINGS_OBJECT, values, true);
         return getSettings();
     }
@@ -151,7 +151,7 @@ public with sharing class SettingsService {
      * which has no Setting Definition row because it is not an editable setting.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c saveSystemValue(String key, Object value) {
+    public static BarnCRM_Settings__c saveSystemValue(String key, Object value) {
         applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false);
         return getSettings();
     }
@@ -232,7 +232,7 @@ public with sharing class SettingsService {
         String oldText,
         String newText
     ) {
-        if (token != Nonprofit_Settings__c.Household_Membership_Mode__c) {
+        if (token != BarnCRM_Settings__c.Household_Membership_Mode__c) {
             return;
         }
         String refusal = CoexistenceService.membershipChangeRefusal(oldText, newText);
@@ -249,7 +249,7 @@ public with sharing class SettingsService {
         Schema.SObjectField token,
         String newText
     ) {
-        if (token != Nonprofit_Settings__c.Error_Digest_Recipients__c) {
+        if (token != BarnCRM_Settings__c.Error_Digest_Recipients__c) {
             return;
         }
         String refusal = ErrorDigestRecipients.refusal(newText);
@@ -339,9 +339,9 @@ public with sharing class SettingsService {
      * `getOrgDefaults()` instead would store every shipped-on feature as switched off.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c firstSaveRecord() {
+    public static BarnCRM_Settings__c firstSaveRecord() {
         return withShippedDefaults(
-            new Nonprofit_Settings__c(SetupOwnerId = UserInfo.getOrganizationId())
+            new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId())
         );
     }
 
@@ -401,7 +401,7 @@ public with sharing class SettingsService {
     }
 
     private static Boolean isCoreSettings(Schema.SObjectType type) {
-        return type == Nonprofit_Settings__c.SObjectType;
+        return type == BarnCRM_Settings__c.SObjectType;
     }
 
     /**
@@ -650,19 +650,19 @@ public with sharing class SettingsService {
         }
     }
 
-    private static Nonprofit_Settings__c readCache() {
+    private static BarnCRM_Settings__c readCache() {
         Cache.OrgPartition partition = partition();
         if (partition == null) {
             return null;
         }
         try {
-            return (Nonprofit_Settings__c) partition.get(CACHE_KEY);
+            return (BarnCRM_Settings__c) partition.get(CACHE_KEY);
         } catch (Exception e) {
             return null;
         }
     }
 
-    private static void writeCache(Nonprofit_Settings__c record) {
+    private static void writeCache(BarnCRM_Settings__c record) {
         Cache.OrgPartition partition = partition();
         if (partition == null || record == null) {
             return;

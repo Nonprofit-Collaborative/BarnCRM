@@ -37,7 +37,7 @@ public without sharing class OrgSettingsSystemWriter {
     /** Saves the given keys on Core's settings record. */
     @NamespaceAccessible
     public static void save(Map<Schema.SObjectField, Object> values) {
-        save(Nonprofit_Settings__c.SObjectType, values);
+        save(BarnCRM_Settings__c.SObjectType, values);
     }
 
     /** Saves the given keys on the org-level record of the given settings object. */
@@ -67,7 +67,7 @@ public without sharing class OrgSettingsSystemWriter {
             SObject created = SettingsService.firstSaveRecord(type);
             putAll(created, values);
             if (insertFirst(created)) {
-                if (type == Nonprofit_Settings__c.SObjectType) {
+                if (type == BarnCRM_Settings__c.SObjectType) {
                     Database.update(
                         SettingsService.blanksAfterFirstSave(created),
                         AccessLevel.SYSTEM_MODE
@@ -119,8 +119,8 @@ public without sharing class OrgSettingsSystemWriter {
      * second run waits for the first to finish instead of acting on the same stale value.
      */
     @NamespaceAccessible
-    public static Nonprofit_Settings__c lockStored() {
-        return (Nonprofit_Settings__c) lockStored(Nonprofit_Settings__c.SObjectType);
+    public static BarnCRM_Settings__c lockStored() {
+        return (BarnCRM_Settings__c) lockStored(BarnCRM_Settings__c.SObjectType);
     }
 
     /** The same for any settings object. */

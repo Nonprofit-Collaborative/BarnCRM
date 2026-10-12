@@ -11,7 +11,7 @@
 public with sharing class ImportController {
     /**
      * Injected by the tests so the permitted path can be asserted in an org where the
-     * Manage_Nonprofit_Settings custom permission is not assigned to the running user. Null
+     * Manage_BarnCRM_Settings custom permission is not assigned to the running user. Null
      * in production, where the real check runs.
      */
     @TestVisible
@@ -462,7 +462,7 @@ public with sharing class ImportController {
         if (permissionOverride != null) {
             return permissionOverride;
         }
-        return FeatureManagement.checkPermission('Manage_Nonprofit_Settings');
+        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
     }
 
     /**

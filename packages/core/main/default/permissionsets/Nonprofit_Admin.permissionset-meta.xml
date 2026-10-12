@@ -317,7 +317,7 @@
   </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
-    <name>Manage_Nonprofit_Settings</name>
+    <name>Manage_BarnCRM_Settings</name>
   </customPermissions>
   <fieldPermissions>
     <editable>true</editable>

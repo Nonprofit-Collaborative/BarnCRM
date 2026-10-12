@@ -196,7 +196,7 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     private static HealthCheckService.Finding automationFinding() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         Datetime pausedUntil = settings == null ? null : settings.Automation_Paused_Until__c;
         if (pausedUntil == null || pausedUntil <= System.now()) {
             return new HealthCheckService.Finding(

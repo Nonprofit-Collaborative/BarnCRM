@@ -15,7 +15,7 @@
  * Every change is recorded as a Setting Change, as the console records its own.
  */
 public with sharing class AccountingPeriodController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Accounting periods page';
     private static final String REOPEN_CONTEXT = 'Posting lock override';
     private static final String SETTING_NAME = 'Giving_Settings__c.Books_Closed_Through__c';

@@ -58,7 +58,7 @@ private class AccountingExportServiceTest {
             allocation(cancelled.Id, general.Id, 65),
             allocation(september.Id, general.Id, 25)
         };
-        Nonprofit_Settings__c running = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c running = TestDataFactory.defaultSettings();
         running.Automation_Paused_Until__c = null;
         TestDataFactory.saveSettings(running);
     }

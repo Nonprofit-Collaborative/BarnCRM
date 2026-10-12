@@ -3,7 +3,7 @@
 
 A checkbox field can declare `<defaultValue>true</defaultValue>`. That default is what the
 platform applies when a record is created through the user interface. It is not what Apex
-reads: `Nonprofit_Settings__c.getOrgDefaults()` on an org that has never saved its settings
+reads: `BarnCRM_Settings__c.getOrgDefaults()` on an org that has never saved its settings
 returns a materialized record with every checkbox false, not null and not the declared
 default. So a feature guarded by such a setting does nothing at all on every fresh install,
 raises nothing, and logs nothing.
@@ -15,7 +15,7 @@ was expected, because the other side of a relationship was never written. No off
 could see it: the field metadata was right, the Apex compiled, and the assumption that joined
 them was invisible.
 
-The gate, for Core: a checkbox on `Nonprofit_Settings__c` that declares a default of true has
+The gate, for Core: a checkbox on `BarnCRM_Settings__c` that declares a default of true has
 to be registered in `SHIPPED_DEFAULTS` in SettingsService, which puts the value on the record
 for an org that has never saved one, or be listed in KNOWN_UNREGISTERED below with a reason.
 The listed ones are also checked, so an entry cannot outlive the field it excuses.
@@ -37,7 +37,7 @@ import xml.etree.ElementTree as ET
 
 NS = "http://soap.sforce.com/2006/04/metadata"
 SETTINGS_SERVICE = "packages/core/main/default/classes/SettingsService.cls"
-CORE_SETTINGS = "Nonprofit_Settings__c"
+CORE_SETTINGS = "BarnCRM_Settings__c"
 
 # Checkboxes that ship on and are deliberately not registered, with the reason. An entry here
 # says the shipped default is not applied for that field today: it is a known gap, recorded

@@ -11,7 +11,7 @@
  * page.
  */
 public with sharing class HubController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'BarnCRM home';
 
     public class HomeModel {

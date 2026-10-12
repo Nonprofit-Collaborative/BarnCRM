@@ -24,12 +24,12 @@ private class ErrorDigestServiceTest {
         );
     }
 
-    private static Nonprofit_Settings__c settings() {
-        return Nonprofit_Settings__c.getOrgDefaults();
+    private static BarnCRM_Settings__c settings() {
+        return BarnCRM_Settings__c.getOrgDefaults();
     }
 
     private static void setDigest(String recipients, String frequency, Datetime coveredUntil) {
-        Nonprofit_Settings__c record = settings();
+        BarnCRM_Settings__c record = settings();
         record.Error_Digest_Recipients__c = recipients;
         record.Error_Digest_Frequency__c = frequency;
         record.Error_Digest_Covered_Until__c = coveredUntil;
@@ -80,7 +80,7 @@ private class ErrorDigestServiceTest {
         Assert.isFalse(body.contains('DmlException'), 'Nor the technical detail.');
         Assert.isFalse(body.contains('001000000000001AAA'), 'Nor the record it names.');
 
-        Nonprofit_Settings__c after = settings();
+        BarnCRM_Settings__c after = settings();
         Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'The window moved on.');
         Assert.isNotNull(after.Error_Digest_Last_Run__c, 'The run is recorded.');
         Assert.areEqual(
@@ -105,7 +105,7 @@ private class ErrorDigestServiceTest {
 
         Assert.isFalse(outcome.sent, 'Nothing new, nothing sent.');
         Assert.isTrue(ErrorDigestService.capturedMessages.isEmpty(), 'Not a single message.');
-        Nonprofit_Settings__c after = settings();
+        BarnCRM_Settings__c after = settings();
         Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'An empty window is still covered.');
         Assert.isTrue(
             after.Error_Digest_Last_Run_Summary__c.startsWith(
@@ -203,7 +203,7 @@ private class ErrorDigestServiceTest {
         }
 
         // Whether this org may send email is its own setting; both outcomes are correct ones.
-        Nonprofit_Settings__c after = settings();
+        BarnCRM_Settings__c after = settings();
         if (outcome.sent) {
             Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'Sent, so the window moved on.');
         } else {
@@ -286,14 +286,14 @@ private class ErrorDigestServiceTest {
         ErrorDigestWriter.recordRun(System.now(), 'Nothing new.', System.now());
         Test.stopTest();
 
-        Nonprofit_Settings__c saved = [
+        BarnCRM_Settings__c saved = [
             SELECT
                 Error_Digest_Last_Run__c,
                 Relationship_Auto_Reciprocal__c,
                 Auto_Create_Households__c,
                 Coexistence_Mode__c,
                 Household_Membership_Mode__c
-            FROM Nonprofit_Settings__c
+            FROM BarnCRM_Settings__c
             WHERE SetupOwnerId = :UserInfo.getOrganizationId()
         ];
         Assert.isNotNull(saved.Error_Digest_Last_Run__c, 'The run is recorded.');

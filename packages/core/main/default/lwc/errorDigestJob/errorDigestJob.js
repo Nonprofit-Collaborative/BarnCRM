@@ -2,7 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
-import canManageSettings from '@salesforce/customPermission/Manage_Nonprofit_Settings';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getDigest from '@salesforce/apex/ErrorDigestController.getDigest';
 import setSchedule from '@salesforce/apex/ErrorDigestController.setSchedule';
 import sendNow from '@salesforce/apex/ErrorDigestController.sendNow';

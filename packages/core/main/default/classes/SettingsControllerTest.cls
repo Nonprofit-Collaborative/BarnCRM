@@ -6,7 +6,7 @@
 private class SettingsControllerTest {
     private static final String TEXT_KEY = 'Household_Name_Pattern__c';
     private static final String CHECKBOX_KEY = 'Auto_Create_Households__c';
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
 
     @TestSetup
     static void makeData() {

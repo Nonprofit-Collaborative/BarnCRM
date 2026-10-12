@@ -6,7 +6,7 @@
  * so the component always has a message it can put in front of a person.
  */
 public with sharing class AccessController {
-    private static final String MANAGE_SETTINGS_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String MANAGE_SETTINGS_PERMISSION = 'Manage_BarnCRM_Settings';
 
     /** Error codes the component can branch on without reading the message text. */
     public static final String ERROR_NO_PERMISSION = 'NO_PERMISSION';

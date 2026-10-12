@@ -1,7 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 // Bare, and correctly so: a custom permission in the same package resolves without a prefix.
-import canManageSettings from '@salesforce/customPermission/Manage_Nonprofit_Settings';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import DISMISSAL_OBJECT from '@salesforce/schema/Duplicate_Dismissal__c';
 import getView from '@salesforce/apex/DuplicateController.getView';
 import startScan from '@salesforce/apex/DuplicateController.startScan';

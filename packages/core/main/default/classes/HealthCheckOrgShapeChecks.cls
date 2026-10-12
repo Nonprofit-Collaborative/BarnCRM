@@ -298,7 +298,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         ) {
             return null;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         if (settings != null && settings.Auto_Create_Households__c == true) {
             return null;
         }

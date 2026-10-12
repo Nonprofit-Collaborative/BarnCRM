@@ -6,7 +6,7 @@
  * the only merge it performs is the household merge C-09 ships, one pair at a time with a
  * person confirming it (R-DP4).
  *
- * Every action on the panel needs `Manage_Nonprofit_Settings`: scanning and dismissing are
+ * Every action on the panel needs `Manage_BarnCRM_Settings`: scanning and dismissing are
  * configuration, and a merge from here also closes the suggestion. Merging households from
  * the household record page stays open to anyone who can edit both, as C-09 decided.
  *
@@ -16,7 +16,7 @@
  * there is nothing else, rather than failing (ADR-0013, ADR-0050).
  */
 public with sharing class DuplicateController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String SCAN_CLASS = 'DuplicateScanBatch';
     private static final Integer MAX_SUGGESTIONS = 50;
     /**

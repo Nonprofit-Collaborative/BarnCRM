@@ -1,5 +1,5 @@
 /**
- * The system mode writes behind the Automation page: the org default `Nonprofit_Settings__c`
+ * The system mode writes behind the Automation page: the org default `BarnCRM_Settings__c`
  * record for the automation pause, and the Automation Setting rows materialized from the
  * shipped registry.
  *
@@ -20,7 +20,7 @@
  *    `AutomationControl`; nothing an administrator types reaches this class.
  *
  * The permission is enforced before this class is reached: `AutomationControl` writes the pause
- * only after `FeatureManagement.checkPermission('Manage_Nonprofit_Settings')` passes, and the
+ * only after `FeatureManagement.checkPermission('Manage_BarnCRM_Settings')` passes, and the
  * Health Check fix checks the same permission in `HealthCheckController` before it asks for the
  * switch rows. The post-install scripts run as the platform's install user, which the platform
  * itself authorizes.
@@ -31,7 +31,7 @@ public without sharing class AutomationSettingsWriter {
         // that first save must keep the shipped defaults (OrgSettingsSystemWriter).
         OrgSettingsSystemWriter.save(
             new Map<Schema.SObjectField, Object>{
-                Nonprofit_Settings__c.Automation_Paused_Until__c => pausedUntil
+                BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil
             }
         );
     }

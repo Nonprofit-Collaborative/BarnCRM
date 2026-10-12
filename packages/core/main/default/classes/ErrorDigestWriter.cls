@@ -5,7 +5,7 @@
  * under ADR-0021: a scheduled job's record of its own run. The digest runs as whoever scheduled
  * it, and a protected custom setting takes no field permissions, so no user-mode write can be
  * relied on. The permission gate is where the job starts: `ErrorDigestController` requires
- * `Manage_Nonprofit_Settings` before scheduling the job or sending a digest now.
+ * `Manage_BarnCRM_Settings` before scheduling the job or sending a digest now.
  *
  * The conditions of ADR-0021 that still apply are met: only three package owned keys are
  * written, every value is produced by `ErrorDigestService` about its own run (two times and one
@@ -19,11 +19,11 @@ public without sharing class ErrorDigestWriter {
         // settings, and that save must keep the shipped defaults (OrgSettingsSystemWriter).
         OrgSettingsSystemWriter.save(
             new Map<Schema.SObjectField, Object>{
-                Nonprofit_Settings__c.Error_Digest_Last_Run__c => ranAt,
-                Nonprofit_Settings__c.Error_Digest_Last_Run_Summary__c => summary == null
+                BarnCRM_Settings__c.Error_Digest_Last_Run__c => ranAt,
+                BarnCRM_Settings__c.Error_Digest_Last_Run_Summary__c => summary == null
                     ? null
                     : summary.left(255),
-                Nonprofit_Settings__c.Error_Digest_Covered_Until__c => coveredUntil
+                BarnCRM_Settings__c.Error_Digest_Covered_Until__c => coveredUntil
             }
         );
     }
