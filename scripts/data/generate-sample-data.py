@@ -162,7 +162,7 @@ SPOUSE_AGE_SPREAD = 12
 # uses this pool instead, keeping that name unique in the sample set.
 SURNAME_POOL = [s for s in SURNAMES if s != "Garcia"]
 
-# Core's sample data is neutral (NEXT-core-names-other-products-only-when-detected.md):
+# Core's sample data is neutral (ADR-0062):
 # mostly businesses, schools and clubs, with one foundation and one church among them, as
 # any organization's contact list has. Keep exactly eleven templates: the generator's draws
 # depend on the list's length, and changing it would reshuffle every later record.

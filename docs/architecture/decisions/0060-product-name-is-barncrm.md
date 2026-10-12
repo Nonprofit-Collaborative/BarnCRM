@@ -1,4 +1,4 @@
-# ADR-NEXT: The product name is BarnCRM
+# ADR-0060: The product name is BarnCRM
 
 **Status:** Accepted
 **Date:** 2026-10-12

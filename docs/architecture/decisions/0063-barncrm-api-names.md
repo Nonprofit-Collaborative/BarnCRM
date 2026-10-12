@@ -1,10 +1,9 @@
-# ADR-NEXT: The `Nonprofit_*` API names become BarnCRM names before the first package version
+# ADR-0063: The `Nonprofit_*` API names become BarnCRM names before the first package version
 
 **Status:** Accepted
 **Date:** 2026-10-12
 **Source:** product owner decision (Brandon, 2026-10-12); supersedes ADR-0059 decision 6; builds
-on ADR-0046, `NEXT-product-name-is-barncrm.md` and
-`NEXT-core-names-other-products-only-when-detected.md`
+on ADR-0046, ADR-0060 and ADR-0062
 
 ## Context
 
@@ -42,7 +41,7 @@ Resulting Record and Second Resulting Record (ADR-0059 decision 7), and a module
 
 `NonprofitCloud` names a Salesforce product, which the neutral-Core rule allows only where that
 product is detected; a stored value is never shown, and its label is shown only where the org
-has the Nonprofit Cloud objects (`NEXT-core-names-other-products-only-when-detected.md`).
+has the Nonprofit Cloud objects (ADR-0062).
 
 Historical documents keep the names they were written with: the ADRs before this one, the
 release notes, and history rows in the canonical model.

@@ -122,7 +122,7 @@ public with sharing class OrgShapeDetector {
      * The coexistence mode this org shape calls for (plan Section 4.5). Nonprofit Cloud
      * wins over NPSP: an org with both is a Nonprofit Cloud org that also has the older
      * package in it. A mode named after a product is recommended only where that product is
-     * detected (NEXT-core-names-other-products-only-when-detected.md), so an org with Person
+     * detected (ADR-0062), so an org with Person
      * Accounts and neither product is Standalone; its people still get junction membership
      * (CoexistenceService.withMembership).
      */

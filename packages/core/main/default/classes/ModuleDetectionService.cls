@@ -25,7 +25,7 @@ public with sharing class ModuleDetectionService {
      * The modules every organization is offered (ADR-0046: the Community Suite is Core with
      * the modules that fit). The others are offered only once Giving is installed, since
      * until the suite choice exists (C-30) Giving being here is what says the org is a
-     * nonprofit (NEXT-core-names-other-products-only-when-detected.md).
+     * nonprofit (ADR-0062).
      */
     private static final Set<String> OFFERED_TO_EVERY_ORG = new Set<String>{
         MODULE_CORE,

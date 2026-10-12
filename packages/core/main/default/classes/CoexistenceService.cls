@@ -93,7 +93,7 @@ public with sharing class CoexistenceService {
 
     /**
      * The modes this org is offered, in the order a person reads them
-     * (NEXT-core-names-other-products-only-when-detected.md). Standalone always; a mode named
+     * (ADR-0062). Standalone always; a mode named
      * after another Salesforce product only when detection finds that product, because Core
      * names no other product in an org that does not have it. The mode already saved is
      * always included, so a choice made earlier is never hidden from the person who made it.

@@ -1,4 +1,4 @@
-# ADR-NEXT: A module's first settings save takes its checkbox defaults from field metadata
+# ADR-0061: A module's first settings save takes its checkbox defaults from field metadata
 
 **Status:** Accepted
 **Date:** 2026-10-12

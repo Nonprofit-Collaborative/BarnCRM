@@ -1,4 +1,4 @@
-# ADR-NEXT: Core shows nonprofit wording and other products' names only where they apply
+# ADR-0062: Core shows nonprofit wording and other products' names only where they apply
 
 **Status:** Accepted
 **Date:** 2026-10-12

@@ -69,8 +69,8 @@ these pages, so that everyone is talking about the same person.
   neutral, because Core alone serves organizations that are not nonprofits: no gifts,
   donors, receipts or fundraising unless the passage is marked as applying with Giving, and
   no Salesforce product name (NPSP, Nonprofit Cloud) unless the passage is marked as
-  applying when that product is in the org (ADR-NEXT,
-  `NEXT-core-names-other-products-only-when-detected.md`). Giving pages use giving
+  applying when that product is in the org (ADR-0062,
+  `0062-core-names-other-products-only-when-detected.md`). Giving pages use giving
   language: "Gift" not "Donation Transaction", "Fund" not "General Accounting Unit",
   "Appeal" not "Campaign" (plan Sections 7.1 and 13).
 - **No API names in prose.** Maria never needs to know one (plan Section 2.3). Say "the

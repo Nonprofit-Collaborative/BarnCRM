@@ -115,7 +115,7 @@ const TARGETS = [
  * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
  * the targets an installed module supplies: with none installed, Core offers no gift column
  * at all, and a suggested one becomes "Do not load" (the staged row still keeps the whole
- * original line). NEXT-core-names-other-products-only-when-detected.md.
+ * original line). ADR-0062.
  */
 const DEFERRED_ENTITY_PREFIXES = ['Gift.', 'Allocation.', 'SoftCredit.', 'Tribute.'];
 
