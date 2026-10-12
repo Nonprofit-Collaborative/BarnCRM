@@ -161,6 +161,30 @@
         <value>More records match now than the {0} you confirmed. Nothing was changed. Preview again and confirm the new number.</value>
     </labels>
     <labels>
+        <fullName>Core_BulkUpdate_ErrorNotBulkUpdate</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the job named is not a bulk update.</shortDescription>
+        <value>This bulk update could not be found. Refresh the page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorNoPermission</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the person lacks the bulk update permissions.</shortDescription>
+        <value>Bulk update needs the Bulk Update Records and Find and Export Records permissions. Ask your administrator.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_UnexpectedError</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown when something unexpected went wrong; the details are in the Error Log.</shortDescription>
+        <value>Something went wrong. The details are in the Error Log; try again, or ask your administrator.</value>
+    </labels>
+    <labels>
         <fullName>Core_BulkUpdate_LogStarted</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
