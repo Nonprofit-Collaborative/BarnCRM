@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Several_Matches__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9).</description>
+  <inlineHelpText>More than one record matched this row.</inlineHelpText>
+  <label>Several Matches</label>
+  <type>Checkbox</type>
+</CustomField>
