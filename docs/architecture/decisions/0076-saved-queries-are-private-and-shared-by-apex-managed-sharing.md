@@ -20,7 +20,7 @@ a Setup-managed piece of configuration the admin can break without knowing.
 - `Saved_Query__c` ships with the Private sharing model. The owner reads and edits their own
   queries through ordinary user-mode access.
 - Sharing is an Apex managed share: one `Saved_Query__Share` row with the reason
-  `Shared_With_Find_Users`, granting Read to the org's All Internal Users group. `Shared__c`
+  `Shared_With_Find_Users__c`, granting Read to the org's All Internal Users group. `Shared__c`
   is the flag the person sees; the share row follows it.
 - Only the owner may set or clear `Shared__c`. `FindController` checks ownership and the
   `Find_And_Export_Records` permission first, then calls `SavedQuerySharingWriter`, which

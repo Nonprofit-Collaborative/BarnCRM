@@ -212,7 +212,7 @@ private class FindControllerTest {
             SavedQuerySharingWriter.setShared(sharedById);
             Test.stopTest();
 
-            String reason = Schema.Saved_Query__Share.RowCause.Shared_With_Find_Users;
+            String reason = Schema.Saved_Query__Share.RowCause.Shared_With_Find_Users__c;
             System.Assert.areEqual(
                 200,
                 [SELECT COUNT() FROM Saved_Query__Share WHERE RowCause = :reason],

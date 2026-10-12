@@ -6034,7 +6034,7 @@ third-party code (the same reasoning as ADR-0049).
 | Query | `Query_JSON__c` | Long Text Area (131072) |
 | Shared | `Shared__c` | Checkbox, default false |
 
-- **Apex sharing reason:** `Shared_With_Find_Users`.
+- **Apex sharing reason:** `Shared_With_Find_Users__c` (Apex sharing reason API names end in `__c`).
 - **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
 - **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
   `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10).
