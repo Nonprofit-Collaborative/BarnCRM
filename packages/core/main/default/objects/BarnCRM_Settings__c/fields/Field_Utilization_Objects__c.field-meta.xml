@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Field_Utilization_Objects__c</fullName>
+  <description>
+    The API names of the objects the field utilization count covers, separated by commas. Chosen
+    on the Field Utilization page of the settings console and checked against describe there and
+    again at each run. Empty counts nothing (canonical model Section 12, Section 29F).
+  </description>
+  <externalId>false</externalId>
+  <label>Field Utilization Objects</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

@@ -88,6 +88,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FieldUtilizationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FindController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -780,6 +784,51 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Field_Label__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Field_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Field_Utilization_Snapshot__c.Fill_Rate__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Filled_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Record_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Record_Type__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Sampled__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Taken_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Household_Member__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1428,6 +1477,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Error_Log__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Field_Utilization_Snapshot__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

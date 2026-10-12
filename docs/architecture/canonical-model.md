@@ -899,24 +899,17 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
 
-### v0.7 keys
+### Field utilization keys
 
-Added by Find (C-34, Section 29D) and bulk update (C-35, Section 29E). Shown in the console's
-Import section.
-
-| Key | Type | Default | Definition |
-|---|---|---|---|
-| `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
-| `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
-
-### v0.8 keys
-
-Added by the suite choice (C-30) and the Module Manager (C-24).
+Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-NEXT
+`NEXT-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
+scheduling its job from the console (ADR-0038), so it has no on and off key.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). |
-| `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
+| `Field_Utilization_Objects__c` | text (255) | empty | The API names of the objects the field utilization count covers, separated by commas, each checked against describe when saved and again when counted. Empty counts nothing. Written from the Field Utilization page only, with Manage BarnCRM Settings, and audited. |
+| `Field_Utilization_Last_Run__c` | datetime | empty | When the last field utilization count finished. Written by the job. |
+| `Field_Utilization_Last_Run_Summary__c` | text (255) | empty | What the last count did, in one sentence: fields and objects counted, fields that could not be counted, objects skipped as too large. Written by the job. |
 
 ### Rules
 
@@ -5496,15 +5489,6 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
 
 ---
 
-# Part F: Connect additions for v0.6
-
-The Connect package is the only place a standard Salesforce object such as Campaign or
-Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
-Connect installs on an org where the object is absent and its feature says it is unavailable.
-The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
-sync (X-02) adds one attribute to Appeal and Connect's own settings object. The Opportunity
-mirror (X-01) adds one attribute to Gift and two keys to that settings object.
-
 ## 29B. Campaign Sync
 
 ### Definition
@@ -6067,6 +6051,90 @@ permission and, because every bulk update starts from a Find query, `Find_And_Ex
 
 ---
 
+## 29F. Field Utilization Snapshot
+
+### Definition
+
+One count of how many records hold a value in one field, for one object and one record type,
+taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-NEXT
+`NEXT-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
+a run is the set of rows sharing it, and a trend is the same object, field and record type
+across runs. Neutral: it names no nonprofit concept and is in Core.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The snapshot's identifier, assigned automatically. |
+| Object Name | text | yes | The API name of the object counted, as describe gives it. |
+| Field Name | text | yes | The API name of the field counted, as describe gives it. |
+| Field Label | text | yes | The field's label when it was counted, for reports. |
+| Record Type | text | no | The developer name of the record type the count is for. Empty when the object has no record types, or for its records with none. |
+| Filled Count | number | yes | Records in this group with a value in the field. |
+| Record Count | number | yes | Records in this group that were looked at. |
+| Fill Rate | percent | computed | Filled Count divided by Record Count. |
+| Sampled | boolean | yes | True when the count covers a sample of recent records rather than all of them. |
+| Taken At | datetime | yes | When the run started. |
+
+### Rules
+
+**R-FU1 Describe only.** Objects come from the saved list `Field_Utilization_Objects__c`,
+each kept only when the global describe has it and it is queryable and accessible; fields come
+from that object's describe. No typed text reaches a query.
+**R-FU2 What is counted.** A field is counted when the runner can read it and either create or
+edit it, and it is not a formula, roll-up, auto number, checkbox, compound (address or
+location) or non-nillable field.
+**R-FU3 User mode.** Every count, read and write is in user mode, so a run counts the records
+its runner can see. Written into the page and the admin guide.
+**R-FU4 Count, else sample.** A filterable field is counted with one `COUNT(field)` query
+grouped by record type, one query row per group. A field that is not filterable, or whose
+count is refused, is counted on the 200 most recently modified records and its rows are
+Sampled.
+**R-FU5 Size limit.** An object holding more than 1,000,000 records is skipped and named in the
+run summary.
+**R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
+**R-FU7 Retention.** Rows are never edited. Each run's finish deletes rows whose Taken At is more
+than 13 months old.
+**R-FU8 Visible last run.** Each run records when it finished and a one sentence summary on
+`BarnCRM_Settings__c`, including a run that counted nothing.
+
+### Salesforce implementation
+
+- **Object** `Field_Utilization_Snapshot__c`, auto number Name `FUS-{000000}`, public read only
+  sharing, reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it:
+  Read, Create, Delete, View All and Modify All (the last so a user-mode retention delete
+  reaches another administrator's rows).
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Object Name | `Object_Name__c` | Text(80) | |
+| Field Name | `Field_Name__c` | Text(80) | |
+| Field Label | `Field_Label__c` | Text(255) | |
+| Record Type | `Record_Type__c` | Text(80) | Developer name. |
+| Filled Count | `Filled_Count__c` | Number(18, 0) | |
+| Record Count | `Record_Count__c` | Number(18, 0) | |
+| Fill Rate | `Fill_Rate__c` | Formula (Percent) | Blank when Record Count is 0. |
+| Sampled | `Sampled__c` | Checkbox | Default false. |
+| Taken At | `Taken_At__c` | DateTime | |
+
+- **Service:** `FieldUtilizationService` (plan and count), `FieldUtilizationBatch` (25 fields
+  per chunk), `FieldUtilizationScheduler` (weekly, Sundays 04:00), `FieldUtilizationSelector`,
+  `FieldUtilizationController`. The page is the `fieldUtilization` panel on the Field
+  Utilization page of BarnCRM Settings.
+
+---
+
+# Part F: Connect additions for v0.6
+
+The Connect package is the only place a standard Salesforce object such as Campaign or
+Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
+Connect installs on an org where the object is absent and its feature says it is unavailable.
+The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
+sync (X-02) adds one attribute to Appeal and Connect's own settings object. The Opportunity
+mirror (X-01) adds one attribute to Gift and two keys to that settings object.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -6233,6 +6301,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Rollup operations slice (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, decision 10). `Rollup_Definition__c.Aggregate__c` gains COUNT_DISTINCT, ANY, NONE, TEXT_LIST and TEXT_LIST_DISTINCT, and the definition gains `Delimiter__c` (Comma, Semicolon, New line). New rule R-R15 says which target types each aggregate fills (checkbox targets for ANY and NONE, text targets for FIRST, LAST and the text lists), how blanks, ties, order, the delimiter and the field length are handled, and that every aggregate stays exact under recompute. R-R10 records what the save checks today. The shipped-default type `Rollup_Definition_Default__mdt` keeps its seven aggregates and has no delimiter: no shipped rollup uses the new ones. |
 | v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-NEXT, `NEXT-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
 | v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`NEXT-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
+| post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-NEXT `NEXT-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
 
 ---
 ## 32. Entity ownership by package
@@ -6274,7 +6343,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
-| Saved Query | Core | v0.7 | 29D |
+| Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29F, 12 |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |

@@ -67,6 +67,8 @@ function importCoreComponent(name) {
       return import('c/moduleManager');
     case 'customMetadataManager':
       return import('c/customMetadataManager');
+    case 'fieldUtilization':
+      return import('c/fieldUtilization');
     default:
       return null;
   }
