@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Matching_Rule__c</fullName>
-  <description>How an incoming row is matched to an existing person or organization before a new one is created.</description>
-  <inlineHelpText>How a row is matched to someone you already have.</inlineHelpText>
-  <label>Matching Rule</label>
+  <description>How an incoming row's people are matched to people the org already has before new ones are created. Organizations have their own rule.</description>
+  <inlineHelpText>How a row is matched to a person you already have.</inlineHelpText>
+  <label>Person Matching Rule</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>Picklist</type>
