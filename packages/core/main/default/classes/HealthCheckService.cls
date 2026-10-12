@@ -445,7 +445,7 @@ public with sharing class HealthCheckService {
         if (canManageSettings()) {
             steps.add(
                 new CheckStep(
-                    'nonprofit_admin',
+                    'admin_role',
                     new HealthCheckAccessChecks.NoAdminCheck(accessCounts())
                 )
             );
@@ -586,8 +586,8 @@ public with sharing class HealthCheckService {
      * A mode's name as an administrator sees it.
      */
     public static String modeLabel(String mode) {
-        if (CoexistenceService.MODE_AGENTFORCE_NONPROFIT.equals(mode)) {
-            return System.Label.Core_CoexistenceMode_AgentforceNonprofit;
+        if (CoexistenceService.MODE_NONPROFIT_CLOUD.equals(mode)) {
+            return System.Label.Core_CoexistenceMode_NonprofitCloud;
         }
         if (CoexistenceService.MODE_NPSP.equals(mode)) {
             return System.Label.Core_CoexistenceMode_Npsp;

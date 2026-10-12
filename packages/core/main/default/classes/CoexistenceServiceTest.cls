@@ -98,9 +98,9 @@ private class CoexistenceServiceTest {
             'NPSP coexistence can be chosen by hand.'
         );
 
-        CoexistenceService.setMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+        CoexistenceService.setMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_NONPROFIT_CLOUD,
             CoexistenceService.getCurrentMode(),
             'Nonprofit Cloud coexistence can be chosen by hand.'
         );
@@ -156,9 +156,9 @@ private class CoexistenceServiceTest {
                 'NPSP coexistence can be applied by an administrator.'
             );
 
-            CoexistenceService.applyMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+            CoexistenceService.applyMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
             System.assertEquals(
-                CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+                CoexistenceService.MODE_NONPROFIT_CLOUD,
                 CoexistenceService.getCurrentMode(),
                 'Nonprofit Cloud coexistence can be applied by an administrator.'
             );
@@ -166,7 +166,7 @@ private class CoexistenceServiceTest {
     }
 
     @IsTest
-    static void applyModeBringsJunctionMembershipWithAgentforceNonprofit() {
+    static void applyModeBringsJunctionMembershipWithNonprofitCloud() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
         System.runAs(maria) {
@@ -176,7 +176,7 @@ private class CoexistenceServiceTest {
                 'Membership starts in contact mode.'
             );
 
-            CoexistenceService.applyMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+            CoexistenceService.applyMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
 
             System.assertEquals(
                 CoexistenceService.MEMBERSHIP_JUNCTION,
@@ -236,7 +236,7 @@ private class CoexistenceServiceTest {
     }
 
     @IsTest
-    static void anExplicitContactChoiceSurvivesAgentforceNonprofitDetection() {
+    static void anExplicitContactChoiceSurvivesNonprofitCloudDetection() {
         // Maria's org has Person Accounts switched on but stores everyone as a contact, and
         // she chose the simple way of belonging on purpose. Neither detection nor choosing
         // the Nonprofit Cloud mode by hand is allowed to override that choice.
@@ -257,11 +257,11 @@ private class CoexistenceServiceTest {
             'Detection proposes the flexible way only where nobody has chosen.'
         );
 
-        CoexistenceService.setMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+        CoexistenceService.setMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
         Test.stopTest();
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_NONPROFIT_CLOUD,
             CoexistenceService.getCurrentMode(),
             'The coexistence mode itself is still set.'
         );

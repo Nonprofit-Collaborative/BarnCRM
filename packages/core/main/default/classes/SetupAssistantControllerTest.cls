@@ -98,14 +98,14 @@ private class SetupAssistantControllerTest {
         Test.stopTest();
 
         Assert.areEqual(
-            SetupAssistantService.MODE_AGENTFORCE,
+            SetupAssistantService.MODE_NONPROFIT_CLOUD,
             state.coexistence.recommendedMode,
             'Nonprofit Cloud objects mean Nonprofit Cloud coexistence (plan Section 4.5)'
         );
         Assert.areEqual(
             new List<String>{
                 SetupAssistantService.MODE_STANDALONE,
-                SetupAssistantService.MODE_AGENTFORCE
+                SetupAssistantService.MODE_NONPROFIT_CLOUD
             },
             state.coexistence.modes,
             'Standalone and the detected product, and not NPSP, which is not here'
@@ -168,7 +168,7 @@ private class SetupAssistantControllerTest {
 
         Test.startTest();
         try {
-            SetupAssistantController.applyCoexistence(SetupAssistantService.MODE_AGENTFORCE);
+            SetupAssistantController.applyCoexistence(SetupAssistantService.MODE_NONPROFIT_CLOUD);
         } catch (AuraHandledException e) {
             refused = true;
         }

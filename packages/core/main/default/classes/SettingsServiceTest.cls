@@ -190,7 +190,7 @@ private class SettingsServiceTest {
                 Section__c = SettingSections.GENERAL,
                 Module__c = 'Core',
                 Data_Type__c = 'Picklist',
-                Picklist_Values__c = 'Standalone:On its own;AgentforceNonprofit:Alongside Nonprofit Cloud',
+                Picklist_Values__c = 'Standalone:On its own;NonprofitCloud:Alongside Nonprofit Cloud',
                 Sort_Order__c = 1
             )
         };

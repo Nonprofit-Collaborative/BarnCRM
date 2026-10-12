@@ -52,7 +52,7 @@ private class SettingsControllerTest {
                 Section__c = SettingSections.GENERAL,
                 Module__c = 'Core',
                 Data_Type__c = 'Picklist',
-                Picklist_Values__c = 'Standalone:On its own;AgentforceNonprofit:Alongside Nonprofit Cloud',
+                Picklist_Values__c = 'Standalone:On its own;NonprofitCloud:Alongside Nonprofit Cloud',
                 Sort_Order__c = 1
             ),
             new Setting_Definition__mdt(
@@ -152,7 +152,7 @@ private class SettingsControllerTest {
         List<SettingsController.Option> fresh = coexistenceOptions();
         SettingsService.saveValues(
             new Map<String, Object>{
-                'Coexistence_Mode__c' => CoexistenceService.MODE_AGENTFORCE_NONPROFIT
+                'Coexistence_Mode__c' => CoexistenceService.MODE_NONPROFIT_CLOUD
             }
         );
         List<SettingsController.Option> saved = coexistenceOptions();

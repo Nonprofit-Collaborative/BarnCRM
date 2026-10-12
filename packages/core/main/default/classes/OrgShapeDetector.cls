@@ -133,7 +133,7 @@ public with sharing class OrgShapeDetector {
     /** The same rule for a given shape, so the Setup Assistant can ask it of its own. */
     public static String recommendedCoexistenceMode(OrgShape shape) {
         if (shape != null && shape.hasIndustriesNonprofit == true) {
-            return CoexistenceService.MODE_AGENTFORCE_NONPROFIT;
+            return CoexistenceService.MODE_NONPROFIT_CLOUD;
         }
         if (shape != null && shape.hasNpsp == true) {
             return CoexistenceService.MODE_NPSP;

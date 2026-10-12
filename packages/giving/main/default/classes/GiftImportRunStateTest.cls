@@ -149,7 +149,7 @@ private class GiftImportRunStateTest {
             mapping.serialize(),
             ImportTemplateService.RULE_EMAIL
         );
-        template.Donation_Matching__c = DonationMatcher.NEVER_MATCH;
+        template.Payment_Matching__c = DonationMatcher.NEVER_MATCH;
         update template;
         Import_Batch__c batch = ImportTestDataFactory.batch(template);
         List<Map<String, String>> rows = new List<Map<String, String>>();

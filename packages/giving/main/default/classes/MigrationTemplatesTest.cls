@@ -58,7 +58,7 @@ private class MigrationTemplatesTest {
                 Default_Values_JSON__c,
                 Matching_Rule__c,
                 Person_Mode__c,
-                Donation_Matching__c,
+                Payment_Matching__c,
                 Match_Date_Window_Days__c,
                 Match_Amount_Tolerance__c
             FROM Import_Template__c
@@ -195,7 +195,7 @@ private class MigrationTemplatesTest {
             ImportTestDataFactory.donorMapping(),
             ImportTemplateService.RULE_EMAIL
         );
-        generic.Template_Key__c = 'generic_donor_list';
+        generic.Template_Key__c = 'generic_contact_list';
         generic.Name = 'Maria renamed this';
         update generic;
 

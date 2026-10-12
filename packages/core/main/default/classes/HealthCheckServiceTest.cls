@@ -242,7 +242,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void junctionMembershipWithPersonAccountsIsNotReported() {
         OrgShapeDetector.overrideShape = shape(false, true, false, false);
-        CoexistenceService.setMode(CoexistenceService.MODE_AGENTFORCE_NONPROFIT);
+        CoexistenceService.setMode(CoexistenceService.MODE_NONPROFIT_CLOUD);
 
         System.assertEquals(
             null,
@@ -397,10 +397,7 @@ private class HealthCheckServiceTest {
             OrgShapeDetector.overrideShape = shape(false, false, false, false);
             HealthCheckService.accessCountsOverride = new FixedAccessCounts(0, 0);
 
-            HealthCheckService.Finding finding = find(
-                HealthCheckService.run(),
-                'no_nonprofit_admin'
-            );
+            HealthCheckService.Finding finding = find(HealthCheckService.run(), 'no_admin');
 
             System.assertNotEquals(
                 null,
@@ -432,7 +429,7 @@ private class HealthCheckServiceTest {
 
             System.assertEquals(
                 null,
-                find(findings, 'no_nonprofit_admin'),
+                find(findings, 'no_admin'),
                 'One administrator is enough: there is nothing to say about it.'
             );
             System.assertEquals(
@@ -473,7 +470,7 @@ private class HealthCheckServiceTest {
 
             System.assertEquals(
                 null,
-                find(HealthCheckService.run(), 'no_nonprofit_admin'),
+                find(HealthCheckService.run(), 'no_admin'),
                 'Someone given the admin permission set by hand is still an administrator.'
             );
         }
@@ -519,7 +516,7 @@ private class HealthCheckServiceTest {
 
             System.assertEquals(
                 null,
-                find(findings, 'no_nonprofit_admin'),
+                find(findings, 'no_admin'),
                 'Priya sees her own assignments and nothing else, so the count would be wrong.'
             );
             System.assertEquals(
@@ -1141,8 +1138,8 @@ private class HealthCheckServiceTest {
             'Standalone has a name a person recognizes.'
         );
         System.assertEquals(
-            System.Label.Core_CoexistenceMode_AgentforceNonprofit,
-            HealthCheckService.modeLabel(CoexistenceService.MODE_AGENTFORCE_NONPROFIT),
+            System.Label.Core_CoexistenceMode_NonprofitCloud,
+            HealthCheckService.modeLabel(CoexistenceService.MODE_NONPROFIT_CLOUD),
             'Nonprofit Cloud coexistence has a name a person recognizes.'
         );
     }

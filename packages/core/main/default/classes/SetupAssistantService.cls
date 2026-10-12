@@ -37,7 +37,7 @@ public with sharing class SetupAssistantService {
     /** The coexistence modes, as plan Section 4.5 names them. */
     public static final String MODE_STANDALONE = 'Standalone';
     public static final String MODE_NPSP = 'NPSP';
-    public static final String MODE_AGENTFORCE = 'AgentforceNonprofit';
+    public static final String MODE_NONPROFIT_CLOUD = 'NonprofitCloud';
 
     /** What detection found, in the order the assistant leads with. */
     public static final String SHAPE_PERSON_ACCOUNTS = 'PersonAccounts';

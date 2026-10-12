@@ -92,7 +92,7 @@ function agentforceReport(overrides = {}) {
         fixTarget: 'action:enableAutomaticHouseholds'
       },
       {
-        key: 'no_nonprofit_admin',
+        key: 'no_admin',
         title: 'No one is assigned the BarnCRM Admin role',
         detail: 'Nobody has the role.',
         severity: 'Error',
@@ -321,7 +321,7 @@ describe('c-health-check-panel', () => {
             category: 'Settings',
             fixLabel: 'Restore import templates',
             fixTarget: 'action:restoreImportTemplates',
-            fixScope: ['Generic donor list']
+            fixScope: ['Generic contact list']
           }
         ]
       })

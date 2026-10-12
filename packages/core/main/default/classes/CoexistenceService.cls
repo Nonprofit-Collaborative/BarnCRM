@@ -10,7 +10,7 @@
 public with sharing class CoexistenceService {
     public static final String MODE_STANDALONE = 'Standalone';
     public static final String MODE_NPSP = 'NPSP';
-    public static final String MODE_AGENTFORCE_NONPROFIT = 'AgentforceNonprofit';
+    public static final String MODE_NONPROFIT_CLOUD = 'NonprofitCloud';
 
     public static final String MEMBERSHIP_CONTACT = 'Contact';
     public static final String MEMBERSHIP_JUNCTION = 'Junction';
@@ -24,7 +24,7 @@ public with sharing class CoexistenceService {
     private static final Set<String> VALID_MODES = new Set<String>{
         MODE_STANDALONE,
         MODE_NPSP,
-        MODE_AGENTFORCE_NONPROFIT
+        MODE_NONPROFIT_CLOUD
     };
 
     /**
@@ -106,9 +106,9 @@ public with sharing class CoexistenceService {
         }
         if (
             (shape != null && shape.hasIndustriesNonprofit == true) ||
-            MODE_AGENTFORCE_NONPROFIT.equals(current)
+            MODE_NONPROFIT_CLOUD.equals(current)
         ) {
-            modes.add(MODE_AGENTFORCE_NONPROFIT);
+            modes.add(MODE_NONPROFIT_CLOUD);
         }
         return modes;
     }
@@ -133,7 +133,7 @@ public with sharing class CoexistenceService {
      */
     private static Map<String, Object> withMembership(String mode) {
         Map<String, Object> values = new Map<String, Object>{ KEY_COEXISTENCE_MODE => mode };
-        Boolean needsJunction = MODE_AGENTFORCE_NONPROFIT.equals(mode) || hasPersonAccounts();
+        Boolean needsJunction = MODE_NONPROFIT_CLOUD.equals(mode) || hasPersonAccounts();
         if (needsJunction && !membershipModeChosen()) {
             values.put(KEY_MEMBERSHIP_MODE, MEMBERSHIP_JUNCTION);
         }

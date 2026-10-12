@@ -131,9 +131,9 @@ public with sharing class ImportTemplateService {
         return template;
     }
 
-    /** The donation matching behaviours a template can hold (R-IT7, R-DM5). */
+    /** The payment matching behaviours a template can hold (R-IT7, R-DM5). */
     @NamespaceAccessible
-    public static final List<String> DONATION_MATCHING_VALUES = new List<String>{
+    public static final List<String> PAYMENT_MATCHING_VALUES = new List<String>{
         'Match or create',
         'Always create',
         'Match only',
@@ -146,7 +146,7 @@ public with sharing class ImportTemplateService {
      * behaviour Core does not know, a negative window or a negative tolerance is refused.
      */
     @NamespaceAccessible
-    public static Import_Template__c saveDonationMatching(
+    public static Import_Template__c savePaymentMatching(
         Id templateId,
         String behaviour,
         Integer windowDays,
@@ -157,22 +157,22 @@ public with sharing class ImportTemplateService {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
         String chosen = null;
-        for (String value : DONATION_MATCHING_VALUES) {
+        for (String value : PAYMENT_MATCHING_VALUES) {
             if (String.isNotBlank(behaviour) && value.equalsIgnoreCase(behaviour.trim())) {
                 chosen = value;
             }
         }
         if (String.isNotBlank(behaviour) && chosen == null) {
-            throw new ImportException(Label.Core_Import_ErrorDonationMatchingUnknown);
+            throw new ImportException(Label.Core_Import_ErrorPaymentMatchingUnknown);
         }
         if (
             (windowDays != null && (windowDays < 0 || windowDays > 999)) ||
             (tolerance != null &&
             tolerance < 0)
         ) {
-            throw new ImportException(Label.Core_Import_ErrorDonationMatchingRange);
+            throw new ImportException(Label.Core_Import_ErrorPaymentMatchingRange);
         }
-        template.Donation_Matching__c = chosen;
+        template.Payment_Matching__c = chosen;
         template.Match_Date_Window_Days__c = windowDays;
         template.Match_Amount_Tolerance__c = tolerance == null ? null : tolerance.setScale(2);
         Database.update(template, AccessLevel.USER_MODE);

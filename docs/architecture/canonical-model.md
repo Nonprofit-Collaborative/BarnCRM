@@ -801,7 +801,7 @@ may add keys, and must add them here first.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Coexistence_Mode__c` | picklist(Standalone, NPSP, AgentforceNonprofit) | Standalone | How this org coexists with what is already installed; set by the Setup Assistant after automatic detection and confirmable later (plan Section 4.5). Shown as Standalone, NPSP coexistence and Nonprofit Cloud coexistence. Standalone is always offered; NPSP coexistence only when `OrgShapeDetector` finds NPSP (`hasNpsp`); Nonprofit Cloud coexistence only when it finds Nonprofit Cloud objects (`hasIndustriesNonprofit`); the saved value is always offered. The Setup Assistant and the console offer the same list. Recommended: Nonprofit Cloud coexistence, else NPSP coexistence, else Standalone (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). |
+| `Coexistence_Mode__c` | picklist(Standalone, NPSP, NonprofitCloud) | Standalone | How this org coexists with what is already installed; set by the Setup Assistant after automatic detection and confirmable later (plan Section 4.5). Shown as Standalone, NPSP coexistence and Nonprofit Cloud coexistence. Standalone is always offered; NPSP coexistence only when `OrgShapeDetector` finds NPSP (`hasNpsp`); Nonprofit Cloud coexistence only when it finds Nonprofit Cloud objects (`hasIndustriesNonprofit`); the saved value is always offered. The Setup Assistant and the console offer the same list. Recommended: Nonprofit Cloud coexistence, else NPSP coexistence, else Standalone (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). |
 | `Household_Membership_Mode__c` | picklist(Contact, Junction) | Contact | Whether household membership uses the Contact's Account reference or the Household Member junction. |
 | `Auto_Create_Households__c` | boolean | true | Whether saving a new person who belongs to no household creates one automatically. Governs both membership modes, and both objects a person can be stored on (R-H1, R-H2). |
 | `Delete_Empty_Households__c` | boolean | true | Whether a household left with no members is deleted. |
@@ -1377,7 +1377,7 @@ from Nonprofit Cloud", section 5).
 | Source Name | `Source_Name__c` | Text |
 | Last Import Date | `Last_Import_Date__c` | Date |
 | Active | `Active__c` | Checkbox |
-| Payment Matching (labelled Donation Matching before v0.6) | `Donation_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
+| Payment Matching (labelled Donation Matching, API name `Donation_Matching__c`, before v0.6) | `Payment_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
 
@@ -4274,7 +4274,7 @@ recorded values, or values that cannot be read, falls back to the template.
   a run that matches hundreds of thousands of scheduled payments is the remaining heap limit.
 - **Settings keys** (on `Giving_Settings__c`, Section 21A):
   `Donation_Match_Date_Window_Days__c`, `Donation_Match_Amount_Tolerance__c`.
-- **Template attributes** (on `Import_Template__c`, Section 15): `Donation_Matching__c`,
+- **Template attributes** (on `Import_Template__c`, Section 15): `Payment_Matching__c`,
   `Match_Date_Window_Days__c`, `Match_Amount_Tolerance__c`.
 
 ---
@@ -5470,3 +5470,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | Neutral Core wording (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
+| v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |

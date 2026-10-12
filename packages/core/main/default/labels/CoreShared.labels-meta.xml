@@ -57,7 +57,7 @@
         <value>Something went wrong while BarnCRM was updating this record, so the record was not saved. The details are in the Error Log. Try again, and if it keeps happening, send the newest Error Log entry to whoever supports your Salesforce.</value>
     </labels>
     <labels>
-        <fullName>Core_CoexistenceMode_AgentforceNonprofit</fullName>
+        <fullName>Core_CoexistenceMode_NonprofitCloud</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>

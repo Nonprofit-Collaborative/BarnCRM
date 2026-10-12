@@ -31,10 +31,11 @@ Rename these API names in one pass, on three stacked branches, before any packag
 | `Nonprofit_Settings` | `BarnCRM_Settings` | tab and flexipage, and every `/lightning/n/` URL |
 | `AgentforceNonprofit` | `NonprofitCloud` | stored value of `Coexistence_Mode__c` |
 | `Core_CoexistenceMode_AgentforceNonprofit` | `Core_CoexistenceMode_NonprofitCloud` | custom label |
-| `generic_donor_list` | `generic_contact_list` | Import Template key |
+| `Core_SetupAssistant_ModeAgentforce` | `Core_SetupAssistant_ModeNonprofitCloud` | custom label of the same mode in the Setup Assistant |
+| `generic_donor_list` (record `Generic_Donor_List`) | `generic_contact_list` (record `Generic_Contact_List`) | Import Template key and its `Import_Template_Default` record |
 | `nonprofit_admin`, `no_nonprofit_admin` | `admin_role`, `no_admin` | Health Check check and finding keys |
 | `Import_Template__c.Donation_Matching__c` | `Import_Template__c.Payment_Matching__c` | field |
-| `Core_Import_Donation*` | `Core_Import_PaymentMatching*` | custom labels of the import wizard's payment matching |
+| `Core_Import_DonationMatching{Heading,Help,Label}`, `Core_Import_Donation{MatchOrCreate,AlwaysCreate,MatchOnly,NeverMatch}`, `Core_Import_ErrorDonationMatching{Unknown,Range}` | `Core_Import_PaymentMatching{Heading,Help,Label}`, `Core_Import_PaymentMatching{MatchOrCreate,AlwaysCreate,MatchOnly,NeverMatch}`, `Core_Import_ErrorPaymentMatching{Unknown,Range}` | custom labels of the import wizard's payment matching |
 
 `Import_Row__c.Gift_Id__c` and `Soft_Credit_Id__c` keep their API names: they are labelled
 Resulting Record and Second Resulting Record (ADR-0059 decision 7), and a module loads them.

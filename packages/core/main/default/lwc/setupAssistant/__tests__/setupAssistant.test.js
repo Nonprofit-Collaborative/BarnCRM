@@ -100,9 +100,9 @@ function state(overrides = {}) {
     elapsedMinutes: 21,
     coexistence: {
       detectedShape: 'PersonAccounts',
-      recommendedMode: 'AgentforceNonprofit',
+      recommendedMode: 'NonprofitCloud',
       currentMode: null,
-      modes: ['Standalone', 'NPSP', 'AgentforceNonprofit']
+      modes: ['Standalone', 'NPSP', 'NonprofitCloud']
     },
     modules: [{ name: 'Core', present: true, docsUrl: 'https://example.invalid/core' }],
     roles: [
@@ -183,10 +183,10 @@ describe('c-setup-assistant', () => {
 
     element.shadowRoot
       .querySelector('c-setup-step-coexistence')
-      .dispatchEvent(new CustomEvent('confirm', { detail: { mode: 'AgentforceNonprofit' } }));
+      .dispatchEvent(new CustomEvent('confirm', { detail: { mode: 'NonprofitCloud' } }));
     await settle();
 
-    expect(applyCoexistence).toHaveBeenCalledWith({ mode: 'AgentforceNonprofit' });
+    expect(applyCoexistence).toHaveBeenCalledWith({ mode: 'NonprofitCloud' });
   });
 
   it('skips a step without marking it done', async () => {

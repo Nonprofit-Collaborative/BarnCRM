@@ -201,7 +201,7 @@ private class OrgShapeDetectorTest {
         OrgShapeDetector.overrideShape = shapeWith(false, false, true);
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_NONPROFIT_CLOUD,
             OrgShapeDetector.recommendedCoexistenceMode(),
             'Nonprofit Cloud gift objects mean Nonprofit Cloud coexistence.'
         );
@@ -223,7 +223,7 @@ private class OrgShapeDetectorTest {
         OrgShapeDetector.overrideShape = shapeWith(true, true, true);
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_NONPROFIT_CLOUD,
             OrgShapeDetector.recommendedCoexistenceMode(),
             'When both products are present, Nonprofit Cloud decides.'
         );

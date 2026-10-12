@@ -991,7 +991,7 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Import_Template__c.Donation_Matching__c</field>
+    <field>Import_Template__c.Payment_Matching__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

@@ -41,7 +41,7 @@ public with sharing class ImportController {
         public String sourceName;
         /** How this template's gifts are matched to scheduled payments (R-IT7). */
         @AuraEnabled
-        public String donationMatching;
+        public String paymentMatching;
         @AuraEnabled
         public Integer matchDateWindowDays;
         @AuraEnabled
@@ -92,9 +92,9 @@ public with sharing class ImportController {
     public class BatchOptions {
         public Integer expectedCount;
         public Decimal expectedAmount;
-        /** True when the wizard showed the donation matching choices, which are then saved. */
-        public Boolean saveDonationMatching;
-        public String donationMatching;
+        /** True when the wizard showed the payment matching choices, which are then saved. */
+        public Boolean savePaymentMatching;
+        public String paymentMatching;
         public Integer matchDateWindowDays;
         public Decimal matchAmountTolerance;
     }
@@ -156,7 +156,7 @@ public with sharing class ImportController {
                     : String.valueOf(template.Last_Import_Date__c);
                 view.isRecurring = template.Is_Recurring__c;
                 view.sourceName = template.Source_Name__c;
-                view.donationMatching = template.Donation_Matching__c;
+                view.paymentMatching = template.Payment_Matching__c;
                 view.matchDateWindowDays = template.Match_Date_Window_Days__c == null
                     ? null
                     : template.Match_Date_Window_Days__c.intValue();
@@ -229,10 +229,10 @@ public with sharing class ImportController {
             enforcePermission();
             BatchOptions options = parseOptions(optionsJson);
             ImportTemplateService.saveMapping(templateId, mappingDocument, matchingRule);
-            if (options.saveDonationMatching == true) {
-                ImportTemplateService.saveDonationMatching(
+            if (options.savePaymentMatching == true) {
+                ImportTemplateService.savePaymentMatching(
                     templateId,
-                    options.donationMatching,
+                    options.paymentMatching,
                     options.matchDateWindowDays,
                     options.matchAmountTolerance
                 );

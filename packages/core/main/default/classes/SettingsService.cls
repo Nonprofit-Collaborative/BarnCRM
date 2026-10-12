@@ -682,7 +682,7 @@ public with sharing class SettingsService {
     private static final Set<String> COEXISTENCE_MODES = new Set<String>{
         'Standalone',
         'NPSP',
-        'AgentforceNonprofit'
+        'NonprofitCloud'
     };
     private static final Set<String> MEMBERSHIP_MODES = new Set<String>{ 'Contact', 'Junction' };
 

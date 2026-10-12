@@ -153,7 +153,7 @@
         <value>Load the sample data</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_ModeAgentforce</fullName>
+        <fullName>Core_SetupAssistant_ModeNonprofitCloud</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>

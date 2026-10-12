@@ -72,7 +72,7 @@ function model(canEdit) {
             checked: false,
             options: [
               { label: 'On its own', value: 'Standalone' },
-              { label: 'Alongside Nonprofit Cloud', value: 'AgentforceNonprofit' }
+              { label: 'Alongside Nonprofit Cloud', value: 'NonprofitCloud' }
             ]
           }
         ]

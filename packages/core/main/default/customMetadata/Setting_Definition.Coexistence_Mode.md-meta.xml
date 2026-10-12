@@ -20,7 +20,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value xsi:type="xsd:string">Standalone:Standalone;NPSP:NPSP coexistence;AgentforceNonprofit:Nonprofit Cloud coexistence</value>
+    <value xsi:type="xsd:string">Standalone:Standalone;NPSP:NPSP coexistence;NonprofitCloud:Nonprofit Cloud coexistence</value>
   </values>
   <values>
     <field>Component__c</field>

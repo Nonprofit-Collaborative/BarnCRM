@@ -937,7 +937,7 @@
         <value>Total of the gift amounts</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ErrorDonationMatchingUnknown</fullName>
+        <fullName>Core_Import_ErrorPaymentMatchingUnknown</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -945,7 +945,7 @@
         <value>Choose how gifts are matched: Match or create, Always create, Match only or Never match.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ErrorDonationMatchingRange</fullName>
+        <fullName>Core_Import_ErrorPaymentMatchingRange</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -953,7 +953,7 @@
         <value>The days either side and the amount difference allowed cannot be less than zero, and the days cannot be more than 999.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationMatchingHeading</fullName>
+        <fullName>Core_Import_PaymentMatchingHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -961,7 +961,7 @@
         <value>Scheduled payments</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationMatchingHelp</fullName>
+        <fullName>Core_Import_PaymentMatchingHelp</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -969,7 +969,7 @@
         <value>When a gift pays a pledge or a recurring gift the donor already has, BarnCRM can link the two. Leave the numbers empty to use BarnCRM Settings.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationMatchingLabel</fullName>
+        <fullName>Core_Import_PaymentMatchingLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -977,7 +977,7 @@
         <value>Matching gifts to scheduled payments</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationMatchOrCreate</fullName>
+        <fullName>Core_Import_PaymentMatchingMatchOrCreate</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -985,7 +985,7 @@
         <value>Match or create: pay the payment it matches, or create it on its own</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationAlwaysCreate</fullName>
+        <fullName>Core_Import_PaymentMatchingAlwaysCreate</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -993,7 +993,7 @@
         <value>Always create: never look for payments</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationMatchOnly</fullName>
+        <fullName>Core_Import_PaymentMatchingMatchOnly</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -1001,7 +1001,7 @@
         <value>Match only: reject a gift that matches no payment</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DonationNeverMatch</fullName>
+        <fullName>Core_Import_PaymentMatchingNeverMatch</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>

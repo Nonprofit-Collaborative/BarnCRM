@@ -52,13 +52,13 @@ import controlTotalsHeading from '@salesforce/label/c.Core_Import_ControlTotalsH
 import controlTotalsHelp from '@salesforce/label/c.Core_Import_ControlTotalsHelp';
 import expectedCountLabel from '@salesforce/label/c.Core_Import_ExpectedCountLabel';
 import expectedAmountLabel from '@salesforce/label/c.Core_Import_ExpectedAmountLabel';
-import donationMatchingHeading from '@salesforce/label/c.Core_Import_DonationMatchingHeading';
-import donationMatchingHelp from '@salesforce/label/c.Core_Import_DonationMatchingHelp';
-import donationMatchingLabel from '@salesforce/label/c.Core_Import_DonationMatchingLabel';
-import donationMatchOrCreate from '@salesforce/label/c.Core_Import_DonationMatchOrCreate';
-import donationAlwaysCreate from '@salesforce/label/c.Core_Import_DonationAlwaysCreate';
-import donationMatchOnly from '@salesforce/label/c.Core_Import_DonationMatchOnly';
-import donationNeverMatch from '@salesforce/label/c.Core_Import_DonationNeverMatch';
+import paymentMatchingHeading from '@salesforce/label/c.Core_Import_PaymentMatchingHeading';
+import paymentMatchingHelp from '@salesforce/label/c.Core_Import_PaymentMatchingHelp';
+import paymentMatchingLabel from '@salesforce/label/c.Core_Import_PaymentMatchingLabel';
+import paymentMatchOrCreate from '@salesforce/label/c.Core_Import_PaymentMatchingMatchOrCreate';
+import paymentAlwaysCreate from '@salesforce/label/c.Core_Import_PaymentMatchingAlwaysCreate';
+import paymentMatchOnly from '@salesforce/label/c.Core_Import_PaymentMatchingMatchOnly';
+import paymentNeverMatch from '@salesforce/label/c.Core_Import_PaymentMatchingNeverMatch';
 import matchWindowLabel from '@salesforce/label/c.Core_Import_MatchWindowLabel';
 import matchToleranceLabel from '@salesforce/label/c.Core_Import_MatchToleranceLabel';
 
@@ -160,7 +160,7 @@ export default class ImportWizard extends LightningElement {
   expectedCount = '';
   expectedAmount = '';
   /** How this mapping's gifts are matched to scheduled payments (R-IT7), as the template holds it. */
-  donationMatching = 'Match or create';
+  paymentMatching = 'Match or create';
   matchDateWindowDays = '';
   matchAmountTolerance = '';
 
@@ -194,9 +194,9 @@ export default class ImportWizard extends LightningElement {
     controlTotalsHelp,
     expectedCountLabel,
     expectedAmountLabel,
-    donationMatchingHeading,
-    donationMatchingHelp,
-    donationMatchingLabel,
+    paymentMatchingHeading,
+    paymentMatchingHelp,
+    paymentMatchingLabel,
     matchWindowLabel,
     matchToleranceLabel
   };
@@ -250,7 +250,7 @@ export default class ImportWizard extends LightningElement {
     }
     this.isRecurring = Boolean(template && template.isRecurring);
     this.sourceName = (template && template.sourceName) || '';
-    this.donationMatching = (template && template.donationMatching) || 'Match or create';
+    this.paymentMatching = (template && template.paymentMatching) || 'Match or create';
     this.matchDateWindowDays = numberText(template && template.matchDateWindowDays);
     this.matchAmountTolerance = numberText(template && template.matchAmountTolerance);
   }
@@ -423,17 +423,17 @@ export default class ImportWizard extends LightningElement {
     this.expectedAmount = event.target.value;
   }
 
-  get donationMatchingOptions() {
+  get paymentMatchingOptions() {
     return [
-      { value: 'Match or create', label: donationMatchOrCreate },
-      { value: 'Always create', label: donationAlwaysCreate },
-      { value: 'Match only', label: donationMatchOnly },
-      { value: 'Never match', label: donationNeverMatch }
+      { value: 'Match or create', label: paymentMatchOrCreate },
+      { value: 'Always create', label: paymentAlwaysCreate },
+      { value: 'Match only', label: paymentMatchOnly },
+      { value: 'Never match', label: paymentNeverMatch }
     ];
   }
 
-  handleDonationMatchingChange(event) {
-    this.donationMatching = event.detail.value;
+  handlePaymentMatchingChange(event) {
+    this.paymentMatching = event.detail.value;
   }
 
   handleMatchWindowChange(event) {
@@ -457,8 +457,8 @@ export default class ImportWizard extends LightningElement {
       const days = String(this.matchDateWindowDays || '').trim();
       const tolerance = String(this.matchAmountTolerance || '').trim();
       Object.assign(options, {
-        saveDonationMatching: true,
-        donationMatching: this.donationMatching,
+        savePaymentMatching: true,
+        paymentMatching: this.paymentMatching,
         matchDateWindowDays: days === '' ? null : Number(days),
         matchAmountTolerance: tolerance === '' ? null : Number(tolerance)
       });
