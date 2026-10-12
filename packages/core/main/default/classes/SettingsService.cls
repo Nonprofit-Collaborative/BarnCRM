@@ -344,8 +344,15 @@ public with sharing class SettingsService {
     }
 
     /**
-     * The same for any settings object: Core's gets its shipped defaults, and a module's is an
-     * empty record owned by the org.
+     * The same for any settings object. Core's gets `SHIPPED_DEFAULTS`. A module's gets the
+     * checkbox defaults its own field metadata declares, because Core cannot name a module's
+     * fields (ADR-0059) and the module's readers already treat an unsaved checkbox as its
+     * shipped value. Without this, a module's first save (a nightly job recording its run, say)
+     * stored every checkbox nobody touched as false, and switched off the features that ship
+     * on (ADR-0035, "the second half of the same trap").
+     *
+     * Only checkboxes are taken from the declared defaults. Every other field is left unset, as
+     * it was before, so this changes nothing but the one value a record cannot leave blank.
      */
     @NamespaceAccessible
     public static SObject firstSaveRecord(Schema.SObjectType type) {
@@ -354,7 +361,26 @@ public with sharing class SettingsService {
         }
         SObject record = type.newSObject();
         record.put(SETUP_OWNER, UserInfo.getOrganizationId());
+        SObject declared = type.newSObject(null, true);
+        for (Schema.SObjectField field : checkboxFields(type)) {
+            Object shipped = declared.get(field);
+            if (shipped != null) {
+                record.put(field, shipped);
+            }
+        }
         return record;
+    }
+
+    /** The custom checkbox fields of a settings object, from the cached field map. */
+    private static List<Schema.SObjectField> checkboxFields(Schema.SObjectType type) {
+        List<Schema.SObjectField> checkboxes = new List<Schema.SObjectField>();
+        for (Schema.SObjectField field : fieldsByLocalName(type).values()) {
+            Schema.DescribeFieldResult describe = field.getDescribe();
+            if (describe.isCustom() && describe.getType() == Schema.DisplayType.BOOLEAN) {
+                checkboxes.add(field);
+            }
+        }
+        return checkboxes;
     }
 
     /**

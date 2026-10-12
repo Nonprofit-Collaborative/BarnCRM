@@ -766,21 +766,9 @@ C-29 stack is still open with a `failure` status on its top head, and two Depend
 ### Work items
 
 These are also recorded, in the same detail, in plan Section 11.3 (parking lot). Remove an item
-from both when its PR merges.
+from both when its PR merges. Item numbers match the plan's and are kept when an item is
+removed, so a list may start above 1.
 
-1. **Harden the settings writers and cap uncapped counts.**
-   - `SettingsService.applyValues`, through `SettingsWriter.saveOrgDefault`, upserts the whole
-     cached, unlocked `Nonprofit_Settings__c` record. It should update only the changed fields
-     through `OrgSettingsSystemWriter` and `SettingsRecordSelector.lockStored()`.
-   - Giving makes raw first saves from `getOrgDefaults()` in `AcknowledgmentService`,
-     `DonorLevelWriter`, `AccountingPeriodWriter`, `AcknowledgmentController` and
-     `CommitmentService`. A first save from the raw record writes false into
-     `Giving_Settings__c` checkboxes that default to true:
-     - `Auto_Apply_Gifts_To_Installments__c`
-     - `Automatic_Household_Soft_Credits__c`
-     - `Receipt_Print_Logo__c`
-   - `SettingsService.getSettingsForUpdate()` takes no lock: rename it.
-   - Cap `HealthCheckSettingsChecks.countNew()`.
 2. **Log unrecognized checkbox values in imports.** `ImportRowProcessor.convertCheckbox` reads
    only `true`, `yes` and `1` as true. The new rule:
    - **True:** `true`, `yes`, `y`, `1`, `x`, `checked`, `on`, `t`.
@@ -794,8 +782,8 @@ from both when its PR merges.
      exist, so it always reports Connect as not installed. Point it at a real Connect class,
      and update item 4 of `packages/core/integration/c-07-c-11.permissions.md`.
    - **Uncapped counts:** `ReceiptGapSelector` (on `main`; C-29 replaces it),
-     `CampaignSyncSelector.countAppeals`, `HubErrorCountSelector.countNewErrors`, and
-     `HealthCheckSettingsChecks.errorLogFinding` (use `countNewUpTo`).
+     `CampaignSyncSelector.countAppeals` and `HubErrorCountSelector.countNewErrors`.
+     (`HealthCheckSettingsChecks.errorLogFinding` was capped with item 1.)
    - **Describes inside loops:** `ImportMatcher.firstNameOf`, `ImportUndoBatch.fieldMap`, and
      `SettingsService.hasKey` / `SettingsController.toSetting`.
    - **`HubErrorCountSelector`:** add a field-level check on `Status__c` and a namespace-first
