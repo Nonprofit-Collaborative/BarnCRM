@@ -25,6 +25,17 @@ import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
 
 const RECENT_LIMIT = 10;
 
+/** A Record Type List value, stored as developer names separated by commas, as a list. */
+function splitList(text) {
+  if (typeof text !== 'string' || text.trim() === '') {
+    return [];
+  }
+  return text
+    .split(',')
+    .map((name) => name.trim())
+    .filter((name) => name);
+}
+
 /**
  * The panels Core itself ships, each behind a literal import (ADR-0020). A dynamic specifier
  * is rejected by the platform, and Core cannot name a component from a package that depends on
@@ -177,6 +188,8 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isNumber: setting.dataType === 'Number',
       isPicklist: setting.dataType === 'Picklist',
       isDateTime: setting.dataType === 'DateTime',
+      isRecord: setting.dataType === 'Record',
+      isRecordTypeList: setting.dataType === 'RecordTypeList',
       isComponent: setting.dataType === 'Component',
       hasHelp: Boolean(setting.helpUrl),
       disabled: !this.canEdit,
@@ -187,7 +200,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
         Boolean(setting.component) &&
         !this.componentTypes[setting.component],
       checked: isCheckbox ? (hasPending ? pendingValue === true : setting.checked) : false,
-      value: hasPending ? pendingValue : setting.value
+      value: hasPending ? pendingValue : setting.value,
+      selected: splitList(hasPending ? pendingValue : setting.value),
+      // Ties the description to the control for a screen reader; ids are scoped to this template.
+      descriptionId: setting.description ? `description-${setting.key}` : undefined
     };
   }
 
@@ -290,6 +306,10 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       value = event.target.checked;
     } else if (kind === 'Picklist') {
       value = event.detail.value;
+    } else if (kind === 'Record') {
+      value = event.detail.recordId || '';
+    } else if (kind === 'RecordTypeList') {
+      value = (event.detail.value || []).join(',');
     } else {
       value = event.target.value;
     }

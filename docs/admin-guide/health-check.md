@@ -105,6 +105,7 @@ Nothing is broken today.
 | Settings | Whether any of the totals BarnCRM ships are missing from the Rollups page. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
+| Settings | Whether any BarnCRM nightly job is not scheduled: the rollup recalculation, the seasonal address swap and the error digest, plus the nightly jobs of any module that registers them. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Connect it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
 | Settings | Whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Connect: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
@@ -156,7 +157,7 @@ pressing it once. Most can be undone on their own page:
 | **Shipped totals are missing** | Creates the missing totals exactly as shipped. Each one starts calculating straight away, as it would have from install. Your own totals are not touched, and a shipped total whose field one of your own active totals already writes is skipped and named, so the two never overwrite each other. | Switch a total off on the Rollups page. Do not delete it: a deleted shipped total comes back the next time totals are restored or the package is upgraded (see Rollups). |
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
 | **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
-| **Nightly totals are not scheduled** | Schedules the nightly run at 2:00 AM. | **Stop the nightly recalculation** on the Rollups page. |
+| **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollups page, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Connect. |
 | **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
@@ -181,7 +182,7 @@ permission. Only in an org that also has Nonprofit Cloud households: some of the
 households listed may belong to one: BarnCRM cannot see that membership, and the finding
 says so.
 
-The four checks about shipped totals, switches, templates and the nightly run are shown only to
+The checks about shipped totals, switches, templates and nightly jobs are shown only to
 people with the Manage BarnCRM Settings permission, because only they can act on them. The
 two household checks are shown only to them too, for the reason given above.
 
@@ -235,9 +236,15 @@ unexplained one, and the receipts still will not generate. Fix the cause and re-
 left behind by an older version, or a total you created yourself, stays where it is. Nothing
 runs an automation whose switch is left over, so it does no harm.
 
-**Scheduling the nightly run only for the finding to come back.** The nightly-run finding only
-appears while at least one total is set to Scheduled or Both. If you switch every total to Real
-time, the finding goes away without the schedule, which is also correct.
+**Waiting for install to schedule the nightly jobs.** Nothing is scheduled when BarnCRM is
+installed, because a scheduled job runs as the person who scheduled it. Press **Schedule all
+nightly jobs** once, as the administrator the jobs should run as. If that person later leaves,
+stop the jobs on their pages and press the fix again as somebody else.
+
+**Wondering why "Nightly totals are not scheduled" has no button.** It explains what an
+unscheduled rollup run costs you. The button that fixes it is **Schedule all nightly jobs**, on
+the nightly jobs finding. The totals finding only appears while at least one total is set to
+Scheduled or Both.
 
 **Leaving automation paused.** Pausing automation for a bulk load is exactly right. Forgetting
 to turn it back on means households stop being created and names stop being recomputed, quietly.

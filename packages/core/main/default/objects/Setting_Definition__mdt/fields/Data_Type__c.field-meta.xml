@@ -37,6 +37,16 @@
         <label>Date and Time</label>
       </value>
       <value>
+        <fullName>Record</fullName>
+        <default>false</default>
+        <label>Record</label>
+      </value>
+      <value>
+        <fullName>RecordTypeList</fullName>
+        <default>false</default>
+        <label>Record Type List</label>
+      </value>
+      <value>
         <fullName>Component</fullName>
         <default>false</default>
         <label>Component</label>

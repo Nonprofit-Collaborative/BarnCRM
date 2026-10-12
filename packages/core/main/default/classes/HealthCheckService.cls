@@ -80,11 +80,11 @@ public with sharing class HealthCheckService {
     public static final String FIX_KEY_RESTORE_ROLLUPS = 'restoreShippedRollups';
     public static final String FIX_KEY_RESTORE_AUTOMATION_SWITCHES = 'restoreAutomationSwitches';
     public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
-    public static final String FIX_KEY_SCHEDULE_NIGHTLY_ROLLUPS = 'scheduleNightlyRollups';
+    public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
 
     /**
      * What one of those fixes would change if it ran now: the names of the rows it would create,
-     * or the name of the job it would schedule. Empty when it would change nothing, null for a
+     * or the names of the jobs it would schedule. Empty when it would change nothing, null for a
      * key that is not one of them.
      *
      * The finding carries this list, the panel sends it back with the fix request, and the
@@ -102,10 +102,8 @@ public with sharing class HealthCheckService {
         if (FIX_KEY_RESTORE_IMPORT_TEMPLATES.equals(fixKey)) {
             return ImportTemplateService.missingDefaultNames();
         }
-        if (FIX_KEY_SCHEDULE_NIGHTLY_ROLLUPS.equals(fixKey)) {
-            return RollupScheduler.isScheduled()
-                ? new List<String>()
-                : new List<String>{ RollupScheduler.jobName() };
+        if (FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
+            return NightlyJobs.unscheduledLabels();
         }
         return null;
     }
@@ -501,6 +499,9 @@ public with sharing class HealthCheckService {
                     'import_templates',
                     new HealthCheckSettingsChecks.ImportTemplatesCheck()
                 )
+            );
+            steps.add(
+                new CheckStep('nightly_jobs', new HealthCheckSettingsChecks.NightlyJobsCheck())
             );
             steps.add(
                 new CheckStep(

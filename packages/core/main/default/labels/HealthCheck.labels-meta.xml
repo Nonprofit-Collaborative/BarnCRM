@@ -277,8 +277,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>After the nightly run fix: what it did.</shortDescription>
-        <value>Done. The nightly run is scheduled every night at 2:00 AM.</value>
+        <shortDescription>After the nightly jobs fix: what it did. {0} the job names.</shortDescription>
+        <value>Done. Scheduled: {0}.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FixStale</fullName>
@@ -311,6 +311,30 @@
         <protected>false</protected>
         <shortDescription>Sentence under the Health Check heading.</shortDescription>
         <value>What BarnCRM found in your org, and what to do about it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_JobErrorDigest</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that emails the error digest.</shortDescription>
+        <value>Error digest email</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_JobRollups</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that recalculates rollups.</shortDescription>
+        <value>Rollup recalculation</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_JobSeasonalAddresses</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that swaps seasonal addresses.</shortDescription>
+        <value>Seasonal address swap</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_LoadFailed</fullName>
@@ -417,20 +441,36 @@
         <value>This org uses more than one currency</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_NightlyJobsDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly jobs not scheduled. {0} the job names.</shortDescription>
+        <value>Not scheduled: {0}. Each keeps something up to date overnight, and none runs until somebody schedules it. The fix schedules each one at its usual time, to run as you. Stop any of them on its own page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyJobsFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fix button: schedule every nightly job that is not scheduled.</shortDescription>
+        <value>Schedule all nightly jobs</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyJobsTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: some nightly jobs are not scheduled.</shortDescription>
+        <value>Nightly jobs are not scheduled</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_NightlyOffDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: nightly run off. {0} waiting rollups, {1} nightly only.</shortDescription>
-        <value>{0} active totals are set to recalculate in the nightly run, and it is not scheduled. {1} of them recalculate only then, so their values are not being kept up to date. The fix schedules the run every night at 2:00 AM. Stop it on the Rollups page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_NightlyOffFix</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Fix button: schedule the nightly rollup run.</shortDescription>
-        <value>Schedule the nightly run</value>
+        <value>{0} active totals are set to recalculate in the nightly run, and it is not scheduled. {1} of them recalculate only then, so their values are not being kept up to date. Schedule all nightly jobs fixes this.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyOffTitle</fullName>

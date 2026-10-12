@@ -17,16 +17,10 @@
             <div class="slds-grid slds-wrap slds-gutters">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
                     <c-settings-search onsettingselect={handleSearchSelect}></c-settings-search>
-                    <h2
-                        class="slds-text-title_caps slds-var-p-vertical_small"
-                        id="settings-sections"
-                    >
-                        {labels.sectionsHeading}
-                    </h2>
                     <lightning-vertical-navigation
+                        class="slds-var-p-top_small"
                         selected-item={selectedSection}
                         onselect={handleSectionSelect}
-                        aria-labelledby="settings-sections"
                     >
                         <lightning-vertical-navigation-section label={labels.sectionsHeading}>
                             <template for:each={navigationItems} for:item="item">
@@ -46,7 +40,13 @@
                     </template>
 
                     <template for:each={currentSettings} for:item="row">
-                        <div key={row.key} class="slds-form-element slds-var-m-bottom_medium">
+                        <div
+                            key={row.key}
+                            class="slds-form-element slds-var-m-bottom_medium"
+                            role="group"
+                            aria-label={row.label}
+                            aria-describedby={row.descriptionId}
+                        >
                             <template lwc:if={row.isCheckbox}>
                                 <lightning-input
                                     type="checkbox"
@@ -107,6 +107,30 @@
                                 ></lightning-combobox>
                             </template>
 
+                            <template lwc:elseif={row.isRecord}>
+                                <lightning-record-picker
+                                    label={row.label}
+                                    object-api-name={row.objectApiName}
+                                    value={row.value}
+                                    disabled={row.disabled}
+                                    data-key={row.key}
+                                    data-kind="Record"
+                                    onchange={handleChange}
+                                ></lightning-record-picker>
+                            </template>
+
+                            <template lwc:elseif={row.isRecordTypeList}>
+                                <lightning-checkbox-group
+                                    label={row.label}
+                                    options={row.options}
+                                    value={row.selected}
+                                    disabled={row.disabled}
+                                    data-key={row.key}
+                                    data-kind="RecordTypeList"
+                                    onchange={handleChange}
+                                ></lightning-checkbox-group>
+                            </template>
+
                             <template lwc:elseif={row.isComponent}>
                                 <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
                                     {row.label}
@@ -129,7 +153,10 @@
                             </template>
 
                             <template lwc:if={row.description}>
-                                <p class="slds-form-element__help slds-text-color_weak">
+                                <p
+                                    class="slds-form-element__help slds-text-color_weak"
+                                    id={row.descriptionId}
+                                >
                                     {row.description}
                                     <template lwc:if={row.hasHelp}>
                                         <a

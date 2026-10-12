@@ -140,17 +140,19 @@ public with sharing class HealthCheckController {
         if (HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES.equals(fixKey)) {
             return System.Label.Core_HealthCheck_TemplatesMissingFix;
         }
-        if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_ROLLUPS.equals(fixKey)) {
-            return System.Label.Core_HealthCheck_NightlyOffFix;
+        if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
+            return System.Label.Core_HealthCheck_NightlyJobsFix;
         }
         return null;
     }
 
     /** Runs the fix and returns the sentence that says what it did. */
     private static String runFix(String fixKey, List<String> scope) {
-        if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_ROLLUPS.equals(fixKey)) {
-            RollupScheduler.start();
-            return System.Label.Core_HealthCheck_FixScheduled;
+        if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
+            return String.format(
+                System.Label.Core_HealthCheck_FixScheduled,
+                new List<Object>{ String.join(NightlyJobs.scheduleAll(), ', ') }
+            );
         }
         String outcome = String.format(
             System.Label.Core_HealthCheck_FixCreated,

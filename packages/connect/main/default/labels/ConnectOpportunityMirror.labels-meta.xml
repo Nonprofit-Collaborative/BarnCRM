@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
+    <fullName>Connect_NightlyJob_MirrorName</fullName>
+    <categories>Connect, Opportunity Mirror, Health Check</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Health Check: name of the Opportunity mirror nightly job</shortDescription>
+    <value>Opportunity mirror, 1:30 AM</value>
+  </labels>
+  <labels>
     <fullName>Connect_HealthCheck_MirrorNotRunTitle</fullName>
     <categories>Connect, Opportunity Mirror, Health Check</categories>
     <language>en_US</language>

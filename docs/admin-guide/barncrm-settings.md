@@ -61,6 +61,22 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    out and there is no Save button. He can still read every description and follow every
    Learn more link.
 
+## You never type an identifier
+
+No setting asks you for a record ID, an API name or a developer name. Where a setting points
+at something, you choose it:
+
+- **A record**, such as the default fund or the default appeal with Giving, is chosen with a
+  search box. Start typing the record's name and pick it from the list. The box shows the
+  name; clearing it leaves the setting empty.
+- **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Connect, are
+  a list of checkboxes, one per active record type in your org, by the name you see in Setup.
+  Ticking none means every record type.
+- **A choice from a fixed list**, such as the month your fiscal year starts, is a dropdown.
+
+The description of each setting is read out by a screen reader together with the control,
+so every setting is explained the same way however you use the page.
+
 ## Common mistakes
 
 - **Trying to change settings without the permission and thinking the page is broken.**
@@ -85,6 +101,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 - **Typing a value in the wrong format.** A date and time setting expects a date and time,
   and a number setting expects a number. If a value cannot be read, nothing on the page is
   saved and a message says which value to fix. Correct it and save again.
+- **Not finding a record in a picker.** The search box finds records you can see, by name.
+  If the fund or appeal you want is missing, check that it exists and that you have access
+  to it, then search again.
 - **Expecting a settings change to fix records that already exist.** Changing a naming
   pattern changes what happens next. To apply it to households you already have, use the
   recompute action on the household naming settings.

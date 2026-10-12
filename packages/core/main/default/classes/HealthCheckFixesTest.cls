@@ -365,11 +365,12 @@ private class HealthCheckFixesTest {
     }
 
     @IsTest
-    static void aNightlyOnlyRollupWithNoNightlyRunIsAWarningAndTheFixSchedulesIt() {
+    static void aNightlyOnlyRollupWithNoNightlyRunIsAWarningWithTheNightlyJobsFix() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
         shipOneRollup(RollupService.MODE_SCHEDULED);
         RollupService.skipEngine = true;
         RollupScheduler.jobNameInUse = TEST_JOB_NAME;
+        NightlyJobs.jobsOverride = new List<NightlyJob>{ new NightlyJobs.RollupJob() };
 
         System.runAs(maria) {
             RollupService.ensureDefaults();
@@ -380,20 +381,35 @@ private class HealthCheckFixesTest {
                 finding.severity,
                 'A rollup that recalculates only at night is going stale.'
             );
+            Assert.isNull(finding.fixTarget, 'One cause, one button: the nightly jobs fix.');
+
+            HealthCheckService.Finding jobs = find('nightly_jobs_not_scheduled');
+            Assert.areEqual(
+                new List<String>{ System.Label.Core_HealthCheck_JobRollups },
+                jobs.fixScope,
+                'The nightly jobs finding names the rollup run.'
+            );
 
             // No startTest: the scheduled run must not execute inside the test.
-            HealthCheckService.Report report = press(finding);
-            assertPressingAgainIsRefused(finding);
+            HealthCheckService.Report report = press(jobs);
+            assertPressingAgainIsRefused(jobs);
 
             Assert.isTrue(RollupScheduler.isScheduled(), 'The nightly run is scheduled.');
             Assert.isNull(
                 find(report, 'nightly_rollups_not_scheduled'),
-                'The re-run report no longer has the finding.'
+                'The re-run report no longer has the rollup finding.'
+            );
+            Assert.isNull(
+                find(report, 'nightly_jobs_not_scheduled'),
+                'Nor the nightly jobs finding.'
             );
             Assert.areEqual(
-                System.Label.Core_HealthCheck_FixScheduled,
+                String.format(
+                    System.Label.Core_HealthCheck_FixScheduled,
+                    new List<Object>{ System.Label.Core_HealthCheck_JobRollups }
+                ),
                 report.fixOutcome,
-                'The panel is told the run is scheduled.'
+                'The panel is told which jobs were scheduled.'
             );
             Assert.areEqual(
                 1,
