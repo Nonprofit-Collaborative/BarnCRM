@@ -3,7 +3,10 @@
 For developers connecting a payment processor, online giving page or integration platform
 to BarnCRM (feature X-03). The administrator's side, including the user and sign-in
 setup, is in the admin guide: [Inbound Gift API](../admin-guide/inbound-gift-api.md). The
-decisions behind this shape are in ADR-0051.
+decisions behind this shape are in ADR-0051. The same contract as an OpenAPI 3.1 document,
+for code generators and API tools, is
+[`inbound-gift-api.openapi.yaml`](../architecture/reference/inbound-gift-api.openapi.yaml);
+CI checks it against the Apex.
 
 This contract is permanent once the Connect package is released as a managed package: new
 optional fields may be added, and nothing below will be removed or renamed.

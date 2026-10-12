@@ -19,7 +19,15 @@ Salesforce org is needed for this job. Steps:
 
 1. `npm ci`
 2. `npm run prettier:verify`
-3. `npm run lint`
+3. `npm run lint`. Besides the LWC rules, it holds the pure modules to plain JavaScript:
+   each file in `PURE_MODULES` at the top of `eslint.config.js` (today the import wizard's
+   `csv.js` and `xlsx.js`) fails lint if it imports `lwc`, `lightning/*` or `@salesforce/*`.
+   A pure module is a helper inside a component bundle (its file name differs from the
+   bundle's) that works on plain values only; add each new one to the list, and the config
+   refuses to load if a listed file no longer exists, so a rename cannot drop a module out
+   of the rule silently. Without the rule the next edit can pull in the platform and the
+   module stops being reusable outside Salesforce or testable without stubs (plan Section
+   4.4, portability at near-zero cost).
 4. `npm run test:unit:coverage`
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
@@ -135,7 +143,26 @@ Salesforce org is needed for this job. Steps:
    `Gift_Record_Page` and `Commitment_Record_Page` were stranded the same way in Fundraising.
 15. `scripts/ci/check-canonical-model.py`, failing the build if a shipped object or field
    is missing from `docs/architecture/canonical-model.md`. The canonical model is updated
-   before an object or a field is added, so this is the gate that keeps it true.
+   before an object or a field is added, so this is the gate that keeps it true. It checks
+   both directions. Inside the model: no API name declared twice for one object, and no
+   name used in prose that no table declares. Against the metadata: every folder under
+   `packages/*/main/default/objects/` is named in the model, and every custom field shipped
+   in it is named in backticks in a top-level section that also names that object. Until
+   2026-10 only the first direction ran, so this line claimed more than the script did, and
+   four custom metadata fields had shipped with no API name in the model. The vendored
+   rollup engine (`packages/core/vendor/`) is not BarnCRM's data model and is outside the
+   path it reads.
+   `scripts/ci/check-openapi.js` (`npm run check:openapi`) fails the build if
+   `docs/architecture/reference/inbound-gift-api.openapi.yaml` does not parse as YAML, is
+   not OpenAPI 3.1, has a `$ref` that resolves to nothing, an operation without a unique
+   `operationId` or a response without a description, or has drifted from the Apex: its
+   request properties and required list against `InboundGift`, its result properties
+   against `InboundGiftResult`, its `outcome` and `errorCode` values against that class's
+   constants, and its two length limits against `InboundGiftRequest`. The document is only
+   read by integrators' tools, never by the build, so without this a broken file or a new
+   field missing from it would ship and be found by a partner. It is not a full OpenAPI
+   validator, which would need a network install; it reads the file with the `yaml`
+   package already in `devDependencies`.
 16. `scripts/ci/check-setting-defaults.py`, failing the build if a checkbox setting that
    ships switched on is not declared in `SettingsService.SHIPPED_DEFAULTS`, or is declared
    there with a value the field metadata disagrees with. A field's own `defaultValue` is
@@ -192,6 +219,7 @@ npm run check:adrs
 npm run check:components-reachable
 npm run check:record-pages-assigned
 npm run check:canonical-model
+npm run check:openapi
 npm run check:setting-defaults
 npm run check:apex
 npm run check:analyzer

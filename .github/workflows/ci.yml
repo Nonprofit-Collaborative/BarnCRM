@@ -78,6 +78,9 @@ jobs:
       - name: Check the canonical model lists every shipped API name
         run: python3 scripts/ci/check-canonical-model.py
 
+      - name: Check the inbound gift API OpenAPI document parses and matches the Apex
+        run: node scripts/ci/check-openapi.js
+
       - name: Check every setting that ships switched on actually reads on
         run: python3 scripts/ci/check-setting-defaults.py
 
