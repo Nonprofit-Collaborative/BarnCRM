@@ -135,11 +135,11 @@ deletes an Opportunity. Decide whether it should stay, and delete it yourself if
 replacement, because it cannot tell a deleted Opportunity from one the person saving may not
 see, and a replacement for one that still exists would count the gift twice. The Error Log says
 so when the gift next changes. Check, as someone who sees every Opportunity, whether it exists.
-If it was deleted, clear the gift's **Opportunity ID** in the **Gifts and their Opportunities**
+If it was deleted, clear the gift's **Opportunity ID** in the **Gifts and Their Opportunities**
 list view and save: a new Opportunity is made.
 
 **Linking a gift to an Opportunity you already had.** Open the **Gifts** tab and choose the
-**Gifts and their Opportunities** list view, which the mirror adds. Double-click the gift's
+**Gifts and Their Opportunities** list view, which the mirror adds. Double-click the gift's
 **Opportunity ID** cell, paste the Opportunity's record ID (the 18-character code in its web
 address, starting `006`), and save. Be sure it is the right one: in Gifts to Opportunities the gift's amount, date, stage,
 account and campaign are written onto it at once. An Opportunity belongs to one gift only;

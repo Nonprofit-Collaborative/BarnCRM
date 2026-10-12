@@ -20,5 +20,5 @@
     <value>Received</value>
   </filters>
   <filterScope>Everything</filterScope>
-  <label>Gifts To Acknowledge</label>
+  <label>Gifts to Acknowledge</label>
 </ListView>

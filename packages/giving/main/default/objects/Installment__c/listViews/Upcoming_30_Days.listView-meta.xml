@@ -17,5 +17,5 @@
     <operation>equals</operation>
     <value>Scheduled</value>
   </filters>
-  <label>Upcoming 30 days</label>
+  <label>Upcoming 30 Days</label>
 </ListView>

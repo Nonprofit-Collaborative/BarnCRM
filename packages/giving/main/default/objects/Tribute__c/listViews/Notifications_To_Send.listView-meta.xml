@@ -13,5 +13,5 @@
     <operation>equals</operation>
     <value>0</value>
   </filters>
-  <label>Notifications to send</label>
+  <label>Notifications to Send</label>
 </ListView>

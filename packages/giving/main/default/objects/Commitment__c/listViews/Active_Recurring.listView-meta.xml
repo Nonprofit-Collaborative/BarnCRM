@@ -19,5 +19,5 @@
     <operation>equals</operation>
     <value>Active</value>
   </filters>
-  <label>Active recurring</label>
+  <label>Active Recurring Gifts</label>
 </ListView>

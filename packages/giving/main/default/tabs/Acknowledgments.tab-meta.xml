@@ -4,6 +4,6 @@
     The thank you queue: your rules, what is waiting to go, and the buttons that send it.
   </description>
   <flexiPage>Acknowledgments</flexiPage>
-  <label>Acknowledgments</label>
+  <label>Acknowledgment Queue</label>
   <motif>Custom25: Envelope</motif>
 </CustomTab>

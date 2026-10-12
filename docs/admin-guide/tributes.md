@@ -58,7 +58,7 @@ You are David. Start from the sample data.
    **Nobody is recorded as the person to notify, so there is no letter to send. Add a
    notification recipient, or a name and address, on the tribute.** That is the intended
    state for a tribute the donor asked you to record but not to announce, and it is also
-   how you find the ones somebody forgot to finish: the **Notifications to send** list view
+   how you find the ones somebody forgot to finish: the **Notifications to Send** list view
    is built for exactly that.
 9. Try one thing that should fail. Open a new gift, add an **In memory of** tribute whose
    honoree is a Contact marked deceased, and make that same person the notification
