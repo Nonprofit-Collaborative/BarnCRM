@@ -1,0 +1,221 @@
+<template>
+    <lightning-card title={labels.title} icon-name="utility:edit">
+        <lightning-button slot="actions" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+            <template if:true={busy}>
+                <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+            </template>
+
+            <template if:true={hasError}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+                    <span data-id="error-message">{errorMessage}</span>
+                </div>
+            </template>
+            <template if:true={hasNotice}>
+                <div
+                    class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <span data-id="notice-message">{noticeMessage}</span>
+                </div>
+            </template>
+
+                <p class="slds-var-m-bottom_small">{labels.panelIntro}</p>
+                <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.changes}</h2>
+                <template for:each={changeRows} for:item="change">
+                    <div
+                        key={change.key}
+                        class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-bottom_x-small"
+                        data-id="change"
+                    >
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                            <lightning-combobox
+                                label={labels.field}
+                                placeholder={labels.chooseField}
+                                options={fieldOptions}
+                                value={change.field}
+                                data-key={change.key}
+                                data-part="field"
+                                onchange={handleChangeEdit}
+                            ></lightning-combobox>
+                        </div>
+                        <template if:true={change.hasField}>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                                <lightning-combobox
+                                    label={labels.action}
+                                    options={change.actionOptions}
+                                    value={change.action}
+                                    data-key={change.key}
+                                    data-part="action"
+                                    onchange={handleChangeEdit}
+                                ></lightning-combobox>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <template if:true={change.isBoolean}>
+                                    <lightning-combobox
+                                        label={labels.newValue}
+                                        options={change.booleanOptions}
+                                        value={change.value}
+                                        data-key={change.key}
+                                        data-part="value"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-combobox>
+                                </template>
+                                <template if:true={change.isPicklist}>
+                                    <lightning-combobox
+                                        label={labels.newValue}
+                                        options={change.picklistOptions}
+                                        value={change.value}
+                                        data-key={change.key}
+                                        data-part="value"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-combobox>
+                                </template>
+                                <template if:true={change.isMulti}>
+                                    <lightning-checkbox-group
+                                        label={labels.newValue}
+                                        options={change.picklistOptions}
+                                        value={change.multiValue}
+                                        data-key={change.key}
+                                        data-part="value"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-checkbox-group>
+                                </template>
+                                <template if:true={change.isRecord}>
+                                    <lightning-record-picker
+                                        label={labels.newValue}
+                                        object-api-name={change.referenceTo}
+                                        value={change.value}
+                                        data-key={change.key}
+                                        data-part="record"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-record-picker>
+                                </template>
+                                <template if:true={change.isInput}>
+                                    <lightning-input
+                                        data-id="value"
+                                        type={change.inputType}
+                                        step="any"
+                                        label={labels.newValue}
+                                        value={change.value}
+                                        data-key={change.key}
+                                        data-part="value"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-input>
+                                </template>
+                                <template if:true={change.isCopy}>
+                                    <lightning-combobox
+                                        label={labels.copyFrom}
+                                        placeholder={labels.chooseField}
+                                        options={change.sourceOptions}
+                                        value={change.source}
+                                        data-key={change.key}
+                                        data-part="source"
+                                        onchange={handleChangeEdit}
+                                    ></lightning-combobox>
+                                </template>
+                            </div>
+                        </template>
+                        <div class="slds-col slds-no-flex">
+                            <lightning-button-icon
+                                icon-name="utility:delete"
+                                alternative-text={labels.remove}
+                                title={labels.remove}
+                                data-key={change.key}
+                                onclick={handleRemoveChange}
+                            ></lightning-button-icon>
+                        </div>
+                    </div>
+                </template>
+                <div class="slds-var-m-vertical_small">
+                    <lightning-button
+                        data-id="add-change"
+                        label={labels.addChange}
+                        icon-name="utility:add"
+                        disabled={addDisabled}
+                        onclick={handleAddChange}
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="preview"
+                        variant="brand"
+                        label={labels.preview}
+                        disabled={previewDisabled}
+                        onclick={handlePreview}
+                    ></lightning-button>
+                </div>
+
+                <template if:true={preview}>
+                    <section class="slds-box slds-var-m-bottom_medium" data-id="preview-box">
+                        <p class="slds-text-title_bold" data-id="preview-line" role="status">{previewLine}</p>
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-vertical_small">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{labels.record}</th>
+                                    <th scope="col">{labels.field}</th>
+                                    <th scope="col">{labels.before}</th>
+                                    <th scope="col">{labels.after}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={sampleRows} for:item="row">
+                                    <tr key={row.key} data-id="sample-row">
+                                        <th scope="row">{row.name}</th>
+                                        <td>{row.label}</td>
+                                        <td>{row.before}</td>
+                                        <td>{row.after}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                        <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <lightning-input
+                                    data-id="confirm"
+                                    label={labels.confirm}
+                                    value={confirmText}
+                                    onchange={handleConfirmText}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-no-flex">
+                                <lightning-button
+                                    data-id="start"
+                                    variant="destructive"
+                                    label={updateLabel}
+                                    disabled={startDisabled}
+                                    onclick={handleStart}
+                                ></lightning-button>
+                            </div>
+                        </div>
+                    </section>
+                </template>
+
+                <template if:true={jobView}>
+                    <section class="slds-box slds-var-m-bottom_medium" data-id="job">
+                        <p class="slds-text-title_bold">{jobView.name}: {jobView.status}</p>
+                        <template if:true={jobView.running}>
+                            <p class="slds-var-m-vertical_x-small" role="status" aria-live="polite">
+                                {jobView.progressLine}
+                            </p>
+                            <lightning-progress-bar value={jobView.progressValue} size="large"></lightning-progress-bar>
+                        </template>
+                        <template if:false={jobView.running}>
+                            <p data-id="job-summary">{jobView.summary}</p>
+                            <template if:true={jobView.hasFailures}>
+                                <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.failures}</h3>
+                                <ul class="slds-list_dotted">
+                                    <template for:each={jobView.failures} for:item="failure">
+                                        <li key={failure.recordId}>{failure.recordId}: {failure.reason}</li>
+                                    </template>
+                                </ul>
+                            </template>
+                            <template if:true={jobView.showUndo}>
+                                <p class="slds-var-m-top_small" data-id="undo-from-tab">{labels.undoFromTab}</p>
+                            </template>
+                        </template>
+                    </section>
+                </template>
+        </div>
+    </lightning-card>
+</template>

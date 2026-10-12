@@ -44,21 +44,27 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 
 1. Open **Find**. Choose **Account**, add the column **Billing City**, and add the condition
    **Billing City**, **equals**, `springfield`. Press **Run**.
-2. Press **Bulk update**. The bulk update panel opens below the results, naming the object and
-   the query it will use.
+2. Press **Bulk update**. The bulk update panel opens below the results. It uses the query as
+   it is now; changing the query closes the panel.
 3. Under **Changes**, choose the field **Billing City**, **Set to a value**, and type
    `Springfield`. To change a second field, press **Add a change** (up to five).
 4. Press **Preview**. BarnCRM says how many records match, for example 37, and shows the first
    five with the value before and after.
 5. Type `37` into **Type the number of records to confirm**, then press **Update 37 records**.
 6. The progress bar shows the chunks done. When it finishes, the panel says how many records
-   were updated, how many already held the new value, how many no longer matched the query,
-   and how many failed, with the reason for each failure.
+   were updated, how many already held the new value and how many failed, with the reason for
+   each failure. The job's run log, on the Import record, also says how many no longer matched
+   the query.
 7. To undo it, open the **Bulk Update** tab. Find the job under **Recent bulk updates**, press
    **Undo**, check the number, and confirm.
 
 ## 4. What can and cannot be changed
 
+- **Every matching record, not only the rows shown.** Find's **Rows to show** and sort order
+  only shape the results table. A bulk update covers every record the object and conditions
+  match, and the preview count says how many that is.
+- **Lookup values** are chosen by searching for the record when the lookup points at one kind
+  of record. When it can point at several (Owner, for example), paste the record Id.
 - **Fields you can choose** are the fields of the query's object that you may edit. Fields on a
   related record are not offered: a bulk update changes the records the query returns and
   nothing else.
