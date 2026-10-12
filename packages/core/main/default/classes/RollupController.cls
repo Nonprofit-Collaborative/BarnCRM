@@ -28,6 +28,12 @@ public with sharing class RollupController {
         public String relationshipPath { get; set; }
         @AuraEnabled
         public String aggregate { get; set; }
+        /** The calculation by the name the Aggregate picklist gives it: Sum, Count distinct, Any. */
+        @AuraEnabled
+        public String aggregateLabel { get; set; }
+        /** What separates a text list's values, by its picklist name; blank for anything else. */
+        @AuraEnabled
+        public String delimiterLabel { get; set; }
         @AuraEnabled
         public String sourceField { get; set; }
         @AuraEnabled
@@ -189,10 +195,32 @@ public with sharing class RollupController {
         };
         page.modeOptions = modeOptions(page.modes);
         page.rollups = new List<RollupView>();
+        Map<String, String> aggregateLabels = labelsOf(Rollup_Definition__c.Aggregate__c);
+        Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);
         for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
-            page.rollups.add(toView(definition));
+            RollupView view = toView(definition);
+            String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c;
+            view.aggregateLabel = aggregateLabels.containsKey(aggregate)
+                ? aggregateLabels.get(aggregate)
+                : aggregate;
+            if (aggregate.startsWith('TEXT_LIST')) {
+                String delimiter = String.isBlank(definition.Delimiter__c)
+                    ? 'Comma'
+                    : definition.Delimiter__c;
+                view.delimiterLabel = delimiterLabels.get(delimiter);
+            }
+            page.rollups.add(view);
         }
         return page;
+    }
+
+    /** A picklist's labels by stored value, in the running user's language. */
+    private static Map<String, String> labelsOf(Schema.SObjectField picklist) {
+        Map<String, String> labelByValue = new Map<String, String>();
+        for (Schema.PicklistEntry entry : picklist.getDescribe().getPicklistValues()) {
+            labelByValue.put(entry.getValue(), entry.getLabel());
+        }
+        return labelByValue;
     }
 
     private static RollupView toView(Rollup_Definition__c definition) {
@@ -220,13 +248,7 @@ public with sharing class RollupController {
 
     /** The modes in the order given, each named by the Mode picklist's own label. */
     private static List<ModeOption> modeOptions(List<String> modes) {
-        Map<String, String> labelByValue = new Map<String, String>();
-        for (
-            Schema.PicklistEntry entry : Rollup_Definition__c.Mode__c.getDescribe()
-                .getPicklistValues()
-        ) {
-            labelByValue.put(entry.getValue(), entry.getLabel());
-        }
+        Map<String, String> labelByValue = labelsOf(Rollup_Definition__c.Mode__c);
         List<ModeOption> options = new List<ModeOption>();
         for (String mode : modes) {
             ModeOption option = new ModeOption();

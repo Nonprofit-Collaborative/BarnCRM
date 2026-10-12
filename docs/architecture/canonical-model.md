@@ -1325,6 +1325,10 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 | Active | `Active__c` | Checkbox |
 
 - **Shipped defaults:** `Rollup_Definition_Default__mdt` (Section 13).
+- **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
+  ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
+  10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
+  target or the source attribute, so switching a definition on or off never re-checks it.
 - **Settings keys:** `Fiscal_Year_Start_Month__c`, `Rollup_Mode_Default__c` (Section 12).
 - **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
   Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed

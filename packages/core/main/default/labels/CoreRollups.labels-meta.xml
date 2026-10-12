@@ -57,6 +57,14 @@
         <value>What it counts</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_CountsSeparatedBy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Added to what a text list counts: {0} is the delimiter, such as semicolon.</shortDescription>
+        <value>separated by {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ColumnCalculation</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

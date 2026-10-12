@@ -167,6 +167,36 @@ public with sharing class RollupPlanner {
     }
 
     /**
+     * What the save check refuses (canonical model R-R10): a target attribute whose type does not
+     * suit the aggregate, and a COUNT_DISTINCT or text list with nothing to read. A target entity
+     * or attribute this org does not have is left to the planner, which refuses it at run time,
+     * so a definition for a module that is not installed can still be saved.
+     *
+     * @param definition the definition about to be saved
+     * @return the message to show, or null when the save may go ahead
+     */
+    public static String saveProblem(Rollup_Definition__c definition) {
+        Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
+        if (targetType == null || String.isBlank(definition.Target_Field__c)) {
+            return null;
+        }
+        Schema.SObjectField field = targetType.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .fields.getMap()
+            .get(definition.Target_Field__c.trim().toLowerCase());
+        if (field == null) {
+            return null;
+        }
+        String problem = targetTypeProblem(definition.Aggregate__c, field.getDescribe().getType());
+        String kind = String.isBlank(definition.Aggregate__c)
+            ? null
+            : KIND_BY_AGGREGATE.get(definition.Aggregate__c.toUpperCase());
+        if (problem == null && kind == KIND_LISTED && String.isBlank(definition.Source_Field__c)) {
+            problem = System.Label.Core_Rollups_ErrorSourceFieldNeeded;
+        }
+        return problem;
+    }
+
+    /**
      * Plans every given definition that targets this entity.
      *
      * @param targetType the entity written

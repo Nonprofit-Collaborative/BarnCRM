@@ -183,7 +183,9 @@ contacts, then all funds), and calculate all of a record's totals together:
 
 Each rollup has a **calculation**, and the calculation decides what kind of field can show
 the result. BarnCRM refuses to save a rollup whose field cannot hold its result, and says
-which kind of field to choose instead.
+which kind of field to choose instead. That check is the **Check rollups before saving**
+automation on the **Automation** page; if it is switched off, such a rollup still saves, but
+BarnCRM skips it on every run and the Error Log says why.
 
 | Calculation | What it gives you | Shown in |
 |---|---|---|
@@ -304,7 +306,7 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    **BarnCRM Settings** and choose **Rollups**.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
    Each row says what the number means in plain language, what it counts ("Sum Amount__c
-   on Gift__c", or for a text list "Text list Name on Program__c, separated by Semicolon"),
+   on Gift__c", or for a text list "Text list Name on Program__c, separated by semicolon"),
    where it shows ("Account.Total_Giving__c"), its mode, and when it was
    last calculated. The names begin with the kind of record the number lands on, so
    **Household total giving**, **Account total giving**, and **Contact total giving** sit

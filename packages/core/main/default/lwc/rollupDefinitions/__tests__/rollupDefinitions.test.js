@@ -50,6 +50,12 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock(
+  '@salesforce/label/c.Core_Rollups_CountsSeparatedBy',
+  () => ({ default: 'separated by {0}' }),
+  { virtual: true }
+);
+
 const ROLLUP = {
   recordId: 'a01000000000001AAA',
   name: 'Household total giving',
@@ -117,6 +123,41 @@ describe('c-rollup-definitions', () => {
     expect(rows[0].textContent).toContain('Household total giving');
     expect(rows[0].textContent).toContain('SUM Amount__c on Gift__c');
     expect(rows[0].textContent).toContain('Account.Total_Giving__c');
+  });
+
+  it('names each calculation as the administrator reads it, with a text list separator', async () => {
+    const programs = {
+      ...ROLLUP,
+      recordId: 'a01000000000002AAA',
+      name: 'Contact programs',
+      sourceObject: 'Program_Enrollment__c',
+      targetObject: 'Contact',
+      targetField: 'Programs__c',
+      aggregate: 'TEXT_LIST_DISTINCT',
+      aggregateLabel: 'Text list, each value once',
+      delimiterLabel: 'Semicolon',
+      sourceField: 'Program_Name__c'
+    };
+    const major = {
+      ...ROLLUP,
+      recordId: 'a01000000000003AAA',
+      name: 'Has given a major gift',
+      targetField: 'Major_Donor__c',
+      aggregate: 'ANY',
+      aggregateLabel: 'Any',
+      delimiterLabel: null,
+      sourceField: null
+    };
+    const element = createComponent();
+    getPage.emit({ ...PAGE, rollups: [programs, major] });
+    await flush();
+
+    const rows = element.shadowRoot.querySelectorAll('[data-id="rollup-row"]');
+    expect(rows[0].textContent).toContain(
+      'Text list, each value once Program_Name__c on Program_Enrollment__c, separated by semicolon'
+    );
+    expect(rows[1].textContent).toContain('Any on Gift__c');
+    expect(rows[1].textContent).not.toContain('separated by');
   });
 
   it('offers the modes by the names an administrator reads, keeping the stored values', async () => {

@@ -15,6 +15,7 @@ import TITLE from '@salesforce/label/c.Core_Rollups_PageTitle';
 import INTRO from '@salesforce/label/c.Core_Rollups_PageIntro';
 import COLUMN_ROLLUP from '@salesforce/label/c.Core_Rollups_ColumnRollup';
 import COLUMN_COUNTS from '@salesforce/label/c.Core_Rollups_ColumnCounts';
+import COUNTS_SEPARATED_BY from '@salesforce/label/c.Core_Rollups_CountsSeparatedBy';
 import COLUMN_TARGET from '@salesforce/label/c.Core_Rollups_ColumnTarget';
 import COLUMN_MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import COLUMN_ACTIVE from '@salesforce/label/c.Core_Rollups_ColumnActive';
@@ -48,6 +49,7 @@ export default class RollupDefinitions extends LightningElement {
     intro: INTRO,
     columnRollup: COLUMN_ROLLUP,
     columnCounts: COLUMN_COUNTS,
+    countsSeparatedBy: COUNTS_SEPARATED_BY,
     columnTarget: COLUMN_TARGET,
     columnMode: COLUMN_MODE,
     columnActive: COLUMN_ACTIVE,
@@ -152,10 +154,22 @@ export default class RollupDefinitions extends LightningElement {
     return !!this.noticeMessage;
   }
 
+  /**
+   * What a rollup counts, by the calculation's own name: "Sum Amount__c on Gift__c", and for a
+   * text list what separates its values: "Text list Name on Program__c, separated by semicolon".
+   */
   countsText(rollup) {
-    const aggregate = rollup.aggregate || '';
+    const aggregate = rollup.aggregateLabel || rollup.aggregate || '';
     const field = rollup.sourceField ? ` ${rollup.sourceField}` : '';
-    return `${aggregate}${field} on ${rollup.sourceObject}`;
+    const counts = `${aggregate}${field} on ${rollup.sourceObject}`;
+    if (!rollup.delimiterLabel) {
+      return counts;
+    }
+    const separator = this.labels.countsSeparatedBy.replace(
+      '{0}',
+      rollup.delimiterLabel.toLowerCase()
+    );
+    return `${counts}, ${separator}`;
   }
 
   handleActiveToggle(event) {
