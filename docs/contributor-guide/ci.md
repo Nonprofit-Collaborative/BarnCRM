@@ -189,6 +189,10 @@ Salesforce org is needed for this job. Steps:
    with sharing (Apex Developer Guide, Versioned Behavior Changes), so an elevated read that
    relied on the old system-mode default fails for a user without access, and only an org
    run as that user shows it.
+   `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
+   in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
+   carries no `// runs-as: deploying user (reason)` comment. See "Tests run as a user they
+   create" below for why.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.
@@ -230,6 +234,7 @@ npm run check:canonical-model
 npm run check:openapi
 npm run check:setting-defaults
 npm run check:flow-templates
+npm run check:tests-run-as
 npm run check:apex
 npm run check:analyzer
 ```
@@ -413,6 +418,43 @@ including the gate, fails at once with `UNKNOWN_EXCEPTION` before any test start
 
 While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` against
 your own org for speed; the script is the final full run before merge, not the inner loop.
+
+### Tests run as a user they create
+
+From API version 67.0 a query or DML statement with no access mode runs in user mode, and
+that includes the plain `insert` and `[SELECT ...]` in a test class. A test that runs as
+whoever deploys or runs it passes only where that person already holds the BarnCRM
+permission sets. The gate above assigns them, so the gate alone never showed the problem; a
+check-only deploy to a real sandbox, as an administrator without them, failed 565 of 1008
+Core tests ("fields being inaccessible", "No such column", "Record Type ID: this ID value
+isn't valid for the user", "You need the Manage BarnCRM Settings permission"). A subscriber
+running the tests, or a different administrator, would see the same.
+
+So every test is self-contained:
+
+- Every `@IsTest` method and every `@TestSetup` method runs its body inside
+  `System.runAs(TestUsers.admin())` in Core, and `System.runAs(TestUsers.adminWith('Giving_Admin'))`
+  in Giving and Connect. `TestUsers` (Core, `@IsTest`, namespace accessible) creates a user
+  on the running user's own profile and assigns the packaged permission sets by their bare
+  name, preferring the ones in this package's namespace. `withPermissionSets(names)` takes any
+  other list. It keeps one user per list of sets per transaction, and finds the user a
+  `@TestSetup` made again in every test method, so setup data and the test share an owner.
+- The profile stays the running user's so a test keeps what an administrator's profile gave
+  it before (View All Data over Giving's Private objects, Manage Users for the tests that
+  create people) and loses only the dependence on permission set assignments. A test that has
+  something to prove about least privilege still builds its own user with
+  `TestDataFactory.createUser` on the Standard User profile, inside the outer `runAs`.
+- Users and permission set assignments are setup objects. `TestUsers` writes them in a
+  context of their own; a test that creates more people does the same with a nested
+  `System.runAs(new User(Id = UserInfo.getUserId()))`, as before.
+- A test that touches no data and no permission dependent code (a parser, an in-memory
+  calculation) may run as the deploying user, and says so with
+  `// runs-as: deploying user (reason)` above the class, or inside one method.
+  `scripts/ci/check-tests-run-as.py` fails the build on any other test method without
+  `System.runAs`.
+
+To prove a branch is self-contained, run its tests in an org as a user who holds none of the
+BarnCRM permission sets.
 
 ### `org-tests`
 

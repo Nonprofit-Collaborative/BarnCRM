@@ -26,6 +26,7 @@
     "check:setting-defaults": "python3 scripts/ci/check-setting-defaults.py",
     "check:setting-object-explicit": "python3 scripts/ci/check-setting-object-explicit.py",
     "check:flow-templates": "python3 scripts/ci/check-flow-templates.py",
+    "check:tests-run-as": "python3 scripts/ci/check-tests-run-as.py",
     "precommit": "lint-staged",
     "check:apex": "bash scripts/ci/check-apex-offline.sh",
     "check:analyzer": "sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2"

@@ -93,6 +93,9 @@ jobs:
       - name: Check every Apex class states its sharing and every query and DML its access mode
         run: python3 scripts/ci/check-apex-access-modes.py
 
+      - name: Check every Apex test runs as a user it creates, not as the deploying user
+        run: python3 scripts/ci/check-tests-run-as.py
+
       - name: Test the migration kit
         run: python3 -m unittest discover -s scripts/migration/tests
 
