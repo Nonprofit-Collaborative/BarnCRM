@@ -56,7 +56,7 @@ The rule, for anything whose API name gains a prefix when a package is namespace
 Visualforce and Lightning pages, custom objects and fields, and Lightning page state keys):
 
 - A Lightning web component never writes such a name itself, neither prefixed nor bare. No
-  `apiName: 'Nonprofit_Settings'`, no `state: { c__section: ... }`.
+  `apiName: 'BarnCRM_Settings'`, no `state: { c__section: ... }`.
 - It obtains the name from Apex, on the response it already reads, and uses it verbatim.
 - Apex builds it through `NamespaceUtil`, which asks the running package what its namespace is:
   `NamespaceUtil.prefix()` returns `mynamespace__` or an empty string, `qualify(apiName)` puts
@@ -68,7 +68,7 @@ both computed in its constructor, and `healthCheckPanel` navigates with the two 
 report gave it. Nothing has to change in either place when the namespace is registered.
 
 Apex referring to its own packaged metadata does not need any of this: the compiler resolves
-`Nonprofit_Settings__c` inside the package regardless of namespace. Only names that cross into
+`BarnCRM_Settings__c` inside the package regardless of namespace. Only names that cross into
 strings, URLs, page state, or metadata lookups do.
 
 ## A note on `config/scratch-defs/person-accounts.json`

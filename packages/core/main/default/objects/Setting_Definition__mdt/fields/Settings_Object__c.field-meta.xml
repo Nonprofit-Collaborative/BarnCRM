@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Settings_Object__c</fullName>
-  <defaultValue>"Nonprofit_Settings__c"</defaultValue>
+  <defaultValue>"BarnCRM_Settings__c"</defaultValue>
   <description>
     The protected hierarchy custom setting this row reads and writes. Core rows leave this at
-    Nonprofit_Settings__c; a module ships its own settings object and names it here (ADR-0017).
+    BarnCRM_Settings__c; a module ships its own settings object and names it here (ADR-0017).
   </description>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>

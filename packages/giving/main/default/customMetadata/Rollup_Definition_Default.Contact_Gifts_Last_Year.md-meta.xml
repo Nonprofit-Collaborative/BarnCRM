@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">How many gifts this contact gave in the previous fiscal year, counted rather than added, so that a gift refunded later still counts as one gift. The fiscal year runs from the fiscal year start month in Nonprofit Settings, and a gift falls in it by its gift date. Retention reporting reads this to tell a retained donor from a reactivated one.</value>
+        <value xsi:type="xsd:string">How many gifts this contact gave in the previous fiscal year, counted rather than added, so that a gift refunded later still counts as one gift. The fiscal year runs from the fiscal year start month in BarnCRM Settings, and a gift falls in it by its gift date. Retention reporting reads this to tell a retained donor from a reactivated one.</value>
     </values>
     <values>
         <field>Definition_Key__c</field>

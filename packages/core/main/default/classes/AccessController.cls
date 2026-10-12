@@ -1,12 +1,12 @@
 /**
  * The Access page's connection to Apex.
  *
- * Every method validates what it was given, checks the Manage Nonprofit Settings custom
+ * Every method validates what it was given, checks the Manage BarnCRM Settings custom
  * permission before changing anything, and returns an AccessResult rather than throwing,
  * so the component always has a message it can put in front of a person.
  */
 public with sharing class AccessController {
-    private static final String MANAGE_SETTINGS_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String MANAGE_SETTINGS_PERMISSION = 'Manage_BarnCRM_Settings';
 
     /** Error codes the component can branch on without reading the message text. */
     public static final String ERROR_NO_PERMISSION = 'NO_PERMISSION';
@@ -180,7 +180,7 @@ public with sharing class AccessController {
     /**
      * Whether the person using the page may change roles.
      *
-     * @return true when they hold the Manage Nonprofit Settings custom permission
+     * @return true when they hold the Manage BarnCRM Settings custom permission
      */
     private static Boolean canManageAccess() {
         return FeatureManagement.checkPermission(MANAGE_SETTINGS_PERMISSION);

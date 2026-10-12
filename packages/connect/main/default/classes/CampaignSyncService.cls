@@ -46,6 +46,13 @@ public with sharing class CampaignSyncService {
     private static Schema.SObjectType resolvedType;
     private static Boolean typeResolved = false;
 
+    /**
+     * Set by tests to see the org as having no Campaign, the Platform-only shape no test org
+     * has (dynamic-apex.md section 9), so the absent path is run rather than skipped.
+     */
+    @TestVisible
+    private static Boolean unavailableForTest = false;
+
     /** Warnings collected during one call and written together by `flushLog`. */
     private static List<String> pendingMessages = new List<String>();
     private static List<Id> pendingRecordIds = new List<Id>();
@@ -75,6 +82,9 @@ public with sharing class CampaignSyncService {
 
     /** The Campaign object, or null in an org without it (a Platform-only org). */
     public static Schema.SObjectType campaignType() {
+        if (unavailableForTest == true) {
+            return null;
+        }
         if (!typeResolved) {
             resolvedType = Schema.getGlobalDescribe().get(CAMPAIGN_OBJECT);
             typeResolved = true;

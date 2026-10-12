@@ -144,7 +144,7 @@ private class HouseholdControllerTest {
 
     @IsTest
     static void thePageOpensOnTheSavedPatterns() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Household_Name_Pattern__c = '{LastName} Household';

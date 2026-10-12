@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments: the permission a send needs</shortDescription>
-    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your administrator to add you to Giving Staff or Giving Admin.</value>
+    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your administrator for the Fundraising Staff role, together with the Giving Staff permission set.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgment_UnexpectedError</fullName>
@@ -110,7 +110,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the feature is off</shortDescription>
-    <value>Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in Nonprofit Settings, under Giving.</value>
+    <value>Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_NoRules</fullName>

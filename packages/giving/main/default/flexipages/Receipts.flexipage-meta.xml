@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Receipt letters and the year end statement run, opened from Nonprofit Settings. A page of its
+    Receipt letters and the year end statement run, opened from BarnCRM Settings. A page of its
     own because the settings console renders only components Core imports (ADR-0020).
   </description>
   <flexiPageRegions>

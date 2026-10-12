@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Lets a user open the Opportunity mirror page and its entry in the Nonprofit Settings console,
+    Lets a user open the Opportunity mirror page and its entry in the BarnCRM Settings console,
     and compare gifts with Opportunities. Granted by the Opportunity Mirror permission set.
   </description>
   <isLicensed>false</isLicensed>

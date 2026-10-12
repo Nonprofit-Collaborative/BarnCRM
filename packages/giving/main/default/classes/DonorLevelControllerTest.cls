@@ -79,7 +79,7 @@ private class DonorLevelControllerTest {
         );
         Assert.isTrue(
             model.canRecalculate,
-            'This user was granted Manage Nonprofit Settings in setup.'
+            'This user was granted Manage BarnCRM Settings in setup.'
         );
     }
 

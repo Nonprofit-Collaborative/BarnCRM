@@ -38,6 +38,21 @@ Salesforce org is needed for this job. Steps:
    unguarded: check 7 below covers the vendored tree with an allowlist, and the objects it
    names are recorded, with the evidence that they are present on the Platform-only shape,
    in `packages/core/vendor/apex-rollup/VENDOR.md`.
+   It also checks Connect's object and field declarations (everything under
+   `packages/connect/**/objects/`): Connect's Apex may name Campaign or Opportunity as strings,
+   but a lookup, formula or field declared on one of those objects is resolved at deploy time
+   and refuses the install where the object is absent. A folder named after a denied object
+   fails, and so does a denied name in the file outside its prose (label, description, help
+   text, values).
+   The next workflow step, `scripts/ci/check-person-account-fields.py`, closes the gap both
+   gates leave: a static reference to a Person Account field (`IsPersonAccount`,
+   `PersonEmail`, `PersonMailingPostalCode`, any `__pc` or `__pr` field) anywhere under
+   `packages/`, outside the vendored tree. Apex comments and string literals are ignored,
+   because holding the name as text and resolving it through describe is the allowed seam
+   (`dynamic-apex.md`); a token such as `Account.PersonEmail`, a static SOQL query naming one,
+   an `@salesforce/schema` import, a `field-name` attribute, or a metadata reference such as a
+   permission set field grant fails. Custom metadata records are data and are skipped. There
+   is no exemption marker.
 7. `scripts/ci/check-object-allowlist.py`, failing the build if Apex or an `objects/`
    folder anywhere under `packages/` names a standard object that is not on the allowlist
    in that script. This is the other half of check 6 and the stronger shape: check 6 is a
@@ -82,7 +97,7 @@ Salesforce org is needed for this job. Steps:
    the repository does not ship, or a permission set group contains a set that is not there. A dangling grant refuses the whole deployment, and the
    permission sets are assembled by hand at every merge from each branch's integration
    file, so the reference and the metadata can drift apart silently. This ran because
-   `Nonprofit_Admin` granted a `Household_Member__c` tab that was never created.
+   `BarnCRM_Admin` granted a `Household_Member__c` tab that was never created.
 11. `scripts/ci/check-help-links.py`, failing the build if a Setting Definition's Learn
    more link points at a page that does not exist. `SettingsController` appends
    `Help_Path__c` to a base already ending in `docs/admin-guide/`, so a row storing
@@ -115,7 +130,7 @@ Salesforce org is needed for this job. Steps:
    page nothing assigns is never shown, so the component sits on a page nobody opens. Same
    defect class one level up, and the same symptom: it deploys, every test passes, and the
    administrator sees none of it until they wire it up by hand in the Lightning App Builder.
-   This ran because `Nonprofit_Hub.app-meta.xml` carried no `actionOverrides` at all, so the
+   This ran because `BarnCRM.app-meta.xml` carried no `actionOverrides` at all, so the
    household walkthrough failed at step 4 on every fresh install, and because
    `Gift_Record_Page` and `Commitment_Record_Page` were stranded the same way in Fundraising.
 15. `scripts/ci/check-canonical-model.py`, failing the build if a shipped object or field
@@ -282,7 +297,7 @@ scripts/org/run-org-tests.sh <org alias>
 ```
 
 It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, assigns
-`Nonprofit_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
+`BarnCRM_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
 posts `Org tests (local)` on that commit: success only when every test passed, failure
 otherwise. It names the test classes rather than running every test in the org, because the
 test org is shared: another branch's deploy can leave its own test classes behind, and those
@@ -322,10 +337,13 @@ once more. A run with any result, including real failures, is never retried. Dep
 that stall are resubmitted too: see "Stalled deploys" under `org-tests`.
 
 **At about 2,200 tests the sf CLI can run out of memory reading the results.** The Node
-process aborts with `JavaScript heap out of memory` after every stage has deployed, the retry
-hits the same wall, and the script posts a failure reading `0 of 0 failed`: no test failed.
-Run the gate with a larger heap:
-`NODE_OPTIONS=--max-old-space-size=8192 scripts/org/run-org-tests.sh <org alias>`.
+process aborts with `JavaScript heap out of memory` after every stage has deployed. The script
+exports `NODE_OPTIONS=--max-old-space-size=8192` itself (a larger heap you set is kept; other
+`NODE_OPTIONS` flags are preserved). If the CLI still crashes, or returns empty or unreadable
+output, the script prints "sf CLI crashed, rerun", exits 3, does not retry, and posts no
+`Org tests (local)` status (it used to post a failure reading `0 of 0 failed`). Rerun the gate.
+The CLI has no option to omit passing-test detail from the JSON, so the payload is not reduced.
+`deploy-packages.sh` has not shown the crash and is unchanged.
 
 **One test depends on Salesforce's own duplicate matching.**
 `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce` asks the platform's
@@ -733,27 +751,30 @@ Code users. Everything below is pushed to GitHub; nothing lives only on a local 
 Remove each item from this list in the PR that finishes it.
 
 Last checked 2026-10-12: nothing below has changed since 2026-09-26. `main` is at PR #178, the
-C-29 stack is still open with a `failure` status on its top head, and two Dependabot PRs (#179,
-#180) are open. The plan's Section 0 carries the same build-state summary.
+C-29 stack is still open and needs a gate run on its new top head, Dependabot #179 is merged,
+and #180 is open. The plan's Section 0 carries the same build-state summary.
 
 ### Waiting to merge: C-29 neutral Core (PRs #163 to #174)
 
 - Branches `feature/c-29-neutral-core-1` to `-12`, stacked; top head
-  `3da9276ad53ed3231e01b314d7e0e6205a23f8e7`. Review approved. ADR-0059 is already numbered.
-- Not yet tested cleanly: the `Org tests (local)` status on the top head is `failure`. Of two
+  `ffcf5b6562c39f837578dec6f04a69bdc528d790`. Review approved. ADR-0059 is already numbered.
+  That head merged `main` in on 2026-10-12 (no conflicts); the earlier head was `3da9276`.
+- Not yet tested cleanly: the last `Org tests (local)` status, on `3da9276`, was `failure`. Of two
   full runs, one hit the sf CLI heap crash, and the other passed 2,234 of 2,235; the one failure
   was the flaky `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce`,
   which passed 16 times out of 16 when run alone.
 - To land it:
   1. Run one full gate from a clean detached worktree at the top head, with
-     `NODE_OPTIONS=--max-old-space-size=8192 scripts/org/run-org-tests.sh oi-test` (or `oi-pa`).
+     `scripts/org/run-org-tests.sh oi-test` (or `oi-pa`).
      If only the flaky test fails, rerun the gate.
   2. Fast-forward each lower branch to the top head:
-     `git push origin 3da9276ad53ed3231e01b314d7e0e6205a23f8e7:refs/heads/feature/c-29-neutral-core-N`
+     `git push origin ffcf5b6562c39f837578dec6f04a69bdc528d790:refs/heads/feature/c-29-neutral-core-N`
      for N = 1 to 11.
-  3. Wait for the CI checks.
+  3. Wait for the CI checks. The jest test `setupStepFields` "opens the tab a navigation field
+     names" fails about one full parallel run in five (it passes alone); if it is the only static
+     failure, re-run the job once.
   4. Squash-merge the bottom PR:
-     `gh pr merge 163 --squash --match-head-commit 3da9276ad53ed3231e01b314d7e0e6205a23f8e7`.
+     `gh pr merge 163 --squash --match-head-commit ffcf5b6562c39f837578dec6f04a69bdc528d790`.
      The stacked PRs close as merged.
 
 ### Never tested
@@ -766,21 +787,9 @@ C-29 stack is still open with a `failure` status on its top head, and two Depend
 ### Work items
 
 These are also recorded, in the same detail, in plan Section 11.3 (parking lot). Remove an item
-from both when its PR merges.
+from both when its PR merges. Item numbers match the plan's and are kept when an item is
+removed, so a list may start above 1.
 
-1. **Harden the settings writers and cap uncapped counts.**
-   - `SettingsService.applyValues`, through `SettingsWriter.saveOrgDefault`, upserts the whole
-     cached, unlocked `Nonprofit_Settings__c` record. It should update only the changed fields
-     through `OrgSettingsSystemWriter` and `SettingsRecordSelector.lockStored()`.
-   - Giving makes raw first saves from `getOrgDefaults()` in `AcknowledgmentService`,
-     `DonorLevelWriter`, `AccountingPeriodWriter`, `AcknowledgmentController` and
-     `CommitmentService`. A first save from the raw record writes false into
-     `Giving_Settings__c` checkboxes that default to true:
-     - `Auto_Apply_Gifts_To_Installments__c`
-     - `Automatic_Household_Soft_Credits__c`
-     - `Receipt_Print_Logo__c`
-   - `SettingsService.getSettingsForUpdate()` takes no lock: rename it.
-   - Cap `HealthCheckSettingsChecks.countNew()`.
 2. **Log unrecognized checkbox values in imports.** `ImportRowProcessor.convertCheckbox` reads
    only `true`, `yes` and `1` as true. The new rule:
    - **True:** `true`, `yes`, `y`, `1`, `x`, `checked`, `on`, `t`.
@@ -789,36 +798,13 @@ from both when its PR merges.
    - **Anything else:** skip the field, with a note in the run log.
 
    Update the admin guide first. Add tests, including a 200-row bulk case.
-3. **Fix the dynamic Apex convention violations** (see `dynamic-apex.md`).
-   - **Bug:** `HealthCheckOrgShapeChecks` looks for a `ConnectService` class that does not
-     exist, so it always reports Connect as not installed. Point it at a real Connect class,
-     and update item 4 of `packages/core/integration/c-07-c-11.permissions.md`.
-   - **Uncapped counts:** `ReceiptGapSelector` (on `main`; C-29 replaces it),
-     `CampaignSyncSelector.countAppeals`, `HubErrorCountSelector.countNewErrors`, and
-     `HealthCheckSettingsChecks.errorLogFinding` (use `countNewUpTo`).
-   - **Describes inside loops:** `ImportMatcher.firstNameOf`, `ImportUndoBatch.fieldMap`, and
-     `SettingsService.hasKey` / `SettingsController.toSetting`.
-   - **`HubErrorCountSelector`:** add a field-level check on `Status__c` and a namespace-first
-     lookup.
-   - **Wrong-shape classes:** `ImportEntityProcessors` and `SampleDataModules` should log them.
-     `SampleDataModules` should also cache its lookups.
-   - **CI gaps:**
-     - add a static check for Person Account field references;
-     - extend `check-standard-objects.sh` to cover the declarations in `packages/connect`.
-   - **Tests:**
-     - add a "Campaign unavailable" test seam;
-     - make tests that return early assert both cases.
-4. **Raise the sf CLI heap in the org test script.**
-   - Export `NODE_OPTIONS=--max-old-space-size=8192` in `scripts/org/run-org-tests.sh`, and in
-     `scripts/org/deploy-packages.sh` if it needs it.
-   - Detect the out-of-memory signature and report it as a client crash, not as "0 of 0
-     failed".
-   - Consider requesting a smaller result payload.
-   - Update the heap paragraph in this page.
 5. **Smaller review follow-ups.**
    - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
    - X-01: the admin guide should warn against listing `Master` in the record-type filter.
    - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.
+   - X-01: about 30 Opportunity mirror tests return early where Opportunity is absent without
+     asserting that case. Add an `OpportunityMirrorService` unavailable seam, as
+     `CampaignSyncService.unavailableForTest` does for Campaign.
 
 ### Next on the roadmap
 

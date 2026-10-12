@@ -8,8 +8,8 @@
  */
 @IsTest
 private class AutomationResumeJobTest {
-    private static User nonprofitAdmin() {
-        return TestDataFactory.createUser('Maria', new List<String>{ 'Nonprofit_Admin' });
+    private static User barnCrmAdmin() {
+        return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
     private static List<CronTrigger> resumeJobs() {
@@ -21,13 +21,13 @@ private class AutomationResumeJobTest {
     }
 
     private static Datetime storedPause() {
-        return Nonprofit_Settings__c.getOrgDefaults().Automation_Paused_Until__c;
+        return BarnCRM_Settings__c.getOrgDefaults().Automation_Paused_Until__c;
     }
 
     @IsTest
     static void anExpiredPauseIsClearedAndTheResumeIsAudited() {
         Datetime ended = TestDataFactory.pausedSettings(-1).Automation_Paused_Until__c;
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         System.runAs(maria) {
             Test.startTest();
@@ -57,7 +57,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void pausingSchedulesTheResumeForTheEndAndResumingCancelsIt() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         System.runAs(maria) {
             Test.startTest();
@@ -87,7 +87,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void pausingAgainReplacesTheScheduledResume() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         System.runAs(maria) {
             Test.startTest();
@@ -107,7 +107,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void aJobForAnEarlierPauseLeavesTheNewerOneAlone() {
         Datetime stored = TestDataFactory.pausedSettings(-1).Automation_Paused_Until__c;
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         System.runAs(maria) {
             Test.startTest();
@@ -122,7 +122,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void aPauseStillPausesWhenItsResumeCannotBeScheduled() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
         AutomationControl.schedulingFailsForTest = true;
 
         System.runAs(maria) {
@@ -144,7 +144,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void aResumeThatFiresBeforeTheEndLeavesThePauseAlone() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         System.runAs(maria) {
             Test.startTest();
@@ -176,7 +176,7 @@ private class AutomationResumeJobTest {
         TestDataFactory.insertAutomationSettings(
             new Map<String, Boolean>{ 'Household_Naming' => true }
         );
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         System.runAs(maria) {
             Test.startTest();
@@ -198,7 +198,7 @@ private class AutomationResumeJobTest {
     @IsTest
     static void onlyAnAdministratorCanPauseOrScheduleAResume() {
         TestDataFactory.defaultSettings();
-        User david = TestDataFactory.createUser('David', new List<String>{ 'Nonprofit_Staff' });
+        User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
         System.runAs(david) {
             Test.startTest();

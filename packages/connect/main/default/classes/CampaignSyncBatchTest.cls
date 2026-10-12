@@ -30,6 +30,15 @@ private class CampaignSyncBatchTest {
         return maria;
     }
 
+    /** The absent branch: the appeals the setup made are all still without a Campaign. */
+    private static void assertNoAppealLinked() {
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Appeal__c WHERE Campaign_Id__c != NULL WITH SYSTEM_MODE],
+            'Without Campaign no appeal is linked (R-CS1).'
+        );
+    }
+
     @IsTest
     static void oneRunGivesEveryAppealItsCampaign() {
         CampaignSyncBatch.chainSecondPass = false;
@@ -52,6 +61,7 @@ private class CampaignSyncBatchTest {
     @IsTest
     static void theSecondPassPutsAChildUnderItsParent() {
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         User admin = maria();
@@ -106,6 +116,7 @@ private class CampaignSyncBatchTest {
     @IsTest
     static void anAppealThatCannotBeSavedDoesNotCostTheChunkItsLinks() {
         if (!CampaignSyncService.isAvailable()) {
+            assertNoAppealLinked();
             return;
         }
         // Two appeals that are each other's parent, made with Giving's hierarchy check and the
