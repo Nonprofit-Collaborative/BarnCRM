@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description
+  >Template for the delete half of the automation "Keep both sides of relationships in step" (registry row Relationship_Reciprocal). Copy it together with the save template. When a relationship whose Keep Both Sides In Step box is ticked is deleted, deletes its other side too. Deleting both sides in the same save can be refused: delete one side. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  <environments>Default</environments>
+  <interviewLabel>BarnCRM template: Keep both sides of relationships in step (delete) {!$Flow.CurrentDateTime}</interviewLabel>
+  <isTemplate>true</isTemplate>
+  <label>BarnCRM template: Keep both sides of relationships in step (delete)</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <recordDeletes>
+    <description>Deletes the other side, when it still points back at this one.</description>
+    <name>Delete_Other_Side</name>
+    <label>Delete other side</label>
+    <locationX>176</locationX>
+    <locationY>431</locationY>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Id</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Reciprocal_Relationship__c</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Reciprocal_Relationship__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Id</elementReference>
+      </value>
+    </filters>
+    <object>Relationship__c</object>
+  </recordDeletes>
+  <recordUpdates>
+    <description>Clears Keep Both Sides In Step on the other side first. Without this, deleting the other side would run this flow again on it, and it would try to delete the record already being deleted here.</description>
+    <name>Release_Other_Side</name>
+    <label>Release other side</label>
+    <locationX>176</locationX>
+    <locationY>323</locationY>
+    <connector>
+      <targetReference>Delete_Other_Side</targetReference>
+    </connector>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Id</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Reciprocal_Relationship__c</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Reciprocal_Relationship__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Id</elementReference>
+      </value>
+    </filters>
+    <inputAssignments>
+      <field>Is_Reciprocal_Managed__c</field>
+      <value>
+        <booleanValue>false</booleanValue>
+      </value>
+    </inputAssignments>
+    <object>Relationship__c</object>
+  </recordUpdates>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Release_Other_Side</targetReference>
+    </connector>
+    <filterFormula>AND({!$Record.Is_Reciprocal_Managed__c}, NOT(ISBLANK({!$Record.Reciprocal_Relationship__c})))</filterFormula>
+    <object>Relationship__c</object>
+    <recordTriggerType>Delete</recordTriggerType>
+    <triggerType>RecordBeforeDelete</triggerType>
+  </start>
+  <status>Draft</status>
+</Flow>
