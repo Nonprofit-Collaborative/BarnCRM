@@ -5239,6 +5239,69 @@ only, because a gift is never edited from its Opportunity.
 
 ---
 
+## 29D. Interaction Note
+
+### Definition
+
+A note a staff member writes about a conversation, a meeting or a visit with a person or an
+account: when it happened, what kind of interaction it was, who took part and what was said
+(plan Section 5.1, feature C-39). It is the lightweight version of a contact report.
+
+An interaction note is not an entity of its own. It is a completed platform activity (a Task)
+logged through the packaged action "Log an interaction". The package adds no object, no field
+on Task or Activity, and no automation on Task (ADR-NEXT,
+`NEXT-interaction-notes-are-completed-tasks.md`).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Subject | text | yes | A short line that says what the interaction was about. |
+| Date | date | yes (defaults today) | The day the interaction happened, which may be earlier than the day the note is written. |
+| Kind | picklist (the org's Task Type values) | no (defaults Meeting) | What kind of interaction it was: a meeting, a call, a visit, or another value the org keeps. |
+| Notes | long text | no | What was said and what was agreed. |
+| Staff member | reference(User) | yes (defaults the person logging it) | Who held the interaction. |
+| People | reference(Contact), one or several | no | The people who took part. Several only where the org relates multiple contacts to tasks. |
+| Account | reference(Account) | no | The household or organization the note is about. Set from the account the note is logged on, or derived by the platform from the person's account. |
+| Status | picklist | yes (always Completed) | Completed, so the note is history rather than a to-do. |
+
+### Relationships
+
+- **Interaction Note to Contact**, many to one (many to many where the org relates multiple
+  contacts to tasks), through `WhoId`.
+- **Interaction Note to Account**, many to one, through `WhatId` when logged on an account and
+  through the platform-derived `AccountId` when logged on a person.
+
+### Rules
+
+**R-IN1 An interaction note is history.** It is created Completed and dated the day the
+interaction happened. Next steps are an open task, not a field on the note.
+
+**R-IN2 Visibility follows the record.** A note is readable by anyone who can see the person or
+the account it is on. There is no per-note confidentiality (ADR-NEXT, owner question).
+
+**R-IN3 Where it shows.** A note logged on a person shows on the person's timeline and on the
+timeline of the account their contact points at: the household in contact mode, the employer
+or nothing in junction mode. A note logged on an account shows on that account.
+
+**R-IN4 No packaged schema on activities.** Nothing in the package reads, writes or extends
+Task for this feature beyond the action that creates it.
+
+### Salesforce implementation
+
+- **Object:** Task (standard), Status Completed.
+- **Standard fields used:** `Subject`, `ActivityDate` (Date), `Type` (Kind), `Description`
+  (Notes), `OwnerId` (Staff member), `WhoId` (People), `WhatId` and `AccountId` (Account),
+  `Status`.
+- **Quick actions:** `Contact.Log_Interaction` (Create on Task, parent field Who) and
+  `Account.Log_Interaction` (Create on Task, parent field What), labelled "Log an interaction".
+  Predefined values: Status Completed, ActivityDate `TODAY()`, Type Meeting.
+- **Placement:** Dynamic Actions on `Contact_Record_Page` (Edit, Log an interaction, Delete)
+  and `Account_Record_Page` (after Edit, for every record type), and the action list of the
+  Account fallback layout (ADR-0043).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -5398,6 +5461,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| Interaction Note (Task, no packaged schema) | Core | v0.9 | 29D |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
@@ -5471,3 +5535,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| v0.9 | 2026-10-12 | C-39 interaction notes (ADR-NEXT, `NEXT-interaction-notes-are-completed-tasks.md`). New Section 29D, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
