@@ -12,7 +12,7 @@ private class AutomationControlTest {
     private static final String HOUSEHOLDS = 'Household_Creation';
     private static final String LOCK = 'Gift_Receipt_Lock';
 
-    private static User nonprofitAdmin() {
+    private static User barnCrmAdmin() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
@@ -23,7 +23,7 @@ private class AutomationControlTest {
     @IsTest
     static void mariaPausesForTwoHoursAndTheBannerKnowsWhenItEnds() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         System.runAs(maria) {
@@ -56,7 +56,7 @@ private class AutomationControlTest {
     @IsTest
     static void mariaResumesBeforeThePauseExpires() {
         TestDataFactory.pausedSettings(2);
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
         Assert.isTrue(AutomationControl.isPaused(), 'Set up as paused.');
 
         Test.startTest();
@@ -126,7 +126,7 @@ private class AutomationControlTest {
     @IsTest
     static void onlyTheOfferedPauseLengthsAreAccepted() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
         Assert.areEqual(
             new Set<Integer>{ 1, 2, 4, 8, 24 },
             AutomationControl.allowedPauseHours(),
@@ -158,7 +158,7 @@ private class AutomationControlTest {
         TestDataFactory.insertAutomationSettings(
             new Map<String, Boolean>{ NAMING => true, HOUSEHOLDS => true }
         );
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
         Assert.isTrue(AutomationControl.isEnabled(NAMING), 'It starts switched on.');
 
         Test.startTest();
@@ -183,7 +183,7 @@ private class AutomationControlTest {
     @IsTest
     static void switchingSomethingToTheValueItAlreadyHasChangesNothing() {
         TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ NAMING => true });
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         System.runAs(maria) {
@@ -201,7 +201,7 @@ private class AutomationControlTest {
     @IsTest
     static void switchingSomethingThatDoesNotExistSaysSo() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         System.runAs(maria) {
@@ -241,7 +241,7 @@ private class AutomationControlTest {
         );
         insert lockRow;
         AutomationControl.clearCache();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         System.runAs(maria) {

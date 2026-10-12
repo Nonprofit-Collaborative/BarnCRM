@@ -1,5 +1,5 @@
 /**
- * Builds, in a test, the access a person needs to change settings: the Manage Nonprofit
+ * Builds, in a test, the access a person needs to change settings: the Manage BarnCRM
  * Settings custom permission plus create and read on the audit object, which is what the
  * packaged BarnCRM Admin permission set grants in a real org.
  *

@@ -1771,7 +1771,7 @@ public with sharing class HouseholdService {
         Set<Id> withPrimary = new Set<Id>();
         for (Account household : households) {
             // Only a household. An organization shares the Primary Contact field (R-O3),
-            // where it names the person the nonprofit deals with rather than a member, and
+            // where it names the person the organization deals with rather than a member, and
             // household upkeep never touches it.
             Boolean isHousehold = recordTypeId != null && household.RecordTypeId == recordTypeId;
             if (isHousehold && household.Primary_Contact__c != null) {

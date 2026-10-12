@@ -128,7 +128,7 @@ public with sharing class HealthCheckService {
      */
     public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
     public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';
-    public static final Set<String> NONPROFIT_GROUPS = new Set<String>{
+    public static final Set<String> BARNCRM_GROUPS = new Set<String>{
         GROUP_ADMIN,
         'Fundraising_Staff',
         'Program_Staff',
@@ -140,7 +140,7 @@ public with sharing class HealthCheckService {
      * The packaged permission sets themselves. An administrator who assigned one of these
      * directly, rather than through a role, has still given that person the app.
      */
-    public static final Set<String> NONPROFIT_PERMISSION_SETS = new Set<String>{
+    public static final Set<String> BARNCRM_PERMISSION_SETS = new Set<String>{
         PERMISSION_SET_ADMIN,
         'BarnCRM_Staff',
         'BarnCRM_Read_Only'
@@ -322,9 +322,9 @@ public with sharing class HealthCheckService {
         }
 
         public Integer usersWithoutAccess() {
-            Set<Id> assigned = UserAccessSelector.getAssignedUserIds(NONPROFIT_GROUPS);
+            Set<Id> assigned = UserAccessSelector.getAssignedUserIds(BARNCRM_GROUPS);
             assigned.addAll(
-                UserAccessSelector.getPermissionSetAssigneeIds(NONPROFIT_PERMISSION_SETS)
+                UserAccessSelector.getPermissionSetAssigneeIds(BARNCRM_PERMISSION_SETS)
             );
             return UserAccessSelector.countActiveStandardUsersExcluding(assigned);
         }

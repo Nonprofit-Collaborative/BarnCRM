@@ -1,6 +1,6 @@
 /**
  * The settings object is a protected component, so no permission set can grant a subscriber
- * user write access to it. The write therefore runs in system mode and the Manage Nonprofit
+ * user write access to it. The write therefore runs in system mode and the Manage BarnCRM
  * Settings custom permission is the gate. These tests hold that gate honest.
  */
 @IsTest

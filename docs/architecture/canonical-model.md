@@ -3460,7 +3460,7 @@ proof rather than invisible on the donor's copy.
 the sentences R-RC7 requires. A template that also types them produces them twice, which is
 the administrator's to fix, and a template that omits them still produces a valid receipt.
 
-**R-RT4 The shipped letters arrive at install, and writing one needs Manage Nonprofit
+**R-RT4 The shipped letters arrive at install, and writing one needs Manage BarnCRM
 Settings.** `Receipt_Template_Default__mdt` is materialized by the Giving post-install script,
 at install and at every upgrade, creating only what the org does not have (ADR-0029). The
 Receipts page carries a Restore the shipped letters action for an install whose step failed,

@@ -1,6 +1,6 @@
 /**
  * The Automation page as two people see it: Maria, who has the Manage BarnCRM Settings
- * permission through the BarnCRM Admin role, and David, who has the Nonprofit Staff role and
+ * permission through the BarnCRM Admin role, and David, who has the BarnCRM Staff permission set and
  * does not.
  *
  * Both are built on a minimal profile with only a packaged permission set, so these tests prove
@@ -10,7 +10,7 @@
 private class AutomationControlControllerTest {
     private static final String NAMING = 'Household_Naming';
 
-    private static User nonprofitAdmin() {
+    private static User barnCrmAdmin() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }
 
@@ -22,7 +22,7 @@ private class AutomationControlControllerTest {
     static void thePageListsEveryAutomationAndThePauseState() {
         TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ NAMING => true });
         TestDataFactory.pausedSettings(2);
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         AutomationControlController.AutomationPageView page;
@@ -56,7 +56,7 @@ private class AutomationControlControllerTest {
             Is_Package_Default__c = true
         );
         AutomationControl.clearCache();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         AutomationControlController.AutomationPageView page;
@@ -87,7 +87,7 @@ private class AutomationControlControllerTest {
     static void mariaPausesResumesAndSwitchesOneAutomationOff() {
         TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ NAMING => true });
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         System.runAs(maria) {
@@ -158,7 +158,7 @@ private class AutomationControlControllerTest {
     @IsTest
     static void aPauseLengthThatIsNotOfferedIsRefused() {
         TestDataFactory.defaultSettings();
-        User maria = nonprofitAdmin();
+        User maria = barnCrmAdmin();
 
         Test.startTest();
         System.runAs(maria) {

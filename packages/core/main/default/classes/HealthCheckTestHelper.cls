@@ -12,7 +12,7 @@
 @IsTest
 public class HealthCheckTestHelper {
     /** The packaged role an administrator of BarnCRM is given (admin guide, Access). */
-    private static final String NONPROFIT_ADMIN = HealthCheckService.PERMISSION_SET_ADMIN;
+    private static final String ADMIN_PERMISSION_SET = HealthCheckService.PERMISSION_SET_ADMIN;
 
     /**
      * Maria: a user holding the Manage BarnCRM Settings custom permission, and the packaged
@@ -42,7 +42,7 @@ public class HealthCheckTestHelper {
         List<PermissionSet> packaged = [
             SELECT Id
             FROM PermissionSet
-            WHERE Name = :NONPROFIT_ADMIN
+            WHERE Name = :ADMIN_PERMISSION_SET
             LIMIT 1
         ];
         System.assert(
@@ -106,7 +106,7 @@ public class HealthCheckTestHelper {
             Email = alias + '@example.invalid',
             EmailEncodingKey = 'UTF-8',
             FirstName = alias.capitalize(),
-            LastName = 'Nonprofit',
+            LastName = 'Tester',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
             ProfileId = UserInfo.getProfileId(),

@@ -207,7 +207,7 @@ private class AccessServiceTest {
     }
 
     @IsTest
-    static void removeRoleRefusesToRemoveTheLastNonprofitAdmin() {
+    static void removeRoleRefusesToRemoveTheLastBarnCrmAdmin() {
         TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
         User maria = insertUser('Maria', 'Alvarez');
         AccessService.assignRole(maria.Id, AccessService.ADMIN_ROLE);

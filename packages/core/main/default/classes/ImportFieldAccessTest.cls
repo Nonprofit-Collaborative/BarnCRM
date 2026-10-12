@@ -144,7 +144,7 @@ private class ImportFieldAccessTest {
     }
 
     @IsTest
-    static void aNonprofitAdminLoadsTheOptOuts() {
+    static void aBarnCrmAdminLoadsTheOptOuts() {
         given();
         User person = importer();
         ImportRowProcessor.Outcome committed;

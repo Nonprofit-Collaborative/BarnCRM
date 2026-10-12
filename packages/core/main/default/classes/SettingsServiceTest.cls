@@ -378,7 +378,7 @@ private class SettingsServiceTest {
 
         Assert.areEqual(
             SettingsService.typeByName('BarnCRM_Settings__c'),
-            SettingsService.typeByName(' nonprofit_settings__c '),
+            SettingsService.typeByName(' barncrm_settings__c '),
             'The cached lookup ignores case and spacing, like the describe it replaces'
         );
         Assert.isNull(SettingsService.typeByName('Not_A_Settings_Object__c'), 'Absent stays null');

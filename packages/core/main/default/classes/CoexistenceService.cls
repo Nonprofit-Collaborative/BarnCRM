@@ -269,7 +269,7 @@ public with sharing class CoexistenceService {
 
     /**
      * Change the mode on behalf of the person asking, which is what the settings console and
-     * Health Check do. Unlike setMode, this refuses anyone without the Manage Nonprofit
+     * Health Check do. Unlike setMode, this refuses anyone without the Manage BarnCRM
      * Settings permission: the coexistence mode governs how the whole package behaves, so it
      * is an administrator's decision even where the calling code forgot to say so.
      *
