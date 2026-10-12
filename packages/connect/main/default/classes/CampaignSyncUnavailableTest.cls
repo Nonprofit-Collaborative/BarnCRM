@@ -78,7 +78,7 @@ private class CampaignSyncUnavailableTest {
 
         Test.startTest();
         CampaignSyncService.Result result = CampaignSyncService.syncSaved(
-            [SELECT Id, Name, Campaign_Id__c FROM Appeal__c]
+            [SELECT Id, Name, Campaign_Id__c FROM Appeal__c WITH SYSTEM_MODE]
         );
         Test.stopTest();
 
