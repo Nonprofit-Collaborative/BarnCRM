@@ -101,6 +101,27 @@
                 ></lightning-input>
             </div>
 
+            <template lwc:if={showPayments}>
+                <div class="slds-var-m-top_small">
+                    <lightning-combobox
+                        label={labels.paysLabel}
+                        field-level-help={labels.paysHelp}
+                        options={paymentOptions}
+                        value={installmentId}
+                        onchange={handlePaymentChange}
+                        data-id="pays"
+                    ></lightning-combobox>
+                    <p class="slds-form-element__help" aria-live="polite" data-id="pays-note">
+                        {paymentNote}
+                    </p>
+                </div>
+            </template>
+            <template lwc:if={paymentLoadFailed}>
+                <p class="slds-var-m-top_small slds-text-color_weak" role="status" data-id="pays-error">
+                    {labels.paysErrorLoad}
+                </p>
+            </template>
+
             <div class="slds-var-m-top_small">
                 <lightning-combobox
                     required

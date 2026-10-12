@@ -319,6 +319,122 @@ private class QuickGiftEntryControllerTest {
         );
     }
 
+    /** An active pledge of this person with one payment of 50 due today. */
+    private static Installment__c pledgePaymentDueToday(Id personId) {
+        Commitment__c pledge = new Commitment__c(
+            Type__c = 'Pledge',
+            Status__c = 'Active',
+            Donor_Contact__c = personId,
+            Amount__c = 50,
+            Frequency__c = 'Monthly',
+            Start_Date__c = Date.today(),
+            Expected_Total__c = 50,
+            Installments_Planned__c = 1
+        );
+        insert pledge;
+        delete [SELECT Id FROM Installment__c WHERE Commitment__c = :pledge.Id];
+        Installment__c payment = new Installment__c(
+            Commitment__c = pledge.Id,
+            Sequence__c = 1,
+            Due_Date__c = Date.today(),
+            Expected_Amount__c = 50,
+            Status__c = 'Scheduled'
+        );
+        insert payment;
+        return payment;
+    }
+
+    @IsTest
+    static void offersTheDonorsPaymentAndChoosesTheOnlyMatch() {
+        Contact donor = makeContact();
+        Installment__c payment = pledgePaymentDueToday(donor.Id);
+
+        Test.startTest();
+        GiftEntryPayments.Choices choices = QuickGiftEntryController.getPaymentChoices(
+            donor.Id,
+            null,
+            Date.today(),
+            50
+        );
+        Test.stopTest();
+
+        Assert.areEqual(1, choices.choices.size(), 'The one payment owed is offered.');
+        Assert.areEqual(payment.Id, choices.suggestedId, 'It is the only match, so it is chosen.');
+    }
+
+    @IsTest
+    static void savesAGiftThatPaysTheChosenPayment() {
+        makeFund();
+        Contact donor = makeContact();
+        Installment__c payment = pledgePaymentDueToday(donor.Id);
+        QuickGiftEntryController.GiftInput input = baseInput();
+        input.donorContactId = donor.Id;
+        input.installmentId = payment.Id;
+
+        Test.startTest();
+        QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+        Test.stopTest();
+
+        Assert.isTrue(result.success, 'The gift saved: ' + result.fieldErrors + result.formError);
+        Gift__c saved = [
+            SELECT Installment__c, Commitment__c
+            FROM Gift__c
+            WHERE Id = :result.giftId
+        ];
+        Assert.areEqual(payment.Id, saved.Installment__c, 'The gift pays the payment chosen.');
+        Assert.areEqual(payment.Commitment__c, saved.Commitment__c, 'And belongs to its pledge.');
+        Assert.areEqual(
+            'Paid',
+            [SELECT Status__c FROM Installment__c WHERE Id = :payment.Id].Status__c,
+            'The payment is paid by the gift triggers.'
+        );
+    }
+
+    @IsTest
+    static void refusesAPaymentOfAnotherDonorAndSavesNothing() {
+        makeFund();
+        Contact donor = makeContact();
+        Contact someoneElse = new Contact(FirstName = 'Kim', LastName = 'Lee');
+        insert someoneElse;
+        Installment__c payment = pledgePaymentDueToday(someoneElse.Id);
+        QuickGiftEntryController.GiftInput input = baseInput();
+        input.donorContactId = donor.Id;
+        input.installmentId = payment.Id;
+
+        Test.startTest();
+        QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+        Test.stopTest();
+
+        Assert.isFalse(result.success, 'Nothing saved.');
+        Assert.areEqual(
+            Label.Giving_GiftEntryPays_ErrorNotOpen,
+            messagesByField(result.fieldErrors).get('installmentId'),
+            'The message sits beside the payment list.'
+        );
+        Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift was written.');
+    }
+
+    @IsTest
+    static void refusesAPaymentForAGiftOfGoods() {
+        Contact donor = makeContact();
+        Installment__c payment = pledgePaymentDueToday(donor.Id);
+        QuickGiftEntryController.GiftInput input = baseInput();
+        input.donorContactId = donor.Id;
+        input.giftType = 'In-kind';
+        input.inKindDescription = 'Two chairs';
+        input.installmentId = payment.Id;
+
+        Test.startTest();
+        QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+        Test.stopTest();
+
+        Assert.areEqual(
+            Label.Giving_GiftEntryPays_ErrorInKind,
+            messagesByField(result.fieldErrors).get('installmentId'),
+            'A gift of goods pays no pledge.'
+        );
+    }
+
     @IsTest
     static void saysSoWhenNothingArrivedToSave() {
         Test.startTest();

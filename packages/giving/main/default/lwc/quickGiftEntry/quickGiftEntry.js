@@ -8,6 +8,7 @@ import APPEAL_OBJECT from '@salesforce/schema/Appeal__c';
 
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
+import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
 
 import heading from '@salesforce/label/c.Giving_QuickGiftEntry_Heading';
 import donorKindLabel from '@salesforce/label/c.Giving_QuickGiftEntry_DonorKindLabel';
@@ -38,8 +39,16 @@ import errorTitle from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorTitle';
 import errorLoadDefaults from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorLoadDefaults';
 import errorUnexpected from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorUnexpected';
 import fundNotApplied from '@salesforce/label/c.Giving_QuickGiftEntry_FundNotApplied';
+import paysLabel from '@salesforce/label/c.Giving_GiftEntryPays_Label';
+import paysHelp from '@salesforce/label/c.Giving_GiftEntryPays_Help';
+import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
+import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
+import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
+import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
 
 const IN_KIND = 'In-kind';
+/** How long typing has to pause before the donor's payments are looked up again. */
+const PAYMENT_LOOKUP_DELAY_MS = 300;
 const PERSON = 'person';
 const ORGANIZATION = 'organization';
 const ACCOUNT = 'Account';
@@ -50,6 +59,7 @@ const FIELD_ORDER = [
   ['donor', 'donor-person', 'donor-organization'],
   ['amount', 'amount'],
   ['giftDate', 'gift-date'],
+  ['installmentId', 'pays'],
   ['giftType', 'gift-type'],
   ['inKindDescription', 'in-kind-description'],
   ['fairMarketValue', 'fair-market-value'],
@@ -91,7 +101,10 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     saveAndNewButton,
     savingMessage,
     errorTitle,
-    openGiftLink
+    openGiftLink,
+    paysLabel,
+    paysHelp,
+    paysErrorLoad
   };
 
   donorKind = PERSON;
@@ -104,6 +117,16 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   appealId;
   fundId;
   paymentReference;
+  /** The scheduled payment this gift pays; empty means None, a gift on its own (R-DM8). */
+  installmentId = '';
+  /** The donor's payments as the controller last described them, or null when there are none to show. */
+  paymentChoices = null;
+  /** True once the person chose in the list themselves, so a later lookup keeps their choice. */
+  paymentPicked = false;
+  paymentNote;
+  paymentLoadFailed = false;
+  paymentLookup = 0;
+  paymentTimer;
 
   giftTypeOptions = [];
   hasPersonAccounts = false;
@@ -126,6 +149,10 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   connectedCallback() {
     this.prefillFromRecordPage();
     this.loadDefaults();
+  }
+
+  disconnectedCallback() {
+    clearTimeout(this.paymentTimer);
   }
 
   get donorKindOptions() {
@@ -177,25 +204,131 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     return this.saving || this.entrySaved;
   }
 
+  /** The list appears only for a gift of money from a donor who still owes a payment. */
+  get showPayments() {
+    return (
+      this.isMoneyGift && Boolean(this.paymentChoices) && this.paymentChoices.choices.length > 0
+    );
+  }
+
+  /** None first, always, then the donor's payments earliest due first. */
+  get paymentOptions() {
+    const choices = this.paymentChoices ? this.paymentChoices.choices : [];
+    return [
+      { label: paysNone, value: '' },
+      ...choices.map((choice) => ({ label: choice.label, value: choice.value }))
+    ];
+  }
+
   handleDonorKindChange(event) {
     this.markChanged(event);
     this.donorKind = event.detail.value;
     this.donorId = undefined;
+    this.forgetPayment();
   }
 
   handleDonorChange(event) {
     this.markChanged(event);
     this.donorId = event.detail ? event.detail.recordId : undefined;
+    this.forgetPayment();
+    this.schedulePaymentLookup();
   }
 
   handleAmountChange(event) {
     this.markChanged(event);
     this.amount = event.detail.value;
+    this.schedulePaymentLookup();
   }
 
   handleDateChange(event) {
     this.markChanged(event);
     this.giftDate = event.detail.value;
+    this.schedulePaymentLookup();
+  }
+
+  handlePaymentChange(event) {
+    this.markChanged(event);
+    this.installmentId = event.detail.value || '';
+    this.paymentPicked = true;
+    this.paymentNote = undefined;
+  }
+
+  /** A new donor owes different payments: what was chosen for the last one goes. */
+  forgetPayment() {
+    this.paymentLookup += 1;
+    this.paymentChoices = null;
+    this.installmentId = '';
+    this.paymentPicked = false;
+    this.paymentNote = undefined;
+    this.paymentLoadFailed = false;
+  }
+
+  /** Waits for typing to pause, so a lookup is not made for every digit of an amount. */
+  schedulePaymentLookup() {
+    clearTimeout(this.paymentTimer);
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.paymentTimer = setTimeout(() => {
+      this.lookUpPayments();
+    }, PAYMENT_LOOKUP_DELAY_MS);
+  }
+
+  /**
+   * Asks for the donor's payments still owed. Only the latest answer is used, so a slow reply
+   * to an earlier amount never overwrites the list for the amount on screen.
+   */
+  async lookUpPayments() {
+    if (!this.donorId) {
+      this.forgetPayment();
+      return;
+    }
+    const lookup = ++this.paymentLookup;
+    const donor = this.donorIds();
+    try {
+      const choices = await getPaymentChoices({
+        donorContactId: donor.contactId,
+        donorAccountId: donor.accountId,
+        giftDate: this.giftDate || null,
+        amount: this.numberOrNull(this.amount)
+      });
+      if (lookup !== this.paymentLookup) {
+        return;
+      }
+      this.paymentLoadFailed = false;
+      this.applyPaymentChoices(choices);
+    } catch {
+      // The controller logged the cause; the gift can still be saved on its own.
+      if (lookup === this.paymentLookup) {
+        this.paymentChoices = null;
+        this.installmentId = '';
+        this.paymentNote = undefined;
+        this.paymentLoadFailed = true;
+      }
+    }
+  }
+
+  /**
+   * Never applies a payment unseen (R-DM8): a choice the person made stays while it is still
+   * offered; otherwise a payment is chosen in advance only when it is the only suggestion, and
+   * the note under the list says why.
+   */
+  applyPaymentChoices(choices) {
+    const list = choices && Array.isArray(choices.choices) ? choices.choices : [];
+    this.paymentChoices = { ...choices, choices: list };
+    const offered = list.some((choice) => choice.value === this.installmentId);
+    if (this.paymentPicked && (this.installmentId === '' || offered)) {
+      return;
+    }
+    this.paymentPicked = false;
+    if (choices && choices.suggestedId) {
+      this.installmentId = choices.suggestedId;
+      this.paymentNote = paysOneSuggested;
+    } else {
+      this.installmentId = '';
+      const several = choices && choices.suggestedCount > 1;
+      this.paymentNote = several
+        ? paysSeveralSuggested.replace('{0}', choices.suggestedCount)
+        : undefined;
+    }
   }
 
   /**
@@ -211,6 +344,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
       this.inKindDescription = undefined;
       this.fairMarketValue = undefined;
     }
+    this.schedulePaymentLookup();
   }
 
   handleInKindDescriptionChange(event) {
@@ -295,6 +429,9 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.giftDate = this.defaults.giftDate;
     this.appealId = this.defaults.defaultAppealId;
     this.fundId = this.defaults.defaultFundId;
+    if (this.donorId) {
+      this.schedulePaymentLookup();
+    }
   }
 
   /**
@@ -357,10 +494,24 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     }
   }
 
+  /** Where people are accounts, a person donor is an account; otherwise a contact. */
+  donorIds() {
+    const ids = { contactId: null, accountId: null };
+    if (this.donorId) {
+      if (this.isPersonDonor && !this.hasPersonAccounts) {
+        ids.contactId = this.donorId;
+      } else {
+        ids.accountId = this.donorId;
+      }
+    }
+    return ids;
+  }
+
   buildInput() {
-    const input = {
-      donorContactId: null,
-      donorAccountId: null,
+    const donor = this.donorIds();
+    return {
+      donorContactId: donor.contactId,
+      donorAccountId: donor.accountId,
       amount: this.amountAsNumber(),
       giftDate: this.giftDate || null,
       giftType: this.giftType || null,
@@ -368,16 +519,9 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
       fundId: this.fundId || null,
       paymentReference: this.paymentReference || null,
       inKindDescription: this.isInKindGift ? this.inKindDescription || null : null,
-      fairMarketValue: this.isInKindGift ? this.numberOrNull(this.fairMarketValue) : null
+      fairMarketValue: this.isInKindGift ? this.numberOrNull(this.fairMarketValue) : null,
+      installmentId: this.isMoneyGift && this.installmentId ? this.installmentId : null
     };
-    if (this.donorId) {
-      if (this.isPersonDonor && !this.hasPersonAccounts) {
-        input.donorContactId = this.donorId;
-      } else {
-        input.donorAccountId = this.donorId;
-      }
-    }
-    return input;
   }
 
   amountAsNumber() {
@@ -459,6 +603,10 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.inKindDescription = undefined;
     this.fairMarketValue = undefined;
     this.paymentReference = undefined;
+    this.forgetPayment();
+    if (this.donorId) {
+      this.schedulePaymentLookup();
+    }
     this.setFieldErrors({});
     const donor = this.template.querySelector('[data-id="donor-person"]')
       ? this.template.querySelector('[data-id="donor-person"]')
