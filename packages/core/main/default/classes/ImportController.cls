@@ -46,6 +46,15 @@ public with sharing class ImportController {
         public Integer matchDateWindowDays;
         @AuraEnabled
         public Decimal matchAmountTolerance;
+        /** How this template matches (R-IT2, R-IT8, R-IT9). */
+        @AuraEnabled
+        public String personMatchField;
+        @AuraEnabled
+        public String organizationRule;
+        @AuraEnabled
+        public String organizationMatchField;
+        @AuraEnabled
+        public String severalMatches;
     }
 
     /** One import as the wizard and the results screen show it. */
@@ -97,6 +106,28 @@ public with sharing class ImportController {
         public String paymentMatching;
         public Integer matchDateWindowDays;
         public Decimal matchAmountTolerance;
+        /** How people and organizations are matched, saved on the template when sent (R-IT2). */
+        public ImportTemplateService.MatchingChoices matching;
+        /** The values every row of this file takes where it has none (R-IB14). */
+        public List<ImportMapping.Assignment> fileValues;
+    }
+
+    /** A field a row can be matched on, as the wizard lists it (R-IT8). */
+    public class MatchFieldView {
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public String label;
+    }
+
+    /** The fields each object offers for matching under External ID (R-IT8). */
+    public class MatchFieldsView {
+        /** Contact fields, for people stored as contacts. */
+        @AuraEnabled
+        public List<MatchFieldView> contact = new List<MatchFieldView>();
+        /** Account fields, for organizations and for people stored as person accounts. */
+        @AuraEnabled
+        public List<MatchFieldView> account = new List<MatchFieldView>();
     }
 
     /** One staged row as the exceptions table shows it. */
@@ -161,12 +192,49 @@ public with sharing class ImportController {
                     ? null
                     : template.Match_Date_Window_Days__c.intValue();
                 view.matchAmountTolerance = template.Match_Amount_Tolerance__c;
+                view.personMatchField = template.Person_Match_Field__c;
+                view.organizationRule = ImportTemplateService.normalizedOrganizationRule(
+                    template.Organization_Matching_Rule__c
+                );
+                view.organizationMatchField = template.Organization_Match_Field__c;
+                view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
+                    template.Several_Matches__c
+                );
                 result.add(view);
             }
             return result;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getTemplates');
         }
+    }
+
+    /**
+     * The fields a row can be matched on under External ID, for people and organizations
+     * (R-IT8): those marked External ID or Unique, holding text or an email, that the user
+     * may read.
+     */
+    @AuraEnabled
+    public static MatchFieldsView getMatchFields() {
+        try {
+            enforcePermission();
+            MatchFieldsView view = new MatchFieldsView();
+            view.contact = fieldViews(Contact.SObjectType);
+            view.account = fieldViews(Account.SObjectType);
+            return view;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getMatchFields');
+        }
+    }
+
+    private static List<MatchFieldView> fieldViews(Schema.SObjectType type) {
+        List<MatchFieldView> result = new List<MatchFieldView>();
+        for (Schema.DescribeFieldResult describe : ImportMatcher.matchableFields(type)) {
+            MatchFieldView field = new MatchFieldView();
+            field.value = describe.getName();
+            field.label = describe.getLabel();
+            result.add(field);
+        }
+        return result;
     }
 
     /** Marks a template as the mapping for a file that arrives regularly, or not (R-IT6). */
@@ -237,13 +305,19 @@ public with sharing class ImportController {
                     options.matchAmountTolerance
                 );
             }
+            if (options.matching != null) {
+                // The wizard's rule for people is the one passed above; the rest is saved here.
+                options.matching.personRule = matchingRule;
+                ImportTemplateService.saveMatching(templateId, options.matching);
+            }
             return toView(
                 ImportBatchService.create(
                     templateId,
                     fileId,
                     fileName,
                     options.expectedCount,
-                    options.expectedAmount
+                    options.expectedAmount,
+                    options.fileValues
                 )
             );
         } catch (Exception e) {

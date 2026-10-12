@@ -80,10 +80,12 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             if (batch == null || template == null) {
                 throw new ImportException(Label.Core_Import_ErrorTemplateGone);
             }
+            // The file's own values come before the template's defaults (R-IB14).
             ImportMapping mapping = ImportMapping.parse(
-                template.Column_Mapping_JSON__c,
-                template.Default_Values_JSON__c
-            );
+                    template.Column_Mapping_JSON__c,
+                    template.Default_Values_JSON__c
+                )
+                .withFileValues(batch.File_Values_JSON__c);
             ImportEntityProcessors.carriedState = processorState;
             ImportRowProcessor.Outcome outcome = ImportRowProcessor.process(
                 batch,

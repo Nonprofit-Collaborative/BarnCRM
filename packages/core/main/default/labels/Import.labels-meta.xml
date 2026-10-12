@@ -1072,4 +1072,12 @@
         <shortDescription>Import run log: the chosen matching field no longer qualifies</shortDescription>
         <value>Nobody was matched on {0}: the field is gone, is no longer marked External ID or Unique, or you may not read it. Choose another field and dry run again.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_ErrorFileValueNotAllowed</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a value for every row would name one person</shortDescription>
+        <value>A value for every row cannot give a person's name, email or matching ID, because every row would then be the same person. Remove the value for {0} and try again.</value>
+    </labels>
 </CustomLabels>
