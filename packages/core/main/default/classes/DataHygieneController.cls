@@ -8,6 +8,24 @@
  * FindController.saveQuery, so it is compiled, checked and stored exactly as Find stores one.
  */
 public with sharing class DataHygieneController {
+    private static final String FIND_TAB = 'Find';
+    private static final String SAVED_QUERY_STATE = 'savedQueryId';
+
+    /**
+     * Where "Open in Find" goes. The tab name and the state key carry the package namespace, so
+     * they come from here (NamespaceUtil), never from the component.
+     */
+    public class OpenInFind {
+        @AuraEnabled
+        public String savedQueryId;
+        @AuraEnabled
+        public String savedQueryName;
+        @AuraEnabled
+        public String findTabApiName;
+        @AuraEnabled
+        public String stateKey;
+    }
+
     /** Every check with its count, or the reason it has none. */
     @AuraEnabled
     public static List<DataHygieneService.CheckResult> getChecks() {
@@ -21,10 +39,10 @@ public with sharing class DataHygieneController {
 
     /**
      * Saves the check's query as the person's own saved query, named for the check, replacing
-     * the query of their existing one of that name, and returns its Id for the Find tab.
+     * the query of their existing one of that name, and says where the Find tab is.
      */
     @AuraEnabled
-    public static String openInFind(String checkKey) {
+    public static OpenInFind openInFind(String checkKey) {
         try {
             requirePermission();
             String document = DataHygieneService.queryDocument(checkKey);
@@ -41,12 +59,17 @@ public with sharing class DataHygieneController {
                 document,
                 false
             );
+            OpenInFind target = new OpenInFind();
+            target.savedQueryId = existing;
+            target.savedQueryName = name;
+            target.findTabApiName = NamespaceUtil.qualify(FIND_TAB);
+            target.stateKey = NamespaceUtil.stateKey(SAVED_QUERY_STATE);
             for (FindController.SavedQueryView view : page.savedQueries) {
                 if (view.mine == true && view.name == name) {
-                    return view.recordId;
+                    target.savedQueryId = view.recordId;
                 }
             }
-            return existing;
+            return target;
         } catch (AuraHandledException alreadyForThePerson) {
             throw alreadyForThePerson;
         } catch (Exception caught) {
