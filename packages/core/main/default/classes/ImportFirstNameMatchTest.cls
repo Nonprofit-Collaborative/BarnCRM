@@ -309,13 +309,7 @@ private class ImportFirstNameMatchTest {
 
         Test.startTest();
         List<Import_Row__c> rows = load(
-            file(
-                new List<List<String>>{
-                    new List<String>{ 'JANE' },
-                    new List<String>{ 'Jáne' },
-                    new List<String>{ '' }
-                }
-            ),
+            file(new List<List<String>>{ new List<String>{ 'JANE' }, new List<String>{ 'Jáne' } }),
             200
         );
         Test.stopTest();
@@ -326,7 +320,7 @@ private class ImportFirstNameMatchTest {
             firstNameOf(rows[1].Contact_1__c),
             'An accent is a different name: created, not guessed.'
         );
-        Assert.areEqual('John', firstNameOf(rows[2].Contact_1__c), 'No first name: the earliest.');
+        // A row with no first name at this couple matches both: ImportMatchingRulesTest (R-IT9).
         Assert.areEqual(new List<String>{ 'John', 'Jane', 'Jáne' }, smiths(), 'Nobody renamed.');
     }
 

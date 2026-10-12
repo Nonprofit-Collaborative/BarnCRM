@@ -1024,4 +1024,52 @@
         <shortDescription>Import wizard: payment matching amount tolerance label</shortDescription>
         <value>Amount difference allowed</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralPeopleMatch</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: more than one person matches the row</shortDescription>
+        <value>More than one person matches this row. Merge the duplicates, or add a first name or an ID that tells them apart, then import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralOrganizationsMatch</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: more than one organization matches the row</shortDescription>
+        <value>More than one organization matches this row. Merge the duplicates, or match organizations by an ID, then import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogSeveralMatchesUsedRecent</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: rows given the most recently changed of several</shortDescription>
+        <value>Some rows matched more than one record and were given the most recently changed one. Their Several Matches box is ticked: check them in the import's rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorOrganizationNameMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a new organization has no name</shortDescription>
+        <value>This row's organization was not found by its ID and has no name, so it cannot be created. Add the name, or an ID your org already has.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchFieldNotAllowed</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: a field that cannot be matched on was chosen</shortDescription>
+        <value>{0} cannot be used to match. Choose a field marked External ID or Unique that holds text or an email.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogMatchFieldUnavailable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: the chosen matching field no longer qualifies</shortDescription>
+        <value>Nobody was matched on {0}: the field is gone, is no longer marked External ID or Unique, or you may not read it. Choose another field and dry run again.</value>
+    </labels>
 </CustomLabels>

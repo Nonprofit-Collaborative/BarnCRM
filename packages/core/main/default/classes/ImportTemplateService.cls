@@ -28,6 +28,106 @@ public with sharing class ImportTemplateService {
         RULE_EXTERNAL_ID
     };
 
+    /** The organization rules (R-IT2); an empty value means Name exact. */
+    @NamespaceAccessible
+    public static final String ORGANIZATION_RULE_NAME = 'Name exact';
+    @NamespaceAccessible
+    public static final String ORGANIZATION_RULE_EXTERNAL_ID = 'External ID';
+
+    /** What happens when a key finds several records (R-IT9); empty means reject the row. */
+    @NamespaceAccessible
+    public static final String SEVERAL_REJECT = 'Reject the row';
+    @NamespaceAccessible
+    public static final String SEVERAL_MOST_RECENT = 'Use the most recently changed';
+
+    /** How a template matches, as the wizard sends it (R-IT2, R-IT8, R-IT9). */
+    @NamespaceAccessible
+    public class MatchingChoices {
+        @NamespaceAccessible
+        public String personRule;
+        @NamespaceAccessible
+        public String personMatchField;
+        @NamespaceAccessible
+        public String organizationRule;
+        @NamespaceAccessible
+        public String organizationMatchField;
+        @NamespaceAccessible
+        public String severalMatches;
+    }
+
+    /**
+     * Saves how a template matches people and organizations, and what happens when several
+     * records match (R-IT2, R-IT8, R-IT9). A chosen field is stored as describe names it, and
+     * one the object does not offer for matching is refused, saying which.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c saveMatching(Id templateId, MatchingChoices choices) {
+        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+        if (template == null) {
+            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+        }
+        MatchingChoices given = choices == null ? new MatchingChoices() : choices;
+        template.Matching_Rule__c = normalizedRule(given.personRule);
+        template.Organization_Matching_Rule__c = normalizedOrganizationRule(given.organizationRule);
+        template.Several_Matches__c = normalizedSeveralMatches(given.severalMatches);
+        template.Person_Match_Field__c = RULE_EXTERNAL_ID.equals(template.Matching_Rule__c)
+            ? checkedField(personType(template), given.personMatchField)
+            : null;
+        template.Organization_Match_Field__c = ORGANIZATION_RULE_EXTERNAL_ID.equals(
+                template.Organization_Matching_Rule__c
+            )
+            ? checkedField(Account.SObjectType, given.organizationMatchField)
+            : null;
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** A chosen matching field as describe names it, or null for none; refused when not offered. */
+    private static String checkedField(Schema.SObjectType type, String chosen) {
+        if (String.isBlank(chosen)) {
+            return null;
+        }
+        String field = ImportMatcher.matchField(type, chosen);
+        if (field == null) {
+            throw new ImportException(
+                String.format(
+                    Label.Core_Import_ErrorMatchFieldNotAllowed,
+                    new List<String>{ chosen.trim().left(80) }
+                )
+            );
+        }
+        return field;
+    }
+
+    /** The object a template's people are stored on (R-IT3). */
+    @NamespaceAccessible
+    public static Schema.SObjectType personType(Import_Template__c template) {
+        return isPersonAccountMode(template) ? Account.SObjectType : Contact.SObjectType;
+    }
+
+    /** An organization rule the picklist accepts; anything else is Name exact. */
+    @NamespaceAccessible
+    public static String normalizedOrganizationRule(String rule) {
+        return rule != null && ORGANIZATION_RULE_EXTERNAL_ID.equalsIgnoreCase(rule.trim())
+            ? ORGANIZATION_RULE_EXTERNAL_ID
+            : ORGANIZATION_RULE_NAME;
+    }
+
+    /** A several-matches choice the picklist accepts; anything else rejects the row. */
+    @NamespaceAccessible
+    public static String normalizedSeveralMatches(String choice) {
+        return choice != null && SEVERAL_MOST_RECENT.equalsIgnoreCase(choice.trim())
+            ? SEVERAL_MOST_RECENT
+            : SEVERAL_REJECT;
+    }
+
+    /** True when a row matching several records takes the most recently changed (R-IT9). */
+    @NamespaceAccessible
+    public static Boolean usesMostRecent(Import_Template__c template) {
+        return template != null &&
+            SEVERAL_MOST_RECENT.equals(normalizedSeveralMatches(template.Several_Matches__c));
+    }
+
     /**
      * Creates an `Import_Template__c` for every shipped default this org does not have yet,
      * and returns how many were created. Safe to call repeatedly: it is called on install
