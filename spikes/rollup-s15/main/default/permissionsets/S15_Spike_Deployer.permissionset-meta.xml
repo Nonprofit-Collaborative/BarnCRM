@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>S15 Spike Deployer</label>
+  <description>
+    SPIKE (rollup slice S15). Lets the running admin use the self Named Credential principal.
+  </description>
+  <classAccesses>
+    <apexClass>S15SpikeSelfDeploy</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>S15_Self-S15_Self_Principal</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+</PermissionSet>

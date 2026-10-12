@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>SPIKE (rollup slice S15). Stands in for an admin's own object. Its required field and always-failing validation rule reject every dummy insert, the main DLRS deploy failure.</description>
+  <enableActivities>false</enableActivities>
+  <enableReports>false</enableReports>
+  <enableSearch>false</enableSearch>
+  <label>S15 Pet</label>
+  <nameField>
+    <label>Pet Name</label>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>S15 Pets</pluralLabel>
+  <sharingModel>ReadWrite</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

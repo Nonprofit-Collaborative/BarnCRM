@@ -1,0 +1,328 @@
+/**
+ * SPIKE (rollup slice S15). Not packaged, not wired into anything, not for merge as product code.
+ * Lives outside every packageDirectory in sfdx-project.json on purpose.
+ *
+ * Proves, in one org run, that an admin can deploy a generated trigger plus test class from an
+ * LWC with no setup at all:
+ * 1. The LWC calls start() (a Lightning context, whose session has no API access).
+ * 2. start() creates a self-pointing Named Credential at run time with ConnectApi (the org's own
+ *    My Domain URL is only known in the org, so it cannot be shipped), linked to the shipped
+ *    External Credential S15_Self (Custom protocol, no secret). This replaces the Remote Site
+ *    Setting that DLRS creates.
+ * 3. start() enqueues DeployJob. In async Apex, UserInfo.getSessionId() returns a session that the
+ *    API accepts (the DLRS pattern since v2.21 for its metadata deletes).
+ * 4. DeployJob zips the trigger and test with Compression.ZipWriter and calls the Metadata API
+ *    SOAP deploy with RunSpecifiedTests naming only the generated test.
+ * 5. StatusJob polls checkDeployStatus and records the outcome on S15SpikeSignal.lastOutcome
+ *    (debug log only in the spike; the product would write a status record).
+ */
+public with sharing class S15SpikeSelfDeploy {
+    public static final String NAMED_CREDENTIAL = 'S15_Self';
+    public static final String EXTERNAL_CREDENTIAL = 'S15_Self';
+    public static final String API_VERSION = '67.0';
+    private static final String MDAPI_NS = 'http://soap.sforce.com/2006/04/metadata';
+    private static final String SOAP_NS = 'http://schemas.xmlsoap.org/soap/envelope/';
+    private static final Integer MAX_POLLS = 30;
+    private static final Integer NAME_LIMIT = 40;
+
+    /** Called from the LWC. Returns the AsyncApexJob Id of the deploy job. */
+    @AuraEnabled
+    public static Id start(String objectApiName, Boolean checkOnly) {
+        SObjectType objectType = describeTarget(objectApiName);
+        ensureNamedCredential();
+        return System.enqueueJob(
+            new DeployJob(objectType.getDescribe().getName(), checkOnly == true)
+        );
+    }
+
+    /** The admin's own custom object only: it must exist and accept inserts. */
+    @TestVisible
+    private static SObjectType describeTarget(String objectApiName) {
+        SObjectType objectType = String.isBlank(objectApiName)
+            ? null
+            : Schema.getGlobalDescribe().get(objectApiName);
+        if (
+            objectType == null ||
+            !objectType.getDescribe().isCustom() ||
+            !objectType.getDescribe().isCreateable()
+        ) {
+            throw new AuraHandledException('Choose a custom object you can create records on.');
+        }
+        return objectType;
+    }
+
+    /** Creates the self Named Credential once. Its URL is this org's My Domain. */
+    @TestVisible
+    private static void ensureNamedCredential() {
+        if (
+            ![SELECT Id FROM NamedCredential WHERE DeveloperName = :NAMED_CREDENTIAL LIMIT 1]
+                .isEmpty()
+        ) {
+            return;
+        }
+        ConnectApi.ExternalCredentialInput externalCredential = new ConnectApi.ExternalCredentialInput();
+        externalCredential.developerName = EXTERNAL_CREDENTIAL;
+
+        ConnectApi.NamedCredentialCalloutOptionsInput options = new ConnectApi.NamedCredentialCalloutOptionsInput();
+        options.allowMergeFieldsInBody = false;
+        options.allowMergeFieldsInHeader = false;
+        options.generateAuthorizationHeader = false;
+
+        ConnectApi.NamedCredentialInput input = new ConnectApi.NamedCredentialInput();
+        input.developerName = NAMED_CREDENTIAL;
+        input.masterLabel = 'S15 spike: this org';
+        input.type = ConnectApi.NamedCredentialType.SecuredEndpoint;
+        input.calloutUrl = URL.getOrgDomainUrl().toExternalForm();
+        input.externalCredentials = new List<ConnectApi.ExternalCredentialInput>{
+            externalCredential
+        };
+        input.calloutOptions = options;
+        if (!Test.isRunningTest()) {
+            ConnectApi.NamedCredentials.createNamedCredential(input);
+        }
+    }
+
+    /** Deterministic names from the object name, so sandbox and production produce identical code. */
+    @TestVisible
+    private static String baseName(String objectApiName) {
+        String base =
+            'S15_' + objectApiName.removeEndIgnoreCase('__c').replaceAll('[^A-Za-z0-9]', '_');
+        String suffix = '_Test';
+        if (base.length() + suffix.length() > NAME_LIMIT) {
+            String hash = EncodingUtil.convertToHex(
+                    Crypto.generateDigest('MD5', Blob.valueOf(objectApiName))
+                )
+                .left(6);
+            base = base.left(NAME_LIMIT - suffix.length() - 7) + '_' + hash;
+        }
+        return base.replaceAll('_+', '_').removeEnd('_');
+    }
+
+    @TestVisible
+    private static String triggerBody(String objectApiName) {
+        return '// Generated by BarnCRM (S15 spike). Signals "recalculate these parents"; settings live in the definition.\n' +
+            'trigger ' +
+            baseName(objectApiName) +
+            ' on ' +
+            objectApiName +
+            ' (before insert, after insert, after update, before delete, after undelete) {\n' +
+            '  S15SpikeSignal.handle();\n' +
+            '}\n';
+    }
+
+    @TestVisible
+    private static String testBody(String objectApiName) {
+        return '// Generated by BarnCRM (S15 spike).\n' +
+            '@IsTest\n' +
+            'private class ' +
+            baseName(objectApiName) +
+            '_Test {\n' +
+            '  @IsTest\n' +
+            '  static void firesTrigger() {\n' +
+            '    S15SpikeSignal.testHandler(new ' +
+            objectApiName +
+            '());\n' +
+            '    Assert.isTrue(S15SpikeSignal.invoked, \'The generated trigger did not run.\');\n' +
+            '  }\n' +
+            '}\n';
+    }
+
+    private static String metaXml(String type) {
+        return '<?xml version="1.0" encoding="UTF-8"?>\n<' +
+            type +
+            ' xmlns="' +
+            MDAPI_NS +
+            '"><apiVersion>' +
+            API_VERSION +
+            '</apiVersion><status>Active</status></' +
+            type +
+            '>';
+    }
+
+    @TestVisible
+    private static Blob buildZip(String objectApiName) {
+        String name = baseName(objectApiName);
+        String packageXml =
+            '<?xml version="1.0" encoding="UTF-8"?>\n<Package xmlns="' +
+            MDAPI_NS +
+            '">' +
+            '<types><members>' +
+            name +
+            '</members><name>ApexTrigger</name></types>' +
+            '<types><members>' +
+            name +
+            '_Test</members><name>ApexClass</name></types>' +
+            '<version>' +
+            API_VERSION +
+            '</version></Package>';
+        Compression.ZipWriter zip = new Compression.ZipWriter();
+        zip.addEntry('package.xml', Blob.valueOf(packageXml));
+        zip.addEntry('triggers/' + name + '.trigger', Blob.valueOf(triggerBody(objectApiName)));
+        zip.addEntry(
+            'triggers/' + name + '.trigger-meta.xml',
+            Blob.valueOf(metaXml('ApexTrigger'))
+        );
+        zip.addEntry('classes/' + name + '_Test.cls', Blob.valueOf(testBody(objectApiName)));
+        zip.addEntry('classes/' + name + '_Test.cls-meta.xml', Blob.valueOf(metaXml('ApexClass')));
+        return zip.getArchive();
+    }
+
+    /** DeployOptions elements must follow the WSDL sequence order. */
+    @TestVisible
+    private static String deployEnvelope(
+        String sessionId,
+        Blob zip,
+        String testClass,
+        Boolean checkOnly
+    ) {
+        return envelope(
+            sessionId,
+            '<met:deploy><met:ZipFile>' +
+                EncodingUtil.base64Encode(zip) +
+                '</met:ZipFile><met:DeployOptions>' +
+                '<met:checkOnly>' +
+                checkOnly +
+                '</met:checkOnly>' +
+                '<met:rollbackOnError>true</met:rollbackOnError>' +
+                '<met:runTests>' +
+                testClass +
+                '</met:runTests>' +
+                '<met:singlePackage>true</met:singlePackage>' +
+                '<met:testLevel>RunSpecifiedTests</met:testLevel>' +
+                '</met:DeployOptions></met:deploy>'
+        );
+    }
+
+    @TestVisible
+    private static String statusEnvelope(String sessionId, String deployId) {
+        return envelope(
+            sessionId,
+            '<met:checkDeployStatus><met:asyncProcessId>' +
+                deployId.escapeXml() +
+                '</met:asyncProcessId><met:includeDetails>true</met:includeDetails></met:checkDeployStatus>'
+        );
+    }
+
+    private static String envelope(String sessionId, String body) {
+        return '<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope xmlns:soapenv="' +
+            SOAP_NS +
+            '" xmlns:met="' +
+            MDAPI_NS +
+            '"><soapenv:Header><met:SessionHeader><met:sessionId>' +
+            sessionId +
+            '</met:sessionId></met:SessionHeader></soapenv:Header><soapenv:Body>' +
+            body +
+            '</soapenv:Body></soapenv:Envelope>';
+    }
+
+    private static Dom.Document call(String soapBody) {
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint('callout:' + NAMED_CREDENTIAL + '/services/Soap/m/' + API_VERSION);
+        request.setMethod('POST');
+        request.setHeader('Content-Type', 'text/xml; charset=UTF-8');
+        request.setHeader('SOAPAction', '""');
+        request.setTimeout(120000);
+        request.setBody(soapBody);
+        HttpResponse response = new Http().send(request);
+        Dom.Document document = new Dom.Document();
+        document.load(response.getBody());
+        List<String> faults = texts(document.getRootElement(), 'faultstring');
+        if (!faults.isEmpty()) {
+            throw new SpikeException(faults[0]);
+        }
+        return document;
+    }
+
+    /** All text values of elements with this local name, depth first. */
+    @TestVisible
+    private static List<String> texts(Dom.XmlNode node, String localName) {
+        List<String> found = new List<String>();
+        if (node.getNodeType() == Dom.XmlNodeType.ELEMENT) {
+            if (node.getName() == localName) {
+                found.add(node.getText());
+            }
+            for (Dom.XmlNode child : node.getChildElements()) {
+                found.addAll(texts(child, localName));
+            }
+        }
+        return found;
+    }
+
+    /** Plain outcome from a checkDeployStatus response: done, status and the first problems. */
+    @TestVisible
+    private static String outcome(Dom.Document document) {
+        Dom.XmlNode root = document.getRootElement();
+        List<String> done = texts(root, 'done');
+        if (done.isEmpty() || done[0] != 'true') {
+            return null;
+        }
+        List<String> parts = new List<String>{ texts(root, 'status')[0] };
+        parts.addAll(texts(root, 'problem'));
+        for (String message : texts(root, 'message')) {
+            parts.add(message);
+        }
+        return String.join(parts, ' | ');
+    }
+
+    public class DeployJob implements Queueable, Database.AllowsCallouts {
+        private final String objectApiName;
+        private final Boolean checkOnly;
+
+        public DeployJob(String objectApiName, Boolean checkOnly) {
+            this.objectApiName = objectApiName;
+            this.checkOnly = checkOnly;
+        }
+
+        public void execute(QueueableContext context) {
+            Dom.Document response = call(
+                deployEnvelope(
+                    UserInfo.getSessionId(),
+                    buildZip(objectApiName),
+                    baseName(objectApiName) + '_Test',
+                    checkOnly
+                )
+            );
+            String deployId = texts(response.getRootElement(), 'id')[0];
+            System.debug(LoggingLevel.INFO, 'S15 spike deploy started: ' + deployId);
+            enqueueStatus(deployId, 0);
+        }
+    }
+
+    /** Polls once a minute (AsyncOptions delay), so no scheduled job is needed. */
+    private static void enqueueStatus(String deployId, Integer attempt) {
+        if (Test.isRunningTest()) {
+            return;
+        }
+        AsyncOptions options = new AsyncOptions();
+        options.MinimumQueueableDelayInMinutes = 1;
+        System.enqueueJob(new StatusJob(deployId, attempt), options);
+    }
+
+    public class StatusJob implements Queueable, Database.AllowsCallouts {
+        private final String deployId;
+        private final Integer attempt;
+
+        public StatusJob(String deployId, Integer attempt) {
+            this.deployId = deployId;
+            this.attempt = attempt;
+        }
+
+        public void execute(QueueableContext context) {
+            String result = outcome(call(statusEnvelope(UserInfo.getSessionId(), deployId)));
+            if (result == null && attempt < MAX_POLLS) {
+                enqueueStatus(deployId, attempt + 1);
+                return;
+            }
+            S15SpikeSignal.lastOutcome = result == null
+                ? 'Timed out waiting for ' + deployId
+                : result;
+            System.debug(
+                LoggingLevel.INFO,
+                'S15 spike deploy ' + deployId + ': ' + S15SpikeSignal.lastOutcome
+            );
+        }
+    }
+
+    public class SpikeException extends Exception {
+    }
+}

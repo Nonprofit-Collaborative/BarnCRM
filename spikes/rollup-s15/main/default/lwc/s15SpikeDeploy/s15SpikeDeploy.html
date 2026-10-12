@@ -1,0 +1,24 @@
+<template>
+  <lightning-card title="S15 spike: deploy rollup trigger">
+    <div class="slds-p-horizontal_small">
+      <lightning-input
+        label="Custom object API name"
+        value={objectApiName}
+        onchange={handleChange}
+      ></lightning-input>
+      <lightning-input
+        type="checkbox"
+        label="Validate only"
+        checked={checkOnly}
+        onchange={handleCheck}
+      ></lightning-input>
+      <lightning-button
+        variant="brand"
+        label="Deploy"
+        onclick={handleDeploy}
+        disabled={busy}
+      ></lightning-button>
+      <p class="slds-m-top_small">{message}</p>
+    </div>
+  </lightning-card>
+</template>
