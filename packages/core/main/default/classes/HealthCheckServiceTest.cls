@@ -313,6 +313,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void industriesObjectsWithoutConnectAreReported() {
         OrgShapeDetector.overrideShape = shape(false, false, true, false);
+        HealthCheckOrgShapeChecks.connectInstalledOverride = false;
 
         HealthCheckService.Finding finding = find(
             HealthCheckService.run(),
@@ -329,6 +330,35 @@ private class HealthCheckServiceTest {
             null,
             finding.fixTarget,
             'There is nothing to click: Connect is a separate install in v0.6.'
+        );
+    }
+
+    @IsTest
+    static void industriesObjectsWithConnectInstalledAreNotReported() {
+        OrgShapeDetector.overrideShape = shape(false, false, true, false);
+        HealthCheckOrgShapeChecks.connectInstalledOverride = true;
+
+        System.assertEquals(
+            null,
+            find(HealthCheckService.run(), 'connect_module_absent'),
+            'With Connect installed there is nothing to suggest.'
+        );
+    }
+
+    /**
+     * The real lookup, not the seam: a class that ships is found, namespace first or bare, and
+     * one that does not is absent. Core's own class stands in for Connect's, which Core's tests
+     * cannot rely on.
+     */
+    @IsTest
+    static void connectDetectionFindsAClassThatShipsAndNotOneThatDoesNot() {
+        System.assert(
+            HealthCheckOrgShapeChecks.classExists('HealthCheckOrgShapeChecks'),
+            'A class that ships is found.'
+        );
+        System.assert(
+            !HealthCheckOrgShapeChecks.classExists('ConnectService'),
+            'The old marker names a class nothing ships.'
         );
     }
 
