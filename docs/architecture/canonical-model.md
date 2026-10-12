@@ -1252,7 +1252,11 @@ Maria load the same payment processor export every month without rebuilding the 
 | Description | long text | no | What kind of file this template reads, with an example of its columns. |
 | Template Key | text | yes | The stable identifier of this template, matching the shipped default it came from; unique. |
 | Column Mapping | long text | yes | The mapping from source column names to canonical targets, held as a mapping document (see R-IT1). |
-| Matching Rule | picklist(Email exact, Name plus postal code, External ID) | yes | How an incoming row is matched to an existing person or organization before a new one is created. |
+| Person Matching Rule | picklist(Email exact, Name plus postal code, External ID) | yes | How an incoming row's people are matched to people the org already has before new ones are created (R-IT2). |
+| Person Match Field | text | no | Under the External ID person rule, the API name of the field people are matched on, one marked External ID or Unique (R-IT8); empty means the first external identifier the user may read. |
+| Organization Matching Rule | picklist(Name exact, External ID) | no | How a row's organization is matched to an organization the org already has; empty means Name exact (R-IT2). |
+| Organization Match Field | text | no | Under the External ID organization rule, the API name of the account field organizations are matched on (R-IT8). |
+| Several Matches | picklist(Reject the row, Use the most recently changed) | no | What happens when the key a row is looked for by finds more than one record; empty means Reject the row (R-IT9). |
 | Default Values | long text | no | Values applied to every row that does not carry its own, held in the same document format. |
 | Person Mode | picklist(Contacts, Person Accounts) | yes | Whether a person in this file becomes a Contact or a person Account; defaulted from the detected org shape. |
 | Is Package Default | boolean | yes (defaults false) | Marks a template materialized from a shipped default rather than built by the admin. |
@@ -1296,7 +1300,31 @@ template can be read without knowing the object model.
 
 **R-IT2 Matching rules in plain language.** The wizard states what each matching rule
 does and what it risks, for example that "Name plus postal code" merges two people who
-share a name at one address. No rule is offered without that sentence (plan Section 2.3).
+share a name at one address. No rule is offered without that sentence (plan Section 2.3). People and organizations have
+a rule each (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`): a person by
+Email exact, Name plus postal code, or External ID; an organization by Name exact (compared
+ignoring case and surrounding spaces) or External ID, and only among organization accounts.
+The organization rule applies only where the mapping names an organization.
+
+**R-IT8 A chosen matching field.** Under External ID the template names the field: one the
+object marks External ID or Unique, holding text or an email, that the importing user may
+read. For people it is a Contact field, or an Account field where Person Mode is Person
+Accounts; for organizations it is an Account field. The row gives the value through a column
+mapped to that field on the entity (for example `Contact1.Member_Number__c` or
+`Organization.Charity_Number__c`). The field is checked against describe when the template is
+saved and again when rows are matched; one that no longer qualifies matches nobody and the
+run log says so. An empty Person Match Field means the first external identifier field the
+user may read, which is how templates saved before C-32 matched. A row with no value in the
+field is not matched and its person or organization is created (an organization only with a
+name).
+
+**R-IT9 Several matches.** When the key a row is looked for by finds more than one record
+(R-IB12 says which key), Several Matches decides: Reject the row, the default, with a message
+naming the problem; or Use the most recently changed record, by Last Modified Date as the chunk
+reads it, the later created winning a tie. Either way the row's Several Matches box is ticked
+(Section 17) and the run log says once that such rows exist. It applies to people and
+organizations alike. A lookup stopped at its row cap is not a several-matches case: its keys
+find nobody alone, as R-IB12 describes.
 
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
@@ -1369,7 +1397,11 @@ from Nonprofit Cloud", section 5).
 | Description | `Description__c` | Long Text Area |
 | Template Key | `Template_Key__c` | Text, External Id, unique |
 | Column Mapping | `Column_Mapping_JSON__c` | Long Text Area |
-| Matching Rule | `Matching_Rule__c` | Picklist: Email exact, Name plus postal code, External ID |
+| Person Matching Rule (labelled Matching Rule before v0.7) | `Matching_Rule__c` | Picklist: Email exact, Name plus postal code, External ID |
+| Person Match Field | `Person_Match_Field__c` | Text (255) |
+| Organization Matching Rule | `Organization_Matching_Rule__c` | Picklist: Name exact, External ID |
+| Organization Match Field | `Organization_Match_Field__c` | Text (255) |
+| Several Matches | `Several_Matches__c` | Picklist: Reject the row, Use the most recently changed |
 | Default Values | `Default_Values_JSON__c` | Long Text Area |
 | Person Mode | `Person_Mode__c` | Picklist: Contacts, Person Accounts |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
@@ -1424,6 +1456,7 @@ undoes.
 | Processor Settings | long text | computed | The settings the entity processor ran the last dry run under, as a document only that processor reads; the commit runs under them (R-IB11). |
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
+| File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
 
 ### Relationships
 
@@ -1622,7 +1655,7 @@ else: the person is created, and that record is neither matched nor renamed, how
 records hold the key (one, as with John Smith alone at a postal code and a "Jane Smith" row,
 or several, as with a couple). A new record is the safe failure, left for the duplicate scan
 (R-DP3); taking somebody else would rename them. The shared key alone finds a person only when
-the row gives no first name (the earliest holder then), and since a blank incoming value never
+the row gives no first name (R-IT9 decides when it finds several), and since a blank incoming value never
 clears a stored one, such a row renames nobody. A row naming alone the second person of a
 couple of the same chunk waits until the couple is saved (first people are saved before second
 people) and then shares that partner, so both rows name one person in the couple's one
@@ -1636,8 +1669,12 @@ short-form matching ("Bob" is not "Robert"), so each is created. A row whose two
 share a first name cannot be told apart and is rejected, saying so. Under the Email rule a
 second person with no last name of their own therefore matches only a record with the same
 email and first name; otherwise they are to be created, and are rejected without a last name
-as any new person is. Where the org holds several records under one key, the earliest created
-wins, and the lower identifier breaks a tie, so the same file always resolves the same way.
+as any new person is. Where the key a row is looked for by (narrowed to its first name, or
+shared when it gives none) finds several records, Several Matches decides (R-IT9): by default
+the row is rejected, where before v0.7 the earliest created was taken. In a dry run a person an
+earlier chunk would create counts as a holder of their keys, because the commit will find them.
+An organization is found by its rule's key the same way, and several organizations holding it
+are the same case.
 
 **An import saves past a duplicate alert, not past a block.** People, organizations and
 household names are saved past a duplicate rule that only alerts, as an administrator's bulk
@@ -1665,6 +1702,18 @@ with the pass. A key is looked up only on rows stamped with the current pass (R-
 key from an earlier pass is never read. While a pass runs, rows it has not reached yet still
 show the last pass's outcome; the batch's counts are read back when it finishes, by which time
 every row belongs to it.
+
+**R-IB14 Values for every row of a file.** The wizard can give a file values that apply to
+each of its rows, for example every row's appeal (ADR-NEXT,
+`NEXT-import-matching-per-entity-and-per-file-values.md`). They are held on the batch as
+`{ "version": 1, "defaults": [ { "target": "Entity.Attribute", "value": "..." } ] }`, the
+defaults half of the R-IT1 document, so the dry run and the commit of the file use the same
+values and the template is not changed. A row's own value wins, then the file's value, then
+the template's default: each fills only a blank. A file value may not target a person's name
+parts, full name or email, or the field people are matched on under External ID (R-IT8),
+since every row would then be one person; the batch is refused with that reason. It may name
+an organization. The entity processor receives the row's values with the file's values
+applied, as it receives the template's defaults (R-IR6).
 
 ### Salesforce implementation
 
@@ -1694,6 +1743,7 @@ every row belongs to it.
 | Processor Settings | `Processor_Settings_JSON__c` | Long Text Area (32768) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
+| File Values | `File_Values_JSON__c` | Long Text Area (32768) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -1745,6 +1795,7 @@ processor resolves those in dependency order.
 | Person 2 Name Key | text | computed | The same for the second person. |
 | Organization Key | text | computed | The same for the organization this row would create. |
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
+| Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
 | Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. |
 
 ### Relationships
@@ -1817,7 +1868,7 @@ column nothing can load yet. The contract, which ADR-0052 records:
 - **Resolve.** Called once per chunk, after Core has resolved the organization, the household
   and the people and written them onto the rows (their references, and Status Rejected with
   the reason where Core rejected the row), with each row's values grouped by entity and the
-  template's defaults applied. It must be bulk safe, must write nothing when the pass is a dry
+  file's values and the template's defaults applied (R-IB14). It must be bulk safe, must write nothing when the pass is a dry
   run, and must not throw: a failure belongs on its row. It returns a note for the run log,
   the total of the gift amounts it read, for the control totals (R-IB10), and in a dry run the
   settings it ran under, which the commit is held to (R-IB11).
@@ -1867,6 +1918,7 @@ when the corrected row is loaded again.
 | Organization Key | `Organization_Key__c` | Text (16), External ID (indexed) |
 | Processor Key | `Processor_Key__c` | Text (16), External ID (indexed) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
+| Several Matches | `Several_Matches__c` | Checkbox |
 
 The six keys and the row's Pass Number are bookkeeping written and read in system mode
 (ADR-0021), in no permission set. The keys are marked External ID only so that they are
@@ -5473,3 +5525,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
 | v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
+| v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |

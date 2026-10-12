@@ -57,9 +57,14 @@ or six rows.
    without it, BarnCRM suggests **Do not load** for it. The mapping remembers your
    choices: the next file with the same headings opens with them, and a column you set to
    **Do not load** stays that way even when BarnCRM recognizes its heading.
-4. Choose how rows are matched. **Email exact** is the safe default. Read the sentence
-   under each rule before you change it: **Name plus postal code** will treat two
-   different people who share a name at one address as the same person.
+4. Choose how rows are matched. **Email exact** is the safe default for people. Read the
+   sentence under each rule before you change it: **Name plus postal code** will treat two
+   different people who share a name at one address as the same person. If the file has
+   organizations, choose how they are matched too (**Name exact** unless the file has an ID
+   for them), and what happens when more than one record matches a row (**Reject the row**
+   unless you have a reason to change it). On the same step, **Values for every row** lets
+   you give a value the whole file shares, for example a city missing from every row; a row
+   with its own value keeps it. Section 8 explains every choice.
 5. Optionally, under **Control totals**, type how many rows the file should have (and, with
    Giving, for a gift file, what its amounts should add up to). The dry run checks them and a commit is
    refused while they do not match.
@@ -122,12 +127,14 @@ Three things are worth knowing about it.
   "would create" count before you commit; a file that spells names differently from your
   org creates people you may need to merge (see [Duplicates](duplicates.md)).
 - **A row with no first name matches on the rest.** It finds the person with that email, or
-  surname and postal code (the oldest record when several share it), and leaves their first
+  surname and postal code, and leaves their first
   name as it is: an empty cell never clears or renames anything. Loading the same file again finds each of
   them rather than adding the second person again. Two people on one row with the same
   matching details and the same first name cannot be told apart: that row is rejected.
   Under the email rule, a second person who shares the first person's email needs a last
-  name unless they are already in your org with that email and first name.
+  name unless they are already in your org with that email and first name. When a couple
+  share the email, or surname and postal code, a row with no first name matches both of
+  them, and is rejected unless you chose otherwise (section 8).
 
 ## 5. Undoing an import
 
@@ -221,7 +228,16 @@ file is exactly the email on the record, so a file of work addresses will not ma
 people whose personal address you hold. A row whose first name is spelled differently from
 the record ("Bob" for Robert, "J." for John) is also created, under either rule, rather than
 renaming the record. Run a dry run with a different rule, fix the spellings in the file, or
-add an external identifier column to the file and use **External ID**.
+add an external identifier column to the file and use **External ID**. Under **External ID**,
+check that a column is set to the field you chose (section 8): without one, nobody is matched.
+
+**Rows rejected with "More than one person matches this row".** Two or more records in your
+org share the email, or surname and postal code, or ID that the row was looked for by. A couple
+sharing an email, and a row that gives no first name, is the usual cause. Merge the duplicates
+(see [Duplicates](duplicates.md)), add a first name to the row, or match by an ID, then import
+the rejected rows again. "More than one organization matches this row" is the same for two
+organizations with one name. To load such rows into the most recently changed record instead,
+see section 8.
 
 **Rows rejected with "Required value missing: last name".** A person needs a last name.
 Rows where the name column is empty, or where a single "Full Name" column was mapped to
@@ -265,6 +281,59 @@ line. With Giving installed, see [Importing gifts](gift-import.md).
 with Giving, a different total of gift amounts) from the control totals you typed. The run log gives both
 numbers. Fix the file or the totals and dry run again; the commit is refused until they agree.
 
+**"A value for every row cannot give a person's name, email or matching ID".** A value for
+every row that named a person would make every row the same person, so the import refuses it.
+Put names and emails in the file instead. A value for the organization is fine.
+
+## 8. How rows are matched, and values for every row
+
+The matching step of the wizard holds four choices. Each is saved with the mapping, so the
+next file loaded with it starts with the same ones.
+
+**People are matched by** one of three rules:
+
+| Rule | What it does | What it risks |
+|---|---|---|
+| **Email exact** | Finds the person whose email is exactly the email in the file. | A file of work addresses will not match people whose personal address you hold, so they are created again. |
+| **Name plus postal code** | Finds the person with that last name and postal code. | Two different people who share a name at one address are taken as one. |
+| **External ID** | Finds the person whose ID field holds the value in the file, for example a member number from your other system. | Only as good as the IDs: a value typed into the wrong record matches the wrong person. |
+
+Under every rule a row with a first name finds only a person with that first name (section 4).
+
+**Organizations are matched by** **Name exact** (the same name, ignoring capitals and extra
+spaces) or **External ID**. Name exact treats two organizations with one name, such as two
+branches called "First Baptist Church", as one. Only organizations are searched: a household
+or a person with the same name or ID is never taken for one.
+
+**Choosing an ID field.** With **External ID**, choose the field from the list beside the
+rule. It lists the fields your org marks **External ID** or **Unique** that hold text or an
+email. If the list is empty, ask your Salesforce administrator to mark the field that holds
+your other system's ID as External ID. Then, on the columns step, set the column holding the
+ID to that field: it appears in the column list as, for example, "First person: Member Number"
+or "Organization: Charity Number". A row with no ID is not matched, so its person or
+organization is created (an organization needs a name for that).
+
+**When more than one record matches** a row:
+
+- **Reject the row** (the default). The row is rejected with the reason, nothing is written
+  for it, and you fix the duplicates or the file and load it again. This is the safe choice,
+  because a row loaded into the wrong duplicate is hard to notice.
+- **Use the most recently changed record.** The row is loaded into whichever of them was
+  changed last. Use it only when your duplicates are known and the newest is the one you keep.
+  In a large file, a record the commit itself updated earlier becomes the most recently changed,
+  so the commit can choose differently from the dry run.
+
+Either way every such row has **Several Matches** ticked: select **View rows** on the results
+screen, or report on Import Rows, to see them. The run log says when rows were loaded into the
+most recently changed record.
+
+**Values for every row.** Select **Add a value**, choose what the value is for (the same list
+as the columns), and type it. It is used on each row of this file whose own cell is empty, and
+only for this file: the next file starts with none. A row's own value always wins, then the
+file's value, then any default the mapping holds. A value cannot be a person's name, email or
+ID field, because every row would then be the same person. It can be an organization: for a
+staff list from one employer, give every row that organization's name.
+
 ## Fields the BarnCRM Admin role can import
 
 Salesforce controls standard fields one by one, and a person with only a minimal profile
@@ -295,6 +364,9 @@ For building a report on your imports.
 | One upload and its counts | Import Batch | Row Count, Rows Created, Rows Updated, Rows Matched, Rows Rejected |
 | Why an import failed as a whole | Import Batch | Run Log |
 | One row of the file | Import Row | Row Number, Status, Error Message |
+| Rows that matched more than one record | Import Row | Several Matches |
+| How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches |
+| The values given to every row of a file | Import Batch | File Values |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
 | The control totals of a file | Import Batch | Expected Count (and, with Giving, Expected Amount, File Amount) |
 | The import a record came from | Account, Contact (and Gift, with Giving) | Created By Import Batch |
