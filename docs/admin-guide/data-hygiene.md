@@ -43,7 +43,7 @@ paused for the load. She wants to know what the load left behind.
    with no household** says **214**. **Default addresses with parts missing** says **38**. The
    others say **0**.
 2. Next to **People with no household** she presses **Open in Find**. The Find tab opens. Under
-   **Saved queries** there is a new query of hers, **Data hygiene: people with no household**.
+   **Saved queries** there is a new query of hers, **Data hygiene: People with no household**.
    She chooses it.
 3. The query is filled in: object Contact, columns Name and Created Date, one condition
    (**Account ID is blank**), sorted oldest first. She presses **Run** and reads the list. They
