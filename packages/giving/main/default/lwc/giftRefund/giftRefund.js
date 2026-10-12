@@ -56,6 +56,11 @@ export default class GiftRefund extends LightningElement {
     return this.mode === WRITE_OFF;
   }
 
+  /** A refund asks how much goes back; a write-off has no amount to type. */
+  get showAmount() {
+    return !this.isWriteOff;
+  }
+
   get confirmDisabled() {
     return this.working || this.remainingAmount === undefined;
   }

@@ -217,6 +217,20 @@ describe('c-stewardship-plans', () => {
     expect(element.shadowRoot.querySelector('[data-id="no-steps"]')).not.toBeNull();
   });
 
+  it('asks for a plan to be chosen until one is, then shows its steps instead', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="select-plan"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="no-steps"]')).toBeNull();
+
+    await select(element, 0);
+
+    expect(element.shadowRoot.querySelector('[data-id="select-plan"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="no-steps"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('[data-id="step-row"]').length).toBe(2);
+  });
+
   it('creates a plan from the page rather than from an object tab', async () => {
     saveTemplate.mockResolvedValue(WELCOME_ID);
     const element = createComponent();
