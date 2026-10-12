@@ -3,7 +3,7 @@
   <description>
     The person record page in the Fundraising app: Core's Contact Record Page plus the person's
     giving totals, their gifts, commitments and soft credits, and a New Gift action. Keep the
-    Core part in step with Core's page (ADR-NEXT, Giving ships the donor record pages).
+    Core part in step with Core's page (ADR-0064, Giving ships the donor record pages).
   </description>
   <flexiPageRegions>
     <itemInstances>

@@ -70,8 +70,8 @@ const CHANNEL_EMAIL = 'Email';
  * standard New page, for one reason: a rule names its email template by developer name, and no
  * lookup to `EmailTemplate` is possible (ADR-0032). So the template is a picker built from the
  * templates this page already lists, offered by name, and every other field is the standard
- * input field with its own validation (ADR-NEXT,
- * `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`).
+ * input field with its own validation (ADR-0066,
+ * `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`).
  */
 export default class Acknowledgments extends NavigationMixin(LightningElement) {
   labels = {

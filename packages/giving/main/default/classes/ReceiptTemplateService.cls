@@ -133,7 +133,7 @@ public with sharing class ReceiptTemplateService {
 
     /**
      * The letter as the editor shows it: the stored body without the letterhead block the
-     * shipped letters used to open with (ADR-NEXT point 3). The package prints the letterhead
+     * shipped letters used to open with (ADR-0065 point 3). The package prints the letterhead
      * itself now, so the editor never offers it, and the next save stores the letter without it.
      * A body without that block is returned unchanged.
      */
@@ -151,7 +151,7 @@ public with sharing class ReceiptTemplateService {
     }
 
     /**
-     * The draft letter filled in for a sample gift, as the page previews it (ADR-NEXT point 5).
+     * The draft letter filled in for a sample gift, as the page previews it (ADR-0065 point 5).
      *
      * It goes through the same `ReceiptContentBuilder` path as a real receipt, so the preview
      * shows the letterhead, the tax sentences and the signature the document will carry. It

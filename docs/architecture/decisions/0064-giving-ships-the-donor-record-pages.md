@@ -1,4 +1,4 @@
-# ADR-NEXT: Giving ships the donor record pages, with Dynamic Related Lists for giving
+# ADR-0064: Giving ships the donor record pages, with Dynamic Related Lists for giving
 
 **Status:** Accepted
 **Date:** 2026-10-12

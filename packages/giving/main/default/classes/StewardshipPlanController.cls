@@ -124,8 +124,8 @@ public with sharing class StewardshipPlanController {
      * with a general apology: the rules on this object say something an administrator can act on,
      * for example that a minimum amount means nothing on a manual plan.
      *
-     * The plan key is not asked for (ADR-NEXT,
-     * `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`): a new plan gets one
+     * The plan key is not asked for (ADR-0066,
+     * `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`): a new plan gets one
      * made from its name, and an edit never changes it, because the key is what keeps a plan
      * recognizable after it is renamed. A caller that does pass a key for a new plan keeps it.
      */

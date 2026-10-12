@@ -1,6 +1,6 @@
 /**
- * The letter as the Receipts page edits and previews it (ADR-NEXT,
- * `NEXT-receipt-letters-are-edited-as-rich-text.md`).
+ * The letter as the Receipts page edits and previews it (ADR-0065,
+ * `0065-receipt-letters-are-edited-as-rich-text.md`).
  *
  * Three things are asserted. The editor never shows the old letterhead block, so the next save
  * hands the letterhead to the package. The preview runs the real document path for a sample

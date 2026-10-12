@@ -3245,8 +3245,8 @@ charity describes the property and the donor values it.
 
 **R-RC13 What the document is branded with, and what it is valid without.** Every document
 prints the organization's legal name and address and its tax identification number. The name
-and address are the letterhead, and the letterhead is code, not template (ADR-NEXT,
-`NEXT-receipt-letters-are-edited-as-rich-text.md`): the package prints them in a block above
+and address are the letterhead, and the letterhead is code, not template (ADR-0065,
+`0065-receipt-letters-are-edited-as-rich-text.md`): the package prints them in a block above
 the letter whatever the letter says, so an administrator editing the letter can neither delete
 nor misplace them. A letter saved before that decision still carries its own letterhead block
 (`class="letterhead"`); while it does, the package prints the logo only, and the letter's
@@ -3509,7 +3509,7 @@ about which thank you takes precedence.
 | Active | boolean | yes (defaults true) | Whether the rule takes part in matching. An inactive rule matches nothing and is kept rather than deleted. |
 | Order | integer | yes | Where the rule sits in the list. The lowest numbered matching rule wins. |
 | Channel | picklist(Email, Letter, None) | yes | How the donor is thanked, or that this kind of gift is not acknowledged. |
-| Email Template | text | conditional | The developer name of the standard email template this rule sends; required when Channel is Email. Chosen from a picker of the org's active templates, by name, on the Acknowledgments page (ADR-NEXT, `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
+| Email Template | text | conditional | The developer name of the standard email template this rule sends; required when Channel is Email. Chosen from a picker of the org's active templates, by name, on the Acknowledgments page (ADR-0066, `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
 | Minimum Amount | currency | no | The smallest gift this rule matches. Empty means no lower bound. |
 | Maximum Amount | currency | no | The largest gift this rule matches. Empty means no upper bound. |
 | Gift Type | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | no | The one gift type this rule matches. Empty means any type. |
@@ -3756,7 +3756,7 @@ belong to the people who have to do them.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | What the administrator calls the plan, for example "First gift welcome". |
-| Plan Key | text | yes | A stable key, unique, so a shipped default is recognized on upgrade without matching on a name the administrator may have changed. Generated from the plan name when an administrator creates a plan, made unique with a number suffix, and never shown or changed afterwards (ADR-NEXT, `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
+| Plan Key | text | yes | A stable key, unique, so a shipped default is recognized on upgrade without matching on a name the administrator may have changed. Generated from the plan name when an administrator creates a plan, made unique with a number suffix, and never shown or changed afterwards (ADR-0066, `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
 | Active | boolean | yes (defaults false) | Whether the plan can start. An inactive template keeps the plans it already started. |
 | Trigger Event | picklist(Manual, First gift, Gift received, Commitment started) | yes | What starts a plan from this template. Manual means a person starts it and nothing starts it automatically. Commitment started means a pledge or a recurring gift became active (R-SP3a). |
 | Minimum Amount | currency | no | For the two gift events, the smallest gift that starts a plan. Blank means any amount. |
@@ -4402,7 +4402,7 @@ why the definition keeps its own Last Calculated as well.
 ### Salesforce implementation
 
 - **Fields on Account** (shipped by Giving, shown read only in the Giving section of
-  Giving's own Account and Contact record pages, ADR-NEXT on the donor record pages):
+  Giving's own Account and Contact record pages, ADR-0064 on the donor record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -5386,7 +5386,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-10-12 | API name pass (ADR-0063). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (ADR-0063). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (ADR-0063). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
-| v0.6 | 2026-10-12 | UX review item 2 (ADR-NEXT, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
+| v0.6 | 2026-10-12 | UX review item 2 (ADR-0064, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
 | v0.6 | 2026-10-12 | UX review item 10. No object or field added. `Gift__c.Type__c` is relabelled Payment Method (label only; the API name is unchanged), so the gift record, Quick Gift Entry, gift batches, import and the accounting export all say payment method. `Gift_Compact` and `Commitment_Overview` gain the donor (`Donor_Contact__c`, `Donor_Account__c`). On `Gift_Record_Page` (Dynamic Forms, ADR-0043) Donor Contact shows only when Donor Account is empty and Donor Account only when it is filled (R-G1 allows one donor), Original Gift and Refund Reason only when filled, and Matched Gift only when filled or when the donor is an account; the page gains the activity panel (ADR-0042). |
 | v0.6 | 2026-10-12 | UX review quick wins. No object or field added. One minimal fallback page layout each (ADR-0043) for Relationship, Affiliation, Receipt, Receipt Run, Acknowledgment, Acknowledgment Rule, Acknowledgment Run, Stewardship Plan and Stewardship Plan Template, which had tabs and no layout. |
 

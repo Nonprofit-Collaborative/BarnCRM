@@ -1,4 +1,4 @@
-# ADR-NEXT: Receipt letters are edited as rich text, and the package prints the letterhead
+# ADR-0065: Receipt letters are edited as rich text, and the package prints the letterhead
 
 **Status:** Accepted
 **Date:** 2026-10-12

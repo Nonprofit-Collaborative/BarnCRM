@@ -1,4 +1,4 @@
-# ADR-NEXT: Acknowledgment rules pick their template by name, and plan keys are generated
+# ADR-0066: Acknowledgment rules pick their template by name, and plan keys are generated
 
 **Status:** Accepted
 **Date:** 2026-10-12

@@ -72,8 +72,9 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0061](0061-module-settings-first-save-takes-checkbox-defaults-from-metadata.md) | A module's first settings save takes its checkbox defaults from field metadata | Accepted (builder decision) |
 | [0062](0062-core-names-other-products-only-when-detected.md) | Core shows nonprofit wording and other products' names only where they apply (amends ADR-0059 decision 5) | Accepted (owner decision) |
 | [0063](0063-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
-| [NEXT](NEXT-receipt-letters-are-edited-as-rich-text.md) | Receipt letters are edited as rich text, and the package prints the letterhead | Accepted (owner-approved UX review) |
-| [NEXT](NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md) | Acknowledgment rules pick their template by name, and plan keys are generated | Accepted (owner-approved UX review) |
+| [0064](0064-giving-ships-the-donor-record-pages.md) | Giving ships the donor record pages, with Dynamic Related Lists for giving (amends ADR-0043 for the giving lists) | Accepted (owner-approved UX review) |
+| [0065](0065-receipt-letters-are-edited-as-rich-text.md) | Receipt letters are edited as rich text, and the package prints the letterhead | Accepted (owner-approved UX review) |
+| [0066](0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md) | Acknowledgment rules pick their template by name, and plan keys are generated | Accepted (owner-approved UX review) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

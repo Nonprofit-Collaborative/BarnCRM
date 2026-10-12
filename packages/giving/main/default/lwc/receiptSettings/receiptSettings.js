@@ -71,8 +71,8 @@ const TOKENS = [
 ];
 
 /**
- * What the editor offers: only what the PDF rendering service prints (ADR-NEXT,
- * `NEXT-receipt-letters-are-edited-as-rich-text.md`). No images, fonts, sizes or colors, because
+ * What the editor offers: only what the PDF rendering service prints (ADR-0065,
+ * `0065-receipt-letters-are-edited-as-rich-text.md`). No images, fonts, sizes or colors, because
  * the renderer accepts no web fonts and no `data:` images (ADR-0016).
  */
 const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link', 'header'];
@@ -81,7 +81,7 @@ const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link
  * The Receipts panel in the settings console: the letters, and the year end run.
  *
  * The letter is edited as rich text, and the letterhead is not in it: the package prints the
- * organization's name, address and logo above every document (ADR-NEXT). The panel also does
+ * organization's name, address and logo above every document (ADR-0065). The panel also does
  * not offer a way to edit the tax sentences. They are not on this screen because they are not
  * editable: whatever the letter says, BarnCRM adds what IRS Publication 1771 requires (ADR-0016,
  * R-RC7). The note under the editor says so, so that an administrator looking for them stops
@@ -252,7 +252,7 @@ export default class ReceiptSettings extends LightningElement {
     );
   }
 
-  /** The draft as it stands, unsaved, filled in for a sample gift (ADR-NEXT point 5). */
+  /** The draft as it stands, unsaved, filled in for a sample gift (ADR-0065 point 5). */
   async handlePreview() {
     const template = this.selectedTemplate;
     this.working = true;

@@ -13,8 +13,8 @@
  * through `@page` margin boxes.
  *
  * The organization's branding is printed the same way, and for the same reason (R-RC13): the legal
- * name and the address are a letterhead the package prints above every letter (ADR-NEXT,
- * `NEXT-receipt-letters-are-edited-as-rich-text.md`), so an administrator cannot produce a
+ * name and the address are a letterhead the package prints above every letter (ADR-0065,
+ * `0065-receipt-letters-are-edited-as-rich-text.md`), so an administrator cannot produce a
  * document with no organization on it. The logo is optional and
  * comes from `ReceiptLogoSource`, whose delivery route is **unverified in an org**: ADR-0016's
  * second spike is open, and a receipt with no images at all is a valid receipt.
@@ -63,7 +63,7 @@ public with sharing class ReceiptContentBuilder {
     /**
      * What marks a letter saved before the package printed the letterhead itself: the shipped
      * letters opened with `<div class="letterhead">`. While a stored letter still has it, that
-     * block prints the name and the package prints the logo only (ADR-NEXT point 3).
+     * block prints the name and the package prints the logo only (ADR-0065 point 3).
      */
     public static final String LEGACY_LETTERHEAD_MARKER = 'class="letterhead"';
 
@@ -376,7 +376,7 @@ public with sharing class ReceiptContentBuilder {
      * The letterhead the package prints above the letter (R-RC13): the logo, when the organization
      * has one and has left it turned on, and the organization's name and address.
      *
-     * The letterhead is code, not template (ADR-NEXT): a letter that merely mentions
+     * The letterhead is code, not template (ADR-0065): a letter that merely mentions
      * `{{OrganizationName}}` in a sentence still gets it. The one exception is a letter saved
      * before that decision, which still carries its own letterhead block; that block prints the
      * name, so the package does not print it twice.

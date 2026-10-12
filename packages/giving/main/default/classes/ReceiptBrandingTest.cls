@@ -80,7 +80,7 @@ private class ReceiptBrandingTest {
 
     /**
      * A letter saved before the package printed the letterhead keeps its own block, and the
-     * package does not print the name a second time (ADR-NEXT point 3).
+     * package does not print the name a second time (ADR-0065 point 3).
      */
     @IsTest
     static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
@@ -98,7 +98,7 @@ private class ReceiptBrandingTest {
     }
 
     /**
-     * The letterhead is code, not template (ADR-NEXT point 2). A letter that only mentions the
+     * The letterhead is code, not template (ADR-0065 point 2). A letter that only mentions the
      * organization in a sentence used to lose the letterhead, because the test was for the token.
      */
     @IsTest
