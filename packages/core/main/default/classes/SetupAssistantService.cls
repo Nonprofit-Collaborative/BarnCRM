@@ -1,21 +1,38 @@
 /**
- * The eight step setup checklist Maria works through on the Hub home page (plan Section
- * 4.8). It defines the steps, says whether each one can be done in this org yet, how each
- * one finishes, and remembers where Maria got to, so that closing the browser in the middle
- * of step four opens on step four tomorrow.
+ * The setup checklist Maria works through on the home page (plan Section 4.8). It defines the
+ * steps, says how each one finishes, and remembers where Maria got to, so that closing the
+ * browser in the middle of step four opens on step four tomorrow.
+ *
+ * Core ships seven neutral steps. A dependent package adds its own steps, fields and wording
+ * through `SetupAssistantExtension` (C-29, ADR-0059): Giving adds the fund and appeal step and
+ * the receipt fields, which makes eight. A step's fields are data, rendered by one Core panel
+ * and saved through `SettingsService` on the settings object each field names.
  *
  * A step is finished when the administrator finishes it, or when the setting that step
  * exists to fill in already has a value. A step can also be skipped, which moves it out of
- * the way without counting as done, so that step three can wait for the Giving module.
+ * the way without counting as done.
  */
+@NamespaceAccessible
 public with sharing class SetupAssistantService {
     /** Where a step is carried out: a section of the settings console, or Salesforce Setup. */
     public static final String TARGET_SETTINGS = 'Settings';
     public static final String TARGET_SETUP = 'Setup';
 
     /** How a step finishes: by a setting getting a value, or by Maria finishing the panel. */
+    @NamespaceAccessible
     public static final String RULE_SETTING = 'Setting';
+    @NamespaceAccessible
     public static final String RULE_ACTION = 'Action';
+
+    /** The kinds of field a step's panel can show (see `StepField`). */
+    @NamespaceAccessible
+    public static final String FIELD_TEXT = 'Text';
+    @NamespaceAccessible
+    public static final String FIELD_RECORD = 'Record';
+    @NamespaceAccessible
+    public static final String FIELD_FILE = 'File';
+    @NamespaceAccessible
+    public static final String FIELD_NAVIGATE = 'Navigate';
 
     /** The coexistence modes, as plan Section 4.5 names them. */
     public static final String MODE_STANDALONE = 'Standalone';
@@ -36,11 +53,19 @@ public with sharing class SetupAssistantService {
     @TestVisible
     private static OrgShapeDetector.OrgShape stubbedShape;
 
-    /** Raised when a step key is not one of the eight the package ships. */
+    /** The merged steps, built once per transaction. */
+    private static List<Step> cachedDefinitions;
+
+    /** Raised when a step key is not one of the steps this org has. */
     public class SetupStepException extends Exception {
     }
 
-    /** One step of the setup checklist, as the Hub home page renders it. */
+    /**
+     * One step of the setup checklist, as the home page renders it. A dependent package builds
+     * one with the constructor and the `with` methods, because an `@AuraEnabled` field cannot
+     * also be `@NamespaceAccessible` (dynamic-apex.md section 3).
+     */
+    @NamespaceAccessible
     public class Step {
         @AuraEnabled
         public String key;
@@ -58,6 +83,9 @@ public with sharing class SetupAssistantService {
         public String setupPath;
         @AuraEnabled
         public String completionSettingKey;
+        /** The settings object the completion key is on; blank means Core's. */
+        @AuraEnabled
+        public String completionSettingsObject;
         @AuraEnabled
         public String completionRule;
         @AuraEnabled
@@ -67,20 +95,178 @@ public with sharing class SetupAssistantService {
         /** True when the step is finished. The Hub checklist has called this `completed` since C-03. */
         @AuraEnabled
         public Boolean completed;
+        /** The fields the step's panel shows, in order; empty for a step with its own panel. */
+        @AuraEnabled
+        public List<StepField> fields;
+        /** True when saving the panel's fields also moves on to the next step. */
+        @AuraEnabled
+        public Boolean advanceOnSave;
+        /** Where the step sits: Core's steps are 10 to 80 in tens, a module fills the gaps. */
+        public Integer sortOrder;
+
+        /** A step, or a contribution to a Core step when the key is one of Core's. */
+        @NamespaceAccessible
+        public Step(String key, Integer sortOrder, String label, String description) {
+            this.key = key;
+            this.sortOrder = sortOrder;
+            this.label = label;
+            this.description = description;
+            this.targetType = TARGET_SETTINGS;
+            this.completionRule = RULE_ACTION;
+            this.isAvailable = true;
+            this.skipped = false;
+            this.completed = false;
+            this.advanceOnSave = false;
+            this.fields = new List<StepField>();
+        }
+
+        /** The settings section the step's answers live in afterwards. */
+        @NamespaceAccessible
+        public Step withTarget(String target) {
+            this.target = target;
+            return this;
+        }
+
+        /** The step finishes by itself once this setting has a value. */
+        @NamespaceAccessible
+        public Step completedBy(String settingsObject, String settingKey) {
+            this.completionRule = RULE_SETTING;
+            this.completionSettingsObject = settingsObject;
+            this.completionSettingKey = settingKey;
+            return this;
+        }
+
+        @NamespaceAccessible
+        public Step withField(StepField field) {
+            this.fields.add(field);
+            return this;
+        }
+
+        /** Saving the step's fields moves on to the next step. */
+        @NamespaceAccessible
+        public Step advancingOnSave() {
+            this.advanceOnSave = true;
+            return this;
+        }
     }
 
-    /** The shipped steps, in order, each carrying whether it is finished, skipped, and possible yet. */
+    /**
+     * One field on a step's panel: a setting to type, a record to pick, a file to upload, or a
+     * button that opens another tab. The page renders it and the assistant saves only the keys
+     * a step declares, so a panel can never write a setting its step does not name.
+     */
+    @NamespaceAccessible
+    public class StepField {
+        @AuraEnabled
+        public String fieldType;
+        /** The settings field the value is saved to; blank for a Navigate button. */
+        @AuraEnabled
+        public String key;
+        /** The settings object the key is on; blank means Core's. */
+        @AuraEnabled
+        public String settingsObject;
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public String value;
+        /** For a Record field, the object the picker offers, as its API name. */
+        @AuraEnabled
+        public String objectApiName;
+        @AuraEnabled
+        public Integer maxLength;
+        @AuraEnabled
+        public String pattern;
+        @AuraEnabled
+        public String patternMessage;
+        /** For a File field, the alternative text of the preview. */
+        @AuraEnabled
+        public String previewAlt;
+        /** For a Navigate field, the Lightning tab it opens. */
+        @AuraEnabled
+        public String navigationTarget;
+        @AuraEnabled
+        public Boolean fullWidth;
+        public Integer sortOrder;
+
+        @NamespaceAccessible
+        public StepField(
+            String fieldType,
+            Integer sortOrder,
+            String settingsObject,
+            String key,
+            String label
+        ) {
+            this.fieldType = fieldType;
+            this.sortOrder = sortOrder;
+            this.settingsObject = settingsObject;
+            this.key = key;
+            this.label = label;
+            this.fullWidth = false;
+        }
+
+        @NamespaceAccessible
+        public StepField withLimits(Integer maxLength, String pattern, String patternMessage) {
+            this.maxLength = maxLength;
+            this.pattern = pattern;
+            this.patternMessage = patternMessage;
+            return this;
+        }
+
+        @NamespaceAccessible
+        public StepField withObject(String objectApiName) {
+            this.objectApiName = objectApiName;
+            return this;
+        }
+
+        @NamespaceAccessible
+        public StepField withPreviewAlt(String previewAlt) {
+            this.previewAlt = previewAlt;
+            return this;
+        }
+
+        @NamespaceAccessible
+        public StepField withNavigationTarget(String navigationTarget) {
+            this.navigationTarget = navigationTarget;
+            return this;
+        }
+
+        @NamespaceAccessible
+        public StepField asFullWidth() {
+            this.fullWidth = true;
+            return this;
+        }
+    }
+
+    /** The steps, in order, each carrying whether it is finished or skipped, and its fields' values. */
+    @NamespaceAccessible
     public static List<Step> getSteps() {
         Set<String> marked = keysIn(PROGRESS_KEY);
         Set<String> skipped = keysIn(SKIPPED_KEY);
-        Boolean givingPresent = ModuleDetectionService.isGivingPresent();
         List<Step> steps = definitions();
         for (Step step : steps) {
-            step.completed = marked.contains(step.key) || hasValue(step.completionSettingKey);
+            step.completed =
+                marked.contains(step.key) ||
+                hasValue(step.completionSettingsObject, step.completionSettingKey);
             step.skipped = skipped.contains(step.key) && !step.completed;
-            step.isAvailable = step.key == 'funddefaults' ? givingPresent : true;
+            for (StepField field : step.fields) {
+                field.value = String.isBlank(field.key)
+                    ? null
+                    : valueOf(field.settingsObject, field.key);
+            }
         }
         return steps;
+    }
+
+    /** The step with this key, or null when this org has no such step. */
+    @NamespaceAccessible
+    public static Step findStep(String stepKey) {
+        String key = stepKey == null ? '' : stepKey.trim();
+        for (Step step : definitions()) {
+            if (step.key == key) {
+                return step;
+            }
+        }
+        return null;
     }
 
     /** How many of the steps are finished. */
@@ -221,11 +407,28 @@ public with sharing class SetupAssistantService {
         return stored;
     }
 
-    private static Boolean hasValue(String settingKey) {
-        if (String.isBlank(settingKey) || !SettingsService.hasKey(settingKey)) {
-            return false;
+    private static Boolean hasValue(String settingsObject, String settingKey) {
+        return String.isNotBlank(valueOf(settingsObject, settingKey));
+    }
+
+    /**
+     * A setting's value as text, or null when it is blank or the key is not in this org. A
+     * module's settings object that is missing is an absent answer, never a failed page.
+     */
+    private static String valueOf(String settingsObject, String settingKey) {
+        if (String.isBlank(settingKey)) {
+            return null;
         }
-        return String.isNotBlank(SettingsService.asText(SettingsService.getValue(settingKey)));
+        try {
+            String value = SettingsService.asText(
+                String.isBlank(settingsObject)
+                    ? SettingsService.getValue(settingKey)
+                    : SettingsService.getValue(settingsObject, settingKey)
+            );
+            return String.isBlank(value) ? null : value;
+        } catch (SettingsService.SettingsException unknown) {
+            return null;
+        }
     }
 
     private static Set<String> keys() {
@@ -236,139 +439,188 @@ public with sharing class SetupAssistantService {
         return keys;
     }
 
+    /**
+     * Core's seven steps with every installed extension's contributions merged in, sorted and
+     * numbered. Built once per transaction: the page asks for the steps several times a call.
+     */
     private static List<Step> definitions() {
-        List<Step> steps = new List<Step>();
-        steps.add(
-            build(
-                'coexistence',
-                1,
-                System.Label.Core_SetupAssistant_Step1Label,
-                System.Label.Core_SetupAssistant_Step1Description,
-                TARGET_SETTINGS,
-                SettingSections.GENERAL,
-                null,
-                'Coexistence_Mode__c',
-                RULE_SETTING
-            )
-        );
-        steps.add(
-            build(
-                'naming',
-                2,
-                System.Label.Core_SetupAssistant_Step2Label,
-                System.Label.Core_SetupAssistant_Step2Description,
-                TARGET_SETTINGS,
-                SettingSections.HOUSEHOLDS,
-                null,
-                'Household_Name_Pattern__c',
-                RULE_SETTING
-            )
-        );
-        steps.add(
-            build(
-                'funddefaults',
-                3,
-                System.Label.Core_SetupAssistant_Step3Label,
-                System.Label.Core_SetupAssistant_Step3Description,
-                TARGET_SETTINGS,
-                SettingSections.GIVING,
-                null,
-                'Default_Fund__c',
-                RULE_SETTING
-            )
-        );
-        steps.add(
-            build(
-                'access',
-                4,
-                System.Label.Core_SetupAssistant_Step4Label,
-                System.Label.Core_SetupAssistant_Step4Description,
-                TARGET_SETTINGS,
-                SettingSections.ACCESS,
-                '/lightning/setup/ManageUsers/home',
-                null,
-                RULE_ACTION
-            )
-        );
-        steps.add(
-            build(
-                'identity',
-                5,
-                System.Label.Core_SetupAssistant_Step5Label,
-                System.Label.Core_SetupAssistant_Step5Description,
-                TARGET_SETTINGS,
-                SettingSections.ORGANIZATION,
-                null,
-                'Organization_Legal_Name__c',
-                RULE_SETTING
-            )
-        );
-        steps.add(
-            build(
-                'modules',
-                6,
-                System.Label.Core_SetupAssistant_Step6Label,
-                System.Label.Core_SetupAssistant_Step6Description,
-                TARGET_SETTINGS,
-                SettingSections.GENERAL,
-                null,
-                null,
-                RULE_ACTION
-            )
-        );
-        steps.add(
-            build(
-                'data',
-                7,
-                System.Label.Core_SetupAssistant_Step7Label,
-                System.Label.Core_SetupAssistant_Step7Description,
-                TARGET_SETTINGS,
-                SettingSections.IMPORTING,
-                null,
-                null,
-                RULE_ACTION
-            )
-        );
-        steps.add(
-            build(
-                'verify',
-                8,
-                System.Label.Core_SetupAssistant_Step8Label,
-                System.Label.Core_SetupAssistant_Step8Description,
-                TARGET_SETTINGS,
-                SettingSections.HEALTH,
-                null,
-                null,
-                RULE_ACTION
-            )
-        );
+        if (cachedDefinitions != null) {
+            return cachedDefinitions;
+        }
+        List<Step> steps = coreSteps();
+        Map<String, Step> byKey = new Map<String, Step>();
+        for (Step step : steps) {
+            byKey.put(step.key, step);
+        }
+        for (SetupAssistantExtension extension : SetupAssistantExtensions.findAll()) {
+            List<Step> contributed;
+            try {
+                contributed = extension.contributions();
+            } catch (Exception e) {
+                ErrorLogger.log(e, 'Setup Assistant extension');
+                continue;
+            }
+            for (Step contribution : contributed == null ? new List<Step>() : contributed) {
+                if (contribution == null || String.isBlank(contribution.key)) {
+                    continue;
+                }
+                Step existing = byKey.get(contribution.key);
+                if (existing == null) {
+                    byKey.put(contribution.key, contribution);
+                    steps.add(contribution);
+                } else {
+                    mergeInto(existing, contribution);
+                }
+            }
+        }
+        steps = sortedBySortOrder(steps);
+        for (Integer i = 0; i < steps.size(); i++) {
+            steps[i].position = i + 1;
+            steps[i].fields = sortedFields(steps[i].fields);
+        }
+        cachedDefinitions = steps;
         return steps;
     }
 
-    private static Step build(
-        String key,
-        Integer position,
-        String label,
-        String description,
-        String targetType,
-        String target,
-        String setupPath,
-        String completionSettingKey,
-        String completionRule
-    ) {
-        Step step = new Step();
-        step.key = key;
-        step.position = position;
-        step.label = label;
-        step.description = description;
-        step.targetType = targetType;
-        step.target = target;
-        step.setupPath = setupPath;
-        step.completionSettingKey = completionSettingKey;
-        step.completionRule = completionRule;
-        step.isAvailable = true;
-        step.skipped = false;
-        step.completed = false;
-        return step;
+    /** A contribution to a Core step adds its fields and, when it has any, its own wording. */
+    private static void mergeInto(Step existing, Step contribution) {
+        if (String.isNotBlank(contribution.label)) {
+            existing.label = contribution.label;
+        }
+        if (String.isNotBlank(contribution.description)) {
+            existing.description = contribution.description;
+        }
+        existing.fields.addAll(contribution.fields);
+        existing.advanceOnSave = existing.advanceOnSave || contribution.advanceOnSave;
+    }
+
+    /** A stable insertion sort: a handful of steps, and equal orders keep their arrival order. */
+    private static List<Step> sortedBySortOrder(List<Step> steps) {
+        List<Step> sorted = new List<Step>();
+        for (Step step : steps) {
+            Integer at = sorted.size();
+            while (at > 0 && orderOf(sorted[at - 1].sortOrder) > orderOf(step.sortOrder)) {
+                at--;
+            }
+            if (at == sorted.size()) {
+                sorted.add(step);
+            } else {
+                sorted.add(at, step);
+            }
+        }
+        return sorted;
+    }
+
+    private static List<StepField> sortedFields(List<StepField> fields) {
+        List<StepField> sorted = new List<StepField>();
+        for (StepField field : fields) {
+            Integer at = sorted.size();
+            while (at > 0 && orderOf(sorted[at - 1].sortOrder) > orderOf(field.sortOrder)) {
+                at--;
+            }
+            if (at == sorted.size()) {
+                sorted.add(field);
+            } else {
+                sorted.add(at, field);
+            }
+        }
+        return sorted;
+    }
+
+    private static Integer orderOf(Integer sortOrder) {
+        return sortOrder == null ? 1000 : sortOrder;
+    }
+
+    /** The seven steps every organization answers, whatever else is installed. */
+    private static List<Step> coreSteps() {
+        List<Step> steps = new List<Step>();
+        steps.add(
+            new Step(
+                    'coexistence',
+                    10,
+                    System.Label.Core_SetupAssistant_Step1Label,
+                    System.Label.Core_SetupAssistant_Step1Description
+                )
+                .withTarget(SettingSections.GENERAL)
+                .completedBy(null, 'Coexistence_Mode__c')
+        );
+        steps.add(
+            new Step(
+                    'naming',
+                    20,
+                    System.Label.Core_SetupAssistant_Step2Label,
+                    System.Label.Core_SetupAssistant_Step2Description
+                )
+                .withTarget(SettingSections.HOUSEHOLDS)
+                .completedBy(null, 'Household_Name_Pattern__c')
+        );
+        Step access = new Step(
+                'access',
+                40,
+                System.Label.Core_SetupAssistant_Step4Label,
+                System.Label.Core_SetupAssistant_Step4Description
+            )
+            .withTarget(SettingSections.ACCESS);
+        access.setupPath = '/lightning/setup/ManageUsers/home';
+        steps.add(access);
+        steps.add(
+            new Step(
+                    'identity',
+                    50,
+                    System.Label.Core_SetupAssistant_Step5Label,
+                    System.Label.Core_SetupAssistant_Step5Description
+                )
+                .withTarget(SettingSections.ORGANIZATION)
+                .completedBy(null, 'Organization_Legal_Name__c')
+                .withField(
+                    new StepField(
+                            FIELD_TEXT,
+                            10,
+                            null,
+                            'Organization_Legal_Name__c',
+                            System.Label.Core_SetupAssistant_LegalNameLabel
+                        )
+                        .withLimits(255, null, null)
+                )
+                .withField(
+                    new StepField(
+                            FIELD_TEXT,
+                            30,
+                            null,
+                            'Organization_Address__c',
+                            System.Label.Core_SetupAssistant_AddressLabel
+                        )
+                        .withLimits(255, null, null)
+                        .asFullWidth()
+                )
+        );
+        steps.add(
+            new Step(
+                    'modules',
+                    60,
+                    System.Label.Core_SetupAssistant_Step6Label,
+                    System.Label.Core_SetupAssistant_Step6Description
+                )
+                .withTarget(SettingSections.GENERAL)
+        );
+        steps.add(
+            new Step(
+                    'data',
+                    70,
+                    System.Label.Core_SetupAssistant_Step7Label,
+                    System.Label.Core_SetupAssistant_Step7Description
+                )
+                .withTarget(SettingSections.IMPORTING)
+        );
+        steps.add(
+            new Step(
+                    'verify',
+                    80,
+                    System.Label.Core_SetupAssistant_Step8Label,
+                    System.Label.Core_SetupAssistant_Step8Description
+                )
+                .withTarget(SettingSections.HEALTH)
+        );
+        return steps;
     }
 }

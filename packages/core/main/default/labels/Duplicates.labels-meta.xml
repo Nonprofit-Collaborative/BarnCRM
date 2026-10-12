@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates: refusal when the user cannot use duplicate record sets.</shortDescription>
-        <value>You need the Nonprofit Duplicate Review permission set to scan, dismiss or merge from here. Salesforce gives it only to users with a Sales Cloud or Service Cloud license.</value>
+        <value>You need the Open Impact Duplicate Review permission set to scan, dismiss or merge from here. Salesforce gives it only to users with a Sales Cloud or Service Cloud license.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ErrorNotReviewable</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates: action needs Manage Nonprofit Settings</shortDescription>
-        <value>Scanning, dismissing and merging from this panel need the Manage Nonprofit Settings permission. Ask your Open Impact administrator.</value>
+        <value>Scanning, dismissing and merging from this panel need the Manage Open Impact Settings permission. Ask your Open Impact administrator.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ErrorUnexpected</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: merge dialog explanation</shortDescription>
-        <value>Members, gifts, files and activities of the other household move to the one you keep, totals are recalculated, and the other household is deleted. This cannot be undone.</value>
+        <value>Members, related records, files and activities of the other household move to the one you keep, totals are recalculated, and the other household is deleted. This cannot be undone.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_MergeButton</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: why no suggestions are shown without the license bound access.</shortDescription>
-        <value>Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. An administrator with one of those licenses can be given the Nonprofit Duplicate Review permission set. The rules above still run when records are saved.</value>
+        <value>Suggestions need access to duplicate record sets, which Salesforce gives only to Sales Cloud and Service Cloud licenses. An administrator with one of those licenses can be given the Open Impact Duplicate Review permission set. The rules above still run when records are saved.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_ObjectHousehold</fullName>
@@ -254,7 +254,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: read only notice</shortDescription>
-        <value>You can see this list. Scanning, dismissing and merging here need the Manage Nonprofit Settings permission.</value>
+        <value>You can see this list. Scanning, dismissing and merging here need the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_Refresh</fullName>

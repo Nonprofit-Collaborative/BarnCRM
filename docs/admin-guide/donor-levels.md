@@ -19,7 +19,7 @@ printed next to it can never disagree.
 
 Everything is in the app. You never open Setup.
 
-1. Open **Nonprofit Settings**, then **Giving**.
+1. Open **Open Impact Settings**, then **Giving**.
 2. Open **Donor levels**. This is the page that shows your ladder.
 3. Choose **New level** and create your first rung. Each rung has:
    - a **name**, the one you use with donors and on your donor wall;
@@ -33,7 +33,7 @@ Everything is in the app. You never open Setup.
    - **active**, which is on for a new rung.
 4. Repeat until your ladder is complete. There is no limit and no required number of
    rungs; four or five is usual.
-5. Back in **Nonprofit Settings**, then **Giving**, set **Donor level source**. This is
+5. Back in **Open Impact Settings**, then **Giving**, set **Donor level source**. This is
    the total your ladder is measured on:
    - **Total giving**, everything the donor has ever given. This is the default and the
      safe choice: it never resets.
@@ -54,9 +54,9 @@ announce: your fiscal year turning over, and a ladder you edited.
 
 ## A five-minute walkthrough
 
-Start with the sample data loaded (Nonprofit Settings, then Sample data).
+Start with the sample data loaded (Open Impact Settings, then Sample data).
 
-1. Open **Nonprofit Settings**, then **Giving**, then **Donor levels**. The ladder is
+1. Open **Open Impact Settings**, then **Giving**, then **Donor levels**. The ladder is
    empty.
 2. Choose **New level**. Name it `Friend`, minimum `100`, maximum `1000`. Save.
 3. Choose **New level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
@@ -89,7 +89,7 @@ totals and not in-kind value, so the honest way to do it is to recognize those d
 alongside the ladder rather than on it. See [In-kind gifts](in-kind-gifts.md).
 
 **Nobody has a level after you build the ladder.** Two causes. Either **Donor levels** is
-still off in Nonprofit Settings, or you have not pressed **Recalculate now**. Editing the
+still off in Open Impact Settings, or you have not pressed **Recalculate now**. Editing the
 ladder does not reassign anybody by itself: a donor moves when their giving changes, or
 when the nightly pass runs, or when you recalculate. Press the button after every change
 to the ladder.

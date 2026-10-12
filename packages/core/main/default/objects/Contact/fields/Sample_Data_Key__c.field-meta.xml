@@ -9,12 +9,10 @@
   <unique>false</unique>
   <trackTrending>false</trackTrending>
   <description>
-    The key the generated sample data set gives this person, so a module sample set (the Giving
-    gifts, for example) can join its own records to the people and households the Core loader
+    The key the generated sample data set gives this person, so a module sample set (a module's own sample records) can join its own records to the people and households the Core loader
     created. Empty on every record an administrator entered.
   </description>
   <inlineHelpText>
-    Set by the sample data loader on each person it creates, so sample gifts and pledges
-    attach to the right sample record. Leave it empty on your own records.
+    Set by the sample data loader on each person it creates, so a module's sample records attach to the right sample record. Leave it empty on your own records.
   </inlineHelpText>
 </CustomField>

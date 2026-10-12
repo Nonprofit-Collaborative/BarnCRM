@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">When a person's mailing address is entered or changed, either moves the whole household or gives that person an address of their own, depending on the Addresses setting in Nonprofit Settings.</value>
+        <value xsi:type="xsd:string">When a person's mailing address is entered or changed, either moves the whole household or gives that person an address of their own, depending on the Addresses setting in Open Impact Settings.</value>
     </values>
     <values>
         <field>Enabled_By_Default__c</field>

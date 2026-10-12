@@ -22,7 +22,7 @@ the automation always runs. See "Automations that always run" below.
 This page describes the finished feature. Two parts of it arrive with the next pieces of
 v0.1, and until they do the walkthrough below cannot be completed end to end:
 
-- The Nonprofit Hub app, its home page, and the Nonprofit Settings console are built by
+- The Open Impact app, its home page, and the Open Impact Settings console are built by
   feature C-03. Until then there is no page to put automation control on.
 - The list of automations is empty, because the first automations (creating households,
   naming them) arrive with feature C-01. Until then the page says so rather than listing
@@ -39,13 +39,13 @@ ever missing, the automation still runs, and Health Check names it and offers to
 
 You will find it in two places:
 
-- **Nonprofit Settings, then Automation.** This is the full page: the list of every
+- **Open Impact Settings, then Automation.** This is the full page: the list of every
   automation with its on and off switch, and the pause button.
-- **The Nonprofit Hub home page.** While automation is paused, a banner appears at the top
+- **The Open Impact home page.** While automation is paused, a banner appears at the top
   of the home page telling you what is paused and when it will come back on.
 
-Changing anything on this page requires the Manage Nonprofit Settings permission, which
-comes with the Nonprofit Admin role. If you do not have it, the page still opens and you
+Changing anything on this page requires the Manage Open Impact Settings permission, which
+comes with the Open Impact Admin role. If you do not have it, the page still opens and you
 can read everything, but the switches are greyed out and a message names the permission
 you need to ask for.
 
@@ -55,7 +55,7 @@ Maria is about to load a spreadsheet of 400 people from a partner organization. 
 the records in first and the automatic housekeeping to happen afterwards, so nothing runs
 400 times while she is watching.
 
-1. Open the **Nonprofit Hub** app and click **Nonprofit Settings**.
+1. Open the **Open Impact** app and click **Open Impact Settings**.
 2. In the left navigation, click **Automation**. You see a list of every piece of
    automation Open Impact ships, each with a plain-language description and a switch.
 3. At the top of the page, choose **2 hours** in the **How long** list, then click
@@ -65,7 +65,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
 4. Click **Home**. The same banner appears at the top of the Hub, so anyone else working
    today can see why records are not updating themselves.
 5. Load your spreadsheet. Nothing runs automatically while you do.
-6. Come back to **Nonprofit Settings**, then **Automation**, and click **Resume
+6. Come back to **Open Impact Settings**, then **Automation**, and click **Resume
    automation**. The banner disappears and the automation starts running again on the next
    record anyone saves. If you forget this step, nothing breaks: automation turns itself
    back on at the two hour mark, and the change is recorded like any other (see "How long
@@ -88,7 +88,7 @@ selected, because most spreadsheet loads are done in less. There is no longer ch
 
 When the time is up, automation starts again at that moment, whether or not anybody has the
 page open. Open Impact also writes the end of the pause into the list of recent changes at the
-bottom of Nonprofit Settings, with the time it ended and the name of the person who paused, as
+bottom of Open Impact Settings, with the time it ended and the name of the person who paused, as
 if they had clicked **Resume automation** themselves. So the list always shows every pause
 with its start and its end.
 
@@ -107,7 +107,7 @@ something. An automation whose job is to refuse a change, rather than to save yo
 is marked as always running, and neither the pause nor its own switch turns it off.
 
 In the list you can tell one at a glance: its switch sits at **Off** and is greyed out even
-when you hold the Manage Nonprofit Settings permission, and underneath the description is
+when you hold the Manage Open Impact Settings permission, and underneath the description is
 the line "This automation enforces a rule, so it always runs. It cannot be switched off
 here and a pause does not suspend it." Clicking the switch does nothing, and if a change
 somehow reaches the server it is refused with the same explanation.
@@ -152,5 +152,5 @@ receipt lock" on the [Gifts page](gifts.md). Every change made with it is writte
   not for you alone. Anyone saving a record during the pause gets the same behavior, so say
   something in your team channel before you pause during working hours.
 - **Looking for the switches with the wrong role.** If the switches are greyed out, you are
-  signed in as a user without the Manage Nonprofit Settings permission. Ask whoever
-  administers your Salesforce to give you the Nonprofit Admin role.
+  signed in as a user without the Manage Open Impact Settings permission. Ask whoever
+  administers your Salesforce to give you the Open Impact Admin role.

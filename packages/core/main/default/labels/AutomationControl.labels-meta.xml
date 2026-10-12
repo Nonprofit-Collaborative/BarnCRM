@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automation page read only notice</shortDescription>
-        <value>You can read this page but not change it. Ask your administrator for the Manage Nonprofit Settings permission.</value>
+        <value>You can read this page but not change it. Ask your administrator for the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_AutomationControl_ResumeButton</fullName>

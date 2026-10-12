@@ -4,7 +4,7 @@
  */
 @IsTest
 private class AccessControllerTest {
-    private static final String FUNDRAISING_ROLE = 'Fundraising_Staff';
+    private static final String PROGRAM_ROLE = 'Program_Staff';
 
     /**
      * Inserts one active user.
@@ -107,7 +107,7 @@ private class AccessControllerTest {
 
         Test.startTest();
         System.runAs(david) {
-            result = AccessController.assignRole(david.Id, FUNDRAISING_ROLE);
+            result = AccessController.assignRole(david.Id, PROGRAM_ROLE);
         }
         Test.stopTest();
 
@@ -131,7 +131,7 @@ private class AccessControllerTest {
 
         Test.startTest();
         System.runAs(maria) {
-            result = AccessController.assignRole('not an id', FUNDRAISING_ROLE);
+            result = AccessController.assignRole('not an id', PROGRAM_ROLE);
         }
         Test.stopTest();
 
@@ -166,20 +166,20 @@ private class AccessControllerTest {
     static void assignRoleAndRemoveRoleWorkForMaria() {
         User maria = insertAdminUser();
         User david = insertUser('David', 'Okafor');
-        TestDataFactory.prepareRoleGroup(FUNDRAISING_ROLE);
+        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
         AccessController.AccessResult assigned;
         AccessController.AccessResult removed;
 
         Test.startTest();
         System.runAs(maria) {
-            assigned = AccessController.assignRole(david.Id, FUNDRAISING_ROLE);
-            removed = AccessController.removeRole(david.Id, FUNDRAISING_ROLE);
+            assigned = AccessController.assignRole(david.Id, PROGRAM_ROLE);
+            removed = AccessController.removeRole(david.Id, PROGRAM_ROLE);
         }
         Test.stopTest();
 
         Assert.isTrue(
             assigned.success,
-            'Maria should be able to give David the Fundraising Staff role.'
+            'Maria should be able to give David the Program Staff role.'
         );
         Assert.isTrue(removed.success, 'Maria should be able to take the role away again.');
         Assert.areEqual(
@@ -187,9 +187,7 @@ private class AccessControllerTest {
             [
                 SELECT COUNT()
                 FROM PermissionSetAssignment
-                WHERE
-                    AssigneeId = :david.Id
-                    AND PermissionSetGroup.DeveloperName = :FUNDRAISING_ROLE
+                WHERE AssigneeId = :david.Id AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
             ],
             'David should not hold the role after Maria removes it.'
         );

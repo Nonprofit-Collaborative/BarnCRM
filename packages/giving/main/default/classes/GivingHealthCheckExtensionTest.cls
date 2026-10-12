@@ -38,6 +38,10 @@ private class GivingHealthCheckExtensionTest {
 
     @IsTest
     static void delegatesStraightToTheGivingChecks() {
+        // Nobody holds the receipt lock override and no receipt run failed, whatever the test
+        // org holds, so the one finding counted is the closed period one.
+        HealthCheckGivingChecks.holdersOverride = new CustomPermissionSelector.Holders();
+        ReceiptGenerationFailureSelector.resultOverride = new ReceiptGenerationFailureSelector.Result();
         // Closing the books is Maria's own act on the Accounting Periods page, done here as
         // the test-running admin: GivingTestDataFactory writes the protected custom setting
         // directly, which is a test-only shortcut around AccountingPeriodWriter's system-mode

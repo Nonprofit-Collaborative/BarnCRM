@@ -18,13 +18,13 @@ Nothing to install and no Setup step. Quick Gift Entry arrives with the Giving p
 
 1. Open the **Fundraising** app from the app launcher (the grid of dots in the top left
    corner). The Giving package ships this app, and Quick Gift Entry is its first tab.
-2. Open **Nonprofit Settings**, then **Giving**, and check two values:
+2. Open **Open Impact Settings**, then **Giving**, and check two values:
    - **Default fund**: the fund a gift is allocated to when nobody picks one. Most
      organizations choose the Annual Fund or the General Fund.
    - **Default appeal**: the appeal proposed on a new gift. Leave it empty outside of
      appeal season, or set it to the appeal you are running right now so that staff do
      not have to pick it every time.
-3. Give your fundraising staff access. In Nonprofit Settings, open **Access** and assign
+3. Give your fundraising staff access. In Open Impact Settings, open **Access** and assign
    the **Fundraising Staff** role, and then, in Salesforce Setup, the **Giving Staff**
    permission set that the Giving module ships. The tab and the save both come from that
    permission set, and no role carries it yet: joining the two up arrives with the Module
@@ -78,12 +78,12 @@ honest. Open the original gift and use the refund action.
 
 **Forgetting the appeal at an event.** Gifts with no appeal are not wrong, but they
 disappear from the appeal results Tom reads on the dashboard. Set the **Default appeal**
-in Nonprofit Settings to the appeal you are running before the event starts, and every
+in Open Impact Settings to the appeal you are running before the event starts, and every
 gift entered that evening carries it.
 
 **Saving with no default fund set.** Every gift has to be designated to a fund, so a gift
 saved without one is refused rather than saved incomplete: the message names the missing
-default fund. Choose a default fund in Nonprofit Settings, or mark one fund as the default
+default fund. Choose a default fund in Open Impact Settings, or mark one fund as the default
 on the fund record, and it is done for good. Set it once, on the day you install.
 
 **Choosing a fund on a gift that is already split.** The Fund box sets the gift's single

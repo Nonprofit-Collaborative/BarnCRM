@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Fiscal_Date_Field__c</fullName>
-    <description>The date attribute the fiscal year window is measured on, for example the gift date. Only used when Fiscal Year Aware is on. Left empty, the attribute being aggregated is used, which is right for a rollup that aggregates a date and wrong for one that aggregates an amount.</description>
+    <description>The date attribute the fiscal year window is measured on, for example a record's date. Only used when Fiscal Year Aware is on. Left empty, the attribute being aggregated is used, which is right for a rollup that aggregates a date and wrong for one that aggregates an amount.</description>
     <externalId>false</externalId>
-    <inlineHelpText>The date that decides which fiscal year a record falls in, such as Gift Date.</inlineHelpText>
+    <inlineHelpText>The date that decides which fiscal year a record falls in, such as a record's date.</inlineHelpText>
     <label>Fiscal Date Field</label>
     <length>80</length>
     <required>false</required>

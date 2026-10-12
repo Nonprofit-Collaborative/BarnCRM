@@ -3,22 +3,29 @@
 ## What it does
 
 The Setup Assistant is the guided path from "I just installed Open Impact" to "we are
-entering real gifts", in under thirty minutes, without opening Salesforce Setup and without
-reading anything else. It asks you eight questions, one screen at a time, in the order that
+working with real records", in under thirty minutes, without opening Salesforce Setup and
+without reading anything else. It asks its questions one screen at a time, in the order that
 makes each answer easy, and it remembers where you got to. Close the browser in the middle
 of step four and come back tomorrow: the assistant opens on step four.
 
+How many steps you see depends on what is installed. Open Impact Core on its own asks seven
+questions. When the **Giving** module is installed as well, Giving adds its own: a step for
+the default fund and appeal, the receipt details on the identity step, and a first gift to
+check everything with, which makes eight steps. This page numbers the steps as they appear
+with Giving installed and marks what comes from Giving. Without Giving, the steps after step
+two move up by one.
+
 Nothing it asks is permanent. Every answer is a setting you can change later on the
-Nonprofit Settings page, and you can re-run the whole assistant whenever your organization
+Open Impact Settings page, and you can re-run the whole assistant whenever your organization
 changes.
 
 ## How to turn it on
 
-There is nothing to turn on. The Setup Assistant is the Nonprofit Hub home page until you
+There is nothing to turn on. The Setup Assistant is the Open Impact home page until you
 finish it.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
-2. Type `Nonprofit` and choose **Nonprofit Hub**.
+2. Type `Open Impact` and choose **Open Impact**.
 3. The home page opens on the assistant, at the first step you have not finished.
 
 When every step is done, the assistant collapses to a small **Setup complete** tile that
@@ -26,10 +33,10 @@ shows how many steps you finished. The tile has a **Reopen setup** button, so th
 is always one click away, and it opens straight back on the first step rather than on the
 completion screen.
 
-You need the **Manage Nonprofit Settings** permission to change anything in the assistant.
+You need the **Manage Open Impact Settings** permission to change anything in the assistant.
 Everyone else sees the same steps, reads the same explanations, and cannot save. If you can
 read but not save, the assistant says so at the top and names the permission you are
-missing. Ask whoever installed Open Impact to add you to the **Nonprofit Admin** role on
+missing. Ask whoever installed Open Impact to add you to the **Open Impact Admin** role on
 the Access page.
 
 Two things sit outside the assistant, because Salesforce does not let an app do them:
@@ -41,20 +48,20 @@ Two things sit outside the assistant, because Salesforce does not let an app do 
 
 ## A five-minute walkthrough, and then the eight steps
 
-Maria has just installed Open Impact Core in her organization's Nonprofit Cloud org. That
-org has Person Accounts turned on, which matters in step one and nowhere else. She has half
-an hour before her next meeting.
+Maria has just installed Open Impact Core and the Giving module in her organization's
+Nonprofit Cloud org. That org has Person Accounts turned on, which matters in step one and
+nowhere else. She has half an hour before her next meeting.
 
 ### Before you start
 
 Have these to hand. Every one of them is optional, and every one of them is faster to have
 ready than to go and find:
 
-- Your organization's legal name as it appears on your tax filings.
-- Your tax identification number (in the United States, your EIN).
-- Your mailing address as you want it printed on a receipt.
-- Your logo, as a PNG or JPG file.
-- A scan of the signature that goes on receipt letters, if you use one.
+- Your organization's legal name as it appears on your official filings.
+- Your mailing address as you want it printed.
+- With Giving: your tax identification number (in the United States, your EIN).
+- With Giving: your logo, as a PNG or JPG file.
+- With Giving: a scan of the signature that goes on receipt letters, if you use one.
 
 ### Step 1: Confirm how Open Impact fits your org
 
@@ -67,7 +74,7 @@ Open Impact looks at your org and tells you what it found, in plain words:
   they do today. Confirming this mode switches household membership to those membership
   records, and from then on saving a new person creates their household and their
   membership of it, exactly as it does in the simple mode. The switch that governs that is
-  "create a household automatically" on the Households page of Nonprofit Settings.
+  "create a household automatically" on the Households page of Open Impact Settings.
 - **"NPSP is installed in this org."** Open Impact recommends **NPSP coexistence**, which
   records that NPSP is here. In this version it changes no behaviour: Open Impact builds its
   own households and leaves NPSP's alone.
@@ -96,26 +103,25 @@ with the pattern it ships until you change it.
 tries `Smith Household` in the name box, sees it in the preview, decides she prefers the
 default, and puts it back.
 
-**What she decides:** whether her donors are a Family or a Household. That is genuinely the
-whole decision.
+**What she decides:** whether her households are a Family or a Household. That is genuinely
+the whole decision.
 
-### Step 3: Pick your default fund and appeal
+### Step 3: Pick your default fund and appeal (Giving)
 
-This step needs the **Giving** module, which is a separate package.
+This step comes with the **Giving** module, which is a separate package. Without Giving the
+step is not there at all, and the assistant goes straight from naming to access.
 
-- **If Giving is installed**, you get two pickers: the fund a gift belongs to when nobody
-  says otherwise (usually your general operating fund) and the appeal it is credited to
-  (usually a general or unsolicited appeal). Choose them and click **Save**. The pickers
-  only offer real funds and appeals, and anything else is refused, so a default can never
-  point at the wrong kind of record.
-- **If Giving is not installed**, the step says **Install the Giving module to choose
-  defaults** and offers **Skip for now**. Skipping does not mark the step done, so it is
-  waiting for you after you install Giving.
+You get two pickers: the fund a gift belongs to when nobody says otherwise (usually your
+general operating fund) and the appeal it is credited to (usually a general or unsolicited
+appeal). Choose them and click **Save**. The pickers only offer real funds and appeals, and
+anything else is refused, so a default can never point at the wrong kind of record. If you
+install Giving after finishing setup, this step appears as **To do** the next time you open
+the home page.
 
-**What Maria sees:** the install notice, because she has only installed Core so far. She
-clicks **Skip for now** and moves on.
+**What Maria sees:** her General Fund and her Unsolicited appeal in the pickers. She picks
+both and clicks **Save**.
 
-**What she decides:** to come back to this one.
+**What she decides:** where a gift goes when nobody says.
 
 ### Step 4: Give your colleagues access
 
@@ -125,8 +131,8 @@ one. Give access to as many colleagues as you like, one at a time. The roles are
 
 | Role | Who it is for |
 |---|---|
-| Nonprofit Admin | Maria: everything, including settings |
-| Fundraising Staff | David: gifts, donors, receipts |
+| Open Impact Admin | Maria: everything, including settings |
+| Fundraising Staff (comes with Giving) | David: gifts, donors, receipts |
 | Program Staff | Priya: participants and services |
 | Volunteer Coordinator | Volunteer jobs, shifts, and hours |
 | Read Only | Tom and Jen: see everything, change nothing |
@@ -140,20 +146,23 @@ Staff role and Tom the Read Only role. The step marks itself done.
 **What she decides:** who gets to change settings. Give that to as few people as the work
 allows: settings change how the whole org behaves.
 
-### Step 5: Set your organization's identity for receipts
+### Step 5: Set your organization's identity
 
-This is the form the "before you start" list was for. Fill in:
+This is the form the "before you start" list was for. Core asks for two things:
 
-- **Legal name**, exactly as on your tax filings, not your nickname.
-- **Tax identification number** (EIN in the United States).
+- **Legal name**, exactly as on your official filings, not your nickname.
 - **Address**, on one line, as you want it printed.
+
+With the Giving module installed, the same form also asks for what your receipts print:
+
+- **Tax identification number** (EIN in the United States).
 - **Logo**: click **Upload logo** and choose the file. The logo appears under the button
   once it has uploaded, so you can see what your receipts will carry.
 - **Signature image**: the same, for the scanned signature on receipt letters.
 - **Signer name and title**, for example `Ana Ruiz` and `Executive Director`.
 
 Click **Save**. The step completes when the legal name is filled in, because that is the
-one a receipt cannot be printed without.
+one a receipt or letter cannot be printed without.
 
 Two things to know about the uploaded files. They are stored as Salesforce files owned by
 whoever uploads them, and they are attached to that person's user record, because
@@ -207,12 +216,11 @@ still being cleaned up.
 
 ### Step 8: Check that everything works
 
-If the Giving module is installed, **Enter your first gift** opens the Giving module's own
-gift entry screen: enter one gift, save it, and you have proved the whole chain works, from
-donor to household to gift. Come back to the Hub afterwards and click **Finish**.
-
-If Giving is not installed yet, the step shows a **You are ready** summary of what you
-configured, and says that the first gift check is waiting for Giving.
+Follow the short walkthrough: add a person and see their household appear. With the Giving
+module installed, the step also has **Enter your first gift**, which opens the Giving
+module's own gift entry screen: enter one gift, save it, and you have proved the whole chain
+works, from donor to household to gift. Come back to the home page afterwards and click
+**Finish**.
 
 Click **Finish**. The assistant shows the completion screen: every step with its status,
 and how long setup took, measured from the first change you made.
@@ -227,20 +235,19 @@ finished, because it is.
 
 - **Treating Skip for now as done.** Skipping moves you on without marking the step
   finished, on purpose. A skipped step still shows as **To do**, and the next time you open
-  the Hub the assistant opens on it again. That is the point: step three is meant to wait
-  until Giving is installed.
+  the home page the assistant opens on it again.
 - **Marking coexistence mode and then changing your mind quietly.** Changing the mode later
   is allowed and is a real change: it changes how household membership is tracked from that
-  point on. Change it on the Nonprofit Settings page, read the note there first, and do it
+  point on. Change it on the Open Impact Settings page, read the note there first, and do it
   before you import, not after.
 - **Uploading the logo from a colleague's login, then deactivating them.** The file belongs
   to the person who uploaded it. Upload the logo and the signature from an account that
   will stay active, ideally the administrator's.
 - **Putting the everyday name in the legal name box.** Receipts have to carry the name your
-  tax filings carry. If they differ, the legal name goes in step five.
+  official filings carry. If they differ, the legal name goes in step five.
 - **Expecting the assistant to install Giving.** No app can install another package for
-  you. Step three and step six give you the link and the instructions, and detect the
-  module the moment you come back.
+  you. Step six gives you the link and the instructions, and the Giving steps appear the
+  moment you come back after installing it.
 - **Re-running setup to fix one thing.** You do not have to. Every answer is on the
-  Nonprofit Settings page, grouped by section, with a search box. Reopen the assistant when
+  Open Impact Settings page, grouped by section, with a search box. Reopen the assistant when
   something big changes, such as a new fiscal year or a merger, not to correct a typo.

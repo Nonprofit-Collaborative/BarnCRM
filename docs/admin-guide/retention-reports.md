@@ -40,7 +40,7 @@ follow, which is why these reports read those fields instead of reading last yea
 **LYBUNT** means Last Year But Unfortunately Not This year. A donor is on the list when their
 most recent qualifying gift falls in the last fiscal year. The year boundary is the fiscal
 year, not the calendar year, and it is the one set in Setup, which must match the fiscal year
-start month in Nonprofit Settings (see step 1 below).
+start month in Open Impact Settings (see step 1 below).
 
 The refund cases, spelled out because they are where other systems go wrong:
 
@@ -83,11 +83,11 @@ because they have not had the same amount of time.
 
 ## How to turn it on
 
-1. **Make the two fiscal years agree.** In Nonprofit Settings, open the **Rollups** page and
+1. **Make the two fiscal years agree.** In Open Impact Settings, open the **Rollups** page and
    read **Fiscal year start month**. Then, in Salesforce Setup, search for **Fiscal Year** and
    check that the org's
    fiscal year starts in the same month. Salesforce reports can only read the Setup value, and
-   the donor fields these reports rest on are calculated from the Nonprofit Settings value, so
+   the donor fields these reports rest on are calculated from the Open Impact Settings value, so
    if the two disagree the reports draw the year boundary in a different place from the donor
    record. This is the one setup step, and it takes a minute.
 2. **Run the rollups once.** On the same **Rollups** page, choose **Recalculate all**.
@@ -146,7 +146,7 @@ gift is dated in the future. Last Gift Date is the date on the gift, so a gift d
 month counts as next month, and until then the donor looks lapsed.
 
 **The year boundary looks wrong: a December gift landed in the wrong year.** The two fiscal
-years disagree. Setup's fiscal year decides which donors the report selects, and Nonprofit
+years disagree. Setup's fiscal year decides which donors the report selects, and Open Impact
 Settings' fiscal year start month decides what Giving Last Year and Gifts Last Year hold. The
 symptom is a donor on the LYBUNT list whose Giving This Year is not zero. Fix it with step 1
 of the setup above, then recalculate the rollups.

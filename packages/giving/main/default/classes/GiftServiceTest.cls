@@ -192,7 +192,8 @@ private class GiftServiceTest {
     static void theSettingsFundWinsOverTheFlaggedFund() {
         Fund__c chosen = GivingTestDataFactory.buildFund('Building', false);
         insert chosen;
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+        settings.SetupOwnerId = UserInfo.getOrganizationId();
         settings.Default_Fund__c = chosen.Id;
         upsert settings;
         SettingsService.clearCaches();
@@ -209,13 +210,14 @@ private class GiftServiceTest {
         System.assertEquals(
             chosen.Id,
             allocation.Fund__c,
-            'The fund Maria picked in Nonprofit Settings is the one gifts land in.'
+            'The fund Maria picked in settings is the one gifts land in.'
         );
     }
 
     @IsTest
     static void anUnusableSettingsFundFallsBackToTheFlaggedFund() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+        settings.SetupOwnerId = UserInfo.getOrganizationId();
         settings.Default_Fund__c = 'not an identifier';
         upsert settings;
         SettingsService.clearCaches();

@@ -8,7 +8,6 @@
     True when the record was created by the sample data loader so it can be removed in one action.
   </description>
   <inlineHelpText>
-    Checked for contacts created by the sample data loader. Remove sample data from Nonprofit
-    Settings to delete every record with this box checked.
+    Checked for contacts created by the sample data loader. Remove sample data from Open Impact Settings to delete every record with this box checked.
   </inlineHelpText>
 </CustomField>

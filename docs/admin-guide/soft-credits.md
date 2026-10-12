@@ -15,7 +15,7 @@ surprise to him.
 
 ## How to turn it on
 
-1. Open **Nonprofit Settings** and choose **Giving**.
+1. Open **Open Impact Settings** and choose **Giving**.
 2. Find **Automatic household soft credits**. It is on when you install Open Impact.
 3. Leave it on if your organization thanks and reports on households. Turn it off if you
    want soft credits only where a person entered one by hand.

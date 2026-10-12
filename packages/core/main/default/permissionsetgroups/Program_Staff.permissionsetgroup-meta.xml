@@ -3,7 +3,7 @@
   <description>
     For program and services staff. Day to day work with people, households, and organizations, and
     with program and service records once the Programs module is turned on. Does not include
-    Nonprofit Settings.
+    Open Impact Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Program Staff</label>

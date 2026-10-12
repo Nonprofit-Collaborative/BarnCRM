@@ -8,7 +8,7 @@
     </values>
     <values>
         <field>Settings_Object__c</field>
-        <value xsi:type="xsd:string">Nonprofit_Settings__c</value>
+        <value xsi:type="xsd:string">Giving_Settings__c</value>
     </values>
     <values>
         <field>Section__c</field>

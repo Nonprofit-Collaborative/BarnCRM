@@ -18,7 +18,7 @@ Open Impact brings the contacts mapping, and the Giving module brings the two pa
 In an org that has never opened the **Import** tab they appear the first time it opens. In an
 org that already had the generic mappings, add them once from Health Check:
 
-1. Open the **Nonprofit Hub** app, click **Nonprofit Settings** and choose **Health**.
+1. Open the **Open Impact** app, click **Open Impact Settings** and choose **Health**.
 2. The report opens (click **Re-run** if it is from earlier). A finding reads "3 shipped
    import templates are missing" (a higher number if other shipped mappings are missing too)
    and names them.

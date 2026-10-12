@@ -66,8 +66,7 @@ private class SettingsControllerTest {
             ),
             // A row from a module that is not in this org. Its key has to be one no settings
             // object in the repo defines, because that absence is the whole test: Default_Fund__c
-            // used to be such a key and is now a real Core field, since Core records the fund
-            // Giving falls back to before Giving is installed.
+            // used to be such a key and is now a real Giving field (ADR-0059).
             new Setting_Definition__mdt(
                 DeveloperName = 'Not_Installed_Yet',
                 MasterLabel = 'Default grant program',

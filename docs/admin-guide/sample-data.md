@@ -46,14 +46,14 @@ has to stay removable.
 
 ## 2. How to turn it on
 
-1. Open **Nonprofit Settings**.
+1. Open **Open Impact Settings**.
 2. In the **General** section, find **Sample Data** and open it. If you do not see it,
    type "sample" in the settings search box.
 3. Read the warning, then select **Load Sample Data**.
 4. Confirm in the dialog. Loading runs in the background; the card shows progress and
    updates automatically until it finishes. With Giving installed there are several
    thousand records to write, so allow a few minutes rather than one.
-5. When it says **Loaded**, open **Nonprofit Settings > Rollups** and select
+5. When it says **Loaded**, open **Open Impact Settings > Rollups** and select
    **Recalculate**. Giving totals (total giving, this year, largest gift, fund and appeal
    totals) are worked out by the nightly rollup run rather than as each gift is saved, so
    until you recalculate, or until tonight, those fields are empty while the gift records
@@ -63,7 +63,7 @@ If you came here from the Setup Assistant, the same **Sample Data** step takes y
 this screen. Loading sample data is entirely optional; skipping it does not block any
 other step.
 
-You need the **Manage Nonprofit Settings** permission to load or remove sample data.
+You need the **Manage Open Impact Settings** permission to load or remove sample data.
 Without it, the card is read only and tells you who to ask.
 
 Sample data loads whichever way your org tracks household membership. In the simple way,
@@ -79,7 +79,7 @@ household records, names, greetings, member counts, and Members panel.
 
 ## 3. A five-minute walkthrough (as Maria)
 
-1. Open **Nonprofit Settings**, go to **Sample Data**, and select **Load Sample Data**.
+1. Open **Open Impact Settings**, go to **Sample Data**, and select **Load Sample Data**.
    Confirm the dialog. Wait for the card to show **Loaded**, with counts for households,
    contacts, organizations, connections, affiliations, and, with Giving installed, gifts.
 2. Open the **Households** tab. Use the list view search to find "Garcia" and open
@@ -104,10 +104,10 @@ household records, names, greetings, member counts, and Members panel.
    Its installments are generated from the schedule and the ones a gift has paid are marked
    Paid. One monthly donor in the set has three installments marked Overdue: that is the
    lapsed recurring donor a fundraiser would want to call this week.
-8. Open the **Giving Overview** dashboard. If the numbers are empty, go to **Nonprofit
+8. Open the **Giving Overview** dashboard. If the numbers are empty, go to **Open Impact
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
-9. Return to **Nonprofit Settings**, **Sample Data**, and select **Remove Sample Data**.
+9. Return to **Open Impact Settings**, **Sample Data**, and select **Remove Sample Data**.
    Confirm the dialog. The card returns to **Not loaded** and every record the loader
    created is gone: households, contacts, organizations, connections, affiliations, and the
    gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
@@ -132,7 +132,7 @@ household records, names, greetings, member counts, and Members panel.
   assuming it is done.
 - **Expecting the giving totals to appear straight away.** The gifts are all there the
   moment the load finishes, but the totals on households, people, funds and appeals are
-  worked out by the rollup run. Recalculate from **Nonprofit Settings > Rollups**, or wait
+  worked out by the rollup run. Recalculate from **Open Impact Settings > Rollups**, or wait
   for tonight.
 - **Reporting on sample gifts as if the dates were fixed.** Gift dates are counted back
   from the day you loaded the set, so two orgs loaded on different days hold different
@@ -142,7 +142,7 @@ household records, names, greetings, member counts, and Members panel.
   sample set, not of households: the households, memberships, names, greetings, and counts
   all work the same way they will with your own records.
 - **Not having the permission.** If the **Load Sample Data** button does not appear, you
-  are missing **Manage Nonprofit Settings**. Ask an administrator to grant it from the
+  are missing **Manage Open Impact Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.
 
 ## Reference

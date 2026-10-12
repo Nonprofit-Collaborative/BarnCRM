@@ -18,9 +18,9 @@ count after a change.
 ## How to turn it on
 
 Households work as soon as Core is installed. Everything you can change is on the
-Nonprofit Settings page, so nobody needs to open Salesforce Setup.
+Open Impact Settings page, so nobody needs to open Salesforce Setup.
 
-1. Open the **Nonprofit Hub** app and click the **Nonprofit Settings** tab.
+1. Open the **Open Impact** app and click the **Open Impact Settings** tab.
 2. Click **Households** in the left navigation.
 3. Check the three settings and change any that do not match how you work.
 
@@ -43,7 +43,7 @@ it would affect. Moving them across is a migration, which Open Impact does not d
 
 Maria does this from the sample data.
 
-1. Open the **Nonprofit Hub** app and click the **Contacts** tab.
+1. Open the **Open Impact** app and click the **Contacts** tab.
 2. Click **New** and enter the first name `Maria` and the last name `Garcia`. Leave the
    household blank. Click **Save**.
 3. Look at the household field on the new person. It is filled in, and the household is
@@ -59,7 +59,7 @@ Maria does this from the sample data.
 8. Back on the Members panel, use **Move to another household** on Maria and move her to
    any other household. Return to the first household: it is still there, with nobody in
    it and a member count of 0, because "delete a household when the last person leaves"
-   ships off. Switch that setting on in Nonprofit Settings if you would rather it were
+   ships off. Switch that setting on in Open Impact Settings if you would rather it were
    removed, and the next household left empty is.
 
 That is the whole lifecycle: created for you, named for you, counted for you, and tidied
@@ -111,7 +111,7 @@ the same Members panel. A household is still its own record, never a person.
 **"I added a person and no household appeared."**
 Either "create a household automatically" is off, or the person already belongs to a
 household: you filled the household in yourself when you created them, or a membership
-record already joins them to one. Turn the setting back on in Nonprofit Settings, then open
+record already joins them to one. Turn the setting back on in Open Impact Settings, then open
 the person and pick or create a household. Health Check reports the setting being off as a
 red finding, with a button that turns it on.
 

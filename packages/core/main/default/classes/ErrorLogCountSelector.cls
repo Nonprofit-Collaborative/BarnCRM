@@ -2,6 +2,7 @@
  * Counts Error Log rows for Health Check (plan Section 4.8). Counting, not listing: Health
  * Check says how many entries nobody has read and sends the administrator to the tab.
  */
+@NamespaceAccessible
 public with sharing class ErrorLogCountSelector {
     @TestVisible
     private static final String STATUS_NEW = 'New';
@@ -54,6 +55,7 @@ public with sharing class ErrorLogCountSelector {
      * The relative URL of the Error Log list view, resolved through describe so that it is
      * correct whatever namespace the package carries.
      */
+    @NamespaceAccessible
     public static String listViewUrl() {
         return '/lightning/o/' +
             Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +

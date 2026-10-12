@@ -777,6 +777,14 @@ naming pattern choices. Stored as a protected hierarchy custom setting so that t
 settings console can write them synchronously and so that they are cacheable (Decision
 D-06).
 
+Core is neutral (plan Section 4.1, C-29, ADR-0059): a key lives here only if Core reads it or
+it means the same thing to any organization. The console and the object are labelled **Open
+Impact Settings**; the API name `Nonprofit_Settings__c` is unchanged until the product name
+pass (ADR-0059 decision 6). Seven keys this section listed before v0.6, the tax
+identification number, the four receipt signer and file keys, and the default fund and
+appeal, are read only by Giving and moved to `Giving_Settings__c` (Section 21A) in C-29, with
+their API names and definitions unchanged.
+
 ### v0.1 keys
 
 This is the **starting inventory** for v0.1. It is not closed. Each feature pull request
@@ -796,23 +804,16 @@ may add keys, and must add them here first.
 | `Setup_Steps_Completed__c` | text (255) | empty | The comma separated keys of the Setup Assistant steps the administrator has marked done, so the Hub checklist remembers progress across sessions. |
 | `Setup_Steps_Skipped__c` | text (255) | empty | The comma separated keys of the Setup Assistant steps the administrator chose to skip for now, so a skipped step moves out of the way without counting as done. |
 | `Setup_Started_At__c` | datetime | empty | When the administrator first changed something in the Setup Assistant, so the completion screen can say how long setup took. |
-| `Organization_Legal_Name__c` | text (255) | empty | The organization's legal name as it appears on its tax filings, printed on receipts and year-end statements. |
-| `Organization_EIN__c` | text (20) | empty | The organization's tax identification number (the EIN in the United States), printed on receipts. |
-| `Organization_Address__c` | text (255) | empty | The organization's mailing address as one line, as it is printed on a receipt. Custom settings have no long text field, so a single 255 character line is the format. |
-| `Receipt_Logo_Document_Id__c` | text (18) | empty | The Salesforce file identifier of the logo printed on receipts and letters. |
-| `Receipt_Signature_Document_Id__c` | text (18) | empty | The Salesforce file identifier of the scanned signature printed on receipt letters. |
-| `Receipt_Signer_Name__c` | text (80) | empty | The name of the person who signs receipt letters. |
-| `Receipt_Signer_Title__c` | text (80) | empty | The job title of the person who signs receipt letters. |
-| `Default_Fund__c` | text (18) | empty | The record identifier of the fund a gift is allocated to when nobody says otherwise. Written by the Setup Assistant only when the Giving module is present; Core never names the Giving objects statically (R-F4, ADR-0014). |
-| `Default_Appeal__c` | text (18) | empty | The record identifier of the appeal a gift is credited to when nobody says otherwise, on the same terms as the default fund. |
+| `Organization_Legal_Name__c` | text (255) | empty | The organization's legal name, as it appears on its official filings. Giving prints it on receipts and year-end statements. |
+| `Organization_Address__c` | text (255) | empty | The organization's mailing address as one line, as it is printed on letters and documents. Custom settings have no long text field, so a single 255 character line is the format. |
 
 ### v0.2 keys
 
 Added by the v0.2 features: the rollup engine (C-13) and the import framework (C-14). The
 Setup Assistant (C-12) keys arrived early and are listed in the table above, where
 `Setup_Steps_Completed__c` and `Setup_Steps_Skipped__c` are what was planned here as
-`Setup_Assistant_Steps_Complete__c`, and the two default record identifiers ship with the
-assistant that writes them.
+`Setup_Assistant_Steps_Complete__c`, and the two default record identifiers shipped with the
+assistant that wrote them (they are Giving keys from v0.6, Section 21A).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -832,9 +833,9 @@ and addresses (C-17).
 Three keys published here in v0.3 are no longer Core keys. ADR-0017 gives each package its
 own settings object, so `Automatic_Household_Soft_Credits__c`,
 `Installment_Generation_Horizon_Months__c` and `Installment_Overdue_Grace_Days__c` live on
-the Giving package's own `Giving_Settings__c` and are specified in Section 21A. Core keeps
-`Default_Fund__c` and `Default_Appeal__c`, because the Setup Assistant writes them and Core
-must be able to read them with no Giving package installed.
+the Giving package's own `Giving_Settings__c` and are specified in Section 21A. Core kept
+`Default_Fund__c` and `Default_Appeal__c` until v0.6, when C-29 moved them to Giving as well:
+the Setup Assistant now writes them through Giving's step (ADR-0059).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -868,7 +869,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage Nonprofit Settings. |
+| `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage Open Impact Settings. |
 | `Error_Digest_Frequency__c` | picklist(Daily, Weekly) | Daily | How often the error digest may be sent. Stored as text (ADR-0019); empty reads as Daily. |
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
@@ -899,8 +900,8 @@ definition.
   value. Recorded as ADR-0019.
 - **Service:** `SettingsService`, with the console LWCs `settingsConsole`,
   `settingsSearch`, `householdNamingSettings`.
-- **Permission:** editing requires the `Manage_Nonprofit_Settings` custom permission;
-  users without it see a read-only view naming the permission.
+- **Permission:** editing requires the `Manage_Nonprofit_Settings` custom permission, labelled
+  Manage Open Impact Settings; users without it see a read-only view naming the permission.
 
 ---
 
@@ -1845,8 +1846,8 @@ when the corrected row is loaded again.
 | Contact 2 | `Contact_2__c` | Lookup to Contact |
 | Person 2 Account | `Person_2_Account__c` | Lookup to Account |
 | Organization | `Organization__c` | Lookup to Account |
-| Gift | `Gift_Id__c` | Text (18) |
-| Soft Credit | `Soft_Credit_Id__c` | Text (18) |
+| Resulting Record | `Gift_Id__c` | Text (18) |
+| Second Resulting Record | `Soft_Credit_Id__c` | Text (18) |
 | Person 1 Key | `Person_1_Key__c` | Text (16), External ID (indexed) |
 | Person 2 Key | `Person_2_Key__c` | Text (16), External ID (indexed) |
 | Person 1 Name Key | `Person_1_Name_Key__c` | Text (16), External ID (indexed) |
@@ -2451,9 +2452,9 @@ its own protected hierarchy custom setting, because a dependent package cannot a
 to the Core settings object and Core must not carry fields for modules that are not
 installed (Principle 3).
 
-Core keeps the settings that Core itself reads, including `Default_Fund__c` and
-`Default_Appeal__c`, which the Setup Assistant writes as record identifiers (R-F4,
-ADR-0014). Everything that only the Giving package reads lives here.
+Core keeps the settings that Core itself reads. Everything that only the Giving package reads
+lives here, including, from v0.6, the default fund and appeal and the receipt identity keys
+that C-29 moved out of Core (ADR-0059).
 
 ### v0.3 keys
 
@@ -2484,10 +2485,10 @@ Added by acknowledgments (G-12, ADR-0032).
 | `Acknowledgment_From_Address__c` | text | empty | The organization wide email address acknowledgments are sent from, named by its address. Empty means they are sent from the user who ran the send, which is what a small organization usually wants. |
 | `Acknowledgments_Last_Run__c` | datetime | empty | When the last acknowledgment send finished, shown read only on the Acknowledgments page (R-AK12). |
 | `Acknowledgments_Last_Run_Summary__c` | text | empty | What that run did, in one sentence, because a bare timestamp says the job woke up and not that it sent anything (R-AK12). |
-Added by receipting (G-13). The organization's identity keys that a receipt prints, the
-legal name, the tax identification number, the address, the logo, the signature, and the
-signer's name and title, are Core keys and stay on `Nonprofit_Settings__c` (Section 12):
-the Setup Assistant writes them and letters other than receipts print them too.
+Added by receipting (G-13). The organization's legal name and address, which a receipt
+prints, are Core keys on `Nonprofit_Settings__c` (Section 12): any organization has them. The
+tax identification number, the logo, the signature and the signer's name and title were Core
+keys until v0.6 and are Giving keys now (see the v0.6 table below).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
@@ -2520,6 +2521,20 @@ Definition row, so the console's generic save cannot write it past the page's ch
 |---|---|---|---|
 | `Books_Closed_Through__c` | date | empty | The last day of the latest closed accounting period; empty means no period is closed. Gifts in the books dated on or before it are locked (R-G14). It is at least two days before today (so today is open in every time zone) and moves only forward; moving it back or clearing it needs `Override_Posting_Lock` and writes an Error Log entry at Warning. Every change is a Setting Change. |
 
+Moved from `Nonprofit_Settings__c` by C-29 (ADR-0059), API names unchanged. The Setup Assistant
+writes them through the steps Giving contributes, and the console shows them in the sections
+it showed them in before.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Organization_EIN__c` | text (20) | empty | The organization's tax identification number (the EIN in the United States), printed on receipts. Moved from Section 12 by C-29. |
+| `Receipt_Logo_Document_Id__c` | text (18) | empty | The Salesforce file identifier of the logo printed on receipts and letters. Moved from Section 12 by C-29. |
+| `Receipt_Signature_Document_Id__c` | text (18) | empty | The Salesforce file identifier of the scanned signature printed on receipt letters. Moved from Section 12 by C-29. |
+| `Receipt_Signer_Name__c` | text (80) | empty | The name of the person who signs receipt letters. Moved from Section 12 by C-29. |
+| `Receipt_Signer_Title__c` | text (80) | empty | The job title of the person who signs receipt letters. Moved from Section 12 by C-29. |
+| `Default_Fund__c` | text (18) | empty | The record identifier of the fund a gift is allocated to when nobody says otherwise, chosen in the Setup Assistant's fund and appeal step, which Giving contributes (R-F4, ADR-0014). Moved from Section 12 by C-29. |
+| `Default_Appeal__c` | text (18) | empty | The record identifier of the appeal a gift is credited to when nobody says otherwise, on the same terms as the default fund. Moved from Section 12 by C-29. |
+
 ### Rules
 
 **R-GS1 Same contract as Core settings.** Protected, hierarchical, written synchronously
@@ -2528,7 +2543,8 @@ only by adding a row to the table above in the pull request that adds the field 
 R-N5 apply unchanged).
 
 **R-GS2 One console, several settings objects.** The Giving keys appear in the same
-Nonprofit Settings console as the Core keys, in the Giving section. The console reaches
+Open Impact Settings console as the Core keys, in the Giving section (the moved receipt
+identity keys in the Organization section, beside the legal name they print with). The console reaches
 them because each shipped `Setting_Definition__mdt` row names its settings object, so an
 administrator never learns that there is more than one place the values are stored.
 
@@ -2564,6 +2580,13 @@ these keys, which is what makes a module that is off leave nothing behind.
 | Donation Match Date Window Days | `Donation_Match_Date_Window_Days__c` | Number(3, 0) |
 | Donation Match Amount Tolerance | `Donation_Match_Amount_Tolerance__c` | Currency(16, 2) |
 | Books Closed Through | `Books_Closed_Through__c` | Date (v0.6) |
+| Organization EIN | `Organization_EIN__c` | Text(20) (v0.6, from Core) |
+| Receipt Logo Document Id | `Receipt_Logo_Document_Id__c` | Text(18) (v0.6, from Core) |
+| Receipt Signature Document Id | `Receipt_Signature_Document_Id__c` | Text(18) (v0.6, from Core) |
+| Receipt Signer Name | `Receipt_Signer_Name__c` | Text(80) (v0.6, from Core) |
+| Receipt Signer Title | `Receipt_Signer_Title__c` | Text(80) (v0.6, from Core) |
+| Default Fund | `Default_Fund__c` | Text(18) (v0.6, from Core) |
+| Default Appeal | `Default_Appeal__c` | Text(18) (v0.6, from Core) |
 
 - **Service:** Core `SettingsService`, reading and writing this object through the
   `Settings_Object__c` field on `Setting_Definition__mdt` (ADR-0017).
@@ -5388,6 +5411,25 @@ included; standard objects the packages extend are named by the entity that gove
 | Programs entities | Programs | v0.8 | 30 |
 | Funders entities | Funders | v0.9 | 30 |
 | NPSP household adoption | Connect | v0.9 | 30 |
+| Organization legal name and address keys | Core | v0.2 | 12 |
+| Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
+
+**Components that are not entities (C-29, ADR-0059).** Core is the Community Suite on its own,
+so nothing below that is nonprofit-specific ships in Core.
+
+| Component | Package | Mechanism |
+|---|---|---|
+| Hub app (labelled Open Impact), Home, Households, Organizations, Import and Settings tabs | Core | Metadata |
+| Fundraising app (the nonprofit app) and its tabs | Giving | Metadata (ADR-0018) |
+| Setup Assistant: seven neutral steps (fit, naming, access, identity, modules, data, check) | Core | `SetupAssistantService` |
+| Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
+| Health Check: household, access, settings, org shape findings | Core | `HealthCheckService` |
+| Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
+| Roles: Admin, Program Staff, Volunteer Coordinator, Read Only | Core | Permission set groups |
+| Role: Fundraising Staff | Giving | Permission set group |
+| Custom permission Manage Open Impact Settings | Core | Metadata |
+| Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
+
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 and Agentforce Nonprofit orgs: the Gift Transaction mirror is v0.6, brought forward from
 v0.9, and NPSP household adoption is v0.9, moved back from v0.6. The plan's roadmap table
@@ -5414,3 +5456,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.5 | 2026-09-24 | C-14 dry run at scale. `Import_Row__c` gains `Person_1_Key__c`, `Person_2_Key__c`, `Person_1_Name_Key__c`, `Person_2_Name_Key__c`, `Organization_Key__c` and `Processor_Key__c`, indexed digests a dry run writes on the row that would create a record or load an external ID. R-IB12 and R-IR6: the digests are looked up per chunk instead of carried in the batch's state, so a dry run's heap no longer grows with the rows before the chunk. |
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
+| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled Open Impact Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |

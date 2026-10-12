@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>What the person is warned about before a merge runs</shortDescription>
-        <value>{0} will be combined into {1}. Everyone in it, and all of its giving history, letters, files, and notes, will move across. A merge cannot be undone. Check both households before you continue.</value>
+        <value>{0} will be combined into {1}. Everyone in it, and all of its history, letters, files, and notes, will move across. A merge cannot be undone. Check both households before you continue.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_ConfirmButton</fullName>

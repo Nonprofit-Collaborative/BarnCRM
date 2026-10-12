@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: quick link to the Nonprofit Settings tab</shortDescription>
-        <value>Nonprofit Settings</value>
+        <value>Open Impact Settings</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinksHeading</fullName>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Data_Type__c</fullName>
-  <description>How the Nonprofit Settings console renders and validates this row.</description>
+  <description>How the Open Impact Settings console renders and validates this row.</description>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>
   <label>Data Type</label>

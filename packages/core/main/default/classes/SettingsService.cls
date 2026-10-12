@@ -434,7 +434,7 @@ public with sharing class SettingsService {
         try {
             partition.remove(CACHE_KEY);
         } catch (Exception e) {
-            ErrorLogger.log(e, 'Nonprofit Settings cache');
+            ErrorLogger.log(e, 'Open Impact Settings cache');
         }
     }
 
@@ -607,7 +607,7 @@ public with sharing class SettingsService {
         try {
             partition.put(CACHE_KEY, record);
         } catch (Exception e) {
-            ErrorLogger.log(e, 'Nonprofit Settings cache');
+            ErrorLogger.log(e, 'Open Impact Settings cache');
         }
     }
 

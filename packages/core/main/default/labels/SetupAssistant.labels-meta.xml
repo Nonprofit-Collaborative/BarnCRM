@@ -25,14 +25,6 @@
         <value>Address, as you want it printed</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_AppealLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the default appeal picker on the giving defaults step</shortDescription>
-        <value>Default appeal</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_BackButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -81,36 +73,12 @@
         <value>Done</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_EinLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the tax identification number field on the identity step</shortDescription>
-        <value>Tax identification number</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_EinPatternMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what a tax identification number looks like</shortDescription>
-        <value>In the United States this is two digits, a hyphen, and seven digits, for example 12-3456789. Leave it blank if your country does not use one.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_ElapsedLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: label in front of how long setup took, in minutes</shortDescription>
         <value>Setup took, in minutes</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_EnterFirstGiftButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: button that opens the Giving package's gift entry screen</shortDescription>
-        <value>Enter your first gift</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_FinishButton</fullName>
@@ -121,36 +89,12 @@
         <value>Finish</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_FundLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the default fund picker on the giving defaults step</shortDescription>
-        <value>Default fund</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_GiveAccessButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: button that gives the chosen person the chosen role</shortDescription>
         <value>Give access</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_GivingMissingNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: giving defaults step notice when Giving is not installed</shortDescription>
-        <value>Install the Giving module to choose defaults. This step waits for you until then.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_GivingRequiredError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: error when defaults are saved without the Giving module present</shortDescription>
-        <value>The Giving module is not in this org yet, so there is no fund or appeal to point at. Nothing was saved.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Heading</fullName>
@@ -177,12 +121,20 @@
         <value>Importing a spreadsheet arrives with the Import tab. Load the sample data for now, or skip this step.</value>
     </labels>
     <labels>
+        <fullName>Core_SetupAssistant_InvalidValueError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: a typed value is not in the shape the field asks for</shortDescription>
+        <value>That value is not in the shape this field asks for, so nothing was saved.</value>
+    </labels>
+    <labels>
         <fullName>Core_SetupAssistant_LegalNameLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the legal name field on the identity step</shortDescription>
-        <value>Legal name, as on your tax filings</value>
+        <value>Legal name, as registered</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_LoadErrorMessage</fullName>
@@ -199,22 +151,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the sample data panel</shortDescription>
         <value>Load the sample data</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_LogoLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the logo upload on the identity step</shortDescription>
-        <value>Logo</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_LogoPreviewAlt</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: alternative text of the uploaded logo preview</shortDescription>
-        <value>The logo that will be printed on your receipts</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModeAgentforce</fullName>
@@ -334,7 +270,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice for someone who can read but not change it</shortDescription>
-        <value>You can read the setup steps but not change them. Ask whoever installed Open Impact to add you to the Nonprofit Admin role on the Access page.</value>
+        <value>You can read the setup steps but not change them. Ask whoever installed Open Impact to add you to the Open Impact Admin role on the Access page.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_RecommendedLabel</fullName>
@@ -425,38 +361,6 @@
         <value>Your org uses Person Accounts, as Nonprofit Cloud orgs do. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working.</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_SignatureLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the signature image upload on the identity step</shortDescription>
-        <value>Signature image</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_SignaturePreviewAlt</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: alternative text of the uploaded signature preview</shortDescription>
-        <value>The signature that will be printed on your receipt letters</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_SignerNameLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the receipt signer name field on the identity step</shortDescription>
-        <value>Who signs your receipts</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_SignerTitleLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the receipt signer title field on the identity step</shortDescription>
-        <value>Their job title</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_SkipButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -513,22 +417,6 @@
         <value>Confirm how households are named</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_Step3Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step three is for</shortDescription>
-        <value>Pick where a gift goes when nobody says otherwise. This step waits until the Giving module is installed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_Step3Label</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the name of step three</shortDescription>
-        <value>Choose your default fund and appeal</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_Step4Description</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -543,14 +431,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step four</shortDescription>
         <value>Give your colleagues access</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_Step5Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step five is for</shortDescription>
-        <value>Record the name, tax identification number, address, logo, and signature that appear on your receipts and letters.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step5Label</fullName>
@@ -593,14 +473,6 @@
         <value>Bring in your data</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_Step8Description</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what step eight is for</shortDescription>
-        <value>Follow the short walkthrough that adds a person, a household, and a first gift, so you know the setup is right.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_Step8Label</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -623,6 +495,14 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: badge on a step that is not finished</shortDescription>
         <value>To do</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupAssistant_TooLongError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: value too long. {0} field label, {1} character limit</shortDescription>
+        <value>{0} can be at most {1} characters, so nothing was saved.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_UnknownModeError</fullName>
@@ -657,19 +537,27 @@
         <value>Person</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_VerifyGivingMissing</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: notice on the last step when the Giving module is absent</shortDescription>
-        <value>The first gift check is waiting for the Giving module. Everything else is set up and ready.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_WrongRecordTypeError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: chosen record is not the kind the step asks for</shortDescription>
         <value>That is not the kind of record this step is choosing, so nothing was saved. Pick again from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupAssistant_Step5Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what the organization identity step asks for</shortDescription>
+        <value>Record your organization's legal name and the address you want printed on letters and documents.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupAssistant_Step8Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what the last step, the check that setup works, asks for</shortDescription>
+        <value>Follow the short walkthrough that adds a person and a household, so you know the setup is right.</value>
     </labels>
 </CustomLabels>

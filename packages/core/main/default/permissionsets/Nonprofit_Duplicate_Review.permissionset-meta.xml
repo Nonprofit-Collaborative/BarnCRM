@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Nonprofit Duplicate Review</label>
+  <label>Open Impact Duplicate Review</label>
   <description>
     Optional (C-20): duplicate suggestions, for users with a Sales Cloud or Service Cloud license
     only. Salesforce gives no other license, Salesforce Platform included, access to duplicate

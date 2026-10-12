@@ -3,7 +3,7 @@
   <fullName>Household_Formal_Greeting__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>
-    The greeting used on letters and receipts, for example Mr. and Mrs. John Smith. It is written
+    The greeting used on letters and documents, for example Mr. and Mrs. John Smith. It is written
     for you unless Custom Name is checked.
   </inlineHelpText>
   <label>Formal Greeting</label>

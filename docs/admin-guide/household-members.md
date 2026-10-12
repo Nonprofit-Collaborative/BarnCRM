@@ -17,7 +17,7 @@ contact sends its mail to the wrong person.
 
 ## How to turn it on
 
-Both panels are there as soon as Core is installed and the Nonprofit Hub app is in use.
+Both panels are there as soon as Core is installed and the Open Impact app is in use.
 There is nothing to switch on.
 
 **Who can do what.** Anyone who can see a household sees its members. Making somebody the
@@ -28,8 +28,8 @@ that person as well.
 
 **Where the panels are.** Core ships the placement: the Members panel sits on the packaged
 Household record page, and the Household panel sits on the packaged Contact record page,
-both of which the Nonprofit Hub app uses. If either is missing, you are most
-likely looking at the record outside the **Nonprofit Hub** app, or somebody has overridden
+both of which the Open Impact app uses. If either is missing, you are most
+likely looking at the record outside the **Open Impact** app, or somebody has overridden
 the page assignment in the Lightning App Builder.
 
 ## The Members panel
@@ -98,7 +98,7 @@ means no current membership record names them.
 
 Maria does this from the sample data.
 
-1. Open the **Nonprofit Hub** app and click the **Households** tab, then open **The Garcia
+1. Open the **Open Impact** app and click the **Households** tab, then open **The Garcia
    Family**. The **Household Members** panel lists Harper, Luis and Diego Garcia, with a
    **Primary** badge on one of them.
 2. On Luis's row, click **Make primary**. The badge moves to Luis and the message "Luis
@@ -135,7 +135,7 @@ instead; the field updates on its own.
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account
 while the org uses the simple way of belonging, because that move cannot be carried out.
-Switch to the flexible way in Nonprofit Settings, Households, if you need it.
+Switch to the flexible way in Open Impact Settings, Households, if you need it.
 
 **"The Household panel on a person says they are not in a household yet, but they are."**
 In the simple way, check that the household field on the person is filled in and points at

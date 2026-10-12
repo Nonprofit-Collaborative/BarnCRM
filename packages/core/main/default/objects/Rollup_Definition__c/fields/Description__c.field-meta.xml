@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Description__c</fullName>
-    <description>What this number means, in the language a nonprofit administrator uses. Shown as the rollup label on the Rollups page.</description>
+    <description>What this number means, in the language an administrator uses. Shown as the rollup label on the Rollups page.</description>
     <externalId>false</externalId>
     <inlineHelpText>Say what this number means in one sentence, the way you would explain it to a colleague.</inlineHelpText>
     <label>Description</label>

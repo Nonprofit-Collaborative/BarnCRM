@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The person to speak to at someone's employer, for example about a matching gift. The other side reads Colleague, because the connection back is an ordinary working one.</value>
+    <value xsi:type="xsd:string">The person to speak to at someone's employer, for example about a matching program. The other side reads Colleague, because the connection back is an ordinary working one.</value>
   </values>
   <values>
     <field>Is_Gendered__c</field>

@@ -63,7 +63,7 @@ Opportunity mirror page says so.
 
 1. Give yourself the **Opportunity Mirror** permission set. Until the Module Manager arrives,
    module permission sets are assigned in Setup.
-2. Open **Nonprofit Settings**, choose **Giving**, and set **Opportunity mirror direction**.
+2. Open **Open Impact Settings**, choose **Giving**, and set **Opportunity mirror direction**.
    For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of
    Opportunities does not create, and thank donors for, a gift for every one of them.
@@ -99,7 +99,7 @@ copied as usual.
 
 Do this as Maria, in an org that has Opportunities, with the sample data loaded.
 
-1. In **Nonprofit Settings**, **Giving**, set **Opportunity mirror direction** to **Gifts to
+1. In **Open Impact Settings**, **Giving**, set **Opportunity mirror direction** to **Gifts to
    Opportunities** and save.
 2. Open **Opportunity mirror** and click **Run now**. Wait a minute, then open the
    **Reconciliation** section, choose this year, and click **Compare**. The gift count and total

@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One packaged automation, with a description an administrator can understand and a switch to turn
-    it off. Managed from the Automation page of the Nonprofit Settings console, which is why this
+    it off. Managed from the Automation page of the Open Impact Settings console, which is why this
     object has no tab.
   </description>
   <enableActivities>false</enableActivities>

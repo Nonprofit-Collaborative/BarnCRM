@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Automation page of the Nonprofit Settings console: an on and off switch for every packaged
+    The Automation page of the Open Impact Settings console: an on and off switch for every packaged
     automation, and one button that pauses all of them and lets them start again by themselves.
   </description>
   <isExposed>true</isExposed>

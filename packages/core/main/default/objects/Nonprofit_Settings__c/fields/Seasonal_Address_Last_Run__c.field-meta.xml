@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Seasonal_Address_Last_Run__c</fullName>
   <description>
-    When the seasonal address swap job last finished. Shown on the Nonprofit Hub home page and on
+    When the seasonal address swap job last finished. Shown on the Open Impact home page and on
     the Addresses page of the settings console, so an administrator can see that the nightly job
     is really running (C-18, R-AD8).
   </description>

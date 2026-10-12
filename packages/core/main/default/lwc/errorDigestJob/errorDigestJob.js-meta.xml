@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The error digest panel on the Error Log page of the Nonprofit Settings console: whether the
+    The error digest panel on the Error Log page of the Open Impact Settings console: whether the
     daily job is scheduled, when it last ran, what it did, who receives it, and the buttons that
     start it, stop it, and send one now.
   </description>

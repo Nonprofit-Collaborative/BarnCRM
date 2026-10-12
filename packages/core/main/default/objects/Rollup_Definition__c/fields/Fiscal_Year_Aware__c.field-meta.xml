@@ -4,7 +4,7 @@
     <defaultValue>false</defaultValue>
     <description>Whether the calculation is limited to one fiscal year window.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Turn this on for totals such as giving this year. The window comes from the fiscal year start month on the Rollups page.</inlineHelpText>
+    <inlineHelpText>Turn this on for totals such as this fiscal year's total. The window comes from the fiscal year start month on the Rollups page.</inlineHelpText>
     <label>Fiscal Year Aware</label>
     <trackHistory>true</trackHistory>
     <type>Checkbox</type>

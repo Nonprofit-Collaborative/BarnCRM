@@ -9,12 +9,14 @@ private class SetupAssistantServiceTest {
     }
 
     @IsTest
-    static void shipsEightStepsInOrder() {
+    static void shipsSevenStepsInOrderOnCoreAlone() {
+        SetupAssistantTestExtension.useNone();
+
         Test.startTest();
         List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
         Test.stopTest();
 
-        Assert.areEqual(8, steps.size(), 'The plan describes eight setup steps');
+        Assert.areEqual(7, steps.size(), 'Core alone ships seven setup steps (ADR-0059)');
         for (Integer i = 0; i < steps.size(); i++) {
             Assert.areEqual(
                 i + 1,
@@ -36,7 +38,7 @@ private class SetupAssistantServiceTest {
         );
         Assert.areEqual(
             '/lightning/setup/ManageUsers/home',
-            steps[3].setupPath,
+            steps[2].setupPath,
             'Creating a colleague who has never signed in is the one part of access Salesforce keeps in Setup'
         );
     }
@@ -102,10 +104,10 @@ private class SetupAssistantServiceTest {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
 
         Test.startTest();
-        List<SetupAssistantService.Step> steps = SetupAssistantService.markSkipped('funddefaults');
+        List<SetupAssistantService.Step> steps = SetupAssistantService.markSkipped('data');
         Test.stopTest();
 
-        SetupAssistantService.Step step = stepByKey(steps, 'funddefaults');
+        SetupAssistantService.Step step = stepByKey(steps, 'data');
         Assert.isTrue(step.skipped, 'The step Maria skipped is out of the way');
         Assert.isFalse(step.completed, 'Skipping a step is not the same as finishing it');
     }
@@ -138,7 +140,7 @@ private class SetupAssistantServiceTest {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
         SettingsService.saveSystemValue('Household_Name_Pattern__c', 'The {LastName} Family');
         SetupAssistantService.markComplete('modules');
-        SetupAssistantService.markSkipped('funddefaults');
+        SetupAssistantService.markSkipped('data');
 
         Test.startTest();
         List<SetupAssistantService.Step> steps = SetupAssistantService.reset();
@@ -148,7 +150,7 @@ private class SetupAssistantServiceTest {
             stepByKey(steps, 'modules').completed,
             'A step Maria recorded as done is back on the list'
         );
-        Assert.isFalse(stepByKey(steps, 'funddefaults').skipped, 'A skip is forgotten too');
+        Assert.isFalse(stepByKey(steps, 'data').skipped, 'A skip is forgotten too');
         Assert.isNull(SetupAssistantService.getStartedAt(), 'So is when setup started');
         Assert.isTrue(
             stepByKey(steps, 'naming').completed,
@@ -180,18 +182,14 @@ private class SetupAssistantServiceTest {
     }
 
     @IsTest
-    static void waitsForTheGivingModuleOnStepThree() {
+    static void saysHowEachStepFinishes() {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        SetupAssistantTestExtension.useNone();
 
         Test.startTest();
         List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
         Test.stopTest();
 
-        Assert.areEqual(
-            ModuleDetectionService.isGivingPresent(),
-            stepByKey(steps, 'funddefaults').isAvailable,
-            'Step three is available exactly when the Giving module is'
-        );
         Assert.areEqual(
             SetupAssistantService.RULE_SETTING,
             stepByKey(steps, 'naming').completionRule,
@@ -202,6 +200,85 @@ private class SetupAssistantServiceTest {
             stepByKey(steps, 'modules').completionRule,
             'A step with no setting behind it finishes when Maria finishes it'
         );
+        Assert.areEqual(
+            2,
+            stepByKey(steps, 'identity').fields.size(),
+            'On Core alone the organization step asks for the legal name and the address'
+        );
+    }
+
+    @IsTest
+    static void placesAModuleStepWhereItsSortOrderSays() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        SetupAssistantTestExtension.useThis();
+
+        Test.startTest();
+        List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
+        Test.stopTest();
+
+        Assert.areEqual(8, steps.size(), 'The module adds one step to Core\'s seven');
+        Assert.areEqual(SetupAssistantTestExtension.STEP_KEY, steps[2].key, 'It comes third');
+        Assert.areEqual(3, steps[2].position, 'And is numbered where it stands');
+        Assert.areEqual('access', steps[3].key, 'The Core steps after it move down one');
+        Assert.areEqual(
+            SetupAssistantService.RULE_SETTING,
+            steps[2].completionRule,
+            'A module step can finish when its setting has a value'
+        );
+        Assert.isTrue(steps[2].advanceOnSave, 'A one question step moves on once answered');
+        Assert.areEqual('Contact', steps[2].fields[0].objectApiName, 'Its picker names its object');
+    }
+
+    @IsTest
+    static void letsAModuleAddFieldsAndWordingToACoreStep() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        SetupAssistantTestExtension.useThis();
+
+        Test.startTest();
+        SetupAssistantService.Step identity = SetupAssistantService.findStep('identity');
+        Test.stopTest();
+
+        Assert.areEqual(
+            SetupAssistantTestExtension.IDENTITY_WORDING,
+            identity.description,
+            'The module words the step for what it now asks'
+        );
+        Assert.areEqual(
+            System.Label.Core_SetupAssistant_Step5Label,
+            identity.label,
+            'A contribution with no label keeps the Core one'
+        );
+        Assert.areEqual(3, identity.fields.size(), 'Core\'s two fields and the module\'s one');
+        Assert.areEqual(
+            SetupAssistantService.FIELD_NAVIGATE,
+            identity.fields[1].fieldType,
+            'Fields are ordered by sort order, whichever package declared them'
+        );
+    }
+
+    @IsTest
+    static void opensWithCoreStepsWhenAModuleFails() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        SetupAssistantExtensions.overrides = new List<SetupAssistantExtension>{
+            new SetupAssistantTestExtension(true)
+        };
+
+        Test.startTest();
+        List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
+        Test.stopTest();
+
+        Assert.areEqual(7, steps.size(), 'A module that throws is left out, and setup still opens');
+    }
+
+    @IsTest
+    static void findsNoStepForAKeyNobodyShips() {
+        SetupAssistantTestExtension.useNone();
+
+        Test.startTest();
+        SetupAssistantService.Step missing = SetupAssistantService.findStep('moduledefaults');
+        Test.stopTest();
+
+        Assert.isNull(missing, 'A module step is not there when the module is not');
     }
 
     private static SetupAssistantService.Step stepByKey(

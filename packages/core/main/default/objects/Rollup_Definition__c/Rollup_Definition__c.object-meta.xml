@@ -3,7 +3,7 @@
     <allowInChatterGroups>false</allowInChatterGroups>
     <compactLayoutAssignment>Rollup_Definition_Compact</compactLayoutAssignment>
     <deploymentStatus>Deployed</deploymentStatus>
-    <description>One calculated number: which records are counted, how they reach the record that shows the number, what is aggregated, and when it is recalculated. Administrators manage these on the Rollups page of the Nonprofit Settings console.</description>
+    <description>One calculated number: which records are counted, how they reach the record that shows the number, what is aggregated, and when it is recalculated. Administrators manage these on the Rollups page of the Open Impact Settings console.</description>
     <enableActivities>false</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>
