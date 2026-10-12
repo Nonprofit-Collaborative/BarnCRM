@@ -24,6 +24,11 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 - Branch audit: 62 stale remote branches with no PR, whose work is in main or superseded, deleted with owner approval, plus local `feature/g-17-gift-batch-entry-v2`. Kept: the salvage branch above, `feature/v-01-v-02-v-03-volunteers` (parked work), `experiment/cmdt-by-type`. The 3 unclear household branches (`fix/household-apex-correctness`, `feature/c-01-members-panel-primary`, `fix/household-lwc-polish`) were checked line by line, found fully covered or obsolete in main, and deleted. `experiment/cmdt-by-type` deleted with owner approval.
 - PR #213 opened: `.forceignore` ignores `jsconfig.json` and `.eslintrc.json` in every package folder (owner approved).
 - New fixes built: empty-household tidy-up and import undo keep households that gifts or pledges are credited to; API 67.0 access modes made explicit with a CI check.
+- Rename stack merged through #181 (squash 87a00cb9): BarnCRM product name, neutral Core, BarnCRM API names, settings first-save defaults; ADRs 0060 to 0063 numbered; CampaignSyncUnavailableTest fixed for API 67 user mode. Gated on `oi-test` 2273/2273. PRs #184 to #200 closed as landed (#200's branch had been moved by mistake; its extra commits land in batch 3).
+- `barn-npc` (Nonprofit Cloud trial) enabled: Fundraising_Admin and Program Management Administrator permission set groups assigned to the admin (owner approved); Contacts to Multiple Accounts on; Industries settings Fundraising, Gift Entry Grid, Group Membership, Program and Benefit Management on (owner approved, irreversible). Gift, household and program objects visible.
+- Branches built: C-33 load one object, C-35 bulk update, C-28 data hygiene, C-36 advanced Find, C-37 part 1 (transforms, duplicate-rule matching), CMDT Manager, field utilization, rollup S6 to S8, Appeal Percent To Goal fix (was 100 times too high).
+- Seven sync-duplicate refs moved out of `.git/refs` (backup in the session scratchpad); `git fetch` works again.
+- Landing batches 2 to 5 being integrated (`landing/batch-N` branches, one PR each). Check-only deploy of Core to `mwdbdevsb` started (owner approved).
 
 ### Merged to main
 
