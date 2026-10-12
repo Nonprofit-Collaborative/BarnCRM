@@ -3,6 +3,23 @@ import QuickGiftEntry from 'c/quickGiftEntry';
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
 
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
+
 jest.mock('@salesforce/apex/QuickGiftEntryController.getDefaults', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -35,6 +52,13 @@ function build() {
 
 function pick(element, id) {
   return element.shadowRoot.querySelector(`[data-id="${id}"]`);
+}
+
+/** Records the messages a base component is given through its own validity methods. */
+function watchValidity(field) {
+  field.setCustomValidity = jest.fn();
+  field.reportValidity = jest.fn();
+  return field;
 }
 
 function change(target, detail) {
@@ -125,13 +149,67 @@ describe('c-quick-gift-entry', () => {
     });
     const element = build();
     await settle();
+    const donor = watchValidity(pick(element, 'donor-person'));
+    const amount = watchValidity(pick(element, 'amount'));
+    const giftDate = watchValidity(pick(element, 'gift-date'));
 
     pick(element, 'save').click();
     await settle();
 
-    expect(pick(element, 'error-donor').textContent).toContain('Choose the person');
-    expect(pick(element, 'error-amount').textContent).toContain('greater than zero');
+    expect(donor.setCustomValidity).toHaveBeenLastCalledWith(
+      'Choose the person or organization who gave this gift.'
+    );
+    expect(donor.reportValidity).toHaveBeenCalled();
+    expect(amount.setCustomValidity).toHaveBeenLastCalledWith(
+      'Enter an amount greater than zero. A refund is entered from the original gift, not here.'
+    );
+    expect(amount.reportValidity).toHaveBeenCalled();
+    expect(giftDate.setCustomValidity).toHaveBeenLastCalledWith('');
+    expect(giftDate.reportValidity).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id^="error-"]')).toBeNull();
     expect(pick(element, 'saved')).toBeNull();
+  });
+
+  it('takes the message off a field as soon as the person changes it', async () => {
+    saveGift.mockResolvedValue({
+      success: false,
+      fieldErrors: [{ field: 'amount', message: 'Enter an amount greater than zero.' }]
+    });
+    const element = build();
+    await settle();
+    const amount = watchValidity(pick(element, 'amount'));
+    pick(element, 'save').click();
+    await settle();
+    expect(amount.setCustomValidity).toHaveBeenLastCalledWith('Enter an amount greater than zero.');
+
+    change(amount, { value: '40' });
+    await settle();
+
+    expect(amount.setCustomValidity).toHaveBeenLastCalledWith('');
+    expect(amount.reportValidity).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens the standard new person form and stays on this form after it saves', async () => {
+    const element = build();
+    await settle();
+
+    pick(element, 'new-person').click();
+
+    const pageReference = mockNavigate.mock.calls[0][0];
+    expect(pageReference.type).toBe('standard__objectPage');
+    expect(pageReference.attributes).toEqual({ objectApiName: 'Contact', actionName: 'new' });
+    expect(pageReference.state.navigationLocation).toBe('RELATED_LIST');
+  });
+
+  it('offers a new person only while the donor is a person', async () => {
+    const element = build();
+    await settle();
+    expect(pick(element, 'new-person')).not.toBeNull();
+
+    change(pick(element, 'donor-kind'), { value: 'organization' });
+    await settle();
+
+    expect(pick(element, 'new-person')).toBeNull();
   });
 
   it('saves the gift the person entered and confirms it with a link', async () => {
@@ -328,10 +406,12 @@ describe('c-quick-gift-entry', () => {
     change(pick(element, 'donor-person'), { recordId: CONTACT_ID });
     change(pick(element, 'gift-type'), { value: 'In-kind' });
     await settle();
+    const description = watchValidity(pick(element, 'in-kind-description'));
     pick(element, 'save').click();
     await settle();
 
-    expect(pick(element, 'error-in-kind-description').textContent).toBe('Describe what was given.');
+    expect(description.setCustomValidity).toHaveBeenLastCalledWith('Describe what was given.');
+    expect(description.reportValidity).toHaveBeenCalled();
   });
 
   it('says so when the gift saved but the fund chosen could not be applied', async () => {

@@ -41,6 +41,14 @@
         <value>Donor</value>
     </labels>
     <labels>
+        <fullName>Giving_QuickGiftEntry_NewPerson</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Quick gift entry: opens the standard new person form</shortDescription>
+        <value>Not in the list? Add a new person</value>
+    </labels>
+    <labels>
         <fullName>Giving_QuickGiftEntry_OrganizationLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

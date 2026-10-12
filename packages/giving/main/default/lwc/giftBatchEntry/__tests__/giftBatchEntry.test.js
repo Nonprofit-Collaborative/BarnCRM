@@ -18,6 +18,19 @@ jest.mock('@salesforce/apex/GiftBatchController.postBatch', () => ({ default: je
   virtual: true
 });
 
+// The two labels that carry a line number are given their real wording, so the tests can
+// read the number in them.
+jest.mock('@salesforce/label/c.Giving_GiftBatch_CellLabel', () => ({ default: '{0}, line {1}' }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Giving_GiftBatch_RemoveLine',
+  () => ({ default: 'Remove line {0}' }),
+  {
+    virtual: true
+  }
+);
+
 const BATCH_ID = 'a0B000000000001AAA';
 const ANA = '003000000000001AAA';
 const RIVERSIDE = '001000000000001AAA';
@@ -82,6 +95,36 @@ describe('c-gift-batch-entry', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('names every input and remove button with its line number', async () => {
+    const element = await build(view({ lines: [line('a0C1', 100), line('a0C2', 25)] }));
+
+    const amounts = field(element, 'amount');
+    expect(amounts[0].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 1');
+    expect(amounts[1].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 2');
+    expect(field(element, 'fundId')[1].label).toBe('c.Giving_GiftBatch_ColumnFund, line 2');
+    expect(all(element, 'donor')[1].label).toBe('c.Giving_GiftBatch_ColumnDonor, line 2');
+    expect(all(element, 'kind')[0].label).toBe('c.Giving_GiftBatch_DonorKind, line 1');
+    const removes = all(element, 'remove');
+    expect(removes[0].alternativeText).toBe('Remove line 1');
+    expect(removes[1].alternativeText).toBe('Remove line 2');
+  });
+
+  it('renumbers the labels when a line is removed', async () => {
+    const element = await build(view({ lines: [line('a0C1', 100), line('a0C2', 25)] }));
+
+    all(element, 'remove')[0].click();
+    await settle();
+
+    expect(field(element, 'amount')[0].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 1');
+    expect(all(element, 'remove')[0].alternativeText).toBe('Remove line 1');
+  });
+
+  it('shows no phone note on a computer', async () => {
+    const element = await build(view({ lines: [line('a0C1', 100)] }));
+
+    expect(pick(element, 'use-computer')).toBeNull();
   });
 
   it('opens an empty batch with its control total and says it is short', async () => {
