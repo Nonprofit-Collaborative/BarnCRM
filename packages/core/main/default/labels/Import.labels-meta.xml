@@ -609,6 +609,14 @@
         <value>Kept: something recorded after the import points at this record, such as an activity or a relationship.</value>
     </labels>
     <labels>
+        <fullName>Core_Import_UndoKeptCredited</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import undo journal: kept, records are credited to this household</shortDescription>
+        <value>Kept: gifts or pledges are still credited to this household.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_UndoKeptHasPeople</fullName>
         <categories>Import</categories>
         <language>en_US</language>

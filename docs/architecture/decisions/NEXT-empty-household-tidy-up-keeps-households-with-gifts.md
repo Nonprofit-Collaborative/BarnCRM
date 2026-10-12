@@ -57,3 +57,9 @@ about gifts itself.
   name to `HouseholdDependentsExtensions.EXTENSION_CLASSES`; no new decision is needed.
 - Receipts also carry a Household lookup. A receipt takes its household from its gifts, so a
   household with receipts has gifts and the gift check covers it.
+- Import undo deletes households outside `deleteEmptyHouseholds`, so it asks the same
+  finder (R-IB9) and keeps, with a journaled reason, a household an installed module still
+  credits records to. Its existing checks already keep a household that a gift created after
+  the import points at, and the households of gifts the import made and kept; the finder
+  closes the rest (a gift or pledge edited onto the household, or made during the commit by
+  the committer).

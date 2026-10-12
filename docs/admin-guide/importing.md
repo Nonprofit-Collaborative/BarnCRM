@@ -150,8 +150,11 @@ What undo will not do, on purpose:
   yours before the import. Values the import wrote to them are put back instead.
 - **It keeps a record that has gained something since.** If somebody recorded a
   relationship, an affiliation or an address (or, with Giving, a gift) for a person the import created, that person is
-  kept, and so is their household. A household somebody else has joined is kept too. Each
-  record kept is listed with the reason in the import's journal.
+  kept, and so is their household. A household somebody else has joined is kept too, and so
+  is a household that gifts or pledges (with Giving) are still credited to, even when the
+  gift was not entered after the import, for example an older gift whose donor was changed
+  to a person in that household. Each record kept is listed with the reason in the import's
+  journal.
 - **It does not overwrite a correction.** A value somebody has changed since the import is
   left as they set it, and listed as not put back.
 - **It does not empty the recycle bin.** Deleted records go to the recycle bin, where you can
