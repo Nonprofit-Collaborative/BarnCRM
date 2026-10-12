@@ -106,6 +106,20 @@ private class OpportunityMirrorCopyTest {
         ];
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: the gifts
+     * saved, none was linked, and nothing was logged (R-OM1). `OpportunityMirrorUnavailableTest`
+     * runs this branch.
+     */
+    private static void assertNothingMirrored() {
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Gift__c WHERE Opportunity_Id__c != NULL WITH SYSTEM_MODE],
+            'Without Opportunity no gift is linked (R-OM1).'
+        );
+        Assert.areEqual(0, warnings().size(), 'And nothing is logged.');
+    }
+
     @IsTest
     static void anOrganizationGivesItsOwnAccountAndNoContactRole() {
         Account acme = GivingTestDataFactory.insertOrganization('Acme Foundation');
@@ -116,6 +130,7 @@ private class OpportunityMirrorCopyTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         String linked = reread(grant.Id).Opportunity_Id__c;
@@ -133,7 +148,11 @@ private class OpportunityMirrorCopyTest {
             WHERE Id IN :personTypeIds AND IsActive = TRUE
             LIMIT 1
         ];
-        if (personTypes.isEmpty() || !OpportunityMirrorService.isAvailable()) {
+        if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
+            return;
+        }
+        if (personTypes.isEmpty()) {
             return; // An org without person accounts has no such path to prove.
         }
         SObject person = new Account(RecordTypeId = personTypes[0].Id);
@@ -165,6 +184,7 @@ private class OpportunityMirrorCopyTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         SObject copy = opportunity(reread(goods.Id).Opportunity_Id__c);
@@ -179,8 +199,12 @@ private class OpportunityMirrorCopyTest {
             'Maria',
             new List<String>{ 'Giving_Admin', 'Opportunity_Mirror', 'Campaign_Sync' }
         );
-        if (!OpportunityMirrorService.isAvailable() || !CampaignSyncService.isAvailable()) {
+        if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
+        }
+        if (!CampaignSyncService.isAvailable()) {
+            return; // Without Campaign there is no appeal Campaign to copy.
         }
         System.runAs(new User(Id = UserInfo.getUserId())) {
             update new User(Id = admin.Id, UserPermissionsMarketingUser = true);
@@ -214,6 +238,7 @@ private class OpportunityMirrorCopyTest {
     static void typingAnExistingOpportunityLinksAndUpdatesIt() {
         User admin = maria();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         SObject open = openOpportunity(luis().AccountId);
@@ -255,6 +280,7 @@ private class OpportunityMirrorCopyTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         List<SObject> roles = primaryRoles(reread(given.Id).Opportunity_Id__c);
@@ -270,6 +296,7 @@ private class OpportunityMirrorCopyTest {
             insert given;
         }
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         String linked = reread(given.Id).Opportunity_Id__c;
@@ -291,6 +318,7 @@ private class OpportunityMirrorCopyTest {
     static void refusalsForOneReasonAreOneWarning() {
         User admin = maria();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         List<SObject> gone = new List<SObject>{
@@ -365,6 +393,7 @@ private class OpportunityMirrorCopyTest {
         Assert.isTrue(saved[0].isSuccess() && saved[2].isSuccess(), 'The good gifts save.');
         Assert.isFalse(saved[1].isSuccess(), 'A zero amount is refused by Giving.');
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         for (Integer i : new List<Integer>{ 0, 2 }) {
@@ -402,6 +431,7 @@ private class OpportunityMirrorCopyTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Assert.areEqual(200, countOpportunities(), 'Every gift copied.');
@@ -428,6 +458,7 @@ private class OpportunityMirrorCopyTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Assert.areEqual(2, countOpportunities(), 'Both Opportunities stay (R-OM9).');
@@ -446,8 +477,12 @@ private class OpportunityMirrorCopyTest {
             new List<String>{ 'Giving_Admin', 'Opportunity_Mirror', 'Campaign_Sync' }
         );
         User admin = maria();
-        if (!OpportunityMirrorService.isAvailable() || !CampaignSyncService.isAvailable()) {
+        if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
+        }
+        if (!CampaignSyncService.isAvailable()) {
+            return; // Without Campaign there is no appeal Campaign to copy.
         }
         System.runAs(new User(Id = UserInfo.getUserId())) {
             update new List<User>{
@@ -512,6 +547,7 @@ private class OpportunityMirrorCopyTest {
         Assert.isTrue(saved[0].isSuccess(), 'The cleared gift saves.');
         Assert.isFalse(saved[1].isSuccess(), 'A zero amount is refused by Giving.');
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         String linked = reread(cleared.Id).Opportunity_Id__c;

@@ -804,13 +804,6 @@ removed, so a list may start above 1.
    - **Anything else:** skip the field, with a note in the run log.
 
    Update the admin guide first. Add tests, including a 200-row bulk case.
-5. **Smaller review follow-ups.**
-   - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
-   - X-01: the admin guide should warn against listing `Master` in the record-type filter.
-   - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.
-   - X-01: about 30 Opportunity mirror tests return early where Opportunity is absent without
-     asserting that case. Add an `OpportunityMirrorService` unavailable seam, as
-     `CampaignSyncService.unavailableForTest` does for Campaign.
 
 ### Next on the roadmap
 

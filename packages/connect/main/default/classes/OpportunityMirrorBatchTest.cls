@@ -92,6 +92,27 @@ private class OpportunityMirrorBatchTest {
         ];
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: no gift was
+     * linked, nothing was logged, and no run can start (R-OM1).
+     * `OpportunityMirrorUnavailableTest` runs this branch.
+     */
+    private static void assertNothingMirrored() {
+        Set<String> contexts = new Set<String>{ LOG_CONTEXT, OpportunityMirrorService.CONTEXT };
+        Assert.areEqual(0, giftsFromOpportunities().size(), 'Without Opportunity nothing links.');
+        Assert.areEqual(
+            0,
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c IN :contexts
+                WITH SYSTEM_MODE
+            ],
+            'Nothing is logged.'
+        );
+        Assert.isNull(OpportunityMirrorBatch.run(), 'And no run can start.');
+    }
+
     @IsTest
     static void aRunGivesTheGiftsThatWereThereBeforeTheirOpportunities() {
         List<Gift__c> gifts = GivingTestDataFactory.buildGifts(luisId(), 3, 40);
@@ -134,6 +155,7 @@ private class OpportunityMirrorBatchTest {
             insert given;
         }
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Id linked = [
@@ -219,11 +241,12 @@ private class OpportunityMirrorBatchTest {
 
     @IsTest
     static void withoutAStartDateNoOpportunityBecomesAGift() {
+        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS, null);
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         onlineGift('Online gift from Luis', 60, Date.today(), true);
-        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS, null);
         Test.startTest();
         System.runAs(maria()) {
             OpportunityMirrorBatch.run();

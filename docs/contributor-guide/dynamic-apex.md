@@ -296,3 +296,8 @@ insert runs it once per 200 records.
   (ci.md, opening section). Absent-object paths are covered only by the seams above and by
   the static gates in section 2. A manual check on a real Platform-license org is scheduled for the
   v0.10 hardening iteration (ADR-0013).
+- **Opportunity absent:** `OpportunityMirrorService.unavailableForTest` hides Opportunity and
+  its contact roles; `OpportunityMirrorUnavailableTest` runs that path. Each Connect test that
+  stops where Opportunity is absent first asserts the absent case through its class's
+  `assertNothingMirrored()` (for the page `assertRefusedAsUnavailable`, for Health Check
+  `assertNothingReported`).

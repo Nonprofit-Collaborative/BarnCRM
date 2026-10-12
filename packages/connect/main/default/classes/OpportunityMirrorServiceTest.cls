@@ -92,6 +92,20 @@ private class OpportunityMirrorServiceTest {
         ];
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: the gifts
+     * saved, none was linked, and nothing was logged (R-OM1). `OpportunityMirrorUnavailableTest`
+     * runs this branch.
+     */
+    private static void assertNothingMirrored() {
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Gift__c WHERE Opportunity_Id__c != NULL WITH SYSTEM_MODE],
+            'Without Opportunity no gift is linked (R-OM1).'
+        );
+        Assert.areEqual(0, warnings().size(), 'And nothing is logged.');
+    }
+
     @IsTest
     static void savingAGiftGivesItAWonOpportunityWithTheDonorAsPrimaryContact() {
         Gift__c given = gift(100);
@@ -130,6 +144,7 @@ private class OpportunityMirrorServiceTest {
             insert given;
         }
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         String linked = reread(given.Id).Opportunity_Id__c;
@@ -182,6 +197,7 @@ private class OpportunityMirrorServiceTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         SObject negative = opportunity(reread(refundId).Opportunity_Id__c);
@@ -204,6 +220,7 @@ private class OpportunityMirrorServiceTest {
             insert given;
         }
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         String linked = reread(given.Id).Opportunity_Id__c;
@@ -234,6 +251,8 @@ private class OpportunityMirrorServiceTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            Assert.isTrue(saved.isSuccess(), 'Without Opportunity the value is not read (R-OM1).');
+            Assert.areEqual(0, warnings().size(), 'And nothing is logged.');
             return;
         }
         Assert.isFalse(saved.isSuccess(), 'Another object\'s id is refused (R-OM10).');
@@ -303,6 +322,7 @@ private class OpportunityMirrorServiceTest {
         }
         Test.stopTest();
         if (!OpportunityMirrorService.isAvailable()) {
+            assertNothingMirrored();
             return;
         }
         Assert.areEqual(

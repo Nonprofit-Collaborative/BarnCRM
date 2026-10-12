@@ -15,6 +15,11 @@ public with sharing class OpportunityGiftService {
     private static final String TYPE_OTHER = 'Other';
     private static final String STATUS_RECEIVED = 'Received';
     private static final String CAMPAIGN_FIELD = 'CampaignId';
+    /**
+     * The name describe gives the record type of an Opportunity without one. Such an Opportunity
+     * stores no record type, so this name matches none and is left out of the filter.
+     */
+    private static final String MASTER_RECORD_TYPE = 'Master';
 
     /** The fields a run reads from each won Opportunity, with Campaign where the org has it. */
     public static List<String> opportunityFields() {
@@ -47,7 +52,8 @@ public with sharing class OpportunityGiftService {
     /**
      * The record types whose won Opportunities become gifts (R-OM7), or null for every record
      * type. A name the org does not have matches nothing, so a mistyped list makes no gifts
-     * rather than gifts from every Opportunity.
+     * rather than gifts from every Opportunity. `Master` is left out: it matches nothing either,
+     * and in an org without record types there is no record type field to filter on.
      */
     public static Set<Id> recordTypeIds() {
         List<String> names = listedRecordTypes();
@@ -57,7 +63,7 @@ public with sharing class OpportunityGiftService {
         Map<String, Schema.RecordTypeInfo> byName = recordTypesByName();
         Set<Id> ids = new Set<Id>();
         for (String name : names) {
-            if (byName.containsKey(name)) {
+            if (byName.containsKey(name) && !isMaster(name)) {
                 ids.add(byName.get(name).getRecordTypeId());
             }
         }
@@ -69,11 +75,25 @@ public with sharing class OpportunityGiftService {
         List<String> unknown = new List<String>();
         Map<String, Schema.RecordTypeInfo> byName = recordTypesByName();
         for (String name : listedRecordTypes()) {
-            if (!byName.containsKey(name)) {
+            if (!byName.containsKey(name) && !isMaster(name)) {
                 unknown.add(name);
             }
         }
         return unknown;
+    }
+
+    /** Whether the record type list names `Master`, for a run to warn about once. */
+    public static Boolean listsMasterRecordType() {
+        for (String name : listedRecordTypes()) {
+            if (isMaster(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Boolean isMaster(String name) {
+        return MASTER_RECORD_TYPE.equalsIgnoreCase(name);
     }
 
     private static List<String> listedRecordTypes() {
@@ -204,16 +224,38 @@ public with sharing class OpportunityGiftService {
         return result;
     }
 
-    /** Only a duplicate on the gift's Opportunity link means another run made the gift first. */
     private static Boolean isLinkDuplicate(Database.Error error) {
-        if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
+        return isLinkDuplicate(error.getStatusCode(), error.getFields(), error.getMessage());
+    }
+
+    /**
+     * Only a duplicate on the gift's Opportunity link means another run made the gift first.
+     *
+     * A unique index refusal often names the field only in its message ("duplicate value found:
+     * Opportunity_Id__c duplicates value on record with id: ..."), so a refusal with no fields
+     * is matched on the link's API name as a whole word of the message. A field whose name only
+     * contains it, such as a later `Opportunity_Id_Legacy__c`, is not the link. Treating every
+     * refusal without fields as a failure instead would report the overlapping-run case this
+     * exists for as an error each time; a whole-word match keeps it, and names nothing else,
+     * since an object has one field of that name.
+     */
+    @TestVisible
+    private static Boolean isLinkDuplicate(StatusCode code, List<String> fields, String message) {
+        if (code != StatusCode.DUPLICATE_VALUE) {
             return false;
         }
         String link = Gift__c.Opportunity_Id__c.getDescribe().getName();
-        List<String> fields = error.getFields();
-        // Some unique index refusals name the field only in the message.
-        return fields != null && !fields.isEmpty()
-            ? fields.contains(link)
-            : error.getMessage().contains(link);
+        if (fields != null && !fields.isEmpty()) {
+            return fields.contains(link);
+        }
+        if (String.isBlank(message)) {
+            return false;
+        }
+        for (String word : message.split('[^A-Za-z0-9_]+')) {
+            if (word.equalsIgnoreCase(link)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

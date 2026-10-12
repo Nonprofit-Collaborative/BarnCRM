@@ -63,6 +63,21 @@ private class OpportunityMirrorControllerTest {
         return null;
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: the page
+     * refuses the action in words, before anything starts (R-OM1).
+     * `OpportunityMirrorUnavailableTest` runs this branch.
+     */
+    private static void assertRefusedAsUnavailable(String action) {
+        System.runAs(maria()) {
+            Assert.areEqual(
+                Label.Connect_OpportunityMirror_Unavailable,
+                refusalOf(new Action(action)),
+                'Without Opportunity ' + action + ' is refused in words (R-OM1).'
+            );
+        }
+    }
+
     /** The page actions, so each refusal test reads as one line. */
     private class Action implements Callable {
         private final String name;
@@ -105,6 +120,7 @@ private class OpportunityMirrorControllerTest {
     @IsTest
     static void theReconciliationListsEachKindOfDifference() {
         if (!OpportunityMirrorService.isAvailable()) {
+            assertRefusedAsUnavailable('compare');
             return;
         }
         User admin = maria();
@@ -235,8 +251,12 @@ private class OpportunityMirrorControllerTest {
             WHERE Name = 'Minimum Access - Salesforce'
             LIMIT 1
         ];
-        if (!OpportunityMirrorService.isAvailable() || minimum.isEmpty()) {
+        if (!OpportunityMirrorService.isAvailable()) {
+            assertRefusedAsUnavailable('compare');
             return;
+        }
+        if (minimum.isEmpty()) {
+            return; // An org without that profile has no such user to prove it with.
         }
         User rosa = TestDataFactory.createUser(
             'Rosa',
@@ -259,6 +279,7 @@ private class OpportunityMirrorControllerTest {
     @IsTest
     static void someoneWhoCannotManageSettingsCannotRunScheduleOrStop() {
         if (!OpportunityMirrorService.isAvailable()) {
+            assertRefusedAsUnavailable('runNow');
             return;
         }
         choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
@@ -319,6 +340,7 @@ private class OpportunityMirrorControllerTest {
     @IsTest
     static void copyingAgainNeedsGiftsToOpportunitiesAndARange() {
         if (!OpportunityMirrorService.isAvailable()) {
+            assertRefusedAsUnavailable('copyAgain');
             return;
         }
         User admin = maria();
@@ -346,6 +368,8 @@ private class OpportunityMirrorControllerTest {
     @IsTest
     static void mariaSchedulesAndStopsTheNightlyRun() {
         if (!OpportunityMirrorService.isAvailable()) {
+            assertRefusedAsUnavailable('schedule');
+            Assert.isNull(OpportunityMirrorSchedulable.nextRunAt(), 'Nothing was scheduled.');
             return;
         }
         User admin = maria();
