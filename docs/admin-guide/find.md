@@ -112,8 +112,9 @@ a value; the operators offered depend on the field:
 
 Typed SOQL, subqueries of child records ("households with no gifts"), totals and groupings,
 XLSX export, editing results in the table and exports run on the server are planned for a
-later release (C-36). Changing many records at once is **Bulk update** (C-35), which starts
-from a Find query.
+later release (C-36). To change many records at once, run a query and press **Bulk update**,
+shown to people who also hold the Bulk Update Records permission. See
+[Bulk update](bulk-update.md).
 
 ## Field reference
 

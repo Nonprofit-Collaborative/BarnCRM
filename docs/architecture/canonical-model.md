@@ -886,11 +886,13 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 ### v0.7 keys
 
-Added by Find (C-34, Section 29D). Shown in the console's Import section.
+Added by Find (C-34, Section 29D) and bulk update (C-35, Section 29E). Shown in the console's
+Import section.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
+| `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
 
 ### Rules
 
@@ -1463,9 +1465,11 @@ from Nonprofit Cloud", section 5).
 
 ### Definition
 
-One upload: the file, the template it was read with, what happened, and the log of it
-(plan Section 4.9). A batch is the unit an administrator dry-runs, commits, and in v0.5
-undoes.
+One data job: a file import (one upload: the file, the template it was read with, what
+happened, and the log of it) or, from v0.7, a bulk update (C-35, Section 29E: the query and the
+changes, and what happened). An import is the unit an administrator dry-runs, commits, and in
+v0.5 undoes; a bulk update is committed when it starts and is undone the same way
+(plan Section 4.9, ADR-0047).
 
 ### Attributes
 
@@ -1495,6 +1499,8 @@ undoes.
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
+| Operation | picklist(Import, Update) | yes (defaults Import) | What kind of data job this is: a file import, or a bulk update (R-BU1). Empty on a batch created before v0.7, which reads as Import. |
+| Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); empty for an import. |
 
 ### Relationships
 
@@ -1782,6 +1788,8 @@ applied, as it receives the template's defaults (R-IR6).
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
+| Operation | `Operation__c` | Picklist: Import, Update (default Import) |
+| Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -1797,7 +1805,8 @@ applied, as it receives the template's defaults (R-IR6).
 - **Service:** `ImportBatchService`, `ImportBatchSelector`, `ImportProcessorBatch`,
   `ImportUndoService` and `ImportUndoBatch` (R-IB7 to R-IB9), `ImportController` (the one
   Aura-enabled entry point the import screens call), LWC `importWizard`, `importResults`,
-  `importHistory` (recent imports and their undo).
+  `importHistory` (recent imports and their undo). The import history lists imports only; bulk
+  updates are listed by their own page (Section 29E).
 
 ---
 
@@ -2015,7 +2024,9 @@ a date as `YYYY-MM-DD`), so a value put back is the value that was there.
     { "action": "Kept", "object": "Account", "id": "001...", "label": "The Smith Family",
       "reason": "A person this import did not create is in this household." },
     { "action": "NotRestored", "object": "Contact", "id": "003...", "field": "Email",
-      "reason": "Changed since the import." }
+      "reason": "Changed since the import." },
+    { "action": "Failed", "object": "Contact", "id": "003...",
+      "reason": "The platform's own message, for example a validation rule's." }
   ]
 }
 ```
@@ -2023,7 +2034,10 @@ a date as `YYYY-MM-DD`), so a value put back is the value that was there.
 **R-IJ3 What is journaled.** A commit journals updates only: the attributes a row changed on
 a record the import did not create, with the value before and the value written, in full. A
 created record needs no entry because it carries the tag (R-IB3), and a matched or rejected
-row changed nothing and is recorded on its staged row (Section 17). An undo journals the
+row changed nothing and is recorded on its staged row (Section 17). A bulk update (R-BU3)
+journals, for each record it saved, the fields whose value changed, before and after, and for
+each record the platform refused, a Failed entry with the reason; a record that already held
+the new values is not saved and not journaled. An undo journals the
 records it kept and the values it did not put back, each with its reason; the records it
 deleted are counted in the Run Log rather than listed, because the recycle bin lists them.
 
@@ -5413,6 +5427,100 @@ permission, which opens the tool and grants no record access.
 
 ---
 
+## 29E. Bulk update
+
+### Definition
+
+Up to five changes to every record a Find query returns (plan Section 4.9, feature C-35): set
+a field to a value, clear it, or copy another field of the same record into it. A bulk update
+adds no object of its own: it is a data job (Section 16) with Operation Update, journaled in
+the import journal (Section 17A) and undone as an import is (ADR-0047; builder decisions in
+ADR-NEXT, `NEXT-bulk-update-runs-as-the-user-from-a-find-query.md`).
+
+### Rules
+
+**R-BU1 A data job with no rows.** A bulk update is an `Import_Batch__c` with Operation Update,
+no template, no file and no staged rows. Its Bulk Update Definition holds, as one document,
+the query document (R-SQ1), the changes and the count the person confirmed:
+
+```
+{
+  "version": 1,
+  "query": { "version": 1, "object": "Contact", "fields": ["Name"], "filter": { ... } },
+  "changes": [
+    { "field": "MailingCity", "action": "set", "value": "Portland" },
+    { "field": "Preferred_Email__c", "action": "copy", "source": "Work_Email__c" },
+    { "field": "Title", "action": "clear" }
+  ],
+  "confirmedCount": 37
+}
+```
+
+The record set comes only from the query document, compiled by `QueryCompiler` as the person
+(R-SQ2); no SOQL text is accepted. The query's columns, order and row count are ignored: the
+job reads the fields its changes need, in Id order.
+
+**R-BU2 Counted, confirmed, and a ceiling.** The preview counts the matching records as the
+person, in user mode, and shows the first five before and after. The start counts again and is
+refused when none match, when more match than the person confirmed, or when more match than
+`Bulk_Update_Run_Limit__c`. One request may read just under 50,000 rows, so the count reads at
+most the run limit plus one, and the limit is held to 48,000. When the count starts, the job
+stamps Committed By, Started At, Row Count (the count) and the Undo Deadline (R-IB7), and runs
+in Batch Apex, at most 200 records a chunk.
+
+**R-BU3 Only records that still match, as the person.** The job reads at most the confirmed
+number of records, in Id order, in user mode. Each chunk reads its records again with the
+query's filter, so a record changed since so that it no longer matches is left alone and
+counted in the Run Log. Each record is saved with `Database.update(records, false,
+AccessLevel.USER_MODE)`, so access, validation rules, duplicate rules and automation apply and
+one refusal does not stop the rest. Rows Updated counts the records saved, Rows Matched those
+that already held the new values (not saved), and Rows Rejected those the platform refused.
+Each chunk writes one commit journal page (R-IJ1, R-IJ3).
+
+**R-BU4 What a bulk update never writes.** A target field must be on the query's object (no
+path to another record), editable by the person (`isUpdateable`, which excludes formula,
+auto-number and system fields), of a type a value can be written to, and not one the package
+keeps: the target of any Rollup Definition (active or not, read when the job is checked, so a
+new rollup is protected without a code change), the household greetings and member count, any
+field ending `Last_Calculated__c`, the import tag (`Created_By_Import_Batch__c`) and the
+sample data key (`Sample_Data_Key__c`). The object must be editable by the person and not one
+of the package's bookkeeping objects (data jobs, import rows and templates, the journal, the
+error log, settings and setting changes, automation settings, rollup definitions, duplicate
+dismissals, saved queries), a custom setting, or a Salesforce setup object (users, groups,
+profiles, roles, permission sets and their assignments, record types, the organization). A
+copy needs a compatible source: the same type; any text, email, phone, URL or picklist into a
+text field; any number into a number field; a lookup into a lookup that can point at the same
+kind of record. A value to set is typed for its field before the job starts; a restricted
+picklist takes only its active values. Locks on another module's records (a posted gift, an
+issued receipt) are not listed here: their triggers refuse the save, and the record is
+journaled as Failed.
+
+**R-BU5 Undo.** The undo is the import undo (R-IB8): counted and confirmed, once, within the
+Undo Deadline. For a data job whose Operation is Update it runs the restore pass only, and it
+restores any object its journal names that describe still finds, where an import restores
+only people, households and organizations. A value is put back only where the record still
+holds the value the bulk update wrote; anything else is journaled as not put back.
+
+**R-BU6 Permission.** Every bulk update action requires the `Bulk_Update_Records` custom
+permission and, because every bulk update starts from a Find query, `Find_And_Export_Records`
+(R-SQ5). Neither grants record access.
+
+### Salesforce implementation
+
+- **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`) and
+  `Import_Journal__c` (Sections 16 and 17A).
+- **Settings key:** `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys).
+- **Services:** `BulkUpdateFields` (which fields and objects can be written, and how a value
+  or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
+  `BulkUpdateBatch` (the job), `BulkUpdateController`; `QueryCompiler` gains the count and the
+  chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
+- **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
+  permission set `BarnCRM_Bulk_Update`, assigned beside `BarnCRM_Find_And_Export`.
+- **UI:** component `bulkUpdate`, opened from Find's results with the query, and on the Bulk
+  Update tab (app page `Bulk_Update`) listing recent bulk updates with their progress and undo.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -5533,6 +5641,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-09-24 | C-23 automation pause with automatic resume, and the error digest (ADR-0055). No object added. `Nonprofit_Settings__c` gains five keys (Section 12, v0.6 keys): `Error_Digest_Recipients__c`, `Error_Digest_Frequency__c`, `Error_Digest_Covered_Until__c`, `Error_Digest_Last_Run__c` and `Error_Digest_Last_Run_Summary__c`. New rules R-A5 (a pause ends by itself through a one-time job that records the resume) and R-E5 (the digest counts and links, never quotes, and goes only to active users); R-E3 reworded to point at R-E5. |
 | v0.6 | 2026-09-25 | G-20 follow-up: Health Check finding for unposted gifts in a closed period (ADR-0053's recorded follow-up, ADR-0057). No object, field or rule added: the finding reports what R-G14 already locks, a gift with a counting status (ADR-0022) and a type other than In-kind, dated on or before Books Closed Through, whose `Accounting_Posted_At__c` is still empty, capped and linked the way C-21's orphan findings already are. Because Core may not name a gift or a closed period (C-29), Core gains a small extension seam instead of a new Core check: `HealthCheckExtension`, an interface, and `HealthCheckExtensions`, a resolver that finds an implementation by name with `Type.forName`, the same shape `ImportEntityProcessor` already uses for the opposite direction (R-IR6). `HealthCheckService.run()` folds a found extension's findings into the one report, isolated the way one failing check already is. Giving ships the one implementation, `GivingHealthCheckExtension`, delegating to `HealthCheckGivingChecks`, grouped the way ADR-0039 groups Core's own checks. |
 | v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
+| v0.7 | 2026-10-12 | C-35 bulk update (ADR-NEXT, `NEXT-bulk-update-runs-as-the-user-from-a-find-query.md`). New Section 29E, rules R-BU1 to R-BU6; no new object. `Import_Batch__c` gains `Operation__c` (Import, Update) and `Operation_JSON__c`, and Section 16's definition covers both kinds of data job. R-IJ2 and R-IJ3: the journal gains the Failed entry. BarnCRM Settings gains `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Update_Records` and permission set `BarnCRM_Bulk_Update`. |
 | v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-NEXT `NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
 
 ---

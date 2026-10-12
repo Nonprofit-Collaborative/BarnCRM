@@ -147,3 +147,4 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Connect | v0.6 |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving | v0.6 |
 | C-34 Find and export | [find.md](find.md) | Core | v0.7 |
+| C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |

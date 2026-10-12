@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Bulk_Update_Run_Limit__c</fullName>
+  <defaultValue>48000</defaultValue>
+  <description>The most records one bulk update may change (canonical model R-BU2). Read as 48,000 when empty, held between 1 and 48,000.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The most records one bulk update may change.</inlineHelpText>
+  <label>Bulk Update Run Limit</label>
+  <precision>5</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

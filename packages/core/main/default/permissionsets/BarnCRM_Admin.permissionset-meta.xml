@@ -325,6 +325,10 @@
   </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
+    <name>Bulk_Update_Records</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
     <name>Find_And_Export_Records</name>
   </customPermissions>
   <customPermissions>
@@ -859,6 +863,16 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Batch__c.Job_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
