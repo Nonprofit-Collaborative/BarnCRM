@@ -751,14 +751,15 @@ Code users. Everything below is pushed to GitHub; nothing lives only on a local 
 Remove each item from this list in the PR that finishes it.
 
 Last checked 2026-10-12: nothing below has changed since 2026-09-26. `main` is at PR #178, the
-C-29 stack is still open with a `failure` status on its top head, and two Dependabot PRs (#179,
-#180) are open. The plan's Section 0 carries the same build-state summary.
+C-29 stack is still open and needs a gate run on its new top head, Dependabot #179 is merged,
+and #180 is open. The plan's Section 0 carries the same build-state summary.
 
 ### Waiting to merge: C-29 neutral Core (PRs #163 to #174)
 
 - Branches `feature/c-29-neutral-core-1` to `-12`, stacked; top head
-  `3da9276ad53ed3231e01b314d7e0e6205a23f8e7`. Review approved. ADR-0059 is already numbered.
-- Not yet tested cleanly: the `Org tests (local)` status on the top head is `failure`. Of two
+  `ffcf5b6562c39f837578dec6f04a69bdc528d790`. Review approved. ADR-0059 is already numbered.
+  That head merged `main` in on 2026-10-12 (no conflicts); the earlier head was `3da9276`.
+- Not yet tested cleanly: the last `Org tests (local)` status, on `3da9276`, was `failure`. Of two
   full runs, one hit the sf CLI heap crash, and the other passed 2,234 of 2,235; the one failure
   was the flaky `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce`,
   which passed 16 times out of 16 when run alone.
@@ -767,11 +768,13 @@ C-29 stack is still open with a `failure` status on its top head, and two Depend
      `scripts/org/run-org-tests.sh oi-test` (or `oi-pa`).
      If only the flaky test fails, rerun the gate.
   2. Fast-forward each lower branch to the top head:
-     `git push origin 3da9276ad53ed3231e01b314d7e0e6205a23f8e7:refs/heads/feature/c-29-neutral-core-N`
+     `git push origin ffcf5b6562c39f837578dec6f04a69bdc528d790:refs/heads/feature/c-29-neutral-core-N`
      for N = 1 to 11.
-  3. Wait for the CI checks.
+  3. Wait for the CI checks. The jest test `setupStepFields` "opens the tab a navigation field
+     names" fails about one full parallel run in five (it passes alone); if it is the only static
+     failure, re-run the job once.
   4. Squash-merge the bottom PR:
-     `gh pr merge 163 --squash --match-head-commit 3da9276ad53ed3231e01b314d7e0e6205a23f8e7`.
+     `gh pr merge 163 --squash --match-head-commit ffcf5b6562c39f837578dec6f04a69bdc528d790`.
      The stacked PRs close as merged.
 
 ### Never tested
