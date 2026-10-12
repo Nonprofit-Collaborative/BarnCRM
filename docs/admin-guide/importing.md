@@ -391,7 +391,9 @@ organization the rule found nobody for: a file of work emails, for example, can 
 Ramirez by her name and phone if your rule for people compares those. What it risks: your
 duplicate rules are usually looser than **Email exact**, so a row can be loaded into somebody who
 is only similar. Every row matched this way has **Matched By Duplicate Rule** ticked and the run
-log counts them, so read them in the dry run before you commit. When a rule finds more than one
+log says there are such rows, so read them in the dry run before you commit (report on Import
+Rows, or open the import's rows). A row whose two people the rules match to one record is
+rejected. When a rule finds more than one
 record, **When more than one record matches** decides, as for any match. Only organizations are
 taken for organizations, and only people for people, whatever the rule compares. The choice is
 saved with the mapping.

@@ -53,12 +53,15 @@ public with sharing class ImportTemplateService {
         public String organizationMatchField;
         @NamespaceAccessible
         public String severalMatches;
+        /** Whether the org's duplicate rules are asked too (R-IT16); false when absent. */
+        @NamespaceAccessible
+        public Boolean useDuplicateRules;
     }
 
     /**
      * Saves how a template matches people and organizations, and what happens when several
-     * records match (R-IT2, R-IT8, R-IT9). A chosen field is stored as describe names it, and
-     * one the object does not offer for matching is refused, saying which.
+     * records match (R-IT2, R-IT8, R-IT9, R-IT16). A chosen field is stored as describe names it,
+     * and one the object does not offer for matching is refused, saying which.
      */
     @NamespaceAccessible
     public static Import_Template__c saveMatching(Id templateId, MatchingChoices choices) {
@@ -70,6 +73,7 @@ public with sharing class ImportTemplateService {
         template.Matching_Rule__c = normalizedRule(given.personRule);
         template.Organization_Matching_Rule__c = normalizedOrganizationRule(given.organizationRule);
         template.Several_Matches__c = normalizedSeveralMatches(given.severalMatches);
+        template.Use_Duplicate_Rules__c = given.useDuplicateRules == true;
         template.Person_Match_Field__c = RULE_EXTERNAL_ID.equals(template.Matching_Rule__c)
             ? checkedField(personType(template), given.personMatchField)
             : null;

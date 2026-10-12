@@ -1469,15 +1469,20 @@ Rules ticked also asks the org's active duplicate rules (ADR-NEXT,
 (R-IT2, R-IT8) found nobody for, that no record ID names (R-IT10), that no earlier row of the
 pass is creating (R-IB12) and whose row is not already rejected. The row's values for the
 entity, as stored names (R-IT11), are set on an unsaved record of the entity's object (Contact,
-or Account in Person Accounts mode, for a person; Account for an organization) and passed to
-the platform's duplicate matcher, at most 50 records a call. Matches of another object are
-ignored. The matched identifiers are then read in user mode, keeping only records the user can
-see and, for accounts, of the entity's kind (a person record type for a person account, the
-Organization record type for an organization). One record kept matches; several follow Several
-Matches (R-IT9). A row matched this way has Matched By Duplicate Rule ticked (Section 17) and
-the run log counts such rows once a chunk. When the object has no active duplicate rule the user
-can see, or the matcher raises, the entity is matched by its rule alone and the run log says so
-once; nothing is rejected for it. Duplicate rules are not asked for a one-object template.
+or Account in Person Accounts mode, for a person; Account for an organization), copying only
+fields the user may read and create that hold text, an email, a phone, a URL or a picklist value,
+and passed to the platform's duplicate matcher, at most 50 records a call. Matches of another
+object are ignored. The matched identifiers are then read in user mode, keeping only records the
+user can see and, for accounts, of the entity's kind (a person record type for a person account,
+the Organization record type for an organization). One record kept matches; several follow
+Several Matches (R-IT9). A row whose two people are matched to one record is rejected. In a dry
+run an organization an earlier chunk would create is not asked about (the commit finds it by its
+key). A row matched this way has Matched By Duplicate Rule ticked (Section 17) and the run log
+says that such rows exist. The active rules are read first (`DuplicateRule`, user mode): when
+the object has none the user can see, or the matcher raises, the entity is matched by its rule
+alone and the run log says so; nothing is rejected for it. A matcher failure is written to the
+Error Log only when a rule was known to be active. Duplicate rules are not asked for a
+one-object template.
 
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can

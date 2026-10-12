@@ -100,6 +100,8 @@ public with sharing class ImportRowProcessor {
     private static Boolean organizationsByField = false;
     private static String organizationMatchField;
     private static Boolean mostRecent = false;
+    /** Whether the org's duplicate rules are asked about whom the rule found nobody for (R-IT16). */
+    private static Boolean useDuplicateRules = false;
 
     /**
      * The attributes that can name or find a person. A full name column is not listed because
@@ -157,6 +159,8 @@ public with sharing class ImportRowProcessor {
         String organizationGroup;
         /** True when a key this row was looked for by found several records (R-IT9). */
         Boolean severalMatches = false;
+        /** True when the org's duplicate rules matched a person or the organization (R-IT16). */
+        Boolean duplicateRuleMatch = false;
         /** The record IDs the row gives, as typed, taken out of its values (R-IT10). */
         String givenOrganizationId;
         String givenPerson1Id;
@@ -245,6 +249,7 @@ public with sharing class ImportRowProcessor {
         Outcome outcome
     ) {
         mostRecent = ImportTemplateService.usesMostRecent(template);
+        useDuplicateRules = template.Use_Duplicate_Rules__c == true;
         ImportMatcher.keepMostRecent(mostRecent);
         personMatchField = null;
         if (ImportTemplateService.RULE_EXTERNAL_ID.equals(rule)) {
@@ -700,6 +705,16 @@ public with sharing class ImportRowProcessor {
                   new Set<Id>{ recordTypeId }
               )
             : ImportMatcher.accountsByName(keys, recordTypeId);
+        if (useDuplicateRules) {
+            matchOrganizationsByDuplicateRules(
+                working,
+                existing,
+                recordTypeId,
+                batch,
+                dryRun,
+                outcome
+            );
+        }
 
         Map<String, Working> firstRowByKey = new Map<String, Working>();
         List<Account> toCreate = new List<Account>();
@@ -926,6 +941,9 @@ public with sharing class ImportRowProcessor {
             : new Map<String, Integer>();
         findPerson(working, matches, earlier, true);
         findPerson(working, matches, earlier, false);
+        if (useDuplicateRules) {
+            matchPeopleByDuplicateRules(working, personAccounts, outcome);
+        }
         validate(working);
         if (batch.Match_Only__c == true) {
             rejectUnmatchedPeople(working);
@@ -1293,6 +1311,7 @@ public with sharing class ImportRowProcessor {
         row.Organization_Key__c = null;
         row.Processor_Key__c = null;
         row.Several_Matches__c = false;
+        row.Duplicate_Rule_Match__c = false;
     }
 
     /** A row has to describe somebody. One that does not is rejected before anything is saved. */
@@ -2328,6 +2347,165 @@ public with sharing class ImportRowProcessor {
     }
 
     // -------------------------------------------------------------------------------------
+    // The org's duplicate rules (R-IT16)
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Asks the org's duplicate rules about each person the rule found nobody for: not given by
+     * record ID, not created by an earlier chunk, on a row not already rejected. A person they
+     * match is loaded into that record; several follow Several Matches (R-IT9). A row whose two
+     * people they match to one record is rejected, since one record cannot be both.
+     */
+    private static void matchPeopleByDuplicateRules(
+        List<Working> working,
+        Boolean personAccounts,
+        Outcome outcome
+    ) {
+        Schema.SObjectType type = personAccounts ? Account.SObjectType : Contact.SObjectType;
+        Id recordTypeId = personAccounts ? anyPersonRecordTypeId() : null;
+        List<SObject> probes = new List<SObject>();
+        List<Working> owners = new List<Working>();
+        List<Boolean> isFirst = new List<Boolean>();
+        for (Working item : working) {
+            for (Integer which = 1; which <= 2; which++) {
+                String entity = which == 1
+                    ? ImportMapping.ENTITY_CONTACT_1
+                    : ImportMapping.ENTITY_CONTACT_2;
+                Boolean unmatched = which == 1
+                    ? item.person1Id == null && !item.comingPerson1
+                    : item.person2Id == null && !item.comingPerson2;
+                if (item.error != null || !unmatched || !describesPerson(item, entity)) {
+                    continue;
+                }
+                probes.add(
+                    ImportDuplicateRuleMatcher.probe(
+                        type,
+                        asStored(item.byEntity.get(entity), personAccounts),
+                        recordTypeId
+                    )
+                );
+                owners.add(item);
+                isFirst.add(which == 1);
+            }
+        }
+        if (probes.isEmpty()) {
+            return;
+        }
+        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
+            probes,
+            personAccounts ? personRecordTypeIds() : null
+        );
+        if (found == null) {
+            outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
+            return;
+        }
+        for (Integer i = 0; i < probes.size(); i++) {
+            Working item = owners[i];
+            Id matched = chosenByRule(item, found[i], Label.Core_Import_ErrorSeveralPeopleMatch);
+            if (matched == null) {
+                continue;
+            }
+            if (isFirst[i]) {
+                item.person1Id = matched;
+            } else {
+                item.person2Id = matched;
+            }
+            if (item.person1Id == item.person2Id) {
+                item.error = Label.Core_Import_ErrorDuplicateRuleOnePerson;
+            }
+        }
+    }
+
+    /**
+     * Asks the org's duplicate rules about each organization the rule found nobody for. In a
+     * dry run an organization an earlier chunk would create is left out, because the commit
+     * finds that one by its key (R-IB12).
+     */
+    private static void matchOrganizationsByDuplicateRules(
+        List<Working> working,
+        Map<String, Id> existing,
+        Id recordTypeId,
+        Import_Batch__c batch,
+        Boolean dryRun,
+        Outcome outcome
+    ) {
+        List<Working> owners = new List<Working>();
+        Set<String> digests = new Set<String>();
+        for (Working item : working) {
+            if (
+                looksForOrganization(item) &&
+                (item.organizationKey == null || !existing.containsKey(item.organizationKey))
+            ) {
+                owners.add(item);
+                if (dryRun && item.organizationKey != null) {
+                    digests.add(digest(ORGANIZATION_DIGEST, item.organizationKey));
+                }
+            }
+        }
+        Set<String> earlier = digests.isEmpty()
+            ? new Set<String>()
+            : ImportRowSelector.createdDigestsWrittenEarlier(batch, digests);
+        List<SObject> probes = new List<SObject>();
+        List<Working> asked = new List<Working>();
+        for (Working item : owners) {
+            if (
+                item.organizationKey != null &&
+                earlier.contains(digest(ORGANIZATION_DIGEST, item.organizationKey))
+            ) {
+                continue;
+            }
+            Map<String, String> values = new Map<String, String>(
+                item.byEntity.containsKey(ImportMapping.ENTITY_ORGANIZATION)
+                    ? item.byEntity.get(ImportMapping.ENTITY_ORGANIZATION)
+                    : new Map<String, String>()
+            );
+            values.put('Name', item.organizationName);
+            probes.add(ImportDuplicateRuleMatcher.probe(Account.SObjectType, values, recordTypeId));
+            asked.add(item);
+        }
+        if (probes.isEmpty()) {
+            return;
+        }
+        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
+            probes,
+            new Set<Id>{ recordTypeId }
+        );
+        if (found == null) {
+            outcome.notes.add(Label.Core_Import_LogNoDuplicateRuleOrganizations);
+            return;
+        }
+        for (Integer i = 0; i < asked.size(); i++) {
+            Id matched = chosenByRule(
+                asked[i],
+                found[i],
+                Label.Core_Import_ErrorSeveralOrganizationsMatch
+            );
+            if (matched != null) {
+                asked[i].organizationId = matched;
+            }
+        }
+    }
+
+    /**
+     * The record the duplicate rules matched for one person or organization, or null: none
+     * matched, or several did and Several Matches rejects the row (R-IT9).
+     */
+    private static Id chosenByRule(Working item, List<SObject> found, String severalError) {
+        if (found.isEmpty() || item.error != null) {
+            return null;
+        }
+        if (found.size() > 1) {
+            item.severalMatches = true;
+            if (!mostRecent) {
+                item.error = severalError;
+                return null;
+            }
+        }
+        item.duplicateRuleMatch = true;
+        return ImportDuplicateRuleMatcher.mostRecent(found).Id;
+    }
+
+    // -------------------------------------------------------------------------------------
     // Writing the rows back
     // -------------------------------------------------------------------------------------
 
@@ -2338,6 +2516,11 @@ public with sharing class ImportRowProcessor {
             // Ticked whether the row was rejected for it or not, so every such row can be
             // listed (R-IT9); the run log says once that some were loaded anyway.
             row.Several_Matches__c = item.severalMatches;
+            // Ticked so the rows a looser rule matched can be read before a commit (R-IT16).
+            row.Duplicate_Rule_Match__c = item.duplicateRuleMatch && item.error == null;
+            if (row.Duplicate_Rule_Match__c) {
+                outcome.notes.add(Label.Core_Import_LogDuplicateRuleMatches);
+            }
             if (item.severalMatches && item.error == null) {
                 outcome.notes.add(Label.Core_Import_LogSeveralMatchesUsedRecent);
             }

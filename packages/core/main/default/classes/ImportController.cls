@@ -55,6 +55,9 @@ public with sharing class ImportController {
         public String organizationMatchField;
         @AuraEnabled
         public String severalMatches;
+        /** Whether the org's duplicate rules are asked too (R-IT16). */
+        @AuraEnabled
+        public Boolean useDuplicateRules;
         /** For a template that loads one object (R-IT12, R-IT13). */
         @AuraEnabled
         public String targetObject;
@@ -165,6 +168,14 @@ public with sharing class ImportController {
         /** The fields an organization's column can be mapped to besides the fixed list. */
         @AuraEnabled
         public List<ImportMapping.Target> organizationFields = new List<ImportMapping.Target>();
+        /**
+         * Whether contacts, and accounts, have an active duplicate rule the user can see; null
+         * when the user cannot read the rules (R-IT16).
+         */
+        @AuraEnabled
+        public Boolean contactRules;
+        @AuraEnabled
+        public Boolean accountRules;
     }
 
     /** One staged row as the exceptions table shows it. */
@@ -261,6 +272,7 @@ public with sharing class ImportController {
                 view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
                     template.Several_Matches__c
                 );
+                view.useDuplicateRules = template.Use_Duplicate_Rules__c == true;
                 describeLoad(template, view);
                 result.add(view);
             }
@@ -285,6 +297,8 @@ public with sharing class ImportController {
             view.account = fieldViews(Account.SObjectType);
             view.personFields = ImportFieldCatalog.personFields();
             view.organizationFields = ImportFieldCatalog.organizationFields();
+            view.contactRules = ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType);
+            view.accountRules = ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType);
             return view;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getMatchFields');
