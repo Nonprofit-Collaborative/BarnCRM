@@ -24,6 +24,13 @@ public with sharing class ImportMapping {
     @NamespaceAccessible
     public static final String ENTITY_ORGANIZATION = 'Organization';
 
+    /**
+     * The one entity of a template that loads one object (R-IT12): its attributes are the
+     * target object's field API names, and `Record.Id` names an existing record.
+     */
+    @NamespaceAccessible
+    public static final String ENTITY_RECORD = 'Record';
+
     /** The row entities Core stages but does not write (R-IR6). */
     @NamespaceAccessible
     public static final Set<String> DEFERRED_ENTITIES = new Set<String>{
@@ -52,6 +59,12 @@ public with sharing class ImportMapping {
         public String source;
         @AuraEnabled
         public String target;
+        /**
+         * For a lookup column of a one-object template, the parent field its values name the
+         * parent by (R-IT13); empty or `Id` for the record ID.
+         */
+        @AuraEnabled
+        public String lookupField;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the
@@ -60,6 +73,7 @@ public with sharing class ImportMapping {
         public Column() {
             this.source = null;
             this.target = null;
+            this.lookupField = null;
         }
 
         @NamespaceAccessible
@@ -356,6 +370,50 @@ public with sharing class ImportMapping {
             }
         }
         return false;
+    }
+
+    /**
+     * The parent field each `Record` lookup column names its parent by (R-IT13), keyed by the
+     * attribute folded to lower case. A column with no `lookupField`, or with `Id`, is left out:
+     * it names its parent by record ID.
+     */
+    @NamespaceAccessible
+    public Map<String, String> lookupFieldsByAttribute() {
+        Map<String, String> result = new Map<String, String>();
+        for (Column column : columns) {
+            if (
+                column == null ||
+                isIgnored(column.target) ||
+                String.isBlank(column.lookupField) ||
+                'Id'.equalsIgnoreCase(column.lookupField.trim()) ||
+                !ENTITY_RECORD.equalsIgnoreCase(entityOf(column.target))
+            ) {
+                continue;
+            }
+            result.put(attributeOf(column.target).toLowerCase(), column.lookupField.trim());
+        }
+        return result;
+    }
+
+    /**
+     * Every `Record` attribute this mapping writes, from its columns and its values for every
+     * row, folded to lower case (R-IT12).
+     */
+    @NamespaceAccessible
+    public Set<String> recordAttributes() {
+        Set<String> result = new Set<String>();
+        List<String> targets = new List<String>(targetsBySourceKey().values());
+        for (Assignment assignment : defaults) {
+            if (assignment != null && !isIgnored(assignment.target)) {
+                targets.add(assignment.target);
+            }
+        }
+        for (String target : targets) {
+            if (ENTITY_RECORD.equalsIgnoreCase(entityOf(target))) {
+                result.add(attributeOf(target).toLowerCase());
+            }
+        }
+        return result;
     }
 
     /** The lookup key of a column name: trimmed and folded to lower case. */

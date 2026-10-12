@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_RecordIdOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the record ID choice for a column or lookup</shortDescription>
+        <value>Salesforce record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorObjectNoAccess</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the user lacks the object access the load needs</shortDescription>
+        <value>You cannot read, create or edit {0} as this mapping needs. Ask your Salesforce administrator for access, or choose another action for each row.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorPeopleUpdateOnly</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: accounts and contacts load by update only</shortDescription>
+        <value>{0} can only be updated by record ID here. Add new people and organizations with a people mapping, which also builds their households.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorNothingMapped</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no column is mapped to a field of the object</shortDescription>
+        <value>No column is mapped to a field of the object. Map at least one column in the columns step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorIdColumnMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: update by record ID has no record ID column</shortDescription>
+        <value>Update by record ID needs a column mapped to Salesforce record ID.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyFieldRequired</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: upsert has no external ID field chosen</shortDescription>
+        <value>Upsert by external ID needs the external ID field rows are matched on. Choose it in the matching step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyFieldUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the chosen upsert field cannot be used</shortDescription>
+        <value>Rows cannot be matched on {0}: it is not an external ID text field of this object that you can read. Choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyColumnMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no column is mapped to the upsert field</shortDescription>
+        <value>Upsert by external ID needs a column mapped to {0}, the field rows are matched on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyForEveryRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a value for every row names the record</shortDescription>
+        <value>A value for every row cannot be {0}: every row would then name the same record. Map {0} to a column of the file instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorValueTooLong</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a value is longer than its field holds</shortDescription>
+        <value>The value for {0} is longer than the {1} characters it holds. Shorten it and load the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorValueUnreadable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a value cannot be read as its field type</shortDescription>
+        <value>"{1}" is not a value {0} accepts. Fix the cell and load the row again.</value>
+    </labels>
+</CustomLabels>
