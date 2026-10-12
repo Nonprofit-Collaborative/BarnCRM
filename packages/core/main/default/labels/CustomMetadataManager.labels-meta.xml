@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_CmdtManager_UnknownType</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the list is not one the page can change</shortDescription>
+        <value>That list cannot be changed here. Reload the page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RecordNotFound</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the row is no longer in the list</shortDescription>
+        <value>That row is no longer in the list. Click Check again to refresh it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_ShippedReadOnly</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the row ships with BarnCRM; names the row</shortDescription>
+        <value>{0} ships with BarnCRM and cannot be changed here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NameRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the Name box is empty</shortDescription>
+        <value>Enter a name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NameTooLong</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the name is over 40 characters</shortDescription>
+        <value>Keep the name to 40 characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_FieldRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: a required box is empty; names the box</shortDescription>
+        <value>Enter {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_FieldTooLong</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: a value is too long; names the box and the limit</shortDescription>
+        <value>Keep {0} to {1} characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NotAChoice</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: value missing from a picklist; value, field, object</shortDescription>
+        <value>{0} is not a choice in the {1} list on {2}. Add it in Setup (Object Manager, {2}, Fields, {1}), then save again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DuplicateActive</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: another active row uses the value; value, row name</shortDescription>
+        <value>{0} already has an active row, {1}. Only one active row can use it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DeployRefused</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused by Salesforce before it started</shortDescription>
+        <value>Salesforce did not accept the change, so nothing was saved. If BarnCRM was installed as a package, turn on Deploy Metadata from Non-Certified Package Versions via Apex in Setup (Apex Settings), then save again. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DeployFailed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log entry: the background save failed; row name, reason</shortDescription>
+        <value>The change to {0} was not saved: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DeployFailedNoReason</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log entry: the background save failed with no reason given</shortDescription>
+        <value>Salesforce gave no reason. Try again, and if it fails again, make the change in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_LoadError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the list could not be read</shortDescription>
+        <value>The list could not be read. Reload the page, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_SaveError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the save could not be started</shortDescription>
+        <value>The change could not be saved. Nothing was changed. Try again, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RelationshipTypes</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading for the relationship types list</shortDescription>
+        <value>Relationship types</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RelationshipTypesHelp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: what the relationship types list is for</shortDescription>
+        <value>What the other side of a relationship becomes. Add a choice to the Type list on a relationship in Setup first, and add both sides of a pair.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_PermissionRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the user lacks Manage BarnCRM Metadata</shortDescription>
+        <value>You need the BarnCRM Metadata Admin permission set to change custom metadata. Ask your administrator to add it.</value>
+    </labels>
+</CustomLabels>

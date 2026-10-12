@@ -70,7 +70,7 @@ them.
 ## Common mistakes
 
 - **Adding the type here before adding the choice in Setup.** The save is refused with
-  "Mentor is not a choice in the Type list on a relationship. Add it in Setup (Object
+  "Mentor is not a choice in the Type list on Relationship. Add it in Setup (Object
   Manager, Relationship, Fields, Type), then save again." Add the choice and save again.
 - **Adding only one side.** BarnCRM writes the reciprocal type on the other person, and
   reads that type's own row whenever the other person's side is saved. Add both rows (Mentor
