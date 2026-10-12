@@ -5383,6 +5383,25 @@ paths as R-R2); `filter` is an R-R2 filter document, or absent for every record;
 holds at most one entry, `direction` ASC or DESC; `limit` is 1 to 2,000 rows shown. The
 `version` key exists for the reason R-R2 gives.
 
+Advanced Find (C-36) adds three optional keys, still at version 1, so every earlier document
+reads unchanged:
+
+```
+  "related": [
+    { "object": "Gift__c", "field": "Household__c", "has": false,
+      "filter": { "version": 1, "conditions": [ ... ] } }
+  ],
+  "children": [
+    { "relationship": "Contacts", "fields": ["Name", "Email"], "limit": 10 }
+  ],
+  "aggregate": { "function": "sum", "field": "Amount__c", "groupBy": "Status__c" }
+```
+
+`related` holds at most two related-records conditions (R-SQ8), `children` at most two
+related record columns of 1 to 5 field paths and a `limit` of 1 to 10 (R-SQ8), and
+`aggregate` the last summary chosen (R-SQ9): `function` is `count`, `sum`, `min` or `max`,
+`field` is required except for `count`, and `groupBy` is optional.
+
 **R-SQ2 Compiled, never typed.** `QueryCompiler` turns a document into SOQL using only names
 taken from the running user's describe (`QueryFieldCatalog`): an object or field the user
 cannot see is refused with a message naming it. Every filter value is a bind variable, a
@@ -5406,6 +5425,48 @@ and write runs as the user.
 **R-SQ5 Permission.** Every Find action requires the `Find_And_Export_Records` custom
 permission, which opens the tool and grants no record access.
 
+**R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
+in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists
+what each accepts). The browser parses it into a query document and loads that document into
+the builder; the server never receives the text. Every check of R-SQ2 then applies to the
+document as to one built by hand, so there is one enforcement path (ADR-NEXT,
+`NEXT-typed-find-queries-are-parsed-into-the-query-document.md`). Text the parser cannot map
+onto the document, including anything R-R2 has no operator for, is refused before anything is
+sent.
+
+**R-SQ8 Related records.** A `related` entry names a child object and its lookup to the
+query's object; both come from the running user's describe, the lookup must be readable,
+filterable and point at the query's object, and the child object must be queryable. It
+compiles to `Id IN (SELECT lookup FROM child WHERE ...)`, or `NOT IN` when `has` is false,
+with the entry's R-R2 filter bound as any other (its own bind names), and is joined to the
+document's filter with AND. A `children` entry names a child relationship of the query's
+object, found in describe, and compiles to a subquery in the select list of the grid query
+and the export pages, newest first by Created Date, at most `limit` rows per record. Counts,
+bulk update selections and summaries ignore `children`.
+
+**R-SQ9 Summaries.** A summary compiles the document's object, filter and `related` entries to
+one aggregate query with `GROUP BY` the `groupBy` path (a groupable field, at most two lookups
+deep), and runs it in user mode. `sum` takes a number field, `min` and `max` a number, date or
+date and time field, each aggregatable. A summary is refused when more than 20,000 records
+match (counted first, at most 20,001), so the count and the aggregate stay inside one
+request's query rows, and shows at most 2,000 groups.
+
+**R-SQ10 Editing results.** A person who holds `Bulk_Update_Records` as well (R-BU6) may edit
+the results grid. A save sends at most 200 records, each an Id of the query's object and
+values for fields that pass R-BU4; each value is typed as a bulk update's set value is, and an
+empty value clears a field that may be empty. The records are read again as the person, a
+field whose value is unchanged is not written, and the rest are saved with
+`Database.update(records, false, AccessLevel.USER_MODE)`. Each save is one data job with
+Operation Update (R-BU1), committed and complete when the request ends, whose definition
+holds the query object, the record Ids as an R-R2 `in` condition, no changes and the count;
+one commit journal page holds an Updated or Failed entry per record (R-IJ3), so the save is
+listed and undone as a bulk update is (R-BU5).
+
+**R-SQ11 Excel export.** An Excel export reads exactly the pages of R-SQ3 and writes, in the
+browser, one sheet with a header row of column labels, numbers as numbers, dates and times as
+dates, and everything else as text. The workbook is written by BarnCRM's own module, with no
+third-party code (the same reasoning as ADR-0049).
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -5420,7 +5481,8 @@ permission, which opens the tool and grants no record access.
 - **Apex sharing reason:** `Shared_With_Find_Users`.
 - **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
 - **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
-  `FindController`, `SavedQuerySharingWriter`.
+  `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10).
+- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`.
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
@@ -5643,6 +5705,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
 | v0.7 | 2026-10-12 | C-35 bulk update (ADR-NEXT, `NEXT-bulk-update-runs-as-the-user-from-a-find-query.md`). New Section 29E, rules R-BU1 to R-BU6; no new object. `Import_Batch__c` gains `Operation__c` (Import, Update) and `Operation_JSON__c`, and Section 16's definition covers both kinds of data job. R-IJ2 and R-IJ3: the journal gains the Failed entry. BarnCRM Settings gains `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Update_Records` and permission set `BarnCRM_Bulk_Update`. |
 | v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-NEXT `NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
+| 1.x | 2026-10-12 | C-36 Advanced Find (ADR-NEXT, `NEXT-typed-find-queries-are-parsed-into-the-query-document.md`). No object, field or settings key added. R-SQ1 gains three optional keys at version 1 (`related`, `children`, `aggregate`). New rules R-SQ7 (typed queries parsed in the browser into the document), R-SQ8 (related-records conditions as semi-joins and anti-joins, related record columns as subqueries), R-SQ9 (summaries), R-SQ10 (editing results, journaled as an Update data job) and R-SQ11 (Excel export). New service `FindInlineEditService`. |
 
 ---
 ## 32. Entity ownership by package

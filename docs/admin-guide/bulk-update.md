@@ -23,6 +23,10 @@ you may edit. Your organization's validation rules, duplicate rules and automati
 record, as they do on any save. A record that is refused is listed with the reason; the rest
 still save.
 
+Values you change by editing Find's results table ([Find](find.md), section 7.6) are saved
+the same way, and each save is listed with the bulk updates on the **Bulk Update** tab, its
+run log starting "Edited in Find", with the same undo.
+
 ## 2. How to turn it on
 
 1. Bulk update needs two permissions: **Bulk Update Records**, and **Find and Export Records**,

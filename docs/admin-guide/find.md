@@ -11,18 +11,24 @@ rows to show, and press **Run**. The results appear in a table. You can then:
 - **Export to CSV**: every matching record, not only the rows on screen, up to the export
   limit set in BarnCRM Settings. The file is UTF-8 with a byte-order mark, so Excel opens
   names with accents correctly.
+- **Export to Excel**: the same rows as an Excel workbook (.xlsx).
 - **Save** the query under a name, to run it again next month.
 - **Share** a saved query, so everyone else who uses Find can open it.
+- **Summarize**: count, total, lowest or highest value, grouped by a field.
+- **Edit in the table**, if you may also bulk update: change values in the results and save
+  them, with an undo (section 7.6).
 
-Find never changes a record. Everything it shows, and everything it exports, is read with
-your own access: a record you cannot open, or a field you cannot see, is not in the results
-and is not offered as a column or a condition. A shared query works the same way for the
-person who opens it: they see the records their own access allows, which may be fewer than
-you see.
+Find changes a record only when you edit it in the table and press **Save**. Everything it
+shows, and everything it exports, is read with your own access: a record you cannot open, or
+a field you cannot see, is not in the results and is not offered as a column or a condition. A
+shared query works the same way for the person who opens it: they see the records their own
+access allows, which may be fewer than you see.
 
 Below the conditions, Find shows the query it will run, in Salesforce's query language
 (SOQL), read only. You never need to read it. It is there so someone who knows SOQL can check
-exactly what Find does, or copy it into another tool. Find does not accept typed SOQL.
+exactly what Find does, or copy it into another tool. Someone who prefers typing can type a
+query in the same language instead of building it (section 7.4); Find reads it into the
+builder and checks it exactly as if it had been built by hand.
 
 ## 2. How to turn it on
 
@@ -108,13 +114,102 @@ a value; the operators offered depend on the field:
 - **A date field shows the right day in the table but a condition seems a day off.** Date and
   time fields are compared in your own time zone, as Salesforce shows them.
 
-## 7. What Find does not do (yet)
+## 7. Advanced Find
 
-Typed SOQL, subqueries of child records ("households with no gifts"), totals and groupings,
-XLSX export, editing results in the table and exports run on the server are planned for a
-later release (C-36). To change many records at once, run a query and press **Bulk update**,
-shown to people who also hold the Bulk Update Records permission. See
-[Bulk update](bulk-update.md).
+### 7.1 Related records in conditions
+
+Under **Related records**, press **Add related records** to keep only the records that have,
+or do not have, related records matching conditions of their own. For example, on Account:
+
+- **Has related records**, **Gifts (Household)**, with the condition **Gift Date** is this
+  year: every household with a gift this year.
+- **Has no related records**, **Gifts (Household)**, with no conditions: every household that
+  has never given.
+
+The list offers each kind of record that points at the object, with the lookup it points
+through in brackets, because one object can point at another in more than one way. You can add
+two related-records conditions to a query; they are combined with the other conditions by AND.
+
+### 7.2 Related record columns
+
+Under **Related record columns**, choose a kind of related record and up to five of its
+fields, to show the most recent related records in one column. For example, on Account, the
+column **Contacts** with **Full Name** and **Email** shows each household's members as
+"Ana Ruiz, ana@example.org; Ben Ruiz, ben@example.org". A column shows at most 10 related
+records per row, newest first, and you can add two such columns. Exports write the same text.
+
+### 7.3 Summarize
+
+Press **Summarize** to count or total the matching records instead of listing them:
+
+1. Choose **Count of records**, **Total of**, **Lowest** or **Highest**, and for the last three
+   the number or date field to measure.
+2. Optional: choose **Group by**, a field such as **Status** or **Gift Date** (or a related
+   record's field, such as **Household > Billing City**). Leave it empty for one line.
+3. Press **Summarize**. A table shows one line per group, with the blank group shown as
+   "(blank)".
+
+Summaries use the same conditions and your own access. They cover at most 20,000 matching
+records and show at most 2,000 groups; for more, narrow the conditions or use a report.
+
+### 7.4 Typing a query
+
+Press **Type a query** to type or paste a query instead of building it, for example:
+
+```
+SELECT Name, BillingCity FROM Account
+WHERE BillingCity = 'Springfield' AND (Type = 'Household' OR Type = null)
+ORDER BY Name LIMIT 500
+```
+
+Press **Use this query**. Find reads the text into the builder (object, columns, conditions,
+sort and rows to show), and from there it is an ordinary Find query: it is checked against
+your access, it runs with every value kept apart from the query, and it can be saved and
+shared. Find never sends the text itself to Salesforce. **Type a query** starts with the query
+shown below the conditions, so you can change a built query as text, and the other way round.
+
+What a typed query may hold:
+
+| Part | What it accepts |
+|---|---|
+| `SELECT` | Fields and related fields (`Household__r.Name`), up to 20. Related record columns as `(SELECT Name, Amount__c FROM Gifts__r LIMIT 5)`. |
+| `FROM` | One object. |
+| `WHERE` | `=`, `!=`, `<`, `<=`, `>`, `>=`, `IN (...)`, `NOT IN (...)`, `= null`, `!= null`, `LIKE 'text%'` (starts with), `LIKE '%text%'` (contains), `THIS_YEAR`, `LAST_YEAR`, `LAST_N_DAYS:n`, with AND, OR, NOT and brackets. Brackets are needed where AND and OR are mixed. Related records as `Id IN (SELECT Household__c FROM Gift__c WHERE ...)` or `Id NOT IN (...)`, joined to the rest with AND. |
+| `ORDER BY` | One field, `ASC` or `DESC`. |
+| `LIMIT` | 1 to 2,000. |
+
+Anything else (GROUP BY, functions, other LIKE patterns, a second sort field) is refused with
+a message pointing at the words it could not read. Use **Summarize** for totals.
+
+### 7.5 Export to Excel
+
+**Export to Excel** reads the same rows as **Export to CSV**, up to the same export row limit,
+and downloads an Excel workbook with one sheet, a header row of column labels, numbers as
+numbers and dates as dates. A very large export can take a while to build in the browser; for
+more than a few tens of thousands of rows, CSV is faster.
+
+### 7.6 Editing in the table
+
+If you hold the **Bulk Update Records** permission as well as Find's, the columns you may edit
+show a pencil after a query runs. Double-click a cell (or press Enter on it), change the value,
+and press **Save** at the foot of the table. Find saves up to 200 changed records at a time.
+
+- Only the query object's own fields that a bulk update may change can be edited: not fields
+  of a related record, not formula or system fields, and not the fields BarnCRM keeps itself
+  ([Bulk update](bulk-update.md), section 4).
+- Each save runs with your access, and your organization's validation rules and automation
+  run, as on any save. A record that is refused is marked in the table with the reason; the
+  rest still save.
+- Each save is recorded like a bulk update. It appears on the **Bulk Update** tab under
+  **Recent bulk updates**, and can be undone there within the same window as an import. The
+  undo puts back each value nobody has changed since.
+
+## 8. What Find does not do (yet)
+
+Exports run on the server, for more rows than a browser can hold, are planned for a later
+release (C-36). Totals are a summary table, not a chart. To change many records to the same
+value at once, run a query and press **Bulk update**, shown to people who also hold the Bulk
+Update Records permission. See [Bulk update](bulk-update.md).
 
 ## Field reference
 
