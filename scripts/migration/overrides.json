@@ -1,0 +1,39 @@
+{
+  "skip": {
+    "Import_Row__c": "staged import rows: each import keeps them only until it commits, and their resolved Ids are not carried",
+    "Import_Journal__c": "import undo journal: undo cannot work once every record Id has changed, so the undo window ends at the move"
+  },
+  "upsert_keys": {
+    "Automation_Setting__c": "Automation_Name__c",
+    "Rollup_Definition__c": "Definition_Key__c",
+    "Receipt_Number_Sequence__c": "Series_Key__c"
+  },
+  "related": [
+    {
+      "object": "Task",
+      "link_field": "WhatId",
+      "fields": ["Subject", "Status", "Priority", "ActivityDate", "Description", "Type", "OwnerId", "WhoId"]
+    },
+    {
+      "object": "Event",
+      "link_field": "WhatId",
+      "fields": [
+        "Subject",
+        "StartDateTime",
+        "EndDateTime",
+        "IsAllDayEvent",
+        "Location",
+        "Description",
+        "Type",
+        "ShowAs",
+        "OwnerId",
+        "WhoId"
+      ]
+    },
+    {
+      "object": "ContentDocumentLink",
+      "link_field": "LinkedEntityId",
+      "fields": ["ContentDocumentId", "ShareType", "Visibility"]
+    }
+  ]
+}

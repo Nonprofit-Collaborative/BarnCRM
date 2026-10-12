@@ -45,8 +45,11 @@ time, which is safe because the mapping holds only packaged custom names.
 - `related`: standard records hung on packaged records that uninstall deletes with them: tasks
   and events (by `WhatId`) and file links (by `LinkedEntityId`).
 
-A new object or field needs no change here. A new object that a post-install script seeds needs
-an `upsert_keys` row; the test `test_seeded_objects_have_upsert_keys` fails until it has one.
+A new object or field needs no change here. A new object that a post-install script seeds (a
+`*PostInstall` class) needs an `upsert_keys` row naming a unique external Id field, or reimport
+adds a second copy of each seeded record. Nothing detects a missing row automatically: a review
+of any post-install change checks it. `build_mapping.py` refuses a key that is not a unique
+external Id.
 
 ## How reimport works
 

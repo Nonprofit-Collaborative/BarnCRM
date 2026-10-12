@@ -145,8 +145,11 @@ Salesforce org is needed for this job. Steps:
    silently, which is a defect only an org run finds (ADR-0035). This ran because C-15 had
    been writing one side of every relationship since it merged: the reciprocal upkeep read
    its own shipped default as false.
-17. A grep check that fails the build if any tracked file contains an em dash character.
-18. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
+17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
+   (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
+   mapping from the real package source, so a new object or field that breaks it fails here.
+18. A grep check that fails the build if any tracked file contains an em dash character.
+19. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
    The results are uploaded as a build artifact (`code-analyzer-results.html` and
    `code-analyzer-results.json`) even if the job fails, so anyone can download and read
