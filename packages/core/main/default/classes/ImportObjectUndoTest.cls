@@ -16,7 +16,9 @@ private class ImportObjectUndoTest {
 
     @TestSetup
     static void setUp() {
-        TestDataFactory.defaultSettings();
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+        }
     }
 
     private static User admin() {
@@ -107,133 +109,143 @@ private class ImportObjectUndoTest {
 
     @IsTest
     static void undoOfTwoHundredUpsertRowsDeletesWhatTheyCreatedAndPutsBackWhatTheyChanged() {
-        System.runAs(admin()) {
-            List<Duplicate_Dismissal__c> existing = dismissals(MANY / 2, 'Old');
-            commitUpsert(rowsFor(MANY, 'New'));
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                List<Duplicate_Dismissal__c> existing = dismissals(MANY / 2, 'Old');
+                commitUpsert(rowsFor(MANY, 'New'));
 
-            Test.startTest();
-            ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
-            undo(view.total);
-            Test.stopTest();
+                Test.startTest();
+                ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
+                undo(view.total);
+                Test.stopTest();
 
-            Assert.isTrue(view.allowed, 'A committed one-object import can be undone.');
-            Assert.areEqual(MANY / 2, view.total, 'The records it created are confirmed.');
-            Assert.areEqual(MANY / 2, view.updates, 'The values it changed are counted.');
-            Assert.areEqual(1, view.others.size(), 'Under one object.');
-            Assert.areEqual(
-                Duplicate_Dismissal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                    .getLabelPlural(),
-                view.others[0].label,
-                'Labelled as the org labels it.'
-            );
-            Assert.areEqual(
-                MANY / 2,
-                [SELECT COUNT() FROM Duplicate_Dismissal__c],
-                'Only the records that were there before are left: ' + undoJournal()
-            );
-            Assert.areEqual(
-                MANY / 2,
-                [
-                    SELECT COUNT()
-                    FROM Duplicate_Dismissal__c
-                    WHERE Id IN :existing AND Reason__c = 'Old'
-                ],
-                'And each holds its value from before.'
-            );
+                Assert.isTrue(view.allowed, 'A committed one-object import can be undone.');
+                Assert.areEqual(MANY / 2, view.total, 'The records it created are confirmed.');
+                Assert.areEqual(MANY / 2, view.updates, 'The values it changed are counted.');
+                Assert.areEqual(1, view.others.size(), 'Under one object.');
+                Assert.areEqual(
+                    Duplicate_Dismissal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getLabelPlural(),
+                    view.others[0].label,
+                    'Labelled as the org labels it.'
+                );
+                Assert.areEqual(
+                    MANY / 2,
+                    [SELECT COUNT() FROM Duplicate_Dismissal__c],
+                    'Only the records that were there before are left: ' + undoJournal()
+                );
+                Assert.areEqual(
+                    MANY / 2,
+                    [
+                        SELECT COUNT()
+                        FROM Duplicate_Dismissal__c
+                        WHERE Id IN :existing AND Reason__c = 'Old'
+                    ],
+                    'And each holds its value from before.'
+                );
+            }
+
         }
     }
 
     @IsTest
     static void aJournaledRecordTheCommitterDidNotCreateDuringTheCommitIsKept() {
-        Duplicate_Dismissal__c someoneElses = dismissals(1, 'Theirs')[0];
-        User maria = admin();
-        System.runAs(maria) {
-            commitUpsert(
-                new List<Map<String, String>>{
-                    new Map<String, String>{ 'Pair Key' => 'Mine', 'Reason' => 'New' }
-                }
-            );
-            // A journal entry naming somebody else's record, as a tampered page would.
-            ImportJournalService.write(
-                batch.Id,
-                ImportJournalService.PHASE_CREATED,
-                new List<Map<String, Object>>{
-                    ImportJournalService.created('Duplicate_Dismissal__c', someoneElses.Id, 9)
-                }
-            );
+        System.runAs(TestUsers.admin()) {
+            Duplicate_Dismissal__c someoneElses = dismissals(1, 'Theirs')[0];
+            User maria = admin();
+            System.runAs(maria) {
+                commitUpsert(
+                    new List<Map<String, String>>{
+                        new Map<String, String>{ 'Pair Key' => 'Mine', 'Reason' => 'New' }
+                    }
+                );
+                // A journal entry naming somebody else's record, as a tampered page would.
+                ImportJournalService.write(
+                    batch.Id,
+                    ImportJournalService.PHASE_CREATED,
+                    new List<Map<String, Object>>{
+                        ImportJournalService.created('Duplicate_Dismissal__c', someoneElses.Id, 9)
+                    }
+                );
 
-            Test.startTest();
-            undo(ImportUndoService.preview(batch.Id).total);
-            Test.stopTest();
+                Test.startTest();
+                undo(ImportUndoService.preview(batch.Id).total);
+                Test.stopTest();
+            }
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Id = :someoneElses.Id],
+                'Somebody else record is never deleted by a journal entry.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Pair_Key__c = 'Mine'],
+                'The record the import created is.'
+            );
+            Assert.isTrue(
+                undoJournal().contains(Label.Core_Import_UndoKeptNotCreatedByImport.left(40)),
+                'The kept record is journaled with why.'
+            );
         }
-
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Id = :someoneElses.Id],
-            'Somebody else record is never deleted by a journal entry.'
-        );
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Pair_Key__c = 'Mine'],
-            'The record the import created is.'
-        );
-        Assert.isTrue(
-            undoJournal().contains(Label.Core_Import_UndoKeptNotCreatedByImport.left(40)),
-            'The kept record is journaled with why.'
-        );
     }
 
     @IsTest
     static void aCreatedRecordSomebodyEditedSinceIsKept() {
-        User maria = admin();
-        System.runAs(maria) {
-            commitUpsert(rowsFor(2, 'New'));
-        }
-        // Somebody other than the committer edits one record after the commit.
-        Duplicate_Dismissal__c edited = [
-            SELECT Id
-            FROM Duplicate_Dismissal__c
-            WHERE Pair_Key__c = 'K0'
-        ];
-        update new Duplicate_Dismissal__c(Id = edited.Id, Reason__c = 'Corrected');
+        System.runAs(TestUsers.admin()) {
+            User maria = admin();
+            System.runAs(maria) {
+                commitUpsert(rowsFor(2, 'New'));
+            }
+            // Somebody other than the committer edits one record after the commit.
+            Duplicate_Dismissal__c edited = [
+                SELECT Id
+                FROM Duplicate_Dismissal__c
+                WHERE Pair_Key__c = 'K0'
+            ];
+            update new Duplicate_Dismissal__c(Id = edited.Id, Reason__c = 'Corrected');
 
-        System.runAs(maria) {
-            Test.startTest();
-            undo(ImportUndoService.preview(batch.Id).total);
-            Test.stopTest();
-        }
+            System.runAs(maria) {
+                Test.startTest();
+                undo(ImportUndoService.preview(batch.Id).total);
+                Test.stopTest();
+            }
 
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Id = :edited.Id],
-            'An edited record is kept.'
-        );
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Pair_Key__c = 'K1'],
-            'The other is deleted.'
-        );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Id = :edited.Id],
+                'An edited record is kept.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Pair_Key__c = 'K1'],
+                'The other is deleted.'
+            );
+        }
     }
 
     @IsTest
     static void aSecondRunCountsWhatIsAlreadyGoneAsGone() {
-        System.runAs(admin()) {
-            commitUpsert(rowsFor(3, 'New'));
-            Integer total = ImportUndoService.preview(batch.Id).total;
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                commitUpsert(rowsFor(3, 'New'));
+                Integer total = ImportUndoService.preview(batch.Id).total;
 
-            Test.startTest();
-            undo(total);
-            undo(total);
-            ImportUndoService.finish(batch.Id, total, 0, false, total);
-            Test.stopTest();
+                Test.startTest();
+                undo(total);
+                undo(total);
+                ImportUndoService.finish(batch.Id, total, 0, false, total);
+                Test.stopTest();
 
-            Import_Batch__c finished = ImportBatchSelector.selectById(batch.Id);
-            Assert.areEqual(0, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'All gone.');
-            Assert.areEqual(
-                ImportBatchService.STATUS_UNDONE,
-                finished.Status__c,
-                'A second run is safe and the undo ends Undone.'
-            );
+                Import_Batch__c finished = ImportBatchSelector.selectById(batch.Id);
+                Assert.areEqual(0, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'All gone.');
+                Assert.areEqual(
+                    ImportBatchService.STATUS_UNDONE,
+                    finished.Status__c,
+                    'A second run is safe and the undo ends Undone.'
+                );
+            }
+
         }
     }
 }

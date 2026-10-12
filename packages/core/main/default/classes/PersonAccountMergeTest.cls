@@ -12,128 +12,137 @@
 private class PersonAccountMergeTest {
     @IsTest
     static void theSurvivorTakesTheMergedPersonsHouseholdAndItsPrimary() {
-        settingsThatTidyEmptyHouseholds();
-        overridePeople();
-        Account ana = new Account(Name = 'Ana Okafor');
-        Account bea = new Account(Name = 'Bea Lindqvist');
-        insert new List<Account>{ ana, bea };
-        Map<Id, Id> contactBehind = contactsBehind(ana, bea);
-        Account hers = household('The Okafor Household');
-        Account theirs = household('The Lindqvist Household');
-        insert new List<Household_Member__c>{
-            membership(hers.Id, ana.Id, true),
-            membership(theirs.Id, bea.Id, true)
-        };
+        System.runAs(TestUsers.admin()) {
+            settingsThatTidyEmptyHouseholds();
+            overridePeople();
+            Account ana = new Account(Name = 'Ana Okafor');
+            Account bea = new Account(Name = 'Bea Lindqvist');
+            insert new List<Account>{ ana, bea };
+            Map<Id, Id> contactBehind = contactsBehind(ana, bea);
+            Account hers = household('The Okafor Household');
+            Account theirs = household('The Lindqvist Household');
+            insert new List<Household_Member__c>{
+                membership(hers.Id, ana.Id, true),
+                membership(theirs.Id, bea.Id, true)
+            };
 
-        Test.startTest();
-        Database.merge(ana, bea.Id);
-        Test.stopTest();
+            Test.startTest();
+            Database.merge(ana, bea.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            2,
-            [SELECT COUNT() FROM Account WHERE Id IN :new List<Id>{ hers.Id, theirs.Id }],
-            'The household the merge left empty is kept, although the org tidies empty ones'
-        );
-        assertOnePrimaryMirrored(hers.Id, ana.Id, contactBehind.get(ana.Id));
-        assertOnePrimaryMirrored(theirs.Id, ana.Id, contactBehind.get(ana.Id));
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Account WHERE Id IN :new List<Id>{ hers.Id, theirs.Id }],
+                'The household the merge left empty is kept, although the org tidies empty ones'
+            );
+            assertOnePrimaryMirrored(hers.Id, ana.Id, contactBehind.get(ana.Id));
+            assertOnePrimaryMirrored(theirs.Id, ana.Id, contactBehind.get(ana.Id));
+        }
     }
 
     @IsTest
     static void aSurvivorAlreadyInTheHouseholdBecomesItsPrimary() {
-        settingsThatTidyEmptyHouseholds();
-        overridePeople();
-        Account ana = new Account(Name = 'Ana Okafor');
-        Account bea = new Account(Name = 'Bea Lindqvist');
-        insert new List<Account>{ ana, bea };
-        Map<Id, Id> contactBehind = contactsBehind(ana, bea);
-        Account theirs = household('The Lindqvist Household');
-        insert new List<Household_Member__c>{
-            membership(theirs.Id, bea.Id, true),
-            membership(theirs.Id, ana.Id, false)
-        };
+        System.runAs(TestUsers.admin()) {
+            settingsThatTidyEmptyHouseholds();
+            overridePeople();
+            Account ana = new Account(Name = 'Ana Okafor');
+            Account bea = new Account(Name = 'Bea Lindqvist');
+            insert new List<Account>{ ana, bea };
+            Map<Id, Id> contactBehind = contactsBehind(ana, bea);
+            Account theirs = household('The Lindqvist Household');
+            insert new List<Household_Member__c>{
+                membership(theirs.Id, bea.Id, true),
+                membership(theirs.Id, ana.Id, false)
+            };
 
-        Test.startTest();
-        Database.merge(ana, bea.Id);
-        Test.stopTest();
+            Test.startTest();
+            Database.merge(ana, bea.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Household_Member__c WHERE Household__c = :theirs.Id],
-            'The survivor is not given a second row in a household they are already in'
-        );
-        assertOnePrimaryMirrored(theirs.Id, ana.Id, contactBehind.get(ana.Id));
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Household_Member__c WHERE Household__c = :theirs.Id],
+                'The survivor is not given a second row in a household they are already in'
+            );
+            assertOnePrimaryMirrored(theirs.Id, ana.Id, contactBehind.get(ana.Id));
+        }
     }
 
     @IsTest
     static void aMergeRecalculatesTheSurvivorsTotalsOnly() {
-        settingsThatTidyEmptyHouseholds();
-        overridePeople();
-        Account ana = new Account(Name = 'Ana Okafor');
-        Account bea = new Account(Name = 'Bea Lindqvist');
-        insert new List<Account>{ ana, bea };
-        Map<Id, Id> contactBehind = contactsBehind(ana, bea);
-        // A real-time total on the person contact, the record a gift names a person by.
-        insert new Rollup_Definition__c(
-            Name = 'Person total',
-            Definition_Key__c = 'Core_Person_Merge_Live',
-            Source_Object__c = 'Household_Member__c',
-            Target_Object__c = 'Contact',
-            Relationship_Path__c = 'Contact__c',
-            Aggregate__c = 'COUNT',
-            Target_Field__c = 'Member_Count__c',
-            Mode__c = RollupService.MODE_BOTH,
-            Fiscal_Year_Aware__c = false,
-            Active__c = true
-        );
+        System.runAs(TestUsers.admin()) {
+            settingsThatTidyEmptyHouseholds();
+            overridePeople();
+            Account ana = new Account(Name = 'Ana Okafor');
+            Account bea = new Account(Name = 'Bea Lindqvist');
+            insert new List<Account>{ ana, bea };
+            Map<Id, Id> contactBehind = contactsBehind(ana, bea);
+            // A real-time total on the person contact, the record a gift names a person by.
+            insert new Rollup_Definition__c(
+                Name = 'Person total',
+                Definition_Key__c = 'Core_Person_Merge_Live',
+                Source_Object__c = 'Household_Member__c',
+                Target_Object__c = 'Contact',
+                Relationship_Path__c = 'Contact__c',
+                Aggregate__c = 'COUNT',
+                Target_Field__c = 'Member_Count__c',
+                Mode__c = RollupService.MODE_BOTH,
+                Fiscal_Year_Aware__c = false,
+                Active__c = true
+            );
 
-        Test.startTest();
-        Database.merge(ana, bea.Id);
-        Test.stopTest();
+            Test.startTest();
+            Database.merge(ana, bea.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            new Set<Id>{ contactBehind.get(ana.Id) },
-            RollupService.lastParentIds,
-            'Only the survivor person contact is recalculated, not every record the total covers'
-        );
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM AsyncApexJob WHERE JobType = 'BatchApex'],
-            'A merge starts no batch job'
-        );
+            Assert.areEqual(
+                new Set<Id>{ contactBehind.get(ana.Id) },
+                RollupService.lastParentIds,
+                'Only the survivor person contact is recalculated, not every record the total covers'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM AsyncApexJob WHERE JobType = 'BatchApex'],
+                'A merge starts no batch job'
+            );
+        }
     }
 
     @IsTest
     static void realPersonAccountsKeepTheirHouseholdsAndPrimaryThroughAMerge() {
-        Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
-        if (personTypes.isEmpty()) {
-            // Proven on every shape by the tests above; this one needs real person accounts.
-            return;
+        System.runAs(TestUsers.admin()) {
+            Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
+            if (personTypes.isEmpty()) {
+                // Proven on every shape by the tests above; this one needs real person accounts.
+                return;
+            }
+            settingsThatTidyEmptyHouseholds();
+            Id personType = new List<Id>(personTypes)[0];
+            Account ana = (Account) realPerson(personType, 'Ana', 'Okafor');
+            Account bea = (Account) realPerson(personType, 'Bea', 'Lindqvist');
+            insert new List<Account>{ ana, bea };
+            Account hers = household('The Okafor Household');
+            Account theirs = household('The Lindqvist Household');
+            insert new List<Household_Member__c>{
+                membership(hers.Id, ana.Id, true),
+                membership(theirs.Id, bea.Id, true)
+            };
+            Id anaContact = PersonRecordSelector.getPersonContactIds(new Set<Id>{ ana.Id })
+                .get(ana.Id);
+
+            Test.startTest();
+            Database.merge(ana, bea.Id);
+            Test.stopTest();
+
+            Assert.isNotNull(anaContact, 'A real person account has a person contact');
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Account WHERE Id IN :new List<Id>{ hers.Id, theirs.Id }],
+                'The household the merge left empty is kept'
+            );
+            assertOnePrimaryMirrored(hers.Id, ana.Id, anaContact);
+            assertOnePrimaryMirrored(theirs.Id, ana.Id, anaContact);
         }
-        settingsThatTidyEmptyHouseholds();
-        Id personType = new List<Id>(personTypes)[0];
-        Account ana = (Account) realPerson(personType, 'Ana', 'Okafor');
-        Account bea = (Account) realPerson(personType, 'Bea', 'Lindqvist');
-        insert new List<Account>{ ana, bea };
-        Account hers = household('The Okafor Household');
-        Account theirs = household('The Lindqvist Household');
-        insert new List<Household_Member__c>{
-            membership(hers.Id, ana.Id, true),
-            membership(theirs.Id, bea.Id, true)
-        };
-        Id anaContact = PersonRecordSelector.getPersonContactIds(new Set<Id>{ ana.Id }).get(ana.Id);
-
-        Test.startTest();
-        Database.merge(ana, bea.Id);
-        Test.stopTest();
-
-        Assert.isNotNull(anaContact, 'A real person account has a person contact');
-        Assert.areEqual(
-            2,
-            [SELECT COUNT() FROM Account WHERE Id IN :new List<Id>{ hers.Id, theirs.Id }],
-            'The household the merge left empty is kept'
-        );
-        assertOnePrimaryMirrored(hers.Id, ana.Id, anaContact);
-        assertOnePrimaryMirrored(theirs.Id, ana.Id, anaContact);
     }
 
     // ------------------------------------------------------------------------------ helpers

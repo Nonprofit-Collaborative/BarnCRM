@@ -34,76 +34,82 @@ private class PermissionSetAssignmentSelectorTest {
 
     @IsTest
     static void selectByGroupIdsListsThePeopleInTheRole() {
-        PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        insert new PermissionSetAssignment(
-            AssigneeId = david.Id,
-            PermissionSetGroupId = groupRecord.Id
-        );
-        PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
+        System.runAs(TestUsers.admin()) {
+            PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            insert new PermissionSetAssignment(
+                AssigneeId = david.Id,
+                PermissionSetGroupId = groupRecord.Id
+            );
+            PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
 
-        Test.startTest();
-        List<PermissionSetAssignment> assignments = selector.selectByGroupIds(
-            new Set<Id>{ groupRecord.Id }
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<PermissionSetAssignment> assignments = selector.selectByGroupIds(
+                new Set<Id>{ groupRecord.Id }
+            );
+            Test.stopTest();
 
-        Set<Id> assignees = new Set<Id>();
-        for (PermissionSetAssignment assignment : assignments) {
-            assignees.add(assignment.AssigneeId);
+            Set<Id> assignees = new Set<Id>();
+            for (PermissionSetAssignment assignment : assignments) {
+                assignees.add(assignment.AssigneeId);
+            }
+            Assert.isTrue(
+                assignees.contains(david.Id),
+                'David should be listed under the role he holds.'
+            );
         }
-        Assert.isTrue(
-            assignees.contains(david.Id),
-            'David should be listed under the role he holds.'
-        );
     }
 
     @IsTest
     static void selectByGroupIdsAndUserIdsFindsAnExistingAssignment() {
-        PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        insert new PermissionSetAssignment(
-            AssigneeId = david.Id,
-            PermissionSetGroupId = groupRecord.Id
-        );
-        PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
+        System.runAs(TestUsers.admin()) {
+            PermissionSetGroup groupRecord = TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            insert new PermissionSetAssignment(
+                AssigneeId = david.Id,
+                PermissionSetGroupId = groupRecord.Id
+            );
+            PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
 
-        Test.startTest();
-        List<PermissionSetAssignment> found = selector.selectByGroupIdsAndUserIds(
-            new Set<Id>{ groupRecord.Id },
-            new Set<Id>{ david.Id }
-        );
-        Integer count = selector.countActiveAssignees(groupRecord.Id);
-        Test.stopTest();
+            Test.startTest();
+            List<PermissionSetAssignment> found = selector.selectByGroupIdsAndUserIds(
+                new Set<Id>{ groupRecord.Id },
+                new Set<Id>{ david.Id }
+            );
+            Integer count = selector.countActiveAssignees(groupRecord.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            found.size(),
-            'The one assignment linking David to the role should be found.'
-        );
-        Assert.areEqual(1, count, 'One active person holds the role.');
+            Assert.areEqual(
+                1,
+                found.size(),
+                'The one assignment linking David to the role should be found.'
+            );
+            Assert.areEqual(1, count, 'One active person holds the role.');
+        }
     }
 
     @IsTest
     static void emptyInputQueriesNothing() {
-        PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
+        System.runAs(TestUsers.admin()) {
+            PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
 
-        Test.startTest();
-        List<PermissionSetAssignment> byGroup = selector.selectByGroupIds(new Set<Id>());
-        List<PermissionSetAssignment> byBoth = selector.selectByGroupIdsAndUserIds(
-            new Set<Id>(),
-            new Set<Id>()
-        );
-        Integer count = selector.countActiveAssignees(null);
-        Test.stopTest();
+            Test.startTest();
+            List<PermissionSetAssignment> byGroup = selector.selectByGroupIds(new Set<Id>());
+            List<PermissionSetAssignment> byBoth = selector.selectByGroupIdsAndUserIds(
+                new Set<Id>(),
+                new Set<Id>()
+            );
+            Integer count = selector.countActiveAssignees(null);
+            Test.stopTest();
 
-        Assert.areEqual(0, byGroup.size(), 'Asking about no groups should return nothing.');
-        Assert.areEqual(
-            0,
-            byBoth.size(),
-            'Asking about no groups and no people should return nothing.'
-        );
-        Assert.areEqual(0, count, 'Counting nobody should return zero without querying.');
+            Assert.areEqual(0, byGroup.size(), 'Asking about no groups should return nothing.');
+            Assert.areEqual(
+                0,
+                byBoth.size(),
+                'Asking about no groups and no people should return nothing.'
+            );
+            Assert.areEqual(0, count, 'Counting nobody should return zero without querying.');
+        }
     }
 
     /**

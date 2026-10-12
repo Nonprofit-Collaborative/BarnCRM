@@ -38,65 +38,75 @@ private class InteractionNoteTest {
 
     @IsTest
     static void noteOnAPersonIsClosedAndShowsOnTheirHousehold() {
-        Contact person = personWithHousehold();
-        Assert.isNotNull(person.AccountId, 'Contact mode gives the person a household (R-C1).');
+        System.runAs(TestUsers.admin()) {
+            Contact person = personWithHousehold();
+            Assert.isNotNull(person.AccountId, 'Contact mode gives the person a household (R-C1).');
 
-        Test.startTest();
-        insert note(person.Id, null, 'Coffee');
-        Test.stopTest();
+            Test.startTest();
+            insert note(person.Id, null, 'Coffee');
+            Test.stopTest();
 
-        Task saved = [SELECT IsClosed, AccountId, ActivityDate FROM Task WHERE WhoId = :person.Id];
-        Assert.isTrue(saved.IsClosed, 'A note is history, not a to-do (R-IN1).');
-        Assert.areEqual(
-            person.AccountId,
-            saved.AccountId,
-            'The note shows on the household (R-IN3).'
-        );
-        Assert.areEqual(
-            Date.today().addDays(-3),
-            saved.ActivityDate,
-            'The note keeps the day it happened.'
-        );
+            Task saved = [
+                SELECT IsClosed, AccountId, ActivityDate
+                FROM Task
+                WHERE WhoId = :person.Id
+            ];
+            Assert.isTrue(saved.IsClosed, 'A note is history, not a to-do (R-IN1).');
+            Assert.areEqual(
+                person.AccountId,
+                saved.AccountId,
+                'The note shows on the household (R-IN3).'
+            );
+            Assert.areEqual(
+                Date.today().addDays(-3),
+                saved.ActivityDate,
+                'The note keeps the day it happened.'
+            );
+        }
     }
 
     @IsTest
     static void noteOnAHouseholdNamesTheChosenPerson() {
-        Contact person = personWithHousehold();
+        System.runAs(TestUsers.admin()) {
+            Contact person = personWithHousehold();
 
-        Test.startTest();
-        insert note(person.Id, person.AccountId, 'Visit');
-        Test.stopTest();
+            Test.startTest();
+            insert note(person.Id, person.AccountId, 'Visit');
+            Test.stopTest();
 
-        Task saved = [SELECT WhatId, AccountId, IsClosed FROM Task WHERE WhoId = :person.Id];
-        Assert.areEqual(
-            person.AccountId,
-            saved.WhatId,
-            'The note is on the household it was logged on.'
-        );
-        Assert.areEqual(person.AccountId, saved.AccountId, 'The household timeline shows it.');
-        Assert.isTrue(saved.IsClosed, 'A note is history, not a to-do (R-IN1).');
+            Task saved = [SELECT WhatId, AccountId, IsClosed FROM Task WHERE WhoId = :person.Id];
+            Assert.areEqual(
+                person.AccountId,
+                saved.WhatId,
+                'The note is on the household it was logged on.'
+            );
+            Assert.areEqual(person.AccountId, saved.AccountId, 'The household timeline shows it.');
+            Assert.isTrue(saved.IsClosed, 'A note is history, not a to-do (R-IN1).');
+        }
     }
 
     @IsTest
     static void twoHundredNotesSaveTogether() {
-        Contact person = personWithHousehold();
-        List<Task> notes = new List<Task>();
-        for (Integer i = 0; i < 200; i++) {
-            notes.add(note(person.Id, null, 'Call ' + i));
+        System.runAs(TestUsers.admin()) {
+            Contact person = personWithHousehold();
+            List<Task> notes = new List<Task>();
+            for (Integer i = 0; i < 200; i++) {
+                notes.add(note(person.Id, null, 'Call ' + i));
+            }
+
+            Test.startTest();
+            insert notes;
+            Test.stopTest();
+
+            Assert.areEqual(
+                200,
+                [
+                    SELECT COUNT()
+                    FROM Task
+                    WHERE WhoId = :person.Id AND IsClosed = TRUE AND AccountId = :person.AccountId
+                ],
+                'Every note is saved closed and on the household; nothing packaged runs on Task (R-IN4).'
+            );
         }
-
-        Test.startTest();
-        insert notes;
-        Test.stopTest();
-
-        Assert.areEqual(
-            200,
-            [
-                SELECT COUNT()
-                FROM Task
-                WHERE WhoId = :person.Id AND IsClosed = TRUE AND AccountId = :person.AccountId
-            ],
-            'Every note is saved closed and on the household; nothing packaged runs on Task (R-IN4).'
-        );
     }
 }
