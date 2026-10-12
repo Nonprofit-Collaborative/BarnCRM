@@ -125,11 +125,18 @@ private class OpportunityMirrorCopyTest {
 
     @IsTest
     static void aPersonHeldAsAnAccountIsThePrimaryContact() {
-        Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
+        Set<Id> personTypeIds = OrgShapeSelector.personTypeRecordTypeIds();
+        // IsActive exists on RecordType in every org; an inactive type cannot be inserted against.
+        List<RecordType> personTypes = [
+            SELECT Id
+            FROM RecordType
+            WHERE Id IN :personTypeIds AND IsActive = TRUE
+            LIMIT 1
+        ];
         if (personTypes.isEmpty() || !OpportunityMirrorService.isAvailable()) {
             return; // An org without person accounts has no such path to prove.
         }
-        SObject person = new Account(RecordTypeId = new List<Id>(personTypes)[0]);
+        SObject person = new Account(RecordTypeId = personTypes[0].Id);
         person.put('LastName', 'Okafor');
         insert person;
         Id personContactId = (Id) Database.query(
