@@ -267,13 +267,27 @@ public with sharing class HealthCheckSettingsChecks {
             );
     }
 
+    /**
+     * How many new Error Log entries the finding counts before it says "N or more" instead. A
+     * flooded Error Log would otherwise spend a query row per entry, and past the transaction's
+     * row limit the whole Health Check page fails (dynamic-apex.md, "Cap every count and read").
+     */
+    @TestVisible
+    private static Integer errorLogCap = 1000;
+
     private static HealthCheckService.Finding errorLogFinding() {
-        Integer newErrors = ErrorLogCountSelector.countNew();
+        Integer newErrors = ErrorLogCountSelector.countNewUpTo(errorLogCap);
         if (newErrors <= 0) {
             return null;
         }
 
-        List<Object> count = new List<Object>{ String.valueOf(newErrors) };
+        String counted = newErrors > errorLogCap
+            ? String.format(
+                  System.Label.Core_HealthCheck_CountOrMore,
+                  new List<Object>{ errorLogCap.format() }
+              )
+            : newErrors.format();
+        List<Object> count = new List<Object>{ counted };
         return new HealthCheckService.Finding(
                 'error_log_new',
                 String.format(System.Label.Core_HealthCheck_ErrorLogTitle, count),

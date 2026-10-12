@@ -14,8 +14,10 @@
  * 1. `FeatureManagement.checkPermission` is re-checked here, not only in the controller, so no
  *    caller can reach the write without the permission.
  * 2. Only fields that exist on the settings object and are named by a shipped Setting Definition
- *    row have been put on the record, and their values have already been coerced and range
- *    checked by `SettingsService`.
+ *    row are written, only the ones whose value changed, and their values have already been
+ *    coerced and range checked by `SettingsService`. The write itself goes through
+ *    `OrgSettingsSystemWriter`, which updates just those keys on the locked stored record, so
+ *    a key another person saved in the meantime is not written back from a stale copy.
  * 3. Nothing else is written in system mode. The `Setting_Change__c` audit records are a normal
  *    custom object and stay in user mode, so an org that has locked audit records down keeps
  *    that control.
@@ -31,15 +33,22 @@ public with sharing class SettingsWriter {
     }
 
     /**
-     * Saves the org-level settings record. The caller has already validated every value on it.
+     * Saves the changed keys on the org-level record of a settings object. The caller has
+     * already validated every value, and read `stored` through
+     * `OrgSettingsSystemWriter.lockStored(type)` in this transaction (null when the org has no
+     * record yet).
      */
-    public static void saveOrgDefault(SObject record) {
-        if (record == null) {
+    public static void saveOrgDefault(
+        Schema.SObjectType type,
+        SObject stored,
+        Map<Schema.SObjectField, Object> changed
+    ) {
+        if (changed == null || changed.isEmpty()) {
             return;
         }
         if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
             throw new PermissionException(System.Label.Core_Settings_PermissionRequiredError);
         }
-        Database.upsert(record, AccessLevel.SYSTEM_MODE);
+        OrgSettingsSystemWriter.saveOver(type, stored, changed);
     }
 }
