@@ -2,6 +2,7 @@
  * The mapping document: parsing, the entity and attribute halves of a target, and the check
  * that refuses a mapping which identifies nobody.
  */
+// runs-as: deploying user (pure logic: parses and checks a mapping document, no DML or SOQL)
 @IsTest
 private class ImportMappingTest {
     @IsTest

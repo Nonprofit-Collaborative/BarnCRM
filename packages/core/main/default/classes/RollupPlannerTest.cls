@@ -2,6 +2,7 @@
  * The planner of BarnCRM's own rollup engine: one pass per target entity, definitions that read
  * the same rows sharing one query, and broken definitions refused one by one (rollup proposal S5).
  */
+// runs-as: deploying user (pure logic: plans rollup definitions built in memory, no DML or SOQL)
 @IsTest
 private class RollupPlannerTest {
     private static Rollup_Definition__c fromChildren(

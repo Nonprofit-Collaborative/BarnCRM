@@ -2,6 +2,7 @@
  * The calculator of BarnCRM's own rollup engine, piece by piece (rollup proposal S5). The whole
  * pass is tested end to end by `RollupEngineTest`.
  */
+// runs-as: deploying user (pure logic: tallies values in memory, no DML or SOQL)
 @IsTest
 private class RollupAggregatorTest {
     @IsTest

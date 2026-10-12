@@ -5,6 +5,7 @@
  * here has run. They are written against the format the canonical model states and the behaviour
  * the class documents.
  */
+// runs-as: deploying user (pure logic: parses a filter document, no DML or SOQL)
 @IsTest
 private class RollupFilterParserTest {
     @IsTest

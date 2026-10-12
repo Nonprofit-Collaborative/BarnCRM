@@ -2,6 +2,7 @@
  * A module's protected objects reach Core's protected list through the extension seam, and a
  * broken extension is left out without stopping anything (canonical model R-IT14).
  */
+// runs-as: deploying user (pure logic: resolves extension classes by name and reads describe, no DML or SOQL)
 @IsTest
 private class DataProtectionExtensionsTest {
     private class ProtectsDismissals implements DataProtectionExtension {
