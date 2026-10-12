@@ -5411,6 +5411,17 @@ permission, which opens the tool and grants no record access.
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
 
+**R-SQ6 Data hygiene copies (C-28).** The Data Hygiene tab builds each check's query document
+in code when it is counted or opened, from schema tokens and the org's membership mode; no
+check is stored in the package. Its count is `SELECT COUNT()` over that same document, bound
+and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved Query owned by
+the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
+own saved query of that name if there is one. Nothing else about Saved Query changes
+(ADR-NEXT, `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+
+- **Services:** `DataHygieneService`, `DataHygieneController`. **UI:** the Data Hygiene tab
+  (app page `Data_Hygiene`, component `dataHygieneConsole`).
+
 ---
 
 ## 30. Deferred to later iterations
@@ -5534,6 +5545,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-09-25 | G-20 follow-up: Health Check finding for unposted gifts in a closed period (ADR-0053's recorded follow-up, ADR-0057). No object, field or rule added: the finding reports what R-G14 already locks, a gift with a counting status (ADR-0022) and a type other than In-kind, dated on or before Books Closed Through, whose `Accounting_Posted_At__c` is still empty, capped and linked the way C-21's orphan findings already are. Because Core may not name a gift or a closed period (C-29), Core gains a small extension seam instead of a new Core check: `HealthCheckExtension`, an interface, and `HealthCheckExtensions`, a resolver that finds an implementation by name with `Type.forName`, the same shape `ImportEntityProcessor` already uses for the opposite direction (R-IR6). `HealthCheckService.run()` folds a found extension's findings into the one report, isolated the way one failing check already is. Giving ships the one implementation, `GivingHealthCheckExtension`, delegating to `HealthCheckGivingChecks`, grouped the way ADR-0039 groups Core's own checks. |
 | v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
 | v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-NEXT `NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
+| v0.7 | 2026-10-12 | C-28 Data hygiene console. No object or field added. New rule R-SQ6: the Data Hygiene tab builds each check's query document in code, counts it in user mode over the same document, and opens it in Find by saving an unshared Saved Query owned by the person. The checks read rules already defined: R-C1 and R-M2 (no household), R-H11 (Member Count), R-M4 (a membership naming nobody), R-AD1 (an address with no owner), R-AD3 (the default address) and R-AD6 (Verification Status). ADR-NEXT `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`. |
 
 ---
 ## 32. Entity ownership by package
