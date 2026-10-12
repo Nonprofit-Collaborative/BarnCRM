@@ -901,7 +901,9 @@ Standing owner instructions for the build session (recorded 2026-10-12 from the 
      - API names: the `Open_Impact_Giving` report and dashboard folders (and every report and dashboard inside them), the `Open_Impact_Acknowledgments` email folder and the `Open_Impact_Thank_You` template, plus any Apex, LWC, Flow or test reference to those names.
      - Leave untouched: `packages/core/vendor/apex-rollup` (vendored third-party code), and historical statements in release notes and ADRs that describe what Open Impact was called at the time.
      - Order: decide with Brandon whether the `Nonprofit_*` API names (Section 11.2 item 25) are renamed in the same pass, since both are pre-first-version renames. Update the canonical model and admin guide first; split into PRs under about 800 changed lines; run the static checks (including the label and permission-set checks) and one full org-test run on the top head.
-     - About 975 mentions across 350 files were counted on 2026-10-12, most of them in `packages/core` and `packages/giving`; docs were renamed separately the same day.
+     - About 975 mentions across 350 files were counted on 2026-10-12, most of them in `packages/core` and `packages/giving`; docs were renamed separately the same day (PR #182).
+     - Also in scope, found by the docs rename: the package names in `sfdx-project.json` ("Open Impact Core", "Open Impact Giving", "Open Impact Connect", "Open Impact Volunteers", "Open Impact Programs", "Open Impact Funders") and every doc that quotes them (package READMEs, admin guide, release notes), the "Open Impact Giving" report folder label, the "Open Impact: thank you for your gift" email label, the `openimpact` namespace examples in `docs/contributor-guide/ci.md` and `scratch-orgs.md`, and the C-29 Hub label "Welcome to Open Impact" (`HubHome` labels; `docs/admin-guide/nonprofit-hub.md` already says "Welcome to BarnCRM").
+     - Merge order that avoids conflicts: C-29 (#163 to #174) first, then the docs PRs #181 and #182 rebased onto it (C-29 also edits docs), then this code pass.
 
 ### 11.4 Decisions the builder must escalate rather than make
 
