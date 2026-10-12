@@ -250,7 +250,7 @@ private class BulkUpdateBatchTest {
             runNow(job, startQuery(job));
         }
         Contact corrected = [SELECT Id FROM Contact LIMIT 1];
-        update new Contact(Id = corrected.Id, Title = 'Lead');
+        update new Contact(Id = corrected.Id, Title = 'Treasurer');
         System.Assert.isFalse(
             new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10))
                 .containsKey(created.Id),
@@ -267,7 +267,10 @@ private class BulkUpdateBatchTest {
         Test.stopTest();
 
         System.Assert.areEqual(199, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
-        System.Assert.areEqual('Lead', [SELECT Title FROM Contact WHERE Id = :corrected.Id].Title);
+        System.Assert.areEqual(
+            'Treasurer',
+            [SELECT Title FROM Contact WHERE Id = :corrected.Id].Title
+        );
         System.Assert.areEqual(ImportBatchService.STATUS_UNDONE, reread(created.Id).Status__c);
         List<Map<String, Object>> kept = journal(created.Id, ImportJournalService.PHASE_UNDO);
         System.Assert.areEqual(1, kept.size(), 'The value changed since is journaled');

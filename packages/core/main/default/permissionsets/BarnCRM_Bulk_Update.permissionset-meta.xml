@@ -177,4 +177,8 @@
     <object>Import_Journal__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Bulk_Update</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>
