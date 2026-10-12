@@ -51,6 +51,8 @@
   <tabs>standard-Contact</tabs>
   <tabs>Organizations</tabs>
   <tabs>Import</tabs>
+  <tabs>Find</tabs>
+  <tabs>Bulk_Update</tabs>
   <tabs>BarnCRM_Settings</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>

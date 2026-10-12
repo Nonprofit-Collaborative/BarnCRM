@@ -1,0 +1,226 @@
+<template>
+    <div class="slds-is-relative">
+        <template if:true={loading}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+
+        <template if:true={loadError}>
+            <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+                <span data-id="load-error">{loadError}</span>
+            </div>
+        </template>
+
+        <template if:true={showErrorSummary}>
+            <div
+                class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
+                role="alert"
+                data-id="error-summary"
+            >
+                {labels.errorSummary}
+            </div>
+        </template>
+
+        <template if:true={showEmpty}>
+            <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="empty">{labels.empty}</p>
+        </template>
+
+        <template for:each={rowViews} for:item="row">
+            <fieldset
+                key={row.key}
+                class="slds-form-element slds-var-m-bottom_small slds-var-p-bottom_x-small slds-border_bottom"
+                data-id="condition"
+                data-key={row.key}
+            >
+                <legend class="slds-form-element__legend slds-form-element__label">{row.legend}</legend>
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                    <template for:each={row.segments} for:item="segment">
+                        <div key={segment.key} class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                            <lightning-combobox
+                                data-id="field"
+                                data-key={row.key}
+                                data-depth={segment.depth}
+                                label={segment.label}
+                                placeholder={segment.placeholder}
+                                options={segment.options}
+                                value={segment.value}
+                                disabled={segment.disabled}
+                                onchange={handleFieldChange}
+                            ></lightning-combobox>
+                        </div>
+                    </template>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-combobox
+                            data-id="operator"
+                            data-key={row.key}
+                            label={labels.operator}
+                            placeholder={labels.chooseOperator}
+                            options={row.operatorOptions}
+                            value={row.operator}
+                            disabled={row.operatorDisabled}
+                            onchange={handleOperatorChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                        <template if:true={row.isText}>
+                            <lightning-input
+                                data-id="value"
+                                data-key={row.key}
+                                type="text"
+                                label={labels.value}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-input>
+                        </template>
+                        <template if:true={row.isNumber}>
+                            <lightning-input
+                                data-id="value"
+                                data-key={row.key}
+                                type="number"
+                                step="any"
+                                label={labels.value}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-input>
+                        </template>
+                        <template if:true={row.isDate}>
+                            <lightning-input
+                                data-id="value"
+                                data-key={row.key}
+                                type="date"
+                                label={labels.value}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-input>
+                        </template>
+                        <template if:true={row.isDateTime}>
+                            <lightning-input
+                                data-id="value"
+                                data-key={row.key}
+                                type="datetime"
+                                label={labels.value}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-input>
+                        </template>
+                        <template if:true={row.isDays}>
+                            <lightning-input
+                                data-id="value"
+                                data-key={row.key}
+                                type="number"
+                                step="1"
+                                min="1"
+                                max="3650"
+                                label={labels.days}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-input>
+                        </template>
+                        <template if:true={row.isBoolean}>
+                            <lightning-combobox
+                                data-id="value"
+                                data-key={row.key}
+                                label={labels.value}
+                                options={booleanOptions}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-combobox>
+                        </template>
+                        <template if:true={row.isPick}>
+                            <lightning-combobox
+                                data-id="value"
+                                data-key={row.key}
+                                label={labels.value}
+                                options={row.picklistOptions}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-combobox>
+                        </template>
+                        <template if:true={row.isLines}>
+                            <lightning-textarea
+                                data-id="value"
+                                data-key={row.key}
+                                label={labels.valuesOnePerLine}
+                                value={row.value}
+                                disabled={disabled}
+                                onchange={handleValueChange}
+                            ></lightning-textarea>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-shrink-none">
+                        <lightning-button-icon
+                            data-id="remove"
+                            data-key={row.key}
+                            icon-name="utility:delete"
+                            variant="border-filled"
+                            alternative-text={row.removeLabel}
+                            title={row.removeLabel}
+                            disabled={disabled}
+                            onclick={handleRemove}
+                        ></lightning-button-icon>
+                    </div>
+                </div>
+                <template if:true={row.isPickList}>
+                    <lightning-dual-listbox
+                        class="slds-var-m-top_x-small"
+                        data-id="value"
+                        data-key={row.key}
+                        label={labels.value}
+                        source-label={labels.availableValues}
+                        selected-label={labels.chosenValues}
+                        options={row.picklistOptions}
+                        value={row.value}
+                        disabled={disabled}
+                        onchange={handleValueChange}
+                    ></lightning-dual-listbox>
+                </template>
+                <template if:true={row.error}>
+                    <p class="slds-text-color_error slds-var-m-top_xx-small" data-id="row-error">{row.error}</p>
+                </template>
+            </fieldset>
+        </template>
+
+        <lightning-button
+            data-id="add"
+            label={labels.addCondition}
+            icon-name="utility:add"
+            disabled={addDisabled}
+            onclick={handleAdd}
+        ></lightning-button>
+
+        <template if:true={showLogicToggle}>
+            <div class="slds-var-m-top_small">
+                <lightning-input
+                    data-id="logic-toggle"
+                    type="checkbox"
+                    label={labels.useLogic}
+                    checked={logicEnabled}
+                    disabled={disabled}
+                    onchange={handleLogicToggle}
+                ></lightning-input>
+                <template if:true={logicEnabled}>
+                    <lightning-input
+                        data-id="logic"
+                        type="text"
+                        label={labels.logic}
+                        field-level-help={labels.logicHelp}
+                        value={logicText}
+                        disabled={disabled}
+                        onchange={handleLogicChange}
+                    ></lightning-input>
+                    <template if:true={logicError}>
+                        <p class="slds-text-color_error slds-var-m-top_xx-small" data-id="logic-error" role="alert">
+                            {logicError}
+                        </p>
+                    </template>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

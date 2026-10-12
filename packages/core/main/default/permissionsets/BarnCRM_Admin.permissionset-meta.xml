@@ -84,6 +84,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FindController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FiscalYearSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -228,6 +232,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RelationshipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -319,6 +327,14 @@
     <apexClass>UserSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Bulk_Update_Records</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Find_And_Export_Records</name>
+  </customPermissions>
   <customPermissions>
     <enabled>true</enabled>
     <name>Manage_BarnCRM_Settings</name>
@@ -854,6 +870,16 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Import_Batch__c.File_Values_JSON__c</field>
     <readable>true</readable>
@@ -1220,6 +1246,21 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Saved_Query__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Query_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Shared__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Setting_Change__c.Changed_At__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1380,6 +1421,15 @@
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Saved_Query__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
     <allowDelete>false</allowDelete>
     <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
@@ -1417,6 +1467,14 @@
   </tabSettings>
   <tabSettings>
     <tab>Import</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Bulk_Update</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Find</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

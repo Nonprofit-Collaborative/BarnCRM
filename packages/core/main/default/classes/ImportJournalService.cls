@@ -23,6 +23,9 @@ public with sharing class ImportJournalService {
     public static final String ACTION_KEPT = 'Kept';
     @NamespaceAccessible
     public static final String ACTION_NOT_RESTORED = 'NotRestored';
+    /** A record a bulk update could not save (C-35). */
+    @NamespaceAccessible
+    public static final String ACTION_FAILED = 'Failed';
 
     /** The document version written into every page, so a reader can tell the shape. */
     private static final Integer DOCUMENT_VERSION = 1;
@@ -85,6 +88,17 @@ public with sharing class ImportJournalService {
             'object' => objectName,
             'id' => String.valueOf(recordId),
             'label' => shorten(label),
+            'reason' => shorten(reason)
+        };
+    }
+
+    /** A record a bulk update could not save, and the platform's reason (R-IJ2, R-BU3). */
+    @NamespaceAccessible
+    public static Map<String, Object> failed(String objectName, Id recordId, String reason) {
+        return new Map<String, Object>{
+            'action' => ACTION_FAILED,
+            'object' => objectName,
+            'id' => String.valueOf(recordId),
             'reason' => shorten(reason)
         };
     }

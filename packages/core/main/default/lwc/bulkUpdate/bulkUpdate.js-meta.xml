@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Bulk update (C-35): set, clear or copy up to five fields on the records a Find query returns,
+    previewed and confirmed, run in the background as the user. Undone from the Bulk Update tab.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

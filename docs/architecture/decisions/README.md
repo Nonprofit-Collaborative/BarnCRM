@@ -84,6 +84,9 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0073](0073-module-manager-turns-automation-off-and-never-installs.md) | The Module Manager switches a module's automation, links to installs, and counts before an uninstall | Accepted (builder decision) |
 | [0074](0074-settings-console-picks-records-and-record-types.md) | The settings console picks records and record types instead of taking identifiers | Accepted (builder decision) |
 | [0075](0075-health-check-schedules-every-nightly-job.md) | Health Check schedules every nightly job with one fix, and modules register theirs (amends ADR-0048) | Accepted (builder decision) |
+| [NEXT](NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md) | Saved queries are private and shared by Apex managed sharing | Accepted (builder decision) |
+| [NEXT](NEXT-bulk-update-runs-as-the-user-from-a-find-query.md) | Bulk update runs as the user, from a Find query, and is undone by the import undo | Accepted (builder decision) |
+| [NEXT](NEXT-typed-find-queries-are-parsed-into-the-query-document.md) | Typed Find queries are parsed into the query document in the browser | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

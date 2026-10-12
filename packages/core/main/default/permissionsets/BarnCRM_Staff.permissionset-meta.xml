@@ -163,6 +163,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RelationshipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -684,6 +688,16 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Batch__c.Job_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

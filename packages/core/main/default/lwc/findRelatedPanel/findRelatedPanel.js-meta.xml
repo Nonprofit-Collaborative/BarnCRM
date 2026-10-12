@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Related records in Find: has or has no related records conditions and related record
+    columns (canonical model R-SQ8). Nested in findRecords.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

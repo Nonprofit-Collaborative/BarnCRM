@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Recent bulk updates, what each changed, and their undo. A bulk update starts from Find.
+  </description>
+  <flexiPage>Bulk_Update</flexiPage>
+  <label>Bulk Update</label>
+  <motif>Custom19: Wrench</motif>
+</CustomTab>

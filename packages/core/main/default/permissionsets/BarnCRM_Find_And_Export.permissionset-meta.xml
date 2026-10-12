@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>BarnCRM Find and Export</label>
+  <description>
+    Find (C-34): build, run, save, share and export queries. Grants no record or field access;
+    Find reads with the user's own. Assignable alone or beside any role. BarnCRM Admin has it.
+  </description>
+  <classAccesses>
+    <apexClass>FindController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Find_And_Export_Records</name>
+  </customPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Query_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Shared__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Saved_Query__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <tabSettings>
+    <tab>Find</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

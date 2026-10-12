@@ -133,6 +133,7 @@ ALLOWED = {
     "CustomPermission": "the packaged custom permissions.",
     "RecordType": "the Household record type, ADR-0005.",
     "UserRecordAccess": "sharing checks in user mode paths.",
+    "Group": "the All Internal Users group a shared Find query is shared with, C-34. Platform feature, every edition.",
     # Async plumbing.
     "AsyncApexJob": "asserting that a queueable or batch was enqueued.",
     "CronTrigger": "the scheduled jobs Core and Giving install.",

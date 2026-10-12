@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Writes Find results as CSV: UTF-8 with a byte-order mark, a header row of labels, quoted
+    values (canonical model R-SQ3). Imported by findRecords.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

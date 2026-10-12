@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The shared filter builder: rows of field, operator and value plus optional condition logic,
+    over one object, reading and writing the filter document of canonical model R-R2. Used inside
+    Find and the Rollup Builder, never placed on a page by itself.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
