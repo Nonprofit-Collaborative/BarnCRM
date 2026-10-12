@@ -203,6 +203,10 @@ public with sharing class ImportRowProcessor {
         if (rows == null || rows.isEmpty()) {
             return outcome;
         }
+        if (ImportObjectSchema.loadsOneObject(template)) {
+            // A row of a one-object template is one record of that object (R-IT12).
+            return ImportObjectLoader.process(batch, template, mapping, rows, dryRun);
+        }
         Boolean personAccounts = ImportTemplateService.isPersonAccountMode(template);
         String rule = ImportTemplateService.normalizedRule(template.Matching_Rule__c);
         readMatchingChoices(template, rule, outcome);
@@ -332,6 +336,18 @@ public with sharing class ImportRowProcessor {
             working.add(item);
         }
         return working;
+    }
+
+    /**
+     * A row's values by entity and attribute, with the mapping's values for every row filled in
+     * where the row has none: what the one-object loader reads a row as (R-IT12).
+     */
+    @NamespaceAccessible
+    public static Map<String, Map<String, String>> valuesByEntity(
+        Import_Row__c row,
+        ImportMapping mapping
+    ) {
+        return groupByEntity(rawValues(row), mapping.targetsBySourceKey(), mapping.defaults);
     }
 
     /** The row's uploaded values, keyed the way a mapping's source columns are keyed. */
@@ -2507,7 +2523,8 @@ public with sharing class ImportRowProcessor {
      * that resembles someone; the pair is left for the duplicate scan to find (R-DP3). A rule
      * the org set to block still blocks, and the row reports the rule's message.
      */
-    private static Database.DMLOptions saveOptions() {
+    @NamespaceAccessible
+    public static Database.DMLOptions saveOptions() {
         Database.DMLOptions options = new Database.DMLOptions();
         options.OptAllOrNone = false;
         options.DuplicateRuleHeader.AllowSave = true;
@@ -2515,7 +2532,8 @@ public with sharing class ImportRowProcessor {
     }
 
     /** The failure of a save, in the words the platform used, so nothing is lost in paraphrase. */
-    private static String message(Database.SaveResult result) {
+    @NamespaceAccessible
+    public static String message(Database.SaveResult result) {
         List<String> parts = new List<String>();
         for (Database.Error error : result.getErrors()) {
             parts.add(error.getMessage());

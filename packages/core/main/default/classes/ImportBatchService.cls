@@ -352,13 +352,20 @@ public with sharing class ImportBatchService {
                 template.Default_Values_JSON__c
             )
             .withFileValues(batch.File_Values_JSON__c);
-        if (!mapping.identifiesSomebody()) {
+        Boolean oneObject = ImportObjectSchema.loadsOneObject(template);
+        // A one-object template is refused for its own reasons, before any row is read (R-IT12).
+        String refused = oneObject ? ImportObjectSchema.refusal(template, mapping) : null;
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        if (!oneObject && !mapping.identifiesSomebody()) {
             throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
         }
         if (batch.Row_Count__c == null || batch.Row_Count__c <= 0) {
             throw new ImportException(Label.Core_Import_ErrorNoRows);
         }
         if (
+            !oneObject &&
             ImportTemplateService.isPersonAccountMode(template) &&
             OrgShapeDetector.detect().personAccountRecordTypeIds.isEmpty()
         ) {

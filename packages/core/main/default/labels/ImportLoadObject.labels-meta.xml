@@ -88,4 +88,108 @@
         <shortDescription>Load one object: a value cannot be read as its field type</shortDescription>
         <value>"{1}" is not a value {0} accepts. Fix the cell and load the row again.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRowEmpty</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the row has no value in any mapped column</shortDescription>
+        <value>This row has no value in any mapped column, so there is nothing to load.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordIdWrongObject</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the record ID is of another object</shortDescription>
+        <value>"{0}" is the ID of another kind of record, not of {1}. Check the Salesforce record ID column.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordNotFound</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no record the user can see has the ID</shortDescription>
+        <value>No record you can see has this ID. Check the ID, or ask your Salesforce administrator for access to the record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordRepeated</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: an earlier row names the same record</shortDescription>
+        <value>An earlier row of this file names the same record. Keep one of the rows, or load the other in a file of its own.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the row has no value in the upsert field</shortDescription>
+        <value>This row has no {0}, which the upsert matches rows on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralRecords</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: several records hold the row's external ID</shortDescription>
+        <value>More than one record has this row's external ID, and the mapping says to reject such a row. Fix the duplicates, or choose Use the most recently changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorLookupNotFound</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a lookup value finds no record</shortDescription>
+        <value>No record you can see matches "{1}" for {0}. Check the value or the field it is found by, or choose Leave it empty to load the rest of the row.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorLookupSeveral</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a lookup value finds several records</shortDescription>
+        <value>More than one record matches "{1}" for {0}, and the mapping says to reject such a row. Find it by a unique field, or choose Use the most recently changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchOnlyWouldCreate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: match only, and the row would create a record</shortDescription>
+        <value>No record matches this row, and this file only matches, so nothing was created. To create it, untick Match only and load the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogFieldProtected</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: a mapped field is never written</shortDescription>
+        <value>Not loaded: {0} is kept by BarnCRM or by Salesforce and is never imported over.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupLeftEmpty</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: some lookups were left empty</shortDescription>
+        <value>Some rows name no record you can see for {0}. They were loaded with it left empty, as the mapping says.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupPolymorphic</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: a lookup to several objects is read by ID</shortDescription>
+        <value>{0} can point at more than one kind of record, so it is read by Salesforce record ID only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupFieldUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: a lookup's chosen field cannot be searched</shortDescription>
+        <value>{0} is found by {1}, which you cannot search by, so no record was found for it. Choose another field in the columns step.</value>
+    </labels>
 </CustomLabels>

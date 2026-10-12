@@ -30,7 +30,11 @@ public with sharing class ImportTemplateSelector {
                 Active__c,
                 Payment_Matching__c,
                 Match_Date_Window_Days__c,
-                Match_Amount_Tolerance__c
+                Match_Amount_Tolerance__c,
+                Target_Object__c,
+                Load_Operation__c,
+                Load_Match_Field__c,
+                Lookup_Not_Found__c
             FROM Import_Template__c
             WHERE Active__c = TRUE
             WITH USER_MODE
@@ -66,7 +70,11 @@ public with sharing class ImportTemplateSelector {
                 Active__c,
                 Payment_Matching__c,
                 Match_Date_Window_Days__c,
-                Match_Amount_Tolerance__c
+                Match_Amount_Tolerance__c,
+                Target_Object__c,
+                Load_Operation__c,
+                Load_Match_Field__c,
+                Lookup_Not_Found__c
             FROM Import_Template__c
             WHERE Id = :templateId
             WITH USER_MODE
