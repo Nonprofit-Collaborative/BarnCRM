@@ -73,7 +73,7 @@ these pages, so that everyone is talking about the same person.
   instructions.
 - **No namespace prefixes anywhere**, in prose or in tables.
 - **No em dashes.** Use colons, commas, or parentheses.
-- **Second person, present tense, active voice.** "Open Nonprofit Settings and choose
+- **Second person, present tense, active voice.** "Open Open Impact Settings and choose
   Households."
 - **Say what to do, then what you will see.** Every step ends in a result the reader can
   check against.
@@ -86,20 +86,25 @@ these pages, so that everyone is talking about the same person.
 
 Each feature adds its row here when its page is written.
 
+The Package column says what has to be installed for the page to apply. Open Impact Core on
+its own is the Community Suite, for organizations that are not nonprofits, so a Core page
+describes only what every organization has: its wording is neutral, and anything about
+gifts, donors or receipts on a Core page is marked as coming from Giving (C-29).
+
 | Feature | Page | Package | Iteration |
 |---|---|---|---|
 | C-04 | [Automation control](automation-control.md) | Core | v0.1 |
 | C-05 | [Error Log](error-log.md) | Core | v0.1 |
-| C-06 | [Access](access.md) | Core | v0.1 |
+| C-06 | [Access](access.md) | Core (the Fundraising Staff role comes with Giving) | v0.1 |
 | C-01 Household model | [households.md](households.md) | Core | v0.1 |
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core | v0.1 |
 | C-07 | [Coexistence mode](coexistence-mode.md) | Core | v0.1 |
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core | v0.1 |
 | C-10 Sample data loader | [sample-data.md](sample-data.md) | Core | v0.1 |
-| C-11 | [Health Check](health-check.md) | Core | v0.1 |
-| C-03 Nonprofit Hub app and setup checklist | [nonprofit-hub.md](nonprofit-hub.md) | Core | v0.1 |
-| C-03 Nonprofit Settings console | [nonprofit-settings.md](nonprofit-settings.md) | Core | v0.1 |
-| C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core | v0.2 |
+| C-11 | [Health Check](health-check.md) | Core, with findings from Giving and Connect | v0.1 |
+| C-03 Open Impact app and setup checklist | [nonprofit-hub.md](nonprofit-hub.md) | Core | v0.1 |
+| C-03 Open Impact Settings console | [nonprofit-settings.md](nonprofit-settings.md) | Core | v0.1 |
+| C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
 | C-13 Rollups | [rollups.md](rollups.md) | Core | v0.2 |
 | C-14 Importing | [importing.md](importing.md) | Core | v0.2 |
 | G-01 Gifts | [gifts.md](gifts.md) | Giving | v0.2 |

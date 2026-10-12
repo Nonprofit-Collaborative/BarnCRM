@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Error Log tile for the Nonprofit Hub home page: how many problems are waiting, the five most
+    The Error Log tile for the Open Impact home page: how many problems are waiting, the five most
     recent in plain language, and a way to mark one as seen.
   </description>
   <isExposed>true</isExposed>

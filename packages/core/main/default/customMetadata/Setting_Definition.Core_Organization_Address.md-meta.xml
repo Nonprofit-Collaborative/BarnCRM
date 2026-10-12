@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Your mailing address on one line, exactly as you want it printed on a receipt.</value>
+    <value xsi:type="xsd:string">Your mailing address on one line, exactly as you want it printed on letters and documents.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

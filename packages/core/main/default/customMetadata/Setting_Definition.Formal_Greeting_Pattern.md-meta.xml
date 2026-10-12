@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How the greeting on letters and receipts is written, for example {Salutation} {FirstName} {LastName}.</value>
+    <value xsi:type="xsd:string">How the greeting on letters and documents is written, for example {Salutation} {FirstName} {LastName}.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

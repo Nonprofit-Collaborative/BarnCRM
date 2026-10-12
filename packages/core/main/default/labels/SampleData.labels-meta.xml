@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load confirmation dialog body</shortDescription>
-        <value>This adds 200 households, 440 contacts, 25 organizations, and the connections and affiliations between them to this org, plus three years of gifts, funds, appeals, pledges and tributes where Giving is installed. Only load sample data into a scratch org, sandbox, or demo org, never into production.</value>
+        <value>This adds 200 households, 440 contacts, 25 organizations, and the connections and affiliations between them to this org, plus sample records for each installed module. Only load sample data into a scratch org, sandbox, or demo org, never into production.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadConfirmTitle</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Missing permission error</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to do this.</value>
+        <value>You need the Manage Open Impact Settings permission to do this.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_OrganizationsLabel</fullName>
@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Read-only message for users without the permission</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to load or remove sample data.</value>
+        <value>You need the Manage Open Impact Settings permission to load or remove sample data.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_RecordTypeMissing</fullName>

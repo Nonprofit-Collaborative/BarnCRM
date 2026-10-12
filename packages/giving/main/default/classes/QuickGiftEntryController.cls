@@ -27,7 +27,7 @@ public with sharing class QuickGiftEntryController {
             defaults.giftDate = Date.today();
             defaults.giftTypes = giftTypeOptions();
             defaults.hasPersonAccounts = OrgShapeDetector.detect().hasPersonAccounts;
-            Nonprofit_Settings__c settings = SettingsService.getSettings();
+            Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
             applyDefaultFund(defaults, settings);
             applyDefaultAppeal(defaults, settings);
             return defaults;
@@ -110,7 +110,7 @@ public with sharing class QuickGiftEntryController {
      * R-GA2), so the form asks the domain the same question rather than showing an empty
      * Fund box and then designating the gift somewhere the person never saw.
      */
-    private static void applyDefaultFund(EntryDefaults defaults, Nonprofit_Settings__c settings) {
+    private static void applyDefaultFund(EntryDefaults defaults, Giving_Settings__c settings) {
         Id fundId = asId(settings.Default_Fund__c, Fund__c.SObjectType);
         if (fundId == null) {
             fundId = GiftService.resolveDefaultFundId();
@@ -126,7 +126,7 @@ public with sharing class QuickGiftEntryController {
         }
     }
 
-    private static void applyDefaultAppeal(EntryDefaults defaults, Nonprofit_Settings__c settings) {
+    private static void applyDefaultAppeal(EntryDefaults defaults, Giving_Settings__c settings) {
         Id appealId = asId(settings.Default_Appeal__c, Appeal__c.SObjectType);
         if (appealId == null) {
             return;

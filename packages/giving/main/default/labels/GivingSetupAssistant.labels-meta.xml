@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Giving_SetupAssistant_FundAppealStepLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the name of step three</shortDescription>
+        <value>Choose your default fund and appeal</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_FundAppealStepDescription</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what step three is for</shortDescription>
+        <value>Pick where a gift goes when nobody says otherwise.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_FundLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the default fund picker on the giving defaults step</shortDescription>
+        <value>Default fund</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_AppealLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the default appeal picker on the giving defaults step</shortDescription>
+        <value>Default appeal</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_EinLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the tax identification number field on the identity step</shortDescription>
+        <value>Tax identification number</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_EinPatternMessage</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what a tax identification number looks like</shortDescription>
+        <value>In the United States this is two digits, a hyphen, and seven digits, for example 12-3456789. Leave it blank if your country does not use one.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_LogoLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the logo upload on the identity step</shortDescription>
+        <value>Logo</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_SignatureLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the signature image upload on the identity step</shortDescription>
+        <value>Signature image</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_SignerNameLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the receipt signer name field on the identity step</shortDescription>
+        <value>Who signs your receipts</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_SignerTitleLabel</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the receipt signer title field on the identity step</shortDescription>
+        <value>Their job title</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_LogoPreviewAlt</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: alternative text of the uploaded logo preview</shortDescription>
+        <value>The logo that will be printed on your receipts</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_SignaturePreviewAlt</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: alternative text of the uploaded signature preview</shortDescription>
+        <value>The signature that will be printed on your receipt letters</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_EnterFirstGiftButton</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: button that opens the Giving package's gift entry screen</shortDescription>
+        <value>Enter your first gift</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_IdentityDescription</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what step five is for</shortDescription>
+        <value>Record the name, tax identification number, address, logo, and signature that appear on your receipts and letters.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupAssistant_VerifyDescription</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what step eight is for</shortDescription>
+        <value>Follow the short walkthrough that adds a person, a household, and a first gift, so you know the setup is right.</value>
+    </labels>
+</CustomLabels>

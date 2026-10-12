@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Match_Amount_Tolerance__c</fullName>
-  <description>How far a gift's amount may differ from a scheduled payment's expected amount and still match it (R-IT7, R-DM3). Empty means the org's default in Nonprofit Settings.</description>
-  <inlineHelpText>Amount difference allowed. Leave empty to use Nonprofit Settings.</inlineHelpText>
+  <description>How far a gift's amount may differ from a scheduled payment's expected amount and still match it (R-IT7, R-DM3). Empty means the org's default in Open Impact Settings.</description>
+  <inlineHelpText>Amount difference allowed. Leave empty to use Open Impact Settings.</inlineHelpText>
   <label>Match Amount Tolerance</label>
   <precision>16</precision>
   <required>false</required>

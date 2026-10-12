@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>Receipt signer name</label>
+  <label>Receipt logo file</label>
   <protected>true</protected>
   <values>
     <field>Setting_Key__c</field>
-    <value xsi:type="xsd:string">Receipt_Signer_Name__c</value>
+    <value xsi:type="xsd:string">Receipt_Logo_Document_Id__c</value>
   </values>
   <values>
     <field>Settings_Object__c</field>
-    <value xsi:type="xsd:string">Nonprofit_Settings__c</value>
+    <value xsi:type="xsd:string">Giving_Settings__c</value>
   </values>
   <values>
     <field>Section__c</field>
@@ -16,7 +16,7 @@
   </values>
   <values>
     <field>Module__c</field>
-    <value xsi:type="xsd:string">Core</value>
+    <value xsi:type="xsd:string">Giving</value>
   </values>
   <values>
     <field>Data_Type__c</field>
@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The name of the person who signs your receipt letters, for example Ana Ruiz.</value>
+    <value xsi:type="xsd:string">The Salesforce file holding the logo printed on receipts and letters. Upload it in step five of the Setup Assistant rather than typing a value here.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -32,6 +32,6 @@
   </values>
   <values>
     <field>Sort_Order__c</field>
-    <value xsi:type="xsd:double">60</value>
+    <value xsi:type="xsd:double">40</value>
   </values>
 </CustomMetadata>

@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Message shown to a user without the settings permission.</shortDescription>
-        <value>You can see these totals but not change them. Ask an administrator for the Manage Nonprofit Settings permission.</value>
+        <value>You can see these totals but not change them. Ask an administrator for the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorNoPermission</fullName>

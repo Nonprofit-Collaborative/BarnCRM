@@ -92,38 +92,6 @@
                     </template>
                 </template>
 
-                <template lwc:if={isDefaultsStep}>
-                    <template lwc:if={givingPresent}>
-                        <lightning-record-picker
-                            label={labels.fund}
-                            object-api-name={fundObject}
-                            data-id="fund-picker"
-                            onchange={handleFundChange}
-                        ></lightning-record-picker>
-                        <lightning-record-picker
-                            class="slds-var-m-top_x-small"
-                            label={labels.appeal}
-                            object-api-name={appealObject}
-                            data-id="appeal-picker"
-                            onchange={handleAppealChange}
-                        ></lightning-record-picker>
-                        <template lwc:if={canEdit}>
-                            <lightning-button
-                                class="slds-var-m-top_small"
-                                variant="brand"
-                                label={labels.save}
-                                data-id="save-defaults"
-                                onclick={handleDefaultsSave}
-                            ></lightning-button>
-                        </template>
-                    </template>
-                    <template lwc:else>
-                        <p class="slds-text-body_regular" data-id="giving-missing">
-                            {labels.givingMissing}
-                        </p>
-                    </template>
-                </template>
-
                 <template lwc:if={isAccessStep}>
                     <lightning-record-picker
                         label={labels.user}
@@ -160,14 +128,6 @@
                     <p class="slds-var-m-top_x-small">
                         <a href={createUserUrl}>{labels.createUser}</a>
                     </p>
-                </template>
-
-                <template lwc:if={isIdentityStep}>
-                    <c-setup-step-identity
-                        values={identityValues}
-                        can-edit={canEdit}
-                        onsave={handleIdentitySave}
-                    ></c-setup-step-identity>
                 </template>
 
                 <template lwc:if={isModulesStep}>
@@ -208,20 +168,13 @@
                     </template>
                 </template>
 
-                <template lwc:if={isVerifyStep}>
-                    <template lwc:if={givingPresent}>
-                        <lightning-button
-                            variant="brand"
-                            label={labels.enterGift}
-                            data-id="enter-gift"
-                            onclick={handleEnterGift}
-                        ></lightning-button>
-                    </template>
-                    <template lwc:else>
-                        <p class="slds-text-body_regular" data-id="verify-missing">
-                            {labels.verifyMissing}
-                        </p>
-                    </template>
+                <template lwc:if={hasStepFields}>
+                    <c-setup-step-fields
+                        data-id="step-fields"
+                        fields={stepFields}
+                        can-edit={canEdit}
+                        onsave={handleFieldsSave}
+                    ></c-setup-step-fields>
                 </template>
 
                 <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small">

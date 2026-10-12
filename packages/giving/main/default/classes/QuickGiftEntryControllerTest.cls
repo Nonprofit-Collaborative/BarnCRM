@@ -30,7 +30,8 @@ private class QuickGiftEntryControllerTest {
     }
 
     private static void setDefaults(String fundId, String appealId) {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+        settings.SetupOwnerId = UserInfo.getOrganizationId();
         settings.Default_Fund__c = fundId;
         settings.Default_Appeal__c = appealId;
         upsert settings;

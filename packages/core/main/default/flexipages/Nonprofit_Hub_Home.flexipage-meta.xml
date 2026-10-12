@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The Nonprofit Hub home page: welcome, setup checklist, automation banner, errors tile, and quick
+    The Open Impact home page: welcome, setup checklist, automation banner, errors tile, and quick
     links.
   </description>
   <flexiPageRegions>
@@ -14,7 +14,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Nonprofit Hub Home</masterLabel>
+  <masterLabel>Open Impact Home</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

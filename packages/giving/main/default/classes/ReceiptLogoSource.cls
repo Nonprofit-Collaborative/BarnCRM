@@ -29,7 +29,6 @@ public with sharing class ReceiptLogoSource {
     public static final String ROUTE_DOCUMENT_SERVER = 'Document server';
 
     private static final String SETTINGS_OBJECT = 'Giving_Settings__c';
-    private static final String CORE_SETTINGS_OBJECT = 'Nonprofit_Settings__c';
     private static final String KEY_LOGO_DOCUMENT = 'Receipt_Logo_Document_Id__c';
     private static final String KEY_PRINT_LOGO = 'Receipt_Print_Logo__c';
     private static final String KEY_WIDTH = 'Receipt_Logo_Width_Mm__c';
@@ -67,9 +66,7 @@ public with sharing class ReceiptLogoSource {
         if (!printLogo()) {
             return '';
         }
-        String documentId = trimmed(
-            SettingsService.getValue(CORE_SETTINGS_OBJECT, KEY_LOGO_DOCUMENT)
-        );
+        String documentId = trimmed(SettingsService.getValue(SETTINGS_OBJECT, KEY_LOGO_DOCUMENT));
         if (String.isBlank(documentId)) {
             return '';
         }

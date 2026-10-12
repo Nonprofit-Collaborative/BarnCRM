@@ -25,7 +25,7 @@ gift entered on Quick Gift Entry does.
 Nothing to install and no Setup step. Gift batches arrive with the Giving package.
 
 1. Open the **Fundraising** app from the app launcher. **Gift Batches** is one of its tabs.
-2. Check that a default fund is set: **Nonprofit Settings**, then **Giving**, **Default
+2. Check that a default fund is set: **Open Impact Settings**, then **Giving**, **Default
    fund**. A line with no fund of its own, in a batch with no fund, goes to that fund, and
    without one the batch cannot post.
 3. The people who type batches need the **Giving Staff** permission set, the same one Quick
@@ -90,7 +90,7 @@ attempt. A batch's **Posted** status is not the same as a gift posted to account
 [Posting and Closed Periods](posting-and-closed-periods.md)).
 
 **No default fund anywhere.** Posting fails and names every line: the gifts have nowhere
-to be designated. Set the default fund in Nonprofit Settings and post again; nothing was
+to be designated. Set the default fund in Open Impact Settings and post again; nothing was
 created by the failed attempt.
 
 **Two people typing the same batch.** Each save sends the whole grid. Type a batch on one

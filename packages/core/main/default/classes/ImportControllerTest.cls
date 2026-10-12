@@ -37,7 +37,7 @@ private class ImportControllerTest {
             Assert.fail('Importing needs the Manage Nonprofit Settings permission.');
         } catch (Exception e) {
             Assert.isTrue(
-                e.getMessage().contains('Manage Nonprofit Settings'),
+                e.getMessage().contains('Manage Open Impact Settings'),
                 'And says which permission and who to ask: ' + e.getMessage()
             );
         }

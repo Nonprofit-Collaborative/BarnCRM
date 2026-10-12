@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The seasonal address swap panel on the Addresses page of the Nonprofit Settings console:
+    The seasonal address swap panel on the Addresses page of the Open Impact Settings console:
     whether the nightly job is scheduled, when it last ran, what it did, and the buttons that
     start it, stop it, and run it now.
   </description>

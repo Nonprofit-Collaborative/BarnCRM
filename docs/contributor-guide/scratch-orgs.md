@@ -70,7 +70,7 @@ usable rather than empty.
 
 **Two settings make it behave like an Agentforce Nonprofit org**, and both are set in the app
 rather than by the script, because walking through them is itself worth testing. Open the
-Nonprofit Hub; the Setup Assistant offers the coexistence mode it detected. Set it to
+Open Impact app; the Setup Assistant offers the coexistence mode it detected. Set it to
 Agentforce Nonprofit coexistence, which moves household membership to the junction records
 that person accounts need in the same save. Health Check will then report an org shape that
 matches the mode. What still differs from a real Nonprofit Cloud org is that its objects are

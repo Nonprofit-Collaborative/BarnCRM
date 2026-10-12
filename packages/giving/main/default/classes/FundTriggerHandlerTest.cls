@@ -100,7 +100,7 @@ private class FundTriggerHandlerTest {
 
         System.assertEquals(
             String.valueOf(general.Id),
-            SettingsService.getSettings().Default_Fund__c,
+            Giving_Settings__c.getOrgDefaults().Default_Fund__c,
             'The flag and the Nonprofit Settings key are two faces of one decision (R-F4).'
         );
         System.assertEquals(
@@ -124,7 +124,7 @@ private class FundTriggerHandlerTest {
 
         System.assertEquals(
             String.valueOf(building.Id),
-            SettingsService.getSettings().Default_Fund__c,
+            Giving_Settings__c.getOrgDefaults().Default_Fund__c,
             'The key follows the flag rather than quietly outvoting it.'
         );
         System.assertEquals(
@@ -146,7 +146,7 @@ private class FundTriggerHandlerTest {
 
         System.assertEquals(
             null,
-            SettingsService.getSettings().Default_Fund__c,
+            Giving_Settings__c.getOrgDefaults().Default_Fund__c,
             'A fund that is no longer the default does not stay named in the settings.'
         );
     }

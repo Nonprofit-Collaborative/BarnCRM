@@ -5,5 +5,5 @@
     automation. Users without it see the settings pages read only.
   </description>
   <isLicensed>false</isLicensed>
-  <label>Manage Nonprofit Settings</label>
+  <label>Manage Open Impact Settings</label>
 </CustomPermission>

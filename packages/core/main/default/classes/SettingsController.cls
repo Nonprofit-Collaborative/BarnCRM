@@ -9,7 +9,7 @@ public with sharing class SettingsController {
     private static final String TYPE_COMPONENT = 'Component';
     private static final String TYPE_CHECKBOX = 'Checkbox';
     private static final String TYPE_PICKLIST = 'Picklist';
-    private static final String ERROR_CONTEXT = 'Nonprofit Settings console';
+    private static final String ERROR_CONTEXT = 'Open Impact Settings console';
 
     public class ConsoleModel {
         @AuraEnabled

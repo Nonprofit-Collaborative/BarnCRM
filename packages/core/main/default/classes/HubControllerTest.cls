@@ -28,11 +28,13 @@ private class HubControllerTest {
 
     @IsTest
     static void tellsMariaWhatToDoNext() {
+        SetupAssistantTestExtension.useNone();
+
         Test.startTest();
         HubController.HomeModel model = HubController.getHomeModel();
         Test.stopTest();
 
-        Assert.areEqual(8, model.stepsTotal, 'The checklist has eight steps');
+        Assert.areEqual(7, model.stepsTotal, 'On Core alone the checklist has seven steps');
         Assert.isNotNull(model.stepsCompleted, 'The page says how many are done');
         Assert.isFalse(model.automationPaused, 'Nothing is paused on a fresh org');
         Assert.areEqual(0, model.newErrorCount, 'A fresh org has nothing to review');
@@ -40,6 +42,7 @@ private class HubControllerTest {
 
     @IsTest
     static void letsDavidReadTheHomePageWithoutChangingAnything() {
+        SetupAssistantTestExtension.useNone();
         User david = buildDavid();
         System.runAs(new User(Id = UserInfo.getUserId())) {
             insert david;
@@ -48,7 +51,7 @@ private class HubControllerTest {
         Test.startTest();
         System.runAs(david) {
             HubController.HomeModel model = HubController.getHomeModel();
-            Assert.areEqual(8, model.stepsTotal, 'David sees the same eight steps counted');
+            Assert.areEqual(7, model.stepsTotal, 'David sees the same seven steps counted');
             Assert.isFalse(model.canEdit, 'David may not change anything');
         }
         Test.stopTest();

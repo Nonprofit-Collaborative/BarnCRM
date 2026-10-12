@@ -94,7 +94,7 @@ giving totals because it has no gifts, and they appear when the Giving module is
 
 One step is left for you, and nothing in the app does it on your behalf:
 
-1. Open the **Nonprofit Hub** app and choose the **Nonprofit Settings** tab.
+1. Open the **Open Impact** app and choose the **Open Impact Settings** tab.
 2. Choose **Rollups** in the left navigation. You should see every total listed above, one
    row each.
 3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
@@ -127,7 +127,7 @@ Two settings on the same page change how every rollup behaves:
 - **Default rollup mode** decides how a newly created rollup starts out: Real time,
   Scheduled, or Both.
 
-You need the **Manage Nonprofit Settings** permission to change any of this. Without it,
+You need the **Manage Open Impact Settings** permission to change any of this. Without it,
 the Rollups page still opens and still shows every total and its last calculated time; the
 controls are simply read only.
 
@@ -135,10 +135,10 @@ controls are simply read only.
 
 Do this as Maria, with the sample data loaded.
 
-1. Open the **Nonprofit Hub** app. On the home page, find the **Rollups** tile. It reads
+1. Open the **Open Impact** app. On the home page, find the **Rollups** tile. It reads
    "Rollups last completed" with a time. If it has been more than 36 hours, the tile turns
    into a warning and offers a link to the Rollups page. Click that link, or open
-   **Nonprofit Settings** and choose **Rollups**.
+   **Open Impact Settings** and choose **Rollups**.
 2. You are looking at every total the rollup engine maintains, a little over forty rows.
    Each row says what the number means in plain language, what it counts ("SUM Amount__c
    on Gift__c"), where it shows ("Account.Total_Giving__c"), its mode, and when it was

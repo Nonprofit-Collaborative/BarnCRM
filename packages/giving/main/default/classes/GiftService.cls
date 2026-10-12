@@ -602,14 +602,13 @@ public with sharing class GiftService {
     }
 
     /**
-     * The organization's default fund: the identifier held in Nonprofit Settings when it points
+     * The organization's default fund: the identifier held in Giving's settings when it points
      * at a fund that still exists and is active, and otherwise the fund that carries the
      * default flag (R-F4). Null when nobody has picked one.
      */
     public static Id resolveDefaultFundId() {
         Id settingFundId = null;
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
-        String stored = settings == null ? null : settings.Default_Fund__c;
+        String stored = Giving_Settings__c.getOrgDefaults().Default_Fund__c;
         if (String.isNotBlank(stored)) {
             try {
                 settingFundId = Id.valueOf(stored);

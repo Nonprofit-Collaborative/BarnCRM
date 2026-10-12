@@ -103,7 +103,7 @@ public without sharing class ReceiptNumberSequence {
      *
      * **The caller must be all or nothing in one transaction.** Nothing reconciles the per gift
      * series: `reconcile` is called from `ReceiptStatementBatch.finish` for the statement series
-     * and from nowhere else, and `ReceiptGapSelector`, which is what the Health Check reads,
+     * and from nowhere else, and `ReceiptGenerationFailureSelector`, which Health Check reads,
      * counts only the records `reconcile` wrote. So a number taken here is accounted for by the
      * receipt insert happening in the same transaction and by the whole transaction rolling back
      * when anything fails. A caller that catches the failure and commits anyway consumes a number

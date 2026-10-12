@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Description__c</fullName>
   <description>
-    The plain-language help shown under the control in the Nonprofit Settings console.
+    The plain-language help shown under the control in the Open Impact Settings console.
   </description>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>

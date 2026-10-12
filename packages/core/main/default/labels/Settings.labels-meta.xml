@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: error when a user without the permission tries to save</shortDescription>
-        <value>You need the Manage Nonprofit Settings permission to change settings. Ask your administrator to add it.</value>
+        <value>You need the Manage Open Impact Settings permission to change settings. Ask your administrator to add it.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_ReadOnlyNotice</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: notice shown to a user who may read but not change settings</shortDescription>
-        <value>You can read these settings but not change them. Ask your administrator for the Manage Nonprofit Settings permission.</value>
+        <value>You can read these settings but not change them. Ask your administrator for the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_RecentChangesEmpty</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: the page title</shortDescription>
-        <value>Nonprofit Settings</value>
+        <value>Open Impact Settings</value>
     </labels>
     <labels>
         <fullName>Core_Settings_UnknownKeyError</fullName>

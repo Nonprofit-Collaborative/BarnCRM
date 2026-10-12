@@ -4,8 +4,7 @@
   <active>true</active>
   <compactLayoutAssignment>Household_Compact</compactLayoutAssignment>
   <description>
-    A group of people the nonprofit treats as one donor: one mailing, one greeting, one giving
-    history.
+    A group of people the organization treats as one: one mailing, one greeting, one shared history.
   </description>
   <label>Household</label>
 </RecordType>

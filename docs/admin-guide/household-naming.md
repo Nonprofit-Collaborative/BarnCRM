@@ -20,7 +20,7 @@ they check one box and the product stops touching it.
 Naming is on as soon as Core is installed, with patterns that work out of the box. To
 change them:
 
-1. Open the **Nonprofit Hub** app and click the **Nonprofit Settings** tab.
+1. Open the **Open Impact** app and click the **Open Impact Settings** tab.
 2. Click **Households** in the left navigation. The naming panel is in that section.
 3. Change any of the three patterns. A preview of five sample households updates as you
    type, so you can see the result before you save. The samples ship with the product; they
@@ -36,7 +36,7 @@ change them:
    a time. A large org takes a few minutes. The page does not report progress or tell you
    when the batch has finished.
 
-You need the "Manage Nonprofit Settings" permission to change these. Without it the page
+You need the "Manage Open Impact Settings" permission to change these. Without it the page
 opens read only and says so.
 
 ### Patterns and tokens
@@ -82,7 +82,7 @@ Maria does steps 1 to 5. David does step 6.
 3. Open Wei's record, check **Deceased**, and save. Refresh the household: the informal
    greeting reads **Maria** again. The household name still mentions Lee only if you chose
    to keep people who have died in household names.
-4. Open **Nonprofit Settings**, click **Households**, and change the household name
+4. Open **Open Impact Settings**, click **Households**, and change the household name
    pattern to `{LastName} Household`. Watch the sample preview change as you type.
    Click **Save**, then **Recompute all households**, and confirm.
 5. Go back to a household with one surname. It now reads **Garcia Household**.

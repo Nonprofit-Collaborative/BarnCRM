@@ -14,16 +14,16 @@ is **donation matching** (section 5).
 
 ## 2. How to turn it on
 
-Nothing to turn on once the Giving module is installed. You need the **Manage Nonprofit
+Nothing to turn on once the Giving module is installed. You need the **Manage Open Impact
 Settings** permission to import, and the Giving admin role to create gifts; the **Access**
-page gives both to a Nonprofit Admin. The importer must also be able to delete gifts (Giving
+page gives both to an Open Impact Admin. The importer must also be able to delete gifts (Giving
 Admin can; Giving Staff cannot), because a row is saved whole or not at all: when a gift's soft
 credit or tribute is refused, the import removes the gift it had just made. Without that right
 every gift row is rejected, in the dry run too, saying so.
 
 Two settings decide how donation matching behaves when a mapping does not say:
 
-1. Open **Nonprofit Settings** and choose **Import**.
+1. Open **Open Impact Settings** and choose **Import**.
 2. **Days either side of a payment's due date** is 7. A gift dated within 7 days of a
    scheduled payment can match it.
 3. **Amount difference allowed** is 0: a gift matches a payment only for exactly the amount
@@ -121,10 +121,10 @@ Each mapping says what to do, on the matching step of the wizard:
 | **Never match** | Reject a gift that matches a payment or a gift you already have. Use it for a file of new gifts that should not touch pledges. |
 
 The same step lets a mapping use its own window and allowed difference instead of the ones in
-**Nonprofit Settings**. Leave them empty to use the settings.
+**Open Impact Settings**. Leave them empty to use the settings.
 
 The commit matches under the choice, window and allowed difference the dry run used. If you
-change them on the mapping, or in **Nonprofit Settings**, after a dry run, run the dry run
+change them on the mapping, or in **Open Impact Settings**, after a dry run, run the dry run
 again: the commit keeps to what the last dry run showed you.
 
 ## 6. Undoing a gift import

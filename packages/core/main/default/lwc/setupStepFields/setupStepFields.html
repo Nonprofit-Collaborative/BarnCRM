@@ -1,0 +1,86 @@
+<template>
+    <template lwc:if={hasInputs}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <template for:each={inputs} for:item="field">
+                <div key={field.key} class={field.columnClass}>
+                    <template lwc:if={field.isText}>
+                        <lightning-input
+                            label={field.label}
+                            data-key={field.key}
+                            value={field.value}
+                            disabled={isReadOnly}
+                            max-length={field.maxLength}
+                            pattern={field.pattern}
+                            message-when-pattern-mismatch={field.patternMessage}
+                            field-level-help={field.patternMessage}
+                            onchange={handleFieldChange}
+                        ></lightning-input>
+                    </template>
+                    <template lwc:if={field.isRecord}>
+                        <lightning-record-picker
+                            class="slds-var-m-top_x-small"
+                            label={field.label}
+                            object-api-name={field.objectApiName}
+                            value={field.value}
+                            data-key={field.key}
+                            disabled={isReadOnly}
+                            onchange={handleRecordChange}
+                        ></lightning-record-picker>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <template lwc:if={hasFiles}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_small">
+            <template for:each={files} for:item="field">
+                <div key={field.key} class={field.columnClass}>
+                    <lightning-file-upload
+                        label={field.label}
+                        name={field.key}
+                        data-key={field.key}
+                        accept={acceptedFormats}
+                        record-id={userId}
+                        onuploadfinished={handleUploaded}
+                    ></lightning-file-upload>
+                    <template lwc:if={field.previewUrl}>
+                        <img
+                            class="slds-var-m-top_x-small"
+                            src={field.previewUrl}
+                            alt={field.previewAlt}
+                            data-id="file-preview"
+                            data-key={field.key}
+                            height="60"
+                        />
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">
+            {labels.uploadHelp}
+        </p>
+    </template>
+
+    <template lwc:if={showSave}>
+        <lightning-button
+            class="slds-var-m-top_small"
+            variant="brand"
+            label={labels.save}
+            data-id="save-fields"
+            onclick={handleSave}
+        ></lightning-button>
+    </template>
+
+    <template for:each={buttons} for:item="field">
+        <lightning-button
+            key={field.navigationTarget}
+            variant="brand"
+            label={field.label}
+            data-id="navigate"
+            data-target={field.navigationTarget}
+            onclick={handleNavigate}
+        ></lightning-button>
+    </template>
+</template>

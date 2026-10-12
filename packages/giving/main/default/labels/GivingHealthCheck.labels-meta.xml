@@ -41,4 +41,85 @@
         <shortDescription>Fix button: open Giving settings (no more specific page target exists).</shortDescription>
         <value>Open Giving settings</value>
     </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_OverrideLockTitle</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: someone holds the Override Receipt Lock permission</shortDescription>
+        <value>Someone can override the receipt lock</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_OverrideLockDetail</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: who holds the Override Receipt Lock permission</shortDescription>
+        <value
+    >The Override Receipt Lock permission lets a person change or delete a gift that already carries a receipt number. Open Impact grants it to nobody: it is meant to be assigned in Setup for one correction and taken away again. It is held by {0}. If nobody is correcting a receipted gift right now, remove it in Setup, Custom Permissions. Every change made with it is in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_OverrideLockFix</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that opens Custom Permissions in Setup from the override finding.</shortDescription>
+        <value>Open Custom Permissions in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_OverrideLockMoreNames</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check: ends a list of permission holders longer than it shows</shortDescription>
+        <value>and {0} others</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_ReceiptFailedOneTitle</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the single receipt generation failure finding.</shortDescription>
+        <value>One receipt number was used by a run that failed</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_ReceiptFailedOneDetail</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explains the single reconciled receipt number, which is ordinary.</shortDescription>
+        <value>One receipt is recorded as Void with the reason Generation failed. That is the record of a number that was handed out to a document which never generated, and a single one is ordinary rather than a problem. The Error Log says what went wrong, and the receipt can be run again once it is fixed.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_ReceiptFailedMoreThan</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>How many failed receipts, when there are more than the count cap.</shortDescription>
+        <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_ReceiptFailedManyTitle</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the repeated receipt generation failure finding.</shortDescription>
+        <value>{0} receipts failed to generate</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_ReceiptFailedManyDetail</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Explains that receipt generation has failed repeatedly.</shortDescription>
+        <value>{0} receipts are recorded as Void with the reason Generation failed, which means receipt generation has failed that many times and those donors are still waiting for their documents. Read the receipt entries in the Error Log, fix what they name, and run the receipts again. Leave the void records alone: they are what accounts for the numbers that were used.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_HealthCheck_ErrorLogFix</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Fix button on the receipt generation findings: open the Error Log.</shortDescription>
+        <value>Open the Error Log</value>
+    </labels>
 </CustomLabels>

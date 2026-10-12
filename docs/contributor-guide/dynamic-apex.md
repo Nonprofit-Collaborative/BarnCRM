@@ -15,8 +15,7 @@ at runtime.
 | --- | --- | --- | --- |
 | Connect | Campaign (and later Opportunity, Gift Transaction) | `CampaignSyncService`, `CampaignSyncSelector` | ADR-0056 |
 | Core | Person Account fields (`PersonEmail`, `PersonMailingPostalCode`, `...__pc`) | `ImportMatcher`, `ImportRowProcessor.storedName` | ADR-0013 |
-| Core | Giving objects (`Receipt__c`) | `ReceiptGapSelector` | ADR-0017 |
-| Core | Giving behaviour (classes) | `ImportEntityProcessors`, `SampleDataModules`, `HealthCheckExtensions` | ADR-0017, ADR-0057 |
+| Core | Giving behaviour (classes) | `ImportEntityProcessors`, `SampleDataModules`, `HealthCheckExtensions`, `SetupAssistantExtensions` | ADR-0017, ADR-0057, ADR-0059 |
 | Core | Industries, NPSP, Sales Cloud detection | `OrgShapeDetector` | ADR-0013 |
 
 The shape, from `CampaignSyncService`:
@@ -41,7 +40,7 @@ Rules:
 - Field names come from the org's own describe before use. `ImportRowProcessor.personFieldFor`
   returns `getDescribe().getName()` of a field it found, never a name it assembled.
 - Absent means "feature off", not an error: return empty, `null`, or `available = false`
-  (`ReceiptGapSelector.Result`), and let the caller say nothing rather than zero.
+  (a result whose `available` is false), and let the caller say nothing rather than zero.
 - When the logic is another package's rule, not one field comparison, do not re-derive it
   dynamically; call the package through a discovered class (section 3). ADR-0057 records why.
 
@@ -66,9 +65,9 @@ is the only guard: hold those names as strings, as `ImportMatcher` does.
 ## 3. Discovering a class in another package (`Type.forName`)
 
 Core defines an interface; a dependent package implements it under a known class name; Core
-looks the class up at runtime. Three resolvers share one shape (`ImportEntityProcessors`,
-`HealthCheckExtensions`, `SampleDataModules`), and `TriggerDispatcher` uses it for registry
-handlers.
+looks the class up at runtime. Four resolvers share one shape (`ImportEntityProcessors`,
+`HealthCheckExtensions`, `SampleDataModules`, `SetupAssistantExtensions`), and
+`TriggerDispatcher` uses it for registry handlers.
 
 ```apex
 private static HealthCheckExtension resolve() {
@@ -135,8 +134,9 @@ If a registered namespace later shows production code cannot read such a field, 
 `sfdx-project.json` has no namespace (ADR-0001). Never write a prefix; `check-namespace.sh`
 fails the build. Never assume there is none either:
 
-- Packaged API names in dynamic code go through `NamespaceUtil.qualify('Receipt__c')`
-  (`ReceiptGapSelector`). Values matched on are data and are never qualified.
+- Packaged API names in dynamic code go through `NamespaceUtil.qualify(...)`
+  (`ImportEntityProcessors`, for a field it looks up by name). Values matched on are data and
+  are never qualified.
 - Names from metadata rows, which carry no prefix, resolve with
   `SettingsService.typeByName`, which tries the exact name and then the part after a
   namespace.
@@ -186,7 +186,7 @@ A user-mode query naming a field the user cannot read throws, and fails the whol
 check. So check the object **and every field the query names** first:
 
 ```apex
-// ReceiptGapSelector
+// The Receipt__c count Core took before C-29 moved it to Giving (ADR-0059)
 DescribeSObjectResult receipt = receiptType.getDescribe(SObjectDescribeOptions.DEFERRED);
 if (!receipt.isAccessible()) {
     return result;
@@ -207,7 +207,7 @@ alone turned missing field access into a failed Health Check.
   for writes.
 - What a person cannot see is told to them as nothing, never as a fault
   (`ErrorLogCountSelector`). Where a zero would read as "none failed", say "unknown"
-  instead (`ReceiptGapSelector.Result.available`).
+  instead (a result whose `available` is false).
 
 ## 7. Dynamic SOQL
 
@@ -230,8 +230,8 @@ alone turned missing field access into a failed Health Check.
   string handed to the rollup engine (`RollupFilterParser`). On a bind it corrupts the value
   (`HouseholdSelector.searchHouseholds`: it "would lose every O'Brien").
 - **Escape LIKE wildcards** in a bound search term (`\`, `%`, `_`), as `searchHouseholds` does.
-- **Keep the query string testable.** `ReceiptGapSelector.countQuery` is a separate
-  `@TestVisible` method, so a test with no Giving package still asserts what Core would ask.
+- **Keep the query string testable.** Build it in a separate `@TestVisible` method, so a test
+  in an org without the other package still asserts what Core would ask.
 
 ### Cap every count and read
 
@@ -283,7 +283,7 @@ insert runs it once per 200 records.
   the present branch must assert something real (`ImportPersonAccountTest`, guarded by
   `orgHasPersonAccounts()`).
 - **Force the other shape with seams**, not with the org: `OrgShapeDetector.overrideShape`,
-  `ReceiptGapSelector.resultOverride`, the resolver overrides in section 3.
+  `CustomPermissionSelector.holdersOverride`, the resolver overrides in section 3.
 - **Test orgs:** `oi-test` and `oi-pa` both have Person Accounts and the Sales Cloud objects
   (see [ci.md](ci.md)). Every feature-present branch runs on them; no feature-absent branch
   does.

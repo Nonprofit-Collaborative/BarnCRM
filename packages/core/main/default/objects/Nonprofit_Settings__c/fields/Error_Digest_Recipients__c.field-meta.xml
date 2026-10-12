@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Error_Digest_Recipients__c</fullName>
-  <description>The email addresses of the users who receive the error digest, separated by commas. Each must belong to an active user of this org; empty sends it to every active user holding Manage Nonprofit Settings (C-23, R-E5).</description>
+  <description>The email addresses of the users who receive the error digest, separated by commas. Each must belong to an active user of this org; empty sends it to every active user holding Manage Open Impact Settings (C-23, R-E5).</description>
   <externalId>false</externalId>
-  <inlineHelpText>Leave empty to send the digest to everyone with the Nonprofit Admin role, or list your users' email addresses, separated by commas.</inlineHelpText>
+  <inlineHelpText>Leave empty to send the digest to everyone with the Open Impact Admin role, or list your users' email addresses, separated by commas.</inlineHelpText>
   <label>Error Digest Recipients</label>
   <length>255</length>
   <required>false</required>

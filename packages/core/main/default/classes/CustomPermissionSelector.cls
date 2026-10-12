@@ -1,24 +1,22 @@
 /**
  * Who holds a custom permission, asked for by name (feature C-11).
  *
- * ADR-0024 ships `Override_Receipt_Lock` assigned to nobody and expects an administrator to
- * grant it in Setup for one correction and take it away again. Health Check has to report a
- * standing assignment, and it has to name the people holding it, because "somebody has it"
- * is not something an administrator can act on.
+ * A module's Health Check asks it who holds a permission the module ships, and has to name
+ * the people holding it, because "somebody has it" is not something an administrator can act
+ * on. Giving asks it about `Override_Receipt_Lock` (ADR-0024), through
+ * `HealthCheckGivingChecks` since C-29 (ADR-0059); Core's Error Log digest asks it too.
  *
- * That permission lives in the Giving package and Health Check lives in Core, which must
- * still deploy and run on a Platform-only org (ADR-0009, ADR-0013). Nothing here compiles
- * against Giving: `CustomPermission`, `SetupEntityAccess`, `PermissionSet` and
- * `PermissionSetAssignment` are platform setup objects present in every Salesforce org, and
- * the permission is matched on `DeveloperName`, which is a String this class is handed. In an
- * org where Giving is not installed the first query simply returns no rows and the answer is
- * "nobody", which is the truth in that org. The name is deliberately not namespace qualified:
+ * `CustomPermission`, `SetupEntityAccess`, `PermissionSet` and `PermissionSetAssignment` are
+ * platform setup objects present in every Salesforce org, and the permission is matched on
+ * `DeveloperName`, which is a String this class is handed, so a permission that is not in the
+ * org is simply held by nobody. The name is deliberately not namespace qualified:
  * a packaged custom permission keeps its bare `DeveloperName` and carries the namespace in
  * `NamespacePrefix`, so qualifying it would find nothing once the namespace is registered.
  *
  * All SOQL for the question lives here (plan Section 7.1) and runs in user mode, like every
  * other Health Check query.
  */
+@NamespaceAccessible
 public with sharing class CustomPermissionSelector {
     /** How many holders a finding names before it counts the rest. */
     public static final Integer NAMES_SHOWN = 3;
@@ -38,11 +36,16 @@ public with sharing class CustomPermissionSelector {
      * allowed to see setup entities at all, which is not the same answer as "nobody holds
      * it" and is reported as no finding rather than as a clean bill of health.
      */
+    @NamespaceAccessible
     public class Holders {
+        @NamespaceAccessible
         public Boolean readable;
+        @NamespaceAccessible
         public Integer total;
+        @NamespaceAccessible
         public List<String> names;
 
+        @NamespaceAccessible
         public Holders() {
             this.readable = true;
             this.total = 0;
@@ -54,6 +57,7 @@ public with sharing class CustomPermissionSelector {
      * The active users holding the named custom permission, through a permission set, a
      * permission set group, or the profile that owns one.
      */
+    @NamespaceAccessible
     public static Holders holders(String developerName) {
         if (holdersOverride != null) {
             return holdersOverride;
@@ -67,10 +71,11 @@ public with sharing class CustomPermissionSelector {
                     result.names.add(holder.Name);
                 }
             }
+        } catch (System.SecurityException cannotSeeSetup) {
+            // A user-mode query the viewer may not run throws this rather than QueryException.
+            result = unreadable();
         } catch (QueryException cannotSeeSetup) {
-            result.readable = false;
-            result.total = 0;
-            result.names = new List<String>();
+            result = unreadable();
         }
 
         return result;
@@ -87,10 +92,20 @@ public with sharing class CustomPermissionSelector {
             for (User holder : activeHolders(developerName)) {
                 ids.add(holder.Id);
             }
+        } catch (System.SecurityException cannotSeeSetup) {
+            ids.clear();
         } catch (QueryException cannotSeeSetup) {
             ids.clear();
         }
         return ids;
+    }
+
+    private static Holders unreadable() {
+        Holders result = new Holders();
+        result.readable = false;
+        result.total = 0;
+        result.names = new List<String>();
+        return result;
     }
 
     /**

@@ -39,7 +39,7 @@ Two things are worth doing once, so that the numbers are visible where people lo
    fields but does not place them for you. Put them next to total giving rather than under it. A
    reader who sees one number without the other reads the one they see as everything the
    donor gave, which is the whole mistake this feature exists to prevent.
-2. Open **Nonprofit Settings**, then **Giving**, then **Rollups**, and choose **Recalculate
+2. Open **Open Impact Settings**, then **Giving**, then **Rollups**, and choose **Recalculate
    now** after your first in-kind gifts are entered, unless you are content to wait for the
    nightly run. In-kind value and in-kind gift count are maintained by the same rollup engine
    as every other total on those records.
@@ -98,7 +98,7 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
    just looked at is in the second number and not the first, and its gift count is separate
    too. This is the thing to be able to explain to a colleague: the two numbers answer two
    different questions.
-3. Now enter one yourself. Open **Quick Gift Entry** (it is on the Nonprofit Hub, and on
+3. Now enter one yourself. Open **Quick Gift Entry** (it is on the Open Impact app, and on
    every household and person page).
 4. Choose the donor, leave the date at today, and set **How it arrived** to **In-kind**. The
    amount box disappears and two boxes take its place.

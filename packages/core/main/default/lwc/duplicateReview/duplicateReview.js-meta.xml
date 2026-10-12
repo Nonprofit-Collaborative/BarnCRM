@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Duplicates panel on the Households page of the Nonprofit Settings console: which
+    The Duplicates panel on the Households page of the Open Impact Settings console: which
     duplicate rules are on, a scan of the records already in the org, the possible duplicates
     found, a household merge for each household pair, and Not a duplicate.
   </description>

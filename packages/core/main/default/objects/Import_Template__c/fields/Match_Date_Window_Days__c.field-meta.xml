@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Match_Date_Window_Days__c</fullName>
-  <description>How many days either side of a scheduled payment's due date a gift on this template may fall and still match it (R-IT7, R-DM3). Empty means the org's default in Nonprofit Settings.</description>
-  <inlineHelpText>Days either side of a payment's due date. Leave empty to use Nonprofit Settings.</inlineHelpText>
+  <description>How many days either side of a scheduled payment's due date a gift on this template may fall and still match it (R-IT7, R-DM3). Empty means the org's default in Open Impact Settings.</description>
+  <inlineHelpText>Days either side of a payment's due date. Leave empty to use Open Impact Settings.</inlineHelpText>
   <label>Match Date Window Days</label>
   <precision>3</precision>
   <required>false</required>

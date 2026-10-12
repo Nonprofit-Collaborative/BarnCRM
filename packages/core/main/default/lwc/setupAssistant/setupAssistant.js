@@ -1,12 +1,10 @@
 import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
 import resetSetup from '@salesforce/apex/SetupAssistantController.reset';
 import applyCoexistence from '@salesforce/apex/SetupAssistantController.applyCoexistence';
-import saveOrganizationIdentity from '@salesforce/apex/SetupAssistantController.saveOrganizationIdentity';
-import saveDefaults from '@salesforce/apex/SetupAssistantController.saveDefaults';
+import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepValues';
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
 
 import HEADING from '@salesforce/label/c.Core_SetupAssistant_Heading';
@@ -27,9 +25,6 @@ import LOAD_ERROR from '@salesforce/label/c.Core_SetupAssistant_LoadErrorMessage
 import COMPLETE_HEADING from '@salesforce/label/c.Core_SetupAssistant_CompleteHeading';
 import ELAPSED from '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel';
 import REOPEN from '@salesforce/label/c.Core_SetupAssistant_ReopenButton';
-import GIVING_MISSING from '@salesforce/label/c.Core_SetupAssistant_GivingMissingNotice';
-import FUND_LABEL from '@salesforce/label/c.Core_SetupAssistant_FundLabel';
-import APPEAL_LABEL from '@salesforce/label/c.Core_SetupAssistant_AppealLabel';
 import USER_LABEL from '@salesforce/label/c.Core_SetupAssistant_UserLabel';
 import ROLE_LABEL from '@salesforce/label/c.Core_SetupAssistant_RoleLabel';
 import GIVE_ACCESS from '@salesforce/label/c.Core_SetupAssistant_GiveAccessButton';
@@ -38,10 +33,8 @@ import CREATE_USER from '@salesforce/label/c.Core_SetupAssistant_CreateUserLink'
 import LOAD_SAMPLE from '@salesforce/label/c.Core_SetupAssistant_LoadSampleButton';
 import IMPORT_BUTTON from '@salesforce/label/c.Core_SetupAssistant_ImportButton';
 import IMPORT_MISSING from '@salesforce/label/c.Core_SetupAssistant_ImportMissingNotice';
-import VERIFY_MISSING from '@salesforce/label/c.Core_SetupAssistant_VerifyGivingMissing';
 import NAMING_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_NamingUnavailableNotice';
 import SAMPLE_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_SampleDataUnavailableNotice';
-import ENTER_GIFT from '@salesforce/label/c.Core_SetupAssistant_EnterFirstGiftButton';
 import START_AGAIN from '@salesforce/label/c.Core_SetupAssistant_StartAgainButton';
 import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionButton';
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
@@ -51,17 +44,15 @@ const CREATE_USER_URL = '/lightning/setup/ManageUsers/home';
 // namespace is assigned (Decision D-01), which is recorded in the integration file.
 const IMPORT_URL = '/lightning/n/Import';
 const SETTINGS_PAGE = '/lightning/n/Nonprofit_Settings';
-// detection-only: the Giving package ships this tab, and Core may not import its components
-// (ADR-0020), so the first gift check is reached by navigation when Giving is installed.
-const GIFT_ENTRY_TAB = 'Gift_Entry';
 
 /**
  * The guided Setup Assistant: one step open at a time, Back and Next, Skip for now, and it
  * opens on the step Maria stopped at. Steps that belong to another feature render that
  * feature's component dynamically, so a step whose module is not installed shows a notice
- * instead of breaking the page.
+ * instead of breaking the page. A step's fields, including the ones a module adds, come from
+ * Apex and are shown by one field panel (ADR-0059, C-29).
  */
-export default class SetupAssistant extends NavigationMixin(LightningElement) {
+export default class SetupAssistant extends LightningElement {
   /** Set by the Hub home page when Maria asked to reopen a finished setup. */
   @api reopened = false;
 
@@ -79,8 +70,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   showSampleData = false;
   chosenUserId;
   chosenRole;
-  chosenFundId;
-  chosenAppealId;
   accessGranted = false;
   userFilter = { criteria: [{ fieldPath: 'IsActive', operator: 'eq', value: true }] };
 
@@ -97,9 +86,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     completeHeading: COMPLETE_HEADING,
     elapsed: ELAPSED,
     reopen: REOPEN,
-    givingMissing: GIVING_MISSING,
-    fund: FUND_LABEL,
-    appeal: APPEAL_LABEL,
     user: USER_LABEL,
     role: ROLE_LABEL,
     giveAccess: GIVE_ACCESS,
@@ -108,10 +94,8 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     loadSample: LOAD_SAMPLE,
     importButton: IMPORT_BUTTON,
     importMissing: IMPORT_MISSING,
-    verifyMissing: VERIFY_MISSING,
     namingUnavailable: NAMING_UNAVAILABLE,
     sampleUnavailable: SAMPLE_UNAVAILABLE,
-    enterGift: ENTER_GIFT,
     startAgain: START_AGAIN,
     openSection: OPEN_SECTION
   };
@@ -273,16 +257,8 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return this.activeKey === 'naming';
   }
 
-  get isDefaultsStep() {
-    return this.activeKey === 'funddefaults';
-  }
-
   get isAccessStep() {
     return this.activeKey === 'access';
-  }
-
-  get isIdentityStep() {
-    return this.activeKey === 'identity';
   }
 
   get isModulesStep() {
@@ -291,22 +267,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
 
   get isDataStep() {
     return this.activeKey === 'data';
-  }
-
-  get isVerifyStep() {
-    return this.activeKey === 'verify';
-  }
-
-  get givingPresent() {
-    return Boolean(this.state && this.state.giving && this.state.giving.isPresent);
-  }
-
-  get fundObject() {
-    return this.state && this.state.giving ? this.state.giving.fundObject : undefined;
-  }
-
-  get appealObject() {
-    return this.state && this.state.giving ? this.state.giving.appealObject : undefined;
   }
 
   get importAvailable() {
@@ -320,8 +280,13 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     }));
   }
 
-  get identityValues() {
-    return (this.state && this.state.identity) || {};
+  /** The fields this step declares, whichever package declared them. */
+  get stepFields() {
+    return (this.activeStep && this.activeStep.fields) || [];
+  }
+
+  get hasStepFields() {
+    return this.stepFields.length > 0;
   }
 
   get modules() {
@@ -420,24 +385,19 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     this.call(completeStep, { stepKey: 'naming' }, false);
   }
 
-  handleIdentitySave(event) {
-    this.call(saveOrganizationIdentity, { values: event.detail.values }, false);
-  }
-
-  handleFundChange(event) {
-    this.chosenFundId = event.detail.recordId;
-  }
-
-  handleAppealChange(event) {
-    this.chosenAppealId = event.detail.recordId;
-  }
-
-  handleDefaultsSave() {
+  // A step that asks one question moves on once it is answered; a step with several answers
+  // (the organization step) stays open so Maria can fill in the rest. The step says which.
+  handleFieldsSave(event) {
+    const step = this.activeStep;
+    if (!step) {
+      return;
+    }
+    const afterwards = step.advanceOnSave ? () => this.advance() : undefined;
     this.call(
-      saveDefaults,
-      { fundId: this.chosenFundId, appealId: this.chosenAppealId },
+      saveStepValues,
+      { stepKey: step.key, values: event.detail.values },
       false,
-      () => this.advance()
+      afterwards
     );
   }
 
@@ -472,14 +432,6 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
 
   handleShowSampleData() {
     this.showSampleData = true;
-  }
-
-  /** The first gift is entered on the Giving package's own tab (ADR-0020). */
-  handleEnterGift() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: GIFT_ENTRY_TAB }
-    });
   }
 
   async call(action, parameters, moveToFirstUnfinished, afterwards) {

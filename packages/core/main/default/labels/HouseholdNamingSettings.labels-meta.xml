@@ -86,7 +86,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Shown to a user who cannot change settings</shortDescription>
-        <value>You can see these settings but not change them. Changing them needs the Manage Nonprofit Settings permission.</value>
+        <value>You can see these settings but not change them. Changing them needs the Manage Open Impact Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_Recompute</fullName>

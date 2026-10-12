@@ -20,7 +20,7 @@ the thank you is yours to write and rewrite, and the receipt is not.
 
 Everything is in the app, with one exception noted at step 3.
 
-1. Open **Nonprofit Settings**, then **Giving**, then **Acknowledgments**.
+1. Open **Open Impact Settings**, then **Giving**, then **Acknowledgments**.
 2. Turn on **Acknowledge gifts**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
@@ -55,7 +55,7 @@ Everything is in the app, with one exception noted at step 3.
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
-1. Open **Nonprofit Settings**, then **Giving**, then **Acknowledgments**. Turn on
+1. Open **Open Impact Settings**, then **Giving**, then **Acknowledgments**. Turn on
    **Acknowledge gifts**.
 2. Choose **New rule**. Name it `Everything else`, order `100`, channel `Email`, email
    template `Open_Impact_Thank_You`. Save.
