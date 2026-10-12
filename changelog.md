@@ -17,6 +17,9 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 - Branches built: C-32 import matching, C-34 Find, hub rebuild, C-24 Module Manager, C-30 suite choice, C-27 what's new, C-31 migration kit, Flow templates, C-39 interaction notes, UX core, rollup S1 to S5 (and the S15 spike), AI-ready invocable actions, portability checks, explicit access modes, household fixes, pledge payment picker.
 - Feature catalog moved into `docs/barncrm-features.md` (branch `docs/barncrm-features`).
 - Four root project docs created (`architecture.md`, `roadmap.md`, `changelog.md`, `memory.md`; branch `docs/project-docs`).
+- BMemory plan: 7 stale lines fixed (test orgs now include `barn-core` in Sections 0 and 9.6 and item 26; item 2 license marked resolved by D-08; Section 11.3 item 6 and follow-ups 1 to 5 status; salvage branch `claude/openimpact-barncrm-status-ft0c1x` recorded as the source for C-33, C-35 and X-07).
+- Branch audit: 62 stale remote branches with no PR, whose work is in main or superseded, deleted with owner approval, plus local `feature/g-17-gift-batch-entry-v2`. Kept: the salvage branch above, `feature/v-01-v-02-v-03-volunteers` (parked work), `experiment/cmdt-by-type`, and 3 unclear household branches pending a closer check.
+- New fixes built: empty-household tidy-up and import undo keep households that gifts or pledges are credited to; API 67.0 access modes made explicit with a CI check.
 
 ### Merged to main
 
