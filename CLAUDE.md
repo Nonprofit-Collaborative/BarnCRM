@@ -15,6 +15,7 @@ Read the product plan before any work. Its canonical copy is the BMemory documen
 - Canonical model (`docs/architecture/canonical-model.md`) is updated before any object or field is added.
 - A new ADR written on a branch uses `ADR-NEXT`, never a chosen number: file `NEXT-title.md`, heading `# ADR-NEXT`, and every citation the same. The integrator assigns the number at merge. Picking a number on a branch collides when branches run in parallel, and renumbering afterwards is what rewrites correct citations in files that mention several ADRs.
 - Admin-guide page (`docs/admin-guide/`) is written before the LWC.
+- Feature catalog (`docs/barncrm-features.md`) is updated in the same PR as any feature added, changed, or removed.
 - Definition of done: plan Section 7.4. Review checklist: Section 9.4.
 
 ## Project docs
