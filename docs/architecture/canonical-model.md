@@ -1345,7 +1345,14 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   nightly recalculation: one batch pass per target entity in turn, records with many source rows
   in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13, one
   run at a time, R-R14) with `RollupRecalcErrorHandler` queueing a stopped chunk's records from
-  `BatchApexErrorEvent` (R-R14); an invocable recalculation action for Flow follows.
+  `BatchApexErrorEvent` (R-R14).
+- **Flow action and template (R-R12):** `RollupRecalcAction`, the invocable action "Recalculate
+  rollups", takes the saved record and its prior values (generic, so it serves any entity) and
+  marks targets exactly as a packaged trigger does (R-R11): in the same save when few, queued
+  otherwise, and always queued for a record being deleted, since a Flow runs before the delete.
+  It does nothing while all automation is paused. `Recalculate_Rollups_Template` is a
+  record-triggered Flow template (on Contact, never active) an administrator saves as her own
+  copy and points at her entity.
 
 ## 14A. Rollup Queue
 

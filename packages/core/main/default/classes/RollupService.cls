@@ -219,6 +219,64 @@ public with sharing class RollupService {
     }
 
     /**
+     * Recalculates the totals a save of these records changed, for an entity BarnCRM ships no
+     * trigger for. The Recalculate rollups Flow action calls this (R-R12, `RollupRecalcAction`):
+     * the same marking as a packaged trigger (R-R11), in the same save or queued (R-R4).
+     *
+     * A record-triggered Flow on delete runs before the record is gone, so a recalculation then
+     * would still count it: the targets of a record being deleted are queued instead, and the
+     * processor runs after the delete is committed.
+     *
+     * @param sourceObject the entity whose records changed
+     * @param records the records as saved, or as they are before a delete
+     * @param oldRecords the same records before an update, or null
+     * @param deleting true when the records are about to be deleted
+     */
+    @NamespaceAccessible
+    public static void runForFlow(
+        String sourceObject,
+        List<SObject> records,
+        Map<Id, SObject> oldRecords,
+        Boolean deleting
+    ) {
+        if (
+            String.isBlank(sourceObject) ||
+            records == null ||
+            records.isEmpty() ||
+            AutomationControl.isPaused()
+        ) {
+            return;
+        }
+        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
+            REAL_TIME_MODES
+        );
+        if (definitions.isEmpty()) {
+            return;
+        }
+        if (deleting == true) {
+            RollupQueue.add(
+                idsByTargetOf(RollupChanges.afterDelete(sourceObject, records, definitions))
+            );
+            return;
+        }
+        recalculateNowOrQueue(
+            RollupChanges.forSave(sourceObject, records, oldRecords, false, definitions)
+        );
+    }
+
+    /** Marked records keyed by each target entity's own API name; unknown entities are dropped. */
+    private static Map<String, Set<Id>> idsByTargetOf(RollupChanges.Marked marked) {
+        Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
+        for (String target : marked.idsByTarget.keySet()) {
+            Schema.SObjectType targetType = SettingsService.typeByName(target);
+            if (targetType != null) {
+                idsByTarget.put(String.valueOf(targetType), marked.idsByTarget.get(target));
+            }
+        }
+        return idsByTarget;
+    }
+
+    /**
      * R-R4: a normal save that marks a few records recalculates them in the same save; a bulk
      * change, or a save already running in the background, queues them. A record the platform
      * refuses to save is queued to be tried again, and anything that stops the recalculation
@@ -228,13 +286,7 @@ public with sharing class RollupService {
         if (marked.isEmpty()) {
             return;
         }
-        Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
-        for (String target : marked.idsByTarget.keySet()) {
-            Schema.SObjectType targetType = SettingsService.typeByName(target);
-            if (targetType != null) {
-                idsByTarget.put(String.valueOf(targetType), marked.idsByTarget.get(target));
-            }
-        }
+        Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
         if (!canRecalculateNow(marked.size())) {
             RollupQueue.add(idsByTarget);
             return;

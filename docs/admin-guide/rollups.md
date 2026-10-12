@@ -147,7 +147,7 @@ Every rollup has a mode.
 
 "Instantly" needs BarnCRM to see the change as it happens. It does for gifts, pledges and
 other BarnCRM records. For a total that counts records from one of your own objects, see
-[Instant totals on your own objects](#instant-totals-on-your-own-objects-coming) below;
+[Instant totals on your own objects](#instant-totals-on-your-own-objects) below;
 without that, such a total is calculated every night and on demand only.
 
 ### How the nightly run works
@@ -254,11 +254,44 @@ totals could not be saved and why, and **Retry**. Before **Recalculate all** it 
 long the run is likely to take and, during working hours, offers to run it tonight instead.
 Until the Builder ships, use the Rollups page described above.
 
-## Instant totals on your own objects (coming)
+## Instant totals on your own objects
 
-BarnCRM can only ship automation for its own records. If you build a rollup that counts
-records from an object your organization created (for example volunteer hours on a custom
-Shift object), the Rollup Builder will offer to make it instant by adding a small piece of
+BarnCRM can only ship automation for its own records. A rollup that counts records from an
+object your organization created (for example volunteer hours on a custom Shift object) is
+calculated every night and when you click **Recalculate**, until you make it instant. Today
+the way to do that is the **Recalculate rollups** Flow template, which needs no code.
+
+### With the Flow template
+
+1. In Setup, open **Flows** and find **Recalculate rollups (template)**. Open it and click
+   **Save As**, choosing **A New Flow**, so you have a copy of your own. The template itself
+   is never active and an upgrade may change it; your copy is yours.
+2. In your copy, open the **Start** element and change the object from **Contact** to your
+   object, for example **Shift**. Leave it on **A record is created or updated** and
+   **Actions and Related Records**.
+3. Open the **Recalculate rollups** action and set its object to the same object. Leave
+   **Record** set to the triggering record and **Record before the change** set to the
+   prior values of the triggering record.
+4. Save and activate.
+
+What to know:
+
+- **Every rollup that counts that object is kept up to date**, instantly or queued for a
+  minute or two exactly as for BarnCRM's own records: one flow per object, however many
+  rollups count it.
+- **A record moved to another parent** leaves the old total and joins the new one, because
+  the action is given the record as it was before the change.
+- **A deleted record** is not seen by this flow. Either keep such rollups in **Both
+  (recommended)**, so the nightly run removes it, or make a second copy that starts when **A
+  record is deleted** and set the action's **Record is being deleted** to true. That copy
+  puts the totals in the queue, and they are right a minute or two after the delete.
+- **A record restored from the recycle bin** is never seen by a flow, so keep such rollups in
+  **Both (recommended)**.
+- **Pausing all automation** stops the action as well; the nightly run catches up.
+
+### One click (coming)
+
+The Rollup Builder will offer to make such a total instant by adding a small piece of
 automation for you:
 
 - One click deploys a one-line trigger on your object and a test for it. The trigger only
@@ -276,9 +309,7 @@ automation for you:
   too. Health Check reports a BarnCRM trigger that no rollup uses any more. Remove these
   triggers before uninstalling BarnCRM.
 
-If you prefer no code in your org, a **Recalculate rollups** Flow template does the same job:
-copy it, point it at your object, and activate it. Because a Flow cannot react to a record
-being restored from the recycle bin, keep such rollups in **Both (recommended)**.
+If you prefer no code in your org, the Flow template above does the same job.
 
 ## Current limits
 
@@ -289,9 +320,10 @@ and so does changing a gift's status or deleting a gift. What is not here yet:
 - **The Rollup Builder and its Needs attention list** are coming. Until then, the Error Log
   says how many records' totals could not be saved. BarnCRM tries them again automatically,
   and the nightly run puts right any that still could not be saved.
-- **Instant totals on your own objects** are coming with the Builder. A rollup that counts
-  records from an object your organization created is calculated every night and when you
-  click **Recalculate**.
+- **One-click instant totals on your own objects** are coming with the Builder. Until then,
+  use the [Flow template](#with-the-flow-template); without it, a rollup that counts records
+  from an object your organization created is calculated every night and when you click
+  **Recalculate**.
 - **Before the Builder ships, BarnCRM is checked against its previous rollup engine.** A
   developer runs that comparison on a test org; it changes nothing in your data.
 
