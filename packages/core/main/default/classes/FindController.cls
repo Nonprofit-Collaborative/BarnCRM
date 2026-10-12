@@ -131,6 +131,19 @@ public with sharing class FindController {
         }
     }
 
+    /** The kinds of related record of an object, for related records (C-36, R-SQ8). */
+    @AuraEnabled(cacheable=true)
+    public static List<FindRelatedRecords.ChildOption> listChildRelationships(
+        String objectApiName
+    ) {
+        try {
+            requirePermission();
+            return FindRelatedRecords.childOptions(objectApiName);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Find related records');
+        }
+    }
+
     /** Runs a document with the person's own access. */
     @AuraEnabled
     public static QueryResult runQuery(String queryJson) {

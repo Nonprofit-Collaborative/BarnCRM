@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Find_ErrorRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a related record kind is unknown. {0} is its name.</shortDescription>
+        <value>"{0}" is not a kind of related record you can use here. Choose one from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorRelatedCount</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: too many related records conditions or columns.</shortDescription>
+        <value>A query can have at most two related records conditions and two related record columns.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorChildColumn</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a related record column has bad fields or count.</shortDescription>
+        <value>A related record column needs from 1 to 5 fields and shows from 1 to 10 records.</value>
+    </labels>
+</CustomLabels>

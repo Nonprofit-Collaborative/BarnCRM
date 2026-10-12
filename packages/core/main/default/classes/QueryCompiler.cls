@@ -30,6 +30,11 @@ public with sharing class QueryCompiler {
         public String orderField;
         public String orderDirection;
         public Integer rowLimit = DEFAULT_ROWS;
+        /** Related-records conditions and related record columns (C-36, R-SQ8), as sent. */
+        public List<Object> related = new List<Object>();
+        public List<Object> children = new List<Object>();
+        /** The summary (C-36, R-SQ9), as sent; null when there is none. */
+        public Map<String, Object> aggregate;
     }
 
     /** A compiled query: SOQL with bind names, its binds, and the rendering to show. */
@@ -94,6 +99,20 @@ public with sharing class QueryCompiler {
         if (raw.get('limit') != null) {
             document.rowLimit = rowLimit(raw.get('limit'));
         }
+        document.related = optionalList(raw.get('related'));
+        document.children = optionalList(raw.get('children'));
+        if (
+            document.related.size() > FindRelatedRecords.MAX_RELATED ||
+            document.children.size() > FindRelatedRecords.MAX_CHILD_COLUMNS
+        ) {
+            throw new QueryCompilerException(System.Label.Core_Find_ErrorRelatedCount);
+        }
+        if (raw.get('aggregate') != null) {
+            if (!(raw.get('aggregate') instanceof Map<String, Object>)) {
+                throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+            }
+            document.aggregate = (Map<String, Object>) raw.get('aggregate');
+        }
         return document;
     }
 
@@ -150,6 +169,7 @@ public with sharing class QueryCompiler {
     ) {
         QueryDocument document = parse(queryJson);
         document.fields = new List<String>(fieldNames);
+        document.children.clear();
         return selectAndWhere(document, null, onlyIds);
     }
 
@@ -202,6 +222,19 @@ public with sharing class QueryCompiler {
             shownParts.add('(' + bound.display() + ')');
         }
         Map<String, Object> binds = new Map<String, Object>(bound.binds);
+        for (Integer index = 0; index < document.related.size(); index++) {
+            FindRelatedRecords.Rendered joined = FindRelatedRecords.condition(
+                objectName,
+                document.related[index],
+                index
+            );
+            whereParts.add(joined.clause);
+            shownParts.add(joined.display);
+            binds.putAll(joined.binds);
+        }
+        for (Object child : document.children) {
+            fields.add(FindRelatedRecords.childColumn(objectName, child).clause);
+        }
         if (afterId != null) {
             binds.put('afterId', afterId);
             whereParts.add('Id > :afterId');
@@ -241,6 +274,17 @@ public with sharing class QueryCompiler {
         } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
             throw new QueryCompilerException(refused.getMessage());
         }
+    }
+
+    /** An optional list key of the document: absent reads as empty, anything else is refused. */
+    private static List<Object> optionalList(Object raw) {
+        if (raw == null) {
+            return new List<Object>();
+        }
+        if (!(raw instanceof List<Object>)) {
+            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+        }
+        return (List<Object>) raw;
     }
 
     private static Integer rowLimit(Object raw) {

@@ -75,7 +75,22 @@ public with sharing class RollupFilterParser {
      * is empty when the document is; the binder carries the values and the display rendering.
      */
     public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName) {
-        FilterValueBinder binder = new FilterValueBinder(objectApiName);
+        return toBoundClause(filterDocument, new FilterValueBinder(objectApiName));
+    }
+
+    /** The same, with bind names of the caller's own prefix (C-36, related records). */
+    public static FilterValueBinder toBoundClause(
+        String filterDocument,
+        String objectApiName,
+        String bindPrefix
+    ) {
+        return toBoundClause(filterDocument, new FilterValueBinder(objectApiName, bindPrefix));
+    }
+
+    private static FilterValueBinder toBoundClause(
+        String filterDocument,
+        FilterValueBinder binder
+    ) {
         binder.clause = compile(filterDocument, binder);
         return binder;
     }

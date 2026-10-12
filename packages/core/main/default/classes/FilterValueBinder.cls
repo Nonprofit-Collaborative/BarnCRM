@@ -64,9 +64,20 @@ public with sharing class FilterValueBinder {
     private final Map<String, String> displayByName = new Map<String, String>();
     private Schema.DescribeFieldResult field;
     private String path;
+    private final String bindPrefix;
 
     public FilterValueBinder(String objectApiName) {
+        this(objectApiName, BIND_PREFIX);
+    }
+
+    /**
+     * A binder whose bind names start with `bindPrefix`, so a second filter in the same query
+     * (a related-records condition, C-36 R-SQ8) never reuses the first one's names. The prefix
+     * is the caller's constant, never anything a person typed.
+     */
+    public FilterValueBinder(String objectApiName, String bindPrefix) {
         this.objectApiName = objectApiName;
+        this.bindPrefix = bindPrefix;
     }
 
     /** The clause with each value written in, for display only. */
@@ -74,7 +85,7 @@ public with sharing class FilterValueBinder {
         String shown = clause == null ? '' : clause;
         // Highest first, so :fb1 never rewrites the start of :fb10.
         for (Integer index = displayByName.size() - 1; index >= 0; index--) {
-            String name = BIND_PREFIX + index;
+            String name = bindPrefix + index;
             shown = shown.replace(':' + name, displayByName.get(name));
         }
         return shown;
@@ -225,7 +236,7 @@ public with sharing class FilterValueBinder {
 
     /** Stores a value under the next bind name and returns `:name`. */
     private String bind(Object value) {
-        String name = BIND_PREFIX + binds.size();
+        String name = bindPrefix + binds.size();
         binds.put(name, value);
         displayByName.put(name, literal(value));
         return ':' + name;
