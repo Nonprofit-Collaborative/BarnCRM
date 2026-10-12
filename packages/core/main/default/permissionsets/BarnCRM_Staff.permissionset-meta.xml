@@ -803,6 +803,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Duplicate_Rule_Match__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Relationship__c.Contact__c</field>
     <readable>true</readable>

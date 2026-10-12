@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Duplicate_Rule_Match__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>True when the org's duplicate rules, not the template's matching rule, matched this row's person or organization (R-IT16).</description>
+  <inlineHelpText>Your duplicate rules matched this row to a record. Check it is the right one.</inlineHelpText>
+  <label>Matched By Duplicate Rule</label>
+  <type>Checkbox</type>
+</CustomField>

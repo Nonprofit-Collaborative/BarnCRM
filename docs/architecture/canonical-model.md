@@ -1257,6 +1257,7 @@ Maria load the same payment processor export every month without rebuilding the 
 | Organization Matching Rule | picklist(Name exact, External ID) | no | How a row's organization is matched to an organization the org already has; empty means Name exact (R-IT2). |
 | Organization Match Field | text | no | Under the External ID organization rule, the API name of the account field organizations are matched on (R-IT8). |
 | Several Matches | picklist(Reject the row, Use the most recently changed) | no | What happens when the key a row is looked for by finds more than one record; empty means Reject the row (R-IT9). |
+| Use Duplicate Rules | boolean | yes (defaults false) | Whether people and organizations the rule found nobody for are also matched through the org's active duplicate rules (R-IT16). |
 | Default Values | long text | no | Values applied to every row that does not carry its own, held in the same document format. |
 | Person Mode | picklist(Contacts, Person Accounts) | yes | Whether a person in this file becomes a Contact or a person Account; defaulted from the detected org shape. |
 | Is Package Default | boolean | yes (defaults false) | Marks a template materialized from a shipped default rather than built by the admin. |
@@ -1307,6 +1308,9 @@ lookup column may carry `"lookupField"`, the parent field it names its parent by
 ```
 { "source": "Program", "target": "Record.Program__c", "lookupField": "Program_Code__c" }
 ```
+
+Any column may also carry `"transforms"`, the steps that change its values as they load
+(R-IT15).
 
 **R-IT2 Matching rules in plain language.** The wizard states what each matching rule
 does and what it risks, for example that "Name plus postal code" merges two people who
@@ -1431,6 +1435,50 @@ Name. A column mapped to one is
 named once in the run log and skipped; so is a field the user may not create or edit, asked of
 describe for each row according to whether it creates or updates.
 
+**R-IT15 Changing a column's values (the transform document).** A column of the mapping
+document may carry `"transforms"`, an ordered list of at most 10 steps that change the
+column's value before it is matched or written (ADR-NEXT, `NEXT-data-transform-document.md`):
+
+```
+{ "source": "Last", "target": "Contact1.LastName",
+  "transforms": [ { "op": "trim" }, { "op": "proper" } ] }
+```
+
+| `op` | Parameters | What it does |
+|---|---|---|
+| `trim` | none | Removes leading and trailing white space and turns each run of white space into one space. |
+| `upper`, `lower` | none | Every letter as a capital, or as a small letter. |
+| `proper` | none | A capital for each letter that follows anything but a letter, every other letter small. |
+| `replace` | `find` (required, at most 255 characters), `with` (at most 255), `matchCase` (default false), `whole` (default false) | Replaces each occurrence of `find`, read as literal text, with `with`; under `whole`, replaces the value only when the whole value equals `find`. |
+| `ifBlank` | `value` (required, at most 255) | The value, when the value so far is blank. |
+| `append` | `columns` (1 to 5 source column names of the same row), `separator` (at most 10, default one space) | Adds the named columns' values after the value so far, leaving blank ones out, joined by the separator. |
+| `date` | `order`: `MDY`, `DMY` or `YMD` | Reads three numbers separated by any characters that are not digits in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
+
+Steps run in order, before values for every row (R-IB14): a step's output that is blank is
+filled by a file or template value like any blank cell. A document is checked when it is saved
+(an unknown `op`, a missing or oversized parameter, more than 10 steps, or an `append` naming
+no column refuses the save with the column named); a stored step that fails the check is skipped
+on read, as the rest of R-IT1 is forgiving. No step evaluates an expression, calls code, reads a
+record or uses a pattern the administrator typed: `replace` quotes its text. The engine is
+`DataTransform` in Core, which knows nothing of imports: it takes a value and the other values
+of the row by name, so bulk update (C-35) can apply the same steps to a record's fields.
+
+**R-IT16 Matching through the org's duplicate rules.** A people template with Use Duplicate
+Rules ticked also asks the org's active duplicate rules (ADR-NEXT,
+`NEXT-data-transform-document.md`) about each person and organization of a chunk that its rule
+(R-IT2, R-IT8) found nobody for, that no record ID names (R-IT10), that no earlier row of the
+pass is creating (R-IB12) and whose row is not already rejected. The row's values for the
+entity, as stored names (R-IT11), are set on an unsaved record of the entity's object (Contact,
+or Account in Person Accounts mode, for a person; Account for an organization) and passed to
+the platform's duplicate matcher, at most 50 records a call. Matches of another object are
+ignored. The matched identifiers are then read in user mode, keeping only records the user can
+see and, for accounts, of the entity's kind (a person record type for a person account, the
+Organization record type for an organization). One record kept matches; several follow Several
+Matches (R-IT9). A row matched this way has Matched By Duplicate Rule ticked (Section 17) and
+the run log counts such rows once a chunk. When the object has no active duplicate rule the user
+can see, or the matcher raises, the entity is matched by its rule alone and the run log says so
+once; nothing is rejected for it. Duplicate rules are not asked for a one-object template.
+
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
 override it per template, and the processor resolves the person references in R-IR1
@@ -1507,6 +1555,7 @@ from Nonprofit Cloud", section 5).
 | Organization Matching Rule | `Organization_Matching_Rule__c` | Picklist: Name exact, External ID |
 | Organization Match Field | `Organization_Match_Field__c` | Text (255) |
 | Several Matches | `Several_Matches__c` | Picklist: Reject the row, Use the most recently changed |
+| Use Duplicate Rules | `Use_Duplicate_Rules__c` | Checkbox |
 | Default Values | `Default_Values_JSON__c` | Long Text Area |
 | Person Mode | `Person_Mode__c` | Picklist: Contacts, Person Accounts |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
@@ -1531,6 +1580,8 @@ from Nonprofit Cloud", section 5).
   parents describe offers, and reading a value as its field's type), `ImportObjectLoader` (one
   chunk), `DataProtectedFields` with the `DataProtectionExtension` seam and
   `DataProtectionExtensions` (what a load never writes), LWC `importLoadOptions`.
+  Column changes (R-IT15): `DataTransform` (the engine, shared with bulk update), LWC
+  `importColumnTransforms`. Duplicate rules (R-IT16): `ImportDuplicateRuleMatcher`.
 
 ---
 
@@ -1925,6 +1976,7 @@ processor resolves those in dependency order.
 | Organization Key | text | computed | The same for the organization this row would create. |
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
 | Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
+| Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule, matched this row's person or organization (R-IT16). |
 | Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12). |
 
 ### Relationships
@@ -2050,6 +2102,7 @@ when the corrected row is loaded again.
 | Processor Key | `Processor_Key__c` | Text (16), External ID (indexed) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Several Matches | `Several_Matches__c` | Checkbox |
+| Matched By Duplicate Rule | `Duplicate_Rule_Match__c` | Checkbox |
 
 The six keys and the row's Pass Number are bookkeeping written and read in system mode
 (ADR-0021), in no permission set. The keys are marked External ID only so that they are
@@ -5665,3 +5718,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
 | v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-NEXT, `NEXT-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
 | v0.7 | 2026-10-12 | C-33 load one object (ADR-NEXT, `NEXT-import-load-one-object.md`). `Import_Template__c` gains `Target_Object__c`, `Load_Operation__c`, `Load_Match_Field__c` and `Lookup_Not_Found__c`; `Import_Journal__c.Phase__c` gains Created. R-IT12 (a template that loads one object: insert, update by record Id, upsert by external ID), R-IT13 (lookup columns by ID, name or a unique field) and R-IT14 (the allow-list of objects and the fields never written) added. R-IT1 gains the `Record` entity and `lookupField`; R-IR1, R-IB8, R-IB9 and R-IJ3 say how a one-object import's creations are journaled and undone; Import Row's Resulting Record and Processor Key serve one-object rows. |
+| 1.x | 2026-10-12 | C-37 data transforms and dedupe on import (ADR-NEXT, `NEXT-data-transform-document.md`). R-IT1 columns gain `transforms`; R-IT15 (the transform document and the `DataTransform` engine shared with bulk update) and R-IT16 (matching through the org's active duplicate rules) added. `Import_Template__c` gains `Use_Duplicate_Rules__c`; `Import_Row__c` gains `Duplicate_Rule_Match__c`. |
