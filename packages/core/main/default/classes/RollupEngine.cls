@@ -1,7 +1,7 @@
 /**
  * BarnCRM's own rollup engine: the entry point the instant path (slice S6), the full
- * recalculation batch (`RollupFullRecalcBatch`, S7) and the swap behind `RollupService` (S8) call (rollup proposal D1, D3,
- * Part 2 section 4). It runs next to the vendored engine until S8 and replaces it then.
+ * recalculation batch (`RollupFullRecalcBatch`, S7) and `RollupService` (S8) call (rollup
+ * proposal D1, D3, Part 2 section 4). Since S8 it is the only engine any run reaches.
  *
  * One pass per target entity: `RollupPlanner` turns every definition that writes it into a few
  * source queries, `RollupAggregator` recomputes each value from all its source rows, and

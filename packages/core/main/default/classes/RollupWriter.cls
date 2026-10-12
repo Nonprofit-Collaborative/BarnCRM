@@ -46,35 +46,6 @@ public without sharing class RollupWriter {
         Database.update(toStamp, AccessLevel.SYSTEM_MODE);
     }
 
-    /**
-     * Stamps the one freshness attribute a target entity carries (canonical model Section 26).
-     * The attribute is named rather than referenced, because Core drives rollups over objects it
-     * holds no reference to (R-R7), and an entity that does not carry the attribute is skipped
-     * rather than failing the run.
-     */
-    public static void stampTargets(String targetObject, Set<Id> targetIds, Datetime completedAt) {
-        if (String.isBlank(targetObject) || targetIds == null || targetIds.isEmpty()) {
-            return;
-        }
-        Schema.SObjectType targetType = SettingsService.typeByName(targetObject);
-        if (targetType == null) {
-            return;
-        }
-        Schema.SObjectField stamp = targetType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap()
-            .get(RollupService.FRESHNESS_FIELD);
-        if (stamp == null || !stamp.getDescribe().isUpdateable()) {
-            return;
-        }
-        List<SObject> toStamp = new List<SObject>();
-        for (Id targetId : targetIds) {
-            SObject target = targetType.newSObject(targetId);
-            target.put(stamp, completedAt);
-            toStamp.add(target);
-        }
-        Database.update(toStamp, false, AccessLevel.SYSTEM_MODE);
-    }
-
     /** Turns a definition off after the engine has refused it. */
     public static void deactivate(Id definitionId) {
         if (definitionId == null) {

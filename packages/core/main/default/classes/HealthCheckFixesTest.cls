@@ -368,7 +368,6 @@ private class HealthCheckFixesTest {
     static void aNightlyOnlyRollupWithNoNightlyRunIsAWarningAndTheFixSchedulesIt() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
         shipOneRollup(RollupService.MODE_SCHEDULED);
-        RollupService.skipEngine = true;
         RollupScheduler.jobNameInUse = TEST_JOB_NAME;
 
         System.runAs(maria) {

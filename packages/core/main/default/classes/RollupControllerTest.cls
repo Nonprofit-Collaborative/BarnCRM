@@ -111,7 +111,6 @@ private class RollupControllerTest {
 
     @IsTest
     static void recalculatingSomethingThatIsGoneSaysSoRatherThanFailing() {
-        RollupService.skipEngine = true;
         try {
             RollupController.recalculate(null);
             System.Assert.fail('An unknown definition is refused');

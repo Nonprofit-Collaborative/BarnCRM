@@ -1,106 +1,110 @@
 /**
  * The generic real-time handler: one handler, whichever entity a package registers it against.
  *
- * These tests have not been executed: no Salesforce org exists in this environment.
+ * Core holds no giving objects, so organizations count their child organizations (`ParentId`),
+ * as `RollupEngineTest` does. Account is not registered for real time, so the handler is called
+ * directly with the records in front of it, as a registered trigger would.
  */
 @IsTest
 private class RollupTriggerHandlerTest {
-    private static Rollup_Definition__c memberCount() {
+    private static Rollup_Definition__c childCount() {
         return new Rollup_Definition__c(
-            Name = 'Household member count',
-            Definition_Key__c = 'Core_Household_Member_Count',
-            Source_Object__c = 'Household_Member__c',
+            Name = 'Child organization count',
+            Definition_Key__c = 'Core_Child_Count',
+            Source_Object__c = 'Account',
             Target_Object__c = 'Account',
-            Relationship_Path__c = 'Household__c',
+            Relationship_Path__c = 'ParentId',
             Aggregate__c = 'COUNT',
-            Target_Field__c = 'Member_Count__c',
+            Target_Field__c = 'NumberOfEmployees',
             Mode__c = RollupService.MODE_REAL_TIME,
             Fiscal_Year_Aware__c = false,
             Active__c = true
         );
     }
 
+    private static Account organization(String name, Id parentId) {
+        return new Account(
+            Name = name,
+            ParentId = parentId,
+            RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+                .get('Organization')
+                .getRecordTypeId()
+        );
+    }
+
+    private static Integer countOn(Id parentId) {
+        return [SELECT NumberOfEmployees FROM Account WHERE Id = :parentId].NumberOfEmployees;
+    }
+
     @IsTest
     static void theHandlerRunsTheDefinitionsForWhateverEntityItWasGiven() {
-        insert memberCount();
-        Account household = new Account(Name = 'Test household');
-        insert household;
-        Contact person = new Contact(LastName = 'Okafor', AccountId = household.Id);
-        insert person;
-        Household_Member__c membership = new Household_Member__c(
-            Household__c = household.Id,
-            Contact__c = person.Id
-        );
-        insert membership;
+        insert childCount();
+        Account parent = organization('Parent', null);
+        insert parent;
+        Account child = organization('Child', parent.Id);
+        insert child;
 
-        RollupService.skipEngine = true;
         TriggerHandler.clearRunClaims();
-        TriggerHandler.testNew = new List<SObject>{ membership };
+        TriggerHandler.testNew = new List<SObject>{ child };
 
         Test.startTest();
         new RollupTriggerHandler().afterInsert();
         Test.stopTest();
 
-        System.Assert.isNotNull(RollupService.lastMetadata, 'The definition reached the engine');
         System.Assert.areEqual(
-            'Household_Member__c',
-            RollupService.lastMetadata[0].CalcItemText__c,
+            1,
+            countOn(parent.Id),
             'The entity was worked out from the records in front of the handler, not hard coded'
         );
     }
 
     @IsTest
     static void thesameRecordsAreNotRunTwiceInOneTransaction() {
-        insert memberCount();
-        Account household = new Account(Name = 'Test household');
-        insert household;
-        Household_Member__c membership = new Household_Member__c(Household__c = household.Id);
-        insert membership;
+        insert childCount();
+        Account parent = organization('Parent', null);
+        insert parent;
+        Account child = organization('Child', parent.Id);
+        insert child;
 
-        RollupService.skipEngine = true;
         TriggerHandler.clearRunClaims();
-        TriggerHandler.testNew = new List<SObject>{ membership };
-
+        TriggerHandler.testNew = new List<SObject>{ child };
         RollupTriggerHandler handler = new RollupTriggerHandler();
         handler.afterInsert();
-        RollupService.lastMetadata = null;
+        update new Account(Id = parent.Id, NumberOfEmployees = 99);
 
         Test.startTest();
         handler.afterInsert();
         Test.stopTest();
 
-        System.Assert.isNull(
-            RollupService.lastMetadata,
+        System.Assert.areEqual(
+            99,
+            countOn(parent.Id),
             'A rollup that causes its own object to be saved again does its work once per record'
         );
     }
 
     /**
-     * A definition asking for a SUM with nothing to sum cannot be expressed to the engine, so
-     * the adapter refuses it. `skipEngine` stands the engine down but not this path: the refusal
-     * happens while the definition is being turned into metadata, before the engine would be
-     * called at all. Two things have to be true afterwards: the save went through, and Maria can
-     * find out why the number did not move.
+     * A definition asking for a SUM with nothing to sum cannot be planned, so the engine refuses
+     * it. Two things have to be true afterwards: the save went through, and Maria can find out
+     * why the number did not move.
      *
-     * The membership is saved before the broken definition exists, so the only run of the rollup
-     * over it is the one this test makes, and the single log entry below is that run's.
+     * The child is saved before the broken definition exists, so the only run of the rollup over
+     * it is the one this test makes, and the single log entry below is that run's.
      */
     @IsTest
     static void aFailureIsLoggedRatherThanFailingTheSave() {
-        Account household = new Account(Name = 'Test household');
-        insert household;
-        Household_Member__c membership = new Household_Member__c(Household__c = household.Id);
-        insert membership;
+        Account parent = organization('Parent', null);
+        insert parent;
+        Account child = organization('Child', parent.Id);
+        insert child;
 
-        Rollup_Definition__c broken = memberCount();
+        Rollup_Definition__c broken = childCount();
         broken.Aggregate__c = 'SUM';
         broken.Source_Field__c = null;
         insert broken;
 
-        RollupService.skipEngine = true;
-        RollupService.lastMetadata = null;
         TriggerHandler.clearRunClaims();
-        TriggerHandler.testNew = new List<SObject>{ membership };
+        TriggerHandler.testNew = new List<SObject>{ child };
 
         Test.startTest();
         new RollupTriggerHandler().afterInsert();
@@ -108,19 +112,16 @@ private class RollupTriggerHandlerTest {
         Test.stopTest();
 
         // Nothing thrown: the administrator's save went through.
-        System.Assert.isNull(
-            RollupService.lastMetadata,
-            'The broken definition never reached the engine, so the refusal is the path that ran'
-        );
+        System.Assert.isNull(countOn(parent.Id), 'The broken definition wrote nothing');
         System.Assert.areEqual(
             1,
-            [SELECT COUNT() FROM Household_Member__c WHERE Id = :membership.Id],
+            [SELECT COUNT() FROM Account WHERE Id = :child.Id],
             'The save the rollup was running for stands (R-R4, plan Principle 2)'
         );
         List<Error_Log__c> logged = [
             SELECT Message__c, Technical_Detail__c, Record_Reference__c, Object_Name__c
             FROM Error_Log__c
-            WHERE Context__c = 'RollupService.runRealTime'
+            WHERE Context__c = 'RollupPlanner.plan'
         ];
         System.Assert.areEqual(1, logged.size(), 'And the failure is in the log, once');
         System.Assert.areEqual(
@@ -139,7 +140,7 @@ private class RollupTriggerHandlerTest {
             'What Maria reads is plain language'
         );
         System.Assert.isTrue(
-            logged[0].Technical_Detail__c.contains('RollupAdapterException'),
+            logged[0].Technical_Detail__c.contains('RollupPlanException'),
             'And the detail she forwards names what refused the definition'
         );
     }

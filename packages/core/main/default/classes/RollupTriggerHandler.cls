@@ -6,10 +6,9 @@
  * become real time, without Core naming that object anywhere (R-R7, ADR-0014).
  *
  * Core registers it against Contact and Household Member. That is not decoration: in contact mode
- * a household total reaches its household through the contact, and the engine requires the
- * intermediate object in a grandparent chain to re-run when a record is reparented, which is what
- * makes moving a person between households correct (ADR-0015). In junction mode the membership row
- * is the reparenting event, so the same is true there.
+ * a household total reaches its household through the contact, so a person who moves household
+ * has to mark both households for recalculation (R-R11). In junction mode the membership row is
+ * the reparenting event, so the same is true there.
  */
 public with sharing class RollupTriggerHandler extends TriggerHandler {
     private static final String CONTEXT = 'RollupTriggerHandler';
@@ -28,8 +27,8 @@ public with sharing class RollupTriggerHandler extends TriggerHandler {
 
     /**
      * After a delete, the totals the deleted records counted towards no longer include them
-     * (`RollupService.runAfterDelete`, BarnCRM's own engine; the vendored one handled the delete
-     * before it). A merge: the records deleted with `MasterRecordId` filled name the survivors,
+     * (`RollupService.runAfterDelete`; `beforeDelete` collected the rows the platform deletes
+     * with them). A merge: the records deleted with `MasterRecordId` filled name the survivors,
      * whose totals are recalculated so they include what the merge moved onto them.
      */
     public override void afterDelete() {

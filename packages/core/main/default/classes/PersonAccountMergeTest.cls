@@ -85,7 +85,6 @@ private class PersonAccountMergeTest {
             Fiscal_Year_Aware__c = false,
             Active__c = true
         );
-        RollupService.skipEngine = true;
 
         Test.startTest();
         Database.merge(ana, bea.Id);

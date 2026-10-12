@@ -241,14 +241,6 @@
         <value>The recalculation could not be started. The Error Log has the details.</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_BatchIncomplete</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup batch finished with failures</shortDescription>
-        <value>{0} rollup(s) could not be recalculated and {1} completed. The Error Log has the details.</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_Recalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -311,14 +303,6 @@
         <protected>false</protected>
         <shortDescription>Unexpected rollup error</shortDescription>
         <value>Something went wrong on the Rollups page. The Error Log has the details.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_MergeRecalcDeferred</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollups: log entry when a merge's totals are left to the nightly run.</shortDescription>
-        <value>A merge of {0} records left too little room to recalculate the kept records' totals now. They are recalculated in tonight's run.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_QueueSaveFailed</fullName>

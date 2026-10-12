@@ -2,10 +2,8 @@
  * The engine as the rest of BarnCRM sees it: materializing shipped defaults, running a
  * definition, and stamping freshness.
  *
- * These tests have not been executed: no Salesforce org exists in this environment. The engine
- * itself is stood down with `RollupService.skipEngine`, because what is being asserted here is
- * BarnCRM's side of ADR-0015: which definitions are selected, what metadata they become, and
- * what is stamped afterwards. The engine's own behaviour is upstream's, and upstream tests it.
+ * The engine's own arithmetic is `RollupEngineTest`'s; here it is which definitions run, for
+ * which records, and what is stamped afterwards.
  */
 @IsTest
 private class RollupServiceTest {
@@ -197,7 +195,6 @@ private class RollupServiceTest {
     static void aRunStampsTheDefinitionSoTheConsoleCanSayWhen() {
         Rollup_Definition__c definition = memberCount(RollupService.MODE_BOTH, true);
         insert definition;
-        RollupService.skipEngine = true;
 
         Test.startTest();
         RollupService.recalculate(definition.Id);
@@ -227,9 +224,9 @@ private class RollupServiceTest {
     }
 
     /**
-     * Two definitions, one of which cannot be expressed to the engine. The point of the rule is
-     * that the broken one is set aside and the run carries on, so the run has to contain
-     * something for it to carry on with.
+     * Two definitions, one of which cannot be planned. The point of the rule is that the broken
+     * one is set aside and the run carries on, so the run has to contain something for it to
+     * carry on with.
      */
     @IsTest
     static void aBrokenDefinitionIsLoggedAndTheRestStillRun() {
@@ -243,31 +240,13 @@ private class RollupServiceTest {
         broken.Source_Field__c = null;
         Rollup_Definition__c good = memberCount(RollupService.MODE_BOTH, true);
         insert new List<Rollup_Definition__c>{ broken, good };
-        RollupService.skipEngine = true;
-        RollupService.lastMetadata = null;
 
         Test.startTest();
-        Integer ran = RollupService.runFullRecalculation(
-            new List<Rollup_Definition__c>{ broken, good }
-        );
+        RollupService.runFullRecalculation(new List<Rollup_Definition__c>{ broken, good });
         Test.getEventBus().deliver();
         Test.stopTest();
+        Test.getEventBus().deliver();
 
-        System.Assert.areEqual(
-            1,
-            ran,
-            'The definition that cannot be expressed is skipped, not thrown, and the other one runs'
-        );
-        System.Assert.areEqual(
-            1,
-            RollupService.lastMetadata.size(),
-            'One definition reached the engine'
-        );
-        System.Assert.areEqual(
-            'Core_Household_Member_Count',
-            RollupService.lastMetadata[0].DeveloperName,
-            'And it is the good one'
-        );
         Map<Id, Rollup_Definition__c> stampedById = new Map<Id, Rollup_Definition__c>(
             [SELECT Last_Calculated__c FROM Rollup_Definition__c]
         );
@@ -282,7 +261,7 @@ private class RollupServiceTest {
         List<Error_Log__c> logged = [
             SELECT Record_Reference__c, Object_Name__c, Technical_Detail__c
             FROM Error_Log__c
-            WHERE Context__c = 'RollupService.recalculate'
+            WHERE Context__c = 'RollupPlanner.plan'
         ];
         System.Assert.areEqual(1, logged.size(), 'The refusal is in the log, once');
         System.Assert.areEqual(
@@ -296,7 +275,7 @@ private class RollupServiceTest {
             'So the entry can be grouped by what it is about'
         );
         System.Assert.isTrue(
-            logged[0].Technical_Detail__c.contains('RollupAdapterException'),
+            logged[0].Technical_Detail__c.contains('RollupPlanException'),
             'And the detail names what refused it'
         );
     }
@@ -313,59 +292,86 @@ private class RollupServiceTest {
         }
     }
 
+    /**
+     * Organizations count their child organizations (`ParentId`), as in `RollupEngineTest`:
+     * one live total, one nightly and one switched off, each on its own attribute, so the test
+     * can see which ran.
+     */
     @IsTest
-    static void aMergeRecalculatesOnlyTheRealTimeTotalsOnTheMergedEntity() {
-        insert new List<Rollup_Definition__c>{
-            memberCountNamed('Live count', 'Core_Merge_Live', RollupService.MODE_BOTH, true),
-            memberCountNamed(
-                'Nightly count',
-                'Core_Merge_Nightly',
-                RollupService.MODE_SCHEDULED,
-                true
-            ),
-            memberCountNamed('Off count', 'Core_Merge_Off', RollupService.MODE_BOTH, false)
+    static void aMergeRecalculatesOnlyTheRealTimeTotalsOnTheSurvivors() {
+        Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+            .get('Organization')
+            .getRecordTypeId();
+        Account survivor = new Account(
+            Name = 'Survivor',
+            RecordTypeId = organizationType,
+            Member_Count__c = 7
+        );
+        Account untouched = new Account(Name = 'Untouched', RecordTypeId = organizationType);
+        insert new List<Account>{ survivor, untouched };
+        insert new List<Account>{
+            new Account(Name = 'Child', RecordTypeId = organizationType, ParentId = survivor.Id),
+            new Account(Name = 'Other', RecordTypeId = organizationType, ParentId = untouched.Id)
         };
-        RollupService.skipEngine = true;
-        RollupService.lastMetadata = null;
+        insert new List<Rollup_Definition__c>{
+            childCount('Core_Merge_Live', 'NumberOfEmployees', RollupService.MODE_BOTH, true),
+            childCount('Core_Merge_Nightly', 'AnnualRevenue', RollupService.MODE_SCHEDULED, true),
+            childCount('Core_Merge_Off', 'Member_Count__c', RollupService.MODE_BOTH, false)
+        };
         // MasterRecordId cannot be written, so the deleted record is built as the trigger has it.
         List<SObject> merged = new List<SObject>{
             (Account) JSON.deserialize(
-                '{"attributes":{"type":"Account"},"MasterRecordId":"001000000000001AAA"}',
+                '{"attributes":{"type":"Account"},"MasterRecordId":"' + survivor.Id + '"}',
                 Account.class
             )
         };
         RollupService.runAfterMerge('Account', new List<SObject>{ new Account(Name = 'Deleted') });
         System.Assert.isNull(
-            RollupService.lastMetadata,
+            RollupService.lastParentIds,
             'An ordinary delete names no survivor, so nothing is recalculated'
         );
 
         Test.startTest();
         RollupService.runAfterMerge('Contact', merged);
-        List<Rollup__mdt> forPeople = RollupService.lastMetadata;
+        Set<Id> forPeople = RollupService.lastParentIds;
         RollupService.runAfterMerge('Account', merged);
         Test.stopTest();
 
         System.Assert.isNull(forPeople, 'No total targets people here, so nothing is run');
         System.Assert.areEqual(
-            1,
-            RollupService.lastMetadata.size(),
-            'Only the active real-time total on the merged entity is recalculated'
-        );
-        System.Assert.areEqual(
-            'Core_Merge_Live',
-            RollupService.lastMetadata[0].DeveloperName,
-            'And it is the live one'
-        );
-        System.Assert.areEqual(
-            new Set<Id>{ Id.valueOf('001000000000001AAA') },
+            new Set<Id>{ survivor.Id },
             RollupService.lastParentIds,
             'Only the survivor is recalculated, not every record the definition covers'
+        );
+        Map<Id, Account> after = new Map<Id, Account>(
+            [
+                SELECT NumberOfEmployees, AnnualRevenue, Member_Count__c
+                FROM Account
+                WHERE Id IN :new List<Id>{ survivor.Id, untouched.Id }
+            ]
+        );
+        System.Assert.areEqual(
+            1,
+            after.get(survivor.Id).NumberOfEmployees,
+            'The live total is recalculated in the same save'
+        );
+        System.Assert.isNull(
+            after.get(survivor.Id).AnnualRevenue,
+            'A nightly total waits for the nightly run'
+        );
+        System.Assert.areEqual(
+            7,
+            after.get(survivor.Id).Member_Count__c,
+            'And a total that is switched off is left alone'
+        );
+        System.Assert.isNull(
+            after.get(untouched.Id).NumberOfEmployees,
+            'A record that was not merged is not recalculated'
         );
     }
 
     @IsTest
-    static void aFullRecalculationCallsTheEngineOncePerSourceEntity() {
+    static void aFullRecalculationCoversDefinitionsOfEverySourceEntityInOneRun() {
         Rollup_Definition__c byMembership = memberCountNamed(
             'Members',
             'Core_Source_Membership',
@@ -387,7 +393,6 @@ private class RollupServiceTest {
             true
         );
         insert new List<Rollup_Definition__c>{ byMembership, byContact, alsoByMembership };
-        RollupService.skipEngine = true;
 
         Test.startTest();
         Integer ran = RollupService.runFullRecalculation(
@@ -395,16 +400,34 @@ private class RollupServiceTest {
         );
         Test.stopTest();
 
-        System.Assert.areEqual(3, ran, 'Every definition is recalculated');
+        System.Assert.areEqual(3, ran, 'Every definition is handed to the run');
         System.Assert.areEqual(
-            2,
-            RollupService.lastEngineCalls,
-            'One engine call per source entity, because one call across two fails in the engine'
+            3,
+            [SELECT COUNT() FROM Rollup_Definition__c WHERE Last_Calculated__c != NULL],
+            'And each is marked calculated when the one run over their target entity finished'
         );
-        System.Assert.isNull(
-            RollupService.lastParentIds,
-            'A full recalculation covers every record'
+        System.Assert.areEqual(
+            1,
+            [
+                SELECT COUNT()
+                FROM AsyncApexJob
+                WHERE JobType = 'BatchApex' AND ApexClass.Name = 'RollupFullRecalcBatch'
+            ],
+            'One run, whatever entities the definitions count'
         );
+    }
+
+    private static Rollup_Definition__c childCount(
+        String key,
+        String targetField,
+        String mode,
+        Boolean active
+    ) {
+        Rollup_Definition__c definition = memberCountNamed(key, key, mode, active);
+        definition.Source_Object__c = 'Account';
+        definition.Relationship_Path__c = 'ParentId';
+        definition.Target_Field__c = targetField;
+        return definition;
     }
 
     private static Rollup_Definition__c memberCountNamed(

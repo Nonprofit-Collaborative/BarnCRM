@@ -276,7 +276,6 @@ private class RollupChangesTest {
         Account child = organization('Child');
         child.ParentId = parent.Id;
         insert child;
-        RollupService.useOwnEngineInTests();
         TriggerHandler.clearRunClaims();
         TriggerHandler.testNew = new List<SObject>{ child };
 
@@ -302,7 +301,6 @@ private class RollupChangesTest {
             children.add(child);
         }
         insert children;
-        RollupService.useOwnEngineInTests();
         RollupService.instantLimit = 0;
         TriggerHandler.clearRunClaims();
         TriggerHandler.testNew = children;

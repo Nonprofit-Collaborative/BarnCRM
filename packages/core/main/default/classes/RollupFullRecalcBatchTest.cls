@@ -214,7 +214,6 @@ private class RollupFullRecalcBatchTest {
     static void theNightlyRunIsTheFullRecalculation() {
         Account organization = organizations(new List<Integer>{ 0 }, new List<Integer>{ 2 })[0];
         Rollup_Definition__c definition = peopleCount();
-        RollupService.useOwnEngineInTests();
 
         Test.startTest();
         Id jobId = RollupScheduler.runNow();
