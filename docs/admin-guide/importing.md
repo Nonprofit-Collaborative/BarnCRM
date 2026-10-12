@@ -56,7 +56,10 @@ or six rows.
    load (an amount or a date, for example) is offered only when that module is installed;
    without it, BarnCRM suggests **Do not load** for it. The mapping remembers your
    choices: the next file with the same headings opens with them, and a column you set to
-   **Do not load** stays that way even when BarnCRM recognizes its heading.
+   **Do not load** stays that way even when BarnCRM recognizes its heading. Besides the
+   usual columns, the picker lists your org's own fields on people and organizations that
+   you may edit (for example "Person: Member Since"), and each one's Salesforce record ID
+   (section 8).
 4. Choose how rows are matched. **Email exact** is the safe default for people. Read the
    sentence under each rule before you change it: **Name plus postal code** will treat two
    different people who share a name at one address as the same person. If the file has
@@ -64,7 +67,8 @@ or six rows.
    for them), and what happens when more than one record matches a row (**Reject the row**
    unless you have a reason to change it). On the same step, **Values for every row** lets
    you give a value the whole file shares, for example a city missing from every row; a row
-   with its own value keeps it. Section 8 explains every choice.
+   with its own value keeps it. Tick **Match only** when the file should update records you
+   already have and never add new ones. Section 8 explains every choice.
 5. Optionally, under **Control totals**, type how many rows the file should have (and, with
    Giving, for a gift file, what its amounts should add up to). The dry run checks them and a commit is
    refused while they do not match.
@@ -285,10 +289,25 @@ numbers. Fix the file or the totals and dry run again; the commit is refused unt
 every row that named a person would make every row the same person, so the import refuses it.
 Put names and emails in the file instead. A value for the organization is fine.
 
+**"No record with the ID ... was found that you can see".** The row gave a Salesforce record
+ID, and BarnCRM found no such record, or your user cannot see it. A row with an ID is loaded
+into that record or rejected; it never creates a new one. Check the ID against the record (a
+report export is the safest source) and that you have access to it, then load the row again.
+
+**"The ID ... is not a person" (or "not an organization").** The ID belongs to another kind
+of record, for example a household's ID in a person's ID column, or a contact's ID in the
+organization's. Map the column to the right one, or fix the ID.
+
+**"Nothing matches this row, and this file only matches".** The file was marked **Match only**,
+so a row whose person or organization is not already in Salesforce is rejected instead of
+creating them. If those rows are new people, untick **Match only** and load them again.
+
 ## 8. How rows are matched, and values for every row
 
-The matching step of the wizard holds four choices. Each is saved with the mapping, so the
-next file loaded with it starts with the same ones.
+The matching step of the wizard holds the choices below. How people and organizations are
+matched, and what happens when several records match, are saved with the mapping, so the next
+file loaded with it starts with the same ones; values for every row and **Match only** are for
+this file only.
 
 **People are matched by** one of three rules:
 
@@ -334,6 +353,25 @@ file's value, then any default the mapping holds. A value cannot be a person's n
 ID field, because every row would then be the same person. It can be an organization: for a
 staff list from one employer, give every row that organization's name.
 
+**Salesforce record IDs.** If your file came out of Salesforce (a report export, for example),
+map its ID column to **Person: Salesforce record ID**, **Second person: Salesforce record ID**
+or **Organization: Salesforce record ID**. A row with an ID is loaded into exactly that record,
+whatever the matching rule says, and is never matched to anyone else. If the ID is not a
+record of the right kind, or no such record exists that you can see, the row is rejected and
+nothing is created for it. A row whose ID cell is empty is matched by the rule as usual.
+
+**Match only.** Tick **Match only** on the matching step for a file that should change records
+you already have and add none, for example a list of updated phone numbers. A row whose person
+or organization matches no record is rejected with the reason, and the dry run shows you those
+rows first. The choice is for this file only: the next file starts with it unticked.
+
+**Your own fields.** The column list includes the fields your org added to people (contacts)
+and organizations (accounts), and the standard ones not already listed, wherever you may edit
+them. Fields Salesforce calculates (formulas, roll-ups, auto numbers), lookups to other records
+and the fields BarnCRM keeps for itself are not listed. A value is converted to the field's
+type (a checkbox takes Yes, True or 1; a date is written 2026-10-12), and a value the field
+cannot take is skipped and named in the run log.
+
 ## Fields the BarnCRM Admin role can import
 
 Salesforce controls standard fields one by one, and a person with only a minimal profile
@@ -367,6 +405,7 @@ For building a report on your imports.
 | Rows that matched more than one record | Import Row | Several Matches |
 | How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches |
 | The values given to every row of a file | Import Batch | File Values |
+| Whether a file only matched existing records | Import Batch | Match Only |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
 | The control totals of a file | Import Batch | Expected Count (and, with Giving, Expected Amount, File Amount) |
 | The import a record came from | Account, Contact (and Gift, with Giving) | Created By Import Batch |

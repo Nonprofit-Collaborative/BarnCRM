@@ -1326,6 +1326,29 @@ reads it, the later created winning a tie. Either way the row's Several Matches 
 organizations alike. A lookup stopped at its row cap is not a several-matches case: its keys
 find nobody alone, as R-IB12 describes.
 
+**R-IT10 A record ID in the file.** A column can be mapped to a person's or the
+organization's Salesforce record ID (`Contact1.Id`, `Contact2.Id`, `Organization.Id`; ADR-NEXT,
+`NEXT-import-record-id-matching-and-match-only.md`). A row giving one is matched to that record
+and no rule is asked: the ID must be a valid record ID of the object the entity is stored on
+(Contact, or Account in Person Accounts mode, for a person; Account for an organization), the
+record must exist and be visible to the importing user, a person account must have a person
+record type and an organization the Organization record type. A row whose ID fails any of these
+is rejected with the reason, and nothing is created for it: an ID given but not found never
+creates a record. The ID itself is never written to a field. A blank ID cell is no ID, and the
+row is matched by its rule. A value for every row of a file may not give a person's ID (R-IB14).
+
+**R-IT11 Custom fields on people and organizations.** A column can be mapped to any field of
+the person's or the organization's object that the importing user may create or edit, by its
+API name (for example `Contact1.Member_Since__c` or `Organization.Region__c`). The wizard offers
+these from describe: fields the user may read and create or edit, not formula, roll-up, auto
+number, lookup, compound address or location fields, not system fields, not the package's own
+bookkeeping fields (the import batch tag, the sample data marks, the household fields the
+household automation writes), and not a field the fixed column list already offers. For people
+it lists Contact fields in contact terms, which R-IT3 translates in Person Accounts mode; for
+organizations it lists Account fields that are not person account fields. Values are written
+as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
+value with a blank, and a field the user may not write is skipped and named in the run log.
+
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
 override it per template, and the processor resolves the person references in R-IR1
@@ -1457,6 +1480,7 @@ undoes.
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
+| Match Only | boolean | yes (defaults false) | When true, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15). |
 
 ### Relationships
 
@@ -1715,6 +1739,14 @@ since every row would then be one person; the batch is refused with that reason.
 an organization. The entity processor receives the row's values with the file's values
 applied, as it receives the template's defaults (R-IR6).
 
+**R-IB15 Match only.** The wizard can mark a file Match only (ADR-NEXT,
+`NEXT-import-record-id-matching-and-match-only.md`), for a file meant to update records the org
+already has. A row whose organization or either person matches no record, by its rule or by a
+record ID (R-IT10), is rejected with a message saying the file creates nobody; nothing is
+created for it. The dry run and the commit reject the same rows. Matched records are updated as
+in any import, and an entity processor still loads the rest of a matched row (R-IR6). The
+choice belongs to the file, not the template, and is set again for each upload.
+
 ### Salesforce implementation
 
 - **Object:** `Import_Batch__c`, auto-number Name with format `IB-{000000}`.
@@ -1744,6 +1776,7 @@ applied, as it receives the template's defaults (R-IR6).
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
+| Match Only | `Match_Only__c` | Checkbox (default false) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -5526,3 +5559,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
 | v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
 | v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
+| v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-NEXT, `NEXT-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
