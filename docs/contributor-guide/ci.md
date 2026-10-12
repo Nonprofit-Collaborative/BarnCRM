@@ -192,8 +192,13 @@ Salesforce org is needed for this job. Steps:
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.
-18. A grep check that fails the build if any tracked file contains an em dash character.
-19. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
+18. `scripts/ci/check-flow-templates.py`, failing the build if a switchable Core automation
+   has neither a Flow template (`Template_<registry name>`) nor a row on
+   `docs/admin-guide/flow-templates.md` saying why it has none, or if a template ships active
+   or not marked as a template (ADR-0040, ADR-NEXT
+   `NEXT-flow-templates-which-automations-get-one.md`).
+19. A grep check that fails the build if any tracked file contains an em dash character.
+20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
    The results are uploaded as a build artifact (`code-analyzer-results.html` and
    `code-analyzer-results.json`) even if the job fails, so anyone can download and read
@@ -224,6 +229,7 @@ npm run check:record-pages-assigned
 npm run check:canonical-model
 npm run check:openapi
 npm run check:setting-defaults
+npm run check:flow-templates
 npm run check:apex
 npm run check:analyzer
 ```

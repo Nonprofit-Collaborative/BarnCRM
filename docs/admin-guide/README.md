@@ -157,3 +157,4 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module | v0.6 |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core | v0.9 |
+| ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core | v0.6 |

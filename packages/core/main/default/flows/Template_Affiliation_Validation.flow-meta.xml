@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <assignments>
+    <description>Settles the status against the dates: an end date means Former, clearing an end date means Current, and an empty status means Current. A former affiliation is never primary.</description>
+    <name>Settle_Status</name>
+    <label>Settle status</label>
+    <locationX>176</locationX>
+    <locationY>323</locationY>
+    <assignmentItems>
+      <assignToReference>$Record.Status__c</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>fStatus</elementReference>
+      </value>
+    </assignmentItems>
+    <assignmentItems>
+      <assignToReference>$Record.Is_Primary__c</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>fIsPrimary</elementReference>
+      </value>
+    </assignmentItems>
+    <connector>
+      <targetReference>Check_People</targetReference>
+    </connector>
+  </assignments>
+  <assignments>
+    <description>Remembers the affiliation already on file that covers the same dates, so the message can name it.</description>
+    <name>Remember_Clash</name>
+    <label>Remember clash</label>
+    <locationX>264</locationX>
+    <locationY>1055</locationY>
+    <assignmentItems>
+      <assignToReference>varClashName</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>Each_Same_Organization.Name</elementReference>
+      </value>
+    </assignmentItems>
+    <connector>
+      <targetReference>Each_Same_Organization</targetReference>
+    </connector>
+  </assignments>
+  <customErrors>
+    <name>Refuse_Organization_Missing</name>
+    <label>Refuse organization missing</label>
+    <locationX>578</locationX>
+    <locationY>539</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Affiliation_OrganizationRequired}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Overlap</name>
+    <label>Refuse overlap</label>
+    <locationX>176</locationX>
+    <locationY>1355</locationY>
+    <customErrorMessages>
+      <errorMessage>{!fOverlapMessage}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Person_Ambiguous</name>
+    <label>Refuse person ambiguous</label>
+    <locationX>50</locationX>
+    <locationY>539</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Affiliation_PersonAmbiguous}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Person_Missing</name>
+    <label>Refuse person missing</label>
+    <locationX>314</locationX>
+    <locationY>539</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Affiliation_PersonRequired}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Self_Affiliation</name>
+    <label>Refuse self affiliation</label>
+    <locationX>842</locationX>
+    <locationY>539</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Affiliation_SelfAffiliation}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <decisions>
+    <description>An affiliation names exactly one person (a contact or a person held as an account, not both), names an organization, and the person is not the organization.</description>
+    <name>Check_People</name>
+    <label>Check people</label>
+    <locationX>578</locationX>
+    <locationY>431</locationY>
+    <defaultConnector>
+      <targetReference>Get_Same_Organization</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Well formed</defaultConnectorLabel>
+    <rules>
+      <name>Person_Ambiguous</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Person_Account__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Person_Ambiguous</targetReference>
+      </connector>
+      <label>Two people named</label>
+    </rules>
+    <rules>
+      <name>Person_Missing</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Person_Account__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Person_Missing</targetReference>
+      </connector>
+      <label>No person named</label>
+    </rules>
+    <rules>
+      <name>Organization_Missing</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Organization__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Organization_Missing</targetReference>
+      </connector>
+      <label>No organization named</label>
+    </rules>
+    <rules>
+      <name>Self_Affiliation</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Person_Account__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <elementReference>$Record.Organization__c</elementReference>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Self_Affiliation</targetReference>
+      </connector>
+      <label>Person is the organization</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>Refuses the save when an affiliation already on file covers the same dates.</description>
+    <name>Found_Clash</name>
+    <label>Found clash</label>
+    <locationX>308</locationX>
+    <locationY>1247</locationY>
+    <defaultConnectorLabel>No clash</defaultConnectorLabel>
+    <rules>
+      <name>Clash</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>varClashName</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Overlap</targetReference>
+      </connector>
+      <label>Clash</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>Compares one affiliation already on file with this one: the same role (ignoring capitals and spaces at either end) and dates that overlap. An empty start or end date is open ended.</description>
+    <name>Same_Role_And_Dates</name>
+    <label>Same role and dates</label>
+    <locationX>396</locationX>
+    <locationY>947</locationY>
+    <defaultConnector>
+      <targetReference>Each_Same_Organization</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>No overlap</defaultConnectorLabel>
+    <rules>
+      <name>Overlaps</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>fOverlaps</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Remember_Clash</targetReference>
+      </connector>
+      <label>Overlaps</label>
+    </rules>
+  </decisions>
+  <description
+  >Template for the automation "Check affiliations before they are saved" (registry row Affiliation_Validation). Save As a new flow, change your copy, activate it, then switch ours off on the Automation page of BarnCRM Settings. Settles the status against the dates, then refuses an affiliation that does not name exactly one person and one organization, that affiliates a person with themselves, or that covers dates another affiliation for the same person, organization, and role already covers. Unlike ours it compares each affiliation with those already saved, not with others in the same import. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  <environments>Default</environments>
+  <formulas>
+    <description>Whether the affiliation stays primary: never when it is former.</description>
+    <name>fIsPrimary</name>
+    <dataType>Boolean</dataType>
+    <expression>IF({!fStatus} = "Former", false, {!$Record.Is_Primary__c})</expression>
+  </formulas>
+  <formulas>
+    <description>The same message BarnCRM shows, with the person, organization, role, and the affiliation already on file filled in.</description>
+    <name>fOverlapMessage</name>
+    <dataType>String</dataType>
+    <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Label.Core_Affiliation_Overlap}, "{0}", {!fPersonName}), "{1}", {!$Record.Organization__r.Name}), "{2}", BLANKVALUE({!$Record.Role__c}, {!$Label.Core_Affiliation_NoRole})), "{3}", {!varClashName})</expression>
+  </formulas>
+  <formulas>
+    <description>True when the affiliation in the loop has the same role and dates that overlap this one.</description>
+    <name>fOverlaps</name>
+    <dataType>Boolean</dataType>
+    <expression
+    >AND(LOWER(TRIM(BLANKVALUE({!Each_Same_Organization.Role__c}, ""))) = LOWER(TRIM(BLANKVALUE({!$Record.Role__c}, ""))), OR(ISBLANK({!Each_Same_Organization.Start_Date__c}), ISBLANK({!$Record.End_Date__c}), {!Each_Same_Organization.Start_Date__c} &lt;= {!$Record.End_Date__c}), OR(ISBLANK({!$Record.Start_Date__c}), ISBLANK({!Each_Same_Organization.End_Date__c}), {!$Record.Start_Date__c} &lt;= {!Each_Same_Organization.End_Date__c}))</expression>
+  </formulas>
+  <formulas>
+    <description>The person this affiliation is for, whether held as a contact or as an account.</description>
+    <name>fPersonId</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Contact__c}, {!$Record.Person_Account__c})</expression>
+  </formulas>
+  <formulas>
+    <description>The person's name for the message.</description>
+    <name>fPersonName</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Contact__r.Name}, BLANKVALUE({!$Record.Person_Account__r.Name}, {!$Label.Core_Affiliation_UnnamedPerson}))</expression>
+  </formulas>
+  <formulas>
+    <description>An end date means Former. Clearing an end date means Current. An empty status means Current. Otherwise the status is left as the person set it.</description>
+    <name>fStatus</name>
+    <dataType>String</dataType>
+    <expression>IF(NOT(ISBLANK({!$Record.End_Date__c})), "Former", IF(NOT(ISBLANK({!$Record__Prior.End_Date__c})), "Current", IF(ISBLANK(TEXT({!$Record.Status__c})), "Current", TEXT({!$Record.Status__c}))))</expression>
+  </formulas>
+  <interviewLabel>BarnCRM template: Check affiliations before they are saved {!$Flow.CurrentDateTime}</interviewLabel>
+  <isTemplate>true</isTemplate>
+  <label>BarnCRM template: Check affiliations before they are saved</label>
+  <loops>
+    <description>Goes through the other affiliations for this person and organization, looking for one with the same role whose dates overlap.</description>
+    <name>Each_Same_Organization</name>
+    <label>Each same organization</label>
+    <locationX>176</locationX>
+    <locationY>839</locationY>
+    <collectionReference>Get_Same_Organization</collectionReference>
+    <iterationOrder>Asc</iterationOrder>
+    <nextValueConnector>
+      <targetReference>Same_Role_And_Dates</targetReference>
+    </nextValueConnector>
+    <noMoreValuesConnector>
+      <targetReference>Found_Clash</targetReference>
+    </noMoreValuesConnector>
+  </loops>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <recordLookups>
+    <description>The other affiliations already on file for this person and organization. Role and dates are compared in the loop, because a role is matched ignoring capitals and an empty date is open ended.</description>
+    <name>Get_Same_Organization</name>
+    <label>Get same organization</label>
+    <locationX>176</locationX>
+    <locationY>731</locationY>
+    <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Each_Same_Organization</targetReference>
+    </connector>
+    <filterLogic>(1 OR 2) AND 3 AND 4</filterLogic>
+    <filters>
+      <field>Contact__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fPersonId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Person_Account__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fPersonId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Organization__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Organization__c</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Id</field>
+      <operator>NotEqualTo</operator>
+      <value>
+        <elementReference>$Record.Id</elementReference>
+      </value>
+    </filters>
+    <getFirstRecordOnly>false</getFirstRecordOnly>
+    <object>Affiliation__c</object>
+    <storeOutputAutomatically>true</storeOutputAutomatically>
+  </recordLookups>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Settle_Status</targetReference>
+    </connector>
+    <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.Contact__c}), ISCHANGED({!$Record.Person_Account__c}), ISCHANGED({!$Record.Organization__c}), ISCHANGED({!$Record.Role__c}), ISCHANGED({!$Record.Start_Date__c}), ISCHANGED({!$Record.End_Date__c}), ISCHANGED({!$Record.Status__c}), ISCHANGED({!$Record.Is_Primary__c}))</filterFormula>
+    <object>Affiliation__c</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordBeforeSave</triggerType>
+  </start>
+  <status>Draft</status>
+  <variables>
+    <description>The name of the affiliation already on file that covers the same dates, when there is one.</description>
+    <name>varClashName</name>
+    <dataType>String</dataType>
+    <isCollection>false</isCollection>
+    <isInput>false</isInput>
+    <isOutput>false</isOutput>
+  </variables>
+</Flow>
