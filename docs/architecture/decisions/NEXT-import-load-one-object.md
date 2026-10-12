@@ -46,8 +46,8 @@ Created By Import Batch field, and Core cannot add one to it.
 4. **An allow-list, decided from describe (R-IT14).** An object may be loaded only when all of
    these hold:
    - it is a custom object (not a custom setting, custom metadata, platform event, big object or
-     external object), or a standard object that describe calls a business record: layoutable,
-     searchable and queryable;
+     external object), or a standard object that describe calls a business record: searchable
+     and queryable;
    - it is not a share, history, feed or change event object;
    - it is not a Salesforce setup or security object: users, groups and group members, queues,
      profiles, roles, permission sets and their groups, assignments and licenses, object and

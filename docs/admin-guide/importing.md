@@ -419,7 +419,7 @@ the same dry run, results, journal and undo as any import.
 6. Select **Dry run**, read the results, and commit.
 
 **Which objects are listed.** Your org's own custom objects, and the standard objects
-Salesforce treats as business records (ones with page layouts that you can search), where you
+Salesforce treats as business records (ones you can find in global search), where you
 may create or edit records. Never listed, whatever your access:
 
 - Salesforce setup and security: users, groups, queues, profiles, roles, permission sets and

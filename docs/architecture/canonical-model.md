@@ -1402,8 +1402,7 @@ follows Several Matches (R-IT9) and ticks the row's Several Matches.
 from describe at run time, so a new object is judged without a code change:
 
 1. It is a custom object, not a custom setting, custom metadata, platform event, big object or
-   external object; or a standard object that describe calls layoutable, searchable and
-   queryable.
+   external object; or a standard object that describe calls searchable and queryable.
 2. Its name does not end in Share, History, Feed or ChangeEvent.
 3. It is not a Salesforce setup or security object: User, Group, GroupMember, QueueSobject,
    Profile, UserRole, PermissionSet, PermissionSetAssignment, PermissionSetGroup,
@@ -1425,8 +1424,10 @@ organizations are created by a people template, which builds households (R-IR1a)
 These fields are never written, whatever the file holds: the fields the platform keeps (Id,
 created and modified stamps, system mod stamp, last activity, viewed and referenced dates),
 formula and auto number fields, every Rollup Definition target on the object, the batch tag
-(R-IB3), any package field whose name ends in Last Calculated, the household fields the household
-automation keeps on accounts and contacts, and a household's Name. A column mapped to one is
+(R-IB3), the sample data marks, any package field whose name ends in Last Calculated, the
+household fields the household automation keeps on accounts and contacts (greetings, member
+count, custom name, household role, primary contact, primary affiliation), and a household's
+Name. A column mapped to one is
 named once in the run log and skipped; so is a field the user may not create or edit, asked of
 describe for each row according to whether it creates or updates.
 
