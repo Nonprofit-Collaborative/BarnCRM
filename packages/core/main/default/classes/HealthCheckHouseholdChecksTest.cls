@@ -289,7 +289,7 @@ private class HealthCheckHouseholdChecksTest {
 
         Assert.isTrue(
             finding.detail.contains(System.Label.Core_HealthCheck_OrphansNativeNote),
-            'Open Impact cannot see native membership, and says so (R-H12).'
+            'BarnCRM cannot see native membership, and says so (R-H12).'
         );
     }
 

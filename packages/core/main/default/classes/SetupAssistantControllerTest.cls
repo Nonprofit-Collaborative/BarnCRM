@@ -1,5 +1,5 @@
 /**
- * Maria works through the guided assistant: she confirms how Open Impact fits her
+ * Maria works through the guided assistant: she confirms how BarnCRM fits her
  * Nonprofit Cloud org, records her organization's name, answers the step a module adds,
  * skips a step, and starts again when she wants to.
  *

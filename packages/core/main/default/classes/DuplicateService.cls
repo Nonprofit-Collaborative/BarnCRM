@@ -5,7 +5,7 @@
  * Nothing in this class compares two records. The comparison is the platform's: the org's own
  * active duplicate rules decide what counts as the same person or the same household, and
  * `Datacloud.FindDuplicatesByIds` runs those rules against records that already exist. That is
- * the gap Open Impact fills, because a duplicate rule otherwise only runs when somebody saves a
+ * the gap BarnCRM fills, because a duplicate rule otherwise only runs when somebody saves a
  * record, and the platform job that runs rules over existing records exists only in the two
  * largest editions.
  *
@@ -128,7 +128,7 @@ public with sharing class DuplicateService {
     /**
      * What the org's active duplicate rules say about these records, which must all be of one
      * object. Only matches of that same object are kept: a rule for people can also name leads,
-     * and a lead is nothing Open Impact can merge.
+     * and a lead is nothing BarnCRM can merge.
      *
      * A failure is logged and answered with nothing rather than thrown. The platform raises when
      * an object has no active rule, and one chunk that cannot be matched is no reason to stop a
@@ -190,7 +190,7 @@ public with sharing class DuplicateService {
     }
 
     /**
-     * Only pairs Open Impact can act on (R-DP2): a pair of accounts is kept only when both are
+     * Only pairs BarnCRM can act on (R-DP2): a pair of accounts is kept only when both are
      * households. People pairs pass through untouched.
      */
     public static List<Pair> actionablePairs(List<Pair> pairs) {

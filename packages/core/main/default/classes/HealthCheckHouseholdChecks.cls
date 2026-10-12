@@ -107,7 +107,7 @@ public with sharing class HealthCheckHouseholdChecks {
     /**
      * One finding for a count of orphans, or null when there are none. No fix: the links are
      * the records to open. In an org that also has Nonprofit Cloud households the detail says
-     * that some may belong to one, because Open Impact cannot see that membership (R-H12).
+     * that some may belong to one, because BarnCRM cannot see that membership (R-H12).
      */
     private static HealthCheckService.Finding orphanFinding(
         String key,

@@ -19,7 +19,7 @@
  */
 @NamespaceAccessible
 public with sharing class HouseholdSelector {
-    // The two Nonprofit Cloud objects an Open Impact household Account can have hanging off
+    // The two Nonprofit Cloud objects a BarnCRM household Account can have hanging off
     // it, and the whole text of the query asked of each. Held as text and never compiled
     // against, so that Core still deploys on a Platform-only org where neither object exists
     // (ADR-0009, ADR-0013), and each query is a complete literal so that nothing is ever
@@ -27,7 +27,7 @@ public with sharing class HouseholdSelector {
     private static final String NATIVE_HOUSEHOLD_GROUP = 'PartyRelationshipGroup'; // detection-only: describe key, so the delete guard can tell whether this org has native household groups at all before it asks about one
     private static final String NATIVE_HOUSEHOLD_GROUP_QUERY = 'SELECT AccountId FROM PartyRelationshipGroup WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice a native household group whose master-detail parent is the Account it is about to delete, because deleting the Account cascade-deletes the group
     private static final String NATIVE_MEMBERSHIP = 'AccountContactRelation'; // detection-only: describe key, so the delete guard can tell whether this org has native membership rows at all before it asks about one
-    private static final String NATIVE_MEMBERSHIP_QUERY = 'SELECT AccountId FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice native household membership rows on the Account it is about to delete, because they make a household that reads as empty to Open Impact
+    private static final String NATIVE_MEMBERSHIP_QUERY = 'SELECT AccountId FROM AccountContactRelation WHERE AccountId IN :accountIds LIMIT 10000'; // detection-only: the delete guard has to notice native household membership rows on the Account it is about to delete, because they make a household that reads as empty to BarnCRM
     private static final String ACCOUNT_FIELD = 'AccountId';
 
     // The one question Health Check asks that getAccountsWithNativeDependents cannot answer:
@@ -36,7 +36,7 @@ public with sharing class HouseholdSelector {
     // exclusion decision (product-plan Section 11.2 item 9) exists to prevent. A second query
     // text, never concatenated, the same shape as the others in this class.
     private static final String NATIVE_HOUSEHOLD_GROUP_TYPE = 'PartyRelationshipGroup'; // detection-only: describe key, so Health Check's collision count can tell whether the object exists before it asks about it
-    private static final String NATIVE_HOUSEHOLD_COLLISION_COUNT_QUERY = 'SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId AND Id IN (SELECT AccountId FROM PartyRelationshipGroup WHERE Type = \'Household\')'; // detection-only: counts Accounts that are an Open Impact household and a native Nonprofit Cloud household at once
+    private static final String NATIVE_HOUSEHOLD_COLLISION_COUNT_QUERY = 'SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId AND Id IN (SELECT AccountId FROM PartyRelationshipGroup WHERE Type = \'Household\')'; // detection-only: counts Accounts that are a BarnCRM household and a native Nonprofit Cloud household at once
 
     /**
      * Set only by tests, so the collision count can be exercised on an org where the native
@@ -222,18 +222,18 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * Accounts that something outside Open Impact still depends on, of the ones given.
+     * Accounts that something outside BarnCRM still depends on, of the ones given.
      *
      * A household built by Salesforce Nonprofit Cloud is an Account plus a second record, the
      * native household group, and its membership is carried on native relationship rows
      * rather than on our own Household Member object. The two object names are the constants
      * at the top of this class. The group's account field is a master-detail to Account with
      * no Update property, so deleting the Account does not orphan the group, it destroys it,
-     * and every membership row goes with it. Such a household reads as empty to Open Impact,
-     * because Open Impact owns none of those rows. The verification is in
+     * and every membership row goes with it. Such a household reads as empty to BarnCRM,
+     * because BarnCRM owns none of those rows. The verification is in
      * docs/architecture/reference/nonprofit-cloud-data-model.md section 8 item 7.
      * ADR-0036 is the decision this method exists to enforce: an empty household is deleted
-     * only when nothing outside Open Impact depends on the Account.
+     * only when nothing outside BarnCRM depends on the Account.
      *
      * Neither object exists on a Platform-only org, so both names and both query texts are
      * held as String constants and each query is run through Database.query (ADR-0009,
@@ -317,7 +317,7 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * How many Accounts are, at once, an Open Impact household and a Nonprofit Cloud native
+     * How many Accounts are, at once, a BarnCRM household and a Nonprofit Cloud native
      * household, the collision the mutual exclusion decision exists to prevent
      * (product-plan Section 11.2 item 9). Health Check reports this as a warning distinct
      * from the informational native household count.

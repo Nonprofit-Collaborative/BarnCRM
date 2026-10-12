@@ -9,7 +9,7 @@
  */
 public with sharing class SeasonalAddressScheduler implements Schedulable {
     /** The name the scheduled job carries, so the settings page can find it again. */
-    public static final String JOB_NAME = 'Open Impact Seasonal Addresses';
+    public static final String JOB_NAME = 'BarnCRM Seasonal Addresses';
 
     /**
      * Half past midnight. Early enough that a season that starts today is in place before the

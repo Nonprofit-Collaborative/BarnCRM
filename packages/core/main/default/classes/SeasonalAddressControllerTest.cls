@@ -149,14 +149,14 @@ private class SeasonalAddressControllerTest {
         Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User reader = new User(
             Alias = 'oiread',
-            Email = 'seasonal.reader@openimpact.invalid',
+            Email = 'seasonal.reader@barncrm.invalid',
             EmailEncodingKey = 'UTF-8',
             LastName = 'Reader',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
             ProfileId = standard.Id,
             TimeZoneSidKey = 'America/Chicago',
-            UserName = 'seasonal.reader.' + DateTime.now().getTime() + '@openimpact.invalid'
+            UserName = 'seasonal.reader.' + DateTime.now().getTime() + '@barncrm.invalid'
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             insert reader;

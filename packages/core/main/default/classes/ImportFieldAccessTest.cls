@@ -24,8 +24,8 @@ private class ImportFieldAccessTest {
         User person = new User(
             ProfileId = minimum.Id,
             LastName = 'Fieldaccess',
-            Email = 'fieldaccess@openimpact.test.invalid',
-            Username = 'fieldaccess' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'fieldaccess@barncrm.test.invalid',
+            Username = 'fieldaccess' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'fldacc',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

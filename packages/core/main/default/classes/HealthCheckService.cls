@@ -1,5 +1,5 @@
 /**
- * Health Check: what this org looks like, whether Open Impact is set up to match, who can
+ * Health Check: what this org looks like, whether BarnCRM is set up to match, who can
  * get in, and what is currently in the way (plan Section 4.8, feature C-11).
  *
  * This class holds the vocabulary every check shares (the Finding, the severities, the
@@ -123,7 +123,7 @@ public with sharing class HealthCheckService {
 
     /**
      * The developer names of the packaged permission set groups (the roles the Access page
-     * assigns) that mean "this person uses Open Impact", and the permission set that means
+     * assigns) that mean "this person uses BarnCRM", and the permission set that means
      * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
      */
     public static final String GROUP_ADMIN = 'Nonprofit_Admin_Group';
@@ -303,7 +303,7 @@ public with sharing class HealthCheckService {
     }
 
     /**
-     * How many people administer Open Impact, and how many active people cannot see it at
+     * How many people administer BarnCRM, and how many active people cannot see it at
      * all. Both are questions about the whole org, which is why only an administrator is
      * allowed to ask them.
      */

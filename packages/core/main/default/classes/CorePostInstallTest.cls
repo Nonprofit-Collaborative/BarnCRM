@@ -1,5 +1,5 @@
 /**
- * Tests for CorePostInstall and its retry job: Maria installs Open Impact and can use
+ * Tests for CorePostInstall and its retry job: Maria installs BarnCRM and can use
  * Nonprofit Settings straight away, the shipped rollups are in the org when she gets there,
  * an upgrade changes nothing, the role follows when the platform has finished preparing it,
  * and nothing here ever breaks an install.
@@ -43,7 +43,7 @@ private class CorePostInstallTest {
      * permission set assertions prove the install gave it, rather than finding the one the
      * test org's run script assigned to the running user beforehand.
      *
-     * @return the installer's Id, holding no Open Impact access yet
+     * @return the installer's Id, holding no BarnCRM access yet
      */
     private static Id newInstaller() {
         return TestDataFactory.createUser('Installer', new List<String>()).Id;

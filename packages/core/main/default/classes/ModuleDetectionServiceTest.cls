@@ -1,5 +1,5 @@
 /**
- * Core has to run on an org where no other Open Impact package is installed, so detection
+ * Core has to run on an org where no other BarnCRM package is installed, so detection
  * answers honestly and nothing static ever names another package's schema.
  */
 @IsTest
@@ -12,7 +12,7 @@ private class ModuleDetectionServiceTest {
         List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
         Test.stopTest();
 
-        Assert.areEqual(6, modules.size(), 'Open Impact is six packages');
+        Assert.areEqual(6, modules.size(), 'BarnCRM is six packages');
         Assert.areEqual('Core', modules[0].name, 'Core comes first and is always here');
         Assert.isTrue(modules[0].present, 'Core is the package this code is in');
         for (ModuleDetectionService.ModuleInfo module : modules) {

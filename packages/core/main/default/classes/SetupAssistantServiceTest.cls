@@ -34,7 +34,7 @@ private class SetupAssistantServiceTest {
         Assert.areEqual(
             'coexistence',
             steps[0].key,
-            'Confirming how Open Impact fits the org comes first'
+            'Confirming how BarnCRM fits the org comes first'
         );
         Assert.areEqual(
             '/lightning/setup/ManageUsers/home',

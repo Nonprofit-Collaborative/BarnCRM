@@ -1475,7 +1475,7 @@ private class HouseholdServiceTest {
         Assert.areEqual(
             0,
             [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
-            'Nothing outside Open Impact points at the empty household, so it was deleted'
+            'Nothing outside BarnCRM points at the empty household, so it was deleted'
         );
         Assert.areEqual(
             0,
@@ -1493,7 +1493,7 @@ private class HouseholdServiceTest {
         Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
         Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
         // As though this household were also a Nonprofit Cloud household: an account with a
-        // native household group hanging off it, whose members Open Impact cannot see.
+        // native household group hanging off it, whose members BarnCRM cannot see.
         HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{ fromHousehold };
 
         Test.startTest();
@@ -1530,7 +1530,7 @@ private class HouseholdServiceTest {
 
     /**
      * Mutual exclusion (product-plan Section 11.2 item 9). afterMembershipChange still
-     * recalculates the member count, which is Open Impact's own bookkeeping, but leaves the
+     * recalculates the member count, which is BarnCRM's own bookkeeping, but leaves the
      * name and greetings of a household that already carries a native Nonprofit Cloud
      * household group exactly as they were.
      */
@@ -1559,14 +1559,14 @@ private class HouseholdServiceTest {
         Assert.areEqual(
             1,
             after.Member_Count__c,
-            'The member count is Open Impact\'s own bookkeeping and still updates'
+            'The member count is BarnCRM\'s own bookkeeping and still updates'
         );
     }
 
     /**
      * Auto-creation, junction mode, contact stored as a person. The weaker but safe rule:
      * a contact whose AccountId already points at an Account carrying a native household
-     * group gets no Open Impact household.
+     * group gets no BarnCRM household.
      */
     @IsTest
     static void aContactAlreadyLinkedToANativeHouseholdGetsNoNewHouseholdInJunctionMode() {
@@ -1591,7 +1591,7 @@ private class HouseholdServiceTest {
         Assert.areEqual(
             0,
             [SELECT COUNT() FROM Household_Member__c WHERE Contact__c = :maria.Id],
-            'No Open Impact household was created for a contact already linked to a native household'
+            'No BarnCRM household was created for a contact already linked to a native household'
         );
     }
 
@@ -1600,7 +1600,7 @@ private class HouseholdServiceTest {
      * Account is the person, so the same rule is asked of the Account itself.
      */
     @IsTest
-    static void aPersonAccountThatAlreadyCarriesANativeGroupGetsNoOpenImpactHousehold() {
+    static void aPersonAccountThatAlreadyCarriesANativeGroupGetsNoBarnCRMHousehold() {
         HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
         HouseholdService.personAccountOverride = true;
         Account person = new Account(Name = 'Maria Garcia');
@@ -1617,7 +1617,7 @@ private class HouseholdServiceTest {
         Assert.areEqual(
             0,
             [SELECT COUNT() FROM Household_Member__c WHERE Account__c = :person.Id],
-            'No Open Impact household was created for a person account that already carries a native household group'
+            'No BarnCRM household was created for a person account that already carries a native household group'
         );
     }
 

@@ -41,7 +41,7 @@ private class ErrorDigestServiceTest {
         TestDataFactory.defaultSettings();
         User jen = TestDataFactory.createUser('Jen', new List<String>{ 'Nonprofit_Staff' });
         User admin = maria();
-        setDigest('JEN@openimpact.example.invalid', null, null);
+        setDigest('JEN@barncrm.example.invalid', null, null);
         List<Error_Log__c> logs = new List<Error_Log__c>{
             entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW),
             entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW),

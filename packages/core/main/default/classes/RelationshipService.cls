@@ -52,7 +52,7 @@ public with sharing class RelationshipService {
     private static Map<String, String> reciprocalByType;
 
     /**
-     * Whether the org asks Open Impact to keep both sides in step (R-RL1). An org that has
+     * Whether the org asks BarnCRM to keep both sides in step (R-RL1). An org that has
      * never saved its settings gets the shipped default, which is on, from
      * `SettingsService.SHIPPED_DEFAULTS`: the field's own `defaultValue` is not what Apex
      * reads back, and this feature did nothing at all on a fresh org until that was fixed

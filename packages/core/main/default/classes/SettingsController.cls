@@ -5,11 +5,11 @@
 @NamespaceAccessible
 public with sharing class SettingsController {
     private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
-    private static final String HELP_BASE = 'https://github.com/Nonprofit-Collaborative/OpenImpact/blob/main/docs/admin-guide/';
+    private static final String HELP_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/';
     private static final String TYPE_COMPONENT = 'Component';
     private static final String TYPE_CHECKBOX = 'Checkbox';
     private static final String TYPE_PICKLIST = 'Picklist';
-    private static final String ERROR_CONTEXT = 'Open Impact Settings console';
+    private static final String ERROR_CONTEXT = 'BarnCRM Settings console';
 
     public class ConsoleModel {
         @AuraEnabled

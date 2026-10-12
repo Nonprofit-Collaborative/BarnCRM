@@ -12,7 +12,7 @@
  */
 public with sharing class AutomationResumeJob implements Schedulable {
     /** The name the job carries, so it can be found, replaced and cancelled. */
-    public static final String JOB_NAME = 'Open Impact Automation Resume';
+    public static final String JOB_NAME = 'BarnCRM Automation Resume';
 
     private static final String LOG_CONTEXT = 'Automation pause: automatic resume';
 

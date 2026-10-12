@@ -369,7 +369,7 @@ private class HealthCheckServiceTest {
             System.assertNotEquals(
                 null,
                 finding,
-                'An org where nobody can administer Open Impact is told so.'
+                'An org where nobody can administer BarnCRM is told so.'
             );
             System.assertEquals(
                 HealthCheckService.SEVERITY_ERROR,
@@ -726,7 +726,7 @@ private class HealthCheckServiceTest {
         );
         System.assert(
             finding.detail.contains(FiscalYearSelector.monthName(7)),
-            'The finding names the month Open Impact uses. Detail was: ' + finding.detail
+            'The finding names the month BarnCRM uses. Detail was: ' + finding.detail
         );
         System.assert(
             finding.detail.contains(FiscalYearSelector.monthName(1)),
@@ -1091,7 +1091,7 @@ private class HealthCheckServiceTest {
 
     /**
      * Informational: an org with native Nonprofit Cloud households is told how many, and
-     * that Open Impact leaves them alone (product-plan Section 11.2 item 9).
+     * that BarnCRM leaves them alone (product-plan Section 11.2 item 9).
      */
     @IsTest
     static void anOrgWithNativeHouseholdsReportsHowManyInformationally() {
@@ -1138,7 +1138,7 @@ private class HealthCheckServiceTest {
     }
 
     /**
-     * Warning: an Account that is an Open Impact household and a native Nonprofit Cloud
+     * Warning: an Account that is a BarnCRM household and a native Nonprofit Cloud
      * household at once, the collision mutual exclusion exists to prevent.
      */
     @IsTest

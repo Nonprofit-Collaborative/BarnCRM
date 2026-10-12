@@ -115,7 +115,7 @@ public with sharing class CorePostInstallRetryQueueable implements Queueable {
             new AccessService.AccessException(
                 'Warning: the Nonprofit Admin role was still being prepared after ' +
                     MAX_ATTEMPTS +
-                    ' attempts, so it was not given to the person who installed Open Impact. ' +
+                    ' attempts, so it was not given to the person who installed BarnCRM. ' +
                     'They already have the Nonprofit Admin permission set, so Nonprofit Settings ' +
                     'works. To finish, open Nonprofit Settings, then Access, and give them the ' +
                     'Nonprofit Admin role.'

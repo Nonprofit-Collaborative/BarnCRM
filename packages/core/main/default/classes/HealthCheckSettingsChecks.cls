@@ -1,5 +1,5 @@
 /**
- * The Health Check questions about how Open Impact is set up and what it has been doing:
+ * The Health Check questions about how BarnCRM is set up and what it has been doing:
  * whether automation is paused (and whether anything will end the pause), whether the two
  * fiscal years agree, and whether anything is waiting in the Error Log
  * (plan Section 4.8, feature C-11). Since C-21 it also asks whether the package defaults

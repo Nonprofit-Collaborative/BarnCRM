@@ -74,7 +74,7 @@ public without sharing class ErrorLogWriter {
             // intentionally (PMD AvoidDebugStatements finding accepted, not suppressed).
             System.debug(
                 LoggingLevel.ERROR,
-                'Open Impact could not publish an Error Log event: ' + cannotPublish.getMessage()
+                'BarnCRM could not publish an Error Log event: ' + cannotPublish.getMessage()
             );
             return false;
         }
@@ -98,7 +98,7 @@ public without sharing class ErrorLogWriter {
             // not suppressed).
             System.debug(
                 LoggingLevel.ERROR,
-                'Open Impact could not write an Error Log record: ' + failedToLog.getMessage()
+                'BarnCRM could not write an Error Log record: ' + failedToLog.getMessage()
             );
         }
     }

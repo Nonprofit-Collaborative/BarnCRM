@@ -21,7 +21,7 @@ private class AccessServiceTest {
             LastName = lastName,
             Alias = 'oi' + suffix.right(6),
             Email = firstName.toLowerCase() + '.' + suffix + '@example.invalid',
-            Username = firstName.toLowerCase() + '.' + suffix + '@openimpact.test.invalid',
+            Username = firstName.toLowerCase() + '.' + suffix + '@barncrm.test.invalid',
             ProfileId = standardProfile.Id,
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',
@@ -164,7 +164,7 @@ private class AccessServiceTest {
         Test.startTest();
         try {
             AccessService.assignRole(david.Id, 'Some_Other_Group');
-            Assert.fail('A role that Open Impact does not ship should be refused.');
+            Assert.fail('A role that BarnCRM does not ship should be refused.');
         } catch (AccessService.AccessException e) {
             message = e.getMessage();
         }

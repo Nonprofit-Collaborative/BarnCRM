@@ -181,7 +181,7 @@ public with sharing class ImportController {
     }
 
     /**
-     * The mapping Open Impact suggests for a file's header row, as a mapping document. The
+     * The mapping BarnCRM suggests for a file's header row, as a mapping document. The
      * template's own mapping wins for any column it already names, Do not load included, so a
      * template used every month keeps the corrections its administrator made to it.
      */

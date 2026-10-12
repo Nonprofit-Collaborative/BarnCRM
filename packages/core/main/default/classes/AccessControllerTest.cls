@@ -21,7 +21,7 @@ private class AccessControllerTest {
             LastName = lastName,
             Alias = 'oi' + suffix.right(6),
             Email = firstName.toLowerCase() + '.' + suffix + '@example.invalid',
-            Username = firstName.toLowerCase() + '.' + suffix + '@openimpact.test.invalid',
+            Username = firstName.toLowerCase() + '.' + suffix + '@barncrm.test.invalid',
             ProfileId = standardProfile.Id,
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',
@@ -204,7 +204,7 @@ private class AccessControllerTest {
         }
         Test.stopTest();
 
-        Assert.isFalse(result.success, 'A role Open Impact does not ship should be refused.');
+        Assert.isFalse(result.success, 'A role BarnCRM does not ship should be refused.');
         Assert.areEqual(
             AccessController.ERROR_FAILED,
             result.errorCode,

@@ -29,7 +29,7 @@ public with sharing class ErrorDigestController {
         /** The names of the people the next digest goes to. */
         @AuraEnabled
         public List<String> recipients;
-        /** True when nobody is listed, so it goes to everyone who administers Open Impact. */
+        /** True when nobody is listed, so it goes to everyone who administers BarnCRM. */
         @AuraEnabled
         public Boolean toAdministrators;
     }

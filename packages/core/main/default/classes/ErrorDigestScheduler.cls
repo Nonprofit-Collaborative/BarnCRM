@@ -6,7 +6,7 @@
  */
 public with sharing class ErrorDigestScheduler implements Schedulable {
     /** The name the scheduled job carries, so the settings page can find it again. */
-    public static final String JOB_NAME = 'Open Impact Error Digest';
+    public static final String JOB_NAME = 'BarnCRM Error Digest';
 
     /**
      * Seven in the morning: after the nightly jobs (the last, donor levels, starts at 03:00), so

@@ -178,8 +178,8 @@ private class ImportMatcherTest {
             ProfileId = [SELECT Id FROM Profile WHERE Name = 'Minimum Access - Salesforce' LIMIT 1]
             .Id,
             LastName = 'Noread',
-            Email = 'noread@openimpact.test.invalid',
-            Username = 'noread' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'noread@barncrm.test.invalid',
+            Username = 'noread' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'noread',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

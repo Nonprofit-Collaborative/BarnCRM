@@ -775,7 +775,7 @@ public with sharing class HouseholdService {
             recalculateMemberCounts(householdIds);
             // Mutual exclusion (product-plan Section 11.2 item 9): a household that already
             // carries a native Nonprofit Cloud household group keeps the name and greetings
-            // the customer maintains there. The member count above is Open Impact's own
+            // the customer maintains there. The member count above is BarnCRM's own
             // bookkeeping and is left alone; only the naming write is guarded.
             Set<Id> namableHouseholds = new Set<Id>(householdIds);
             namableHouseholds.removeAll(
@@ -992,7 +992,7 @@ public with sharing class HouseholdService {
      *
      * Mutual exclusion (product-plan Section 11.2 item 9): here the person's own Account is
      * the person, so a person account that already carries a native Nonprofit Cloud
-     * household group gets no Open Impact household of its own. Membership in a native
+     * household group gets no BarnCRM household of its own. Membership in a native
      * group is really carried on the native membership object HouseholdSelector already
      * names, which is forbidden to query (ADR-0009, ADR-0013); this is the weaker, safe
      * question this file's guards all ask instead: whether the Account itself carries the
@@ -1087,8 +1087,8 @@ public with sharing class HouseholdService {
      * HouseholdSelector already names, which is forbidden to query (ADR-0009, ADR-0013), so
      * this asks the weaker, safe question instead: whether the contact's own AccountId
      * already points at an Account carrying a native group at all. A person truly
-     * native-only and not yet linked to that Account by an AccountId still gets an Open
-     * Impact household from this method; that gap is smaller
+     * native-only and not yet linked to that Account by an AccountId still gets a BarnCRM
+     * household from this method; that gap is smaller
      * than the harm of a duplicate, and no migration or sync is in scope here.
      */
     private static List<Contact> withoutAHousehold(List<Contact> contacts) {
@@ -1836,10 +1836,10 @@ public with sharing class HouseholdService {
 
     /**
      * Deletes households that have been left with no members, when the org asks for that and
-     * nothing outside Open Impact still depends on the account. R-H12, ADR-0036.
+     * nothing outside BarnCRM still depends on the account. R-H12, ADR-0036.
      *
-     * "Empty" is decided from Open Impact's own membership, which is the only membership Open
-     * Impact can see. In an org running Salesforce Nonprofit Cloud a household account can
+     * "Empty" is decided from BarnCRM's own membership, which is the only membership BarnCRM
+     * can see. In an org running Salesforce Nonprofit Cloud a household account can
      * carry a native household group and native membership rows as well, and the account is
      * the master of that group, so deleting it would destroy the group rather than orphan it.
      * Such a household is left alone and the skip is reported, because a tidy-up that quietly

@@ -1,6 +1,6 @@
 /**
  * What a relationship record must be true of before it is saved (canonical model Section 27,
- * rules R-RL4 and R-RL5), and the two values Open Impact fills in for the person saving it.
+ * rules R-RL4 and R-RL5), and the two values BarnCRM fills in for the person saving it.
  *
  * This runs in the before contexts, where the records are still writable, and it runs on both
  * sides of a connection for the same reason every other rule does: the other side is an

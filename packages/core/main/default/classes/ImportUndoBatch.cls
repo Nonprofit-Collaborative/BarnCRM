@@ -624,7 +624,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      * Why each of these records is not the import's to delete (R-IB9): it was edited or had an
      * activity logged since; anything created since points at it through any reference the org
      * can filter on; or, for a household or an organization, a person is still on it or
-     * something outside Open Impact depends on it (ADR-0036).
+     * something outside BarnCRM depends on it (ADR-0036).
      */
     private Map<Id, String> reasonsToKeep(Set<Id> ids, Schema.SObjectType type) {
         Map<Id, String> keep = new Map<Id, String>();

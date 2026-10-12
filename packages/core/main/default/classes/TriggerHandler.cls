@@ -12,7 +12,7 @@
  *     public class ContactTriggerHandler extends TriggerHandler {
  *         public override void beforeInsert() {
  *             for (Contact person : (List<Contact>) Trigger.new) {
- *                 person.Description = 'Seen by Open Impact';
+ *                 person.Description = 'Seen by BarnCRM';
  *             }
  *         }
  *     }

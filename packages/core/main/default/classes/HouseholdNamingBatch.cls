@@ -8,7 +8,7 @@ public with sharing class HouseholdNamingBatch implements Database.Batchable<SOb
 
     /**
      * Households left untouched because they already carry a native Nonprofit Cloud
-     * household group, mutual exclusion (product-plan Section 11.2 item 9): Open Impact
+     * household group, mutual exclusion (product-plan Section 11.2 item 9): BarnCRM
      * never rewrites the name or greetings of an Account somebody else's household model
      * owns.
      */

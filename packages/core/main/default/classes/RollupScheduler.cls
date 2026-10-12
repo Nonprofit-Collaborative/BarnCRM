@@ -7,7 +7,7 @@
  */
 public with sharing class RollupScheduler implements Schedulable {
     /** The name the scheduled job carries, so the console can find it again. */
-    public static final String JOB_NAME = 'Open Impact Rollups';
+    public static final String JOB_NAME = 'BarnCRM Rollups';
 
     /**
      * The name used for the job. A test gives it a name of its own, because the org a test runs

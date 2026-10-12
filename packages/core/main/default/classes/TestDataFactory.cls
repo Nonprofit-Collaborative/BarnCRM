@@ -58,7 +58,7 @@ public class TestDataFactory {
         return new Automation_Setting__c(
             Name = automationName,
             Automation_Name__c = automationName,
-            Description__c = 'Test automation used by the Open Impact test suite.',
+            Description__c = 'Test automation used by the BarnCRM test suite.',
             Enabled__c = enabled,
             Handler_Class__c = automationName,
             Object_Name__c = 'Error_Log__c',
@@ -98,7 +98,7 @@ public class TestDataFactory {
     }
 
     /**
-     * A user on a minimal profile whose only Open Impact access comes from the packaged
+     * A user on a minimal profile whose only BarnCRM access comes from the packaged
      * permission sets named here, so that a test proves what those sets actually grant rather
      * than what a system administrator profile already allows.
      *
@@ -130,14 +130,14 @@ public class TestDataFactory {
         String unique = lastName + System.now().getTime() + Crypto.getRandomInteger();
         User person = new User(
             Alias = lastName.left(8),
-            Email = lastName + '@openimpact.example.invalid',
+            Email = lastName + '@barncrm.example.invalid',
             EmailEncodingKey = 'UTF-8',
             LastName = lastName,
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
             ProfileId = profileId,
             TimeZoneSidKey = 'GMT',
-            Username = unique + '@openimpact.example.invalid'
+            Username = unique + '@barncrm.example.invalid'
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             insert person;

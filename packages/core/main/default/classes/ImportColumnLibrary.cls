@@ -24,7 +24,7 @@ public with sharing class ImportColumnLibrary {
      */
     private static Map<String, String> knownTargets;
 
-    /** The target Open Impact suggests for one header, or null when it recognizes none. */
+    /** The target BarnCRM suggests for one header, or null when it recognizes none. */
     @NamespaceAccessible
     public static String suggest(String header) {
         if (String.isBlank(header)) {

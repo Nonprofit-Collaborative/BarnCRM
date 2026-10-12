@@ -264,8 +264,8 @@ private class DuplicateControllerTest {
         User admin = new User(
             ProfileId = minimum.Id,
             LastName = 'Dupaccess',
-            Email = 'dupaccess@openimpact.test.invalid',
-            Username = 'dupaccess' + DateTime.now().getTime() + '@openimpact.test.invalid',
+            Email = 'dupaccess@barncrm.test.invalid',
+            Username = 'dupaccess' + DateTime.now().getTime() + '@barncrm.test.invalid',
             Alias = 'dupacc',
             TimeZoneSidKey = 'America/Los_Angeles',
             LocaleSidKey = 'en_US',

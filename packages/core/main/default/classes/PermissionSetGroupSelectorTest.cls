@@ -20,12 +20,9 @@ private class PermissionSetGroupSelectorTest {
         }
         Assert.isTrue(
             names.contains(AccessService.ADMIN_ROLE),
-            'The Nonprofit Admin group ships with Open Impact Core and should be found.'
+            'The Nonprofit Admin group ships with BarnCRM Core and should be found.'
         );
-        Assert.isTrue(
-            names.contains('Read_Only'),
-            'The Read Only group ships with Open Impact Core.'
-        );
+        Assert.isTrue(names.contains('Read_Only'), 'The Read Only group ships with BarnCRM Core.');
     }
 
     @IsTest
@@ -47,7 +44,7 @@ private class PermissionSetGroupSelectorTest {
         PermissionSetGroup groupRecord = selector.selectByDeveloperName('Program_Staff');
         Test.stopTest();
 
-        Assert.isNotNull(groupRecord, 'The Program Staff group ships with Open Impact Core.');
+        Assert.isNotNull(groupRecord, 'The Program Staff group ships with BarnCRM Core.');
         Assert.areEqual('Program_Staff', groupRecord.DeveloperName, 'The wrong group came back.');
     }
 

@@ -78,7 +78,7 @@ public with sharing class ErrorLogger {
             // AvoidDebugStatements finding accepted, not suppressed).
             System.debug(
                 LoggingLevel.ERROR,
-                'Open Impact could not build an Error Log record: ' + failedToBuild.getMessage()
+                'BarnCRM could not build an Error Log record: ' + failedToBuild.getMessage()
             );
         }
         ErrorLogWriter.write(entries);
@@ -149,7 +149,7 @@ public with sharing class ErrorLogger {
         Error_Log__c entry = new Error_Log__c(
             Timestamp__c = System.now(),
             User__c = UserInfo.getUserId(),
-            Context__c = truncate(String.isBlank(context) ? 'Open Impact' : context, MAX_CONTEXT),
+            Context__c = truncate(String.isBlank(context) ? 'BarnCRM' : context, MAX_CONTEXT),
             Message__c = truncate(message, MAX_LONG_TEXT),
             Technical_Detail__c = truncate(detail, MAX_LONG_TEXT),
             Severity__c = SEVERITIES.contains(severity) ? severity : SEVERITY_ERROR,

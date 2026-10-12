@@ -1,6 +1,6 @@
 /**
- * The Health Check questions about what this org is: what is installed alongside Open
- * Impact, which coexistence mode that implies, and whether the settings match it
+ * The Health Check questions about what this org is: what is installed alongside BarnCRM,
+ * which coexistence mode that implies, and whether the settings match it
  * (plan Section 4.8, feature C-11).
  *
  * These checks are the ones that run for everybody, because none of them asks a question
@@ -59,7 +59,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         }
     }
 
-    /** How many Accounts are a native household and an Open Impact household at once. */
+    /** How many Accounts are a native household and a BarnCRM household at once. */
     public class NativeHouseholdCollisionCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return nativeHouseholdCollisionFinding();
@@ -310,7 +310,7 @@ public with sharing class HealthCheckOrgShapeChecks {
     /**
      * How many households here are already the Salesforce Nonprofit Cloud way: an Account
      * carrying a native household group. Informational, because it is not a problem, it is
-     * mutual exclusion working (product-plan Section 11.2 item 9): Open Impact leaves these
+     * mutual exclusion working (product-plan Section 11.2 item 9): BarnCRM leaves these
      * households alone rather than renaming, re-greeting, or re-addressing them.
      */
     private static HealthCheckService.Finding nativeHouseholdsFinding(
@@ -335,10 +335,10 @@ public with sharing class HealthCheckOrgShapeChecks {
     }
 
     /**
-     * How many Accounts carry a native Nonprofit Cloud household group and the Open Impact
+     * How many Accounts carry a native Nonprofit Cloud household group and the BarnCRM
      * Household record type at once, the collision mutual exclusion exists to prevent
      * (product-plan Section 11.2 item 9). A warning, unlike the informational count above:
-     * such an Account is one where Open Impact used to write the name, greetings, or
+     * such an Account is one where BarnCRM used to write the name, greetings, or
      * address before this guard, and an administrator should look at it.
      */
     private static HealthCheckService.Finding nativeHouseholdCollisionFinding() {

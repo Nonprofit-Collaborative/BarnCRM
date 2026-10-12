@@ -179,7 +179,7 @@ private class ErrorLoggerTest {
             [
                 SELECT COUNT()
                 FROM Error_Log__c
-                WHERE Severity__c = 'Error' AND Context__c = 'Open Impact'
+                WHERE Severity__c = 'Error' AND Context__c = 'BarnCRM'
             ],
             'An unrecognized severity is recorded as an error, under a default context.'
         );

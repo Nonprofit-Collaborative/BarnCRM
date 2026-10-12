@@ -1,10 +1,10 @@
 /**
- * The engine as the rest of Open Impact sees it: materializing shipped defaults, running a
+ * The engine as the rest of BarnCRM sees it: materializing shipped defaults, running a
  * definition, and stamping freshness.
  *
  * These tests have not been executed: no Salesforce org exists in this environment. The engine
  * itself is stood down with `RollupService.skipEngine`, because what is being asserted here is
- * Open Impact's side of ADR-0015: which definitions are selected, what metadata they become, and
+ * BarnCRM's side of ADR-0015: which definitions are selected, what metadata they become, and
  * what is stamped afterwards. The engine's own behaviour is upstream's, and upstream tests it.
  */
 @IsTest

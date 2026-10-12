@@ -1,6 +1,6 @@
 /**
  * Tests for PermissionSetSelector: the packaged permission set the post-install script
- * hands to the person who installed Open Impact.
+ * hands to the person who installed BarnCRM.
  */
 @IsTest
 private class PermissionSetSelectorTest {
@@ -12,7 +12,7 @@ private class PermissionSetSelectorTest {
         PermissionSet found = selector.selectByNameInSystemMode(AccessService.ADMIN_PERMISSION_SET);
         Test.stopTest();
 
-        Assert.isNotNull(found, 'The Nonprofit Admin permission set ships with Open Impact Core.');
+        Assert.isNotNull(found, 'The Nonprofit Admin permission set ships with BarnCRM Core.');
         Assert.areEqual(
             AccessService.ADMIN_PERMISSION_SET,
             found.Name,

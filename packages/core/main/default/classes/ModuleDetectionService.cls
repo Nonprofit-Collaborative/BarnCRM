@@ -1,5 +1,5 @@
 /**
- * Which Open Impact packages are in this org, and what their objects are called.
+ * Which BarnCRM packages are in this org, and what their objects are called.
  *
  * Core never references another package's schema statically (ADR-0009, plan Section 4.2):
  * every name below is a describe probe held as a string, and every caller has to cope with
@@ -18,7 +18,7 @@ public with sharing class ModuleDetectionService {
     private static final String MODULE_CORE = 'Core';
     private static final String MODULE_GIVING = 'Giving';
 
-    private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/OpenImpact/blob/main/docs/product-plan.md';
+    private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/product-plan.md';
 
     /** One row of the module list the Setup Assistant shows in step six. */
     public class ModuleInfo {
@@ -49,7 +49,7 @@ public with sharing class ModuleDetectionService {
         return objectExists(IMPORT_BATCH_OBJECT);
     }
 
-    /** The six Open Impact packages, each saying whether it is in this org. */
+    /** The six BarnCRM packages, each saying whether it is in this org. */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
         List<ModuleInfo> modules = new List<ModuleInfo>();
@@ -80,7 +80,7 @@ public with sharing class ModuleDetectionService {
                 }
             }
         } catch (Exception e) {
-            ErrorLogger.log(e, 'Open Impact module detection');
+            ErrorLogger.log(e, 'BarnCRM module detection');
         }
         return names;
     }

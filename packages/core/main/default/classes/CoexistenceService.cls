@@ -1,5 +1,5 @@
 /**
- * The org's coexistence mode: how Open Impact behaves next to whatever is already installed
+ * The org's coexistence mode: how BarnCRM behaves next to whatever is already installed
  * (plan Section 4.5). One org-level setting, proposed by detection and confirmed by an
  * administrator, changeable at any time.
  *

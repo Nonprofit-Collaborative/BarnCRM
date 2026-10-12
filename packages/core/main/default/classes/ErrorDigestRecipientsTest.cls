@@ -42,7 +42,7 @@ private class ErrorDigestRecipientsTest {
             try {
                 SettingsService.saveValues(
                     new Map<String, Object>{
-                        'Error_Digest_Recipients__c' => 'Jen@openimpact.example.invalid, donor@example.com'
+                        'Error_Digest_Recipients__c' => 'Jen@barncrm.example.invalid, donor@example.com'
                     }
                 );
                 Assert.fail('An address outside the org must be refused.');
@@ -58,14 +58,14 @@ private class ErrorDigestRecipientsTest {
             }
             SettingsService.saveValues(
                 new Map<String, Object>{
-                    'Error_Digest_Recipients__c' => 'Jen@openimpact.example.invalid'
+                    'Error_Digest_Recipients__c' => 'Jen@barncrm.example.invalid'
                 }
             );
             Test.stopTest();
         }
 
         Assert.areEqual(
-            'Jen@openimpact.example.invalid',
+            'Jen@barncrm.example.invalid',
             settings().Error_Digest_Recipients__c,
             'A user of the org is accepted.'
         );
@@ -85,7 +85,7 @@ private class ErrorDigestRecipientsTest {
         System.runAs(admin) {
             Test.startTest();
             recipients = ErrorDigestRecipients.resolve(
-                'JEN@openimpact.example.invalid; Maria@openimpact.example.invalid'
+                'JEN@barncrm.example.invalid; Maria@barncrm.example.invalid'
             );
             Test.stopTest();
         }
@@ -103,7 +103,7 @@ private class ErrorDigestRecipientsTest {
         }
 
         Test.startTest();
-        String refusal = ErrorDigestRecipients.refusal('Former@openimpact.example.invalid');
+        String refusal = ErrorDigestRecipients.refusal('Former@barncrm.example.invalid');
         Test.stopTest();
 
         Assert.isNotNull(refusal, 'A deactivated user cannot receive the digest.');

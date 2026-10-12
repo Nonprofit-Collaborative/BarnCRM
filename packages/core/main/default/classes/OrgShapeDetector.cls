@@ -1,5 +1,5 @@
 /**
- * Reports what is installed in this org, so that Open Impact can recommend a coexistence
+ * Reports what is installed in this org, so that BarnCRM can recommend a coexistence
  * mode (plan Section 4.5) and Health Check can tell an administrator what it found
  * (plan Section 4.8).
  *

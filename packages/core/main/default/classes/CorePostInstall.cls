@@ -1,5 +1,5 @@
 /**
- * What Open Impact Core does for itself at install and at every upgrade.
+ * What BarnCRM Core does for itself at install and at every upgrade.
  *
  * Four things. The first is to make sure the person who installed the package can open
  * Nonprofit Settings. Without it nobody in the org holds the Manage Nonprofit Settings

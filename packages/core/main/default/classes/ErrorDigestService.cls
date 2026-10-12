@@ -1,6 +1,6 @@
 /**
  * The error digest (C-23, canonical model R-E5, ADR-0055): one short email to each of the
- * people who look after Open Impact, counting the Error Log entries that arrived since the last
+ * people who look after BarnCRM, counting the Error Log entries that arrived since the last
  * digest and are still New.
  *
  * What it may say is the point of the design. It counts entries by source and by severity and

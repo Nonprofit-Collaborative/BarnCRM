@@ -185,7 +185,7 @@ private class SettingsServiceTest {
         SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
             new Setting_Definition__mdt(
                 DeveloperName = 'Coexistence_Mode_Choice',
-                MasterLabel = 'How Open Impact fits your org',
+                MasterLabel = 'How BarnCRM fits your org',
                 Setting_Key__c = 'Coexistence_Mode__c',
                 Section__c = SettingSections.GENERAL,
                 Module__c = 'Core',

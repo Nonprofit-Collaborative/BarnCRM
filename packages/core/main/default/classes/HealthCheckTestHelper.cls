@@ -11,7 +11,7 @@
  */
 @IsTest
 public class HealthCheckTestHelper {
-    /** The packaged role an administrator of Open Impact is given (admin guide, Access). */
+    /** The packaged role an administrator of BarnCRM is given (admin guide, Access). */
     private static final String NONPROFIT_ADMIN = HealthCheckService.PERMISSION_SET_ADMIN;
 
     /**
