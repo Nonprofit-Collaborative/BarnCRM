@@ -12,7 +12,16 @@
     {
       "object": "Task",
       "link_field": "WhatId",
-      "fields": ["Subject", "Status", "Priority", "ActivityDate", "Description", "Type", "OwnerId", "WhoId"]
+      "fields": [
+        "Subject",
+        "Status",
+        "Priority",
+        "ActivityDate",
+        "Description",
+        "Type",
+        "OwnerId",
+        "WhoId"
+      ]
     },
     {
       "object": "Event",
