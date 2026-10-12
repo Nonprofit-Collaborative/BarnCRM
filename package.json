@@ -23,6 +23,7 @@
     "check:record-pages-assigned": "python3 scripts/ci/check-record-pages-assigned.py",
     "check:canonical-model": "python3 scripts/ci/check-canonical-model.py",
     "check:setting-defaults": "python3 scripts/ci/check-setting-defaults.py",
+    "check:setting-object-explicit": "python3 scripts/ci/check-setting-object-explicit.py",
     "precommit": "lint-staged",
     "check:apex": "bash scripts/ci/check-apex-offline.sh",
     "check:analyzer": "sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2"
