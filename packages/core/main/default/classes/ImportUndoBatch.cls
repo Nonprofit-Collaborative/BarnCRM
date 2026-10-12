@@ -673,9 +673,35 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             for (Id dependent : HouseholdSelector.getAccountsWithNativeDependents(ids)) {
                 keep.put(dependent, Label.Core_Import_UndoKeptNativeDependents);
             }
+            markKeptByDependents(keep, ids);
         }
         markKeptByProcessor(keep, ids, type);
         return keep;
+    }
+
+    /**
+     * Keeps a household an installed module still credits records to, asked through the same
+     * extension point the empty household tidy-up uses (ADR-NEXT
+     * `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). The gained-since check
+     * cannot see a gift edited onto the household, or made during the commit by the committer;
+     * deleting the household would clear it on that gift. A check the query budget cannot
+     * afford keeps what it was asked about. The extension answers "every one" when it fails.
+     */
+    private static void markKeptByDependents(Map<Id, String> keep, Set<Id> ids) {
+        Set<Id> open = new Set<Id>(ids);
+        open.removeAll(keep.keySet());
+        if (open.isEmpty()) {
+            return;
+        }
+        if (!enoughQueries()) {
+            notChecked(keep, open);
+            return;
+        }
+        for (Id credited : HouseholdDependentsExtensions.householdsWithDependents(open)) {
+            if (open.contains(credited)) {
+                keep.put(credited, Label.Core_Import_UndoKeptCredited);
+            }
+        }
     }
 
     /**

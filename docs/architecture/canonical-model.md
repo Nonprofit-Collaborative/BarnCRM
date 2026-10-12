@@ -1581,7 +1581,12 @@ after the deadline is refused, in a sentence naming the date it passed.
     are the import's own follow-on work, such as rollups and household naming, which runs as
     the committer); or an activity has been logged on it;
   - for a household or an organization, a person this import did not create is still on it,
-    or Nonprofit Cloud records depend on it (ADR-0036).
+    or Nonprofit Cloud records depend on it (ADR-0036), or an installed module still credits
+    records to it, asked through `HouseholdDependentsExtensions` as the empty household
+    tidy-up asks (R-H12): a gift or pledge that points at the household without having been
+    created since the import, such as an older gift whose donor was changed, which the first
+    bullet cannot see. A module that cannot answer keeps the household, journaled as not
+    checked.
 
   Work the undo itself does (a household renamed as its imported members are deleted) is
   not counted. A check that cannot run, or would leave the delete too few queries, keeps the

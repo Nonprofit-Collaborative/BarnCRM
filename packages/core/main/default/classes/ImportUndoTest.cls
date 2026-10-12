@@ -132,6 +132,11 @@ private class ImportUndoTest {
             List<SObject> scope = new List<SObject>();
             while (records.hasNext()) {
                 scope.add(records.next());
+                // The platform hands the job at most one chunk at a time (100 at most).
+                if (scope.size() == 100) {
+                    job.execute(null, scope);
+                    scope = new List<SObject>();
+                }
             }
             if (!scope.isEmpty()) {
                 job.execute(null, scope);
@@ -363,6 +368,120 @@ private class ImportUndoTest {
         Assert.isFalse(exists(imported.Id), 'The imported person is gone.');
         Assert.isTrue(exists(imported.AccountId), 'Their household is kept for the person in it.');
         Assert.isTrue(exists(joined.Id), 'Who is untouched.');
+    }
+
+    /** Answers that every household in `credited` still has records credited to it. */
+    private class CreditedHouseholds implements HouseholdDependentsExtension {
+        private final Set<Id> credited;
+        private final Boolean fail;
+        CreditedHouseholds(Set<Id> credited, Boolean fail) {
+            this.credited = credited;
+            this.fail = fail;
+        }
+        public Set<Id> householdsWithDependents(Set<Id> householdIds) {
+            if (fail) {
+                throw new System.QueryException('The extension could not answer');
+            }
+            Set<Id> answer = new Set<Id>(householdIds);
+            answer.retainAll(credited);
+            return answer;
+        }
+    }
+
+    private static void installDependents(Set<Id> credited, Boolean fail) {
+        HouseholdDependentsExtensions.noneForTest = true;
+        HouseholdDependentsExtensions.overrides.put(
+            'GivingHouseholdDependentsExtension',
+            new CreditedHouseholds(credited, fail)
+        );
+    }
+
+    /** People the import created, one household each, both tagged, in two bulk writes. */
+    private static List<Contact> importedPeople(Import_Batch__c batch, Integer howMany) {
+        List<Contact> people = new List<Contact>();
+        for (Integer i = 0; i < howMany; i++) {
+            people.add(
+                new Contact(
+                    FirstName = 'Ana',
+                    LastName = 'Bulk' + i,
+                    Created_By_Import_Batch__c = batch.Id
+                )
+            );
+        }
+        insert people;
+        people = [SELECT Id, AccountId FROM Contact WHERE Id IN :people];
+        List<Account> households = new List<Account>();
+        for (Contact person : people) {
+            households.add(
+                new Account(Id = person.AccountId, Created_By_Import_Batch__c = batch.Id)
+            );
+        }
+        update households;
+        return people;
+    }
+
+    @IsTest
+    static void aHouseholdAModuleStillCreditsRecordsToIsKept() {
+        Import_Batch__c batch = committedBatch();
+        Contact credited = importedPerson(batch, 'Ramirez');
+        Contact other = importedPerson(batch, 'Lee');
+        // A gift made before the commit and edited onto this household since: nothing was
+        // created after the import, so only the module can say it is still credited.
+        installDependents(new Set<Id>{ credited.AccountId }, false);
+
+        undo(batch, Datetime.now());
+
+        Assert.isFalse(exists(credited.Id), 'The person goes.');
+        Assert.isTrue(exists(credited.AccountId), 'The household its gifts are credited to stays.');
+        Assert.isFalse(exists(other.AccountId), 'A household nothing is credited to goes.');
+        Assert.isTrue(
+            undoJournal(batch).contains(Label.Core_Import_UndoKeptCredited),
+            'The reason is journaled (R-IB9).'
+        );
+    }
+
+    @IsTest
+    static void aModuleThatCannotSayWhatIsCreditedKeepsEveryHousehold() {
+        Import_Batch__c batch = committedBatch();
+        Contact imported = importedPerson(batch, 'Ramirez');
+        installDependents(new Set<Id>(), true);
+
+        undo(batch, Datetime.now());
+
+        Assert.isTrue(exists(imported.AccountId), 'Not answering is not answering no.');
+    }
+
+    @IsTest
+    static void twoHundredHouseholdsKeepOnlyTheOnesModuleRecordsAreCreditedTo() {
+        Import_Batch__c batch = committedBatch();
+        List<Contact> people = importedPeople(batch, 200);
+        Set<Id> credited = new Set<Id>();
+        for (Integer i = 0; i < 150; i++) {
+            credited.add(people[i].AccountId);
+        }
+        installDependents(credited, false);
+
+        undo(batch, Datetime.now());
+
+        Assert.areEqual(
+            150,
+            [SELECT COUNT() FROM Account WHERE Id IN :credited],
+            'Each credited household is kept.'
+        );
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batch.Id],
+            'Every imported person goes.'
+        );
+        Assert.areEqual(
+            0,
+            [
+                SELECT COUNT()
+                FROM Account
+                WHERE Created_By_Import_Batch__c = :batch.Id AND Id NOT IN :credited
+            ],
+            'The other fifty households go.'
+        );
     }
 
     @IsTest
