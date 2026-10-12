@@ -360,6 +360,30 @@ private class SettingsServiceTest {
         );
     }
 
+    /**
+     * The console asks once per Setting Definition row. The type and its fields are cached for
+     * the transaction, so asking again gives the same answer, an absent object included.
+     */
+    @IsTest
+    static void hasKeyAnswersEveryRowFromTheSameLookup() {
+        Test.startTest();
+        for (Integer row = 0; row < 200; row++) {
+            Assert.isTrue(SettingsService.hasKey('Nonprofit_Settings__c', TEXT_KEY), 'Row ' + row);
+            Assert.isFalse(
+                SettingsService.hasKey('Not_A_Settings_Object__c', TEXT_KEY),
+                'An object the org lacks has no keys, row ' + row
+            );
+        }
+        Test.stopTest();
+
+        Assert.areEqual(
+            SettingsService.typeByName('Nonprofit_Settings__c'),
+            SettingsService.typeByName(' nonprofit_settings__c '),
+            'The cached lookup ignores case and spacing, like the describe it replaces'
+        );
+        Assert.isNull(SettingsService.typeByName('Not_A_Settings_Object__c'), 'Absent stays null');
+    }
+
     @IsTest
     static void readsSettingsWithoutQueryingEveryTime() {
         Test.startTest();

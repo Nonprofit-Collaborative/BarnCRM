@@ -267,13 +267,19 @@ public with sharing class HealthCheckSettingsChecks {
             );
     }
 
+    /** The unread error count stops here and says "1,000+". A test lowers it. */
+    @TestVisible
+    private static Integer errorLogCap = 1000;
+
     private static HealthCheckService.Finding errorLogFinding() {
-        Integer newErrors = ErrorLogCountSelector.countNew();
+        Integer newErrors = ErrorLogCountSelector.countNewUpTo(errorLogCap);
         if (newErrors <= 0) {
             return null;
         }
 
-        List<Object> count = new List<Object>{ String.valueOf(newErrors) };
+        List<Object> count = new List<Object>{
+            newErrors > errorLogCap ? errorLogCap.format() + '+' : newErrors.format()
+        };
         return new HealthCheckService.Finding(
                 'error_log_new',
                 String.format(System.Label.Core_HealthCheck_ErrorLogTitle, count),

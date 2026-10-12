@@ -106,7 +106,9 @@ public with sharing class SettingsService {
         if (String.isBlank(key)) {
             return false;
         }
-        Schema.SObjectType type = Schema.getGlobalDescribe().get(objectName(settingsObject));
+        // Called once per Setting Definition row by SettingsController.toSetting, so the type
+        // and its fields come from the per-transaction caches, never a fresh describe.
+        Schema.SObjectType type = typeByName(objectName(settingsObject));
         return type != null && fieldsByLocalName(type).containsKey(key.trim().toLowerCase());
     }
 
@@ -375,12 +377,22 @@ public with sharing class SettingsService {
         if (type == null) {
             throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
         }
+        if (checkedSettingsTypes.contains(type)) {
+            return type;
+        }
         Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         if (!describe.isCustomSetting() || !describe.fields.getMap().containsKey(SETUP_OWNER)) {
             throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
         }
+        checkedSettingsTypes.add(type);
         return type;
     }
+
+    /** Settings objects already described and found to be hierarchy settings, this transaction. */
+    private static Set<Schema.SObjectType> checkedSettingsTypes = new Set<Schema.SObjectType>();
+
+    /** Objects by trimmed lower-case name, null when absent, looked up once per transaction. */
+    private static Map<String, Schema.SObjectType> typesByName = new Map<String, Schema.SObjectType>();
 
     private static String objectName(String settingsObject) {
         return String.isBlank(settingsObject) ? CORE_SETTINGS_OBJECT : settingsObject.trim();
@@ -396,8 +408,15 @@ public with sharing class SettingsService {
         if (String.isBlank(apiName)) {
             return null;
         }
+        String cacheKey = apiName.trim().toLowerCase();
+        if (!typesByName.containsKey(cacheKey)) {
+            typesByName.put(cacheKey, describeTypeByName(apiName.trim()));
+        }
+        return typesByName.get(cacheKey);
+    }
+
+    private static Schema.SObjectType describeTypeByName(String name) {
         Map<String, Schema.SObjectType> globals = Schema.getGlobalDescribe();
-        String name = apiName.trim();
         Schema.SObjectType type = globals.get(name);
         if (type != null) {
             return type;
@@ -462,11 +481,12 @@ public with sharing class SettingsService {
     }
 
     private static Map<String, Schema.SObjectField> fieldsByLocalName(Schema.SObjectType type) {
-        Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-        String name = describe.getName();
+        // The token's own name, so a cached object is answered without describing it again.
+        String name = String.valueOf(type);
         if (cachedFields.containsKey(name)) {
             return cachedFields.get(name);
         }
+        Schema.DescribeSObjectResult describe = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         Map<String, Schema.SObjectField> fields = new Map<String, Schema.SObjectField>();
         for (Schema.SObjectField token : describe.fields.getMap().values()) {
             fields.put(token.getDescribe().getLocalName().toLowerCase(), token);

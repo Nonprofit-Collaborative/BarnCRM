@@ -95,7 +95,7 @@ recommendation in step 5 is **NPSP coexistence**. Everything else is the same.
 | Access | Whether active users with a Salesforce license have no BarnCRM role at all. |
 | Access | With Giving: whether anyone holds the Override Receipt Lock permission, which is meant to be granted for one correction and taken away again. |
 | Settings | Whether BarnCRM automation is paused, and says so plainly when it is running. A pause that nothing is set to end, or that ends more than 24 hours from now, is a warning. |
-| Settings | Whether there are new entries in the Error Log that nobody has looked at. |
+| Settings | Whether there are new entries in the Error Log that nobody has looked at. It counts up to 1,000 and says `1,000+` past that. |
 | Settings | Whether the error digest is scheduled but has not run for more than two days, which usually means the person who scheduled it was deactivated. |
 | Settings | Whether anybody is in no household while every new person is meant to get one. |
 | Settings | Whether any household has nobody in it. |

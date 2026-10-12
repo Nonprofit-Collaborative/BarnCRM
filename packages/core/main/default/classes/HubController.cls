@@ -21,6 +21,9 @@ public with sharing class HubController {
         public Boolean automationPaused;
         @AuraEnabled
         public Integer newErrorCount;
+        /** True when there are more new errors than `newErrorCount`, the most the tile counts. */
+        @AuraEnabled
+        public Boolean newErrorCountCapped;
         @AuraEnabled
         public Integer stepsCompleted;
         @AuraEnabled
@@ -70,7 +73,9 @@ public with sharing class HubController {
         model.stepsTotal = steps.size();
         model.stepsCompleted = SetupAssistantService.countCompleted(steps);
         model.automationPaused = readAutomationPaused();
-        model.newErrorCount = readNewErrorCount();
+        Integer newErrors = readNewErrorCount();
+        model.newErrorCountCapped = newErrors > HubErrorCountSelector.cap();
+        model.newErrorCount = model.newErrorCountCapped ? HubErrorCountSelector.cap() : newErrors;
         readRollupFreshness(model);
         readSeasonalAddressRun(model);
         model.recurringSources = readRecurringSources();

@@ -38,6 +38,33 @@ private class HubControllerTest {
         Assert.isNotNull(model.stepsCompleted, 'The page says how many are done');
         Assert.isFalse(model.automationPaused, 'Nothing is paused on a fresh org');
         Assert.areEqual(0, model.newErrorCount, 'A fresh org has nothing to review');
+        Assert.isFalse(model.newErrorCountCapped, 'Zero is an exact count');
+    }
+
+    @IsTest
+    static void aFloodedErrorLogShowsTheCapAndSaysThereAreMore() {
+        SetupAssistantTestExtension.useNone();
+        List<Error_Log__c> errors = new List<Error_Log__c>();
+        for (Integer i = 0; i < 3; i++) {
+            errors.add(
+                new Error_Log__c(
+                    Timestamp__c = System.now(),
+                    Context__c = 'Hub test',
+                    Message__c = 'Something went wrong.',
+                    Severity__c = 'Error',
+                    Status__c = 'New'
+                )
+            );
+        }
+        insert errors;
+        HubErrorCountSelector.countCap = 2;
+        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+        System.runAs(maria) {
+            HubController.HomeModel model = HubController.getHomeModel();
+            Assert.areEqual(2, model.newErrorCount, 'The tile shows the cap');
+            Assert.isTrue(model.newErrorCountCapped, 'and says there are more than that');
+        }
     }
 
     @IsTest

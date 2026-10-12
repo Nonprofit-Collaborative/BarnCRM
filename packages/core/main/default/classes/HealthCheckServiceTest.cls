@@ -739,6 +739,37 @@ private class HealthCheckServiceTest {
     }
 
     @IsTest
+    static void aFloodedErrorLogIsCountedUpToTheCap() {
+        List<Error_Log__c> errors = new List<Error_Log__c>();
+        for (Integer i = 0; i < 3; i++) {
+            errors.add(
+                new Error_Log__c(
+                    Timestamp__c = System.now(),
+                    Context__c = 'Health Check test',
+                    Message__c = 'Something went wrong.',
+                    Severity__c = 'Error',
+                    Status__c = 'New'
+                )
+            );
+        }
+        insert errors;
+        HealthCheckSettingsChecks.errorLogCap = 2;
+        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+        System.runAs(maria) {
+            OrgShapeDetector.overrideShape = shape(false, false, false, false);
+
+            HealthCheckService.Finding finding = find(HealthCheckService.run(), 'error_log_new');
+
+            System.assertNotEquals(null, finding, 'Past the cap there is still a finding.');
+            System.assert(
+                finding.title.startsWith('2+'),
+                'Past the cap the count says more than the cap: ' + finding.title
+            );
+        }
+    }
+
+    @IsTest
     static void twoFiscalYearsThatDisagreeAreReportedWithBothMonths() {
         OrgShapeDetector.overrideShape = shape(false, false, false, false);
         SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);

@@ -94,9 +94,9 @@ Rules:
 
 - **Namespace first, then none.** A class name is not an API name: it takes no `__` suffix.
 - **Look up once per transaction** (`looked` flag in `ImportEntityProcessors.find`).
-- **A class that cannot be built, or is the wrong shape, is absent.** A build failure is
-  logged; `HealthCheckExtensions` also logs a wrong shape. The caller must not fail over a
-  module it can do without.
+- **A class that cannot be built, or is the wrong shape, is absent, and is logged.** A class
+  that is not found at all is the ordinary case and is not logged. The caller must not fail
+  over a module it can do without.
 - **Isolate the call.** `HealthCheckService.run()` turns an extension that throws into one
   `check_failed_...` finding; the rest of the report stands.
 - **Only names the package owns reach `Type.forName`**: a constant, a registry row, or an
