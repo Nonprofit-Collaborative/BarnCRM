@@ -44,6 +44,7 @@ private class GivingSetupAssistantExtensionTest {
         }
         System.assertEquals(
             new List<String>{
+                'suite',
                 'coexistence',
                 'naming',
                 'funddefaults',
@@ -54,10 +55,10 @@ private class GivingSetupAssistantExtensionTest {
                 'verify'
             },
             keys,
-            'Giving adds the fund and appeal step third, as before'
+            'Giving adds the fund and appeal step after naming, as before'
         );
         Map<String, Object> defaults = stepByKey(steps, 'funddefaults');
-        System.assertEquals(3, defaults.get('position'));
+        System.assertEquals(4, defaults.get('position'));
         System.assertEquals(Label.Giving_SetupAssistant_FundAppealStepLabel, defaults.get('label'));
         System.assertEquals(true, defaults.get('advanceOnSave'));
     }

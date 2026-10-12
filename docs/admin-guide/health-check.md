@@ -26,9 +26,9 @@ nothing to configure.
 4. Click **Re-run** whenever you want a fresh look. Health Check reads your org each time;
    it never shows you a saved result.
 
-The BarnCRM home page does not carry a Health Check card today, although the Hub
-itself has shipped. The settings console is the way in, and it is the way that always
-works.
+An administrator also finds the same report on the BarnCRM home page, under the setup
+checklist. The settings console is the way in that always works, including for staff who
+do not see the home page copy and for an org where someone removed it from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
@@ -76,7 +76,7 @@ Total time: about five minutes, most of it assigning roles.
 **Only if your org has NPSP or Nonprofit Cloud.** With the Nonprofit Success Pack, step 2
 reads **NPSP detected** and the recommendation is **NPSP coexistence**. With Nonprofit Cloud,
 step 2 reads **Nonprofit Cloud objects detected**, the recommendation is **Nonprofit Cloud
-coexistence**, and **Use recommended mode** switches household membership to junction mode
+coexistence**, and **Use recommended mode** switches household membership to the flexible way of belonging, with one membership record per person,
 with it. If that org has Nonprofit Cloud gift objects and the Connect module is not
 installed, there is also a blue finding, **The Gift Transaction mirror is in the Connect
 module**: install Connect if you want Nonprofit Cloud's own summaries to keep working.
@@ -203,8 +203,7 @@ today are the ones somebody has to group by hand later.
 
 **Ignoring the red membership finding in a Person Accounts org.** "Household membership does
 not fit Person Accounts" is red for a reason: in that state, new households are built through
-the person's account, which in a Person Accounts org is the person. Click **Switch to junction
-membership** and the app fixes it for you. The longer it waits, the more households have to be
+the person's account, which in a Person Accounts org is the person. Click **Switch to the flexible way of belonging** and the app fixes it for you. The longer it waits, the more households have to be
 sorted out afterward.
 
 **Fixing access by editing profiles.** Health Check counts the packaged roles the Access page

@@ -1,0 +1,25 @@
+<template>
+    <lightning-card title={labels.heading}>
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={errorMessage}>
+                <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
+            </template>
+            <template lwc:else>
+                <ul>
+                    <template for:each={rows} for:item="row">
+                        <li key={row.name} data-id="module-row">
+                            <span data-id="module-name">{row.name}</span>
+                            <span class={row.badgeClass} data-id="module-status">{row.statusText}</span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <lightning-button
+                variant="base"
+                label={labels.link}
+                data-id="open-manager"
+                onclick={handleOpenManager}
+            ></lightning-button>
+        </div>
+    </lightning-card>
+</template>

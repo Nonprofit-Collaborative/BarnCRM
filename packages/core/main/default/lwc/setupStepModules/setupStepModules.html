@@ -8,6 +8,17 @@
                     >{labels.learnMore}
                     <span class="slds-assistive-text">{module.name}</span>
                 </a>
+                <template lwc:if={module.installUrl}>
+                    <a
+                        class="slds-var-m-left_small"
+                        href={module.installUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-id="install-link"
+                        >{labels.install}
+                        <span class="slds-assistive-text">{module.name} {labels.newTab}</span>
+                    </a>
+                </template>
             </li>
         </template>
     </ul>

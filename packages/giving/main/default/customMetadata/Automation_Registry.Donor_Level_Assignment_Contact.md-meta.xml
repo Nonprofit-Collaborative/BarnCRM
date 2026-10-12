@@ -22,4 +22,8 @@
     <field>Object_Name__c</field>
     <value xsi:type="xsd:string">Contact</value>
   </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Giving</value>
+  </values>
 </CustomMetadata>

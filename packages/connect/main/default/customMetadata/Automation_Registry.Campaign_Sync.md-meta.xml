@@ -22,4 +22,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Creates or updates the appeal's matching Campaign when it is saved. Does nothing until Copy appeals to Campaigns is switched on in the Giving settings.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Connect</value>
+    </values>
 </CustomMetadata>

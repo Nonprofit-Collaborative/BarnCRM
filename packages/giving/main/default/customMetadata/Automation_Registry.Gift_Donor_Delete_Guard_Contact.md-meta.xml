@@ -28,4 +28,8 @@
       xsi:type="xsd:string"
     >Refuses to delete a person that a gift posted to accounting, or dated in a closed period, names as its donor: deleting it would blank the donor on a gift the books already hold. Merging a duplicate still works. This automation enforces a rule, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Posting Lock permission, and every use is written to the Error Log.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

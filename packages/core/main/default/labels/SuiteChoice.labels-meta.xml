@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_SuiteChoice_StepLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the name of the first step, the suite choice</shortDescription>
+        <value>Choose your edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_StepDescription</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what the suite choice step asks</shortDescription>
+        <value>Choose the Community Suite for BarnCRM Core on its own, or the Nonprofit Edition, which adds the Giving module. Any organization can choose either, and you can change it later.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: refusal when no known suite was chosen</shortDescription>
+        <value>Choose the Community Suite or the Nonprofit Edition, then click Confirm and continue.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_EditionLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the label of the edition choice</shortDescription>
+        <value>Edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_CommunityOption</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the Community Suite option</shortDescription>
+        <value>Community Suite: BarnCRM Core on its own</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_ImpactOption</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the Nonprofit Edition option</shortDescription>
+        <value>Nonprofit Edition (Impact Suite): adds the Giving module</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_GivingInstalled</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: Giving is already installed</shortDescription>
+        <value>Giving is installed. Its steps are part of this setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_GivingNeeded</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the chosen edition needs Giving</shortDescription>
+        <value>The Nonprofit Edition needs the Giving module, which is not installed yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_InstallButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the link to the Giving installer</shortDescription>
+        <value>Open the Giving installer</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_InstallHelp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: how to finish installing Giving</shortDescription>
+        <value>Follow Salesforce's install screens in the new tab. When the install has finished, come back here and click Check again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_NoInstallLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: no published Giving version to link to</shortDescription>
+        <value>The Giving install link is not published yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_ReadAbout</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the link to Giving's description</shortDescription>
+        <value>Read about Giving</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_CheckAgain</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: re-read what is installed</shortDescription>
+        <value>Check again</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_NewTab</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Assistive text: a link opens in a new tab</shortDescription>
+        <value>(opens in a new tab)</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_ModuleInstallLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the install link beside a module</shortDescription>
+        <value>Install</value>
+    </labels>
+</CustomLabels>

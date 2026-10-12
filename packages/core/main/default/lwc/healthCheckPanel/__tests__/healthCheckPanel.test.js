@@ -79,7 +79,7 @@ function agentforceReport(overrides = {}) {
         detail: 'Person Accounts are enabled.',
         severity: 'Error',
         category: 'OrgShape',
-        fixLabel: 'Switch to junction membership',
+        fixLabel: 'Switch to the flexible way of belonging',
         fixTarget: 'action:applyJunctionMembership'
       },
       {

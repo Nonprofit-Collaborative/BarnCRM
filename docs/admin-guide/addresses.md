@@ -190,7 +190,7 @@ where a mailing actually went.
 
 **Expecting the swap to happen without scheduling it.** Entering seasonal dates is not enough:
 the nightly job has to be scheduled once, on the Addresses page of BarnCRM Settings. Until
-you do that, the page says so in as many words and the Hub tile says the swap has not run. If
+you do that, the page says so in as many words and the home page tile says the swap has not run. If
 the tile ever says the swap is scheduled but has not run in more than 36 hours, choose
 **Run the swap now** and check the Error Log.
 

@@ -1,8 +1,10 @@
 import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
 import resetSetup from '@salesforce/apex/SetupAssistantController.reset';
+import applySuite from '@salesforce/apex/SetupAssistantController.applySuite';
 import applyCoexistence from '@salesforce/apex/SetupAssistantController.applyCoexistence';
 import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepValues';
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
@@ -40,10 +42,10 @@ import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionBut
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 
 const CREATE_USER_URL = '/lightning/setup/ManageUsers/home';
-// The tabs the assistant links to. Both are unprefixed today; they are revisited when a
-// namespace is assigned (Decision D-01), which is recorded in the integration file.
-const IMPORT_URL = '/lightning/n/Import';
-const SETTINGS_PAGE = '/lightning/n/BarnCRM_Settings';
+// The tabs the assistant opens, by page reference rather than by URL, so the links keep
+// working on the mobile app and once a namespace is assigned (Decision D-01).
+const IMPORT_TAB = 'Import';
+const SETTINGS_TAB = 'BarnCRM_Settings';
 
 /**
  * The guided Setup Assistant: one step open at a time, Back and Next, Skip for now, and it
@@ -52,7 +54,7 @@ const SETTINGS_PAGE = '/lightning/n/BarnCRM_Settings';
  * instead of breaking the page. A step's fields, including the ones a module adds, come from
  * Apex and are shown by one field panel (ADR-0059, C-29).
  */
-export default class SetupAssistant extends LightningElement {
+export default class SetupAssistant extends NavigationMixin(LightningElement) {
   /** Set by the Hub home page when Maria asked to reopen a finished setup. */
   @api reopened = false;
 
@@ -101,7 +103,6 @@ export default class SetupAssistant extends LightningElement {
   };
 
   createUserUrl = CREATE_USER_URL;
-  importUrl = IMPORT_URL;
 
   connectedCallback() {
     this.load();
@@ -245,8 +246,16 @@ export default class SetupAssistant extends LightningElement {
     return this.state &&
       this.state.elapsedMinutes !== null &&
       this.state.elapsedMinutes !== undefined
-      ? String(this.state.elapsedMinutes)
+      ? this.labels.elapsed.replace('{0}', this.state.elapsedMinutes)
       : '';
+  }
+
+  get isSuiteStep() {
+    return this.activeKey === 'suite';
+  }
+
+  get suite() {
+    return (this.state && this.state.suite) || {};
   }
 
   get isCoexistenceStep() {
@@ -297,10 +306,21 @@ export default class SetupAssistant extends LightningElement {
     return (this.state && this.state.coexistence) || {};
   }
 
-  /** The settings section this step's answers live in afterwards, for the Open in Settings link. */
-  get sectionUrl() {
+  /** Opens the settings section this step's answers live in afterwards. */
+  handleOpenSection() {
     const section = this.activeStep && this.activeStep.target ? this.activeStep.target : '';
-    return `${SETTINGS_PAGE}?c__section=${encodeURIComponent(section)}`;
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: SETTINGS_TAB },
+      state: { c__section: section }
+    });
+  }
+
+  handleOpenImport() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: IMPORT_TAB }
+    });
   }
 
   get showNamingPanel() {
@@ -375,6 +395,22 @@ export default class SetupAssistant extends LightningElement {
       this.focusStepHeading = false;
       heading.focus();
     }
+  }
+
+  // The Community Suite, or the Nonprofit Edition with Giving already here, moves on. The
+  // Nonprofit Edition without Giving stays on the step, which now links to the installer.
+  handleSuiteConfirm(event) {
+    this.call(applySuite, { suite: event.detail.suite }, false, () => {
+      const saved = this.suite;
+      if (saved.currentSuite !== 'Impact' || (saved.giving && saved.giving.present)) {
+        this.advance();
+      }
+    });
+  }
+
+  // Re-reads what is installed without moving off the step, so Maria sees Giving arrive.
+  handleCheckAgain() {
+    this.call(getState, {}, false);
   }
 
   handleCoexistenceConfirm(event) {

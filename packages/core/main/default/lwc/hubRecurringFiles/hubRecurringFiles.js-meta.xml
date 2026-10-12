@@ -2,10 +2,10 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <isExposed>true</isExposed>
-  <masterLabel>BarnCRM Home</masterLabel>
+  <masterLabel>BarnCRM Home: Files That Arrive Regularly</masterLabel>
   <description>
-    The BarnCRM home page: welcome, setup checklist, paused automation banner, errors
-    to review, and quick links.
+    The import files marked as arriving regularly and when each was last imported. Hidden
+    until a file is marked.
   </description>
   <targets>
     <target>lightning__AppPage</target>

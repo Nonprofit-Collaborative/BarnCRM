@@ -34,7 +34,7 @@ private class HubControllerTest {
         HubController.HomeModel model = HubController.getHomeModel();
         Test.stopTest();
 
-        Assert.areEqual(7, model.stepsTotal, 'On Core alone the checklist has seven steps');
+        Assert.areEqual(8, model.stepsTotal, 'On Core alone the checklist has eight steps');
         Assert.isNotNull(model.stepsCompleted, 'The page says how many are done');
         Assert.isFalse(model.automationPaused, 'Nothing is paused on a fresh org');
         Assert.areEqual(0, model.newErrorCount, 'A fresh org has nothing to review');
@@ -78,7 +78,7 @@ private class HubControllerTest {
         Test.startTest();
         System.runAs(david) {
             HubController.HomeModel model = HubController.getHomeModel();
-            Assert.areEqual(7, model.stepsTotal, 'David sees the same seven steps counted');
+            Assert.areEqual(8, model.stepsTotal, 'David sees the same eight steps counted');
             Assert.isFalse(model.canEdit, 'David may not change anything');
         }
         Test.stopTest();

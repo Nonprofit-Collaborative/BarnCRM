@@ -334,15 +334,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains why contact membership does not work with Person Accounts.</shortDescription>
-        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to junction membership fixes it, and the households you already have are not changed.</value>
+        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to the flexible way of belonging, with one membership record per person, fixes it, and the households you already have are not changed.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that switches household membership to the junction.</shortDescription>
-        <value>Switch to junction membership</value>
+        <shortDescription>Button that switches household membership to the flexible way of belonging.</shortDescription>
+        <value>Switch to the flexible way of belonging</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipTitle</fullName>

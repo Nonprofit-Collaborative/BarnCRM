@@ -26,6 +26,8 @@ public with sharing class SetupAssistantController {
         @AuraEnabled
         public Integer elapsedMinutes;
         @AuraEnabled
+        public SuiteModel suite;
+        @AuraEnabled
         public CoexistenceModel coexistence;
         @AuraEnabled
         public List<ModuleDetectionService.ModuleInfo> modules;
@@ -35,7 +37,20 @@ public with sharing class SetupAssistantController {
         public Boolean importAvailable;
     }
 
-    /** What step one shows: what was detected, what is recommended, what is in force. */
+    /**
+     * What the suite step shows: the saved choice, what to preselect, and whether Giving is
+     * here or where its installer and description are (C-30). Nothing is installed from here.
+     */
+    public class SuiteModel {
+        @AuraEnabled
+        public String currentSuite;
+        @AuraEnabled
+        public String recommendedSuite;
+        @AuraEnabled
+        public ModuleDetectionService.ModuleInfo giving;
+    }
+
+    /** What the coexistence step shows: what was detected, what is recommended, what is in force. */
     public class CoexistenceModel {
         @AuraEnabled
         public String detectedShape;
@@ -89,7 +104,31 @@ public with sharing class SetupAssistantController {
         }
     }
 
-    /** Step one: put the confirmed coexistence mode in force and record the step as done. */
+    /**
+     * Step one: save the suite. The step finishes because the setting now has a value. This
+     * saves a preference and nothing else: it installs, removes and hides nothing.
+     */
+    @AuraEnabled
+    public static SetupState applySuite(String suite) {
+        requireEdit();
+        String chosen = suite == null ? '' : suite.trim();
+        Set<String> suites = new Set<String>{
+            ModuleDetectionService.SUITE_COMMUNITY,
+            ModuleDetectionService.SUITE_IMPACT
+        };
+        if (!suites.contains(chosen)) {
+            throw asAuraException(System.Label.Core_SuiteChoice_UnknownSuiteError);
+        }
+        try {
+            SetupAssistantService.ensureStarted();
+            SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
+            return buildState();
+        } catch (Exception e) {
+            throw logged(e, System.Label.Core_SetupAssistant_SaveErrorMessage);
+        }
+    }
+
+    /** The coexistence step: put the confirmed mode in force and record the step as done. */
     @AuraEnabled
     public static SetupState applyCoexistence(String mode) {
         requireEdit();
@@ -198,11 +237,20 @@ public with sharing class SetupAssistantController {
         state.stepsCompleted = SetupAssistantService.countCompleted(state.steps);
         state.isComplete = state.stepsCompleted == state.stepsTotal;
         state.elapsedMinutes = SetupAssistantService.elapsedMinutes();
+        state.suite = suite();
         state.coexistence = coexistence();
         state.modules = ModuleDetectionService.getModules();
         state.roles = roles();
         state.importAvailable = ModuleDetectionService.isImportPresent();
         return state;
+    }
+
+    private static SuiteModel suite() {
+        SuiteModel model = new SuiteModel();
+        model.currentSuite = ModuleDetectionService.chosenSuite();
+        model.recommendedSuite = SetupAssistantService.recommendedSuite();
+        model.giving = ModuleDetectionService.givingModule();
+        return model;
     }
 
     private static CoexistenceModel coexistence() {

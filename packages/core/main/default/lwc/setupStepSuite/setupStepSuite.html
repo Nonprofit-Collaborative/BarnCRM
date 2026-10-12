@@ -1,0 +1,62 @@
+<template>
+    <lightning-radio-group
+        name="suite"
+        label={labels.edition}
+        options={options}
+        value={chosen}
+        disabled={isReadOnly}
+        data-id="suite-choice"
+        onchange={handleChange}
+    ></lightning-radio-group>
+
+    <template lwc:if={canEdit}>
+        <lightning-button
+            class="slds-var-m-top_small"
+            variant="brand"
+            label={labels.confirm}
+            data-id="confirm"
+            onclick={handleConfirm}
+        ></lightning-button>
+    </template>
+
+    <template lwc:if={isImpactSaved}>
+        <div class="slds-var-m-top_small" role="status">
+            <template lwc:if={givingPresent}>
+                <p class="slds-text-color_success" data-id="giving-installed">{labels.givingInstalled}</p>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-body_regular" data-id="giving-needed">{labels.givingNeeded}</p>
+                <template lwc:if={installUrl}>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small">{labels.installHelp}</p>
+                    <a
+                        class="slds-button slds-button_brand"
+                        href={installUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-id="install-link"
+                        >{labels.install}<span class="slds-assistive-text">{labels.newTab}</span></a
+                    >
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="no-install-link">
+                        {labels.noInstallLink}
+                    </p>
+                </template>
+                <a
+                    class="slds-var-m-left_small"
+                    href={docsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-id="docs-link"
+                    >{labels.readAbout}<span class="slds-assistive-text">{labels.newTab}</span></a
+                >
+                <lightning-button
+                    class="slds-var-m-left_small"
+                    label={labels.checkAgain}
+                    data-id="check-again"
+                    onclick={handleCheckAgain}
+                ></lightning-button>
+            </template>
+        </div>
+    </template>
+</template>

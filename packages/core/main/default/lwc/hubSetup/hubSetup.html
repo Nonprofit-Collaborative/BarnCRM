@@ -1,0 +1,25 @@
+<template>
+    <template lwc:if={showAssistant}>
+        <lightning-card title={labels.checklistHeading}>
+            <div class="slds-var-p-horizontal_medium">
+                <c-setup-assistant
+                    reopened={setupReopened}
+                    onsetupchanged={handleSetupChanged}
+                ></c-setup-assistant>
+            </div>
+        </lightning-card>
+    </template>
+    <template lwc:else>
+        <lightning-card title={labels.setupCompleteHeading}>
+            <div class="slds-var-p-horizontal_medium">
+                <p class="slds-text-body_small" data-id="setup-progress">{setupProgressText}</p>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    label={labels.reopenSetup}
+                    data-id="reopen-setup"
+                    onclick={handleReopenSetup}
+                ></lightning-button>
+            </div>
+        </lightning-card>
+    </template>
+</template>

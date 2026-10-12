@@ -28,4 +28,8 @@
       xsi:type="xsd:string"
     >Keeps a gift in the books the way the books hold it. Once a gift is posted to accounting, or is dated on or before the date the books are closed through, its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted, and no gift can be added to a closed period. Refunds and write-offs still work: they are new gifts dated today. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Posting Lock permission, which an administrator grants in Setup and every use of which is written to the Error Log.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>
