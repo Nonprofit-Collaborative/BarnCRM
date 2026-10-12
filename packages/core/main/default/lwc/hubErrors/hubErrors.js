@@ -1,0 +1,78 @@
+import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
+import countInstallProblems from '@salesforce/apex/CorePostInstall.countInstallProblems';
+import HEADING from '@salesforce/label/c.Core_HubHome_ErrorTileHeading';
+import LINK from '@salesforce/label/c.Core_HubHome_ErrorTileLinkLabel';
+import INSTALL_COMPLETED from '@salesforce/label/c.Core_HubHome_InstallCompleted';
+import INSTALL_PROBLEMS from '@salesforce/label/c.Core_HubHome_InstallProblems';
+import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
+import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
+
+/**
+ * Errors to review on the BarnCRM home page: how many new errors are waiting (capped, so a
+ * flooded log never slows the page), and whether the install itself logged any problems.
+ */
+export default class HubErrors extends NavigationMixin(LightningElement) {
+  labels = { heading: HEADING, link: LINK, warning: WARNING };
+
+  newErrorCount = 0;
+  newErrorCountCapped = false;
+  errorMessage;
+
+  // How many problems the install logged, or undefined for someone who cannot read the log.
+  installProblemCount;
+
+  @wire(getHomeModel)
+  wiredModel({ data, error }) {
+    if (data) {
+      this.newErrorCount = data.newErrorCount || 0;
+      this.newErrorCountCapped = Boolean(data.newErrorCountCapped);
+      this.errorMessage = undefined;
+    } else if (error) {
+      this.errorMessage = LOAD_ERROR;
+    }
+  }
+
+  // Optional: a count that cannot be read costs the tile one line, not the tile.
+  @wire(countInstallProblems)
+  wiredInstallProblems({ data, error }) {
+    if (error) {
+      this.installProblemCount = undefined;
+    } else if (data !== undefined) {
+      this.installProblemCount = data;
+    }
+  }
+
+  /** The tile's number: the count, or the cap with a plus once there are more than it counts. */
+  get errorCountText() {
+    return this.newErrorCountCapped ? `${this.newErrorCount}+` : `${this.newErrorCount}`;
+  }
+
+  /**
+   * A partly failed install looks exactly like a good one: every step writes its failure to
+   * the Error Log and carries on. One line says which it was, and only to a person who can
+   * read the log, because a count they cannot see is not evidence either way.
+   */
+  get hasInstallStatus() {
+    return this.installProblemCount !== undefined && this.installProblemCount !== null;
+  }
+
+  get installHadProblems() {
+    return this.installProblemCount > 0;
+  }
+
+  get installStatusText() {
+    return this.installHadProblems
+      ? INSTALL_PROBLEMS.replace('{0}', this.installProblemCount)
+      : INSTALL_COMPLETED;
+  }
+
+  handleOpenErrorLog() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Error_Log__c', actionName: 'list' },
+      state: { filterName: 'New_Errors' }
+    });
+  }
+}
