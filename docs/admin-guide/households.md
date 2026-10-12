@@ -28,7 +28,7 @@ BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 |---|---|---|
 | How people belong to a household | The simple way (one household per person) or the flexible way (a person can belong to more than one household, and you keep the history of who belonged when) | The simple way |
 | Create a household automatically | When you save a new person with no household, one is created for them. This works the same way in both ways of belonging, and for people stored as contacts and for people stored as accounts | On |
-| Delete a household once it is empty | Keeps your list of households clean. A household is left alone when anything outside BarnCRM still depends on its account record, so this never removes a household another product built | Off, switch it on if you want it |
+| Delete a household once it is empty | Keeps your list of households clean. A household is left alone when anything outside BarnCRM still depends on its account record, so this never removes a household another product built. With Giving, a household that still has gifts or pledges credited to it is kept too, so they never lose their household | Off, switch it on if you want it |
 
 4. Click **Save**. The change applies to the next record anyone saves.
 
@@ -132,7 +132,15 @@ If the setting is off, that is a reasonable choice if you want to keep an empty 
 and its giving history. Delete the household by hand, and turn the setting on if you want
 it done for you next time.
 
-If the setting is on, look in the Error Log. BarnCRM never deletes a household that
+If the setting is on and Giving is installed, check the household's gifts and pledges
+first. A household that still has gifts or pledges credited to it is never deleted, even
+when nobody belongs to it any more: a gift stays with the household it was given from, and
+deleting the household would leave those gifts with no household at all. This is the
+ordinary outcome when someone with a giving history moves out on their own, so it is not
+written to the Error Log. Leave the household in place if you want its giving history kept
+together; merge it into another household if you want that history combined with theirs.
+
+Otherwise, look in the Error Log. BarnCRM never deletes a household that
 something outside BarnCRM still points at, because deleting it would delete those
 records too, and it writes an Info entry naming each household it left in place for that
 reason. In an org that also runs Salesforce Nonprofit Cloud, this happens most often because a
@@ -158,7 +166,9 @@ place to change it.
 **"I moved someone and their history stayed behind."**
 That is deliberate. Moving a person moves the person, not the history of the household
 they left (with Giving, that includes the household's gifts). Use merge on the household record page when you want to combine two
-households and their history.
+households and their history. A household left with nobody in it but with gifts or
+pledges credited to it is kept, even when "Delete a household once it is empty" is on,
+so that history always has a household to belong to.
 
 ## Field reference
 

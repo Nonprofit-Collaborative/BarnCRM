@@ -257,7 +257,15 @@ names is deleted.
 **R-H12 Reparenting and empty households.** Moving a contact to a different household
 recalculates both households' member counts and, once Giving is installed, their giving
 rollups. The vacated household is deleted when it is empty, `Delete_Empty_Households__c`
-is on, and nothing outside BarnCRM depends on the account (ADR-0036). "Empty" is
+is on, nothing outside BarnCRM depends on the account (ADR-0036), and no installed module
+still credits records to it (ADR-NEXT,
+`NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). A module reports its
+credited records through the Core extension point `HouseholdDependentsExtension`, found by
+class name the way Health Check finds its extensions; Giving reports every household that
+a Gift or a Commitment names in its Household field, because those lookups clear on delete
+and a gift keeps the household it was given to (R-G2). Such a household is kept without an
+Error Log entry: keeping a donor's past household is the ordinary outcome of a move, not
+something an administrator has to act on. "Empty" is
 measured in BarnCRM's own membership, which is the only membership BarnCRM can
 see, so a household that also carries a Salesforce Nonprofit Cloud household group or its
 membership rows reads as empty here while being anything but. The account is the master of
@@ -5471,3 +5479,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| v0.6 | 2026-10-12 | The empty household tidy-up keeps a household with gifts (ADR-NEXT, `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`; resolves the open follow-up of `NEXT-a-gift-keeps-the-household-it-was-given-to.md`). No object or field added. R-H12: an emptied household is also kept when an installed module still credits records to it, reported through the new Core extension point `HouseholdDependentsExtension`; Giving reports households named by a Gift's or a Commitment's Household field. Such a household is kept without an Error Log entry. |

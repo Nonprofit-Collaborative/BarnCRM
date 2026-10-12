@@ -71,6 +71,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-module-settings-first-save-takes-checkbox-defaults-from-metadata.md) | A module's first settings save takes its checkbox defaults from field metadata | Accepted (builder decision) |
 | [NEXT](NEXT-core-names-other-products-only-when-detected.md) | Core shows nonprofit wording and other products' names only where they apply (amends ADR-0059 decision 5) | Accepted (owner decision) |
 | [NEXT](NEXT-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
+| [NEXT](NEXT-empty-household-tidy-up-keeps-households-with-gifts.md) | The empty household tidy-up keeps a household that still has gifts (extends ADR-0036) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
