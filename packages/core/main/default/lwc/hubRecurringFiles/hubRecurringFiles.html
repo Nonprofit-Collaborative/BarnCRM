@@ -1,0 +1,33 @@
+<template>
+    <template lwc:if={hasSources}>
+        <lightning-card title={labels.heading}>
+            <div class="slds-var-p-horizontal_medium">
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={sources} for:item="source">
+                        <li key={source.id} class="slds-item" data-id="recurring-source">
+                            <p class="slds-text-title_bold">{source.sourceName}</p>
+                            <p class="slds-text-body_small">
+                                <template lwc:if={source.lastImportDate}>
+                                    <lightning-formatted-date-time
+                                        value={source.lastImportDate}
+                                        year="numeric"
+                                        month="short"
+                                        day="2-digit"
+                                        time-zone="UTC"
+                                    ></lightning-formatted-date-time>
+                                </template>
+                                <template lwc:else>{labels.never}</template>
+                            </p>
+                        </li>
+                    </template>
+                </ul>
+                <lightning-button
+                    variant="base"
+                    label={labels.link}
+                    data-id="open-import"
+                    onclick={handleOpenImport}
+                ></lightning-button>
+            </div>
+        </lightning-card>
+    </template>
+</template>

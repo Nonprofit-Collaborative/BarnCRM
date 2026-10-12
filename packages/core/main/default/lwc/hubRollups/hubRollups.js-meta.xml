@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>BarnCRM Home: Rollups</masterLabel>
+  <description>
+    When the rollups last completed, with a warning once the nightly run is more than 36 hours
+    late. Shown to administrators.
+  </description>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>
