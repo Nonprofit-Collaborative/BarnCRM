@@ -242,6 +242,10 @@
     <apexClass>UserSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>WhatsNewController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Alternate_Email__c</field>
