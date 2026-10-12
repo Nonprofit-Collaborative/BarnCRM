@@ -69,6 +69,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0058](0058-opportunity-mirror-keeps-its-link-on-the-gift-and-runs-one-way.md) | The Opportunity mirror keeps its link on the gift, runs one way at a time, and reconciles on a page | Accepted (builder decision) |
 | [0059](0059-core-is-neutral.md) | Core is neutral: the nonprofit app, wording, giving and receipt settings and Setup Assistant steps live in Giving | Accepted (builder decision) |
 | [NEXT](NEXT-module-settings-first-save-takes-checkbox-defaults-from-metadata.md) | A module's first settings save takes its checkbox defaults from field metadata | Accepted (builder decision) |
+| [NEXT](NEXT-unlocked-to-managed-migration-kit.md) | Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API | Proposed (builder decision) |
 | [NEXT](NEXT-core-names-other-products-only-when-detected.md) | Core shows nonprofit wording and other products' names only where they apply (amends ADR-0059 decision 5) | Accepted (owner decision) |
 | [NEXT](NEXT-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
 

@@ -114,6 +114,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
 | C-13 Rollups | [rollups.md](rollups.md) | Core | v0.2 |
 | C-14 Importing | [importing.md](importing.md) | Core | v0.2 |
+| C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package | v0.6 |
 | G-01 Gifts | [gifts.md](gifts.md) | Giving | v0.2 |
 | G-03 Quick gift entry | [quick-gift-entry.md](quick-gift-entry.md) | Giving | v0.2 |
 | G-01 Funds | [funds.md](funds.md) | Giving | v0.2 |
