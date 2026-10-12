@@ -73,113 +73,133 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testLoadStartsTheChainForAPermittedUser() {
-        SampleDataController.permissionOverride = true;
-        SampleDataLoader.jsonOverride = buildJson(2, 2);
+        System.runAs(TestUsers.admin()) {
+            SampleDataController.permissionOverride = true;
+            SampleDataLoader.jsonOverride = buildJson(2, 2);
 
-        Test.startTest();
-        SampleDataController.loadSampleData();
-        Test.stopTest();
+            Test.startTest();
+            SampleDataController.loadSampleData();
+            Test.stopTest();
 
-        SampleDataLoader.Counts status = SampleDataController.getStatus();
-        System.assertEquals(2, status.householdCount, 'stage one should have inserted households');
-        System.assertEquals(
-            1,
-            status.organizationCount,
-            'stage one should have inserted the organization'
-        );
+            SampleDataLoader.Counts status = SampleDataController.getStatus();
+            System.assertEquals(
+                2,
+                status.householdCount,
+                'stage one should have inserted households'
+            );
+            System.assertEquals(
+                1,
+                status.organizationCount,
+                'stage one should have inserted the organization'
+            );
+        }
     }
 
     @IsTest
     static void testRemoveDeletesForAPermittedUser() {
-        SampleDataController.permissionOverride = true;
-        loadEverything(buildJson(2, 2));
+        System.runAs(TestUsers.admin()) {
+            SampleDataController.permissionOverride = true;
+            loadEverything(buildJson(2, 2));
 
-        SampleDataLoader.Counts removed = SampleDataController.removeSampleData();
-        System.assertEquals(2, removed.householdCount, 'both households should be removed');
-        System.assertEquals(4, removed.contactCount, 'every sample contact should be removed');
+            SampleDataLoader.Counts removed = SampleDataController.removeSampleData();
+            System.assertEquals(2, removed.householdCount, 'both households should be removed');
+            System.assertEquals(4, removed.contactCount, 'every sample contact should be removed');
 
-        SampleDataLoader.Counts status = SampleDataController.getStatus();
-        System.assertEquals(0, status.householdCount, 'nothing flagged should remain');
-        System.assertEquals(false, status.loaded, 'the card should report not loaded');
+            SampleDataLoader.Counts status = SampleDataController.getStatus();
+            System.assertEquals(0, status.householdCount, 'nothing flagged should remain');
+            System.assertEquals(false, status.loaded, 'the card should report not loaded');
+        }
     }
 
     @IsTest
     static void testStatusReportsCountsAndLoadedState() {
-        loadEverything(buildJson(1, 3));
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(1, 3));
 
-        SampleDataLoader.Counts status = SampleDataController.getStatus();
-        System.assertEquals(1, status.householdCount);
-        System.assertEquals(1, status.organizationCount);
-        System.assertEquals(3, status.contactCount);
-        System.assertEquals(true, status.loaded, 'loaded once records exist and no job runs');
-        System.assertEquals(false, status.loading);
+            SampleDataLoader.Counts status = SampleDataController.getStatus();
+            System.assertEquals(1, status.householdCount);
+            System.assertEquals(1, status.organizationCount);
+            System.assertEquals(3, status.contactCount);
+            System.assertEquals(true, status.loaded, 'loaded once records exist and no job runs');
+            System.assertEquals(false, status.loading);
+        }
     }
 
     @IsTest
     static void testCanManageIsTrueForAPermittedUser() {
-        SampleDataController.permissionOverride = true;
-        System.assertEquals(
-            true,
-            SampleDataController.canManageSampleData(),
-            'a user with the permission can manage sample data'
-        );
+        System.runAs(TestUsers.admin()) {
+            SampleDataController.permissionOverride = true;
+            System.assertEquals(
+                true,
+                SampleDataController.canManageSampleData(),
+                'a user with the permission can manage sample data'
+            );
+        }
     }
 
     @IsTest
     static void testStandardUserWithoutThePermissionIsRefused() {
-        User standardUser = buildStandardUser();
-        insert standardUser;
+        System.runAs(TestUsers.admin()) {
+            User standardUser = buildStandardUser();
+            insert standardUser;
 
-        Boolean loadThrew = false;
-        Boolean removeThrew = false;
-        Boolean canManage = true;
+            Boolean loadThrew = false;
+            Boolean removeThrew = false;
+            Boolean canManage = true;
 
-        System.runAs(standardUser) {
-            canManage = SampleDataController.canManageSampleData();
-            try {
-                SampleDataController.loadSampleData();
-            } catch (AuraHandledException e) {
-                loadThrew = true;
-                System.assertEquals(
-                    Label.Core_SampleData_NoPermission,
-                    e.getMessage(),
-                    'the refusal should carry the no-permission label'
-                );
+            System.runAs(standardUser) {
+                canManage = SampleDataController.canManageSampleData();
+                try {
+                    SampleDataController.loadSampleData();
+                } catch (AuraHandledException e) {
+                    loadThrew = true;
+                    System.assertEquals(
+                        Label.Core_SampleData_NoPermission,
+                        e.getMessage(),
+                        'the refusal should carry the no-permission label'
+                    );
+                }
+                try {
+                    SampleDataController.removeSampleData();
+                } catch (AuraHandledException e) {
+                    removeThrew = true;
+                    System.assertEquals(
+                        Label.Core_SampleData_NoPermission,
+                        e.getMessage(),
+                        'the refusal should carry the no-permission label'
+                    );
+                }
             }
-            try {
-                SampleDataController.removeSampleData();
-            } catch (AuraHandledException e) {
-                removeThrew = true;
-                System.assertEquals(
-                    Label.Core_SampleData_NoPermission,
-                    e.getMessage(),
-                    'the refusal should carry the no-permission label'
-                );
-            }
+
+            System.assertEquals(false, canManage, 'a Standard User cannot manage sample data');
+            System.assertEquals(true, loadThrew, 'loading without the permission should throw');
+            System.assertEquals(true, removeThrew, 'removing without the permission should throw');
         }
-
-        System.assertEquals(false, canManage, 'a Standard User cannot manage sample data');
-        System.assertEquals(true, loadThrew, 'loading without the permission should throw');
-        System.assertEquals(true, removeThrew, 'removing without the permission should throw');
     }
 
     @IsTest
     static void testAlreadyLoadedSurfacesAsAnAuraHandledException() {
-        SampleDataController.permissionOverride = true;
-        loadEverything(buildJson(1, 1));
-        SampleDataLoader.jsonOverride = buildJson(1, 1);
+        System.runAs(TestUsers.admin()) {
+            SampleDataController.permissionOverride = true;
+            loadEverything(buildJson(1, 1));
+            SampleDataLoader.jsonOverride = buildJson(1, 1);
 
-        Boolean threw = false;
-        try {
-            SampleDataController.loadSampleData();
-        } catch (AuraHandledException e) {
-            threw = true;
+            Boolean threw = false;
+            try {
+                SampleDataController.loadSampleData();
+            } catch (AuraHandledException e) {
+                threw = true;
+                System.assertEquals(
+                    Label.Core_SampleData_AlreadyLoaded,
+                    e.getMessage(),
+                    'the component should receive the already-loaded label text'
+                );
+            }
             System.assertEquals(
-                Label.Core_SampleData_AlreadyLoaded,
-                e.getMessage(),
-                'the component should receive the already-loaded label text'
+                true,
+                threw,
+                'a second load should reach the component as an error'
             );
         }
-        System.assertEquals(true, threw, 'a second load should reach the component as an error');
     }
 }

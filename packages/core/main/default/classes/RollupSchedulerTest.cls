@@ -38,83 +38,105 @@ private class RollupSchedulerTest {
 
     @IsTest
     static void theNightlyRunCoversScheduledAndBothAndNothingElse() {
-        Account parent = organization('Parent', null);
-        insert parent;
-        insert organization('Child', parent.Id);
-        insert new List<Rollup_Definition__c>{
-            childCount('Core_Scheduled', 'NumberOfEmployees', RollupService.MODE_SCHEDULED, true),
-            childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
-            childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
-            childCount('Core_Inactive', 'NumberOfEmployees', RollupService.MODE_SCHEDULED, false)
-        };
+        System.runAs(TestUsers.admin()) {
+            Account parent = organization('Parent', null);
+            insert parent;
+            insert organization('Child', parent.Id);
+            insert new List<Rollup_Definition__c>{
+                childCount(
+                    'Core_Scheduled',
+                    'NumberOfEmployees',
+                    RollupService.MODE_SCHEDULED,
+                    true
+                ),
+                childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
+                childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
+                childCount(
+                    'Core_Inactive',
+                    'NumberOfEmployees',
+                    RollupService.MODE_SCHEDULED,
+                    false
+                )
+            };
 
-        Test.startTest();
-        Id jobId = RollupScheduler.runNow();
-        Test.stopTest();
+            Test.startTest();
+            Id jobId = RollupScheduler.runNow();
+            Test.stopTest();
 
-        Assert.isNotNull(jobId, 'The run started');
-        Set<String> keys = new Set<String>();
-        for (Rollup_Definition__c definition : [
-            SELECT Definition_Key__c
-            FROM Rollup_Definition__c
-            WHERE Last_Calculated__c != NULL
-        ]) {
-            keys.add(definition.Definition_Key__c);
+            Assert.isNotNull(jobId, 'The run started');
+            Set<String> keys = new Set<String>();
+            for (Rollup_Definition__c definition : [
+                SELECT Definition_Key__c
+                FROM Rollup_Definition__c
+                WHERE Last_Calculated__c != NULL
+            ]) {
+                keys.add(definition.Definition_Key__c);
+            }
+            Assert.areEqual(
+                new Set<String>{ 'Core_Scheduled', 'Core_Both' },
+                keys,
+                'R-R4: a real time rollup is already right, and an inactive one does not run'
+            );
+            Account counted = [
+                SELECT NumberOfEmployees, Member_Count__c
+                FROM Account
+                WHERE Id = :parent.Id
+            ];
+            Assert.areEqual(1, counted.NumberOfEmployees, 'The scheduled total is written');
+            Assert.areEqual(1, counted.Member_Count__c, 'And the Both one');
         }
-        Assert.areEqual(
-            new Set<String>{ 'Core_Scheduled', 'Core_Both' },
-            keys,
-            'R-R4: a real time rollup is already right, and an inactive one does not run'
-        );
-        Account counted = [
-            SELECT NumberOfEmployees, Member_Count__c
-            FROM Account
-            WHERE Id = :parent.Id
-        ];
-        Assert.areEqual(1, counted.NumberOfEmployees, 'The scheduled total is written');
-        Assert.areEqual(1, counted.Member_Count__c, 'And the Both one');
     }
 
     @IsTest
     static void theScheduledJobStartsTheFullRecalculation() {
-        insert childCount('Core_Both', 'NumberOfEmployees', RollupService.MODE_BOTH, true);
-        insert organization('Parent', null);
+        System.runAs(TestUsers.admin()) {
+            insert childCount('Core_Both', 'NumberOfEmployees', RollupService.MODE_BOTH, true);
+            insert organization('Parent', null);
 
-        Test.startTest();
-        new RollupScheduler().execute(null);
-        Test.stopTest();
+            Test.startTest();
+            new RollupScheduler().execute(null);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            [
-                SELECT COUNT()
-                FROM AsyncApexJob
-                WHERE JobType = 'BatchApex' AND ApexClass.Name = 'RollupFullRecalcBatch'
-            ],
-            'The nightly job runs the full recalculation of BarnCRM own engine'
-        );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM AsyncApexJob
+                    WHERE JobType = 'BatchApex' AND ApexClass.Name = 'RollupFullRecalcBatch'
+                ],
+                'The nightly job runs the full recalculation of BarnCRM own engine'
+            );
+        }
     }
 
     @IsTest
     static void theScheduleIsStartedAndStoppedFromTheConsole() {
-        Test.startTest();
-        RollupScheduler.start();
-        Boolean scheduledAfterStart = RollupScheduler.isScheduled();
-        RollupScheduler.stop();
-        Boolean scheduledAfterStop = RollupScheduler.isScheduled();
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupScheduler.start();
+            Boolean scheduledAfterStart = RollupScheduler.isScheduled();
+            RollupScheduler.stop();
+            Boolean scheduledAfterStop = RollupScheduler.isScheduled();
+            Test.stopTest();
 
-        System.Assert.isTrue(scheduledAfterStart, 'Starting the nightly run schedules it');
-        System.Assert.isFalse(scheduledAfterStop, 'And stopping it takes it away');
+            System.Assert.isTrue(scheduledAfterStart, 'Starting the nightly run schedules it');
+            System.Assert.isFalse(scheduledAfterStop, 'And stopping it takes it away');
+        }
     }
 
     @IsTest
     static void startingTwiceDoesNotScheduleTwoJobs() {
-        Test.startTest();
-        Id first = RollupScheduler.start();
-        Id second = RollupScheduler.start();
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Id first = RollupScheduler.start();
+            Id second = RollupScheduler.start();
+            Test.stopTest();
 
-        System.Assert.areEqual(first, second, 'The same job, so a second click changes nothing');
+            System.Assert.areEqual(
+                first,
+                second,
+                'The same job, so a second click changes nothing'
+            );
+        }
     }
 }

@@ -139,260 +139,293 @@ private class RollupOperationsTest {
 
     @IsTest
     static void twoHundredPeopleSavedAtOnceFillEveryOperationInTheSameSave() {
-        insert everyOperation(RollupService.MODE_REAL_TIME);
-        List<Account> organizations = organizations(ORGANIZATIONS);
+        System.runAs(TestUsers.admin()) {
+            insert everyOperation(RollupService.MODE_REAL_TIME);
+            List<Account> organizations = organizations(ORGANIZATIONS);
 
-        Test.startTest();
-        insert people(organizations);
-        Test.stopTest();
+            Test.startTest();
+            insert people(organizations);
+            Test.stopTest();
 
-        assertEveryOperation(organizations, 'Instant');
+            assertEveryOperation(organizations, 'Instant');
+        }
     }
 
     @IsTest
     static void aDeleteAndAMoveToAnotherParentMoveTheAnswers() {
-        insert everyOperation(RollupService.MODE_REAL_TIME);
-        List<Account> organizations = organizations(2);
-        Account leaving = organizations[0];
-        Account joining = organizations[1];
-        Date born = Date.newInstance(1990, 1, 1);
-        List<Contact> staff = new List<Contact>{
-            new Contact(
-                LastName = 'Ames',
-                Title = 'Role 1',
-                Birthdate = born,
-                AccountId = leaving.Id
-            ),
-            new Contact(
-                LastName = 'Baker',
-                Title = 'Role 2',
-                Department = 'Board',
-                Birthdate = born.addDays(1),
-                AccountId = leaving.Id
-            )
-        };
-        insert staff;
+        System.runAs(TestUsers.admin()) {
+            insert everyOperation(RollupService.MODE_REAL_TIME);
+            List<Account> organizations = organizations(2);
+            Account leaving = organizations[0];
+            Account joining = organizations[1];
+            Date born = Date.newInstance(1990, 1, 1);
+            List<Contact> staff = new List<Contact>{
+                new Contact(
+                    LastName = 'Ames',
+                    Title = 'Role 1',
+                    Birthdate = born,
+                    AccountId = leaving.Id
+                ),
+                new Contact(
+                    LastName = 'Baker',
+                    Title = 'Role 2',
+                    Department = 'Board',
+                    Birthdate = born.addDays(1),
+                    AccountId = leaving.Id
+                )
+            };
+            insert staff;
 
-        Test.startTest();
-        TriggerHandler.clearRunClaims();
-        staff[0].AccountId = joining.Id;
-        update staff[0];
-        Map<Id, Account> afterMove = reread(organizations);
-        TriggerHandler.clearRunClaims();
-        delete staff[1];
-        Test.stopTest();
+            Test.startTest();
+            TriggerHandler.clearRunClaims();
+            staff[0].AccountId = joining.Id;
+            update staff[0];
+            Map<Id, Account> afterMove = reread(organizations);
+            TriggerHandler.clearRunClaims();
+            delete staff[1];
+            Test.stopTest();
 
-        Assert.isFalse(afterMove.get(leaving.Id).Sample_Data__c, 'Role 1 moved out');
-        Assert.areEqual('Role 2', afterMove.get(leaving.Id).Site, 'Baker is now the eldest');
-        Assert.isTrue(afterMove.get(joining.Id).Sample_Data__c, 'And moved in');
-        Assert.areEqual(
-            'Ames',
-            afterMove.get(joining.Id).Sample_Data_Key__c,
-            'Ames is the youngest'
-        );
+            Assert.isFalse(afterMove.get(leaving.Id).Sample_Data__c, 'Role 1 moved out');
+            Assert.areEqual('Role 2', afterMove.get(leaving.Id).Site, 'Baker is now the eldest');
+            Assert.isTrue(afterMove.get(joining.Id).Sample_Data__c, 'And moved in');
+            Assert.areEqual(
+                'Ames',
+                afterMove.get(joining.Id).Sample_Data_Key__c,
+                'Ames is the youngest'
+            );
 
-        Account emptied = reread(organizations).get(leaving.Id);
-        Assert.isFalse(emptied.Sample_Data__c, 'Any of nobody is unchecked');
-        Assert.isTrue(emptied.Exclude_From_Greetings__c, 'None of nobody is checked');
-        Assert.isNull(emptied.Site, 'First of nobody is blank');
-        Assert.isNull(emptied.Sample_Data_Key__c, 'Last of nobody is blank');
+            Account emptied = reread(organizations).get(leaving.Id);
+            Assert.isFalse(emptied.Sample_Data__c, 'Any of nobody is unchecked');
+            Assert.isTrue(emptied.Exclude_From_Greetings__c, 'None of nobody is checked');
+            Assert.isNull(emptied.Site, 'First of nobody is blank');
+            Assert.isNull(emptied.Sample_Data_Key__c, 'Last of nobody is blank');
+        }
     }
 
     // --------------------------------------------------------------------- full recalculation
 
     @IsTest
     static void theFullRecalculationGivesTheSameAnswersAndASecondRunWritesNothing() {
-        List<Rollup_Definition__c> definitions = everyOperation(RollupService.MODE_SCHEDULED);
-        insert definitions;
-        List<Account> organizations = organizations(ORGANIZATIONS);
-        insert people(organizations);
-        List<Account> empty = organizations(1);
-        Assert.areEqual(
-            'stale',
-            reread(organizations).get(organizations[0].Id).Site,
-            'Nothing ran on save'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<Rollup_Definition__c> definitions = everyOperation(RollupService.MODE_SCHEDULED);
+            insert definitions;
+            List<Account> organizations = organizations(ORGANIZATIONS);
+            insert people(organizations);
+            List<Account> empty = organizations(1);
+            Assert.areEqual(
+                'stale',
+                reread(organizations).get(organizations[0].Id).Site,
+                'Nothing ran on save'
+            );
 
-        Test.startTest();
-        RollupFullRecalcBatch.begin(definitions);
-        Test.stopTest();
+            Test.startTest();
+            RollupFullRecalcBatch.begin(definitions);
+            Test.stopTest();
 
-        assertEveryOperation(organizations, 'Full');
-        Account cleared = reread(empty).get(empty[0].Id);
-        Assert.isFalse(cleared.Sample_Data__c, 'Any of nobody is unchecked');
-        Assert.isTrue(cleared.Exclude_From_Greetings__c, 'None of nobody is checked');
-        Assert.isNull(cleared.Site, 'A stale First is cleared');
-        Set<Id> ids = new Map<Id, Account>(organizations).keySet();
-        Assert.isTrue(
-            RollupEngine.recalculate(ids, definitions).written.isEmpty(),
-            'Recalculating again changes nothing, so writes nothing'
-        );
+            assertEveryOperation(organizations, 'Full');
+            Account cleared = reread(empty).get(empty[0].Id);
+            Assert.isFalse(cleared.Sample_Data__c, 'Any of nobody is unchecked');
+            Assert.isTrue(cleared.Exclude_From_Greetings__c, 'None of nobody is checked');
+            Assert.isNull(cleared.Site, 'A stale First is cleared');
+            Set<Id> ids = new Map<Id, Account>(organizations).keySet();
+            Assert.isTrue(
+                RollupEngine.recalculate(ids, definitions).written.isEmpty(),
+                'Recalculating again changes nothing, so writes nothing'
+            );
+        }
     }
 
     // ------------------------------------------------------------------------------ edge cases
 
     @IsTest
     static void tiesGoToTheLowerRecordIdForFirstAndLast() {
-        List<Account> organizations = organizations(1);
-        Date sameDay = Date.newInstance(1990, 5, 5);
-        insert new List<Contact>{
-            new Contact(LastName = 'Alpha', Birthdate = sameDay, AccountId = organizations[0].Id),
-            new Contact(LastName = 'Beta', Birthdate = sameDay, AccountId = organizations[0].Id),
-            new Contact(LastName = 'Gamma', Birthdate = sameDay, AccountId = organizations[0].Id)
-        };
-        Rollup_Definition__c first = definition(
-            'FIRST',
-            'LastName',
-            'Site',
-            RollupService.MODE_SCHEDULED
-        );
-        first.Order_By_Field__c = 'Birthdate';
-        Rollup_Definition__c last = definition(
-            'LAST',
-            'LastName',
-            'Sample_Data_Key__c',
-            RollupService.MODE_SCHEDULED
-        );
-        last.Order_By_Field__c = 'Birthdate';
-        String lowest = [SELECT LastName FROM Contact ORDER BY Id LIMIT 1].LastName;
+        System.runAs(TestUsers.admin()) {
+            List<Account> organizations = organizations(1);
+            Date sameDay = Date.newInstance(1990, 5, 5);
+            insert new List<Contact>{
+                new Contact(
+                    LastName = 'Alpha',
+                    Birthdate = sameDay,
+                    AccountId = organizations[0].Id
+                ),
+                new Contact(
+                    LastName = 'Beta',
+                    Birthdate = sameDay,
+                    AccountId = organizations[0].Id
+                ),
+                new Contact(
+                    LastName = 'Gamma',
+                    Birthdate = sameDay,
+                    AccountId = organizations[0].Id
+                )
+            };
+            Rollup_Definition__c first = definition(
+                'FIRST',
+                'LastName',
+                'Site',
+                RollupService.MODE_SCHEDULED
+            );
+            first.Order_By_Field__c = 'Birthdate';
+            Rollup_Definition__c last = definition(
+                'LAST',
+                'LastName',
+                'Sample_Data_Key__c',
+                RollupService.MODE_SCHEDULED
+            );
+            last.Order_By_Field__c = 'Birthdate';
+            String lowest = [SELECT LastName FROM Contact ORDER BY Id LIMIT 1].LastName;
 
-        Test.startTest();
-        RollupEngine.recalculate(
-            new Set<Id>{ organizations[0].Id },
-            new List<Rollup_Definition__c>{ first, last }
-        );
-        Test.stopTest();
+            Test.startTest();
+            RollupEngine.recalculate(
+                new Set<Id>{ organizations[0].Id },
+                new List<Rollup_Definition__c>{ first, last }
+            );
+            Test.stopTest();
 
-        Account stored = reread(organizations).get(organizations[0].Id);
-        Assert.areEqual(lowest, stored.Site, 'First takes the lower Id on a tie');
-        Assert.areEqual(lowest, stored.Sample_Data_Key__c, 'And so does Last');
+            Account stored = reread(organizations).get(organizations[0].Id);
+            Assert.areEqual(lowest, stored.Site, 'First takes the lower Id on a tie');
+            Assert.areEqual(lowest, stored.Sample_Data_Key__c, 'And so does Last');
+        }
     }
 
     @IsTest
     static void aDateIsCopiedIntoTextPlainlyAndALongValueIsCut() {
-        List<Account> organizations = organizations(1);
-        insert new List<Contact>{
-            new Contact(
-                LastName = 'Abcdefghijklmnopqrstuvwxyz',
-                Birthdate = Date.newInstance(1970, 3, 1),
-                AccountId = organizations[0].Id
-            )
-        };
-        Rollup_Definition__c birthday = definition(
-            'FIRST',
-            'Birthdate',
-            'Site',
-            RollupService.MODE_SCHEDULED
-        );
-        birthday.Order_By_Field__c = 'Birthdate';
-        Rollup_Definition__c name = definition(
-            'LAST',
-            'LastName',
-            'Sample_Data_Key__c',
-            RollupService.MODE_SCHEDULED
-        );
-        name.Order_By_Field__c = 'Birthdate';
-        List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{ birthday, name };
-        Set<Id> ids = new Set<Id>{ organizations[0].Id };
+        System.runAs(TestUsers.admin()) {
+            List<Account> organizations = organizations(1);
+            insert new List<Contact>{
+                new Contact(
+                    LastName = 'Abcdefghijklmnopqrstuvwxyz',
+                    Birthdate = Date.newInstance(1970, 3, 1),
+                    AccountId = organizations[0].Id
+                )
+            };
+            Rollup_Definition__c birthday = definition(
+                'FIRST',
+                'Birthdate',
+                'Site',
+                RollupService.MODE_SCHEDULED
+            );
+            birthday.Order_By_Field__c = 'Birthdate';
+            Rollup_Definition__c name = definition(
+                'LAST',
+                'LastName',
+                'Sample_Data_Key__c',
+                RollupService.MODE_SCHEDULED
+            );
+            name.Order_By_Field__c = 'Birthdate';
+            List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
+                birthday,
+                name
+            };
+            Set<Id> ids = new Set<Id>{ organizations[0].Id };
 
-        Test.startTest();
-        RollupEngine.Result firstRun = RollupEngine.recalculate(ids, definitions);
-        RollupEngine.Result secondRun = RollupEngine.recalculate(ids, definitions);
-        Test.stopTest();
+            Test.startTest();
+            RollupEngine.Result firstRun = RollupEngine.recalculate(ids, definitions);
+            RollupEngine.Result secondRun = RollupEngine.recalculate(ids, definitions);
+            Test.stopTest();
 
-        Account stored = reread(organizations).get(organizations[0].Id);
-        Assert.areEqual('1970-03-01', stored.Site, 'A date, written plainly');
-        Assert.areEqual(
-            'Abcdefghijklmnopqrst',
-            stored.Sample_Data_Key__c,
-            'Cut at the 20 characters the field holds'
-        );
-        Assert.isTrue(firstRun.failed.isEmpty(), 'The save did not fail on the length');
-        Assert.isTrue(secondRun.written.isEmpty(), 'The cut value is the same on the next run');
+            Account stored = reread(organizations).get(organizations[0].Id);
+            Assert.areEqual('1970-03-01', stored.Site, 'A date, written plainly');
+            Assert.areEqual(
+                'Abcdefghijklmnopqrst',
+                stored.Sample_Data_Key__c,
+                'Cut at the 20 characters the field holds'
+            );
+            Assert.isTrue(firstRun.failed.isEmpty(), 'The save did not fail on the length');
+            Assert.isTrue(secondRun.written.isEmpty(), 'The cut value is the same on the next run');
+        }
     }
 
     // ------------------------------------------------------------------------------ the planner
 
     @IsTest
     static void eachOperationFillsOnlyTheTypesItSuits() {
-        Assert.isNull(
-            RollupPlanner.targetTypeProblem('ANY', Schema.DisplayType.BOOLEAN),
-            'Any into a checkbox'
-        );
-        Assert.areEqual(
-            Label.Core_Rollups_ErrorTargetNeedsCheckbox,
-            RollupPlanner.targetTypeProblem('NONE', Schema.DisplayType.DOUBLE),
-            'None into a number'
-        );
-        Assert.isNull(
-            RollupPlanner.targetTypeProblem('TEXT_LIST', Schema.DisplayType.TEXTAREA),
-            'A list into long text'
-        );
-        Assert.areEqual(
-            Label.Core_Rollups_ErrorTargetNeedsText,
-            RollupPlanner.targetTypeProblem('TEXT_LIST_DISTINCT', Schema.DisplayType.DATE),
-            'A list into a date'
-        );
-        Assert.areEqual(
-            Label.Core_Rollups_ErrorTargetNeedsNumber,
-            RollupPlanner.targetTypeProblem('COUNT_DISTINCT', Schema.DisplayType.STRING),
-            'Count distinct into text'
-        );
-        Assert.isNull(
-            RollupPlanner.targetTypeProblem('LAST', Schema.DisplayType.STRING),
-            'Last into text'
-        );
-        Assert.areEqual(
-            Label.Core_Rollups_ErrorTextTarget,
-            RollupPlanner.targetTypeProblem('SUM', Schema.DisplayType.STRING),
-            'A sum into text'
-        );
-        Assert.areEqual(
-            Label.Core_Rollups_ErrorCheckboxTarget,
-            RollupPlanner.targetTypeProblem('COUNT', Schema.DisplayType.BOOLEAN),
-            'A count into a checkbox'
-        );
-        Assert.areEqual(
-            Label.Core_Rollups_ErrorTargetType,
-            RollupPlanner.targetTypeProblem('MAX', Schema.DisplayType.PICKLIST),
-            'A maximum into a picklist'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.isNull(
+                RollupPlanner.targetTypeProblem('ANY', Schema.DisplayType.BOOLEAN),
+                'Any into a checkbox'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorTargetNeedsCheckbox,
+                RollupPlanner.targetTypeProblem('NONE', Schema.DisplayType.DOUBLE),
+                'None into a number'
+            );
+            Assert.isNull(
+                RollupPlanner.targetTypeProblem('TEXT_LIST', Schema.DisplayType.TEXTAREA),
+                'A list into long text'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorTargetNeedsText,
+                RollupPlanner.targetTypeProblem('TEXT_LIST_DISTINCT', Schema.DisplayType.DATE),
+                'A list into a date'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorTargetNeedsNumber,
+                RollupPlanner.targetTypeProblem('COUNT_DISTINCT', Schema.DisplayType.STRING),
+                'Count distinct into text'
+            );
+            Assert.isNull(
+                RollupPlanner.targetTypeProblem('LAST', Schema.DisplayType.STRING),
+                'Last into text'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorTextTarget,
+                RollupPlanner.targetTypeProblem('SUM', Schema.DisplayType.STRING),
+                'A sum into text'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorCheckboxTarget,
+                RollupPlanner.targetTypeProblem('COUNT', Schema.DisplayType.BOOLEAN),
+                'A count into a checkbox'
+            );
+            Assert.areEqual(
+                Label.Core_Rollups_ErrorTargetType,
+                RollupPlanner.targetTypeProblem('MAX', Schema.DisplayType.PICKLIST),
+                'A maximum into a picklist'
+            );
+        }
     }
 
     @IsTest
     static void anIncompatibleTargetIsRefusedAloneAndAnyNeedsNoSourceField() {
-        Rollup_Definition__c anyIntoNumber = definition(
-            'ANY',
-            null,
-            'NumberOfEmployees',
-            RollupService.MODE_BOTH
-        );
-        Rollup_Definition__c firstWithNothing = definition(
-            'FIRST',
-            null,
-            'Site',
-            RollupService.MODE_BOTH
-        );
-        firstWithNothing.Order_By_Field__c = 'Birthdate';
-        Rollup_Definition__c anyone = definition(
-            'ANY',
-            null,
-            'Sample_Data__c',
-            RollupService.MODE_BOTH
-        );
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c anyIntoNumber = definition(
+                'ANY',
+                null,
+                'NumberOfEmployees',
+                RollupService.MODE_BOTH
+            );
+            Rollup_Definition__c firstWithNothing = definition(
+                'FIRST',
+                null,
+                'Site',
+                RollupService.MODE_BOTH
+            );
+            firstWithNothing.Order_By_Field__c = 'Birthdate';
+            Rollup_Definition__c anyone = definition(
+                'ANY',
+                null,
+                'Sample_Data__c',
+                RollupService.MODE_BOTH
+            );
 
-        RollupPlanner.Plan plan = RollupPlanner.plan(
-            Account.SObjectType,
-            new List<Rollup_Definition__c>{ anyIntoNumber, firstWithNothing, anyone }
-        );
+            RollupPlanner.Plan plan = RollupPlanner.plan(
+                Account.SObjectType,
+                new List<Rollup_Definition__c>{ anyIntoNumber, firstWithNothing, anyone }
+            );
 
-        Assert.areEqual(
-            2,
-            plan.refused.size(),
-            'Any into a number, and First with nothing to read'
-        );
-        Assert.areEqual(1, plan.definitions.size(), 'Any into a checkbox needs no source field');
-        Assert.isNull(plan.queries[0].measures[0].field, 'And reads none');
-        Assert.isFalse(plan.queries[0].measures[0].asText, 'A checkbox is not text');
+            Assert.areEqual(
+                2,
+                plan.refused.size(),
+                'Any into a number, and First with nothing to read'
+            );
+            Assert.areEqual(
+                1,
+                plan.definitions.size(),
+                'Any into a checkbox needs no source field'
+            );
+            Assert.isNull(plan.queries[0].measures[0].field, 'And reads none');
+            Assert.isFalse(plan.queries[0].measures[0].asText, 'A checkbox is not text');
+        }
     }
 }

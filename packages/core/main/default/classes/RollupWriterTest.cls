@@ -6,61 +6,65 @@
 private class RollupWriterTest {
     @IsTest
     static void valuesAreComparedAsTheyWouldBeStored() {
-        Schema.DescribeFieldResult wholeNumber = Account.Member_Count__c.getDescribe();
-        Assert.isTrue(
-            (Decimal) RollupWriter.coerce(wholeNumber, 33.333) == 33,
-            'Rounded to the scale'
-        );
-        Assert.isTrue(RollupWriter.sameValue(1.0, 1.00), 'Scale alone is no change');
-        Assert.isTrue(RollupWriter.sameValue(3, 3.0), 'A whole number and a decimal');
-        Assert.isFalse(RollupWriter.sameValue(null, 0), 'Blank and zero differ');
-        Assert.areEqual(
-            Date.newInstance(2024, 1, 2),
-            RollupWriter.coerce(
-                Account.Anniversary__c.getDescribe(),
-                Datetime.newInstance(2024, 1, 2, 10, 0, 0)
-            ),
-            'A datetime into a date attribute'
-        );
+        System.runAs(TestUsers.admin()) {
+            Schema.DescribeFieldResult wholeNumber = Account.Member_Count__c.getDescribe();
+            Assert.isTrue(
+                (Decimal) RollupWriter.coerce(wholeNumber, 33.333) == 33,
+                'Rounded to the scale'
+            );
+            Assert.isTrue(RollupWriter.sameValue(1.0, 1.00), 'Scale alone is no change');
+            Assert.isTrue(RollupWriter.sameValue(3, 3.0), 'A whole number and a decimal');
+            Assert.isFalse(RollupWriter.sameValue(null, 0), 'Blank and zero differ');
+            Assert.areEqual(
+                Date.newInstance(2024, 1, 2),
+                RollupWriter.coerce(
+                    Account.Anniversary__c.getDescribe(),
+                    Datetime.newInstance(2024, 1, 2, 10, 0, 0)
+                ),
+                'A datetime into a date attribute'
+            );
+        }
     }
 
     @IsTest
     static void onlyRecordsWithAChangedTotalAreSaved() {
-        Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-            .get('Organization')
-            .getRecordTypeId();
-        Account same = new Account(
-            Name = 'Same',
-            RecordTypeId = organizationType,
-            Member_Count__c = 2
-        );
-        Account changed = new Account(
-            Name = 'Changed',
-            RecordTypeId = organizationType,
-            Member_Count__c = 2
-        );
-        insert new List<Account>{ same, changed };
-        Set<Id> both = new Set<Id>{ same.Id, changed.Id };
-        Map<Id, SObject> stored = new Map<Id, SObject>(
-            [SELECT Id, Member_Count__c FROM Account WHERE Id IN :both]
-        );
-        Map<Id, Map<Schema.SObjectField, Object>> computed = new Map<Id, Map<Schema.SObjectField, Object>>{
-            same.Id => new Map<Schema.SObjectField, Object>{ Account.Member_Count__c => 2.0 },
-            changed.Id => new Map<Schema.SObjectField, Object>{ Account.Member_Count__c => 5 }
-        };
+        System.runAs(TestUsers.admin()) {
+            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+                .get('Organization')
+                .getRecordTypeId();
+            Account same = new Account(
+                Name = 'Same',
+                RecordTypeId = organizationType,
+                Member_Count__c = 2
+            );
+            Account changed = new Account(
+                Name = 'Changed',
+                RecordTypeId = organizationType,
+                Member_Count__c = 2
+            );
+            insert new List<Account>{ same, changed };
+            Set<Id> both = new Set<Id>{ same.Id, changed.Id };
+            Map<Id, SObject> stored = new Map<Id, SObject>(
+                [SELECT Id, Member_Count__c FROM Account WHERE Id IN :both]
+            );
+            Map<Id, Map<Schema.SObjectField, Object>> computed = new Map<Id, Map<Schema.SObjectField, Object>>{
+                same.Id => new Map<Schema.SObjectField, Object>{ Account.Member_Count__c => 2.0 },
+                changed.Id => new Map<Schema.SObjectField, Object>{ Account.Member_Count__c => 5 }
+            };
 
-        RollupWriter.TotalsWrite result = RollupWriter.writeTotals(
-            Account.SObjectType,
-            stored,
-            computed,
-            Datetime.now()
-        );
+            RollupWriter.TotalsWrite result = RollupWriter.writeTotals(
+                Account.SObjectType,
+                stored,
+                computed,
+                Datetime.now()
+            );
 
-        Assert.areEqual(new Set<Id>{ changed.Id }, result.written, 'Only the changed record');
-        Assert.areEqual(
-            5,
-            [SELECT Member_Count__c FROM Account WHERE Id = :changed.Id].Member_Count__c,
-            'Saved'
-        );
+            Assert.areEqual(new Set<Id>{ changed.Id }, result.written, 'Only the changed record');
+            Assert.areEqual(
+                5,
+                [SELECT Member_Count__c FROM Account WHERE Id = :changed.Id].Member_Count__c,
+                'Saved'
+            );
+        }
     }
 }

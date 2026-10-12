@@ -38,49 +38,53 @@ private class RollupTriggerHandlerTest {
 
     @IsTest
     static void theHandlerRunsTheDefinitionsForWhateverEntityItWasGiven() {
-        insert childCount();
-        Account parent = organization('Parent', null);
-        insert parent;
-        Account child = organization('Child', parent.Id);
-        insert child;
+        System.runAs(TestUsers.admin()) {
+            insert childCount();
+            Account parent = organization('Parent', null);
+            insert parent;
+            Account child = organization('Child', parent.Id);
+            insert child;
 
-        TriggerHandler.clearRunClaims();
-        TriggerHandler.testNew = new List<SObject>{ child };
+            TriggerHandler.clearRunClaims();
+            TriggerHandler.testNew = new List<SObject>{ child };
 
-        Test.startTest();
-        new RollupTriggerHandler().afterInsert();
-        Test.stopTest();
+            Test.startTest();
+            new RollupTriggerHandler().afterInsert();
+            Test.stopTest();
 
-        System.Assert.areEqual(
-            1,
-            countOn(parent.Id),
-            'The entity was worked out from the records in front of the handler, not hard coded'
-        );
+            System.Assert.areEqual(
+                1,
+                countOn(parent.Id),
+                'The entity was worked out from the records in front of the handler, not hard coded'
+            );
+        }
     }
 
     @IsTest
     static void thesameRecordsAreNotRunTwiceInOneTransaction() {
-        insert childCount();
-        Account parent = organization('Parent', null);
-        insert parent;
-        Account child = organization('Child', parent.Id);
-        insert child;
+        System.runAs(TestUsers.admin()) {
+            insert childCount();
+            Account parent = organization('Parent', null);
+            insert parent;
+            Account child = organization('Child', parent.Id);
+            insert child;
 
-        TriggerHandler.clearRunClaims();
-        TriggerHandler.testNew = new List<SObject>{ child };
-        RollupTriggerHandler handler = new RollupTriggerHandler();
-        handler.afterInsert();
-        update new Account(Id = parent.Id, NumberOfEmployees = 99);
+            TriggerHandler.clearRunClaims();
+            TriggerHandler.testNew = new List<SObject>{ child };
+            RollupTriggerHandler handler = new RollupTriggerHandler();
+            handler.afterInsert();
+            update new Account(Id = parent.Id, NumberOfEmployees = 99);
 
-        Test.startTest();
-        handler.afterInsert();
-        Test.stopTest();
+            Test.startTest();
+            handler.afterInsert();
+            Test.stopTest();
 
-        System.Assert.areEqual(
-            99,
-            countOn(parent.Id),
-            'A rollup that causes its own object to be saved again does its work once per record'
-        );
+            System.Assert.areEqual(
+                99,
+                countOn(parent.Id),
+                'A rollup that causes its own object to be saved again does its work once per record'
+            );
+        }
     }
 
     /**
@@ -93,64 +97,68 @@ private class RollupTriggerHandlerTest {
      */
     @IsTest
     static void aFailureIsLoggedRatherThanFailingTheSave() {
-        Account parent = organization('Parent', null);
-        insert parent;
-        Account child = organization('Child', parent.Id);
-        insert child;
+        System.runAs(TestUsers.admin()) {
+            Account parent = organization('Parent', null);
+            insert parent;
+            Account child = organization('Child', parent.Id);
+            insert child;
 
-        Rollup_Definition__c broken = childCount();
-        broken.Aggregate__c = 'SUM';
-        broken.Source_Field__c = null;
-        insert broken;
+            Rollup_Definition__c broken = childCount();
+            broken.Aggregate__c = 'SUM';
+            broken.Source_Field__c = null;
+            insert broken;
 
-        TriggerHandler.clearRunClaims();
-        TriggerHandler.testNew = new List<SObject>{ child };
+            TriggerHandler.clearRunClaims();
+            TriggerHandler.testNew = new List<SObject>{ child };
 
-        Test.startTest();
-        new RollupTriggerHandler().afterInsert();
-        Test.getEventBus().deliver();
-        Test.stopTest();
+            Test.startTest();
+            new RollupTriggerHandler().afterInsert();
+            Test.getEventBus().deliver();
+            Test.stopTest();
 
-        // Nothing thrown: the administrator's save went through.
-        System.Assert.isNull(countOn(parent.Id), 'The broken definition wrote nothing');
-        System.Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Account WHERE Id = :child.Id],
-            'The save the rollup was running for stands (R-R4, plan Principle 2)'
-        );
-        List<Error_Log__c> logged = [
-            SELECT Message__c, Technical_Detail__c, Record_Reference__c, Object_Name__c
-            FROM Error_Log__c
-            WHERE Context__c = 'RollupPlanner.plan'
-        ];
-        System.Assert.areEqual(1, logged.size(), 'And the failure is in the log, once');
-        System.Assert.areEqual(
-            String.valueOf(broken.Id),
-            logged[0].Record_Reference__c,
-            'Pointing at the definition Maria has to fix'
-        );
-        System.Assert.areEqual(
-            'Rollup_Definition__c',
-            logged[0].Object_Name__c,
-            'So the entry can be grouped by what it is about'
-        );
-        System.Assert.areEqual(
-            Label.Core_ErrorLog_UnexpectedFailure,
-            logged[0].Message__c,
-            'What Maria reads is plain language'
-        );
-        System.Assert.isTrue(
-            logged[0].Technical_Detail__c.contains('RollupPlanException'),
-            'And the detail she forwards names what refused the definition'
-        );
+            // Nothing thrown: the administrator's save went through.
+            System.Assert.isNull(countOn(parent.Id), 'The broken definition wrote nothing');
+            System.Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :child.Id],
+                'The save the rollup was running for stands (R-R4, plan Principle 2)'
+            );
+            List<Error_Log__c> logged = [
+                SELECT Message__c, Technical_Detail__c, Record_Reference__c, Object_Name__c
+                FROM Error_Log__c
+                WHERE Context__c = 'RollupPlanner.plan'
+            ];
+            System.Assert.areEqual(1, logged.size(), 'And the failure is in the log, once');
+            System.Assert.areEqual(
+                String.valueOf(broken.Id),
+                logged[0].Record_Reference__c,
+                'Pointing at the definition Maria has to fix'
+            );
+            System.Assert.areEqual(
+                'Rollup_Definition__c',
+                logged[0].Object_Name__c,
+                'So the entry can be grouped by what it is about'
+            );
+            System.Assert.areEqual(
+                Label.Core_ErrorLog_UnexpectedFailure,
+                logged[0].Message__c,
+                'What Maria reads is plain language'
+            );
+            System.Assert.isTrue(
+                logged[0].Technical_Detail__c.contains('RollupPlanException'),
+                'And the detail she forwards names what refused the definition'
+            );
+        }
     }
 
     @IsTest
     static void theHandlerNamesItselfTheWayTheRegistryDoes() {
-        System.Assert.areEqual(
-            'RollupTriggerHandler',
-            new RollupTriggerHandler().getName(),
-            'The name matches the Automation Registry rows that register it'
-        );
+        System.runAs(TestUsers.admin()) {
+            System.Assert.areEqual(
+                'RollupTriggerHandler',
+                new RollupTriggerHandler().getName(),
+                'The name matches the Automation Registry rows that register it'
+            );
+        }
     }
 }

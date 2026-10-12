@@ -74,170 +74,192 @@ private class RollupQueueTest {
 
     @IsTest
     static void aBulkChangeIsQueuedInEntriesOfTwoHundredWithOneProcessor() {
-        Test.startTest();
-        RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(450) });
-        RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
-        Integer processors = [
-            SELECT COUNT()
-            FROM AsyncApexJob
-            WHERE ApexClass.Name = 'RollupQueue'
-        ];
-        List<Rollup_Queue__c> queued = entries();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(450) });
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
+            Integer processors = [
+                SELECT COUNT()
+                FROM AsyncApexJob
+                WHERE ApexClass.Name = 'RollupQueue'
+            ];
+            List<Rollup_Queue__c> queued = entries();
 
-        Assert.areEqual(4, queued.size(), '450 records make three entries, and 10 a fourth');
-        Assert.areEqual(200, queued[0].Record_Count__c, 'At most 200 records per entry');
-        Assert.areEqual(200, queued[0].Record_Ids__c.split(',').size(), 'Counted as held');
-        Decimal waiting = 0;
-        for (Rollup_Queue__c entry : queued) {
-            waiting += entry.Record_Count__c;
-            Assert.areEqual(RollupQueue.STATUS_PENDING, entry.Status__c, 'Waiting');
-            Assert.areEqual(0, entry.Attempts__c, 'Not tried yet');
-            Assert.isNull(entry.Next_Attempt__c, 'Due now');
-            Assert.areEqual('Account', entry.Target_Object__c, 'Named, not referenced');
+            Assert.areEqual(4, queued.size(), '450 records make three entries, and 10 a fourth');
+            Assert.areEqual(200, queued[0].Record_Count__c, 'At most 200 records per entry');
+            Assert.areEqual(200, queued[0].Record_Ids__c.split(',').size(), 'Counted as held');
+            Decimal waiting = 0;
+            for (Rollup_Queue__c entry : queued) {
+                waiting += entry.Record_Count__c;
+                Assert.areEqual(RollupQueue.STATUS_PENDING, entry.Status__c, 'Waiting');
+                Assert.areEqual(0, entry.Attempts__c, 'Not tried yet');
+                Assert.isNull(entry.Next_Attempt__c, 'Due now');
+                Assert.areEqual('Account', entry.Target_Object__c, 'Named, not referenced');
+            }
+            Assert.areEqual(460, waiting, 'Records waiting is a sum');
+            Assert.areEqual(1, processors, 'One processor per transaction, however many entries');
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Rollup_Queue__c],
+                'Records with no totals to write are finished and their entries deleted'
+            );
         }
-        Assert.areEqual(460, waiting, 'Records waiting is a sum');
-        Assert.areEqual(1, processors, 'One processor per transaction, however many entries');
-        Test.stopTest();
-
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Rollup_Queue__c],
-            'Records with no totals to write are finished and their entries deleted'
-        );
     }
 
     @IsTest
     static void theProcessorRecalculatesASliceAndLeavesTheRestPending() {
-        insertChildCount();
-        Set<Id> parents = parentsWithOneChild(250);
+        System.runAs(TestUsers.admin()) {
+            insertChildCount();
+            Set<Id> parents = parentsWithOneChild(250);
 
-        Test.startTest();
-        RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => parents });
-        Test.stopTest();
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => parents });
+            Test.stopTest();
 
-        Integer counted = [
-            SELECT COUNT()
-            FROM Account
-            WHERE Id IN :parents AND NumberOfEmployees = 1
-        ];
-        Assert.areEqual(200, counted, 'One run recalculates one slice of 200');
-        List<Rollup_Queue__c> left = entries();
-        Assert.areEqual(1, left.size(), 'The entry that did not fit waits for the next run');
-        Assert.areEqual(50, left[0].Record_Count__c, 'Holding the other 50');
-        Assert.areEqual(RollupQueue.STATUS_PENDING, left[0].Status__c, 'Still pending');
+            Integer counted = [
+                SELECT COUNT()
+                FROM Account
+                WHERE Id IN :parents AND NumberOfEmployees = 1
+            ];
+            Assert.areEqual(200, counted, 'One run recalculates one slice of 200');
+            List<Rollup_Queue__c> left = entries();
+            Assert.areEqual(1, left.size(), 'The entry that did not fit waits for the next run');
+            Assert.areEqual(50, left[0].Record_Count__c, 'Holding the other 50');
+            Assert.areEqual(RollupQueue.STATUS_PENDING, left[0].Status__c, 'Still pending');
+        }
     }
 
     @IsTest
     static void entriesForTheSameRecordsAreMergedWithinTheSlice() {
-        List<Id> ids = new List<Id>(fakeAccountIds(6));
-        List<Rollup_Queue__c> due = new List<Rollup_Queue__c>{
-            new Rollup_Queue__c(
-                Target_Object__c = 'Account',
-                Record_Ids__c = ids[0] + ',' + ids[1] + ',' + ids[2],
-                Attempts__c = 0
-            ),
-            new Rollup_Queue__c(
-                Target_Object__c = 'Account',
-                Record_Ids__c = ids[1] + ',' + ids[2] + ',' + ids[3],
-                Attempts__c = 2
-            ),
-            new Rollup_Queue__c(
-                Target_Object__c = 'Account',
-                Record_Ids__c = ids[4] + ',' + ids[5],
-                Attempts__c = 0
-            )
-        };
+        System.runAs(TestUsers.admin()) {
+            List<Id> ids = new List<Id>(fakeAccountIds(6));
+            List<Rollup_Queue__c> due = new List<Rollup_Queue__c>{
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[0] + ',' + ids[1] + ',' + ids[2],
+                    Attempts__c = 0
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[1] + ',' + ids[2] + ',' + ids[3],
+                    Attempts__c = 2
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[4] + ',' + ids[5],
+                    Attempts__c = 0
+                )
+            };
 
-        RollupQueue.Slice slice = RollupQueue.take(due, 4);
+            RollupQueue.Slice slice = RollupQueue.take(due, 4);
 
-        Assert.areEqual(4, slice.idsByTarget.get('Account').size(), 'Two entries, four records');
-        Assert.areEqual(2, slice.finished.size(), 'Both merged entries are finished');
-        Assert.areEqual(2, slice.attemptsByTarget.get('Account'), 'Carrying the most attempts');
-        Assert.isTrue(slice.remainders.isEmpty(), 'Nothing split');
+            Assert.areEqual(
+                4,
+                slice.idsByTarget.get('Account').size(),
+                'Two entries, four records'
+            );
+            Assert.areEqual(2, slice.finished.size(), 'Both merged entries are finished');
+            Assert.areEqual(2, slice.attemptsByTarget.get('Account'), 'Carrying the most attempts');
+            Assert.isTrue(slice.remainders.isEmpty(), 'Nothing split');
 
-        RollupQueue.Slice halved = RollupQueue.take(due, 2);
-        Assert.areEqual(2, halved.idsByTarget.get('Account').size(), 'Only the slice is taken');
-        Assert.areEqual(1, halved.remainders.size(), 'The first entry is split');
-        Assert.areEqual(1, halved.remainders[0].Record_Count__c, 'One record left over');
-        Assert.areEqual(String.valueOf(ids[2]), halved.remainders[0].Record_Ids__c, 'The last');
+            RollupQueue.Slice halved = RollupQueue.take(due, 2);
+            Assert.areEqual(2, halved.idsByTarget.get('Account').size(), 'Only the slice is taken');
+            Assert.areEqual(1, halved.remainders.size(), 'The first entry is split');
+            Assert.areEqual(1, halved.remainders[0].Record_Count__c, 'One record left over');
+            Assert.areEqual(String.valueOf(ids[2]), halved.remainders[0].Record_Ids__c, 'The last');
+        }
     }
 
     @IsTest
     static void aRecordThatCannotBeSavedIsTriedLaterThenFails() {
-        Id locked = new List<Id>(fakeAccountIds(1))[0];
+        System.runAs(TestUsers.admin()) {
+            Id locked = new List<Id>(fakeAccountIds(1))[0];
 
-        Test.startTest();
-        RollupQueue.retryLater('Account', new Map<Id, String>{ locked => 'Record locked.' }, 0);
-        RollupQueue.retryLater('Account', new Map<Id, String>{ locked => 'Record locked.' }, 4);
-        Test.stopTest();
+            Test.startTest();
+            RollupQueue.retryLater('Account', new Map<Id, String>{ locked => 'Record locked.' }, 0);
+            RollupQueue.retryLater('Account', new Map<Id, String>{ locked => 'Record locked.' }, 4);
+            Test.stopTest();
 
-        Rollup_Queue__c again;
-        Rollup_Queue__c failed;
-        for (Rollup_Queue__c entry : entries()) {
-            if (entry.Attempts__c == 1) {
-                again = entry;
-            } else {
-                failed = entry;
+            Rollup_Queue__c again;
+            Rollup_Queue__c failed;
+            for (Rollup_Queue__c entry : entries()) {
+                if (entry.Attempts__c == 1) {
+                    again = entry;
+                } else {
+                    failed = entry;
+                }
             }
+            Assert.isNotNull(again, 'The first failure is queued again');
+            Assert.areEqual(RollupQueue.STATUS_PENDING, again.Status__c, 'To be tried again');
+            Assert.isTrue(again.Next_Attempt__c > Datetime.now(), 'Later, not straight away');
+            Assert.isTrue(again.Last_Error__c.contains('Record locked.'), 'Saying why');
+            Assert.areEqual(5, failed.Attempts__c, 'The fifth attempt');
+            Assert.areEqual(RollupQueue.STATUS_FAILED, failed.Status__c, 'Waits for Retry');
         }
-        Assert.isNotNull(again, 'The first failure is queued again');
-        Assert.areEqual(RollupQueue.STATUS_PENDING, again.Status__c, 'To be tried again');
-        Assert.isTrue(again.Next_Attempt__c > Datetime.now(), 'Later, not straight away');
-        Assert.isTrue(again.Last_Error__c.contains('Record locked.'), 'Saying why');
-        Assert.areEqual(5, failed.Attempts__c, 'The fifth attempt');
-        Assert.areEqual(RollupQueue.STATUS_FAILED, failed.Status__c, 'Waits for Retry');
     }
 
     @IsTest
     static void aRunThatStopsChargesItsEntriesAnAttempt() {
-        List<Rollup_Queue__c> held = new List<Rollup_Queue__c>{
-            new Rollup_Queue__c(
-                Target_Object__c = 'Account',
-                Record_Ids__c = String.join(new List<Id>(fakeAccountIds(2)), ','),
-                Record_Count__c = 2,
-                Attempts__c = 0
-            ),
-            new Rollup_Queue__c(
-                Target_Object__c = 'Account',
-                Record_Ids__c = String.join(new List<Id>(fakeAccountIds(1)), ','),
-                Record_Count__c = 1,
-                Attempts__c = 4
-            )
-        };
-        insert held;
+        System.runAs(TestUsers.admin()) {
+            List<Rollup_Queue__c> held = new List<Rollup_Queue__c>{
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = String.join(new List<Id>(fakeAccountIds(2)), ','),
+                    Record_Count__c = 2,
+                    Attempts__c = 0
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = String.join(new List<Id>(fakeAccountIds(1)), ','),
+                    Record_Count__c = 1,
+                    Attempts__c = 4
+                )
+            };
+            insert held;
 
-        Test.startTest();
-        RollupQueue.charge(held, 'Apex CPU time limit exceeded');
-        Test.stopTest();
+            Test.startTest();
+            RollupQueue.charge(held, 'Apex CPU time limit exceeded');
+            Test.stopTest();
 
-        List<Rollup_Queue__c> charged = entries();
-        Assert.areEqual(1, charged[0].Attempts__c, 'One attempt charged');
-        Assert.areEqual(RollupQueue.STATUS_PENDING, charged[0].Status__c, 'Tried again later');
-        Assert.isTrue(charged[0].Next_Attempt__c > Datetime.now(), 'After a pause');
-        Assert.isTrue(
-            charged[0].Last_Error__c.contains('Apex CPU time limit exceeded'),
-            'With the reason'
-        );
-        Assert.areEqual(RollupQueue.STATUS_FAILED, charged[1].Status__c, 'Fifth attempt: Failed');
+            List<Rollup_Queue__c> charged = entries();
+            Assert.areEqual(1, charged[0].Attempts__c, 'One attempt charged');
+            Assert.areEqual(RollupQueue.STATUS_PENDING, charged[0].Status__c, 'Tried again later');
+            Assert.isTrue(charged[0].Next_Attempt__c > Datetime.now(), 'After a pause');
+            Assert.isTrue(
+                charged[0].Last_Error__c.contains('Apex CPU time limit exceeded'),
+                'With the reason'
+            );
+            Assert.areEqual(
+                RollupQueue.STATUS_FAILED,
+                charged[1].Status__c,
+                'Fifth attempt: Failed'
+            );
+        }
     }
 
     @IsTest
     static void theDelayDoublesWithEachAttempt() {
-        Datetime now = Datetime.now();
-        Assert.isTrue(RollupQueue.nextAttempt(1) >= now.addMinutes(2), 'Two minutes first');
-        Assert.isTrue(RollupQueue.nextAttempt(2) >= now.addMinutes(4), 'Then four');
-        Assert.isTrue(RollupQueue.nextAttempt(4) >= now.addMinutes(16), 'Then sixteen');
-        Assert.isTrue(
-            RollupQueue.nextAttempt(9) < now.addMinutes(17),
-            'Never longer than the last'
-        );
+        System.runAs(TestUsers.admin()) {
+            Datetime now = Datetime.now();
+            Assert.isTrue(RollupQueue.nextAttempt(1) >= now.addMinutes(2), 'Two minutes first');
+            Assert.isTrue(RollupQueue.nextAttempt(2) >= now.addMinutes(4), 'Then four');
+            Assert.isTrue(RollupQueue.nextAttempt(4) >= now.addMinutes(16), 'Then sixteen');
+            Assert.isTrue(
+                RollupQueue.nextAttempt(9) < now.addMinutes(17),
+                'Never longer than the last'
+            );
+        }
     }
 
     @IsTest
     static void anEntryIdThatIsNotAnIdIsDropped() {
-        List<Id> ids = RollupQueue.idsOf(
-            new Rollup_Queue__c(Record_Ids__c = '001000000000001, nonsense')
-        );
-        Assert.areEqual(1, ids.size(), 'Only the identifier is kept');
+        System.runAs(TestUsers.admin()) {
+            List<Id> ids = RollupQueue.idsOf(
+                new Rollup_Queue__c(Record_Ids__c = '001000000000001, nonsense')
+            );
+            Assert.areEqual(1, ids.size(), 'Only the identifier is kept');
+        }
     }
 }
