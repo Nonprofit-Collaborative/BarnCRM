@@ -55,6 +55,33 @@ public with sharing class ImportController {
         public String organizationMatchField;
         @AuraEnabled
         public String severalMatches;
+        /** For a template that loads one object (R-IT12, R-IT13). */
+        @AuraEnabled
+        public String targetObject;
+        @AuraEnabled
+        public String targetObjectLabel;
+        @AuraEnabled
+        public String loadOperation;
+        /** The operations this object allows: Update only for people (R-IT14). */
+        @AuraEnabled
+        public List<String> loadOperations;
+        @AuraEnabled
+        public String loadMatchField;
+        @AuraEnabled
+        public String lookupNotFound;
+    }
+
+    /** One field a column of a one-object template can be mapped to (R-IT12). */
+    public class FieldChoice {
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public Boolean isLookup = false;
+        /** For a lookup, the fields it can name its parent by, the record ID first (R-IT13). */
+        @AuraEnabled
+        public List<ImportMapping.Target> lookupFields = new List<ImportMapping.Target>();
     }
 
     /** One import as the wizard and the results screen show it. */
@@ -112,6 +139,8 @@ public with sharing class ImportController {
         public List<ImportMapping.Assignment> fileValues;
         /** True when the file only matches and creates nobody (R-IB15). */
         public Boolean matchOnly;
+        /** A one-object template's load choices, saved on it when sent (R-IT12). */
+        public ImportTemplateService.LoadChoices load;
     }
 
     /** A field a row can be matched on, as the wizard lists it (R-IT8). */
@@ -208,6 +237,7 @@ public with sharing class ImportController {
                 view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
                     template.Several_Matches__c
                 );
+                describeLoad(template, view);
                 result.add(view);
             }
             return result;
@@ -248,6 +278,121 @@ public with sharing class ImportController {
         return result;
     }
 
+    /** The objects a template may load (R-IT14), by label. */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getLoadableObjects() {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.loadableObjects();
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getLoadableObjects');
+        }
+    }
+
+    /** Creates a template that loads one object, and returns it as the wizard shows it. */
+    @AuraEnabled
+    public static TemplateView createObjectTemplate(String name, String objectName) {
+        try {
+            enforcePermission();
+            Import_Template__c template = ImportTemplateSelector.selectById(
+                ImportTemplateService.createObjectTemplate(name, objectName).Id
+            );
+            TemplateView view = new TemplateView();
+            view.id = template.Id;
+            view.name = template.Name;
+            view.description = template.Description__c;
+            view.matchingRule = template.Matching_Rule__c;
+            view.personMode = template.Person_Mode__c;
+            view.mapping = template.Column_Mapping_JSON__c;
+            view.isPackageDefault = false;
+            view.isRecurring = false;
+            view.organizationRule = ImportTemplateService.ORGANIZATION_RULE_NAME;
+            view.severalMatches = ImportTemplateService.SEVERAL_REJECT;
+            describeLoad(template, view);
+            return view;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.createObjectTemplate');
+        }
+    }
+
+    /**
+     * The fields a column of this one-object template can be mapped to (R-IT12): the record ID
+     * first, then the fields the user may write, and for each lookup the fields it can name its
+     * parent by (R-IT13).
+     */
+    @AuraEnabled
+    public static List<FieldChoice> getObjectFields(String templateId) {
+        try {
+            enforcePermission();
+            Schema.SObjectType type = ImportObjectSchema.typeOf(
+                ImportTemplateSelector.selectById(templateId)
+            );
+            List<FieldChoice> result = new List<FieldChoice>();
+            if (type == null) {
+                return result;
+            }
+            for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
+                FieldChoice choice = new FieldChoice();
+                choice.value = ImportMapping.ENTITY_RECORD + '.' + target.value;
+                choice.label = target.label;
+                Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
+                if (
+                    token != null &&
+                    token.getDescribe().getType() == Schema.DisplayType.REFERENCE
+                ) {
+                    choice.isLookup = true;
+                    choice.lookupFields = ImportObjectSchema.parentFields(type, target.value);
+                }
+                result.add(choice);
+            }
+            return result;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getObjectFields');
+        }
+    }
+
+    /** The external ID fields an upsert of this template's object can match on (R-IT12). */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getKeyFields(String templateId) {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.keyFields(
+                ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
+            );
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getKeyFields');
+        }
+    }
+
+    /** Fills in what a one-object template loads, and how. */
+    private static void describeLoad(Import_Template__c template, TemplateView view) {
+        Schema.SObjectType type = ImportObjectSchema.typeOf(template);
+        if (!ImportObjectSchema.loadsOneObject(template) || type == null) {
+            return;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        view.targetObject = described.getName();
+        view.targetObjectLabel = described.getLabel();
+        view.loadOperation = ImportObjectSchema.updatesOnly(type)
+            ? ImportObjectSchema.OPERATION_UPDATE
+            : ImportObjectSchema.operationOf(template);
+        view.loadOperations = ImportObjectSchema.operationsFor(type);
+        view.loadMatchField = template.Load_Match_Field__c;
+        view.lookupNotFound = ImportObjectSchema.leavesLookupEmpty(template)
+            ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
+            : ImportObjectSchema.LOOKUP_REJECT;
+    }
+
+    /** The parent field a saved column names its parent by, for the column with this source. */
+    private static String lookupFieldOf(ImportMapping saved, String sourceKey) {
+        for (ImportMapping.Column column : saved.columns) {
+            if (column != null && ImportMapping.key(column.source) == sourceKey) {
+                return column.lookupField;
+            }
+        }
+        return null;
+    }
+
     /** Marks a template as the mapping for a file that arrives regularly, or not (R-IT6). */
     @AuraEnabled
     public static void saveRecurring(String templateId, Boolean isRecurring, String sourceName) {
@@ -268,8 +413,11 @@ public with sharing class ImportController {
     public static String suggestMapping(String templateId, List<String> headers) {
         try {
             enforcePermission();
-            ImportMapping suggested = ImportColumnLibrary.suggestMapping(headers);
             Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+            // A one-object template suggests from its object's fields (R-IT12).
+            ImportMapping suggested = ImportObjectSchema.loadsOneObject(template)
+                ? ImportObjectSchema.suggestMapping(ImportObjectSchema.typeOf(template), headers)
+                : ImportColumnLibrary.suggestMapping(headers);
             if (template != null) {
                 ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
                 Map<String, String> known = saved.targetsBySourceKey();
@@ -279,6 +427,7 @@ public with sharing class ImportController {
                     String fromTemplate = known.get(source);
                     if (String.isNotBlank(fromTemplate)) {
                         column.target = fromTemplate;
+                        column.lookupField = lookupFieldOf(saved, source);
                     } else if (ignored.contains(source)) {
                         column.target = ImportMapping.TARGET_IGNORE;
                     }
@@ -315,6 +464,9 @@ public with sharing class ImportController {
                     options.matchDateWindowDays,
                     options.matchAmountTolerance
                 );
+            }
+            if (options.load != null) {
+                ImportTemplateService.saveLoad(templateId, options.load);
             }
             if (options.matching != null) {
                 // The wizard's rule for people is the one passed above; the rest is saved here.

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_Import_ErrorObjectTemplateName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the new mapping has no name</shortDescription>
+        <value>Give the mapping a name.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_RecordIdOption</fullName>
         <categories>Import</categories>
         <language>en_US</language>
