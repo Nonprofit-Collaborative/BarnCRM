@@ -17,6 +17,8 @@ import getLoadableObjects from '@salesforce/apex/ImportController.getLoadableObj
 import createObjectTemplate from '@salesforce/apex/ImportController.createObjectTemplate';
 import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
+import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
+import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -69,6 +71,12 @@ jest.mock('@salesforce/apex/ImportController.getObjectFields', () => ({ default:
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getKeyFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getChangedValues', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.previewChanges', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -150,6 +158,8 @@ describe('the import wizard', () => {
     getRows.mockResolvedValue([]);
     getEntityTargets.mockResolvedValue([]);
     getMatchFields.mockResolvedValue({ contact: [], account: [] });
+    getChangedValues.mockResolvedValue([]);
+    previewChanges.mockResolvedValue({ problems: [], samples: [] });
   });
 
   afterEach(() => {
@@ -753,6 +763,112 @@ describe('the import wizard', () => {
     element.shadowRoot.querySelector('[data-id="file-value-row"] lightning-button-icon').click();
     await flush();
     expect(element.shadowRoot.querySelectorAll('[data-id="file-value-row"]')).toHaveLength(0);
+  });
+
+  it('edits a column changes, shows how many, and sends them with the mapping', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const buttons = element.shadowRoot.querySelectorAll('[data-id="edit-changes"]');
+    expect(buttons[0].label).toBe('c.Core_Import_ChangesButton');
+    buttons[0].click();
+    await flush();
+    const panel = element.shadowRoot.querySelector('[data-id="column-changes"]');
+    expect(panel.source).toBe('Last Name');
+    expect(panel.columnNames).toEqual(['Last Name', 'Email', 'Notes']);
+    expect(panel.sampleRows).toHaveLength(2);
+    panel.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { source: 'Last Name', transforms: [{ op: 'trim' }, { op: 'proper' }] }
+      })
+    );
+    panel.dispatchEvent(new CustomEvent('done'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="column-changes"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('[data-id="edit-changes"]')[0].label).toBe(
+      'c.Core_Import_ChangesButtonCount'
+    );
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+    expect(sent.columns[0]).toEqual({
+      source: 'Last Name',
+      target: 'Contact1.LastName',
+      transforms: [{ op: 'trim' }, { op: 'proper' }]
+    });
+    expect(sent.columns[1].transforms).toBeUndefined();
+  });
+
+  it('starts from the changes the mapping already holds', async () => {
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [
+          { source: 'Last Name', target: 'Contact1.LastName' },
+          { source: 'Email', target: 'Contact1.Email', transforms: [{ op: 'lower' }] }
+        ]
+      })
+    );
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const buttons = element.shadowRoot.querySelectorAll('[data-id="edit-changes"]');
+    expect(buttons[1].label).toBe('c.Core_Import_ChangesButtonCount');
+    buttons[1].click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="column-changes"]').transforms).toEqual([
+      { op: 'lower' }
+    ]);
+  });
+
+  it('sends the duplicate rules choice, and warns when no rule is switched on', async () => {
+    getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: false });
+    const element = await toMatchingStep();
+    const box = element.shadowRoot.querySelector('[data-id="duplicate-rules"]');
+    expect(box.checked).toBe(false);
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).toBeNull();
+    box.checked = true;
+    box.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).not.toBeNull();
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).matching.useDuplicateRules).toBe(
+      true
+    );
+  });
+
+  it('starts with the duplicate rules choice the mapping holds', async () => {
+    getTemplates.mockResolvedValue([{ ...TEMPLATE, useDuplicateRules: true }]);
+    getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: true });
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules"]').checked).toBe(true);
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).toBeNull();
+  });
+
+  it('shows the values a finished dry run changed', async () => {
+    jest.useFakeTimers({ doNotFake: ['setTimeout', 'nextTick', 'queueMicrotask'] });
+    const changed = [{ rowNumber: 2, column: 'Email', before: 'A@X.ORG', after: 'a@x.org' }];
+    getChangedValues.mockResolvedValue(changed);
+    try {
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      jest.advanceTimersByTime(3000);
+      await flush();
+      expect(getChangedValues).toHaveBeenCalledWith({ batchId: 'a02' });
+      expect(element.shadowRoot.querySelector('[data-id="results"]').changedValues).toEqual(
+        changed
+      );
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 

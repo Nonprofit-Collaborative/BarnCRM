@@ -96,7 +96,16 @@ import loadObjectLabel from '@salesforce/label/c.Core_Import_LoadObjectLabel';
 import loadObjectNameLabel from '@salesforce/label/c.Core_Import_LoadObjectNameLabel';
 import loadObjectCreateButton from '@salesforce/label/c.Core_Import_LoadObjectCreateButton';
 import lookupFieldLabel from '@salesforce/label/c.Core_Import_LookupFieldLabel';
+import changesButton from '@salesforce/label/c.Core_Import_ChangesButton';
+import changesButtonCount from '@salesforce/label/c.Core_Import_ChangesButtonCount';
+import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
+import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
+import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
+import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
+
+/** How many of the file's rows the column changes are previewed on (R-IT15). */
+const CHANGE_SAMPLE_ROWS = 5;
 
 /** Fills a label's {0} with a value. */
 function format(label, value) {
@@ -247,6 +256,12 @@ export default class ImportWizard extends LightningElement {
   matchFields = { contact: [], account: [], personFields: [], organizationFields: [] };
   /** Whether this file only matches and creates nobody (R-IB15). */
   matchOnly = false;
+  /** Whether the org's duplicate rules are asked too, as the mapping holds it (R-IT16). */
+  useDuplicateRules = false;
+  /** The column whose changes are being edited, if any (R-IT15). */
+  editingSource;
+  /** Each changed value of a finished dry run's first rows (R-IT15). */
+  changedValues = [];
   /** Values for every row of this file (R-IB14), as typed: { key, target, value }. */
   fileValues = [];
   fileValueCounter = 0;
@@ -315,7 +330,10 @@ export default class ImportWizard extends LightningElement {
     loadObjectLabel,
     loadObjectNameLabel,
     loadObjectCreateButton,
-    lookupFieldLabel
+    lookupFieldLabel,
+    duplicateRulesLabel,
+    duplicateRulesHelp,
+    duplicateRulesNone
   };
 
   async connectedCallback() {
@@ -329,7 +347,9 @@ export default class ImportWizard extends LightningElement {
           contact: (fields && fields.contact) || [],
           account: (fields && fields.account) || [],
           personFields: (fields && fields.personFields) || [],
-          organizationFields: (fields && fields.organizationFields) || []
+          organizationFields: (fields && fields.organizationFields) || [],
+          contactRules: fields ? fields.contactRules : undefined,
+          accountRules: fields ? fields.accountRules : undefined
         };
         if (this.templates.length > 0) {
           this.selectTemplate(this.templates[0].id);
@@ -381,6 +401,7 @@ export default class ImportWizard extends LightningElement {
     this.organizationRule = (template && template.organizationRule) || 'Name exact';
     this.organizationMatchField = (template && template.organizationMatchField) || '';
     this.severalMatches = (template && template.severalMatches) || SEVERAL_REJECT;
+    this.useDuplicateRules = Boolean(template && template.useDuplicateRules);
     this.loadOperation = (template && template.loadOperation) || INSERT;
     this.loadMatchField = (template && template.loadMatchField) || '';
     this.lookupNotFound = (template && template.lookupNotFound) || LOOKUP_REJECT;
@@ -573,6 +594,7 @@ export default class ImportWizard extends LightningElement {
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
     const lookups = {};
+    const changes = {};
     const parsed = JSON.parse(suggested || '{}');
     const offered = new Set(this.targetOptions.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
@@ -580,12 +602,14 @@ export default class ImportWizard extends LightningElement {
         ? column.target
         : IGNORE;
       lookups[column.source] = column.lookupField;
+      changes[column.source] = column.transforms || [];
     });
     this.columns = this.headers.map((heading) => ({
       key: heading,
       source: heading,
       target: targets[heading] || IGNORE,
       lookupField: lookups[heading] || LOOKUP_BY_ID,
+      transforms: changes[heading] || [],
       samples: this.records
         .slice(0, SAMPLE_VALUES)
         .map((record) => record[heading])
@@ -729,6 +753,10 @@ export default class ImportWizard extends LightningElement {
         severalMatches: this.severalMatches
       }
     };
+    if (this.loadsPeople && this.useDuplicateRules) {
+      // Sent only when ticked: the server reads an absent choice as unticked (R-IT16).
+      options.matching.useDuplicateRules = true;
+    }
     const fileValues = this.fileValues
       .filter((each) => each.target && String(each.value || '').trim() !== '')
       .map((each) => ({ target: each.target, value: String(each.value).trim() }));
@@ -785,8 +813,10 @@ export default class ImportWizard extends LightningElement {
         ? this.objectFields.find((each) => each.value === column.target)
         : undefined;
       const isLookup = Boolean(field && field.isLookup);
+      const changeCount = (column.transforms || []).length;
       return {
         ...column,
+        changesLabel: changeCount > 0 ? format(changesButtonCount, changeCount) : changesButton,
         isLookup,
         lookupOptions: isLookup
           ? (field.lookupFields || []).map((each) => ({ label: each.label, value: each.value }))
@@ -803,10 +833,58 @@ export default class ImportWizard extends LightningElement {
         if (this.loadsOneObject && column.lookupField && column.lookupField !== LOOKUP_BY_ID) {
           mapped.lookupField = column.lookupField;
         }
+        if (column.transforms && column.transforms.length > 0) {
+          mapped.transforms = column.transforms;
+        }
         return mapped;
       }),
       defaults: []
     });
+  }
+
+  /** Opens the changes of one column, or closes them when they are open (R-IT15). */
+  handleEditChanges(event) {
+    const source = event.target.dataset.source;
+    this.editingSource = this.editingSource === source ? undefined : source;
+  }
+
+  handleChangesChange(event) {
+    const { source, transforms } = event.detail;
+    this.columns = this.columns.map((column) => {
+      return column.source === source ? { ...column, transforms } : column;
+    });
+  }
+
+  handleChangesDone() {
+    this.editingSource = undefined;
+  }
+
+  get editingColumn() {
+    return this.columns.find((column) => column.source === this.editingSource);
+  }
+
+  /** The file's first rows, for the preview of a column's changes. */
+  get changeSampleRows() {
+    return this.records.slice(0, CHANGE_SAMPLE_ROWS);
+  }
+
+  /** Whether the org's duplicate rules are asked too (R-IT16); saved with the mapping. */
+  handleDuplicateRulesChange(event) {
+    this.useDuplicateRules = event.target.checked;
+  }
+
+  /**
+   * True when the box is ticked and no rule is switched on for people (or, where the file has
+   * organizations, for them), so the box would change nothing. Unknown is not warned about.
+   */
+  get duplicateRulesMissing() {
+    const template = this.selectedTemplate;
+    const people =
+      template && template.personMode === 'Person Accounts'
+        ? this.matchFields.accountRules
+        : this.matchFields.contactRules;
+    const organizations = this.mapsOrganization ? this.matchFields.accountRules : true;
+    return this.useDuplicateRules && (people === false || organizations === false);
   }
 
   /**
@@ -1118,6 +1196,10 @@ export default class ImportWizard extends LightningElement {
           status: 'Rejected',
           offsetRows: 0
         });
+        // A dry run shows each value a column's changes changed, before and after (R-IT15).
+        this.changedValues = this.batch.isDryRun
+          ? (await getChangedValues({ batchId: this.batch.id })) || []
+          : [];
       }
     } catch (error) {
       this.stopPolling();
@@ -1161,6 +1243,8 @@ export default class ImportWizard extends LightningElement {
     this.expectedAmount = '';
     this.fileValues = [];
     this.matchOnly = false;
+    this.changedValues = [];
+    this.editingSource = undefined;
   }
 
   // ---------------------------------------------------------------------------------------
@@ -1180,6 +1264,7 @@ export default class ImportWizard extends LightningElement {
       this.stopPolling();
       this.batch = undefined;
       this.rejectedRows = [];
+      this.changedValues = [];
     }
     this.step = Math.max(this.step - 1, 1);
   }

@@ -140,6 +140,13 @@
                                                     onchange={handleLookupFieldChange}
                                                 ></lightning-combobox>
                                             </template>
+                                            <lightning-button
+                                                variant="base"
+                                                label={column.changesLabel}
+                                                data-id="edit-changes"
+                                                data-source={column.source}
+                                                onclick={handleEditChanges}
+                                            ></lightning-button>
                                         </td>
                                         <td class="slds-text-body_small">{column.samples}</td>
                                     </tr>
@@ -147,6 +154,17 @@
                             </tbody>
                         </table>
                     </div>
+                    <template lwc:if={editingColumn}>
+                        <c-import-column-transforms
+                            data-id="column-changes"
+                            source={editingColumn.source}
+                            transforms={editingColumn.transforms}
+                            column-names={headers}
+                            sample-rows={changeSampleRows}
+                            onchange={handleChangesChange}
+                            ondone={handleChangesDone}
+                        ></c-import-column-transforms>
+                    </template>
                 </template>
 
                 <template lwc:if={isStepMatching}>
@@ -250,6 +268,22 @@
                         checked={matchOnly}
                         onchange={handleMatchOnlyChange}
                     ></lightning-input>
+                    <template lwc:if={loadsPeople}>
+                        <lightning-input
+                            class="slds-var-m-top_small"
+                            type="checkbox"
+                            data-id="duplicate-rules"
+                            label={labels.duplicateRulesLabel}
+                            field-level-help={labels.duplicateRulesHelp}
+                            checked={useDuplicateRules}
+                            onchange={handleDuplicateRulesChange}
+                        ></lightning-input>
+                        <template lwc:if={duplicateRulesMissing}>
+                            <p class="slds-text-color_error slds-text-body_small" data-id="duplicate-rules-none">
+                                {labels.duplicateRulesNone}
+                            </p>
+                        </template>
+                    </template>
                     <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
                         {labels.fileValuesHeading}
                     </h3>
@@ -358,6 +392,7 @@
                     <c-import-results
                         batch={batch}
                         rejected-rows={rejectedRows}
+                        changed-values={changedValues}
                         data-id="results"
                     ></c-import-results>
                 </template>

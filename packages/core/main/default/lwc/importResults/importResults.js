@@ -15,6 +15,10 @@ import reasonHeader from '@salesforce/label/c.Core_Import_ReasonHeader';
 import noRejectedRows from '@salesforce/label/c.Core_Import_NoRejectedRows';
 import runningMessage from '@salesforce/label/c.Core_Import_RunningMessage';
 import loadingAltText from '@salesforce/label/c.Core_Import_LoadingAltText';
+import changedValuesHeading from '@salesforce/label/c.Core_Import_ChangedValuesHeading';
+import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
+import beforeHeader from '@salesforce/label/c.Core_Import_ChangesBefore';
+import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
 
 /**
  * What an import did, or on a dry run what it would do: the four counts, the run log, and
@@ -30,6 +34,8 @@ export default class ImportResults extends LightningElement {
   @api batch;
   /** The rejected rows of that batch, already fetched. */
   @api rejectedRows = [];
+  /** Each value a column's changes changed in the first rows, before and after (R-IT15). */
+  @api changedValues = [];
 
   labels = {
     runLogHeading,
@@ -38,8 +44,23 @@ export default class ImportResults extends LightningElement {
     reasonHeader,
     noRejectedRows,
     runningMessage,
-    loadingAltText
+    loadingAltText,
+    changedValuesHeading,
+    columnHeader,
+    beforeHeader,
+    afterHeader
   };
+
+  get hasChangedValues() {
+    return Array.isArray(this.changedValues) && this.changedValues.length > 0;
+  }
+
+  get changedValueRows() {
+    return (this.changedValues || []).map((changed, index) => ({
+      ...changed,
+      key: `changed-${index}`
+    }));
+  }
 
   get isDryRun() {
     return Boolean(this.batch && this.batch.isDryRun);

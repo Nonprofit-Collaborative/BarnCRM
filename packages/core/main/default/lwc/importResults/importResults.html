@@ -36,6 +36,34 @@
             </ul>
         </template>
 
+        <template lwc:if={hasChangedValues}>
+            <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
+                {labels.changedValuesHeading}
+            </h3>
+            <div class="slds-scrollable_x slds-var-m-bottom_medium">
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">{labels.rowNumberHeader}</th>
+                            <th scope="col">{labels.columnHeader}</th>
+                            <th scope="col">{labels.beforeHeader}</th>
+                            <th scope="col">{labels.afterHeader}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={changedValueRows} for:item="changed">
+                            <tr key={changed.key} data-id="changed-value">
+                                <td>{changed.rowNumber}</td>
+                                <td>{changed.column}</td>
+                                <td>{changed.before}</td>
+                                <td>{changed.after}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+
         <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
             {labels.rejectedHeading}
         </h3>
