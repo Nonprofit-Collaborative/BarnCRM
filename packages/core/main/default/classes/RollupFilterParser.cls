@@ -92,6 +92,32 @@ public with sharing class RollupFilterParser {
         return renderLogic(logic, clauseByConditionId);
     }
 
+    /**
+     * The attribute names a filter document's conditions test, as written (`Status__c`,
+     * `Gift__r.Status__c`), so the engine can tell which changes move a total (R-R11). A document
+     * that cannot be read names nothing; `toWhereClause` is what refuses it.
+     */
+    public static Set<String> fieldsOf(String filterDocument) {
+        Set<String> fields = new Set<String>();
+        if (String.isBlank(filterDocument)) {
+            return fields;
+        }
+        try {
+            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+                filterDocument
+            );
+            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+                String fieldName = (String) ((Map<String, Object>) rawCondition).get('field');
+                if (String.isNotBlank(fieldName) && FIELD_NAME.matcher(fieldName).matches()) {
+                    fields.add(fieldName.trim());
+                }
+            }
+        } catch (Exception unreadable) {
+            return new Set<String>();
+        }
+        return fields;
+    }
+
     /** One condition as `Field operator value`. */
     private static String renderCondition(Map<String, Object> condition) {
         String fieldName = (String) condition.get('field');
