@@ -884,6 +884,14 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
 
+### v0.7 keys
+
+Added by Find (C-34, Section 29D). Shown in the console's Import section.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -5269,6 +5277,89 @@ only, because a gift is never edited from its Opportunity.
 
 ---
 
+## 29D. Saved Query (and the query document)
+
+### Definition
+
+A named, reusable Find query (plan Section 4.9, feature C-34): which object, which columns,
+which records, in what order and how many. Each belongs to the person who saved it, who may
+share it, read only, with everyone who uses Find. A saved query holds no records and grants
+access to none: whoever runs it sees what their own access allows.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text (80) | yes | The name the person gave it. |
+| Object | text (255) | yes | API name of the object the query reads, copied from the document so the list can show and filter it without parsing JSON. |
+| Query | long text | yes | The query document (R-SQ1). |
+| Shared | boolean | no | True when everyone who uses Find can open it (R-SQ4). Default false. |
+| Owner | reference(User) | yes | The person who saved it; only they can change, share or delete it. |
+
+### Rules
+
+**R-SQ1 Query document.** Find, saved queries and bulk update (C-35) share one document:
+
+```
+{
+  "version": 1,
+  "object": "Gift__c",
+  "fields": ["Name", "Amount__c", "Donor_Contact__r.LastName"],
+  "filter": { "version": 1, "conditions": [ ... ] },
+  "orderBy": [{ "field": "Gift_Date__c", "direction": "DESC" }],
+  "limit": 200
+}
+```
+
+`fields` holds 1 to 20 field paths (relationship names, at most two lookups deep, the same
+paths as R-R2); `filter` is an R-R2 filter document, or absent for every record; `orderBy`
+holds at most one entry, `direction` ASC or DESC; `limit` is 1 to 2,000 rows shown. The
+`version` key exists for the reason R-R2 gives.
+
+**R-SQ2 Compiled, never typed.** `QueryCompiler` turns a document into SOQL using only names
+taken from the running user's describe (`QueryFieldCatalog`): an object or field the user
+cannot see is refused with a message naming it. Every filter value is a bind variable, a
+relative date is a date literal written from an integer (R-R2), and the query runs through
+`Database.queryWithBinds` with `AccessLevel.USER_MODE`, so CRUD, field-level security and
+sharing apply. The SOQL shown to the admin is rendered from the same document with the values
+written in, for display only; no SOQL text is ever accepted (ADR-0047).
+
+**R-SQ3 Export.** An export reads the same document in pages ordered by Id (the document's
+own order is ignored for paging), at most 2,000 rows a page, and stops at Export Row Limit
+(`Find_Export_Row_Limit__c`). The file is CSV, UTF-8 with a byte-order mark, built in the
+browser.
+
+**R-SQ4 Sharing.** Saved Query is Private. Sharing is an Apex managed share with the reason
+Shared With Find Users, to the org's All Internal Users group, granting Read. Only the owner
+can set or clear Shared, and the share row follows the flag. The share row is the one
+system-mode write here, recorded in ADR-NEXT
+(`NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`); every other read
+and write runs as the user.
+
+**R-SQ5 Permission.** Every Find action requires the `Find_And_Export_Records` custom
+permission, which opens the tool and grants no record access.
+
+### Salesforce implementation
+
+- **Object:** `Saved_Query__c`, sharing model Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Name | `Name` | Text (80, standard) |
+| Object | `Object_Name__c` | Text (255) |
+| Query | `Query_JSON__c` | Long Text Area (131072) |
+| Shared | `Shared__c` | Checkbox, default false |
+
+- **Apex sharing reason:** `Shared_With_Find_Users`.
+- **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
+- **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
+  `FindController`, `SavedQuerySharingWriter`.
+- **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
+  permission set `BarnCRM_Find_And_Export`, assignable alone.
+- **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -5389,6 +5480,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-09-24 | C-23 automation pause with automatic resume, and the error digest (ADR-0055). No object added. `Nonprofit_Settings__c` gains five keys (Section 12, v0.6 keys): `Error_Digest_Recipients__c`, `Error_Digest_Frequency__c`, `Error_Digest_Covered_Until__c`, `Error_Digest_Last_Run__c` and `Error_Digest_Last_Run_Summary__c`. New rules R-A5 (a pause ends by itself through a one-time job that records the resume) and R-E5 (the digest counts and links, never quotes, and goes only to active users); R-E3 reworded to point at R-E5. |
 | v0.6 | 2026-09-25 | G-20 follow-up: Health Check finding for unposted gifts in a closed period (ADR-0053's recorded follow-up, ADR-0057). No object, field or rule added: the finding reports what R-G14 already locks, a gift with a counting status (ADR-0022) and a type other than In-kind, dated on or before Books Closed Through, whose `Accounting_Posted_At__c` is still empty, capped and linked the way C-21's orphan findings already are. Because Core may not name a gift or a closed period (C-29), Core gains a small extension seam instead of a new Core check: `HealthCheckExtension`, an interface, and `HealthCheckExtensions`, a resolver that finds an implementation by name with `Type.forName`, the same shape `ImportEntityProcessor` already uses for the opposite direction (R-IR6). `HealthCheckService.run()` folds a found extension's findings into the one report, isolated the way one failing check already is. Giving ships the one implementation, `GivingHealthCheckExtension`, delegating to `HealthCheckGivingChecks`, grouped the way ADR-0039 groups Core's own checks. |
 | v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
+| v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-NEXT `NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
 
 ---
 ## 32. Entity ownership by package
@@ -5429,6 +5521,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| Saved Query | Core | v0.7 | 29D |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
