@@ -216,10 +216,12 @@ What to know about them:
   **Text list, each value once** and to **Count distinct**.
 - **First and Last take the first record even when its value is blank.** Add the condition
   "is not blank" on that field if you want the first record that has one. When two records
-  share the same order value, the one created first wins, so the answer never changes from
-  one run to the next.
+  share the same order value, the one with the lower record ID wins (usually the one created
+  first), so the answer never changes from one run to the next.
 - **A number or date copied into text is written plainly**, for example `1250.00` or
-  `2026-03-01`, without a currency symbol or your local date format.
+  `2026-03-01`, without a currency symbol or your local date format. A date and time is
+  written in UTC, for example `2026-03-01 14:05`, so it reads the same whoever saved the
+  record.
 - **They stay right as records change.** Like every rollup, these are worked out again from
   all the matching records each time, so a deleted record, a record moved to another parent,
   or a value changed back is reflected the next time the total is calculated, whatever its

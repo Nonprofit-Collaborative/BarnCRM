@@ -12,10 +12,10 @@
  * unchecked: paths go through `RollupPath`, filters through `RollupFilterParser`, windows through
  * `RollupDateWindow`, and attribute names must be plain API names.
  *
- * What a target attribute may be, for now: a number, currency, percent, date or datetime.
- * Checkbox targets wait for the operations slice, and text targets wait for the slice that adds
- * text FIRST and LAST and COUNT DISTINCT. Those slices add an entry to `KIND_BY_AGGREGATE` and to
- * `WRITABLE_TYPES`; nothing else in the planner changes.
+ * What a target attribute may be depends on the aggregate (canonical model R-R15): checkbox for
+ * ANY and NONE, text for the text lists, a number for COUNT_DISTINCT, text as well as numbers and
+ * dates for FIRST and LAST, and numbers and dates for the rest. `targetTypeProblem` is the one
+ * place that rule lives, read here and by the save check.
  */
 public with sharing class RollupPlanner {
     /** Raised when a definition cannot be planned. */
@@ -32,11 +32,16 @@ public with sharing class RollupPlanner {
         'MIN' => KIND_GROUPED,
         'MAX' => KIND_GROUPED,
         'AVG' => KIND_GROUPED,
+        'ANY' => KIND_GROUPED,
+        'NONE' => KIND_GROUPED,
         'FIRST' => KIND_ORDERED,
         'LAST' => KIND_ORDERED
     };
 
-    private static final Set<Schema.DisplayType> WRITABLE_TYPES = new Set<Schema.DisplayType>{
+    /** Aggregates that read no attribute of the source rows: the filter is the whole question. */
+    private static final Set<String> READS_NO_FIELD = new Set<String>{ 'COUNT', 'ANY', 'NONE' };
+
+    private static final Set<Schema.DisplayType> NUMBER_AND_DATE_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.DOUBLE,
         Schema.DisplayType.INTEGER,
         Schema.DisplayType.LONG,
@@ -44,6 +49,17 @@ public with sharing class RollupPlanner {
         Schema.DisplayType.PERCENT,
         Schema.DisplayType.DATE,
         Schema.DisplayType.DATETIME
+    };
+
+    private static final Set<Schema.DisplayType> NUMBER_TYPES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.DOUBLE,
+        Schema.DisplayType.INTEGER,
+        Schema.DisplayType.LONG
+    };
+
+    private static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.TEXTAREA
     };
 
     private static final Pattern FIELD_PATH = Pattern.compile(
@@ -83,8 +99,48 @@ public with sharing class RollupPlanner {
     public class Measure {
         public Integer definitionIndex;
         public String aggregate;
-        /** The attribute aggregated, or null for COUNT. */
+        /** The attribute aggregated, or null for COUNT, ANY and NONE. */
         public String field;
+        /** True when the target is text, so a value is copied as it was entered, never converted. */
+        public Boolean asText = false;
+    }
+
+    /**
+     * Why this aggregate cannot fill a target attribute of this type, in words an administrator
+     * reads, or null when it can (canonical model R-R15).
+     *
+     * @param aggregate the stored Aggregate value
+     * @param type the target attribute's type
+     */
+    public static String targetTypeProblem(String aggregate, Schema.DisplayType type) {
+        String operation = String.isBlank(aggregate) ? '' : aggregate.toUpperCase();
+        if (operation == 'ANY' || operation == 'NONE') {
+            return type == Schema.DisplayType.BOOLEAN
+                ? null
+                : System.Label.Core_Rollups_ErrorTargetNeedsCheckbox;
+        }
+        if (operation == 'TEXT_LIST' || operation == 'TEXT_LIST_DISTINCT') {
+            return TEXT_TYPES.contains(type)
+                ? null
+                : System.Label.Core_Rollups_ErrorTargetNeedsText;
+        }
+        if (operation == 'COUNT_DISTINCT') {
+            return NUMBER_TYPES.contains(type)
+                ? null
+                : System.Label.Core_Rollups_ErrorTargetNeedsNumber;
+        }
+        if (type == Schema.DisplayType.BOOLEAN) {
+            return System.Label.Core_Rollups_ErrorCheckboxTarget;
+        }
+        if (TEXT_TYPES.contains(type)) {
+            return operation == 'FIRST' ||
+                operation == 'LAST'
+                ? null
+                : System.Label.Core_Rollups_ErrorTextTarget;
+        }
+        return NUMBER_AND_DATE_TYPES.contains(type)
+            ? null
+            : System.Label.Core_Rollups_ErrorTargetType;
     }
 
     /**
@@ -119,8 +175,10 @@ public with sharing class RollupPlanner {
                 result.definitions.add(definition);
                 result.targetFields.add(targetField);
                 result.targetFilters.add(targetFilter);
+                Boolean asText = TEXT_TYPES.contains(targetField.getDescribe().getType());
                 for (SourceQuery query : planned) {
                     query.measures[0].definitionIndex = index;
+                    query.measures[0].asText = asText;
                     foldInto(query, queryByKey, result.queries);
                 }
             } catch (Exception refused) {
@@ -139,12 +197,12 @@ public with sharing class RollupPlanner {
         Schema.SObjectField field = String.isBlank(definition.Target_Field__c)
             ? null
             : targetFieldMap.get(definition.Target_Field__c.toLowerCase());
-        if (field == null) {
-            throw new RollupPlanException(System.Label.Core_Rollups_ErrorUnknownObject);
+        if (field == null || !field.getDescribe().isUpdateable()) {
+            throw new RollupPlanException(System.Label.Core_Rollups_ErrorTargetNotWritable);
         }
-        Schema.DescribeFieldResult describe = field.getDescribe();
-        if (!describe.isUpdateable() || !WRITABLE_TYPES.contains(describe.getType())) {
-            throw new RollupPlanException(System.Label.Core_Rollups_ErrorInvalidOperator);
+        String problem = targetTypeProblem(definition.Aggregate__c, field.getDescribe().getType());
+        if (problem != null) {
+            throw new RollupPlanException(problem);
         }
         return field;
     }
@@ -161,7 +219,12 @@ public with sharing class RollupPlanner {
         if (SettingsService.typeByName(definition.Source_Object__c) == null) {
             throw new RollupPlanException(System.Label.Core_Rollups_ErrorUnknownObject);
         }
-        String field = aggregate == 'COUNT' ? null : checkedPath(definition.Source_Field__c);
+        if (!READS_NO_FIELD.contains(aggregate) && String.isBlank(definition.Source_Field__c)) {
+            throw new RollupPlanException(System.Label.Core_Rollups_ErrorSourceFieldNeeded);
+        }
+        String field = READS_NO_FIELD.contains(aggregate)
+            ? null
+            : checkedPath(definition.Source_Field__c);
         String orderBy = kind == KIND_ORDERED ? checkedPath(definition.Order_By_Field__c) : null;
         String whereClause = whereClauseFor(definition);
 

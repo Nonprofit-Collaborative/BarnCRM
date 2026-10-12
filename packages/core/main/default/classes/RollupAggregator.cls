@@ -12,7 +12,9 @@
  * - A household token is aggregated by person and folded into households in Apex, with the people
  *   and their households answered by `HouseholdService` only, so contact mode and junction mode
  *   give the same answer. AVG is carried as a sum and a count so the fold stays exact.
- * - FIRST and LAST read rows ordered by the order attribute and keep the best per record.
+ * - FIRST and LAST read rows ordered by the order attribute and keep the best per record, a tie
+ *   going to the lower record Id.
+ * - ANY and NONE are a grouped count, read as "more than none" and "none".
  *
  * DOCUMENTED EXCEPTION to user mode reads (plan Section 4.13, ADR-0015, and RollupWriter): every
  * query here runs in system mode and without sharing, because a total must not depend on who
@@ -29,10 +31,17 @@ public without sharing class RollupAggregator {
         public Integer counted = 0;
         public Object best;
         public Object bestOrder;
+        public String bestId;
 
         /** The value to write: zero for a sum or count of nothing, blank otherwise. */
         public Object result(String aggregate) {
             switch on aggregate {
+                when 'ANY' {
+                    return this.counted > 0;
+                }
+                when 'NONE' {
+                    return this.counted == 0;
+                }
                 when 'SUM' {
                     return this.total == null ? 0 : this.total;
                 }
@@ -178,7 +187,7 @@ public without sharing class RollupAggregator {
         if (String.isNotBlank(query.whereClause)) {
             conditions.add('(' + query.whereClause + ')');
         }
-        if (query.orderBy != null) {
+        if (query.kind == RollupPlanner.KIND_ORDERED) {
             conditions.add(query.orderBy + ' != null');
         }
         return ' WHERE ' + String.join(conditions, ' AND ');
@@ -243,7 +252,7 @@ public without sharing class RollupAggregator {
     /** What a measure selects: AVG is a sum and a count, so partial answers merge exactly. */
     private static List<String> expressionsFor(RollupPlanner.Measure measure) {
         switch on measure.aggregate {
-            when 'COUNT' {
+            when 'COUNT', 'ANY', 'NONE' {
                 return new List<String>{ 'COUNT(Id)' };
             }
             when 'AVG' {
@@ -274,7 +283,7 @@ public without sharing class RollupAggregator {
                     tally.total = (tally.total == null ? 0 : tally.total) + toDecimal(first);
                 }
             }
-            when 'COUNT' {
+            when 'COUNT', 'ANY', 'NONE' {
                 tally.counted += first == null ? 0 : Integer.valueOf(first);
             }
             when 'AVG' {
@@ -307,7 +316,7 @@ public without sharing class RollupAggregator {
         Map<String, Object> binds,
         Answer answer
     ) {
-        Set<String> columns = new Set<String>{ query.keyExpression, query.orderBy };
+        Set<String> columns = new Set<String>{ 'Id', query.keyExpression, query.orderBy };
         Map<String, Boolean> isCurrencyByField = new Map<String, Boolean>();
         for (RollupPlanner.Measure measure : query.measures) {
             columns.add(measure.field);
@@ -337,9 +346,11 @@ public without sharing class RollupAggregator {
                 continue;
             }
             Object order = valueAt(row, query.orderBy);
+            String rowId = String.valueOf(row.Id);
             for (RollupPlanner.Measure measure : query.measures) {
                 Object value = valueAt(row, measure.field);
-                if (isCurrencyByField.get(measure.field) && value != null) {
+                // A value copied into text is copied as entered (R-R15), never converted.
+                if (!measure.asText && isCurrencyByField.get(measure.field) && value != null) {
                     value = RollupCurrency.toCorporate(
                         toDecimal(value),
                         (String) row.get(RollupCurrency.ISO_FIELD)
@@ -348,16 +359,40 @@ public without sharing class RollupAggregator {
                 for (Id targetId : targets) {
                     Tally tally = tallyFor(answer, measure.definitionIndex, targetId);
                     Integer direction = query.descending ? 1 : -1;
-                    if (
-                        tally.bestOrder == null ||
-                        compare(order, tally.bestOrder) * direction > 0
-                    ) {
+                    Integer better = tally.bestOrder == null
+                        ? 1
+                        : compare(order, tally.bestOrder) * direction;
+                    // A tie goes to the lower record Id, whichever path alternative read it first.
+                    if (better > 0 || (better == 0 && rowId.compareTo(tally.bestId) < 0)) {
                         tally.best = value;
                         tally.bestOrder = order;
+                        tally.bestId = rowId;
                     }
                 }
             }
         }
+    }
+
+    /**
+     * A value as text, written plainly (canonical model R-R15): a number without grouping or a
+     * currency symbol, a date as `2026-03-01`, a datetime in UTC as `2026-03-01 14:05`, a checkbox
+     * as `true` or `false`. UTC, not the running user's time zone, so an instant run and the
+     * nightly run write the same text.
+     */
+    public static String toText(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Decimal) {
+            return ((Decimal) value).toPlainString();
+        }
+        if (value instanceof Date) {
+            return String.valueOf((Date) value);
+        }
+        if (value instanceof Datetime) {
+            return ((Datetime) value).formatGmt('yyyy-MM-dd HH:mm');
+        }
+        return String.valueOf(value);
     }
 
     private static Tally tallyFor(Answer answer, Integer definitionIndex, Id targetId) {

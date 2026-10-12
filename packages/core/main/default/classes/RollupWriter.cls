@@ -136,7 +136,8 @@ public without sharing class RollupWriter {
      * A value in the form the attribute stores, so that comparing it with what is stored means
      * something: numbers rounded to the attribute's decimal places as the platform rounds them on
      * save (an average of 33.333 is stored as 33.33 and must not count as a change every night),
-     * and dates and datetimes converted to the attribute's type.
+     * dates and datetimes converted to the attribute's type, text cut at the attribute's length,
+     * and a checkbox true or false.
      */
     @TestVisible
     private static Object coerce(Schema.DescribeFieldResult describe, Object value) {
@@ -144,6 +145,15 @@ public without sharing class RollupWriter {
             return null;
         }
         Schema.DisplayType type = describe.getType();
+        if (type == Schema.DisplayType.BOOLEAN) {
+            return value instanceof Boolean && (Boolean) value;
+        }
+        if (type == Schema.DisplayType.STRING || type == Schema.DisplayType.TEXTAREA) {
+            // Cut at the attribute's length (R-R15), so the save never fails on a long list and
+            // the same text is compared, and so not written again, on the next run.
+            String text = RollupAggregator.toText(value);
+            return text.length() > describe.getLength() ? text.left(describe.getLength()) : text;
+        }
         if (type == Schema.DisplayType.DATE) {
             return value instanceof Datetime ? ((Datetime) value).date() : value;
         }

@@ -1286,8 +1286,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   New line with a line break. A value that contains the delimiter is written as it is, not
   escaped, so a list of names that contain commas reads best with Semicolon or New line.
 - **Values into text.** A number, date or checkbox copied into text by FIRST, LAST or a text
-  list is written as its plain value (`1250.00`, `2026-03-01`, `true`), not converted between
-  currencies.
+  list is written as its plain value (`1250.00`, `2026-03-01`, `true`; a datetime in UTC as
+  `2026-03-01 14:05`), not converted between currencies.
 - **Cut at the field length.** A text result longer than the target attribute holds is cut at
   the attribute's length, so the save never fails on it and the same value is written on every
   run.

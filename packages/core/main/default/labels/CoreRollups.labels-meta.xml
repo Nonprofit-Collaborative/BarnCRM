@@ -233,6 +233,70 @@
         <value>The records this rollup counts are not in this org, so it was skipped.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsCheckbox</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Any or None is set to fill a field that is not a checkbox.</shortDescription>
+        <value>Any and None show their answer in a checkbox field. Choose a checkbox field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a text list is set to fill a field that is not text.</shortDescription>
+        <value>A text list shows its answer in a text field. Choose a text or long text field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsNumber</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Count distinct is set to fill a field that is not a number.</shortDescription>
+        <value>Count distinct shows its answer in a number field. Choose a number field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorCheckboxTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a checkbox field is given a calculation other than Any or None.</shortDescription>
+        <value>A checkbox field can show only Any or None. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTextTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a text field is given a calculation that does not produce text.</shortDescription>
+        <value>A text field can show only First, Last or a text list. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetType</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the field chosen to show a rollup cannot hold its calculation.</shortDescription>
+        <value>That field cannot show this calculation. Choose a number, currency, percent or date field, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNotWritable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the field chosen to show a rollup is missing or cannot be written.</shortDescription>
+        <value>BarnCRM cannot write to the field this rollup fills. Choose a field that exists and is not a formula or read only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorSourceFieldNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a calculation that reads a field on each record has no Source Field.</shortDescription>
+        <value>This calculation reads a field on each record. Fill in Source Field with the field to read.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ErrorRecalculateFailed</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
