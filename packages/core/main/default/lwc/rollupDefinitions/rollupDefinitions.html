@@ -73,6 +73,25 @@
                         disabled={controlsDisabled}
                         onclick={handleRestoreDefaults}
                     ></lightning-button>
+                    <template lwc:if={builder}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="brand"
+                            data-id="new-rollup"
+                            label={labels.newRollup}
+                            disabled={controlsDisabled}
+                            onclick={handleNew}
+                        ></lightning-button>
+                    </template>
+                    <template lwc:if={showBuilderLink}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="base"
+                            data-id="open-builder"
+                            label={labels.openBuilder}
+                            onclick={handleOpenBuilder}
+                        ></lightning-button>
+                    </template>
                 </div>
             </div>
 
@@ -152,6 +171,24 @@
                                             disabled={controlsDisabled}
                                             onclick={handleRecalculate}
                                         ></lightning-button>
+                                        <template lwc:if={builder}>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small"
+                                                data-id={row.recordId}
+                                                data-action="edit"
+                                                label={labels.edit}
+                                                disabled={controlsDisabled}
+                                                onclick={handleEdit}
+                                            ></lightning-button>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small"
+                                                data-id={row.recordId}
+                                                data-action="copy"
+                                                label={labels.copy}
+                                                disabled={controlsDisabled}
+                                                onclick={handleCopy}
+                                            ></lightning-button>
+                                        </template>
                                     </td>
                                 </tr>
                             </template>

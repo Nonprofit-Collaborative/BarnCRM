@@ -75,6 +75,9 @@ public with sharing class RollupController {
         public List<ModeOption> modeOptions { get; set; }
         @AuraEnabled
         public List<RollupView> rollups { get; set; }
+        /** The Rollup Builder tab, with the package namespace when there is one. */
+        @AuraEnabled
+        public String builderTabApiName { get; set; }
     }
 
     /** One mode: the stored value and the name the picklist gives it. */
@@ -194,6 +197,7 @@ public with sharing class RollupController {
             RollupService.MODE_BOTH
         };
         page.modeOptions = modeOptions(page.modes);
+        page.builderTabApiName = NamespaceUtil.qualify('Rollup_Builder');
         page.rollups = new List<RollupView>();
         Map<String, String> aggregateLabels = labelsOf(Rollup_Definition__c.Aggregate__c);
         Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);

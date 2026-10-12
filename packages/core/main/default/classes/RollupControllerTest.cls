@@ -38,6 +38,10 @@ private class RollupControllerTest {
             'And where the number shows'
         );
         System.Assert.isTrue(page.stale, 'Nothing has been calculated yet, which the page says');
+        System.Assert.isTrue(
+            page.builderTabApiName.endsWith('Rollup_Builder'),
+            'The page links to the Builder tab'
+        );
         System.Assert.areEqual(3, page.modes.size(), 'Real time, Scheduled, and Both');
         List<String> modeLabels = new List<String>();
         for (RollupController.ModeOption option : page.modeOptions) {

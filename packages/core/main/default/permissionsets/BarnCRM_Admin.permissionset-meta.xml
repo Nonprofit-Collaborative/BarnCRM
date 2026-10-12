@@ -1442,6 +1442,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Rollup_Builder</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Organizations</tab>
     <visibility>Visible</visibility>
   </tabSettings>

@@ -1,4 +1,5 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
@@ -34,6 +35,10 @@ import FRESHNESS_TITLE from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
 import FRESHNESS_STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
 import READ_ONLY from '@salesforce/label/c.Core_Rollups_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
+import EDIT from '@salesforce/label/c.Core_RollupBuilder_Edit';
+import COPY from '@salesforce/label/c.Core_RollupBuilder_Copy';
+import OPEN_BUILDER from '@salesforce/label/c.Core_RollupBuilder_Open';
 
 /**
  * The Rollups page of the BarnCRM Settings console.
@@ -43,8 +48,18 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
  * change when it is recalculated, and recalculate one on its own or all of them at once. It never
  * shows the vendored engine's own configuration, which is the whole point of ADR-0015.
  */
-export default class RollupDefinitions extends LightningElement {
+export default class RollupDefinitions extends NavigationMixin(LightningElement) {
+  /**
+   * True inside the Rollup Builder, which adds New, Edit and Copy and listens for `new`, `edit`
+   * and `copy` (with `detail.recordId`). On the settings page the list links to the Builder.
+   */
+  @api builder = false;
+
   labels = {
+    newRollup: NEW_ROLLUP,
+    edit: EDIT,
+    copy: COPY,
+    openBuilder: OPEN_BUILDER,
     title: TITLE,
     intro: INTRO,
     columnRollup: COLUMN_ROLLUP,
@@ -203,6 +218,35 @@ export default class RollupDefinitions extends LightningElement {
 
   handleRestoreDefaults() {
     this.runAction(restoreDefaults());
+  }
+
+  handleNew() {
+    this.dispatchEvent(new CustomEvent('new'));
+  }
+
+  handleEdit(event) {
+    this.dispatchEvent(new CustomEvent('edit', { detail: { recordId: event.target.dataset.id } }));
+  }
+
+  handleCopy(event) {
+    this.dispatchEvent(new CustomEvent('copy', { detail: { recordId: event.target.dataset.id } }));
+  }
+
+  handleOpenBuilder() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: this.page.builderTabApiName }
+    });
+  }
+
+  get showBuilderLink() {
+    return !this.builder && !!this.page && !!this.page.builderTabApiName;
+  }
+
+  /** Reads the list again, after the Builder saved a rollup. */
+  @api
+  refresh() {
+    return this.refreshPage();
   }
 
   runAction(promise, revert, notice) {

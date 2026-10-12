@@ -52,6 +52,7 @@
   <tabs>Organizations</tabs>
   <tabs>Import</tabs>
   <tabs>BarnCRM_Settings</tabs>
+  <tabs>Rollup_Builder</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
 </CustomApplication>

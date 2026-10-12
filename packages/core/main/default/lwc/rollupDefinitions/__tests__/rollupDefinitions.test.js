@@ -34,6 +34,23 @@ jest.mock('@salesforce/apex/RollupController.restoreDefaults', () => ({ default:
   virtual: true
 });
 
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
+
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
@@ -241,5 +258,39 @@ describe('c-rollup-definitions', () => {
     await flush();
 
     expect(restoreDefaults).toHaveBeenCalled();
+  });
+
+  it('links to the Rollup Builder from the settings page', async () => {
+    const element = createComponent();
+    getPage.emit({ ...PAGE, builderTabApiName: 'Rollup_Builder' });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="new-rollup"]')).toBeNull();
+    element.shadowRoot.querySelector('[data-id="open-builder"]').click();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Rollup_Builder' }
+    });
+  });
+
+  it('asks the Builder to open a new, edited or copied rollup', async () => {
+    const element = createComponent();
+    element.builder = true;
+    getPage.emit({ ...PAGE, builderTabApiName: 'Rollup_Builder' });
+    await flush();
+
+    const events = [];
+    ['new', 'edit', 'copy'].forEach((name) =>
+      element.addEventListener(name, (event) => events.push([name, event.detail]))
+    );
+    expect(element.shadowRoot.querySelector('[data-id="open-builder"]')).toBeNull();
+    element.shadowRoot.querySelector('[data-id="new-rollup"]').click();
+    element.shadowRoot.querySelector('[data-action="edit"]').click();
+    element.shadowRoot.querySelector('[data-action="copy"]').click();
+
+    expect(events.map(([name]) => name)).toEqual(['new', 'edit', 'copy']);
+    expect(events[1][1].recordId).toBe(ROLLUP.recordId);
+    expect(events[2][1].recordId).toBe(ROLLUP.recordId);
   });
 });
