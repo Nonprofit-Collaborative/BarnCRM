@@ -72,8 +72,8 @@ public with sharing class RollupService {
      * True when every call below goes to BarnCRM's own engine (`RollupEngine`) rather than the
      * vendored one. Only a test can set it, through `useOwnEngineInTests`, so the regression
      * suite can judge the new engine before slice S8 swaps it in for everyone; S8 removes the
-     * switch and the vendored calls together. A delete is not recalculated under the switch:
-     * counting after the delete, and collecting changes fully, is slice S6.
+     * switch and the vendored calls together. Under the switch a save's changes are collected by
+     * `RollupChanges` and recalculated now or through `RollupQueue` (slice S6).
      */
     private static Boolean useOwnEngine = false;
 
@@ -122,15 +122,14 @@ public with sharing class RollupService {
         if (String.isBlank(sourceObject) || changedRecords == null || changedRecords.isEmpty()) {
             return;
         }
-        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForSource(
-            sourceObject,
-            REAL_TIME_MODES
-        );
-        if (definitions.isEmpty()) {
+        if (useOwnEngine) {
+            runOwnEngine(sourceObject, changedRecords, oldRecords);
             return;
         }
-        if (useOwnEngine) {
-            runOwnEngine(definitions, changedRecords, oldRecords);
+        List<Rollup_Definition__c> definitions = vendoredRealTime(
+            RollupSelector.selectActiveForSource(sourceObject, REAL_TIME_MODES)
+        );
+        if (definitions.isEmpty()) {
             return;
         }
         List<Rollup__mdt> metadata = new List<Rollup__mdt>();
@@ -330,48 +329,145 @@ public with sharing class RollupService {
     }
 
     /**
-     * A save under the test switch: the records each definition reaches, before and after the
-     * change, recalculated by `RollupEngine`, which stamps the records it writes. Plain lookups
-     * and household tokens only; slice S6 replaces this with full change collection.
+     * The real-time definitions the vendored engine can run in a save. It refuses a definition
+     * that reads an attribute through a relationship (`Gift__r.Status__c`) or reaches its target
+     * through a household token, and one refusal stops every definition handed over in the same
+     * call, which is why Gift Allocation and Soft Credit were not registered for real time. Those
+     * definitions are left to the nightly run until slice S8 swaps in BarnCRM's own engine.
+     */
+    private static List<Rollup_Definition__c> vendoredRealTime(
+        List<Rollup_Definition__c> definitions
+    ) {
+        List<Rollup_Definition__c> runnable = new List<Rollup_Definition__c>();
+        for (Rollup_Definition__c definition : definitions) {
+            Boolean readsThrough = false;
+            Set<String> reads = RollupFilterParser.fieldsOf(definition.Filter_JSON__c);
+            reads.add(String.valueOf(definition.Source_Field__c));
+            reads.add(String.valueOf(definition.Order_By_Field__c));
+            reads.add(String.valueOf(definition.Fiscal_Date_Field__c));
+            for (String read : reads) {
+                readsThrough = readsThrough || read.contains('.');
+            }
+            Boolean token = String.valueOf(definition.Relationship_Path__c).contains('{');
+            if (!readsThrough && !token) {
+                runnable.add(definition);
+            }
+        }
+        return runnable;
+    }
+
+    // ------------------------------------------------------------------ BarnCRM's own engine
+
+    /**
+     * The target records a normal save recalculates itself (R-R4); a save that marks more goes
+     * to the Rollup Queue.
+     */
+    @TestVisible
+    private static Integer instantLimit = 50;
+
+    /**
+     * A save under the test switch (slice S6): `RollupChanges` works out which target records the
+     * save marks (R-R11), and they are recalculated now or queued. A delete is collected in two
+     * steps: before it, the rows the platform deletes with the record; after it, `runAfterDelete`.
      */
     private static void runOwnEngine(
-        List<Rollup_Definition__c> definitions,
+        String sourceObject,
         List<SObject> changedRecords,
         Map<Id, SObject> oldRecords
     ) {
-        if (Trigger.isExecuting && Trigger.isDelete) {
+        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
+            REAL_TIME_MODES
+        );
+        if (definitions.isEmpty()) {
             return;
         }
-        List<SObject> records = new List<SObject>(changedRecords);
-        if (oldRecords != null) {
-            records.addAll(oldRecords.values());
+        if (Trigger.isExecuting && Trigger.isDelete) {
+            RollupDependents.beforeDelete(
+                SettingsService.typeByName(sourceObject),
+                changedRecords,
+                definitions
+            );
+            return;
         }
-        Set<Id> parentIds = new Set<Id>();
-        for (Rollup_Definition__c definition : definitions) {
-            RollupPath.Parsed path;
-            try {
-                path = RollupPath.parse(definition.Relationship_Path__c);
-            } catch (Exception refused) {
-                ErrorLogger.log(refused, CONTEXT_REAL_TIME, definition.Id);
-                continue;
-            }
-            for (Set<Id> reached : RollupPath.resolveTargets(path, records).values()) {
-                parentIds.addAll(reached);
-            }
-            for (RollupPath.Branch branch : path.branches) {
-                if (branch.needsHouseholdResolution() || branch.segments.size() != 1) {
-                    continue;
-                }
-                for (SObject record : records) {
-                    Object value = record.get(branch.segments[0]);
-                    if (value != null) {
-                        parentIds.add((Id) value);
-                    }
-                }
+        recalculateNowOrQueue(
+            RollupChanges.forSave(
+                sourceObject,
+                changedRecords,
+                oldRecords,
+                Trigger.isExecuting && Trigger.isUndelete,
+                definitions
+            )
+        );
+    }
+
+    /**
+     * After records are deleted: recalculates the targets they reached, now that they no longer
+     * count (R-R11). BarnCRM's own engine only; the vendored one handled the delete before it.
+     *
+     * @param sourceObject the entity whose records were deleted
+     * @param deletedRecords the records as they were
+     */
+    @NamespaceAccessible
+    public static void runAfterDelete(String sourceObject, List<SObject> deletedRecords) {
+        if (!useOwnEngine || String.isBlank(sourceObject) || deletedRecords == null) {
+            return;
+        }
+        List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForModes(
+            REAL_TIME_MODES
+        );
+        if (!definitions.isEmpty()) {
+            recalculateNowOrQueue(
+                RollupChanges.afterDelete(sourceObject, deletedRecords, definitions)
+            );
+        }
+    }
+
+    /**
+     * R-R4: a normal save that marks a few records recalculates them in the same save; a bulk
+     * change, or a save already running in the background, queues them. A record the platform
+     * refuses to save is queued to be tried again, and anything that stops the recalculation
+     * queues the lot, so nothing marked is lost.
+     */
+    private static void recalculateNowOrQueue(RollupChanges.Marked marked) {
+        if (marked.isEmpty()) {
+            return;
+        }
+        Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
+        for (String target : marked.idsByTarget.keySet()) {
+            Schema.SObjectType targetType = SettingsService.typeByName(target);
+            if (targetType != null) {
+                idsByTarget.put(String.valueOf(targetType), marked.idsByTarget.get(target));
             }
         }
-        RollupEngine.Result result = RollupEngine.recalculate(parentIds, definitions);
-        stampAfterRun(result.ran, new Map<String, Set<Id>>());
+        if (!canRecalculateNow(marked.size())) {
+            RollupQueue.add(idsByTarget);
+            return;
+        }
+        try {
+            for (String target : idsByTarget.keySet()) {
+                RollupEngine.Result result = RollupEngine.recalculate(
+                    idsByTarget.get(target),
+                    SettingsService.typeByName(target)
+                );
+                RollupQueue.retryLater(target, result.failed, 0);
+            }
+        } catch (Exception stopped) {
+            ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
+            RollupQueue.add(idsByTarget);
+        }
+    }
+
+    /** Whether this transaction recalculates now: few records, not async, room to spare. */
+    @TestVisible
+    private static Boolean canRecalculateNow(Integer targetCount) {
+        return targetCount <= instantLimit &&
+            !System.isBatch() &&
+            !System.isFuture() &&
+            !System.isQueueable() &&
+            !System.isScheduled() &&
+            Limits.getQueries() * 2 < Limits.getLimitQueries() &&
+            Limits.getDmlStatements() * 2 < Limits.getLimitDmlStatements() &&
+            Limits.getCpuTime() * 2 < Limits.getLimitCpuTime();
     }
 
     private static Set<String> sourcesOf(List<Rollup_Definition__c> definitions) {

@@ -178,6 +178,158 @@ private class RollupChangesTest {
         Assert.isTrue(renamed.isEmpty(), 'A rename moves no household total');
     }
 
+    /** A total that reads a parent's attribute moves when the parent changes it (R-R11). */
+    @IsTest
+    static void aChangeReadThroughARelationshipMarksTheRowsUnderIt() {
+        Account riverbend = organization('Riverbend');
+        insert riverbend;
+        Contact ana = new Contact(FirstName = 'Ana', LastName = 'Okafor');
+        insert ana;
+        insert new Affiliation__c(Contact__c = ana.Id, Organization__c = riverbend.Id);
+        List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
+            definition(
+                'Affiliation__c',
+                'Organization__c',
+                filter('Contact__r.Deceased__c', 'equals', false)
+            )
+        };
+        Contact before = new Contact(Id = ana.Id, LastName = 'Okafor', Deceased__c = false);
+
+        Test.startTest();
+        RollupChanges.Marked marked = RollupChanges.forSave(
+            'Contact',
+            new List<SObject>{ new Contact(Id = ana.Id, LastName = 'Okafor', Deceased__c = true) },
+            new Map<Id, SObject>{ ana.Id => before },
+            false,
+            definitions
+        );
+        RollupChanges.Marked unread = RollupChanges.forSave(
+            'Contact',
+            new List<SObject>{ new Contact(Id = ana.Id, LastName = 'Other', Deceased__c = false) },
+            new Map<Id, SObject>{ ana.Id => before },
+            false,
+            definitions
+        );
+        Test.stopTest();
+
+        Assert.areEqual(
+            new Set<Id>{ riverbend.Id },
+            markedAccounts(marked),
+            'The organization whose total counts Ana\'s affiliation'
+        );
+        Assert.isTrue(unread.isEmpty(), 'An attribute nobody reads marks nothing');
+    }
+
+    /**
+     * The platform deletes a household's membership rows with it and restores them with it,
+     * without their triggers: their targets are read before the delete and after the undelete.
+     */
+    @IsTest
+    static void aDeleteMarksTheTotalsOfTheRowsDeletedWithIt() {
+        Account nolan = household('The Nolan Family');
+        Account riverbend = organization('Riverbend');
+        insert new List<Account>{ nolan, riverbend };
+        Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan');
+        insert ana;
+        insert new Household_Member__c(
+            Household__c = nolan.Id,
+            Contact__c = ana.Id,
+            Account__c = riverbend.Id
+        );
+        List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
+            definition('Household_Member__c', 'Account__c', null)
+        };
+
+        Test.startTest();
+        RollupDependents.beforeDelete(Account.SObjectType, new List<SObject>{ nolan }, definitions);
+        RollupChanges.Marked deleted = RollupChanges.afterDelete(
+            'Account',
+            new List<SObject>{ nolan },
+            definitions
+        );
+        RollupChanges.Marked handedOver = RollupDependents.takeReadBeforeDelete();
+        RollupChanges.Marked restored = RollupChanges.forSave(
+            'Account',
+            new List<SObject>{ nolan },
+            null,
+            true,
+            definitions
+        );
+        Test.stopTest();
+
+        Assert.isTrue(
+            markedAccounts(deleted).contains(riverbend.Id),
+            'The organization the deleted membership counted towards'
+        );
+        Assert.isTrue(handedOver.isEmpty(), 'Held targets are handed over once');
+        Assert.isTrue(
+            markedAccounts(restored).contains(riverbend.Id),
+            'And again when the household is restored'
+        );
+    }
+
+    @IsTest
+    static void aFewTargetsAreRecalculatedInTheSameSave() {
+        insert definition('Account', 'ParentId', null);
+        Account parent = organization('Parent');
+        insert parent;
+        Account child = organization('Child');
+        child.ParentId = parent.Id;
+        insert child;
+        RollupService.useOwnEngineInTests();
+        TriggerHandler.clearRunClaims();
+        TriggerHandler.testNew = new List<SObject>{ child };
+
+        Test.startTest();
+        new RollupTriggerHandler().afterInsert();
+        Integer queued = [SELECT COUNT() FROM Rollup_Queue__c];
+        Account counted = [SELECT NumberOfEmployees FROM Account WHERE Id = :parent.Id];
+        Test.stopTest();
+
+        Assert.areEqual(1, counted.NumberOfEmployees, 'Right before the save returned');
+        Assert.areEqual(0, queued, 'Nothing queued');
+    }
+
+    @IsTest
+    static void aBulkChangeIsQueuedAndCaughtUpInTheBackground() {
+        insert definition('Account', 'ParentId', null);
+        Account parent = organization('Parent');
+        insert parent;
+        List<Account> children = new List<Account>();
+        for (Integer i = 0; i < 200; i++) {
+            Account child = organization('Child ' + i);
+            child.ParentId = parent.Id;
+            children.add(child);
+        }
+        insert children;
+        RollupService.useOwnEngineInTests();
+        RollupService.instantLimit = 0;
+        TriggerHandler.clearRunClaims();
+        TriggerHandler.testNew = children;
+
+        Test.startTest();
+        new RollupTriggerHandler().afterInsert();
+        Integer queued = [SELECT COUNT() FROM Rollup_Queue__c];
+        Test.stopTest();
+
+        Assert.areEqual(1, queued, 'Two hundred saves to one parent: one entry');
+        Assert.areEqual(
+            200,
+            [SELECT NumberOfEmployees FROM Account WHERE Id = :parent.Id].NumberOfEmployees,
+            'Caught up by the processor'
+        );
+        Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Queue__c], 'And the entry is gone');
+    }
+
+    @IsTest
+    static void aSaveInTheBackgroundOrOverTheLimitIsQueued() {
+        Assert.isTrue(RollupService.canRecalculateNow(1), 'A normal save of one record');
+        Assert.isFalse(
+            RollupService.canRecalculateNow(RollupService.instantLimit + 1),
+            'More than the instant limit'
+        );
+    }
+
     @IsTest
     static void aDefinitionReadsItsAttributesPathAndFilter() {
         Rollup_Definition__c fund = definition(

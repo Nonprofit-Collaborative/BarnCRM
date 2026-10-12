@@ -27,21 +27,26 @@ public with sharing class RollupTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * A merge: the records deleted with `MasterRecordId` filled name the survivors, whose totals
-     * are recalculated so they include what the merge moved onto them. An ordinary delete was
-     * already handled before the delete.
+     * After a delete, the totals the deleted records counted towards no longer include them
+     * (`RollupService.runAfterDelete`, BarnCRM's own engine; the vendored one handled the delete
+     * before it). A merge: the records deleted with `MasterRecordId` filled name the survivors,
+     * whose totals are recalculated so they include what the merge moved onto them.
      */
     public override void afterDelete() {
+        List<SObject> deleted = oldRecords();
         List<SObject> merged = new List<SObject>();
-        for (SObject record : oldRecords()) {
+        for (SObject record : deleted == null ? new List<SObject>() : deleted) {
             if (record.getPopulatedFieldsAsMap().get('MasterRecordId') != null) {
                 merged.add(record);
             }
         }
-        if (merged.isEmpty()) {
-            return;
-        }
         try {
+            if (deleted != null && !deleted.isEmpty()) {
+                RollupService.runAfterDelete(objectNameOf(deleted), deleted);
+            }
+            if (merged.isEmpty()) {
+                return;
+            }
             RollupService.runAfterMerge(objectNameOf(merged), merged);
         } catch (Exception failed) {
             // As for every rollup: never fail the save, and the nightly run puts it right.

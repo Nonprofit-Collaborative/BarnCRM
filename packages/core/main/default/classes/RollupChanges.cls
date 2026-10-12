@@ -7,6 +7,8 @@
  *   and joins the new one. An update marks only when an attribute the definition reads changed:
  *   the source, order-by and fiscal date attributes, a path attribute, or one the filter tests.
  * - A delete marks the old targets once the rows are gone; an undelete marks them again.
+ * - Rows under a changed parent, which no trigger of their own reports (a gift's status read by
+ *   the fund totals, a gift's allocations deleted with it), are `RollupDependents`.
  * - A person who joins or leaves a household (`HouseholdService.membershipChangeOf`), or who
  *   survives a merge, marks the households on both sides for every definition that reaches its
  *   target through a household token.
@@ -106,6 +108,9 @@ public without sharing class RollupChanges {
             marked.add(definition.Target_Object__c, targetsOf(path, changedType, touched));
             marked.add(definition.Target_Object__c, targetsOf(path, changedType, before));
         }
+        if (oldRecords != null || restored == true) {
+            RollupDependents.forSave(changedType, records, oldRecords, definitions, marked);
+        }
         markMembership(
             definitions,
             HouseholdService.membershipChangeOf(records, oldRecords),
@@ -116,7 +121,7 @@ public without sharing class RollupChanges {
 
     /**
      * After a delete: the old targets of the deleted records, the households their people left,
-     * and the households of merge survivors.
+     * the households of merge survivors, and what `RollupDependents.beforeDelete` held.
      */
     public static Marked afterDelete(
         String changedObject,
@@ -124,6 +129,7 @@ public without sharing class RollupChanges {
         List<Rollup_Definition__c> definitions
     ) {
         Marked marked = new Marked();
+        marked.addAll(RollupDependents.takeReadBeforeDelete());
         Schema.SObjectType changedType = SettingsService.typeByName(changedObject);
         if (changedType == null || records == null || records.isEmpty()) {
             return marked;
