@@ -69,6 +69,11 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 - **Editing values and leaving the page without saving.** The console does not save as you
   type. Changed settings are held until you click **Save**, and leaving the page discards
   them. If you are not sure whether a change went in, check **Recent changes**.
+- **Worrying that two people saving at once undo each other.** They do not. A save writes
+  only the settings you changed, compared with what is stored at that moment, so a setting
+  someone else saved after you opened the page is kept. If you both changed the same
+  setting, the later save wins, and **Recent changes** shows both, each with the value it
+  replaced.
 - **Looking for a setting in Setup because it is not in the section you expected.** Use the
   search box before you go hunting. It searches the setting name, the description, and the
   section name, so `greeting`, `household`, or `pause` all find something.

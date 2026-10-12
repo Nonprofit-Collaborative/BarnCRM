@@ -29,10 +29,9 @@ private class SettingsWriterTest {
         Test.startTest();
         System.runAs(maria) {
             SettingsWriter.saveOrgDefault(
-                new Nonprofit_Settings__c(
-                    SetupOwnerId = UserInfo.getOrganizationId(),
-                    Household_Name_Pattern__c = 'The {LastName} Family'
-                )
+                Nonprofit_Settings__c.SObjectType,
+                null,
+                patternChange('The {LastName} Family')
             );
             saved = true;
         }
@@ -58,10 +57,9 @@ private class SettingsWriterTest {
         System.runAs(david) {
             try {
                 SettingsWriter.saveOrgDefault(
-                    new Nonprofit_Settings__c(
-                        SetupOwnerId = UserInfo.getOrganizationId(),
-                        Household_Name_Pattern__c = 'The {LastName} Clan'
-                    )
+                    Nonprofit_Settings__c.SObjectType,
+                    null,
+                    patternChange('The {LastName} Clan')
                 );
             } catch (SettingsWriter.PermissionException e) {
                 refused = true;
@@ -80,13 +78,69 @@ private class SettingsWriterTest {
     @IsTest
     static void ignoresNothingToSave() {
         Test.startTest();
-        SettingsWriter.saveOrgDefault(null);
+        SettingsWriter.saveOrgDefault(Nonprofit_Settings__c.SObjectType, null, null);
+        SettingsWriter.saveOrgDefault(
+            Nonprofit_Settings__c.SObjectType,
+            null,
+            new Map<Schema.SObjectField, Object>()
+        );
         Test.stopTest();
 
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM Setting_Change__c],
+            [SELECT COUNT() FROM Nonprofit_Settings__c],
             'Nothing to save writes nothing and raises nothing'
         );
+    }
+
+    /**
+     * Another administrator saved a different key after this transaction read its copy. The
+     * save writes only its own key, so theirs survives (plan Section 11.3, follow-up 1).
+     */
+    @IsTest
+    static void savesOnlyTheChangedKeyOverTheStoredRecord() {
+        insert new Nonprofit_Settings__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Household_Name_Pattern__c = 'The {LastName} Family',
+            Relationship_Auto_Reciprocal__c = true
+        );
+        Nonprofit_Settings__c stored = OrgSettingsSystemWriter.lockStored();
+        Nonprofit_Settings__c theirs = new Nonprofit_Settings__c(
+            Id = stored.Id,
+            Relationship_Auto_Reciprocal__c = false
+        );
+        update theirs;
+        User maria = userNamed('Alvarez');
+
+        Test.startTest();
+        System.runAs(maria) {
+            SettingsWriter.saveOrgDefault(
+                Nonprofit_Settings__c.SObjectType,
+                stored,
+                patternChange('{LastName} Household')
+            );
+        }
+        Test.stopTest();
+
+        Nonprofit_Settings__c saved = [
+            SELECT Household_Name_Pattern__c, Relationship_Auto_Reciprocal__c
+            FROM Nonprofit_Settings__c
+            WHERE Id = :stored.Id
+        ];
+        Assert.areEqual(
+            '{LastName} Household',
+            saved.Household_Name_Pattern__c,
+            'Her key is saved'
+        );
+        Assert.isFalse(
+            saved.Relationship_Auto_Reciprocal__c,
+            'And the key the other administrator saved is not written back from her copy'
+        );
+    }
+
+    private static Map<Schema.SObjectField, Object> patternChange(String pattern) {
+        return new Map<Schema.SObjectField, Object>{
+            Nonprofit_Settings__c.Household_Name_Pattern__c => pattern
+        };
     }
 }
