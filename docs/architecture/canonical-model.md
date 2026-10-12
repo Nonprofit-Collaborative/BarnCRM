@@ -4072,10 +4072,13 @@ the browser being closed and the interruption halfway down the pile.
 | Payment Reference | text | no | The check number or deposit reference, which is what makes a batch reconcilable against the bank statement. |
 | Fund | reference(Fund) | no | The fund this gift is designated to, when it differs from the batch's. |
 | Appeal | reference(Appeal) | no | The appeal this gift responded to, when it differs from the batch's. |
+| Installment | reference(Installment) | no | The scheduled payment this line's gift pays, chosen by the person or chosen in advance as the only suggestion (R-GR5, R-DM8). Empty means a gift on its own. |
 | Gift | reference(Gift) | computed | The gift this line produced, written by posting and empty before it (R-GB6). |
 
 ### Relationships
 
+- **Gift Batch Row to Installment**, many to one, optional; cleared if the installment is
+  deleted.
 - **Gift Batch Row to Gift Batch**, many to one, master-detail, not reparentable.
 - **Gift Batch Row to Donor**, many to one, to exactly one of Donor Contact or Donor Account
   by the time the batch posts (Section 4 "Person references").
@@ -4100,7 +4103,15 @@ entered one at a time with its description.
 added to the batch or changed. The one change allowed is the platform clearing Gift when
 that gift is deleted, because refusing it would let a posted batch stop a gift from ever
 being deleted. Deleting a line of a posted batch is refused by the entry screen but not by
-the database: see "Known gaps in shipped rules" in Section 30.
+the database: see "Known gaps in shipped rules" in Section 30. The platform clearing
+Installment when that installment is deleted is allowed for the same reason.
+
+**R-GR5 A line pays the payment it names, or nothing.** A line's Installment is offered and
+suggested as R-DM8 says, using the line's date or the batch's (R-GB1). Posting checks every
+named installment again, in the posting user's mode, before any gift is created: one that is
+no longer a candidate of the line's donor refuses the post and names the line (R-GB5). A
+posted gift carries the line's Installment and that installment's Commitment. Two lines may
+name one installment.
 
 ### Salesforce implementation
 
@@ -4119,6 +4130,7 @@ the database: see "Known gaps in shipped rules" in Section 30.
 | Payment Reference | `Payment_Reference__c` | Text(255), the length of the gift's |
 | Fund | `Fund__c` | Lookup to `Fund__c` |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
+| Installment | `Installment__c` | Lookup to `Installment__c`, cleared if the installment is deleted |
 | Gift | `Gift__c` | Lookup to `Gift__c`, cleared if the gift is deleted |
 
 - **Validation rule:** `Posted_Batch_Rows_Are_Final` (R-GR4).
@@ -4258,8 +4270,8 @@ from the batch, never from the template or the settings, so an edit made after t
 cannot make the commit match, refuse or create what the dry run did not show. A batch with no
 recorded values, or values that cannot be read, falls back to the template.
 
-**R-DM8 A gift entry screen suggests, and a person decides.** Quick Gift Entry (G-03) offers
-the chosen donor's candidates (R-DM2, with no date bound) as payments the new gift can pay,
+**R-DM8 A gift entry screen suggests, and a person decides.** Quick Gift Entry (G-03) and a
+gift batch line (G-17, R-GR5, checked again at posting) offer the chosen donor's candidates (R-DM2, with no date bound) as payments the new gift can pay,
 with None always offered. A candidate whose due date and expected amount fall within R-DM3's
 window and tolerance, taken from the org's settings (no template is involved), is marked
 suggested. It is chosen in advance only when it is the only one suggested, and then it is
@@ -5487,4 +5499,5 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-NEXT, `NEXT-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
+| v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`NEXT-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
