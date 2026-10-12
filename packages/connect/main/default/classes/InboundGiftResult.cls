@@ -32,22 +32,28 @@ global with sharing class InboundGiftResult {
         ERROR_NOT_SAVED => 422
     };
 
-    @InvocableVariable(label='Outcome' description='created, existing or rejected.')
+    @InvocableVariable(
+        label='Outcome'
+        description='created (recorded by this call), existing (recorded earlier, nothing changed) or rejected (nothing recorded, see Error Code).'
+    )
     global String outcome;
 
     @InvocableVariable(
         label='Gift Id'
-        description='The gift recorded, or already recorded under this external id.'
+        description='The record id of the gift recorded by this call or earlier under this External Id. Empty when rejected, except for external_id_conflict when that gift can be seen.'
     )
     global Id giftId;
 
     @InvocableVariable(
         label='Error Code'
-        description='Why the gift was rejected, as a stable code. Empty unless rejected.'
+        description='Empty unless rejected. One of invalid_request, invalid_field, external_id_conflict, donor_not_found, fund_not_found, appeal_not_found, gift_not_saved, internal_error. Branch on this, not on Message.'
     )
     global String errorCode;
 
-    @InvocableVariable(label='Message' description='What happened, in a sentence.')
+    @InvocableVariable(
+        label='Message'
+        description='What happened, in a sentence for a person to read. Its wording may change.'
+    )
     global String message;
 
     /** A gift that was recorded, by this call or an earlier one. */
