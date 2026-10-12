@@ -113,10 +113,7 @@ private class ErrorDigestRecipientsTest {
     static void theDigestStopsAtItsRecipientCap() {
         Assert.areEqual(50, ErrorDigestRecipients.MAX_RECIPIENTS, 'Fifty people at most.');
         User first = TestDataFactory.createUser('Capfirst', new List<String>{ 'BarnCRM_Staff' });
-        User second = TestDataFactory.createUser(
-            'Capsecond',
-            new List<String>{ 'BarnCRM_Staff' }
-        );
+        User second = TestDataFactory.createUser('Capsecond', new List<String>{ 'BarnCRM_Staff' });
         User third = TestDataFactory.createUser('Capthird', new List<String>{ 'BarnCRM_Staff' });
         ErrorDigestRecipients.recipientCap = 2;
 
