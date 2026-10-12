@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The five steps of the Rollup Builder: create or edit one rollup without typing a query.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
