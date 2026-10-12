@@ -89,7 +89,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Not a duplicate" dismissals | Minor | A dismissed pair, with a reason, is not suggested again. | Shipped | C-20 |
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
-| Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Planned (1.x) | C-28 |
+| Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Shipped | C-28 |
 
 ### 1.5 Import and Data Management
 
@@ -99,9 +99,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Import undo | Major | Undoes a committed import within a set window: removes what it created and puts back values it changed, keeping anything that has since gained a life of its own. | Shipped | C-19 |
 | Excel workbook import | Major | Reads .xlsx files directly in the browser, no CSV conversion needed. | Shipped | C-19, ADR-0049 |
 | Import matching rules | Major | Separate matching rules for people and for organizations (email, name plus postal code, or an ID field you choose), set per file in the import wizard. | Shipped | C-32 |
-| Find | Major | A Find tab that builds a query over one object from lists (no typing a query), shows the matching records, and exports them to CSV. | Built, not merged (`feature/c-34-find-1` to `-8`) | C-34 |
-| Load one object | Major | Inserts, updates or upserts any object, including custom ones, with the same dry run, journal and undo. | Planned (v0.7) | C-33 |
-| Bulk update | Major | Sets, clears or copies up to five fields on the records a Find query returns, with a count preview, journal and undo. | Planned (v0.7) | C-35 |
+| Find | Major | A Find tab that builds a query over one object from lists (no typing a query), shows the matching records, and exports them to CSV. | Shipped | C-34 |
+| Load one object | Major | Inserts, updates or upserts any object, including custom ones, with the same dry run, journal and undo. | Shipped | C-33 |
+| Bulk update | Major | Sets, clears or copies up to five fields on the records a Find query returns, with a count preview, journal and undo. | Shipped | C-35 |
 | Shipped mappings | Minor | Generic donor list and generic gift list mappings that upgrades never overwrite once edited. | Shipped | C-14 |
 | Two people on one row | Minor | A row naming two people creates one household with both in it, in either membership model. | Shipped | C-14 |
 | Import tagging | Minor | Every record an import creates is tagged with the import it came from. | Shipped | C-14 |
@@ -122,11 +122,11 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Match only | Minor | A file can be set to update records it finds and never create new ones. | Shipped | C-32 |
 | Your own fields in the wizard | Minor | The wizard offers the org's own custom fields as mapping targets. | Shipped | C-32 |
 | Import undo keeps households with gifts | Minor | Undoing an import keeps a household that gifts or pledges are credited to, and journals why. | Shipped | C-19, ADR-0070 (D-20) |
-| Find conditions | Minor | Conditions on the object's fields and related records, relative dates such as "in the last 30 days", and custom condition logic. | Built, not merged (`feature/c-34-find-1` to `-8`) | C-34 |
-| Saved and shared queries | Minor | Save a Find query under a name to run again, and share it read only with everyone who uses Find. | Built, not merged (`feature/c-34-find-6` to `-8`) | C-34 |
-| Find export | Minor | Exports every matching record (not only the rows on screen) to CSV, up to an export row limit set in the app; results follow each person's own access. | Built, not merged (`feature/c-34-find-7`, `-8`) | C-34 |
-| Advanced Find | Minor | Typed queries checked through the same builder, child records, aggregates, XLSX export and inline edit. | Planned (1.x) | C-36 |
-| Data transforms, dedupe on import, bulk delete | Minor | Formulas and find-and-replace in mappings, matching through duplicate rules, and undoable bulk delete. | Planned (1.x) | C-37 |
+| Find conditions | Minor | Conditions on the object's fields and related records, relative dates such as "in the last 30 days", and custom condition logic. | Shipped | C-34 |
+| Saved and shared queries | Minor | Save a Find query under a name to run again, and share it read only with everyone who uses Find. | Shipped | C-34 |
+| Find export | Minor | Exports every matching record (not only the rows on screen) to CSV, up to an export row limit set in the app; results follow each person's own access. | Shipped | C-34 |
+| Advanced Find | Minor | Typed queries checked through the same builder, child records, aggregates, XLSX export and inline edit. | Shipped | C-36, ADR-0078 |
+| Data transforms and duplicate-rule matching (part 1) | Minor | Import column changes (a declarative step list, no code evaluation) previewed before and after, a shared DataTransform engine for bulk update, and matching through the org's active duplicate rules with the template's several-matches policy. | Shipped (part 1); bulk delete to come | C-37, ADR-0081 |
 | Scheduled imports and external sources | Minor | Loads from SFTP, cloud storage or other systems on a schedule, committing only within admin-set limits. | Planned (1.x) | C-38 |
 
 ### 1.6 Automation and Rollups
