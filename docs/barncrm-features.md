@@ -10,6 +10,7 @@ BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for 
 - **Minor**: a supporting capability, setting, or refinement.
 - **Shipped**: merged to main. No package version has been created yet (the namespace is deferred), so "Shipped" means built and on main, not yet installable as a released package.
 - **Built, not merged**: built on the named branch or open pull request, waiting for review, an org test run, or the branches it is stacked on.
+- **Replaced**: shipped earlier and superseded by the feature the row names; kept in the code only where the row says.
 - **Planned**: in the product plan roadmap (iteration shown where the plan gives one). "Proposed" marks an idea recorded for consideration, not approved or scheduled.
 - **Feature ID**: the product plan ID (C = Core, G = Giving, X = Connect, V = Volunteers, P = Programs, L = Logic Models, F = Funders), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
 
@@ -54,7 +55,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Households follow person changes | Minor | Renaming, deleting or restoring a person recounts and renames their households in both membership models. | Shipped | C-01 |
 | Member count | Minor | Keeps each household's member count correct as people join, move or leave. | Shipped | C-01 |
 | Nonprofit Cloud household guards | Minor | Detects households Nonprofit Cloud already manages and never renames, readdresses, deletes or duplicates them. | Shipped | X-09 (in Core) |
-| Interaction notes | Minor | A "Log an interaction" action on person and organization pages records a meeting or contact report as a completed activity, for major-gift work. | Built, not merged (`feature/c-39-interaction-notes-1`) | C-39 |
+| Interaction notes | Minor | A "Log an interaction" action on person and organization pages records a meeting or contact report as a completed activity, for major-gift work. | Shipped | C-39 |
 
 ### 1.2 Relationships and Affiliations
 
@@ -136,8 +137,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Rollup engine | Major | Calculates totals on households, people, organizations and module records from definitions admins manage in the app, with Real time, Scheduled (nightly) or Both modes. | Shipped | C-13 |
 | Trigger framework | Major | One shared trigger dispatcher for every module: each object has a one-line trigger, and the handlers it runs, and their order, come from a registry, so modules add behavior without editing each other's triggers. Every handler can be switched off, paused or bypassed (except rules marked always-on), and failures are logged and shown as a plain message instead of a stack trace. | Shipped | C-04, ADR-0017, ADR-0024 |
 | Automation control | Major | Lists every packaged automation with a description and an on/off switch, plus a global pause for bulk loads. | Shipped | C-04 |
-| BarnCRM's own rollup engine | Major | BarnCRM's own calculation core replaces the vendored apex-rollup library: it plans each record's totals in a few queries, writes only totals that changed, and handles totals in the record's currency. Built and tested, not yet switched on (the swap is a later slice). | Built, not merged (`feature/rollup-s5-engine-1` to `-4`; decision on `feature/rollup-s4-docs`) | new ADR (supersedes ADR-0015) |
-| BarnCRM Rollup Builder | Major | A dedicated Rollup Builder tab where admins create and edit any rollup, shipped or their own, in five steps without typing a query, check it against a real record, and see a "Needs attention" list with Retry. | Planned (approved 2026-10-12, amendment A1; slices S6 to S17) | new ADR |
+| BarnCRM's own rollup engine | Major | BarnCRM's own calculation core replaces the vendored apex-rollup library: it plans each record's totals in a few queries, writes only totals that changed, and handles totals in the record's currency. It is the only rollup path since rollup slice S8, with instant recalculation, a queue with retry, and a full nightly run. | Shipped | ADR-0082 (supersedes ADR-0015), ADR-0083 |
+| Rollup operations | Minor | Count distinct, Any and None into checkboxes, First and Last into text, text lists with a delimiter and an each-value-once option, and a save check on the target field type. | Shipped | ADR-0082 |
+| BarnCRM Rollup Builder | Major | A dedicated Rollup Builder tab where admins create and edit any rollup, shipped or their own, in five steps without typing a query, check it against a real record, and see a "Needs attention" list with Retry. | Planned (approved 2026-10-12, amendment A1; slices S6 to S17) | ADR-0082 |
 | Automatic pause expiry | Minor | A pause ends on its own at a set time, records who paused and when it ended, and Health Check flags a pause that will not end. | Shipped | C-23, ADR-0055 |
 | Automations that always run | Minor | Rule-enforcing automations (such as the receipt lock) are listed but cannot be switched off. | Shipped | ADR-0024 |
 | Switches created at install | Minor | Installing or upgrading a package creates the switch for every automation it ships. | Shipped | C-21 |
@@ -148,11 +150,11 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Default rollup mode setting | Minor | Decides how a newly created rollup starts out (Real time, Scheduled or Both). | Shipped | C-13 |
 | Fiscal-year aware totals | Minor | This year, last year and two years ago follow the fiscal year start month set in the app. | Shipped | C-13 |
 | Schedule nightly recalculation | Minor | One button on the Rollups page schedules the nightly run. | Shipped | C-13 |
-| Vendored calculation engine | Minor | Uses the open source apex-rollup library inside Core behind an adapter, so admins never see or configure it directly. To be replaced by BarnCRM's own engine. | Shipped | ADR-0015 |
-| Instant totals from gifts and pledges | Minor | Saving a gift or commitment updates the donor's totals in the same save, not only overnight. Fund and soft credit totals still update overnight until the new engine. | Built, not merged (`feature/rollup-s1-realtime`) | C-13 (rollup slice S1) |
-| Instant totals on your own objects | Minor | For a total that counts one of your own objects, the Rollup Builder generates and deploys the trigger that keeps it instant, with no setup. A research spike proved the approach. | Planned (amendment A2; slices S15 to S17; spike on `feature/rollup-s15-spike`) | new ADR |
-| Plainer rollup modes | Minor | Modes named Instantly, Every night and Both (recommended); bulk changes queue instead of slowing the save. | Planned (with the new engine) | new ADR |
-| Flow templates for switchable automation | Minor | Inactive Flow templates a customer can Save As and own ("switch ours off, run yours") for Core automations: keep an account's first address, check affiliations, primary affiliation, relationship checks and keeping both sides of a relationship in step. A CI check requires a template or a written reason for each switchable automation. | Built, not merged (`feature/flow-templates-1` to `-4`) | ADR-0040, new ADR |
+| Vendored calculation engine | Minor | The open source apex-rollup library, kept inside Core only so `RollupEngineComparison` can check BarnCRM's own engine against it; no rollup runs through it since rollup slice S8. | Replaced | ADR-0015, ADR-0082 |
+| Instant totals from gifts and pledges | Minor | Saving a gift or commitment updates the donor's totals in the same save, not only overnight. Fund and soft credit totals still update overnight until the new engine. | Shipped | C-13 (rollup slice S1) |
+| Instant totals on your own objects | Minor | For a total that counts one of your own objects, the Rollup Builder generates and deploys the trigger that keeps it instant, with no setup. A research spike proved the approach. | Planned (amendment A2; slices S15 to S17; spike on `feature/rollup-s15-spike`) | ADR-0082 |
+| Plainer rollup modes | Minor | Modes named Instantly, Every night and Both (recommended); bulk changes queue instead of slowing the save. | Shipped | ADR-0082 |
+| Flow templates for switchable automation | Minor | Inactive Flow templates a customer can Save As and own ("switch ours off, run yours") for Core automations: keep an account's first address, check affiliations, primary affiliation, relationship checks and keeping both sides of a relationship in step. A CI check requires a template or a written reason for each switchable automation. | Shipped | ADR-0040, ADR-0090 |
 
 ### 1.7 Administration and Settings
 
@@ -167,7 +169,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. | Shipped | C-24 |
 | Suite choice | Major | The Setup Assistant's first step asks Impact Suite or Community Suite and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
 | Neutral Core | Major | Moves nonprofit wording, the giving and receipt settings and the nonprofit setup steps out of Core into Giving, so Core alone is the Community Suite. | Shipped | C-29, ADR-0059 |
-| Analytics module: field utilization | Major | Shows, per object and record type, how often each field is filled in, with trends over time. | Planned (proposed, not scheduled) | plan 6.1 item 10 |
+| Analytics module: field utilization | Major | A weekly count, per object and record type, of how often each field is filled in, kept 13 months, on BarnCRM Settings > Health. | Shipped | plan 6.1 item 10, ADR-0086 |
 | Packaged roles | Minor | Five roles: Admin, Fundraising Staff, Program Staff, Volunteer Coordinator and Read Only; packaged sets are never cloned. | Shipped | C-06 |
 | Manage settings permission | Minor | Only holders of the manage-settings permission can change settings; everyone else sees a read-only view with a notice. | Shipped | C-03 |
 | Settings change history | Minor | "Recent changes" records each changed setting with old value, new value, who and when; unchanged saves write nothing. | Shipped | C-03 |
@@ -183,10 +185,10 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Neutral sample organizations | Minor | Sample organizations become mostly businesses, schools and clubs, and the guide states sample data is never loaded automatically. | Shipped | C-29 follow-up |
 | Package labels renamed to BarnCRM | Minor | Renames the app, settings ("BarnCRM Settings"), roles, folders, templates and API names from the old working title to BarnCRM. | Shipped (PR #181) | plan 11.3 item 6 |
 | Faster, safer settings saves | Minor | A settings save writes only the keys that changed, under a lock, so two admins saving at once do not undo each other. | Shipped | plan 11.3 |
-| What's new after upgrade | Minor | A "What's new" card on the home page summarizes what changed after an upgrade, hidden once read and when nothing is new. | Built, not merged (`feature/c-27-whats-new-1`, `-2`) | C-27, new ADR |
-| Unlocked-to-managed migration kit | Minor | Moves a production pilot from unlocked to managed packages: check, export, reimport with every record link translated, and verify record by record. | Built, not merged (`feature/c-31-migration-kit-1` to `-3`) | C-31, new ADR |
+| What's new after upgrade | Minor | A "What's new" card on the home page summarizes what changed after an upgrade, hidden once read and when nothing is new. | Shipped | C-27, ADR-0087 |
+| Unlocked-to-managed migration kit | Minor | Moves a production pilot from unlocked to managed packages: check, export, reimport with every record link translated, and verify record by record. | Shipped | C-31, ADR-0088 |
 | Telemetry (opt-in) | Minor | Anonymous, opt-in usage counts (installed modules, org shape, error counts), off by default. | Planned (v0.11) | C-26 |
-| CMDT Manager | Minor | In-app tab for admins to add, edit and archive custom metadata records. | Planned (proposed, not scheduled) | plan 6.1 item 9 |
+| CMDT Manager | Minor | A Custom metadata page in BarnCRM Settings (General) where holders of the BarnCRM Metadata Admin permission set add, edit and archive the org's own relationship types; shipped types are read only. | Shipped | plan 6.1 item 9, ADR-0085 |
 
 ### 1.8 Monitoring and Health
 
@@ -255,7 +257,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Payment Method" label | Minor | The gift type field is labelled Payment Method in the app and on Quick Gift Entry. | Shipped | G-03 (UX pass) |
 | Gift page polish | Minor | Gift page shows one donor field and shows refund, original gift and matched gift fields only when relevant. | Shipped | G-01 (UX pass) |
 | Quick Gift Entry messages and new donors | Minor | A problem is shown on the field it concerns, the donor picker offers the standard new person form, and batch lines name their line number for screen readers. | Shipped | G-03, G-17 (UX pass) |
-| Pay a scheduled pledge payment | Minor | Quick Gift Entry and the Gift Batches "Pays" column list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Built, not merged (`feature/gift-entry-pays-installment-1` to `-3`) | G-03, G-17, G-24 |
+| Pay a scheduled pledge payment | Minor | Quick Gift Entry and the Gift Batches "Pays" column list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Shipped | G-03, G-17, G-24, ADR-0084 |
 | Stock and planned gift types | Minor | Extra fields for stock and planned gifts. | Planned (1.x) | G-21 |
 
 ### 2.2 Pledges and Recurring
@@ -375,7 +377,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Donors with Giving report type | Minor | A report type whose rows are donors, used by the retention reports. | Shipped | G-16 |
 | Dashboard runs as the viewer | Minor | Each person sees only the gifts they may see. | Shipped | G-06 |
 | Refund-correct totals | Minor | A refunded gift stays in the count and leaves the total; a fully refunded donor shows zero, not blank. | Shipped | ADR-0022 |
-| Giving totals update on save | Minor | Totals on donors move when a gift or commitment is saved, not only overnight (see Core 1.6, Instant totals from gifts and pledges). | Built, not merged (`feature/rollup-s1-realtime`) | G-02 (rollup slice S1) |
+| Giving totals update on save | Minor | Totals on donors move when a gift or commitment is saved, not only overnight (see Core 1.6, Instant totals from gifts and pledges). | Shipped | G-02 (rollup slice S1) |
 
 ### 2.10 Giving App and Administration
 
