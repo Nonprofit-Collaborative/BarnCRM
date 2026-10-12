@@ -143,6 +143,16 @@
                         disabled={actionDisabled}
                         onclick={handleExport}
                     ></lightning-button>
+                    <template if:true={canBulkUpdate}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            data-id="bulk-update"
+                            label={labels.bulkUpdate}
+                            icon-name="utility:edit"
+                            disabled={actionDisabled}
+                            onclick={handleBulkUpdate}
+                        ></lightning-button>
+                    </template>
                 </div>
 
                 <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end slds-var-m-top_medium">
@@ -207,6 +217,11 @@
                 </template>
                 <template if:true={showNoResults}>
                     <p data-id="no-results">{labels.noResults}</p>
+                </template>
+                <template if:true={showBulkUpdate}>
+                    <div class="slds-var-m-top_medium">
+                        <c-bulk-update query-json={bulkQueryJson} onclose={handleBulkClose}></c-bulk-update>
+                    </div>
                 </template>
             </template>
         </div>

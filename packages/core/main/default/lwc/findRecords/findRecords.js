@@ -49,6 +49,7 @@ import DELETED_NOTICE from '@salesforce/label/c.Core_Find_DeletedNotice';
 import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
 import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
 import LOADING from '@salesforce/label/c.Core_Find_Loading';
+import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
 
 const DEFAULT_ROWS = 200;
 const OFFERED_TYPES = new Set(['address', 'location', 'base64']);
@@ -95,6 +96,7 @@ export default class FindRecords extends LightningElement {
     soqlHelp: SOQL_HELP,
     run: RUN,
     export: EXPORT,
+    bulkUpdate: BULK_UPDATE,
     noResults: NO_RESULTS,
     savedQueries: SAVED_QUERIES,
     chooseSaved: CHOOSE_SAVED,
@@ -122,6 +124,7 @@ export default class FindRecords extends LightningElement {
   queryName = '';
   shared = false;
   openQueryId;
+  bulkQueryJson;
   busy = false;
   errorMessage;
   noticeMessage;
@@ -296,6 +299,14 @@ export default class FindRecords extends LightningElement {
     return !!this.rows && this.rows.length > 0;
   }
 
+  get canBulkUpdate() {
+    return Boolean(this.page && this.page.canBulkUpdate);
+  }
+
+  get showBulkUpdate() {
+    return Boolean(this.bulkQueryJson);
+  }
+
   get showNoResults() {
     return !!this.rows && this.rows.length === 0;
   }
@@ -343,6 +354,8 @@ export default class FindRecords extends LightningElement {
   }
 
   async refreshPreview() {
+    // The bulk update panel acts on the query it was opened with; an edited query closes it.
+    this.bulkQueryJson = undefined;
     if (!this.objectApiName || this.columns.length === 0 || !this.filterValid) {
       this.soql = '';
       return;
@@ -495,6 +508,20 @@ export default class FindRecords extends LightningElement {
     });
   }
 
+  /** Opens bulk update over the query as it is now (C-35); the panel keeps that query. */
+  handleBulkUpdate() {
+    this.noticeMessage = undefined;
+    this.errorMessage = undefined;
+    if (!this.checkReady()) {
+      return;
+    }
+    this.bulkQueryJson = this.queryDocument();
+  }
+
+  handleBulkClose() {
+    this.bulkQueryJson = undefined;
+  }
+
   handleNew() {
     this.resetQuery();
     this.objectApiName = undefined;
@@ -551,6 +578,7 @@ export default class FindRecords extends LightningElement {
     this.openQueryId = undefined;
     this.queryName = '';
     this.shared = false;
+    this.bulkQueryJson = undefined;
   }
 
   async work(action) {

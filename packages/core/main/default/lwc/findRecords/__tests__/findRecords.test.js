@@ -7,6 +7,8 @@ import runQuery from '@salesforce/apex/FindController.runQuery';
 import exportPage from '@salesforce/apex/FindController.exportPage';
 import saveQuery from '@salesforce/apex/FindController.saveQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
+import getBulkPage from '@salesforce/apex/BulkUpdateController.getPage';
+import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 
 jest.mock(
   '@salesforce/apex/FindController.listObjects',
@@ -32,6 +34,12 @@ jest.mock('@salesforce/apex/FindController.saveQuery', () => ({ default: jest.fn
   virtual: true
 });
 jest.mock('@salesforce/apex/FindController.deleteQuery', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkUpdateController.getPage', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkUpdateController.getTargets', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/QueryFieldCatalog.getObjectInfo', () => ({ default: jest.fn() }), {
@@ -278,5 +286,43 @@ describe('c-find-records', () => {
     expect(one(element, 'error-message').textContent).toBe(
       'Find needs the Find and Export Records permission.'
     );
+  });
+
+  it('offers bulk update only with the permission, over the query as it is', async () => {
+    getBulkPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5 });
+    getTargets.mockResolvedValue([]);
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    expect(one(element, 'bulk-update')).toBeNull();
+    element.remove();
+
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
+    const allowed = await render();
+    await choose(one(allowed, 'object'), 'Gift__c');
+    one(allowed, 'bulk-update').click();
+    await flush();
+
+    const panel = allowed.shadowRoot.querySelector('c-bulk-update');
+    expect(panel.queryJson).toBe(
+      JSON.stringify({ version: 1, object: 'Gift__c', fields: ['Name'], limit: 200 })
+    );
+    panel.dispatchEvent(new CustomEvent('close'));
+    await flush();
+    expect(allowed.shadowRoot.querySelector('c-bulk-update')).toBeNull();
+  });
+
+  it('closes the bulk update panel when the query changes', async () => {
+    getBulkPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5 });
+    getTargets.mockResolvedValue([]);
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    one(element, 'bulk-update').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('c-bulk-update')).not.toBeNull();
+
+    await choose(one(element, 'columns'), ['Name', 'Amount__c']);
+
+    expect(element.shadowRoot.querySelector('c-bulk-update')).toBeNull();
   });
 });
