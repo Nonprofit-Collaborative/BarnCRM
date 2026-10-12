@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Receipts panel in the Nonprofit Settings console: the receipt letters, and the year end
+    The Receipts panel in the BarnCRM Settings console: the receipt letters, and the year end
     statement run with its history.
   </description>
   <isExposed>true</isExposed>

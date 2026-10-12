@@ -1,5 +1,5 @@
 /**
- * The section names the Nonprofit Settings console groups by.
+ * The section names the BarnCRM Settings console groups by.
  *
  * Every package that ships a Setting Definition row uses one of these exact strings in
  * `Section__c`, and the Setup Assistant points its steps at them, so a step's Open action lands

@@ -123,7 +123,7 @@ private class AccountTriggerHandlerTest {
      */
     @IsTest
     static void householdsForPeopleStoredAsAccountsFollowTheOneCreationSetting() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Auto_Create_Households__c = false;
@@ -219,7 +219,7 @@ private class AccountTriggerHandlerTest {
      */
     @IsTest
     static void deletingAPersonStoredAsAnAccountSettlesTheirHousehold() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Delete_Empty_Households__c = false;
@@ -281,7 +281,7 @@ private class AccountTriggerHandlerTest {
      */
     @IsTest
     static void restoringAPersonStoredAsAnAccountPutsThemBackInTheirHousehold() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Delete_Empty_Households__c = false;
@@ -315,7 +315,7 @@ private class AccountTriggerHandlerTest {
      */
     @IsTest
     static void markingAPersonStoredAsAnAccountDeceasedRewritesTheirHouseholdWording() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Delete_Empty_Households__c = false;
@@ -356,7 +356,7 @@ private class AccountTriggerHandlerTest {
      * because the record override declares every account a person, the household too.
      */
     private static Account personInAHousehold() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Auto_Create_Households__c = false;
         HouseholdTestDataFactory.save(settings);
         HouseholdService.personAccountOverride = true;

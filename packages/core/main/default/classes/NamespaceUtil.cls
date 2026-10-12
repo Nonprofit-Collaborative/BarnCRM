@@ -3,7 +3,7 @@
  *
  * The namespace is deferred (ADR-0001) and will be registered later, at which point every
  * packaged tab, page, object, and page state parameter gains a prefix. Nothing may hard-code
- * either state: source that names `Nonprofit_Settings` breaks once the namespace exists, and
+ * either state: source that names `BarnCRM_Settings` breaks once the namespace exists, and
  * source that writes a prefix in front of it fails the namespace check today and breaks in an
  * unmanaged org.
  *

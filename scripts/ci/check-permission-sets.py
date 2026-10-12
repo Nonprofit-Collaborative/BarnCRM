@@ -7,7 +7,7 @@ permission set group naming a set that is not there. Nothing else in
 the check suite sees it: the offline Apex compiler does not read permission sets, and the
 canonical model check reads objects and fields rather than who is granted them.
 
-This ran because Nonprofit_Admin granted a Household_Member__c tab that had never been
+This ran because BarnCRM_Admin granted a Household_Member__c tab that had never been
 created. The integration contract asked for that tab, the grant was added, and the tab was
 not, so the permission set had been undeployable for as long as it had existed.
 
@@ -21,7 +21,7 @@ One grant that resolves is still checked, because it cannot be given: View All R
 Modify All Records on the detail side of a master-detail relationship. Record access to a
 detail object comes from its master, and a permission set that asks for it anyway risks
 losing the whole objectPermissions entry, and with it the create and edit access the
-feature actually needs. Nonprofit_Admin asked for both on Import Row, and the first org run
+feature actually needs. BarnCRM_Admin asked for both on Import Row, and the first org run
 of the import tests failed on staging a row.
 
 One more grant resolves and still breaks ADR-0013: an object only some licenses may be given.
@@ -46,7 +46,7 @@ NS = "http://soap.sforce.com/2006/04/metadata"
 # Objects a Salesforce Platform license cannot be granted, and the optional sets allowed to
 # grant them (C-20, ADR-0050 on duplicate detection).
 LICENSE_LIMITED_OBJECTS = {"DuplicateRecordSet", "DuplicateRecordItem"}
-OPTIONAL_LICENSE_SETS = {"Nonprofit_Duplicate_Review"}
+OPTIONAL_LICENSE_SETS = {"BarnCRM_Duplicate_Review"}
 
 # The platform's own limits on a permission set's label and description (Metadata API).
 LABEL_MAX = 80

@@ -10,6 +10,6 @@
   </description>
   <inlineHelpText>
     Checked for funds created by the sample data loader. Remove sample data from
-    Nonprofit Settings to delete every record with this box checked.
+    BarnCRM Settings to delete every record with this box checked.
   </inlineHelpText>
 </CustomField>

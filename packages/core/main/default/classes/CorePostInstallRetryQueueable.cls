@@ -1,18 +1,18 @@
 /**
- * Gives the person who installed the package the Nonprofit Admin permission set, then waits
- * for the platform to finish calculating the Nonprofit Admin permission set group and gives
+ * Gives the person who installed the package the BarnCRM Admin permission set, then waits
+ * for the platform to finish calculating the BarnCRM Admin permission set group and gives
  * them that too.
  *
  * The install queues this rather than doing it itself because both are setup object writes,
  * and the install transaction also writes ordinary records, which the platform refuses to mix
  * (CorePostInstall says more). The permission set is given on every attempt, which changes
- * nothing once it is held, so the installer can open Nonprofit Settings as soon as the first
+ * nothing once it is held, so the installer can open BarnCRM Settings as soon as the first
  * attempt runs.
  *
  * Salesforce recalculates a packaged permission set group in the background after an
  * install or an upgrade, and it refuses to assign one while that is running. The installer
  * already has the permission set by then, so they are not blocked; the waiting exists to
- * finish the job properly, so that the Access page lists them under the Nonprofit Admin role
+ * finish the job properly, so that the Access page lists them under the BarnCRM Admin role
  * rather than showing an org where nobody holds it.
  *
  * It re-checks a few times, a job at a time, a minute apart, and then stops. It never
@@ -113,12 +113,10 @@ public with sharing class CorePostInstallRetryQueueable implements Queueable {
     private void giveUp() {
         ErrorLogger.log(
             new AccessService.AccessException(
-                'Warning: the Nonprofit Admin role was still being prepared after ' +
-                    MAX_ATTEMPTS +
-                    ' attempts, so it was not given to the person who installed BarnCRM. ' +
-                    'They already have the Nonprofit Admin permission set, so Nonprofit Settings ' +
-                    'works. To finish, open Nonprofit Settings, then Access, and give them the ' +
-                    'Nonprofit Admin role.'
+                String.format(
+                    System.Label.Core_PostInstall_AdminRoleNotGiven,
+                    new List<Object>{ String.valueOf(MAX_ATTEMPTS) }
+                )
             ),
             CONTEXT
         );

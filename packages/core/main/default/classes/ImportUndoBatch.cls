@@ -464,11 +464,27 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         return fields == null ? new Map<String, Object>() : (Map<String, Object>) fields;
     }
 
+    /** Field maps by lower-case object name, described once per transaction. */
+    private static Map<String, Map<String, Schema.SObjectField>> fieldMaps = new Map<String, Map<String, Schema.SObjectField>>();
+
+    /**
+     * The object's field map. It is asked for once per journal entry inside the restore loop,
+     * so the global describe and the object describe are taken once and kept
+     * (dynamic-apex.md section 5).
+     */
+    @TestVisible
     private static Map<String, Schema.SObjectField> fieldMap(String objectName) {
-        return Schema.getGlobalDescribe()
-            .get(objectName)
-            .getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap();
+        String key = objectName.toLowerCase();
+        if (!fieldMaps.containsKey(key)) {
+            fieldMaps.put(
+                key,
+                Schema.getGlobalDescribe()
+                    .get(objectName)
+                    .getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .fields.getMap()
+            );
+        }
+        return fieldMaps.get(key);
     }
 
     /**

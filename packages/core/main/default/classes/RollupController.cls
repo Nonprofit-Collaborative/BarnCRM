@@ -1,8 +1,8 @@
 /**
- * What the Rollups page of the Nonprofit Settings console reads and writes.
+ * What the Rollups page of the BarnCRM Settings console reads and writes.
  *
  * Every method returns the whole page, so the component never has to work out what changed, and
- * every write is refused for a user without the Manage Nonprofit Settings permission with a
+ * every write is refused for a user without the Manage BarnCRM Settings permission with a
  * message that names the permission. The page is reached the way ADR-0020 requires: it is a Core
  * component, so `settingsConsole` imports it by name from its own registry, and the Setting
  * Definition row that puts it in the Rollups section names it in `Component__c`.
@@ -221,7 +221,7 @@ public with sharing class RollupController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission('Manage_Nonprofit_Settings');
+        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
     }
 
     private static void requirePermission() {

@@ -61,7 +61,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Hub home: quick link to the Nonprofit Settings tab</shortDescription>
+        <shortDescription>Hub home: quick link to the BarnCRM Settings tab</shortDescription>
         <value>BarnCRM Settings</value>
     </labels>
     <labels>

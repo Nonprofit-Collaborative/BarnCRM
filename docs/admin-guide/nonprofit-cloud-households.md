@@ -1,5 +1,8 @@
 # Households you already have in Nonprofit Cloud
 
+This page applies only to an org with Salesforce Nonprofit Cloud. In any other org, BarnCRM
+shows nothing described here.
+
 ## What it does
 
 Salesforce Nonprofit Cloud has its own way of grouping people into a household, and BarnCRM has its own way. If your org is already using the Nonprofit Cloud way, both kinds of

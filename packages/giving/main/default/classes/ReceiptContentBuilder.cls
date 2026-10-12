@@ -78,7 +78,7 @@ public with sharing class ReceiptContentBuilder {
      * document with a blank at the top.
      */
     public static OrganizationDetails organizationDetails() {
-        Nonprofit_Settings__c core = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
         Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
         if (String.isBlank(core.Organization_Legal_Name__c)) {
             throw new ReceiptContentException(Label.Giving_Receipt_OrganizationIncomplete);

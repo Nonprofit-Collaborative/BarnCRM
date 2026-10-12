@@ -67,7 +67,7 @@ export default class HubHome extends NavigationMixin(LightningElement) {
   };
 
   quickLinks = [
-    { key: 'settings', label: QUICK_LINK_SETTINGS, url: '/lightning/n/Nonprofit_Settings' },
+    { key: 'settings', label: QUICK_LINK_SETTINGS, url: '/lightning/n/BarnCRM_Settings' },
     { key: 'households', label: QUICK_LINK_HOUSEHOLDS, url: '/lightning/n/Households' },
     {
       key: 'organizations',
@@ -77,8 +77,8 @@ export default class HubHome extends NavigationMixin(LightningElement) {
   ];
 
   errorLogUrl = '/lightning/o/Error_Log__c/list';
-  rollupsUrl = '/lightning/n/Nonprofit_Settings';
-  addressSettingsUrl = '/lightning/n/Nonprofit_Settings';
+  rollupsUrl = '/lightning/n/BarnCRM_Settings';
+  addressSettingsUrl = '/lightning/n/BarnCRM_Settings';
   importUrl = '/lightning/n/Import';
 
   /** The files that arrive regularly, oldest import first (R-IT6). */
@@ -96,6 +96,7 @@ export default class HubHome extends NavigationMixin(LightningElement) {
   stepsTotal = 0;
   automationPaused = false;
   newErrorCount = 0;
+  newErrorCountCapped = false;
   canEdit = false;
   errorMessage;
   setupReopened = false;
@@ -129,6 +130,11 @@ export default class HubHome extends NavigationMixin(LightningElement) {
   /** Hidden until the household record type is known and until Account is createable at all. */
   get showNewHouseholdButton() {
     return this.accountCreatable && !!this.householdRecordTypeId;
+  }
+
+  /** The tile's number: the count, or the cap with a plus once there are more than it counts. */
+  get errorCountText() {
+    return this.newErrorCountCapped ? `${this.newErrorCount}+` : `${this.newErrorCount}`;
   }
 
   get hasErrors() {
@@ -208,6 +214,7 @@ export default class HubHome extends NavigationMixin(LightningElement) {
     this.stepsTotal = model.stepsTotal || 0;
     this.automationPaused = Boolean(model.automationPaused);
     this.newErrorCount = model.newErrorCount || 0;
+    this.newErrorCountCapped = Boolean(model.newErrorCountCapped);
     this.canEdit = Boolean(model.canEdit);
     this.rollupsLastCalculated = model.rollupsLastCalculated;
     this.rollupsStale = Boolean(model.rollupsStale);

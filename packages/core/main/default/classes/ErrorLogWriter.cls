@@ -19,7 +19,7 @@
  * The direct insert survives only as the fallback for when publishing itself fails, for example
  * for a running user with no create access on the event. It is better to lose the entry to a
  * rollback than to lose it altogether. Publishing is governed by Create on the event, so all three
- * packaged permission sets grant Read and Create on `Error_Log_Event__e`, Nonprofit Read Only
+ * packaged permission sets grant Read and Create on `Error_Log_Event__e`, BarnCRM Read Only
  * included; for a user holding none of them the fallback runs and the entry survives only when the
  * transaction commits.
  *

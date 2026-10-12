@@ -20,7 +20,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value xsi:type="xsd:string">Standalone:Standalone;NPSP:NPSP coexistence;AgentforceNonprofit:Agentforce Nonprofit coexistence</value>
+    <value xsi:type="xsd:string">Standalone:Standalone;NPSP:NPSP coexistence;NonprofitCloud:Nonprofit Cloud coexistence</value>
   </values>
   <values>
     <field>Component__c</field>
@@ -28,9 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value
-      xsi:type="xsd:string"
-    >Records what is already installed in this org. Agentforce Nonprofit coexistence is for a Nonprofit Cloud org, usually with Person Accounts on, and puts household membership on the junction. NPSP coexistence records that the Nonprofit Success Pack is here; in this version it changes no household behaviour, and NPSP's own household accounts are left alone. Standalone is for an org with neither and also changes no behaviour. BarnCRM reads your org and recommends one: you confirm it, and you can change it later.</value>
+    <value xsi:type="xsd:string">Records how BarnCRM fits beside what is already installed in this org. Standalone is always offered and changes no behaviour. When BarnCRM finds another Salesforce product that keeps households, it also offers a coexistence mode named after that product. BarnCRM reads your org and recommends one: you confirm it, and you can change it later.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

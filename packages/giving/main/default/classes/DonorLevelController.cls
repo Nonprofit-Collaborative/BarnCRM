@@ -8,7 +8,7 @@
  * and when was everybody last placed.
  */
 public with sharing class DonorLevelController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Donor Levels page';
 
     public class LadderModel {

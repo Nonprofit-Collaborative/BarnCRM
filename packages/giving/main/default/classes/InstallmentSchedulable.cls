@@ -1,6 +1,6 @@
 /**
  * The nightly job that marks unpaid installments Overdue once the org's grace period has
- * passed (R-IN2). Scheduled from the Nightly Jobs page of the Nonprofit Settings console
+ * passed (R-IN2). Scheduled from the Nightly Jobs page of the BarnCRM Settings console
  * (ADR-0038), which is also where its last run is read.
  *
  * Every run records itself, including a run that found nothing to mark. An empty stamp then

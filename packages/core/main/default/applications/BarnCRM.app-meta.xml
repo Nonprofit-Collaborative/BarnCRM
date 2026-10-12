@@ -46,12 +46,12 @@
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
   <label>BarnCRM</label>
   <navType>Standard</navType>
-  <tabs>Nonprofit_Hub_Home</tabs>
+  <tabs>BarnCRM_Home</tabs>
   <tabs>Households</tabs>
   <tabs>standard-Contact</tabs>
   <tabs>Organizations</tabs>
   <tabs>Import</tabs>
-  <tabs>Nonprofit_Settings</tabs>
+  <tabs>BarnCRM_Settings</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
 </CustomApplication>

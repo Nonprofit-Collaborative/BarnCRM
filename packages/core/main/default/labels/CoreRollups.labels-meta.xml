@@ -5,7 +5,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the Rollups page in the Nonprofit Settings console.</shortDescription>
+        <shortDescription>Title of the Rollups page in the BarnCRM Settings console.</shortDescription>
         <value>Rollups</value>
     </labels>
     <labels>

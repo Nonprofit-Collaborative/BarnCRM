@@ -4,7 +4,7 @@
  * the Opportunity mirror page and by Health Check.
  *
  * A run executes as the administrator who started or scheduled it, and Connect Settings is a
- * protected setting nobody edits outside the Nonprofit Settings console, so the run cannot save
+ * protected setting nobody edits outside the BarnCRM Settings console, so the run cannot save
  * it in user mode. Only the two run keys are written: when a record exists it is locked and only
  * they are updated, so a direction or start date saved meanwhile is never undone; when none
  * exists one is created from the field defaults. The caller carries the authorization (a run it

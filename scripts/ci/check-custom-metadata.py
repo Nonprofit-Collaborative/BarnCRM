@@ -62,7 +62,7 @@ CONSOLE_CASE = re.compile(r"case '([A-Za-z0-9_]+)':")
 SECTIONS = "packages/core/main/default/classes/SettingSections.cls"
 SECTION_CONSTANT = re.compile(r"public static final String [A-Z_]+ = '([^']+)';")
 SETTING_DEFINITIONS = "packages/*/main/default/customMetadata/Setting_Definition.*.md-meta.xml"
-CORE_SETTINGS_OBJECT = "Nonprofit_Settings__c"
+CORE_SETTINGS_OBJECT = "BarnCRM_Settings__c"
 IMPORT_TEMPLATES = "packages/*/main/default/customMetadata/Import_Template_Default.*.md-meta.xml"
 MIGRATION_KEY = re.compile(r"^(npc|npsp)_")
 SAMPLES = "docs/admin-guide/samples"

@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: mirror has not run, detail</shortDescription>
-    <value>The Opportunity mirror's nightly run is scheduled, but no run has completed since {0}. It runs as the person who scheduled it: if they were deactivated or lost access, every run fails before it starts. Open Opportunity mirror in Nonprofit Settings, then stop the nightly run and schedule it again as someone who can run it. The Error Log says why the runs failed.</value>
+    <value>The Opportunity mirror's nightly run is scheduled, but no run has completed since {0}. It runs as the person who scheduled it: if they were deactivated or lost access, every run fails before it starts. Open Opportunity mirror in BarnCRM Settings, then stop the nightly run and schedule it again as someone who can run it. The Error Log says why the runs failed.</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_DifferenceCountAll</fullName>
@@ -358,7 +358,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page refusal: no direction chosen</shortDescription>
-    <value>The Opportunity mirror is off. Choose a direction in Nonprofit Settings, Giving, Opportunity mirror direction.</value>
+    <value>The Opportunity mirror is off. Choose a direction in BarnCRM Settings, Giving, Opportunity mirror direction.</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_NoManagePermission</fullName>
@@ -366,7 +366,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page refusal: cannot manage settings</shortDescription>
-    <value>Starting or scheduling the mirror needs the Manage Nonprofit Settings permission.</value>
+    <value>Starting or scheduling the mirror needs the Manage BarnCRM Settings permission.</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_NoOpportunityAccess</fullName>
@@ -422,7 +422,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page introduction</shortDescription>
-    <value>Keeps gifts and Salesforce Opportunities in step, in the direction chosen in Nonprofit Settings. Run now copies what is waiting; the nightly run catches up every night at 01:30.</value>
+    <value>Keeps gifts and Salesforce Opportunities in step, in the direction chosen in BarnCRM Settings. Run now copies what is waiting; the nightly run catches up every night at 01:30.</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_DirectionGifts</fullName>
@@ -446,7 +446,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page: no start date set</shortDescription>
-    <value>Direction: Opportunities to Gifts, but no start date is set, so no Opportunity becomes a gift. Set Opportunity mirror start date in Nonprofit Settings.</value>
+    <value>Direction: Opportunities to Gifts, but no start date is set, so no Opportunity becomes a gift. Set Opportunity mirror start date in BarnCRM Settings.</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_RunNow</fullName>

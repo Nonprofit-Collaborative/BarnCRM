@@ -177,7 +177,7 @@ public with sharing class HouseholdNamingService {
         applying = true;
         Integer changed = 0;
         try {
-            Nonprofit_Settings__c settings = SettingsService.getSettings();
+            BarnCRM_Settings__c settings = SettingsService.getSettings();
             Boolean includeDeceased =
                 settings != null &&
                 settings.Include_Deceased_In_Name__c == true;
@@ -257,7 +257,7 @@ public with sharing class HouseholdNamingService {
     }
 
     private static Boolean includeDeceasedInName() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings != null && settings.Include_Deceased_In_Name__c == true;
     }
 

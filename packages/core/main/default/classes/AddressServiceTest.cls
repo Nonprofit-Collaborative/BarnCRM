@@ -135,7 +135,7 @@ private class AddressServiceTest {
 
     @IsTest
     static void creatingAPersonalAddressLeavesTheHouseholdWhereItIs() {
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Contact_Address_Change_Behavior__c = 'Create personal address';
         upsert settings;
 

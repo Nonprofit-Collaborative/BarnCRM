@@ -35,7 +35,7 @@ import TOAST_ERROR_TITLE from '@salesforce/label/c.Core_Access_ToastErrorTitle';
 import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_Access_ToastSuccessTitle';
 import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
 
-const ADMIN_ROLE = 'Nonprofit_Admin_Group';
+const ADMIN_ROLE = 'BarnCRM_Admin_Group';
 const SETUP_USERS_PAGE = '/lightning/setup/ManageUsers/home';
 const MINIMUM_SEARCH_LENGTH = 2;
 

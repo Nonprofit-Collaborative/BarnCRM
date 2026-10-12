@@ -62,7 +62,7 @@ public with sharing class HouseholdController {
         String informalPattern
     ) {
         try {
-            Nonprofit_Settings__c settings = SettingsService.getSettings();
+            BarnCRM_Settings__c settings = SettingsService.getSettings();
             Boolean includeDeceased =
                 settings != null &&
                 settings.Include_Deceased_In_Name__c == true;
@@ -99,7 +99,7 @@ public with sharing class HouseholdController {
     @AuraEnabled(cacheable=true)
     public static NamingSettings getNamingSettings() {
         try {
-            Nonprofit_Settings__c settings = SettingsService.getSettings();
+            BarnCRM_Settings__c settings = SettingsService.getSettings();
             NamingSettings result = new NamingSettings();
             result.namePattern = settings == null ? null : settings.Household_Name_Pattern__c;
             result.formalPattern = settings == null ? null : settings.Formal_Greeting_Pattern__c;
@@ -189,7 +189,7 @@ public with sharing class HouseholdController {
     // ------------------------------------------------------------------ helpers
 
     private static Boolean canManageSettings() {
-        return FeatureManagement.checkPermission('Manage_Nonprofit_Settings');
+        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
     }
 
     /**

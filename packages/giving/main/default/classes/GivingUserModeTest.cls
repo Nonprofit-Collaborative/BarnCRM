@@ -31,7 +31,7 @@ private class GivingUserModeTest {
     private static User administrator() {
         return TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
@@ -41,7 +41,7 @@ private class GivingUserModeTest {
     private static User fundraiser() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 
@@ -51,7 +51,7 @@ private class GivingUserModeTest {
     private static User boardMember() {
         return TestDataFactory.createUser(
             'Tom',
-            new List<String>{ 'Nonprofit_Read_Only', 'Giving_Read_Only' }
+            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
         );
     }
 
