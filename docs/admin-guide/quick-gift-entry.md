@@ -63,6 +63,40 @@ Do this as David, on a phone, starting from the sample data.
 
 Five gifts take about a minute once the rhythm is there. Nothing here needs a laptop.
 
+## Paying a pledge or a recurring gift
+
+When the donor you pick still owes payments on a pledge or a recurring gift, a list called
+**Pays a scheduled payment** appears under **Gift date**. It holds that donor's payments that
+are scheduled, overdue or partly paid, on pledges and recurring gifts that are active or
+paused, including the ones made in the name of the donor's household. Each choice names the
+pledge, the payment's due date and the amount expected.
+
+- **None: a new gift on its own** is always in the list. It is what the form did before.
+- A payment is marked **suggested** when its due date is within the date window of the gift
+  date and its expected amount is within the allowed difference of the amount. These are the
+  same two settings gift imports use to match payments: **BarnCRM Settings**, **Import**,
+  **Days either side of a payment's due date** (7 unless you changed it) and **Amount
+  difference allowed** (0, the amounts must be equal).
+- When exactly one payment is suggested, the form chooses it for you and says so under the
+  list. Read it before you save, and choose **None** if the gift is not for that payment.
+  When two or more are suggested, nothing is chosen: pick the right one yourself.
+- When none is suggested, **None** stays chosen. You can still pick any payment in the list,
+  for example when a donor pays early or sends a different amount.
+
+Saved with a payment chosen, the gift is linked to that payment and its pledge, and the
+payment's status and the pledge's paid to date and balance update on their own, exactly as
+for an imported gift that matched. The save checks the payment again: if it was paid, or the
+pledge closed, in the meantime, the form says so and nothing is saved.
+
+Changing the donor, the amount or the date refreshes the list. A payment you picked yourself
+stays picked while it is still in the list. A gift of goods pays no pledge, so the list is
+hidden when **How it arrived** is In-kind.
+
+To try it, open an active pledge from the **Commitments** tab and note its donor and the
+amount and due date of its next payment. Enter a gift from that donor, of that amount, dated
+that day. The list chooses that payment and says it was suggested. Save, open the pledge
+again, and the payment is Received and the balance has gone down.
+
 ## Common mistakes
 
 **The donor is not in BarnCRM yet.** Common at an event. Leave the donor toggle on
@@ -106,6 +140,19 @@ screen, so tap Save again when you have signal rather than retyping. You cannot 
 same gift twice by accident: once a gift is saved, Save and Save and new are greyed out
 until you change something or start another gift.
 
+**A check for a pledge saved as a gift on its own.** The pledge stays unpaid and the payment
+turns Overdue. Open the gift, set its **Commitment** and **Installment** to the pledge and the
+payment it was for, and save: the payment and the balance update. Next time, look at **Pays a
+scheduled payment** before tapping Save.
+
+**The payment you expected is not in the list.** The list shows only payments still owed on
+an active or paused pledge of this donor or their household. A payment already paid in full,
+or one on a completed or cancelled pledge, is not there. A pledge made in the name of a
+different person or an organization is not there either: pick that donor instead.
+
+**"That payment is no longer open" after Save.** Someone paid it, or the pledge was closed,
+while the form was open. Nothing was saved. Choose again from the refreshed list, or None.
+
 ## Field reference
 
 For the person building a report later, these are the fields the form writes.
@@ -120,3 +167,4 @@ For the person building a report later, these are the fields the form writes.
 | Appeal | Appeal |
 | Fund | the gift's single allocation |
 | Check or reference number | Payment Reference |
+| Pays a scheduled payment | Installment, and that payment's pledge in Commitment |

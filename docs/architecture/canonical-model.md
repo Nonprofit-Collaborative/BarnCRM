@@ -4258,8 +4258,24 @@ from the batch, never from the template or the settings, so an edit made after t
 cannot make the commit match, refuse or create what the dry run did not show. A batch with no
 recorded values, or values that cannot be read, falls back to the template.
 
+**R-DM8 A gift entry screen suggests, and a person decides.** Quick Gift Entry (G-03) offers
+the chosen donor's candidates (R-DM2, with no date bound) as payments the new gift can pay,
+with None always offered. A candidate whose due date and expected amount fall within R-DM3's
+window and tolerance, taken from the org's settings (no template is involved), is marked
+suggested. It is chosen in advance only when it is the only one suggested, and then it is
+shown chosen with a note saying why; otherwise None is chosen. R-DM4's choice by closest date
+and R-DM5's behaviours do not apply: the person sees the choice and may change it. The save
+checks the chosen installment again in the saving user's mode: it must still be a candidate of
+the gift's donor, and a gift of goods (R-G12) pays none; otherwise the save is refused, beside
+the choice, and nothing is written. A gift saved with a choice carries the Installment and
+that installment's Commitment, and the numbers follow as in R-DM6. Two gifts may pay one
+installment: each counts toward it.
+
 ### Salesforce implementation
 
+- **Gift entry:** `GiftEntryPayments` (the candidates for a donor, the suggestion and the
+  check at save, R-DM8), using `DonationMatcher.matching` for R-DM3 and
+  `InstallmentSelector.selectOpenForDonors` for R-DM2.
 - **Service:** `GiftImportProcessor` (the `ImportEntityProcessor` Core finds by name),
   `GiftImportRow` (one row's gift as read), `GiftImportReferences` (funds and appeals),
   `GiftImportCredits` (soft credit and tribute), `GiftImportSelector` (funds, appeals and open
@@ -5470,4 +5486,5 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | Neutral Core wording (ADR-NEXT, `NEXT-core-names-other-products-only-when-detected.md`). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
+| v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-NEXT, `NEXT-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
