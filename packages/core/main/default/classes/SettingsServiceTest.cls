@@ -18,7 +18,7 @@ private class SettingsServiceTest {
     static void theCustomPermissionThisFeatureNeedsIsInstalled() {
         Assert.isTrue(
             SettingsTestPermissions.customPermissionExists(),
-            'C-04 ships Manage Nonprofit Settings and merges before C-03: without it nobody can save'
+            'C-04 ships Manage BarnCRM Settings and merges before C-03: without it nobody can save'
         );
     }
 
@@ -70,7 +70,7 @@ private class SettingsServiceTest {
         List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
         Assert.areEqual(1, changes.size(), 'One changed setting writes exactly one audit record');
         Assert.areEqual(
-            'Nonprofit_Settings__c.' + TEXT_KEY,
+            'BarnCRM_Settings__c.' + TEXT_KEY,
             changes[0].Setting_Name__c,
             'The audit record names the settings object and the setting, because each package owns one'
         );
@@ -190,7 +190,7 @@ private class SettingsServiceTest {
                 Section__c = SettingSections.GENERAL,
                 Module__c = 'Core',
                 Data_Type__c = 'Picklist',
-                Picklist_Values__c = 'Standalone:On its own;AgentforceNonprofit:Alongside Nonprofit Cloud',
+                Picklist_Values__c = 'Standalone:On its own;NonprofitCloud:Alongside Nonprofit Cloud',
                 Sort_Order__c = 1
             )
         };
@@ -342,7 +342,7 @@ private class SettingsServiceTest {
         SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 
         Test.startTest();
-        Object named = SettingsService.getValue('Nonprofit_Settings__c', TEXT_KEY);
+        Object named = SettingsService.getValue('BarnCRM_Settings__c', TEXT_KEY);
         Test.stopTest();
 
         Assert.areEqual(
@@ -351,11 +351,11 @@ private class SettingsServiceTest {
             'Naming Core\'s own object reads the same value'
         );
         Assert.isTrue(
-            SettingsService.hasKey('Nonprofit_Settings__c', TEXT_KEY),
+            SettingsService.hasKey('BarnCRM_Settings__c', TEXT_KEY),
             'Core owns the household name pattern'
         );
         Assert.isFalse(
-            SettingsService.hasKey('Nonprofit_Settings__c', 'Not_A_Setting__c'),
+            SettingsService.hasKey('BarnCRM_Settings__c', 'Not_A_Setting__c'),
             'Core does not own a setting that does not exist'
         );
     }
@@ -368,7 +368,7 @@ private class SettingsServiceTest {
     static void hasKeyAnswersEveryRowFromTheSameLookup() {
         Test.startTest();
         for (Integer row = 0; row < 200; row++) {
-            Assert.isTrue(SettingsService.hasKey('Nonprofit_Settings__c', TEXT_KEY), 'Row ' + row);
+            Assert.isTrue(SettingsService.hasKey('BarnCRM_Settings__c', TEXT_KEY), 'Row ' + row);
             Assert.isFalse(
                 SettingsService.hasKey('Not_A_Settings_Object__c', TEXT_KEY),
                 'An object the org lacks has no keys, row ' + row
@@ -377,8 +377,8 @@ private class SettingsServiceTest {
         Test.stopTest();
 
         Assert.areEqual(
-            SettingsService.typeByName('Nonprofit_Settings__c'),
-            SettingsService.typeByName(' nonprofit_settings__c '),
+            SettingsService.typeByName('BarnCRM_Settings__c'),
+            SettingsService.typeByName(' barncrm_settings__c '),
             'The cached lookup ignores case and spacing, like the describe it replaces'
         );
         Assert.isNull(SettingsService.typeByName('Not_A_Settings_Object__c'), 'Absent stays null');
@@ -387,8 +387,8 @@ private class SettingsServiceTest {
     @IsTest
     static void readsSettingsWithoutQueryingEveryTime() {
         Test.startTest();
-        Nonprofit_Settings__c first = SettingsService.getSettings();
-        Nonprofit_Settings__c second = SettingsService.getSettings();
+        BarnCRM_Settings__c first = SettingsService.getSettings();
+        BarnCRM_Settings__c second = SettingsService.getSettings();
         Test.stopTest();
 
         Assert.areNotEqual(null, first, 'An org that has never saved still gets a settings record');
@@ -399,8 +399,8 @@ private class SettingsServiceTest {
     static void theOrgSettingsAreReadOncePerTransaction() {
         TestDataFactory.defaultSettings();
 
-        Nonprofit_Settings__c first = SettingsService.getSettings();
-        Nonprofit_Settings__c second = SettingsService.getSettings();
+        BarnCRM_Settings__c first = SettingsService.getSettings();
+        BarnCRM_Settings__c second = SettingsService.getSettings();
 
         Assert.isNotNull(first, 'A fresh org has settings to read.');
         Assert.areEqual(first.Id, second.Id, 'The second read is the cached one.');
@@ -413,7 +413,7 @@ private class SettingsServiceTest {
 
     @IsTest
     static void aWriteIsSeenByTheNextRead() {
-        Nonprofit_Settings__c settings = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
         Assert.isNull(SettingsService.getSettings().Automation_Paused_Until__c, 'Not paused.');
 
         settings.Automation_Paused_Until__c = System.now().addHours(4);
@@ -427,7 +427,7 @@ private class SettingsServiceTest {
 
     @IsTest
     static void aModeIsReadBackAsItWasSaved() {
-        Nonprofit_Settings__c settings = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
         settings.Coexistence_Mode__c = 'NPSP';
         settings.Household_Membership_Mode__c = 'Junction';
         TestDataFactory.saveSettings(settings);
@@ -442,7 +442,7 @@ private class SettingsServiceTest {
 
     @IsTest
     static void aModeNobodyRecognizesFallsBackToTheShippedDefault() {
-        Nonprofit_Settings__c settings = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
         settings.Coexistence_Mode__c = 'Something a data load put here';
         settings.Household_Membership_Mode__c = null;
         TestDataFactory.saveSettings(settings);
@@ -506,7 +506,7 @@ private class SettingsServiceTest {
             'Formal_Greeting_Pattern__c' => '"{Salutation} {FirstName} {LastName}"',
             'Informal_Greeting_Pattern__c' => '"{FirstName}"'
         };
-        Map<String, Schema.SObjectField> shipped = Schema.SObjectType.Nonprofit_Settings__c.fields.getMap();
+        Map<String, Schema.SObjectField> shipped = Schema.SObjectType.BarnCRM_Settings__c.fields.getMap();
 
         for (String fieldName : expectedByField.keySet()) {
             String formula = shipped.get(fieldName).getDescribe().getDefaultValueFormula();
@@ -570,7 +570,7 @@ private class SettingsServiceTest {
     @IsTest
     static void aCheckboxThatShipsOnReadsOnBeforeTheOrgHasSavedAnything() {
         Test.startTest();
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         Test.stopTest();
 
         Assert.isNull(settings.Id, 'This org has never saved its settings');
@@ -593,7 +593,7 @@ private class SettingsServiceTest {
         SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
         Test.stopTest();
 
-        Nonprofit_Settings__c stored = SettingsService.getSettings();
+        BarnCRM_Settings__c stored = SettingsService.getSettings();
         Assert.isNotNull(stored.Id, 'Saving one value creates the org level record');
         Assert.areEqual(
             'The {LastName} Family',
@@ -603,6 +603,78 @@ private class SettingsServiceTest {
         Assert.isTrue(
             stored.Relationship_Auto_Reciprocal__c,
             'And the shipped defaults it never asked about, rather than a false nobody chose'
+        );
+    }
+
+    /**
+     * Two administrators with the console open: this transaction read its copy, then the other
+     * one saved the naming pattern. The cache here never heard of that save.
+     */
+    private static Id staleCopyThenAnotherSave() {
+        stubDefinitions();
+        insert new BarnCRM_Settings__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Household_Name_Pattern__c = 'The {LastName} Family',
+            Auto_Create_Households__c = true
+        );
+        Assert.areEqual(
+            'The {LastName} Family',
+            SettingsService.getSettings().Household_Name_Pattern__c,
+            'This transaction holds its copy'
+        );
+        BarnCRM_Settings__c theirs = [
+            SELECT Id
+            FROM BarnCRM_Settings__c
+            WHERE SetupOwnerId = :UserInfo.getOrganizationId()
+        ];
+        theirs.Household_Name_Pattern__c = '{LastName} Household';
+        update theirs;
+        return theirs.Id;
+    }
+
+    @IsTest
+    static void aSaveKeepsAKeyAnotherAdministratorSavedMeanwhile() {
+        Id recordId = staleCopyThenAnotherSave();
+
+        Test.startTest();
+        SettingsService.saveValues(new Map<String, Object>{ CHECKBOX_KEY => false });
+        Test.stopTest();
+
+        BarnCRM_Settings__c saved = [
+            SELECT Household_Name_Pattern__c, Auto_Create_Households__c
+            FROM BarnCRM_Settings__c
+            WHERE Id = :recordId
+        ];
+        Assert.isFalse(saved.Auto_Create_Households__c, 'The key Maria changed is saved');
+        Assert.areEqual(
+            '{LastName} Household',
+            saved.Household_Name_Pattern__c,
+            'And the pattern the other administrator saved is not written back from her stale copy'
+        );
+        List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
+        Assert.areEqual(1, changes.size(), 'One audit row, for the one key she changed');
+    }
+
+    @IsTest
+    static void aValueComparedAgainstTheStoredRecordNotAStaleCopy() {
+        Id recordId = staleCopyThenAnotherSave();
+
+        Test.startTest();
+        SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
+        Test.stopTest();
+
+        Assert.areEqual(
+            'The {LastName} Family',
+            [SELECT Household_Name_Pattern__c FROM BarnCRM_Settings__c WHERE Id = :recordId]
+            .Household_Name_Pattern__c,
+            'Her value matched only her stale copy, and it is still saved over the stored one'
+        );
+        List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
+        Assert.areEqual(1, changes.size(), 'The change is audited');
+        Assert.areEqual(
+            '{LastName} Household',
+            changes[0].Old_Value__c,
+            'With the old value that was really stored, not the one in her copy'
         );
     }
 }

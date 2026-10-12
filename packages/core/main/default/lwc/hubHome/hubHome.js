@@ -67,7 +67,7 @@ export default class HubHome extends NavigationMixin(LightningElement) {
   };
 
   quickLinks = [
-    { key: 'settings', label: QUICK_LINK_SETTINGS, url: '/lightning/n/Nonprofit_Settings' },
+    { key: 'settings', label: QUICK_LINK_SETTINGS, url: '/lightning/n/BarnCRM_Settings' },
     { key: 'households', label: QUICK_LINK_HOUSEHOLDS, url: '/lightning/n/Households' },
     {
       key: 'organizations',
@@ -77,8 +77,8 @@ export default class HubHome extends NavigationMixin(LightningElement) {
   ];
 
   errorLogUrl = '/lightning/o/Error_Log__c/list';
-  rollupsUrl = '/lightning/n/Nonprofit_Settings';
-  addressSettingsUrl = '/lightning/n/Nonprofit_Settings';
+  rollupsUrl = '/lightning/n/BarnCRM_Settings';
+  addressSettingsUrl = '/lightning/n/BarnCRM_Settings';
   importUrl = '/lightning/n/Import';
 
   /** The files that arrive regularly, oldest import first (R-IT6). */

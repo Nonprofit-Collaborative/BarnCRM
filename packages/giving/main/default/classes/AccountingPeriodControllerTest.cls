@@ -10,14 +10,14 @@ private class AccountingPeriodControllerTest {
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
     private static User david() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 

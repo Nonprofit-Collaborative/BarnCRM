@@ -423,20 +423,18 @@ public with sharing class AcknowledgmentService {
 
     /** Records what the last run did, so the page can say so without opening a run (R-AK12). */
     public static void recordLastRun(String summary) {
-        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-        settings.Acknowledgments_Last_Run__c = System.now();
-        settings.Acknowledgments_Last_Run_Summary__c = summary == null ||
-            summary.length() <= 255
-            ? summary
-            : summary.substring(0, 255);
-        List<Giving_Settings__c> records = new List<Giving_Settings__c>{ settings };
-        if (settings.Id == null) {
-            settings.SetupOwnerId = UserInfo.getOrganizationId();
-            Database.insert(records, true, AccessLevel.SYSTEM_MODE);
-        } else {
-            Database.update(records, true, AccessLevel.SYSTEM_MODE);
-        }
-        SettingsService.clearCaches();
+        // Only these two keys, on the locked stored record; a first save keeps the checkboxes
+        // that ship on (OrgSettingsSystemWriter, ADR-0021).
+        OrgSettingsSystemWriter.save(
+            Giving_Settings__c.SObjectType,
+            new Map<Schema.SObjectField, Object>{
+                Giving_Settings__c.Acknowledgments_Last_Run__c => System.now(),
+                Giving_Settings__c.Acknowledgments_Last_Run_Summary__c => summary == null ||
+                    summary.length() <= 255
+                    ? summary
+                    : summary.substring(0, 255)
+            }
+        );
     }
 
     /**

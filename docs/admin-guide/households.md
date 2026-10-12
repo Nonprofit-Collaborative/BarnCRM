@@ -6,8 +6,8 @@
 
 ## What it does
 
-A household is the group of people you treat as one donor: one mailing, one thank you
-letter, one giving history. BarnCRM creates a household for every new person you add,
+A household is the group of people you treat as one: one mailing, one letter, one shared
+history. BarnCRM creates a household for every new person you add,
 in either way of belonging to a household and whichever record your org stores people on,
 keeps track of who belongs to it, and keeps the member count right when people join, move,
 or leave.
@@ -82,8 +82,8 @@ can look at it and decide for yourself.
 
 ## If your org stores people as accounts
 
-Some orgs, including most Nonprofit Cloud and Agentforce Nonprofit orgs, store each person
-as an account rather than as a contact. Households work there too, with one difference:
+Some orgs store each person as an account (Salesforce calls this Person Accounts) rather
+than as a contact. Households work there too, with one difference:
 choose the flexible way of belonging to a household. It is the only mode that can hold a
 person who is stored as an account, and BarnCRM selects it for you when it is installed
 and notices your org is shaped that way. It does that only when nobody has chosen a way of
@@ -135,7 +135,7 @@ it done for you next time.
 If the setting is on, look in the Error Log. BarnCRM never deletes a household that
 something outside BarnCRM still points at, because deleting it would delete those
 records too, and it writes an Info entry naming each household it left in place for that
-reason. This happens most often in orgs that also run Salesforce Nonprofit Cloud, where a
+reason. In an org that also runs Salesforce Nonprofit Cloud, this happens most often because a
 household is a second record attached to the same account and its members are held
 somewhere BarnCRM cannot count them: the household looks empty here and is not empty
 there. Open the household, check what else is using it, and delete it by hand if you are
@@ -155,9 +155,9 @@ on the right person in the household's **Household Members** panel. In the flexi
 belonging the field always follows the member marked primary, so that panel is the only
 place to change it.
 
-**"I moved someone and their gifts stayed behind."**
-That is deliberate. Moving a person moves the person, not the giving history of the
-household they left. Use merge on the household record page when you want to combine two
+**"I moved someone and their history stayed behind."**
+That is deliberate. Moving a person moves the person, not the history of the household
+they left (with Giving, that includes the household's gifts). Use merge on the household record page when you want to combine two
 households and their history.
 
 ## Field reference

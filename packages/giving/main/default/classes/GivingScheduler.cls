@@ -1,6 +1,6 @@
 /**
  * The Giving module's three nightly jobs, and the schedule an administrator starts and stops
- * from the Nightly Jobs page of the Nonprofit Settings console (ADR-0038).
+ * from the Nightly Jobs page of the BarnCRM Settings console (ADR-0038).
  *
  * The schedule is an administrator's, not Setup's. Until this page existed nothing called
  * `scheduleAll` outside its own test, so in a real org no recurring schedule was ever topped up

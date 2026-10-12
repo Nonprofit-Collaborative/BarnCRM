@@ -17,7 +17,7 @@ private class CampaignSyncUnavailableTest {
     private static User maria() {
         User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin', 'Campaign_Sync' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Campaign_Sync' }
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             update new User(Id = maria.Id, UserPermissionsMarketingUser = true);

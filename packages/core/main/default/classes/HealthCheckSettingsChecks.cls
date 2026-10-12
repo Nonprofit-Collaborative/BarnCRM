@@ -22,7 +22,7 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
-    /** Whether the fiscal year in Setup and the one in Nonprofit Settings agree. */
+    /** Whether the fiscal year in Setup and the one in BarnCRM Settings agree. */
     public class FiscalYearCheck implements HealthCheckService.Check {
         public HealthCheckService.Finding run() {
             return fiscalYearFinding();
@@ -196,7 +196,7 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     private static HealthCheckService.Finding automationFinding() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         Datetime pausedUntil = settings == null ? null : settings.Automation_Paused_Until__c;
         if (pausedUntil == null || pausedUntil <= System.now()) {
             return new HealthCheckService.Finding(
@@ -235,7 +235,7 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     /**
-     * Whether the fiscal year in Setup and the one in Nonprofit Settings start in the same
+     * Whether the fiscal year in Setup and the one in BarnCRM Settings start in the same
      * month (ADR-0025). They have to: the rollups are computed from the setting and the
      * packaged retention reports are filtered on Setup's fiscal year date literals, so a
      * disagreement makes every year based number quietly measure a different window.
@@ -267,7 +267,11 @@ public with sharing class HealthCheckSettingsChecks {
             );
     }
 
-    /** The unread error count stops here and says "1,000+". A test lowers it. */
+    /**
+     * How many new Error Log entries the finding counts before it says "N or more" instead. A
+     * flooded Error Log would otherwise spend a query row per entry, and past the transaction's
+     * row limit the whole Health Check page fails (dynamic-apex.md, "Cap every count and read").
+     */
     @TestVisible
     private static Integer errorLogCap = 1000;
 
@@ -277,9 +281,13 @@ public with sharing class HealthCheckSettingsChecks {
             return null;
         }
 
-        List<Object> count = new List<Object>{
-            newErrors > errorLogCap ? errorLogCap.format() + '+' : newErrors.format()
-        };
+        String counted = newErrors > errorLogCap
+            ? String.format(
+                  System.Label.Core_HealthCheck_CountOrMore,
+                  new List<Object>{ errorLogCap.format() }
+              )
+            : newErrors.format();
+        List<Object> count = new List<Object>{ counted };
         return new HealthCheckService.Finding(
                 'error_log_new',
                 String.format(System.Label.Core_HealthCheck_ErrorLogTitle, count),

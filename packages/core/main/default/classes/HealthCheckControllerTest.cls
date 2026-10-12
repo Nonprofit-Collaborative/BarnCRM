@@ -1,7 +1,7 @@
 /**
  * Tests for HealthCheckController (feature C-11).
  *
- * Reading the report needs nothing. Acting on a finding needs the Manage Nonprofit Settings
+ * Reading the report needs nothing. Acting on a finding needs the Manage BarnCRM Settings
  * custom permission, and the controller checks it rather than trusting the component, so
  * both sides of that check are covered here.
  *

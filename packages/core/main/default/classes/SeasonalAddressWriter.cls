@@ -6,7 +6,7 @@
  * runs as whoever scheduled it, weeks or years earlier, so there is no user-mode write that can
  * be relied on and no permission to check at the moment of writing. The permission gate sits at
  * the only two ways the job starts instead: `SeasonalAddressController` requires
- * `Manage_Nonprofit_Settings` before scheduling the job or running it now.
+ * `Manage_BarnCRM_Settings` before scheduling the job or running it now.
  *
  * The conditions of ADR-0021 that still apply are met here:
  *
@@ -47,8 +47,8 @@ public without sharing class SeasonalAddressWriter {
     public static void recordRun(Datetime finishedAt, String summary) {
         OrgSettingsSystemWriter.save(
             new Map<Schema.SObjectField, Object>{
-                Nonprofit_Settings__c.Seasonal_Address_Last_Run__c => finishedAt,
-                Nonprofit_Settings__c.Seasonal_Address_Last_Run_Summary__c => summary
+                BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt,
+                BarnCRM_Settings__c.Seasonal_Address_Last_Run_Summary__c => summary
             }
         );
     }

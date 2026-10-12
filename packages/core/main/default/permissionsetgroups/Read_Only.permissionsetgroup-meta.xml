@@ -7,5 +7,5 @@
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Read Only</label>
-  <permissionSets>Nonprofit_Read_Only</permissionSets>
+  <permissionSets>BarnCRM_Read_Only</permissionSets>
 </PermissionSetGroup>

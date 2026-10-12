@@ -5,7 +5,7 @@
  * permission. Merging and splitting are data cleanup, which Maria and David both do, and a
  * person trusted to edit two household records is trusted to combine them. The check is a
  * record level one, so sharing is honored and not merely object access. Nothing here is
- * gated on Manage_Nonprofit_Settings, which is about configuring the org rather than about
+ * gated on Manage_BarnCRM_Settings, which is about configuring the org rather than about
  * fixing a duplicate.
  */
 public with sharing class HouseholdMergeController {

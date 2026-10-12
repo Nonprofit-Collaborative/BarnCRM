@@ -1,5 +1,5 @@
 /**
- * The Nonprofit Hub home page's Apex surface: how far setup has got, whether automation is
+ * The BarnCRM home page's Apex surface: how far setup has got, whether automation is
  * paused, and how many errors nobody has looked at.
  *
  * The steps themselves belong to the Setup Assistant, which loads them itself, so the home
@@ -11,7 +11,7 @@
  * page.
  */
 public with sharing class HubController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'BarnCRM home';
 
     public class HomeModel {

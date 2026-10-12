@@ -75,7 +75,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
    away, and that a merge cannot be undone. Read it, then click **Merge households**.
 8. You land on the surviving household. It lists all of the members from both households,
    the member count is right, and the name has been recalculated from the members unless you
-   chose to keep a custom name. Every gift, letter, file, and note from the duplicate is now
+   chose to keep a custom name. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
 
 ### Splitting a member out

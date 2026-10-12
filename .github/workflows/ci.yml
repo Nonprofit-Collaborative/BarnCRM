@@ -207,7 +207,7 @@ jobs:
       - name: Give the test user the packaged admin roles
         if: steps.check.outputs.enabled == 'true'
         run: |
-          for ps in Nonprofit_Admin Giving_Admin; do
+          for ps in BarnCRM_Admin Giving_Admin; do
             sf org assign permset --name "$ps" --target-org testorg --json > assign.json || true
             if jq -e '.result.failures[]? | select(.message | test("Duplicate") | not)' assign.json > /dev/null; then
               cat assign.json

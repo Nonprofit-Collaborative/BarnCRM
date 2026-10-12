@@ -26,8 +26,8 @@ Every feature page has these four sections, in this order (plan Section 7.4):
 
 ### 1. What it does
 
-Two or three sentences in the language a nonprofit uses. What problem it solves, and for
-whom. No architecture, no object names.
+Two or three sentences in plain language that fits the reader's organization. What problem
+it solves, and for whom. No architecture, no object names.
 
 ### 2. How to turn it on
 
@@ -64,9 +64,15 @@ these pages, so that everyone is talking about the same person.
 
 ## Style rules
 
-- **Nonprofit language, not Salesforce language.** "Gift" not "Donation Transaction",
-  "Fund" not "General Accounting Unit", "Appeal" not "Campaign" (plan Sections 7.1 and
-  13).
+- **Plain language, not Salesforce language.** Use the words the reader's organization
+  uses: "household" and "person", not "Account" and "Contact record". A Core page is
+  neutral, because Core alone serves organizations that are not nonprofits: no gifts,
+  donors, receipts or fundraising unless the passage is marked as applying with Giving, and
+  no Salesforce product name (NPSP, Nonprofit Cloud) unless the passage is marked as
+  applying when that product is in the org (ADR-NEXT,
+  `NEXT-core-names-other-products-only-when-detected.md`). Giving pages use giving
+  language: "Gift" not "Donation Transaction", "Fund" not "General Accounting Unit",
+  "Appeal" not "Campaign" (plan Sections 7.1 and 13).
 - **No API names in prose.** Maria never needs to know one (plan Section 2.3). Say "the
   household's formal greeting", not the field's API name. Where a page genuinely must
   name a field for a report builder, put it in a table at the end, not in the
@@ -89,7 +95,8 @@ Each feature adds its row here when its page is written.
 The Package column says what has to be installed for the page to apply. BarnCRM Core on
 its own is the Community Suite, for organizations that are not nonprofits, so a Core page
 describes only what every organization has: its wording is neutral, and anything about
-gifts, donors or receipts on a Core page is marked as coming from Giving (C-29).
+gifts, donors or receipts on a Core page is marked as coming from Giving (C-29), and anything
+about NPSP or Nonprofit Cloud is marked as applying only when that product is in the org.
 
 | Feature | Page | Package | Iteration |
 |---|---|---|---|
@@ -102,8 +109,8 @@ gifts, donors or receipts on a Core page is marked as coming from Giving (C-29).
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core | v0.1 |
 | C-10 Sample data loader | [sample-data.md](sample-data.md) | Core | v0.1 |
 | C-11 | [Health Check](health-check.md) | Core, with findings from Giving and Connect | v0.1 |
-| C-03 BarnCRM app and setup checklist | [nonprofit-hub.md](nonprofit-hub.md) | Core | v0.1 |
-| C-03 BarnCRM Settings console | [nonprofit-settings.md](nonprofit-settings.md) | Core | v0.1 |
+| C-03 BarnCRM app and setup checklist | [barncrm-app.md](barncrm-app.md) | Core | v0.1 |
+| C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core | v0.1 |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
 | C-13 Rollups | [rollups.md](rollups.md) | Core | v0.2 |
 | C-14 Importing | [importing.md](importing.md) | Core | v0.2 |
@@ -133,7 +140,7 @@ gifts, donors or receipts on a Core page is marked as coming from Giving (C-29).
 | NPC import templates | [migrating-from-nonprofit-cloud.md](migrating-from-nonprofit-cloud.md) | Giving | v0.5 |
 | NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Giving | v0.5 |
 | C-01 Household members | [household-members.md](household-members.md) | Core | v0.1 |
-| X-09 Nonprofit Cloud households | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core | v0.6 |
+| X-09 Nonprofit Cloud households | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core, only in an org with Nonprofit Cloud | v0.6 |
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Connect | v0.6 |
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Connect | v0.6 |
 | X-03 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Connect | v0.6 |

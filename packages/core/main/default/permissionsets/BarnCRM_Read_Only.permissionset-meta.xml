@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Staff</label>
-  <description>
-    David, Priya, and everyone else doing the day job. Reads the Error Log so that a problem can be
-    described accurately, and changes nothing about how BarnCRM is configured.
-  </description>
+  <label>BarnCRM Read Only</label>
+  <description>Tom and Jen, who look but do not change. Read access only, everywhere.</description>
   <applicationVisibilities>
-    <application>Nonprofit_Hub</application>
+    <application>BarnCRM</application>
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
@@ -32,18 +29,6 @@
   </classAccesses>
   <classAccesses>
     <apexClass>AffiliationController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AffiliationDomain</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AffiliationSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>AffiliationService</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -99,26 +84,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>HouseholdMergeService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HouseholdNamingService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HouseholdSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HouseholdService</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>HouseholdWriter</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>HubController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -151,27 +116,7 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>PersonRecordSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>PersonReference</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>RelationshipController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>RelationshipDomain</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>RelationshipSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>RelationshipService</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -243,127 +188,127 @@
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Alternate_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Anniversary__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Created_By_Import_Batch__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Custom_Name__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Deceased__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Exclude_From_Greetings__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Exclude_From_Household_Name__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Household_Formal_Greeting__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Household_Informal_Greeting__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Household_Role__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Member_Count__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Personal_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Preferred_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Preferred_Name__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Primary_Affiliation__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Primary_Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Account.Work_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.City__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Country__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Is_Default__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Latest_Verified_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Person_Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Postal_Code__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -373,77 +318,77 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Seasonal_End_Day__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Seasonal_End_Month__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Seasonal_Start_Day__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Seasonal_Start_Month__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.State__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Street__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Address__c.Verification_Status__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Description__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.End_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Is_Primary__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Organization__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Person_Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Role__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Affiliation__c.Start_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -483,57 +428,57 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Alternate_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Created_By_Import_Batch__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Deceased__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Exclude_From_Greetings__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Exclude_From_Household_Name__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Household_Role__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Personal_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Preferred_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Preferred_Name__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Primary_Affiliation__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Contact.Work_Email__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -588,252 +533,82 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Household_Member__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Household_Member__c.Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Household_Member__c.End_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Household_Member__c.Is_Primary__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Household_Member__c.Role__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Household_Member__c.Start_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
-    <field>Import_Batch__c.Chunk_Size__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Committed_By__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Completed_At__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Expected_Amount__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Expected_Count__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.File_Amount__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.File_Id__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.File_Name__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Import_Template__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Is_Dry_Run__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Processor_Settings_JSON__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Pass_Number__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Job_Id__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Row_Count__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Rows_Created__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Rows_Matched__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Rows_Rejected__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Rows_Updated__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Run_Log__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Started_At__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Status__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Batch__c.Undo_Deadline__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Contact_1__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Contact_2__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Error_Message__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Gift_Id__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Household__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Organization__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Person_1_Account__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Person_2_Account__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Raw_Values_JSON__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Row_Number__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Soft_Credit_Id__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Import_Row__c.Status__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Relationship__c.Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Description__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.End_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Is_Reciprocal_Managed__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Person_Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Reciprocal_Relationship__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Reciprocal_Type__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Related_Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Related_Person_Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
+    <editable>false</editable>
     <field>Relationship__c.Start_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -948,27 +723,27 @@
     <readable>true</readable>
   </fieldPermissions>
   <objectPermissions>
-    <allowCreate>true</allowCreate>
+    <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
-    <allowEdit>true</allowEdit>
+    <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <viewAllRecords>false</viewAllRecords>
     <object>Account</object>
   </objectPermissions>
   <objectPermissions>
-    <allowCreate>true</allowCreate>
-    <allowDelete>true</allowDelete>
-    <allowEdit>true</allowEdit>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Address__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
-    <allowCreate>true</allowCreate>
-    <allowDelete>true</allowDelete>
-    <allowEdit>true</allowEdit>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Affiliation__c</object>
@@ -984,9 +759,9 @@
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
-    <allowCreate>true</allowCreate>
+    <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
-    <allowEdit>true</allowEdit>
+    <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <viewAllRecords>false</viewAllRecords>
@@ -1020,9 +795,9 @@
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
-    <allowCreate>true</allowCreate>
+    <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
-    <allowEdit>true</allowEdit>
+    <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <viewAllRecords>false</viewAllRecords>
@@ -1032,24 +807,6 @@
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
     <allowEdit>false</allowEdit>
-    <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
-    <object>Import_Batch__c</object>
-    <viewAllRecords>false</viewAllRecords>
-  </objectPermissions>
-  <objectPermissions>
-    <allowCreate>false</allowCreate>
-    <allowDelete>false</allowDelete>
-    <allowEdit>false</allowEdit>
-    <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
-    <object>Import_Row__c</object>
-    <viewAllRecords>false</viewAllRecords>
-  </objectPermissions>
-  <objectPermissions>
-    <allowCreate>true</allowCreate>
-    <allowDelete>true</allowDelete>
-    <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Relationship__c</object>
@@ -1091,18 +848,18 @@
   </tabSettings>
   <tabSettings>
     <tab>Error_Log__c</tab>
-    <visibility>Visible</visibility>
+    <visibility>Available</visibility>
   </tabSettings>
   <tabSettings>
     <tab>Households</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Nonprofit_Hub_Home</tab>
+    <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Nonprofit_Settings</tab>
+    <tab>BarnCRM_Settings</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
