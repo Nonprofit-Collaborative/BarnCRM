@@ -64,6 +64,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>DataHygieneController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DuplicateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
