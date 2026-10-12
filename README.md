@@ -67,6 +67,7 @@ Start with [docs/contributor-guide/environment.md](docs/contributor-guide/enviro
 - [docs/admin-guide/](docs/admin-guide/): one page per feature, written for nonprofit administrators.
 - [docs/contributor-guide/](docs/contributor-guide/): environment setup, scratch orgs, CI, and the [dynamic Apex conventions](docs/contributor-guide/dynamic-apex.md) for reaching objects and classes an org may not have.
 - [docs/release-notes/](docs/release-notes/): what shipped in each iteration.
+- [docs/barncrm-features.md](docs/barncrm-features.md): the feature catalog, every feature by module with its status (shipped, built on a branch, or planned).
 
 ## Governance and license
 
