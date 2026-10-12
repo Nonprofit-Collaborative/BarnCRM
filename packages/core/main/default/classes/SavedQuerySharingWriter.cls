@@ -6,7 +6,7 @@
  * sharing reason, so this one write runs as the system. It is reached only from FindController,
  * after the caller has checked the Find and Export Records permission and that the running user
  * owns every query passed in. It writes nothing but Saved_Query__Share rows with the reason
- * Shared_With_Find_Users, granting Read to the org's All Internal Users group.
+ * Shared_With_Find_Users__c, granting Read to the org's All Internal Users group.
  */
 public without sharing class SavedQuerySharingWriter {
     /** Shares each query whose value is true and unshares each whose value is false. */
@@ -14,7 +14,7 @@ public without sharing class SavedQuerySharingWriter {
         if (sharedByQueryId == null || sharedByQueryId.isEmpty()) {
             return;
         }
-        String reason = Schema.Saved_Query__Share.RowCause.Shared_With_Find_Users;
+        String reason = Schema.Saved_Query__Share.RowCause.Shared_With_Find_Users__c;
         Set<Id> queryIds = sharedByQueryId.keySet();
         Map<Id, List<Saved_Query__Share>> existingByQuery = new Map<Id, List<Saved_Query__Share>>();
         for (Saved_Query__Share share : [
