@@ -7,8 +7,9 @@
  * - **Real time.** A trigger on a source entity calls `runRealTime`, which finds the active
  *   definitions for that entity in Real-time or Both mode, hands them to the engine as in-memory
  *   metadata, and stamps freshness when the run completes.
- * - **Scheduled.** `RollupBatch` calls `runFullRecalculation` for the definitions in Scheduled or
- *   Both mode, which is the nightly reconciliation R-R4 describes.
+ * - **Scheduled.** `RollupScheduler` calls `startNightlyRun` for the definitions in Scheduled or
+ *   Both mode, which is the nightly reconciliation R-R4 describes: `RollupBatch` on the vendored
+ *   engine, `RollupFullRecalcBatch` on BarnCRM's own.
  * - **On demand.** `recalculate` runs one definition now, which is what the Recalculate action on
  *   the Rollups page does.
  *
@@ -252,12 +253,35 @@ public with sharing class RollupService {
         if (definitions == null || definitions.isEmpty()) {
             return 0;
         }
+        if (useOwnEngine) {
+            // A batch over every record, one target entity at a time, that marks the definitions
+            // calculated itself when its last pass finishes (R-R13, bug 5), never at hand-over.
+            return RollupFullRecalcBatch.begin(definitions) == null ? 0 : definitions.size();
+        }
         List<Rollup_Definition__c> ran = handToEngine(definitions, null, CONTEXT_RECALCULATE);
         if (ran.isEmpty()) {
             return 0;
         }
         stampAfterRun(ran, new Map<String, Set<Id>>());
         return ran.size();
+    }
+
+    /** One definition per chunk of `RollupBatch`: each is itself a job chain in the vendored engine. */
+    private static final Integer VENDORED_BATCH_SIZE = 1;
+
+    /**
+     * Starts the nightly run now: every active Scheduled and Both definition, over every record
+     * (R-R4). The scheduled job and the Recalculate all button both call this.
+     *
+     * @return the batch job started, or null when nothing started
+     */
+    public static Id startNightlyRun() {
+        if (useOwnEngine) {
+            return RollupFullRecalcBatch.begin(
+                RollupSelector.selectActiveForModes(SCHEDULED_MODES)
+            );
+        }
+        return Database.executeBatch(new RollupBatch(), VENDORED_BATCH_SIZE);
     }
 
     /**
@@ -271,11 +295,9 @@ public with sharing class RollupService {
         String context
     ) {
         if (useOwnEngine) {
+            // Only merge survivors arrive here: a full recalculation goes to the batch above.
             lastParentIds = parentIds;
-            RollupEngine.Result result = parentIds == null
-                ? RollupEngine.recalculateEveryRecord(definitions)
-                : RollupEngine.recalculate(parentIds, definitions);
-            return result.ran;
+            return RollupEngine.recalculate(parentIds, definitions).ran;
         }
         Map<String, List<Rollup__mdt>> metadataBySource = new Map<String, List<Rollup__mdt>>();
         List<Rollup__mdt> metadata = new List<Rollup__mdt>();

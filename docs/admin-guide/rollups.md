@@ -151,6 +151,28 @@ other BarnCRM records. For a total that counts records from one of your own obje
 [Instant totals on your own objects](#instant-totals-on-your-own-objects-coming) below;
 without that, such a total is calculated every night and on demand only.
 
+### How the nightly run works (with the new engine)
+
+With the new rollup engine, the nightly run, **Recalculate** and **Recalculate all** work
+through every record a rollup writes, one kind of record at a time (all accounts, then all
+contacts, then all funds), and calculate all of a record's totals together:
+
+- **A record is saved only when one of its totals changed.** Its **Rollups last calculated**
+  time then moves to the time of that run. A record whose totals were already right is not
+  saved, so it keeps its earlier time: the run checked it and found nothing to change. The
+  **Last calculated** time on the Rollups page is what tells you the run happened.
+- **The Rollups page marks a rollup calculated when the whole run has finished**, not when it
+  starts. When the page shows a time, the totals from that run are already on the records.
+- **Records with a very large number of gifts are calculated separately.** A catch-all
+  donor such as "Anonymous" is calculated on its own after the others, so it cannot hold up
+  everyone else's totals.
+- **A record that cannot be saved is tried again.** If someone was editing it, or a
+  validation rule refused it, BarnCRM tries again automatically; after five tries it waits
+  in the **Needs attention** list. The next nightly run that saves it takes it off the list.
+- **A run does nothing while all automation is paused.** The next night catches up.
+- **If anything could not be saved, one summary goes to the Error Log**, so the Hub's error
+  tile shows it.
+
 ## The Rollup Builder (coming)
 
 The Rollup Builder is coming with the new rollup engine. It will be a tab of its own,

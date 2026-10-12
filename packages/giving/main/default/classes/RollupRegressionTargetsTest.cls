@@ -14,7 +14,8 @@
  * switched off, each naming the slice that switches it on (proposal migration step 3: these are
  * fixed in the new engine, not patched into the old one).
  *
- * Slice S5 switched on the target filter and record freshness tests. They run on BarnCRM's own
+ * Slice S5 switched on the target filter and record freshness tests, and slice S7 the definition
+ * freshness test. They run on BarnCRM's own
  * engine: each calls `GivingRollupTestData.useOwnEngine()` first, which routes `RollupService` to
  * `RollupEngine` for that test only, until slice S8 swaps the engine for everyone and removes the
  * call.
@@ -189,16 +190,15 @@ private class RollupRegressionTargetsTest {
     }
 
     /**
-     * DISABLED until slice S7 (definition freshness stamped at the end of the run). Add `@IsTest`
-     * back in that slice.
-     *
      * A rollup is never marked calculated before its totals are written: whenever the Rollups
-     * page shows a time, the numbers on the records are already the ones that run produced. Today
-     * the time is stamped when the run is queued, so for a moment the page says calculated while
-     * Ana's total is still blank (bug 5).
+     * page shows a time, the numbers on the records are already the ones that run produced. The
+     * vendored engine stamped the time when the run was queued, so for a moment the page said
+     * calculated while Ana's total was still blank (bug 5). Switched on in slice S7: the full
+     * run stamps the time when its last pass finishes.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aRollupIsNeverMarkedCalculatedBeforeItsTotalsAre() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         insert GivingTestDataFactory.buildGift(ana.Id, 100);
         GivingRollupTestData.installShippedRollups();

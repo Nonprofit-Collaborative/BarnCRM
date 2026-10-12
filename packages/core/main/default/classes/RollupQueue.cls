@@ -306,8 +306,7 @@ public without sharing class RollupQueue implements Queueable {
     }
 
     /** The identifiers an entry holds; anything that is not one is dropped. */
-    @TestVisible
-    private static List<Id> idsOf(Rollup_Queue__c entry) {
+    public static List<Id> idsOf(Rollup_Queue__c entry) {
         List<Id> ids = new List<Id>();
         if (String.isBlank(entry.Record_Ids__c)) {
             return ids;

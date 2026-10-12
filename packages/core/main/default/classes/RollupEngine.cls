@@ -1,6 +1,6 @@
 /**
  * BarnCRM's own rollup engine: the entry point the instant path (slice S6), the full
- * recalculation batch (S7) and the swap behind `RollupService` (S8) call (rollup proposal D1, D3,
+ * recalculation batch (`RollupFullRecalcBatch`, S7) and the swap behind `RollupService` (S8) call (rollup proposal D1, D3,
  * Part 2 section 4). It runs next to the vendored engine until S8 and replaces it then.
  *
  * One pass per target entity: `RollupPlanner` turns every definition that writes it into a few
@@ -15,13 +15,9 @@
  */
 @NamespaceAccessible
 public with sharing class RollupEngine {
-    /** Records recalculated in one pass at most; S7's batch hands over chunks of this size. */
+    /** The chunk `RollupFullRecalcBatch` starts from, before it shrinks a chunk to fit its data. */
     @NamespaceAccessible
     public static final Integer RECORDS_PER_PASS = 200;
-
-    /** The most records `recalculateEveryRecord` reads in one transaction, before S7's batch. */
-    @TestVisible
-    private static Integer everyRecordLimit = 10000;
 
     private static final Set<String> EVERY_MODE = new Set<String>{
         RollupService.MODE_REAL_TIME,
@@ -83,30 +79,6 @@ public with sharing class RollupEngine {
                 }
             }
             runPass(plan, ofThisType, result);
-        }
-        return result;
-    }
-
-    /**
-     * Recalculates these definitions for every record of their target entities, in passes of
-     * `RECORDS_PER_PASS`, in this transaction. For the test switch in `RollupService` and for
-     * small scopes until S7's batch, which chunks a whole org across transactions, replaces it.
-     */
-    public static Result recalculateEveryRecord(List<Rollup_Definition__c> definitions) {
-        Result result = new Result();
-        for (RollupPlanner.Plan plan : plansFor(definitions, result)) {
-            List<Id> targetIds = new List<Id>(
-                RollupAggregator.allIds(plan.targetType, everyRecordLimit)
-            );
-            for (Integer start = 0; start < targetIds.size(); start += RECORDS_PER_PASS) {
-                Set<Id> slice = new Set<Id>();
-                for (
-                    Integer i = start; i < Math.min(start + RECORDS_PER_PASS, targetIds.size()); i++
-                ) {
-                    slice.add(targetIds[i]);
-                }
-                runPass(plan, slice, result);
-            }
         }
         return result;
     }

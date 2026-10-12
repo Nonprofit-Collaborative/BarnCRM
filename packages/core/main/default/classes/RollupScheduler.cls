@@ -24,11 +24,8 @@ public with sharing class RollupScheduler implements Schedulable {
     /** Two in the morning, which is after the day's data entry and before the day's reporting. */
     private static final String NIGHTLY_CRON = '0 0 2 * * ?';
 
-    /** One definition per chunk: a full recalculation is itself a job chain inside the engine. */
-    private static final Integer BATCH_SIZE = 1;
-
     public void execute(SchedulableContext context) {
-        Database.executeBatch(new RollupBatch(), BATCH_SIZE);
+        RollupService.startNightlyRun();
     }
 
     /** Starts the nightly run, or does nothing when it is already scheduled. */
@@ -48,9 +45,9 @@ public with sharing class RollupScheduler implements Schedulable {
         }
     }
 
-    /** Runs the nightly work now, without waiting for tonight. */
+    /** Runs the nightly work now, without waiting for tonight; null when nothing started. */
     public static Id runNow() {
-        return Database.executeBatch(new RollupBatch(), BATCH_SIZE);
+        return RollupService.startNightlyRun();
     }
 
     /** True when the nightly run is scheduled. */

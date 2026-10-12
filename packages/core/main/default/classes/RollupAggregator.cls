@@ -439,20 +439,6 @@ public without sharing class RollupAggregator {
             .keySet();
     }
 
-    /** Up to this many records of the target entity, in Id order. */
-    public static Set<Id> allIds(Schema.SObjectType targetType, Integer maxRecords) {
-        return new Map<Id, SObject>(
-                Database.queryWithBinds(
-                    'SELECT Id FROM ' +
-                        String.valueOf(targetType) +
-                        ' ORDER BY Id LIMIT :maxRecords',
-                    new Map<String, Object>{ 'maxRecords' => maxRecords },
-                    AccessLevel.SYSTEM_MODE
-                )
-            )
-            .keySet();
-    }
-
     /** The target records as they are stored now, with the attributes the pass may write. */
     public static Map<Id, SObject> stored(
         Schema.SObjectType targetType,

@@ -344,4 +344,20 @@
         <shortDescription>Error Log summary when queued totals could not be saved.</shortDescription>
         <value>{0} records' totals could not be saved in the background and wait in the Rollup Queue. They are tried again automatically; after five tries they wait for Retry.</value>
     </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunPaused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: full recalculation skipped while automation is paused.</shortDescription>
+        <value>The rollup recalculation did not run because all automation is paused. It runs again tonight, or click Recalculate all once automation is back on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunSummary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log summary when a full recalculation did not save everything.</shortDescription>
+        <value>The rollup recalculation finished, but {0} records' totals could not be saved and {1} batches of records stopped before they finished. The saves are tried again automatically; rollups whose records stopped are not marked calculated and are put right by the next run.</value>
+    </labels>
 </CustomLabels>

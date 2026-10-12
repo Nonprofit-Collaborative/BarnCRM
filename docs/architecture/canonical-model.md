@@ -1286,9 +1286,11 @@ every target record every night, which is the load the changed-only rule removes
   aggregation core replaces it (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`). That core
   is `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source
   queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
-  `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11) and
-  `RollupQueue` (the queue processor, Section 14A); a full recalculation batch and an invocable
-  recalculation action for Flow follow.
+  `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
+  `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
+  nightly recalculation: one batch pass per target entity in turn, records with many source rows
+  in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13); an
+  invocable recalculation action for Flow follows.
 
 ## 14A. Rollup Queue
 
