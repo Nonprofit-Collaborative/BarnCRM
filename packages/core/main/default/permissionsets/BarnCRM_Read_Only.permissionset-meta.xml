@@ -637,6 +637,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Rollup_Definition__c.Delimiter__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Rollup_Definition__c.Filter_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>

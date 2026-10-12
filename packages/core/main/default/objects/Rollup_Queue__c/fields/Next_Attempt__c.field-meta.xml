@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Next_Attempt__c</fullName>
+  <description>The earliest time the processor tries these records again after a failure; empty means now (R-RQ3).</description>
+  <inlineHelpText>When these totals are tried again. Empty means as soon as possible.</inlineHelpText>
+  <label>Next Attempt</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

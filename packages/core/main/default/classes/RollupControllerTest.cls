@@ -39,6 +39,20 @@ private class RollupControllerTest {
         );
         System.Assert.isTrue(page.stale, 'Nothing has been calculated yet, which the page says');
         System.Assert.areEqual(3, page.modes.size(), 'Real time, Scheduled, and Both');
+        List<String> modeLabels = new List<String>();
+        for (RollupController.ModeOption option : page.modeOptions) {
+            modeLabels.add(option.label);
+        }
+        System.Assert.areEqual(
+            new List<String>{ 'Instantly', 'Every night', 'Both (recommended)' },
+            modeLabels,
+            'R-R4: the admin reads the new names; the stored values are unchanged'
+        );
+        System.Assert.areEqual(
+            RollupService.MODE_REAL_TIME,
+            page.modeOptions[0].value,
+            'And the value saved is still the stored one'
+        );
     }
 
     @IsTest
@@ -97,7 +111,6 @@ private class RollupControllerTest {
 
     @IsTest
     static void recalculatingSomethingThatIsGoneSaysSoRatherThanFailing() {
-        RollupService.skipEngine = true;
         try {
             RollupController.recalculate(null);
             System.Assert.fail('An unknown definition is refused');

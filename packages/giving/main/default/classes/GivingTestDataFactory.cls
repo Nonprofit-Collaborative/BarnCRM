@@ -145,8 +145,9 @@ public class GivingTestDataFactory {
 
     /**
      * Fails with what the org can say about a rollup run when a total the engine should have
-     * written is still blank. The engine works in a queued job whose errors are caught by its
-     * own finalizer, so a blank total otherwise arrives with no cause attached. Nothing is
+     * written is still blank. A bulk or background save leaves the totals to a queued job whose
+     * errors are caught by its own finalizer, so a blank total otherwise arrives with no cause
+     * attached. Nothing is
      * asserted about a value that was written: the caller's own assertions do that.
      */
     public static void assertRollupWrote(Object total) {

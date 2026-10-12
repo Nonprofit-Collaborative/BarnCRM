@@ -136,6 +136,7 @@ ALLOWED = {
     "Group": "the All Internal Users group a shared Find query is shared with, C-34. Platform feature, every edition.",
     # Async plumbing.
     "AsyncApexJob": "asserting that a queueable or batch was enqueued.",
+    "BatchApexErrorEvent": "a full rollup recalculation chunk the platform stopped, queued again (R-R14). Platform feature, every edition with Apex.",
     "CronTrigger": "the scheduled jobs Core and Giving install.",
     "CronJobDetail": "their names, read back in tests.",
     # Duplicate management, C-20.

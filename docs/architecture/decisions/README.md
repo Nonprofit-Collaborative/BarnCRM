@@ -19,11 +19,11 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0008](0008-license-apache-2-0.md) | License: Apache-2.0 | Accepted |
 | [0009](0009-no-industries-or-paid-add-on-dependency.md) | No Person Account, Industries, OmniStudio, Data Cloud, or Experience Cloud dependency | Accepted |
 | [0010](0010-receipt-immutability.md) | Receipts are immutable; corrections void and reissue; refunds are negative linked gifts | Accepted |
-| [0011](0011-evaluate-vendoring-a-rollup-library.md) | Evaluate vendoring a proven Apex rollup library before building one | Accepted |
+| [0011](0011-evaluate-vendoring-a-rollup-library.md) | Evaluate vendoring a proven Apex rollup library before building one | Accepted; amended for rollups by `NEXT-barncrm-owns-its-rollup-engine.md` |
 | [0012](0012-trunk-based-development.md) | Trunk-based development with squash merges and an always-releasable main | Accepted |
 | [0013](0013-platform-only-org-shape-verification.md) | How the Platform-only org shape is provisioned and verified | Accepted |
 | [0014](0014-cross-package-references-as-record-identifiers.md) | Core holds Giving record identifiers, not lookups | Accepted |
-| [0015](0015-vendor-apex-rollup-behind-adapter.md) | Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter | Accepted |
+| [0015](0015-vendor-apex-rollup-behind-adapter.md) | Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter | Superseded by `NEXT-barncrm-owns-its-rollup-engine.md` |
 | [0016](0016-receipt-pdf-rendering.md) | Receipt PDFs are rendered by the Visualforce PDF rendering service, called from Apex | Proposed |
 | [0017](0017-cross-package-mechanisms.md) | Cross-package mechanisms under one namespace: NamespaceAccessible, per-package settings objects, registry-driven trigger dispatch | Accepted |
 | [0018](0018-module-tabs-and-apps.md) | Each module ships its own Lightning app; the Hub links to the module apps | Accepted |
@@ -90,6 +90,8 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0079](0079-data-hygiene-checks-are-find-queries-built-at-request-time.md) | Data hygiene checks are Find queries built at request time | Accepted (builder decision) |
 | [0080](0080-import-load-one-object.md) | Import loads one object: insert, update by record ID or upsert, with an allow-list and journaled creations | Accepted (builder decision) |
 | [0081](0081-data-transform-document.md) | Column changes as a declarative transform document, and import matching through the org's duplicate rules | Accepted (builder decision) |
+| [NEXT](NEXT-rollup-totals-in-the-target-record-currency.md) | Rollup totals are in the target record's currency | Accepted (owner decision) |
+| [NEXT](NEXT-barncrm-owns-its-rollup-engine.md) | BarnCRM owns its rollup engine (supersedes ADR-0015, amends ADR-0011) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

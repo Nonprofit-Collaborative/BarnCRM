@@ -7,8 +7,8 @@
     <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
     <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
-    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">Real-time:Real time;Scheduled:Scheduled;Both:Both</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">How a newly created rollup starts out. Real time updates the number as records are saved, Scheduled updates it in the nightly run, Both does the first and reconciles with the second.</value></values>
+    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">Real-time:Instantly;Scheduled:Every night;Both:Both (recommended)</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">How a newly created rollup starts out. Instantly updates the number as records are saved, Every night updates it in the nightly run, Both does the first and checks it again every night.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
 </CustomMetadata>

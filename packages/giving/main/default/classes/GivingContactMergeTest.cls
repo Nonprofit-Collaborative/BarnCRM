@@ -61,7 +61,7 @@ private class GivingContactMergeTest {
         Assert.areEqual(
             0,
             [SELECT COUNT() FROM AsyncApexJob WHERE JobType = 'BatchApex'],
-            'The survivor is recalculated in a small queued job, never a batch over every gift.'
+            'The survivor is recalculated in the same save, never by a batch over every gift.'
         );
         Contact survivor = [SELECT Total_Giving__c FROM Contact WHERE Id = :ana.Id];
         GivingTestDataFactory.assertRollupWrote(survivor.Total_Giving__c);
