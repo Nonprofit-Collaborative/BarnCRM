@@ -1,9 +1,9 @@
-# ADR-NEXT: The Module Manager switches a module's automation, links to installs, and counts before an uninstall
+# ADR-0073: The Module Manager switches a module's automation, links to installs, and counts before an uninstall
 
 **Status:** Accepted (builder decision, under ADR-0046 and the owner decisions of 2026-10-12)
 **Date:** 2026-10-12
 **Source:** C-24; plan Section 4.8 "Module Manager"; ADR-0046; ADR-0021; ADR-0024; builds on
-`NEXT-suite-choice-is-the-first-setup-step.md`
+`0072-suite-choice-is-the-first-setup-step.md`
 
 ## Context
 

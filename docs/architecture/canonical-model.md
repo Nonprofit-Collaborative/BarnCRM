@@ -258,8 +258,8 @@ names is deleted.
 recalculates both households' member counts and, once Giving is installed, their giving
 rollups. The vacated household is deleted when it is empty, `Delete_Empty_Households__c`
 is on, nothing outside BarnCRM depends on the account (ADR-0036), and no installed module
-still credits records to it (ADR-NEXT,
-`NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). A module reports its
+still credits records to it (ADR-0070,
+`0070-empty-household-tidy-up-keeps-households-with-gifts.md`). A module reports its
 credited records through the Core extension point `HouseholdDependentsExtension`, found by
 class name the way Health Check finds its extensions; Giving reports every household that
 a Gift or a Commitment names in its Household field, because those lookups clear on delete
@@ -898,8 +898,8 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-NEXT, `NEXT-suite-choice-is-the-first-setup-step.md`). |
-| `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-NEXT, `NEXT-module-manager-turns-automation-off-and-never-installs.md`). |
+| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). |
+| `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
 
 ### Rules
 
@@ -952,7 +952,7 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example Households, Automation, Access, Health. |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (Decision ADR-NEXT, settings console pickers). |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
 | `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
@@ -1320,7 +1320,7 @@ template can be read without knowing the object model.
 **R-IT2 Matching rules in plain language.** The wizard states what each matching rule
 does and what it risks, for example that "Name plus postal code" merges two people who
 share a name at one address. No rule is offered without that sentence (plan Section 2.3). People and organizations have
-a rule each (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`): a person by
+a rule each (ADR-0068, `0068-import-matching-per-entity-and-per-file-values.md`): a person by
 Email exact, Name plus postal code, or External ID; an organization by Name exact (compared
 ignoring case and surrounding spaces) or External ID, and only among organization accounts.
 The organization rule applies only where the mapping names an organization.
@@ -1346,8 +1346,8 @@ organizations alike. A lookup stopped at its row cap is not a several-matches ca
 find nobody alone, as R-IB12 describes.
 
 **R-IT10 A record ID in the file.** A column can be mapped to a person's or the
-organization's Salesforce record ID (`Contact1.Id`, `Contact2.Id`, `Organization.Id`; ADR-NEXT,
-`NEXT-import-record-id-matching-and-match-only.md`). A row giving one is matched to that record
+organization's Salesforce record ID (`Contact1.Id`, `Contact2.Id`, `Organization.Id`; ADR-0069,
+`0069-import-record-id-matching-and-match-only.md`). A row giving one is matched to that record
 and no rule is asked: the ID must be a valid record ID of the object the entity is stored on
 (Contact, or Account in Person Accounts mode, for a person; Account for an organization), the
 record must exist and be visible to the importing user, a person account must have a person
@@ -1695,7 +1695,7 @@ rows of the chunk and against earlier chunks, in the commit and the dry run alik
 same file again matches both rather than creating the second again. Every person an import
 creates is remembered under both the shared key and the narrowed one.
 
-**A person with a first name is found only by it (ADR-NEXT).** Under the same two rules, a
+**A person with a first name is found only by it (ADR-0067).** Under the same two rules, a
 row's person with a first name is looked for by the key narrowed to it, in the org, among the
 people earlier chunks create and among those earlier rows of the chunk create, and nowhere
 else. A record holding the shared key under another first name, or under none, is somebody
@@ -1752,8 +1752,8 @@ show the last pass's outcome; the batch's counts are read back when it finishes,
 every row belongs to it.
 
 **R-IB14 Values for every row of a file.** The wizard can give a file values that apply to
-each of its rows, for example every row's appeal (ADR-NEXT,
-`NEXT-import-matching-per-entity-and-per-file-values.md`). They are held on the batch as
+each of its rows, for example every row's appeal (ADR-0068,
+`0068-import-matching-per-entity-and-per-file-values.md`). They are held on the batch as
 `{ "version": 1, "defaults": [ { "target": "Entity.Attribute", "value": "..." } ] }`, the
 defaults half of the R-IT1 document, so the dry run and the commit of the file use the same
 values and the template is not changed. A row's own value wins, then the file's value, then
@@ -1763,8 +1763,8 @@ since every row would then be one person; the batch is refused with that reason.
 an organization. The entity processor receives the row's values with the file's values
 applied, as it receives the template's defaults (R-IR6).
 
-**R-IB15 Match only.** The wizard can mark a file Match only (ADR-NEXT,
-`NEXT-import-record-id-matching-and-match-only.md`), for a file meant to update records the org
+**R-IB15 Match only.** The wizard can mark a file Match only (ADR-0069,
+`0069-import-record-id-matching-and-match-only.md`), for a file meant to update records the org
 already has. A row whose organization or either person matches no record, by its rule or by a
 record ID (R-IT10), is rejected with a message saying the file creates nobody; nothing is
 created for it. The dry run and the commit reject the same rows. Matched records are updated as
@@ -2151,8 +2151,8 @@ is a household, and left empty when the donor is an organization. It is derived 
 gift is saved and recomputed only when the gift's donor changes. A gift stays credited to
 the household it was credited to when it was given: when the donor later moves households
 (a reparent, a split, or a membership ending), their past gifts stay with the household
-they left and only gifts given after the move are credited to the new one (ADR-NEXT,
-`NEXT-a-gift-keeps-the-household-it-was-given-to.md`; R-H12). A household merge is not a
+they left and only gifts given after the move are credited to the new one (ADR-0071,
+`0071-a-gift-keeps-the-household-it-was-given-to.md`; R-H12). A household merge is not a
 move: the platform account merge carries the merged household's gifts to the survivor
 (R-H13). Household rollups reached through current membership, such as automatic household
 soft credits, follow current membership instead.
@@ -5505,11 +5505,11 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-10-12 | UX review item 2 (ADR-0064, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
 | v0.6 | 2026-10-12 | UX review item 10. No object or field added. `Gift__c.Type__c` is relabelled Payment Method (label only; the API name is unchanged), so the gift record, Quick Gift Entry, gift batches, import and the accounting export all say payment method. `Gift_Compact` and `Commitment_Overview` gain the donor (`Donor_Contact__c`, `Donor_Account__c`). On `Gift_Record_Page` (Dynamic Forms, ADR-0043) Donor Contact shows only when Donor Account is empty and Donor Account only when it is filled (R-G1 allows one donor), Original Gift and Refund Reason only when filled, and Matched Gift only when filled or when the donor is an account; the page gains the activity panel (ADR-0042). |
 | v0.6 | 2026-10-12 | UX review quick wins. No object or field added. One minimal fallback page layout each (ADR-0043) for Relationship, Affiliation, Receipt, Receipt Run, Acknowledgment, Acknowledgment Rule, Acknowledgment Run, Stewardship Plan and Stewardship Plan Template, which had tabs and no layout. |
-| v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
-| v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
-| v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-NEXT, `NEXT-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
-| v0.6 | 2026-10-12 | The empty household tidy-up keeps a household with gifts (ADR-NEXT, `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`; resolves the open follow-up of `NEXT-a-gift-keeps-the-household-it-was-given-to.md`). No object or field added. R-H12: an emptied household is also kept when an installed module still credits records to it, reported through the new Core extension point `HouseholdDependentsExtension`; Giving reports households named by a Gift's or a Commitment's Household field. Such a household is kept without an Error Log entry. |
-| v0.6 | 2026-10-12 | A gift keeps the household it was given to (ADR-NEXT, `NEXT-a-gift-keeps-the-household-it-was-given-to.md`; plan decision D-20). No object or field added. R-G2 amended: a gift's Household is derived when the gift is saved and again when its donor changes, and is not recomputed when the donor's household membership changes, so a donor who moves households leaves their past gifts with the household they were given to. A household merge still carries the merged household's gifts to the survivor (R-H13). Household rollups reached through current membership, such as automatic household soft credits, follow current membership. The Gift Household attribute says so. This matches what the Giving trigger already did. |
+| v0.6 | 2026-10-12 | Import first names (ADR-0068, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
+| v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-0068, `0068-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
+| v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-0069, `0069-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
+| v0.6 | 2026-10-12 | The empty household tidy-up keeps a household with gifts (ADR-0070, `0070-empty-household-tidy-up-keeps-households-with-gifts.md`; resolves the open follow-up of `0071-a-gift-keeps-the-household-it-was-given-to.md`). No object or field added. R-H12: an emptied household is also kept when an installed module still credits records to it, reported through the new Core extension point `HouseholdDependentsExtension`; Giving reports households named by a Gift's or a Commitment's Household field. Such a household is kept without an Error Log entry. |
+| v0.6 | 2026-10-12 | A gift keeps the household it was given to (ADR-0071, `0071-a-gift-keeps-the-household-it-was-given-to.md`; plan decision D-20). No object or field added. R-G2 amended: a gift's Household is derived when the gift is saved and again when its donor changes, and is not recomputed when the donor's household membership changes, so a donor who moves households leaves their past gifts with the household they were given to. A household merge still carries the merged household's gifts to the survivor (R-H13). Household rollups reached through current membership, such as automatic household soft credits, follow current membership. The Gift Household attribute says so. This matches what the Giving trigger already did. |
 
 ---
 ## 32. Entity ownership by package

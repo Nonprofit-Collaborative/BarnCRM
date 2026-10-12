@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to have Giving's nightly jobs
- * counted and scheduled by Health Check's "Schedule all nightly jobs" fix (ADR-NEXT,
+ * counted and scheduled by Health Check's "Schedule all nightly jobs" fix (ADR-0075,
  * health-check-schedules-every-nightly-job).
  *
  * It lists the installment top up, the installments overdue pass and the donor levels pass, the

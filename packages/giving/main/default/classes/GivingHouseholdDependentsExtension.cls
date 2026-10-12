@@ -1,8 +1,8 @@
 /**
  * The class Core finds by name (in `HouseholdDependentsExtensions.EXTENSION_CLASSES`) and asks
  * before the empty household tidy-up deletes a household: a household that a gift or a
- * commitment is credited to is kept (R-H12, R-G2, ADR-NEXT
- * `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). Both Household lookups clear
+ * commitment is credited to is kept (R-H12, R-G2, ADR-0070
+ * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`). Both Household lookups clear
  * on delete, so deleting the household would leave that history with no household at all.
  *
  * `@NamespaceAccessible` with a public no-argument constructor because Core resolves it with

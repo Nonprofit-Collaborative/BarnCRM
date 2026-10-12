@@ -32,7 +32,7 @@ public with sharing class ModuleDetectionService {
      * Each module's published package version Id (`04t`), blank until that module is first
      * published. The release that publishes a module fills its Id in here: Core never installs
      * anything, it only links to Salesforce's installer
-     * (NEXT-suite-choice-is-the-first-setup-step.md).
+     * (0072-suite-choice-is-the-first-setup-step.md).
      */
     @TestVisible
     private static Map<String, String> installVersionIds = new Map<String, String>{

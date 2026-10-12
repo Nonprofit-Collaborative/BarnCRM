@@ -1,6 +1,6 @@
 /**
  * The org's own fields a column can be mapped to on a person or an organization, besides the
- * wizard's fixed list (R-IT11, ADR-NEXT `NEXT-import-record-id-matching-and-match-only.md`).
+ * wizard's fixed list (R-IT11, ADR-0069 `0069-import-record-id-matching-and-match-only.md`).
  *
  * Read from describe, for the running user: a field is offered when the user may read it and
  * create or edit it, it holds a value a spreadsheet cell can carry, and it is nobody else's to

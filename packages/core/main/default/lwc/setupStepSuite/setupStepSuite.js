@@ -18,7 +18,7 @@ const IMPACT_SUITE = 'Impact';
  * Step one: which edition (C-30). Saving it installs nothing: with the Nonprofit Edition
  * saved and Giving not here, the step links to Salesforce's installer in a new tab and
  * offers Check again, so the administrator installs Giving herself
- * (NEXT-suite-choice-is-the-first-setup-step.md).
+ * (0072-suite-choice-is-the-first-setup-step.md).
  */
 export default class SetupStepSuite extends LightningElement {
   @api canEdit = false;

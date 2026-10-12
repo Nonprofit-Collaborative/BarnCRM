@@ -1,4 +1,4 @@
-# ADR-NEXT: Health Check schedules every nightly job with one fix, and modules register theirs
+# ADR-0075: Health Check schedules every nightly job with one fix, and modules register theirs
 
 **Status:** Accepted (owner approved the UI/UX review item, builder decision on the shape)
 **Date:** 2026-10-12

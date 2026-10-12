@@ -1,6 +1,6 @@
 /**
  * Every nightly job BarnCRM wants scheduled in this org: Core's own, and those of each
- * dependent package that registers a `NightlyJobProvider` (ADR-NEXT,
+ * dependent package that registers a `NightlyJobProvider` (ADR-0075,
  * health-check-schedules-every-nightly-job). Health Check reads the unscheduled ones into one
  * finding and schedules them all with one fix.
  *

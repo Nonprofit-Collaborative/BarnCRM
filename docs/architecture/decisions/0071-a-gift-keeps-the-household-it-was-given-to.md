@@ -1,4 +1,4 @@
-# ADR-NEXT: A gift keeps the household it was given to
+# ADR-0071: A gift keeps the household it was given to
 
 **Status:** Accepted
 **Date:** 2026-10-12
@@ -51,11 +51,6 @@ owner was asked which one is right.
   canonical model (R-G2) and the Gifts admin guide page are amended to match.
 - A test that pins it is worth adding with the next Giving change: move a donor with 200 gifts
   to another household and assert that every gift keeps its Household.
-- Open follow-up (needs the owner): the empty household tidy-up (ADR-0036,
-  `Delete_Empty_Households__c`) can still delete the household a donor left. `Gift__c.Household__c`
-  and `Commitment__c.Household__c` are `SetNull` lookups, so that delete clears the household on
-  the gifts it was given. Under this decision the gifts would lose their household. The
-  recommendation is that the delete guard treats credited gifts as a dependent, through an
-  extension point Giving implements, since Core may not reference Giving.
+- Resolved: the empty household tidy-up keeps a household with gifts or commitments credited to it (`0070-empty-household-tidy-up-keeps-households-with-gifts.md`).
 - Commitments derive their household exactly as gifts do (R-G2), so a pledge also stays with the
   household it was made to.

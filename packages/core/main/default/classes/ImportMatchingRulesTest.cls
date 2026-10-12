@@ -1,5 +1,5 @@
 /**
- * C-32 import matching (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`):
+ * C-32 import matching (ADR-0068, `0068-import-matching-per-entity-and-per-file-values.md`):
  * a row whose key finds several records is rejected unless the template says to take the most
  * recently changed (R-IT9), organizations have a rule of their own and are searched only among
  * organizations (R-IT2), and a chosen matching field must be one describe offers (R-IT8).

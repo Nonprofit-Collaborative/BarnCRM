@@ -1,4 +1,4 @@
-# ADR-NEXT: An import matches a person with a first name only by that first name
+# ADR-0067: An import matches a person with a first name only by that first name
 
 **Status:** Accepted
 **Date:** 2026-10-12

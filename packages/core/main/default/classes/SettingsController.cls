@@ -50,7 +50,7 @@ public with sharing class SettingsController {
         public Boolean checked;
         @AuraEnabled
         public List<Option> options;
-        /** The object a Record row picks from, with this org's namespace (ADR-NEXT). */
+        /** The object a Record row picks from, with this org's namespace (ADR-0074). */
         @AuraEnabled
         public String objectApiName;
     }
@@ -307,7 +307,7 @@ public with sharing class SettingsController {
 
     /**
      * Gives a Record row its object and a Record Type List row its choices, read from describe
-     * (ADR-NEXT). False when the row names an object this org does not have, which leaves the
+     * (ADR-0074). False when the row names an object this org does not have, which leaves the
      * row out as a missing settings object does.
      */
     private static Boolean addRecordChoices(

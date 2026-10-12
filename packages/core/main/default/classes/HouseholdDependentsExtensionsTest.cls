@@ -1,7 +1,7 @@
 /**
  * The empty household tidy-up asks installed packages which households they still credit
- * records to, and keeps those (R-H12, ADR-NEXT
- * `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). No other package is
+ * records to, and keeps those (R-H12, ADR-0070
+ * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`). No other package is
  * present in Core's tests, so a stub extension is injected by class name.
  */
 @IsTest

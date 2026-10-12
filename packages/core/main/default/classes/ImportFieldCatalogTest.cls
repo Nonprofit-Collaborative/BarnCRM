@@ -1,6 +1,6 @@
 /**
- * C-32 custom fields on people and organizations (R-IT11, ADR-NEXT
- * `NEXT-import-record-id-matching-and-match-only.md`): the wizard is offered the fields the
+ * C-32 custom fields on people and organizations (R-IT11, ADR-0069
+ * `0069-import-record-id-matching-and-match-only.md`): the wizard is offered the fields the
  * user may write that a cell can fill, and not formulas, lookups, system fields or the
  * package's own; a column mapped to one is written by the import.
  */

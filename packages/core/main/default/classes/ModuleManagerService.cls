@@ -4,10 +4,10 @@
  * one would delete.
  *
  * Nothing here installs or removes a package: Salesforce does not let an app do that, and the
- * owner ruled it out (NEXT-suite-choice-is-the-first-setup-step.md). A module is turned off by
+ * owner ruled it out (0072-suite-choice-is-the-first-setup-step.md). A module is turned off by
  * listing it in `Modules_Turned_Off__c`, which `AutomationControl.isEnabled` reads, so each of its
  * automation switches keeps its own value
- * (NEXT-module-manager-turns-automation-off-and-never-installs.md).
+ * (0073-module-manager-turns-automation-off-and-never-installs.md).
  *
  * Callers check `Manage_BarnCRM_Settings` before any method that changes something or counts
  * records (`ModuleManagerController`).

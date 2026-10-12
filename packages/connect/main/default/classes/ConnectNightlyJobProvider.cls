@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to have Connect's nightly job
- * counted and scheduled by Health Check's "Schedule all nightly jobs" fix (ADR-NEXT,
+ * counted and scheduled by Health Check's "Schedule all nightly jobs" fix (ADR-0075,
  * health-check-schedules-every-nightly-job).
  *
  * It lists the Opportunity mirror's nightly run, and only while a mirror direction is chosen. A

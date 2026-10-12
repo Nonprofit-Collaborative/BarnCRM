@@ -681,8 +681,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 
     /**
      * Keeps a household an installed module still credits records to, asked through the same
-     * extension point the empty household tidy-up uses (ADR-NEXT
-     * `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). The gained-since check
+     * extension point the empty household tidy-up uses (ADR-0070
+     * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`). The gained-since check
      * cannot see a gift edited onto the household, or made during the commit by the committer;
      * deleting the household would clear it on that gift. A check the query budget cannot
      * afford keeps what it was asked about. The extension answers "every one" when it fails.

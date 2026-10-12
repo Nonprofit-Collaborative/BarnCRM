@@ -1,10 +1,10 @@
-# ADR-NEXT: The suite choice is a Core setting the Setup Assistant asks first
+# ADR-0072: The suite choice is a Core setting the Setup Assistant asks first
 
 **Status:** Accepted (builder decision, under owner decisions of 2026-09-23 and 2026-10-12)
 **Date:** 2026-10-12
 **Source:** C-30; plan Section 4.1 "Suites and packaging"; ADR-0046; owner decisions (Brandon,
-2026-10-12); amends decisions 4 and 7 of ADR-NEXT
-(`NEXT-core-names-other-products-only-when-detected.md`)
+2026-10-12); amends decisions 4 and 7 of ADR-0062
+(`0062-core-names-other-products-only-when-detected.md`)
 
 ## Context
 
@@ -44,7 +44,7 @@ when that product is detected; sample data is never loaded by default.
    an Apex constant or a protected custom metadata row, so a metadata type would add an object,
    fields and rows for nothing an administrator can use.
 7. **Sample data is untouched.** Choosing a suite loads nothing; sample data stays an explicit
-   action (decision 8 of `NEXT-core-names-other-products-only-when-detected.md`).
+   action (decision 8 of `0062-core-names-other-products-only-when-detected.md`).
 
 ## Alternatives considered
 
@@ -62,5 +62,5 @@ when that product is detected; sample data is never loaded by default.
   one.
 - Until a module has a published version, the step and step six link to its README instead of an
   installer; the release that publishes a module fills in its Id (plan Section 6, v0.8).
-- `NEXT-core-names-other-products-only-when-detected.md` decision 4 ("until C-30, an org without
+- `0062-core-names-other-products-only-when-detected.md` decision 4 ("until C-30, an org without
   Giving sees Core and Volunteers") now also offers the full list when the suite is `Impact`.

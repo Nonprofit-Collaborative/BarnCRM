@@ -30,7 +30,7 @@ const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
  * The Module Manager (C-24): every module this org is offered, whether it is installed and on,
  * and the one thing to do next with it. Installing and uninstalling are Salesforce's own
  * screens, opened from here; nothing is installed or removed by BarnCRM
- * (NEXT-module-manager-turns-automation-off-and-never-installs.md).
+ * (0073-module-manager-turns-automation-off-and-never-installs.md).
  */
 export default class ModuleManager extends LightningElement {
   state;

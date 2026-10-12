@@ -1,4 +1,4 @@
-# ADR-NEXT: The settings console picks records and record types instead of taking identifiers
+# ADR-0074: The settings console picks records and record types instead of taking identifiers
 
 **Status:** Accepted (owner approved the UI/UX review item, builder decision on the shape)
 **Date:** 2026-10-12

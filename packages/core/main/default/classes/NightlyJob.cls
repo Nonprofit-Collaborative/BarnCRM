@@ -1,6 +1,6 @@
 /**
  * One scheduled job BarnCRM runs overnight, as Health Check's "Schedule all nightly jobs" fix
- * sees it (ADR-NEXT, health-check-schedules-every-nightly-job). Core implements it for its own
+ * sees it (ADR-0075, health-check-schedules-every-nightly-job). Core implements it for its own
  * jobs in `NightlyJobs`; a dependent package implements it for each job its
  * `NightlyJobProvider` returns.
  */

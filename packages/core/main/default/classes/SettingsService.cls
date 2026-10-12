@@ -297,7 +297,7 @@ public with sharing class SettingsService {
         throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
     }
 
-    /** A Record row holds the Id of a record of its own object, and nothing else (ADR-NEXT). */
+    /** A Record row holds the Id of a record of its own object, and nothing else (ADR-0074). */
     private static void checkRecord(Setting_Definition__mdt definition, String candidate) {
         Schema.SObjectType expected = recordObjectType(definition);
         Id recordId;
@@ -311,7 +311,7 @@ public with sharing class SettingsService {
         }
     }
 
-    /** A Record Type List row names only record types its object has (ADR-NEXT). */
+    /** A Record Type List row names only record types its object has (ADR-0074). */
     private static void checkRecordTypes(Setting_Definition__mdt definition, String candidate) {
         Set<String> known = new Set<String>();
         for (Schema.RecordTypeInfo info : recordTypes(recordObjectType(definition))) {

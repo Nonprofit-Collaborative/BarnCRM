@@ -410,7 +410,7 @@ public with sharing class AutomationControl {
      * A module turned off in the Module Manager stops every automation its registry rows name,
      * except one that always runs (ADR-0024), whatever that automation's own switch says; the
      * switch keeps its value for when the module is turned on again
-     * (NEXT-module-manager-turns-automation-off-and-never-installs.md). The registry is read
+     * (0073-module-manager-turns-automation-off-and-never-installs.md). The registry is read
      * only when some module is off.
      */
     private static void loadOffByModule() {

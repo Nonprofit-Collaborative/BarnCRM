@@ -1,15 +1,15 @@
-# ADR-NEXT: The empty household tidy-up keeps a household that still has gifts
+# ADR-0070: The empty household tidy-up keeps a household that still has gifts
 
 **Status:** Accepted
 **Date:** 2026-10-12
 **Source:** product owner decision (Brandon, 2026-10-12, plan Section 12 decision D-20);
-resolves the open follow-up of `NEXT-a-gift-keeps-the-household-it-was-given-to.md`; extends
+resolves the open follow-up of `0071-a-gift-keeps-the-household-it-was-given-to.md`; extends
 ADR-0036 and canonical model R-H12, under the cross-package mechanism of ADR-0017
 
 ## Context
 
 A gift keeps the household it was credited to when it was given: a donor moving households
-does not move past gifts (`NEXT-a-gift-keeps-the-household-it-was-given-to.md`, R-G2). The
+does not move past gifts (`0071-a-gift-keeps-the-household-it-was-given-to.md`, R-G2). The
 empty household tidy-up (R-H12, ADR-0036, `Delete_Empty_Households__c`) deletes the household
 a person was the last to leave. `Gift__c.Household__c` and `Commitment__c.Household__c` are
 `SetNull` lookups, so that delete clears the household on every gift and pledge credited to

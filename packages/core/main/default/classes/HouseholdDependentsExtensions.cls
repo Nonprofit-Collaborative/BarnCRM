@@ -1,7 +1,7 @@
 /**
  * Asks every installed `HouseholdDependentsExtension` which of a set of households it still
- * credits records to, so the empty household tidy-up keeps them (R-H12, ADR-NEXT
- * `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`).
+ * credits records to, so the empty household tidy-up keeps them (R-H12, ADR-0070
+ * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`).
  *
  * Found by namespace and class name, as `HealthCheckExtensions` finds its extensions
  * (ADR-0017). An extension that is not installed is absent and asks nothing. One that is

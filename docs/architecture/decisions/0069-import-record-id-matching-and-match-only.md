@@ -1,10 +1,10 @@
-# ADR-NEXT: Import matching by Salesforce record ID, files that only match, and custom fields
+# ADR-0069: Import matching by Salesforce record ID, files that only match, and custom fields
 
 **Status:** Accepted (owner decision, 2026-10-12)
 **Date:** 2026-10-12
 **Source:** owner decision of 2026-10-12 on the import gaps found by comparing C-32 with the
 NPSP Data Importer; resolves plan Section 11 open question 15 (custom fields in the import
-wizard) as yes. Builds on `NEXT-import-matching-per-entity-and-per-file-values.md`. Adds
+wizard) as yes. Builds on `0068-import-matching-per-entity-and-per-file-values.md`. Adds
 canonical model R-IT10, R-IT11 and R-IB15 (Sections 15 and 16).
 
 ## Context

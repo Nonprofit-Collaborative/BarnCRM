@@ -1,6 +1,6 @@
 /**
  * The seam a dependent package uses to have its nightly jobs counted and scheduled by Health
- * Check, without Core depending on it (ADR-NEXT, health-check-schedules-every-nightly-job; the
+ * Check, without Core depending on it (ADR-0075, health-check-schedules-every-nightly-job; the
  * same shape as `HealthCheckExtension`, ADR-0057). Core finds an implementation by class name
  * with `Type.forName` in `NightlyJobs` and calls it only when it is installed.
  */

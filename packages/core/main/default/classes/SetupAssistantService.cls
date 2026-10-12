@@ -4,7 +4,7 @@
  * browser in the middle of step four opens on step four tomorrow.
  *
  * Core ships eight neutral steps, the first of which asks which suite (C-30,
- * NEXT-suite-choice-is-the-first-setup-step.md). A dependent package adds its own steps, fields
+ * 0072-suite-choice-is-the-first-setup-step.md). A dependent package adds its own steps, fields
  * and wording through `SetupAssistantExtension` (C-29, ADR-0059): Giving adds the fund and
  * appeal step and the receipt fields, which makes nine. A step's fields are data, rendered by
  * one Core panel and saved through `SettingsService` on the settings object each field names.
@@ -345,7 +345,7 @@ public with sharing class SetupAssistantService {
     /**
      * The suite the first step preselects: the one already chosen; otherwise the Nonprofit
      * Edition when Giving is installed or NPSP or Nonprofit Cloud is detected; otherwise null,
-     * so the administrator picks (NEXT-suite-choice-is-the-first-setup-step.md).
+     * so the administrator picks (0072-suite-choice-is-the-first-setup-step.md).
      */
     public static String recommendedSuite() {
         String chosen = ModuleDetectionService.chosenSuite();

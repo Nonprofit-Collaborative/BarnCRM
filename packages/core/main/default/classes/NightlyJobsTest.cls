@@ -1,6 +1,6 @@
 /**
  * Maria presses one button and every BarnCRM nightly job that is not scheduled gets scheduled:
- * Core's own and any a module registers (ADR-NEXT, health-check-schedules-every-nightly-job).
+ * Core's own and any a module registers (ADR-0075, health-check-schedules-every-nightly-job).
  * Every test supplies the jobs in memory, so none depends on what the org it runs in has
  * scheduled, and none schedules a real job.
  */

@@ -75,15 +75,15 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0064](0064-giving-ships-the-donor-record-pages.md) | Giving ships the donor record pages, with Dynamic Related Lists for giving (amends ADR-0043 for the giving lists) | Accepted (owner-approved UX review) |
 | [0065](0065-receipt-letters-are-edited-as-rich-text.md) | Receipt letters are edited as rich text, and the package prints the letterhead | Accepted (owner-approved UX review) |
 | [0066](0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md) | Acknowledgment rules pick their template by name, and plan keys are generated | Accepted (owner-approved UX review) |
-| [NEXT](NEXT-import-matches-a-person-only-by-their-first-name.md) | An import matches a person with a first name only by that first name | Accepted |
-| [NEXT](NEXT-import-matching-per-entity-and-per-file-values.md) | Import matching per entity, a rule for several matches, and values for every row of a file | Accepted |
-| [NEXT](NEXT-import-record-id-matching-and-match-only.md) | Import matching by Salesforce record ID, files that only match, and custom fields | Accepted (owner decision) |
-| [NEXT](NEXT-empty-household-tidy-up-keeps-households-with-gifts.md) | The empty household tidy-up keeps a household that still has gifts (extends ADR-0036) | Accepted (owner decision) |
-| [NEXT](NEXT-a-gift-keeps-the-household-it-was-given-to.md) | A gift keeps the household it was given to when the donor moves (amends R-G2) | Accepted (owner decision) |
-| [NEXT](NEXT-suite-choice-is-the-first-setup-step.md) | The suite choice is a Core setting the Setup Assistant asks first | Accepted (builder decision) |
-| [NEXT](NEXT-module-manager-turns-automation-off-and-never-installs.md) | The Module Manager switches a module's automation, links to installs, and counts before an uninstall | Accepted (builder decision) |
-| [NEXT](NEXT-settings-console-picks-records-and-record-types.md) | The settings console picks records and record types instead of taking identifiers | Accepted (builder decision) |
-| [NEXT](NEXT-health-check-schedules-every-nightly-job.md) | Health Check schedules every nightly job with one fix, and modules register theirs (amends ADR-0048) | Accepted (builder decision) |
+| [0067](0067-import-matches-a-person-only-by-their-first-name.md) | An import matches a person with a first name only by that first name | Accepted |
+| [0068](0068-import-matching-per-entity-and-per-file-values.md) | Import matching per entity, a rule for several matches, and values for every row of a file | Accepted |
+| [0069](0069-import-record-id-matching-and-match-only.md) | Import matching by Salesforce record ID, files that only match, and custom fields | Accepted (owner decision) |
+| [0070](0070-empty-household-tidy-up-keeps-households-with-gifts.md) | The empty household tidy-up keeps a household that still has gifts (extends ADR-0036) | Accepted (owner decision) |
+| [0071](0071-a-gift-keeps-the-household-it-was-given-to.md) | A gift keeps the household it was given to when the donor moves (amends R-G2) | Accepted (owner decision) |
+| [0072](0072-suite-choice-is-the-first-setup-step.md) | The suite choice is a Core setting the Setup Assistant asks first | Accepted (builder decision) |
+| [0073](0073-module-manager-turns-automation-off-and-never-installs.md) | The Module Manager switches a module's automation, links to installs, and counts before an uninstall | Accepted (builder decision) |
+| [0074](0074-settings-console-picks-records-and-record-types.md) | The settings console picks records and record types instead of taking identifiers | Accepted (builder decision) |
+| [0075](0075-health-check-schedules-every-nightly-job.md) | Health Check schedules every nightly job with one fix, and modules register theirs (amends ADR-0048) | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

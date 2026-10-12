@@ -1,7 +1,7 @@
 /**
  * A gift keeps the household it was given to, even when the donor was the last to leave it
- * and the empty household tidy-up is on (R-G2, R-H12, ADR-NEXT
- * `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). End to end: Core's tidy-up
+ * and the empty household tidy-up is on (R-G2, R-H12, ADR-0070
+ * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`). End to end: Core's tidy-up
  * finds `GivingHouseholdDependentsExtension` by name and keeps what it reports.
  */
 @IsTest

@@ -1,4 +1,4 @@
-# ADR-NEXT: Import matching per entity, a rule for several matches, and values for every row of a file
+# ADR-0068: Import matching per entity, a rule for several matches, and values for every row of a file
 
 **Status:** Accepted
 **Date:** 2026-10-12

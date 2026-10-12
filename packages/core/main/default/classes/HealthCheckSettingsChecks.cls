@@ -127,7 +127,7 @@ public with sharing class HealthCheckSettingsChecks {
 
     /**
      * Every BarnCRM nightly job that is not scheduled, Core's and those modules register, in
-     * one finding with one fix that schedules them all (ADR-NEXT,
+     * one finding with one fix that schedules them all (ADR-0075,
      * health-check-schedules-every-nightly-job). Nothing is scheduled on install, so this is
      * the one place an administrator is told.
      */

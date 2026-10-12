@@ -1,6 +1,6 @@
 /**
  * A person with a first name is found only by it, never by the key they share with somebody
- * else, such as a partner at the same address (canonical model R-IB12, ADR-NEXT). The shared
+ * else, such as a partner at the same address (canonical model R-IB12, ADR-0067). The shared
  * key alone finds a person only when the row gives no first name; otherwise the person is
  * created, never taken for somebody else and renamed, even where one record holds the key.
  */

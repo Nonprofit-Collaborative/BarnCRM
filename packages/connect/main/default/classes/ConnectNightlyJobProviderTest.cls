@@ -1,5 +1,5 @@
 /**
- * Connect's nightly job as Health Check sees it (ADR-NEXT, health-check-schedules-every-nightly-job):
+ * Connect's nightly job as Health Check sees it (ADR-0075, health-check-schedules-every-nightly-job):
  * the Opportunity mirror's run is listed only while a direction is chosen, and scheduling it
  * twice leaves one job.
  */

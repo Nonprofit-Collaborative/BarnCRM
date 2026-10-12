@@ -1847,7 +1847,7 @@ public with sharing class HouseholdService {
      *
      * A household that an installed package still credits records to is kept as well, asked
      * through `HouseholdDependentsExtensions` because Core may not know what those records
-     * are (ADR-NEXT `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`).
+     * are (ADR-0070 `0070-empty-household-tidy-up-keeps-households-with-gifts.md`).
      */
     @NamespaceAccessible
     public static void deleteEmptyHouseholds(Set<Id> householdIds) {

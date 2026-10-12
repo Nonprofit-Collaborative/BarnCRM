@@ -1,6 +1,6 @@
 /**
- * C-32 record ID matching and match only (ADR-NEXT,
- * `NEXT-import-record-id-matching-and-match-only.md`): a row giving a Salesforce record ID is
+ * C-32 record ID matching and match only (ADR-0069,
+ * `0069-import-record-id-matching-and-match-only.md`): a row giving a Salesforce record ID is
  * loaded into that record whatever the rule says, an ID that is not one, is of the wrong kind
  * or is not found rejects the row and creates nothing (R-IT10), and a file marked Match only
  * rejects every row that matches nobody (R-IB15).
