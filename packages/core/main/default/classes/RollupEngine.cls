@@ -149,6 +149,11 @@ public with sharing class RollupEngine {
             }
             result.ran.add(definition);
             String aggregate = definition.Aggregate__c.toUpperCase();
+            // Read only for a text list, so a caller that queried a definition without the
+            // delimiter still runs every other aggregate.
+            String separator = aggregate.startsWith('TEXT_LIST')
+                ? RollupPlanner.separatorFor(definition.Delimiter__c)
+                : null;
             Schema.SObjectField field = plan.targetFields[i];
             Boolean toTargetCurrency =
                 converts &&
@@ -166,7 +171,7 @@ public with sharing class RollupEngine {
                 }
                 RollupAggregator.Tally tally = tallies == null ? null : tallies.get(targetId);
                 Object value = (tally == null ? new RollupAggregator.Tally() : tally)
-                    .result(aggregate);
+                    .result(aggregate, separator);
                 if (toTargetCurrency && value != null) {
                     value = RollupCurrency.fromCorporate(
                         RollupAggregator.toDecimal(value),

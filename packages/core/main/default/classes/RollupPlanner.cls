@@ -22,9 +22,15 @@ public with sharing class RollupPlanner {
     public class RollupPlanException extends Exception {
     }
 
-    /** How the calculator gathers an aggregate: grouped in the query, or from ordered rows. */
+    /**
+     * How the calculator gathers an aggregate: grouped in the query, from ordered rows (FIRST and
+     * LAST), or from every matching row, collected and ordered in Apex (COUNT_DISTINCT and the
+     * text lists, which a grouped answer cannot merge across path alternatives or household
+     * members).
+     */
     public static final String KIND_GROUPED = 'grouped';
     public static final String KIND_ORDERED = 'ordered';
+    public static final String KIND_LISTED = 'listed';
 
     private static final Map<String, String> KIND_BY_AGGREGATE = new Map<String, String>{
         'SUM' => KIND_GROUPED,
@@ -35,7 +41,17 @@ public with sharing class RollupPlanner {
         'ANY' => KIND_GROUPED,
         'NONE' => KIND_GROUPED,
         'FIRST' => KIND_ORDERED,
-        'LAST' => KIND_ORDERED
+        'LAST' => KIND_ORDERED,
+        'COUNT_DISTINCT' => KIND_LISTED,
+        'TEXT_LIST' => KIND_LISTED,
+        'TEXT_LIST_DISTINCT' => KIND_LISTED
+    };
+
+    /** What goes between the values of a text list, by `Delimiter__c` value; Comma when blank. */
+    private static final Map<String, String> SEPARATOR_BY_DELIMITER = new Map<String, String>{
+        'Comma' => ', ',
+        'Semicolon' => '; ',
+        'New line' => '\n'
     };
 
     /** Aggregates that read no attribute of the source rows: the filter is the whole question. */
@@ -103,6 +119,13 @@ public with sharing class RollupPlanner {
         public String field;
         /** True when the target is text, so a value is copied as it was entered, never converted. */
         public Boolean asText = false;
+    }
+
+    /** What separates the values of a text list for this `Delimiter__c` value. */
+    public static String separatorFor(String delimiter) {
+        return String.isNotBlank(delimiter) && SEPARATOR_BY_DELIMITER.containsKey(delimiter)
+            ? SEPARATOR_BY_DELIMITER.get(delimiter)
+            : SEPARATOR_BY_DELIMITER.get('Comma');
     }
 
     /**
@@ -225,7 +248,11 @@ public with sharing class RollupPlanner {
         String field = READS_NO_FIELD.contains(aggregate)
             ? null
             : checkedPath(definition.Source_Field__c);
-        String orderBy = kind == KIND_ORDERED ? checkedPath(definition.Order_By_Field__c) : null;
+        // FIRST and LAST need an order; a text list may have one, and is otherwise alphabetical.
+        String orderBy = kind == KIND_ORDERED ||
+            (kind == KIND_LISTED && String.isNotBlank(definition.Order_By_Field__c))
+            ? checkedPath(definition.Order_By_Field__c)
+            : null;
         String whereClause = whereClauseFor(definition);
 
         List<SourceQuery> queries = new List<SourceQuery>();

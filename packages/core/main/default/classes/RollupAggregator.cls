@@ -15,6 +15,8 @@
  * - FIRST and LAST read rows ordered by the order attribute and keep the best per record, a tie
  *   going to the lower record Id.
  * - ANY and NONE are a grouped count, read as "more than none" and "none".
+ * - COUNT_DISTINCT and the text lists collect every matching row's value per record and order
+ *   them when the answer is read, so they stay exact across alternatives and household members.
  *
  * DOCUMENTED EXCEPTION to user mode reads (plan Section 4.13, ADR-0015, and RollupWriter): every
  * query here runs in system mode and without sharing, because a total must not depend on who
@@ -25,6 +27,39 @@ public without sharing class RollupAggregator {
     @TestVisible
     private static Integer keysPerQuery = 1000;
 
+    /** One value collected for COUNT_DISTINCT or a text list, with what orders it. */
+    public class Listed implements Comparable {
+        /** The order attribute's value, or the value in lower case when the list has no order. */
+        public Object order;
+        public String recordId;
+        public String value;
+
+        public Listed(Object order, String recordId, String value) {
+            this.order = order;
+            this.recordId = recordId;
+            this.value = value;
+        }
+
+        /** By order, a blank order last, then by record Id, so every run lists the same way. */
+        public Integer compareTo(Object other) {
+            Listed that = (Listed) other;
+            if (this.order == null || that.order == null) {
+                if (this.order != null) {
+                    return -1;
+                }
+                if (that.order != null) {
+                    return 1;
+                }
+            } else {
+                Integer byOrder = compare(this.order, that.order);
+                if (byOrder != 0) {
+                    return byOrder;
+                }
+            }
+            return this.recordId.compareTo(that.recordId);
+        }
+    }
+
     /** One definition's running answer for one target record. */
     public class Tally {
         public Decimal total;
@@ -32,10 +67,40 @@ public without sharing class RollupAggregator {
         public Object best;
         public Object bestOrder;
         public String bestId;
+        public List<Listed> listed = new List<Listed>();
 
         /** The value to write: zero for a sum or count of nothing, blank otherwise. */
         public Object result(String aggregate) {
+            return result(aggregate, RollupPlanner.separatorFor(null));
+        }
+
+        /**
+         * The value to write, a text list joined by this separator (canonical model R-R15):
+         * ordered, each value once for TEXT_LIST_DISTINCT, blank when nothing was listed.
+         */
+        public Object result(String aggregate, String separator) {
             switch on aggregate {
+                when 'TEXT_LIST', 'TEXT_LIST_DISTINCT' {
+                    if (this.listed.isEmpty()) {
+                        return null;
+                    }
+                    this.listed.sort();
+                    List<String> values = new List<String>();
+                    Set<String> seen = new Set<String>();
+                    for (Listed entry : this.listed) {
+                        if (seen.add(entry.value) || aggregate == 'TEXT_LIST') {
+                            values.add(entry.value);
+                        }
+                    }
+                    return String.join(values, separator);
+                }
+                when 'COUNT_DISTINCT' {
+                    Set<String> distinct = new Set<String>();
+                    for (Listed entry : this.listed) {
+                        distinct.add(entry.value);
+                    }
+                    return Decimal.valueOf(distinct.size());
+                }
                 when 'ANY' {
                     return this.counted > 0;
                 }
@@ -172,6 +237,8 @@ public without sharing class RollupAggregator {
             Map<String, Object> binds = new Map<String, Object>{ 'keys' => slice };
             if (query.kind == RollupPlanner.KIND_ORDERED) {
                 foldRows(query, fanout, binds, answer);
+            } else if (query.kind == RollupPlanner.KIND_LISTED) {
+                foldListed(query, fanout, binds, answer);
             } else {
                 foldGroups(query, fanout, binds, answer);
             }
@@ -393,6 +460,54 @@ public without sharing class RollupAggregator {
             return ((Datetime) value).formatGmt('yyyy-MM-dd HH:mm');
         }
         return String.valueOf(value);
+    }
+
+    /**
+     * COUNT_DISTINCT and the text lists: every matching row's value, blanks left out, collected
+     * per target record and ordered when the answer is read (`Tally.result`). Rows are read
+     * rather than grouped because a distinct count or a list cannot be merged from partial
+     * grouped answers, and a long text attribute can be neither grouped nor ordered in a query.
+     */
+    private static void foldListed(
+        RollupPlanner.SourceQuery query,
+        Fanout fanout,
+        Map<String, Object> binds,
+        Answer answer
+    ) {
+        Set<String> columns = new Set<String>{ 'Id', query.keyExpression };
+        if (query.orderBy != null) {
+            columns.add(query.orderBy);
+        }
+        for (RollupPlanner.Measure measure : query.measures) {
+            columns.add(measure.field);
+        }
+        String soql =
+            'SELECT ' +
+            String.join(new List<String>(columns), ', ') +
+            ' FROM ' +
+            query.sourceObject +
+            whereFor(query) +
+            ' ORDER BY Id';
+        for (SObject row : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
+            Set<Id> targets = fanout.targetsByKey.get((Id) valueAt(row, query.keyExpression));
+            if (targets == null) {
+                continue;
+            }
+            String rowId = String.valueOf(row.Id);
+            for (RollupPlanner.Measure measure : query.measures) {
+                String value = toText(valueAt(row, measure.field));
+                if (String.isBlank(value)) {
+                    continue;
+                }
+                Object order = query.orderBy == null
+                    ? value.toLowerCase()
+                    : valueAt(row, query.orderBy);
+                for (Id targetId : targets) {
+                    tallyFor(answer, measure.definitionIndex, targetId)
+                        .listed.add(new Listed(order, rowId, value));
+                }
+            }
+        }
     }
 
     private static Tally tallyFor(Answer answer, Integer definitionIndex, Id targetId) {
