@@ -26,7 +26,7 @@ sight.
 The vocabulary, the order and the report stay in `HealthCheckService`. What each check says
 moves into one of three classes, named for the question it asks:
 
-- **`HealthCheckOrgShapeChecks`**: what is installed alongside Open Impact, which
+- **`HealthCheckOrgShapeChecks`**: what is installed alongside BarnCRM, which
   coexistence mode that implies, whether the settings match it, and whether the org runs
   multi-currency. Five checks.
 - **`HealthCheckAccessChecks`**: who administers the app, who cannot see it, who holds the

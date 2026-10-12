@@ -236,7 +236,7 @@ gate run test the same org and cannot disagree because of a difference between o
 2. **Store its auth URL** as the repository secret `SF_TEST_ORG_AUTH_URL`. The auth URL is a
    credential, exactly like the Dev Hub one, so pipe it straight into the secret rather than
    displaying it:
-   `sf org display --target-org oi-test --verbose --json | jq -r .result.sfdxAuthUrl | gh secret set SF_TEST_ORG_AUTH_URL --repo Nonprofit-Collaborative/OpenImpact`
+   `sf org display --target-org oi-test --verbose --json | jq -r .result.sfdxAuthUrl | gh secret set SF_TEST_ORG_AUTH_URL --repo Nonprofit-Collaborative/BarnCRM`
 3. **Run `scripts/org/run-org-tests.sh oi-test`** on a pushed commit (see "The org test
    gate"), or dispatch the CI workflow by hand to have `org-tests` deploy both packages into
    the org and run the Apex tests there.
@@ -685,7 +685,7 @@ reason.
 
 ## Signing off commits (DCO)
 
-Open Impact uses the Developer Certificate of Origin instead of a CLA. Every commit must
+BarnCRM uses the Developer Certificate of Origin instead of a CLA. Every commit must
 carry a `Signed-off-by:` trailer with your name and email, certifying you have the right
 to submit the change under the project's license.
 

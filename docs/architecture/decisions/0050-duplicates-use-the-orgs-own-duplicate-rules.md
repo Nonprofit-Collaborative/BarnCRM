@@ -1,4 +1,4 @@
-# ADR-0050: Duplicate detection uses the org's own duplicate rules, and Open Impact ships none
+# ADR-0050: Duplicate detection uses the org's own duplicate rules, and BarnCRM ships none
 
 **Status:** Accepted (builder decision, conservative; confirm on review)
 **Date:** 2026-09-23
@@ -15,7 +15,7 @@ Every org starts with the standard Contact and Account duplicate rules switched 
 
 Two gaps remain. A duplicate rule only runs when a record is saved, so records already in the
 org are never compared with each other, and the platform job that does that (duplicate jobs)
-exists only in Performance and Unlimited Edition, which the nonprofits Open Impact is built for
+exists only in Performance and Unlimited Edition, which the nonprofits BarnCRM is built for
 do not have. And nothing records a person's decision that a proposed pair is not a duplicate.
 
 An earlier, unmerged draft of this feature shipped its own matching and duplicate rules keyed
@@ -25,7 +25,7 @@ app cannot perform, so that draft needed four Setup steps before anything worked
 
 ## Decision
 
-- **Open Impact ships no matching rule and no duplicate rule.** Detection is whatever
+- **BarnCRM ships no matching rule and no duplicate rule.** Detection is whatever
   duplicate rules for Contact and Account are active in the org: the standard ones by default,
   or the administrator's own.
 - **A scan fills the first gap.** Started by a person from the Duplicates panel of Nonprofit
@@ -55,7 +55,7 @@ app cannot perform, so that draft needed four Setup steps before anything worked
   Error Log is at Warning when that count is above zero, and the panel shows the latest summary
   as its last-scan line, so a partly failed scan never reads as a clean one.
 - **A people merge keeps what it touches.** The platform's merge deletes the merged-away
-  person and moves their children without saving them. Open Impact's contact triggers, and
+  person and moves their children without saving them. BarnCRM's contact triggers, and
   its account triggers for a person stored as an account, handle the delete as a merge when
   `MasterRecordId` is filled in `after delete`:
   - In junction mode the merged-away person's memberships are recreated on the survivor, all
@@ -83,12 +83,12 @@ app cannot perform, so that draft needed four Setup steps before anything worked
 
 ## Alternatives considered
 
-- **Ship Open Impact matching and duplicate rules** (the earlier draft). Rejected: four Setup
+- **Ship BarnCRM matching and duplicate rules** (the earlier draft). Rejected: four Setup
   steps before first use (Principle 1), a second set of active rules beside the standard ones
   that would alert twice on every save, and rules an upgrade may not change once an
   administrator has edited them. What it bought, an import and a scan that agree on "the same
   person", matters less than it looks: the scan only proposes, a person decides.
-- **A matching engine of Open Impact's own.** Rejected: Principle 8, and the platform's
+- **A matching engine of BarnCRM's own.** Rejected: Principle 8, and the platform's
   matching (fuzzy names, normalized addresses) is better than a packaged one would be.
 - **Schedule the scan nightly.** Deferred: duplicate rules already catch new records on save,
   so a schedule would mostly re-scan unchanged records. Rerunning after a large import is in

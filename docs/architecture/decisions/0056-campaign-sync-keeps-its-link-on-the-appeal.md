@@ -57,7 +57,7 @@ Four constraints narrow the answer.
    feature a hierarchy custom setting flag, and ADR-0017 gives each package its own settings
    object, so Connect gains `Connect_Settings__c` with `Campaign_Sync_Enabled__c`, default
    off, shown in the Giving section of Nonprofit Settings. It is off because an org with
-   Campaigns of its own (every NPSP org) must decide before Open Impact adds more. The
+   Campaigns of its own (every NPSP org) must decide before BarnCRM adds more. The
    automation switch is kept as well, because every packaged automation has one (ADR-0040):
    the setting says whether the feature is wanted, and the switch pauses it. The setting is
    the authoritative one: Sync all appeals follows it alone, and the automation switch only

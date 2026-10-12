@@ -6,7 +6,7 @@
 
 ## Context
 
-Open Impact ships as unlocked packages for the foreseeable future. In an unlocked package a
+BarnCRM ships as unlocked packages for the foreseeable future. In an unlocked package a
 customer can edit anything, and the next upgrade can overwrite what they edited, so a
 customer who changes a packaged automation loses the change without warning. The product
 owner prefers Flow for automation because a customer can see how a Flow works and make a

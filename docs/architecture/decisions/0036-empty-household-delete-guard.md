@@ -1,4 +1,4 @@
-# ADR-0036: An empty household is deleted only when nothing outside Open Impact depends on it
+# ADR-0036: An empty household is deleted only when nothing outside BarnCRM depends on it
 
 **Status:** Accepted
 **Date:** 2026-09-09
@@ -7,12 +7,12 @@
 ## Context
 
 R-H12 says the vacated household is deleted when it is empty and `Delete_Empty_Households__c`
-is on. Until now "empty" was decided from Open Impact's own membership alone: the record type
+is on. Until now "empty" was decided from BarnCRM's own membership alone: the record type
 is Household, `HouseholdService.getMembers` returns nothing, so the Account goes.
 
 That is the whole of the test, and in an org running Salesforce Nonprofit Cloud it is the wrong
 test. A household there is a business Account plus a `PartyRelationshipGroup` record, and its
-membership is carried on `AccountContactRelation` rows. Open Impact owns neither object and
+membership is carried on `AccountContactRelation` rows. BarnCRM owns neither object and
 counts neither as a member, so such a household reads as empty on the first day it exists.
 
 `PartyRelationshipGroup.AccountId` is a master-detail to Account with no Update property
@@ -31,7 +31,7 @@ answer to give a delete.
 
 ## Decision
 
-**An empty household is deleted only when nothing outside Open Impact depends on the Account.**
+**An empty household is deleted only when nothing outside BarnCRM depends on the Account.**
 Before deleting, `HouseholdService.deleteEmptyHouseholds` asks
 `HouseholdSelector.getAccountsWithNativeDependents` for the accounts that carry a child
 `PartyRelationshipGroup` or any `AccountContactRelation` rows, and deletes only the rest.
@@ -62,7 +62,7 @@ that exist today; another one found later is added to the same probe and needs n
   property of the org and the hazard is a property of the record. An org can be Platform-only
   and still have a household somebody built a native group on, and a Nonprofit Cloud org has
   plenty of households where the tidy-up is safe and wanted.
-- **Delete the group first, then the Account.** Rejected outright. Open Impact does not own
+- **Delete the group first, then the Account.** Rejected outright. BarnCRM does not own
   that data, and a tidy-up is not a licence to destroy somebody else's household.
 - **Refuse to delete anything when the objects exist at all.** Rejected: it turns the setting
   off for a whole class of org on the strength of an installed package, which is the shape of

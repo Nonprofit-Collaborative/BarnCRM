@@ -7,7 +7,7 @@ building G-16 against canonical model Section 26 and `Fiscal_Year_Start_Month__c
 
 ## Context
 
-Open Impact holds its own fiscal year. `Fiscal_Year_Start_Month__c` in Nonprofit Settings
+BarnCRM holds its own fiscal year. `Fiscal_Year_Start_Month__c` in Nonprofit Settings
 names the month the organization's year begins, and rule R-R3 computes every fiscal rollup
 window from it at run time: `Giving_This_Year__c`, `Giving_Last_Year__c`,
 `Giving_Two_Years_Ago__c`, and now `Gifts_Last_Year__c`.
@@ -69,7 +69,7 @@ administrator can set in ten seconds.
 
 **Make the package write the org fiscal year to match.** Fiscal year in Setup is not a
 setting a package should take over: changing it rewrites how every standard report, forecast
-and dashboard in the org reads, including reports that have nothing to do with Open Impact.
+and dashboard in the org reads, including reports that have nothing to do with BarnCRM.
 
 ## Consequences
 
@@ -81,7 +81,7 @@ and dashboard in the org reads, including reports that have nothing to do with O
 - **A future Health Check rule can close this properly** by comparing
   `Fiscal_Year_Start_Month__c` to the org's fiscal year and offering the fix. Revisit at
   C-21, or sooner if a subscriber reports the symptom above. **Shipped 2026-09-09** in C-11,
-  reading Setup's month from `Organization.FiscalYearStartMonth` and Open Impact's from the
+  reading Setup's month from `Organization.FiscalYearStartMonth` and BarnCRM's from the
   same call the rollup engine makes, so the number compared is the number the totals were
   computed from, January default included.
 - **Nothing else in the package changes.** The rollup engine keeps its own fiscal year, and

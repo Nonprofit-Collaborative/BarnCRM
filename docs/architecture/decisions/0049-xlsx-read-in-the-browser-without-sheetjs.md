@@ -62,7 +62,7 @@ or read the legacy binary .xls format.
 
 - No third-party script ships in the wizard, and plan Section 9's pre-approval of SheetJS is
   unused. The plan owner has since edited Sections 4.9 and 9 to match.
-- The reader is Open Impact's to maintain. Its scope is fixed by this ADR: first sheet,
+- The reader is BarnCRM's to maintain. Its scope is fixed by this ADR: first sheet,
   values only, .xlsx only. A request for more reopens the choice above rather than growing it.
 - Legacy .xls files and password-protected workbooks are not read; the message says to save
   as CSV or .xlsx.

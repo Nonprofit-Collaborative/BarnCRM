@@ -63,7 +63,7 @@ Volunteer Management object name.
 - **Data Processing Engine**, which calculates fundraising rollups, ships with the
   Industries clouds and does not exist in a Platform-only org.
 - Consequence: X-07 must detect all of this at runtime (`Schema.getGlobalDescribe`,
-  `isAccessible`, `isCreateable`) and hide itself when absent. No Open Impact package ever
+  `isAccessible`, `isCreateable`) and hide itself when absent. No BarnCRM package ever
   requires a permission set license.
 
 ## 3. Fundraising objects
@@ -76,7 +76,7 @@ fundraising objects below are API version 59.0 and later.
 ### 3.1 GiftTransaction
 
 `npc_fundraising_api_objects_gifttransaction.htm`. A completed transaction from a gift.
-The direct counterpart of Open Impact `Gift__c`.
+The direct counterpart of BarnCRM `Gift__c`.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -337,9 +337,9 @@ family (`Benefit`, `BenefitAssignment`, `BenefitDisbursement`, `BenefitSchedule`
 profiles, applications, positions, shifts and assignments, but no object API name was
 confirmed. Do not write volunteer mappings from this file.
 
-## 6. Mapping table 1: Open Impact canonical entity to Nonprofit Cloud
+## 6. Mapping table 1: BarnCRM canonical entity to Nonprofit Cloud
 
-Direction is Open Impact to Nonprofit Cloud; the X-07 mirror is one way (plan Section 4.12).
+Direction is BarnCRM to Nonprofit Cloud; the X-07 mirror is one way (plan Section 4.12).
 
 | Canonical entity | Nonprofit Cloud target | Field mapping | Mismatch and loss |
 |---|---|---|---|
@@ -351,7 +351,7 @@ Direction is Open Impact to Nonprofit Cloud; the X-07 mirror is one way (plan Se
 | Soft credit (`Soft_Credit__c`) | `GiftSoftCredit` | Contact or Account to `RecipientId`, role to `Role`, amount to `SoftCreditAmount`, percent to `PartialPercent` | Role picklist values differ; our custom roles have no native equivalent. |
 | Tribute (`Tribute__c`) | `GiftTribute` | Type to `TributeType`, honoree contact to `HonoreeContactId`, honoree name to `HonoreeName`, recipient to `NotificationContactId`, sent flag to `NotificationStatus` | Ours is one record per gift; `GiftTribute` can hang off a transaction or a commitment. |
 | Appeal (`Appeal__c`) | `OutreachSourceCode` (preferred) or `Campaign` | Name to `Name`, code to `SourceCode`, status to `Status`, parent appeal to `CampaignId` | Semantic mismatch: our Appeal is roughly Campaign plus source code. Goal, cost and dates have no source code fields. Flattening an appeal hierarchy onto Campaign plus source codes is lossy in either direction. |
-| Household (Account, record type Household) | `Account` (business account) plus a `PartyRelationshipGroup` of type Household | Name to `Account.Name`; membership through `AccountContactRelation` | **Record type name collision.** Nonprofit Cloud ships no Household or Organization Account record type, but Nonprofit Cloud implementations very commonly create unprefixed ones by hand with exactly the DeveloperNames `Household` and `Organization`. Two independently retrieved real org metadata sets confirm it: ProvisioPartners/ESSCDevOps has `Household` and `Organization`; dnstommy/gearset-demo has `Household`, `Business_Account` and `Person_Accounts`. Open Impact ships unprefixed Account record types named `Household` and `Organization` while its namespace is deliberately empty, so installing into an existing Nonprofit Cloud org is a real collision risk, and equally into an NPSP org. Enabling Person Accounts creates a standard record type whose DeveloperName is `PersonAccount`; no record type with DeveloperName exactly `Person` was found anywhere, so `Person` must not be treated as a real name. Separately: creating the household as a business account without the `PartyRelationshipGroup` leaves it invisible to native household features, and greetings and the custom-name flag have no native equivalent. |
+| Household (Account, record type Household) | `Account` (business account) plus a `PartyRelationshipGroup` of type Household | Name to `Account.Name`; membership through `AccountContactRelation` | **Record type name collision.** Nonprofit Cloud ships no Household or Organization Account record type, but Nonprofit Cloud implementations very commonly create unprefixed ones by hand with exactly the DeveloperNames `Household` and `Organization`. Two independently retrieved real org metadata sets confirm it: ProvisioPartners/ESSCDevOps has `Household` and `Organization`; dnstommy/gearset-demo has `Household`, `Business_Account` and `Person_Accounts`. BarnCRM ships unprefixed Account record types named `Household` and `Organization` while its namespace is deliberately empty, so installing into an existing Nonprofit Cloud org is a real collision risk, and equally into an NPSP org. Enabling Person Accounts creates a standard record type whose DeveloperName is `PersonAccount`; no record type with DeveloperName exactly `Person` was found anywhere, so `Person` must not be treated as a real name. Separately: creating the household as a business account without the `PartyRelationshipGroup` leaves it invisible to native household features, and greetings and the custom-name flag have no native equivalent. |
 | Household Member (`Household_Member__c`) | `AccountContactRelation` | Contact to `ContactId`, household to `AccountId`, role to `Roles`, dates to `StartDate` and `EndDate`, primary to `IsPrimaryMember`, plus `IsIncludedInGroup` and `IsPrimaryGroup` | Our junction can point at an Account (person account) as the person; `AccountContactRelation.ContactId` cannot, so person account members map through the person account's underlying contact. Verified 2026-09-09 that a person account can be a related contact on a business account and that these rows are indirect (`IsDirect` false); still unconfirmed whether a row exists between a person account's own Contact and its own Account. |
 | Address (Core address entity) | `ContactPointAddress` | Street, city, state, postal code, country to the compound `Address`; type to `UsageType` or `AddressType`; primary flag to `IsPrimary` | Their model is one contact point per usage; ours is a shared address with propagation. Propagation semantics do not survive the mirror. |
 | Household and fund rollups | `DonorGiftSummary`, `GiftDesignation` rollups | None | **Never write these.** They are Data Processing Engine outputs; writing them silently conflicts with the native nightly run. |
@@ -359,7 +359,7 @@ Direction is Open Impact to Nonprofit Cloud; the X-07 mirror is one way (plan Se
 ## 7. Mapping table 2: import template columns (C-14)
 
 Two templates ship for Agentforce Nonprofit source data, both assuming a CSV export from a
-Nonprofit Cloud org (report or Data Loader) imported into Open Impact.
+Nonprofit Cloud org (report or Data Loader) imported into BarnCRM.
 
 ### 7.1 Template "Agentforce Nonprofit gifts"
 
@@ -513,7 +513,7 @@ at all.
 the describe, the object not accessible to the running user, or the query throwing. Only a
 count that ran and returned zero answers no. The asymmetry is the one ADR-0036 argues for the
 delete guard. A false negative would let a later guard silently open, rename or tidy up a
-household the customer built in Nonprofit Cloud and Open Impact does not own. A false positive
+household the customer built in Nonprofit Cloud and BarnCRM does not own. A false positive
 only makes that guard cautious about an org that had nothing to protect. `getGlobalDescribe`
 is itself filtered by the running user's permission set licences, and the group is gated by
 the Group Membership permission set, so "not in the describe map" really is an ambiguous
