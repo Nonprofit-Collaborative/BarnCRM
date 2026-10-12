@@ -10,6 +10,7 @@
  * marker scripts/ci/check-standard-objects.sh honors, never a compile-time reference.
  */
 public with sharing class OrgShapeSelector {
+    private static final String PERSON_ACCOUNT_FIELD = 'ispersonaccount'; // detection-only: Account field map key, present only where Person Accounts are enabled
     private static final String PERSON_RECORD_TYPE_QUERY = 'SELECT Id FROM RecordType WHERE SobjectType = \'Account\' AND IsPersonType = true';
 
     // The Nonprofit Cloud household group, and the whole text of the one question asked about
@@ -38,9 +39,18 @@ public with sharing class OrgShapeSelector {
 
     /**
      * The Account record types that describe themselves as person types.
+     *
+     * Empty, without querying, when the org has no Person Accounts. RecordType.IsPersonType
+     * exists only where Person Accounts are enabled, so the query would throw a QueryException
+     * (No such column) anywhere else. The org is checked by describe first, with the same test
+     * OrgShapeDetector uses (the Account field that marks a person account); the exception is never the way
+     * this is found out. Callable on any org shape.
      */
     public static Set<Id> personTypeRecordTypeIds() {
         Set<Id> recordTypeIds = new Set<Id>();
+        if (!Schema.SObjectType.Account.fields.getMap().containsKey(PERSON_ACCOUNT_FIELD)) {
+            return recordTypeIds;
+        }
         for (SObject recordType : Database.query(PERSON_RECORD_TYPE_QUERY, AccessLevel.USER_MODE)) {
             recordTypeIds.add((Id) recordType.get('Id'));
         }

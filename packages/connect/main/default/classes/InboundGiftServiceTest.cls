@@ -463,16 +463,11 @@ private class InboundGiftServiceTest {
 
     @IsTest
     static void aPersonStoredAsAnAccountIsCreditedOnTheAccount() {
-        List<RecordType> personTypes = [
-            SELECT Id
-            FROM RecordType
-            WHERE SobjectType = 'Account' AND IsPersonType = TRUE AND IsActive = TRUE
-            LIMIT 1
-        ];
+        Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
         if (personTypes.isEmpty()) {
             return; // An org without person accounts has no such path to prove.
         }
-        SObject person = new Account(RecordTypeId = personTypes[0].Id);
+        SObject person = new Account(RecordTypeId = new List<Id>(personTypes)[0]);
         person.put('LastName', 'Okafor');
         person.put('PersonEmail', 'ada.okafor.inbound@example.org');
         insert person;
