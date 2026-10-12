@@ -886,11 +886,12 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 ### v0.8 keys
 
-Added by the suite choice (C-30).
+Added by the suite choice (C-30) and the Module Manager (C-24).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, step six offers the nonprofit modules; it installs and hides nothing (ADR-NEXT, `NEXT-suite-choice-is-the-first-setup-step.md`). |
+| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-NEXT, `NEXT-suite-choice-is-the-first-setup-step.md`). |
+| `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-NEXT, `NEXT-module-manager-turns-automation-off-and-never-installs.md`). |
 
 ### Rules
 
@@ -967,6 +968,7 @@ Automation Setting records (Section 10) on install and on upgrade.
 | Handler_Class__c | text | The Apex handler the trigger dispatcher invokes. |
 | Object_Name__c | text | The object whose trigger this automation runs on. |
 | Execution_Order__c | integer | The order in which handlers run for that object. |
+| `Module__c` | text (40) | The module that ships this automation, for example Giving or Connect; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized

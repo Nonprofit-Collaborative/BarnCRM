@@ -32,7 +32,8 @@ public with sharing class AutomationRegistrySelector {
                 Object_Name__c,
                 Execution_Order__c,
                 Enabled_By_Default__c,
-                Always_Runs__c
+                Always_Runs__c,
+                Module__c
             FROM Automation_Registry__mdt
             WITH SYSTEM_MODE
             ORDER BY Execution_Order__c NULLS LAST, DeveloperName

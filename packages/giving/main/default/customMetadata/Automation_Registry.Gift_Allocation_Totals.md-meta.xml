@@ -22,4 +22,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Works out the amount from a percent and the percent from an amount, and refuses any save that would leave a gift over-allocated or under-allocated.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

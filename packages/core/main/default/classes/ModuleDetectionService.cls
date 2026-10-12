@@ -172,7 +172,7 @@ public with sharing class ModuleDetectionService {
      * the same probe works before and after a namespace is assigned (Decision D-01), or null
      * when no object matches.
      */
-    private static String resolveObject(String unqualifiedName) {
+    public static String resolveObject(String unqualifiedName) {
         String wanted = unqualifiedName.toLowerCase();
         Map<String, Schema.SObjectType> describes = Schema.getGlobalDescribe();
         if (describes.containsKey(wanted)) {

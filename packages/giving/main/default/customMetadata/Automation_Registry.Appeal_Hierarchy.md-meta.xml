@@ -22,4 +22,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Refuses a parent appeal that would put an appeal above itself.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

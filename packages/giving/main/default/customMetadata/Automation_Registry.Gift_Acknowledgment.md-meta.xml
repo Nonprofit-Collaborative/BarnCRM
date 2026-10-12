@@ -28,4 +28,8 @@
       xsi:type="xsd:string"
     >Decides which thank you a gift gets and puts it in the queue, using your acknowledgment rules. It sends nothing: sending happens when you press Send on the Acknowledgments page or when the nightly send runs. Switching this off leaves gifts at whatever acknowledgment status they were saved with and stops the queue filling; the thank yous already recorded stay exactly as they are.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

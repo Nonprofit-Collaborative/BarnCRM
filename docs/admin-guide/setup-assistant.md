@@ -249,8 +249,8 @@ leaves nothing behind in your org: no objects, no tabs, no automation. Installin
 opening its install link and following the Salesforce install screens yourself: the
 assistant never installs anything for you.
 
-The one-click **Turn on** and **Turn off** actions arrive with the Module Manager. Until
-then this step is a truthful inventory and a set of links.
+To turn an installed module on or off, or to see what uninstalling one would delete, use the
+[Module Manager](module-manager.md) in BarnCRM Settings; the step links to it.
 
 Click **Next** when you have read it. The step marks itself done.
 

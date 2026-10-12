@@ -72,6 +72,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-core-names-other-products-only-when-detected.md) | Core shows nonprofit wording and other products' names only where they apply (amends ADR-0059 decision 5) | Accepted (owner decision) |
 | [NEXT](NEXT-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
 | [NEXT](NEXT-suite-choice-is-the-first-setup-step.md) | The suite choice is a Core setting the Setup Assistant asks first | Accepted (builder decision) |
+| [NEXT](NEXT-module-manager-turns-automation-off-and-never-installs.md) | The Module Manager switches a module's automation, links to installs, and counts before an uninstall | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

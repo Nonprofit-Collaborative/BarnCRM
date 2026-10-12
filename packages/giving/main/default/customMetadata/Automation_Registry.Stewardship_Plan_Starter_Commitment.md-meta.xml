@@ -28,4 +28,8 @@
       xsi:type="xsd:string"
     >Starts a stewardship plan when a pledge or recurring gift becomes active and an active plan template is waiting for that event, and creates that plan's tasks. It runs when a commitment is entered as Active and when an existing commitment moves into Active from any other status, so a pledge turned on a week after it was entered still gets its follow-up. Switch it off before loading a file of commitments and they load without starting plans; switch it back on and later commitments start plans again. Nothing is started retroactively for the commitments loaded while it was off. Gifts have their own switch, so stopping one does not stop the other.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

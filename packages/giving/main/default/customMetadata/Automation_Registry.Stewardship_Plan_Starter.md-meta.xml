@@ -28,4 +28,8 @@
       xsi:type="xsd:string"
     >Starts a stewardship plan when a gift arrives that an active plan template is waiting for, and creates that plan's tasks. Runs last among the gift automations, so the plan is started against a gift whose totals and links are already settled. Switch it off before a bulk import and the gifts load without starting hundreds of plans; switch it back on and later gifts start plans again. Nothing is started retroactively for the gifts loaded while it was off, which is deliberate: a welcome sequence for a gift from three weeks ago is not a welcome.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>
