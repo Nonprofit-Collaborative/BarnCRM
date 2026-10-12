@@ -61,7 +61,7 @@
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Schedule change refused without Manage Nonprofit Settings</shortDescription>
+        <shortDescription>Schedule change refused without Manage BarnCRM Settings</shortDescription>
         <value>You need the Manage BarnCRM Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the BarnCRM Admin access level.</value>
     </labels>
     <labels>

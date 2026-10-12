@@ -20,7 +20,7 @@ private class PermissionSetGroupSelectorTest {
         }
         Assert.isTrue(
             names.contains(AccessService.ADMIN_ROLE),
-            'The Nonprofit Admin group ships with BarnCRM Core and should be found.'
+            'The BarnCRM Admin group ships with BarnCRM Core and should be found.'
         );
         Assert.isTrue(names.contains('Read_Only'), 'The Read Only group ships with BarnCRM Core.');
     }

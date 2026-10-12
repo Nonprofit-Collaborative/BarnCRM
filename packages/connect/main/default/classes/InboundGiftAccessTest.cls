@@ -51,7 +51,7 @@ private class InboundGiftAccessTest {
                 OwnerId = integration.Id
             )
         };
-        Nonprofit_Settings__c running = TestDataFactory.defaultSettings();
+        BarnCRM_Settings__c running = TestDataFactory.defaultSettings();
         running.Automation_Paused_Until__c = null;
         TestDataFactory.saveSettings(running);
     }

@@ -8,14 +8,14 @@ private class HealthCheckGivingChecksTest {
     private static User jen() {
         return TestDataFactory.createUser(
             'Jen',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
     private static User david() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 
@@ -76,7 +76,7 @@ private class HealthCheckGivingChecksTest {
                 0,
                 findings.size(),
                 'Posting and the close date are an administrator question; a viewer without ' +
-                'Manage Nonprofit Settings is skipped rather than answered wrongly.'
+                'Manage BarnCRM Settings is skipped rather than answered wrongly.'
             );
         }
     }

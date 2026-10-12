@@ -52,7 +52,7 @@ private class HealthCheckHouseholdChecksTest {
 
     /** Junction mode, keeping empty households, so a test can leave one empty on purpose. */
     private static void junctionModeKeepingEmptyHouseholds() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Delete_Empty_Households__c = false;
@@ -126,7 +126,7 @@ private class HealthCheckHouseholdChecksTest {
 
     @IsTest
     static void withAutomaticCreationOffAPersonWithNoHouseholdIsExpected() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Auto_Create_Households__c = false;

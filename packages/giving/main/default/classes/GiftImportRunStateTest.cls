@@ -8,7 +8,7 @@ private class GiftImportRunStateTest {
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
@@ -149,7 +149,7 @@ private class GiftImportRunStateTest {
             mapping.serialize(),
             ImportTemplateService.RULE_EMAIL
         );
-        template.Donation_Matching__c = DonationMatcher.NEVER_MATCH;
+        template.Payment_Matching__c = DonationMatcher.NEVER_MATCH;
         update template;
         Import_Batch__c batch = ImportTestDataFactory.batch(template);
         List<Map<String, String>> rows = new List<Map<String, String>>();

@@ -60,7 +60,7 @@ private class GiftReceiptLockHandlerTest {
     private static User userHoldingTheOverride() {
         User maria = TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
         grantInSetup(maria, true);
         return maria;
@@ -382,7 +382,7 @@ private class GiftReceiptLockHandlerTest {
     private static User fundraiser() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 

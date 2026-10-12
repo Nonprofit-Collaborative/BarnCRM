@@ -107,7 +107,7 @@ private class SeasonalAddressControllerTest {
         System.runAs(reader) {
             try {
                 SeasonalAddressController.setSchedule(true);
-                Assert.fail('Scheduling a nightly job must require Manage Nonprofit Settings.');
+                Assert.fail('Scheduling a nightly job must require Manage BarnCRM Settings.');
             } catch (AuraHandledException expected) {
                 Assert.areEqual(
                     System.Label.Core_SeasonalAddress_PermissionRequired,
@@ -132,7 +132,7 @@ private class SeasonalAddressControllerTest {
         System.runAs(reader) {
             try {
                 SeasonalAddressController.runNow();
-                Assert.fail('Running the swap by hand must require Manage Nonprofit Settings.');
+                Assert.fail('Running the swap by hand must require Manage BarnCRM Settings.');
             } catch (AuraHandledException expected) {
                 Assert.areEqual(
                     System.Label.Core_SeasonalAddress_PermissionRequired,

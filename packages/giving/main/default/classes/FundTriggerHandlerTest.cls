@@ -101,7 +101,7 @@ private class FundTriggerHandlerTest {
         System.assertEquals(
             String.valueOf(general.Id),
             Giving_Settings__c.getOrgDefaults().Default_Fund__c,
-            'The flag and the Nonprofit Settings key are two faces of one decision (R-F4).'
+            'The flag and the BarnCRM Settings key are two faces of one decision (R-F4).'
         );
         System.assertEquals(
             general.Id,

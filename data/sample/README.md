@@ -59,7 +59,7 @@ The JSON shape:
       ]
     }
   ],
-  "organizations": [{ "key": "O001", "name": "...", "type": "church", "website": "...", "phone": "..." }],
+  "organizations": [{ "key": "O001", "name": "...", "type": "business", "website": "...", "phone": "..." }],
   "relationships": [
     {
       "person": "H001-1",

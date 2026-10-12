@@ -7,14 +7,14 @@ private class HealthCheckGivingSelectorTest {
     private static User jen() {
         return TestDataFactory.createUser(
             'Jen',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
     private static User david() {
         return TestDataFactory.createUser(
             'David',
-            new List<String>{ 'Nonprofit_Staff', 'Giving_Staff' }
+            new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
         );
     }
 
@@ -169,7 +169,7 @@ private class HealthCheckGivingSelectorTest {
                 0,
                 count,
                 'The gate is asserted in the selector itself, so a viewer without Manage ' +
-                'Nonprofit Settings gets nothing, not an under-permissioned peek at the org.'
+                'BarnCRM Settings gets nothing, not an under-permissioned peek at the org.'
             );
             System.assertEquals(0, linked.size());
         }

@@ -1,7 +1,7 @@
 /**
  * The nightly rollup run, and the two buttons on the Rollups page that turn it on and off.
  *
- * The schedule is an administrator's, not Setup's: it is started and stopped from the Nonprofit
+ * The schedule is an administrator's, not Setup's: it is started and stopped from the BarnCRM
  * Settings console, which is what "every admin setting lives in the in-app console" means for
  * something that is a scheduled job rather than a field.
  */

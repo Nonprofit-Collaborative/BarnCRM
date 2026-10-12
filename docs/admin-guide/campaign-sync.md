@@ -44,7 +44,7 @@ Campaigns, and the Campaign sync page says so.
 2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.
 3. Still in **Giving**, open **Campaign sync**. It shows how many appeals have a Campaign.
-   Click **Sync all appeals** once, so the appeals you already had get their Campaigns.
+   It counts up to 10,000 appeals; past that a number reads `10000+`. Click **Sync all appeals** once, so the appeals you already had get their Campaigns.
 
 **Who gets a Campaign when they save an appeal.** The Campaign is created with the access of
 the person saving the appeal. Salesforce only lets someone create Campaigns when their user

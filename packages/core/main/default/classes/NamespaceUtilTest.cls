@@ -25,8 +25,8 @@ private class NamespaceUtilTest {
         NamespaceUtil.cachedPrefix = 'example__';
 
         System.assertEquals(
-            'example__Nonprofit_Settings',
-            NamespaceUtil.qualify('Nonprofit_Settings'),
+            'example__BarnCRM_Settings',
+            NamespaceUtil.qualify('BarnCRM_Settings'),
             'A packaged tab carries the package prefix.'
         );
     }
@@ -36,8 +36,8 @@ private class NamespaceUtilTest {
         NamespaceUtil.cachedPrefix = '';
 
         System.assertEquals(
-            'Nonprofit_Settings',
-            NamespaceUtil.qualify('Nonprofit_Settings'),
+            'BarnCRM_Settings',
+            NamespaceUtil.qualify('BarnCRM_Settings'),
             'With no namespace registered the name stands on its own.'
         );
         System.assertEquals(null, NamespaceUtil.qualify(null), 'Nothing qualifies to nothing.');

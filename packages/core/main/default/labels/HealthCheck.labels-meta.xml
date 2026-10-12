@@ -157,8 +157,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that the gift mirror lives in the Connect module.</shortDescription>
-        <value>This org has Agentforce Nonprofit Gift Transaction objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside BarnCRM, the mirror arrives with the Connect module.</value>
+        <shortDescription>Explains which module holds the mirror for the detected objects.</shortDescription>
+        <value>This org has Nonprofit Cloud Gift Transaction objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside BarnCRM, the mirror arrives with the Connect module.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ConnectMissingTitle</fullName>
@@ -167,6 +167,14 @@
         <protected>false</protected>
         <shortDescription>Title of the Connect module finding.</shortDescription>
         <value>The Gift Transaction mirror is in the Connect module</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_CountOrMore</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stands in for a count that reached its cap. {0} the cap.</shortDescription>
+        <value>{0} or more</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CurrentModeLabel</fullName>
@@ -293,8 +301,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Shown when Agentforce Nonprofit objects are present.</shortDescription>
-        <value>Agentforce Nonprofit objects detected</value>
+        <shortDescription>Shown when Salesforce gift objects are detected in the org.</shortDescription>
+        <value>Nonprofit Cloud objects detected</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_Intro</fullName>
@@ -437,7 +445,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that nobody holds the Nonprofit Admin role.</shortDescription>
+        <shortDescription>Explains that nobody holds the BarnCRM Admin role.</shortDescription>
         <value>Nobody in this org has the BarnCRM Admin role, so nobody can change settings and parts of BarnCRM will refuse to run. Assign it to yourself on the Access page.</value>
     </labels>
     <labels>
@@ -493,7 +501,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Shown when the Nonprofit Success Pack is installed.</shortDescription>
+        <shortDescription>Shown when a detected household package is installed.</shortDescription>
         <value>NPSP detected</value>
     </labels>
     <labels>
@@ -541,7 +549,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Orphan findings in an org that also has Nonprofit Cloud households.</shortDescription>
+        <shortDescription>Orphan findings in an org that also has detected native households.</shortDescription>
         <value>This org also has Nonprofit Cloud households, and BarnCRM cannot see who belongs to those, so some of these may be in one.</value>
     </labels>
     <labels>

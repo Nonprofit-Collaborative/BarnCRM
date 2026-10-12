@@ -3,7 +3,7 @@
   <description>
     Every BarnCRM setting on one page, grouped into sections and searchable.
   </description>
-  <flexiPage>Nonprofit_Settings</flexiPage>
+  <flexiPage>BarnCRM_Settings</flexiPage>
   <label>BarnCRM Settings</label>
   <motif>Custom20: Airplane</motif>
 </CustomTab>
