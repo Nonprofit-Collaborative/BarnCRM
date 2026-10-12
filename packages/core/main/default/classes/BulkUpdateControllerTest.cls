@@ -37,7 +37,7 @@ private class BulkUpdateControllerTest {
     );
 
     private static void makeVolunteers(Integer howMany) {
-        BulkUpdateFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();

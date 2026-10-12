@@ -4,9 +4,11 @@
  *
  * Everything is asked of the running user's describe: a target is a field of the query's own
  * object that the user may edit, of a type a value can be written to, and not one the package
- * keeps. The package's list is worked out when asked, from the Rollup Definitions and a short
- * list of names, so a rollup added later is protected without a code change. Core names no
- * object of another module (ADR-0059); their own lock triggers refuse a locked record's save.
+ * keeps. What the package keeps, and which objects are its bookkeeping or Setup's, is the one
+ * list in `DataProtectedFields` that a one-object import (C-33) uses too, worked out when asked
+ * from the Rollup Definitions, so a rollup added later is protected without a code change.
+ * Core names no object of another module (ADR-0059): a module names its protected objects
+ * through `DataProtectionExtensions`, and its own lock triggers refuse a locked record's save.
  *
  * This decides what may be offered and checked. Every write is still in user mode.
  */
@@ -14,49 +16,6 @@ public with sharing class BulkUpdateFields {
     /** Raised for anything the person can fix; the message is for them. */
     public class BulkUpdateException extends Exception {
     }
-
-    /** Core's bookkeeping objects, by their names without a namespace, in lower case. */
-    private static final Set<String> BOOKKEEPING = new Set<String>{
-        'import_template__c',
-        'import_batch__c',
-        'import_row__c',
-        'import_journal__c',
-        'error_log__c',
-        'barncrm_settings__c',
-        'setting_change__c',
-        'automation_setting__c',
-        'rollup_definition__c',
-        'duplicate_dismissal__c',
-        'saved_query__c'
-    };
-
-    /** Salesforce setup and security objects, which Setup manages (ADR-0047, never built). */
-    private static final Set<String> SETUP = new Set<String>{
-        'user',
-        'group',
-        'groupmember',
-        'profile',
-        'userrole',
-        'permissionset',
-        'permissionsetassignment',
-        'permissionsetgroup',
-        'permissionsetgroupcomponent',
-        'permissionsetlicenseassign',
-        'recordtype',
-        'organization',
-        'queuesobject'
-    };
-
-    /** Fields the package keeps on any object that carries them (R-BU4), local names. */
-    private static final Set<String> KEPT = new Set<String>{
-        'created_by_import_batch__c',
-        'sample_data_key__c',
-        'household_formal_greeting__c',
-        'household_informal_greeting__c',
-        'member_count__c'
-    };
-
-    private static final String LAST_CALCULATED_SUFFIX = 'last_calculated__c';
 
     private static final Set<Schema.DisplayType> TEXT_TARGETS = new Set<Schema.DisplayType>{
         Schema.DisplayType.STRING,
@@ -96,13 +55,6 @@ public with sharing class BulkUpdateFields {
         Schema.DisplayType.DATETIME,
         Schema.DisplayType.REFERENCE
     };
-
-    /** Set only by tests: the Rollup Definitions to read in place of the org's. */
-    @TestVisible
-    private static List<Rollup_Definition__c> definitionsOverride;
-
-    /** Rollup targets by local object name, read once per transaction. */
-    private static Map<String, Set<String>> rollupTargets;
 
     /** One field a bulk update may write, as the page offers it. */
     public class Target {
@@ -349,14 +301,13 @@ public with sharing class BulkUpdateFields {
     /** Why no record of this object may be bulk updated, or null when its records may be. */
     @TestVisible
     private static String objectReason(Schema.DescribeSObjectResult described) {
-        String name = described.getName().toLowerCase();
-        if (described.isCustom() && BOOKKEEPING.contains(ownLocalName(name))) {
+        if (DataProtectedFields.isBookkeeping(described.getSObjectType())) {
             return System.Label.Core_BulkUpdate_ReasonBookkeeping;
         }
         if (described.isCustomSetting()) {
             return System.Label.Core_BulkUpdate_ReasonBookkeeping;
         }
-        if (!described.isCustom() && SETUP.contains(name)) {
+        if (DataProtectedFields.isSetup(described.getSObjectType())) {
             return System.Label.Core_BulkUpdate_ReasonSetup;
         }
         if (!described.isUpdateable()) {
@@ -368,12 +319,7 @@ public with sharing class BulkUpdateFields {
     /** Why this field may not be bulk updated, or null when it may. */
     @TestVisible
     private static String fieldReason(Schema.SObjectType type, Schema.DescribeFieldResult field) {
-        String name = field.getName().toLowerCase();
-        String own = field.isCustom() ? ownLocalName(name) : null;
-        if (
-            (own != null && (KEPT.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX))) ||
-            rollupTargetsOf(type).contains(localName(name))
-        ) {
+        if (DataProtectedFields.isKeptByThePackage(type, field)) {
             return System.Label.Core_BulkUpdate_ReasonKept;
         }
         if (!field.isUpdateable() || !field.isAccessible()) {
@@ -383,35 +329,6 @@ public with sharing class BulkUpdateFields {
             return System.Label.Core_BulkUpdate_ReasonType;
         }
         return null;
-    }
-
-    /** The target fields of every Rollup Definition on this object, local names, lower case. */
-    private static Set<String> rollupTargetsOf(Schema.SObjectType type) {
-        if (rollupTargets == null) {
-            rollupTargets = new Map<String, Set<String>>();
-            for (
-                Rollup_Definition__c definition : definitionsOverride != null
-                    ? definitionsOverride
-                    : RollupSelector.selectAll()
-            ) {
-                if (
-                    String.isBlank(definition.Target_Object__c) ||
-                    String.isBlank(definition.Target_Field__c)
-                ) {
-                    continue;
-                }
-                String target = localName(definition.Target_Object__c.trim().toLowerCase());
-                if (!rollupTargets.containsKey(target)) {
-                    rollupTargets.put(target, new Set<String>());
-                }
-                rollupTargets.get(target)
-                    .add(localName(definition.Target_Field__c.trim().toLowerCase()));
-            }
-        }
-        String key = localName(
-            type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
-        );
-        return rollupTargets.containsKey(key) ? rollupTargets.get(key) : new Set<String>();
     }
 
     private static Map<String, Schema.SObjectField> fieldMap(Schema.SObjectType type) {
@@ -441,22 +358,5 @@ public with sharing class BulkUpdateFields {
                 throw refused;
             }
         }
-    }
-
-    /** A lower-case name without this package's namespace, or null for another namespace's. */
-    private static String ownLocalName(String lowerCaseName) {
-        String prefix = NamespaceUtil.prefix().toLowerCase();
-        if (String.isBlank(prefix)) {
-            return lowerCaseName;
-        }
-        return lowerCaseName.startsWith(prefix) ? lowerCaseName.removeStart(prefix) : null;
-    }
-
-    /** A lower-case name without this package's namespace. */
-    private static String localName(String lowerCaseName) {
-        String prefix = NamespaceUtil.prefix().toLowerCase();
-        return String.isNotBlank(prefix) && lowerCaseName.startsWith(prefix)
-            ? lowerCaseName.removeStart(prefix)
-            : lowerCaseName;
     }
 }

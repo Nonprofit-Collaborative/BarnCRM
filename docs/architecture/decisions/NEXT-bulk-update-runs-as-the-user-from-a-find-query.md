@@ -37,8 +37,8 @@ BarnCRM Settings and a permission of its own.
    (canonical model R-BU4): every Rollup Definition target, household greetings and member
    count, last calculated times, the import tag and the sample data key, and objects that are
    the package's bookkeeping, custom settings or Salesforce setup objects. `BulkUpdateFields`
-   holds this; it is named for bulk update so it does not collide with the one-object import's
-   protected list (C-33), and the two can be merged when both have landed. Core names no Giving
+   holds the bulk update rules; at landing its protected list was merged into the one-object
+   import's `DataProtectedFields` (C-33), so both tools refuse the same objects and fields. Core names no Giving
    object: a posted gift or issued receipt is refused by its own lock trigger and journaled as
    Failed.
 5. **The import undo, widened.** `ImportUndoBatch` runs only its restore pass for an Update

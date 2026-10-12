@@ -21,7 +21,7 @@ private class BulkUpdateFieldsTest {
 
     @IsTest
     static void offersEditableFieldsAndNeverOnesThePackageOrPlatformKeeps() {
-        BulkUpdateFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
         Set<String> offered;
         System.runAs(maria()) {
             offered = names(BulkUpdateFields.targets('Contact'));
@@ -43,7 +43,7 @@ private class BulkUpdateFieldsTest {
 
     @IsTest
     static void aRollupTargetIsKeptWithoutACodeChange() {
-        BulkUpdateFields.definitionsOverride = new List<Rollup_Definition__c>{
+        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>{
             new Rollup_Definition__c(Target_Object__c = 'Contact', Target_Field__c = 'Title')
         };
         System.runAs(maria()) {
@@ -109,7 +109,7 @@ private class BulkUpdateFieldsTest {
 
     @IsTest
     static void copySourcesAreFieldsWhoseValuesFit() {
-        BulkUpdateFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
         Set<String> intoEmail = new Set<String>();
         Set<String> intoText = new Set<String>();
         System.runAs(maria()) {

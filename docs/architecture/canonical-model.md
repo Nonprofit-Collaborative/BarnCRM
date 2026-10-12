@@ -5779,13 +5779,16 @@ Each chunk writes one commit journal page (R-IJ1, R-IJ3).
 path to another record), editable by the person (`isUpdateable`, which excludes formula,
 auto-number and system fields), of a type a value can be written to, and not one the package
 keeps: the target of any Rollup Definition (active or not, read when the job is checked, so a
-new rollup is protected without a code change), the household greetings and member count, any
-field ending `Last_Calculated__c`, the import tag (`Created_By_Import_Batch__c`) and the
-sample data key (`Sample_Data_Key__c`). The object must be editable by the person and not one
-of the package's bookkeeping objects (data jobs, import rows and templates, the journal, the
-error log, settings and setting changes, automation settings, rollup definitions, duplicate
-dismissals, saved queries), a custom setting, or a Salesforce setup object (users, groups,
-profiles, roles, permission sets and their assignments, record types, the organization). A
+new rollup is protected without a code change), and the fields the household automation and
+the package write (R-IT14's list: the household greetings, custom name, role and member count,
+the primary contact and primary affiliation, the import tag `Created_By_Import_Batch__c`, the
+sample data marks), and any field ending `Last_Calculated__c`. The object must be editable by
+the person and not one of the package's bookkeeping objects (data jobs, import rows and
+templates, the journal, the error log, settings and setting changes, automation settings,
+rollup definitions, duplicate dismissals, saved queries) or an object a module protects through
+`DataProtectionExtensions`, a custom setting, or a Salesforce setup object (users, groups,
+profiles, roles, permission sets and their assignments, record types, the organization). The
+protected list is one list, `DataProtectedFields`, shared with the one-object import (R-IT14). A
 copy needs a compatible source: the same type; any text, email, phone, URL or picklist into a
 text field; any number into a number field; a lookup into a lookup that can point at the same
 kind of record. A value to set is typed for its field before the job starts; a restricted
@@ -5808,8 +5811,8 @@ permission and, because every bulk update starts from a Find query, `Find_And_Ex
 - **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`) and
   `Import_Journal__c` (Sections 16 and 17A).
 - **Settings key:** `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys).
-- **Services:** `BulkUpdateFields` (which fields and objects can be written, and how a value
-  or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
+- **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
+  `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
   `BulkUpdateBatch` (the job), `BulkUpdateController`; `QueryCompiler` gains the count and the
   chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
 - **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own

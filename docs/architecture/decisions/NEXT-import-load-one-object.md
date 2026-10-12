@@ -69,7 +69,7 @@ Created By Import Batch field, and Core cannot add one to it.
    every Rollup Definition target, the import tag, the package's `Last_Calculated` fields, the
    household fields the household automation keeps on accounts and contacts, and a household's
    name. The list is built from describe and the Rollup Definitions at run time, in a class of
-   its own (`DataProtectedFields`) that bulk update (C-35) will reuse. A field the user may not
+   its own (`DataProtectedFields`) that bulk update (C-35) also uses since landing. A field the user may not
    write is skipped and named in the run log.
 6. **A value the field cannot take rejects the row.** The people import skips such a value and
    logs it, because the row still describes a person; a one-object row is one record, and

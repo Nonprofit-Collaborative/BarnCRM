@@ -73,8 +73,9 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   related record are not offered: a bulk update changes the records the query returns and
   nothing else.
 - **Fields BarnCRM keeps itself** are not offered: every rollup total (any field a Rollup
-  Definition writes), household greetings, member counts, last calculated times, the import
-  tag and the sample data key. Formula, auto-number and system fields cannot be edited by
+  Definition writes), household greetings, custom names, roles and member counts, primary
+  contacts and primary affiliations, last calculated times, the import tag and the sample data
+  marks. These are the same fields an import never writes. Formula, auto-number and system fields cannot be edited by
   anyone, so they are not offered either. Change what they are calculated from instead.
 - **Objects BarnCRM keeps itself** cannot be bulk updated: imports and their journal, import
   templates, the error log, settings and setting changes, automation settings, rollup

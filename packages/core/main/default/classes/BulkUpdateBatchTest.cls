@@ -39,7 +39,7 @@ private class BulkUpdateBatchTest {
 
     /** `volunteers` contacts titled Volunteer and `staff` titled Staff, with work emails. */
     private static void makePeople(Integer volunteers, Integer staff) {
-        BulkUpdateFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();

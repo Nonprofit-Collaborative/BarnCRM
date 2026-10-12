@@ -4,8 +4,8 @@
  * objects a load may not touch, decided by an allow-list rule over describe, and the fields the
  * package or the platform keeps.
  *
- * One class for every tool that writes many records at once: a one-object import (C-33) today,
- * bulk update (C-35) next. Everything is worked out at run time from describe and the Rollup
+ * One class for every tool that writes many records at once: a one-object import (C-33) and
+ * bulk update (C-35, through `BulkUpdateFields`). Everything is worked out at run time from describe and the Rollup
  * Definitions, so a rollup added later is protected without code, and Core names no object of
  * another package: a module names its own protected objects through `DataProtectionExtensions`.
  *
@@ -16,7 +16,8 @@
 public with sharing class DataProtectedFields {
     /**
      * The package's own bookkeeping objects, by local name: imports and the journal, the error
-     * log, setting changes, automation settings and rollup definitions.
+     * log, settings and setting changes, automation settings, rollup definitions, duplicate
+     * dismissals and saved queries.
      */
     private static final Set<String> BOOKKEEPING = new Set<String>{
         'import_template__c',
@@ -24,9 +25,12 @@ public with sharing class DataProtectedFields {
         'import_row__c',
         'import_journal__c',
         'error_log__c',
+        'barncrm_settings__c',
         'setting_change__c',
         'automation_setting__c',
-        'rollup_definition__c'
+        'rollup_definition__c',
+        'duplicate_dismissal__c',
+        'saved_query__c'
     };
 
     /** Household membership rows, written only through the household service (R-M5). */
@@ -158,6 +162,55 @@ public with sharing class DataProtectedFields {
             return String.format(Label.Core_Data_ObjectNotLoadable, plural);
         }
         return null;
+    }
+
+    /**
+     * Whether this object is the package's own bookkeeping or one a module protects, which no
+     * tool writes in bulk.
+     */
+    @NamespaceAccessible
+    public static Boolean isBookkeeping(Schema.SObjectType type) {
+        if (type == null) {
+            return false;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        String own = described.isCustom() ? ownLocalName(described.getName().toLowerCase()) : null;
+        return (own != null && BOOKKEEPING.contains(own)) ||
+            DataProtectionExtensions.protectedObjects().contains(type);
+    }
+
+    /** Whether this object is a Salesforce setup or security object, which Setup manages. */
+    @NamespaceAccessible
+    public static Boolean isSetup(Schema.SObjectType type) {
+        if (type == null) {
+            return false;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        return !described.isCustom() && SETUP.contains(described.getName().toLowerCase());
+    }
+
+    /**
+     * Whether the package keeps this field of this object: a field the package writes itself, a
+     * last calculated field, or a Rollup Definition target. The platform's own, formula and auto
+     * number fields are not counted here; `isProtected` covers them too.
+     */
+    @NamespaceAccessible
+    public static Boolean isKeptByThePackage(
+        Schema.SObjectType type,
+        Schema.DescribeFieldResult field
+    ) {
+        if (type == null || field == null) {
+            return false;
+        }
+        String name = field.getName().toLowerCase();
+        String own = field.isCustom() ? ownLocalName(name) : null;
+        Set<String> targets = rollupTargetsOf(
+            type.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+        );
+        return (own != null &&
+            (KEPT_BY_THE_PACKAGE.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX))) ||
+            targets.contains(name) ||
+            targets.contains(localName(name));
     }
 
     /**

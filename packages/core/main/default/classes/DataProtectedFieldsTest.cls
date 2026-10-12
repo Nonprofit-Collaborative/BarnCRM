@@ -43,6 +43,35 @@ private class DataProtectedFieldsTest {
     }
 
     @IsTest
+    static void bulkUpdateAndLoadShareOneProtectedList() {
+        DataProtectionExtensions.noneForTest = true;
+        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        Test.startTest();
+        Boolean savedQueries = DataProtectedFields.isBookkeeping(Saved_Query__c.SObjectType);
+        Boolean dismissals = DataProtectedFields.isBookkeeping(Duplicate_Dismissal__c.SObjectType);
+        Boolean contacts = DataProtectedFields.isBookkeeping(Contact.SObjectType);
+        Boolean users = DataProtectedFields.isSetup(User.SObjectType);
+        Boolean accounts = DataProtectedFields.isSetup(Account.SObjectType);
+        Boolean sampleKey = DataProtectedFields.isKeptByThePackage(
+            Contact.SObjectType,
+            Contact.Sample_Data_Key__c.getDescribe()
+        );
+        Boolean title = DataProtectedFields.isKeptByThePackage(
+            Contact.SObjectType,
+            Contact.Title.getDescribe()
+        );
+        Test.stopTest();
+
+        Assert.isTrue(savedQueries, 'Saved queries are the package bookkeeping (from C-35).');
+        Assert.isTrue(dismissals, 'Duplicate dismissals are the package bookkeeping.');
+        Assert.isFalse(contacts, 'Contacts are the organization records.');
+        Assert.isTrue(users, 'Users are managed in Setup.');
+        Assert.isFalse(accounts, 'Accounts are not a Setup object.');
+        Assert.isTrue(sampleKey, 'The sample data key is kept by the package.');
+        Assert.isFalse(title, 'An ordinary field is not kept by the package.');
+    }
+
+    @IsTest
     static void setupMembershipSettingsAndEventsAreRefused() {
         DataProtectionExtensions.noneForTest = true;
         Test.startTest();
