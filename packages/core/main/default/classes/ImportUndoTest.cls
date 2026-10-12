@@ -642,4 +642,19 @@ private class ImportUndoTest {
             'And the journal says it could not be checked.'
         );
     }
+
+    /**
+     * The restore loop asks for an object's field map once per journal entry; it is described
+     * once and kept, whatever case the journal wrote the object name in.
+     */
+    @IsTest
+    static void theFieldMapIsDescribedOncePerObject() {
+        Map<String, Schema.SObjectField> first = ImportUndoBatch.fieldMap('Contact');
+
+        Assert.isTrue(first.containsKey('lastname'), 'The map is the object\'s own fields.');
+        Assert.isTrue(
+            first === ImportUndoBatch.fieldMap('contact'),
+            'The second entry for the same object reuses the first describe.'
+        );
+    }
 }

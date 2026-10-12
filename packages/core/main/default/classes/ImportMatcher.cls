@@ -562,12 +562,20 @@ public with sharing class ImportMatcher {
         return null;
     }
 
-    /** True when the account object in this org has the named field. */
+    /** The account field map, described once per transaction (dynamic-apex.md section 5). */
+    private static Map<String, Schema.SObjectField> accountFields;
+
+    /**
+     * True when the account object in this org has the named field. Called once per matched
+     * row by `firstNameOf`, so the describe is taken once and kept.
+     */
     @NamespaceAccessible
     public static Boolean accountHasField(String fieldName) {
-        return Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap()
-            .containsKey(fieldName.toLowerCase());
+        if (accountFields == null) {
+            accountFields = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .fields.getMap();
+        }
+        return accountFields.containsKey(fieldName.toLowerCase());
     }
 
     /**

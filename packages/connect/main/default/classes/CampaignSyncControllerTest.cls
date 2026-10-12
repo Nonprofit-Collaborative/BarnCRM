@@ -50,6 +50,27 @@ private class CampaignSyncControllerTest {
         Assert.areEqual(2, status.appealCount, 'Both appeals are counted.');
         Assert.areEqual(0, status.linkedCount, 'Neither has a Campaign while the sync is off.');
         Assert.isFalse(status.running, 'Nothing is running.');
+        Assert.isFalse(status.appealCountCapped, 'Two appeals is an exact count.');
+    }
+
+    @IsTest
+    static void pastTheCapTheCountStopsAndSaysSo() {
+        switchOn(false);
+        insert new List<Appeal__c>{
+            new Appeal__c(Name = 'Spring appeal', Active__c = true),
+            new Appeal__c(Name = 'Gala', Active__c = true),
+            new Appeal__c(Name = 'Year end', Active__c = true)
+        };
+        CampaignSyncController.countCap = 2;
+        CampaignSyncController.Status status;
+        Test.startTest();
+        System.runAs(maria()) {
+            status = CampaignSyncController.getStatus();
+        }
+        Test.stopTest();
+        Assert.areEqual(2, status.appealCount, 'The count stops at the cap.');
+        Assert.isTrue(status.appealCountCapped, 'and says there are more.');
+        Assert.isFalse(status.linkedCountCapped, 'None linked is still exact.');
     }
 
     @IsTest

@@ -12,6 +12,7 @@
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "check:namespace": "bash scripts/ci/check-namespace.sh",
     "check:standard-objects": "bash scripts/ci/check-standard-objects.sh",
+    "check:person-account-fields": "python3 scripts/ci/check-person-account-fields.py",
     "check:object-allowlist": "python3 scripts/ci/check-object-allowlist.py",
     "check:custom-metadata": "python3 scripts/ci/check-custom-metadata.py",
     "check:symlinks": "bash scripts/ci/check-symlinks.sh",

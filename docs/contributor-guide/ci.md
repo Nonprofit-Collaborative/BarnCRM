@@ -38,6 +38,21 @@ Salesforce org is needed for this job. Steps:
    unguarded: check 7 below covers the vendored tree with an allowlist, and the objects it
    names are recorded, with the evidence that they are present on the Platform-only shape,
    in `packages/core/vendor/apex-rollup/VENDOR.md`.
+   It also checks Connect's object and field declarations (everything under
+   `packages/connect/**/objects/`): Connect's Apex may name Campaign or Opportunity as strings,
+   but a lookup, formula or field declared on one of those objects is resolved at deploy time
+   and refuses the install where the object is absent. A folder named after a denied object
+   fails, and so does a denied name in the file outside its prose (label, description, help
+   text, values).
+   The next workflow step, `scripts/ci/check-person-account-fields.py`, closes the gap both
+   gates leave: a static reference to a Person Account field (`IsPersonAccount`,
+   `PersonEmail`, `PersonMailingPostalCode`, any `__pc` or `__pr` field) anywhere under
+   `packages/`, outside the vendored tree. Apex comments and string literals are ignored,
+   because holding the name as text and resolving it through describe is the allowed seam
+   (`dynamic-apex.md`); a token such as `Account.PersonEmail`, a static SOQL query naming one,
+   an `@salesforce/schema` import, a `field-name` attribute, or a metadata reference such as a
+   permission set field grant fails. Custom metadata records are data and are skipped. There
+   is no exemption marker.
 7. `scripts/ci/check-object-allowlist.py`, failing the build if Apex or an `objects/`
    folder anywhere under `packages/` names a standard object that is not on the allowlist
    in that script. This is the other half of check 6 and the stronger shape: check 6 is a
@@ -769,21 +784,9 @@ C-29 stack is still open with a `failure` status on its top head, and two Depend
 ### Work items
 
 These are also recorded, in the same detail, in plan Section 11.3 (parking lot). Remove an item
-from both when its PR merges.
+from both when its PR merges. Item numbers match the plan's and are kept when an item is
+removed, so a list may start above 1.
 
-1. **Harden the settings writers and cap uncapped counts.**
-   - `SettingsService.applyValues`, through `SettingsWriter.saveOrgDefault`, upserts the whole
-     cached, unlocked `Nonprofit_Settings__c` record. It should update only the changed fields
-     through `OrgSettingsSystemWriter` and `SettingsRecordSelector.lockStored()`.
-   - Giving makes raw first saves from `getOrgDefaults()` in `AcknowledgmentService`,
-     `DonorLevelWriter`, `AccountingPeriodWriter`, `AcknowledgmentController` and
-     `CommitmentService`. A first save from the raw record writes false into
-     `Giving_Settings__c` checkboxes that default to true:
-     - `Auto_Apply_Gifts_To_Installments__c`
-     - `Automatic_Household_Soft_Credits__c`
-     - `Receipt_Print_Logo__c`
-   - `SettingsService.getSettingsForUpdate()` takes no lock: rename it.
-   - Cap `HealthCheckSettingsChecks.countNew()`.
 2. **Log unrecognized checkbox values in imports.** `ImportRowProcessor.convertCheckbox` reads
    only `true`, `yes` and `1` as true. The new rule:
    - **True:** `true`, `yes`, `y`, `1`, `x`, `checked`, `on`, `t`.
@@ -792,29 +795,13 @@ from both when its PR merges.
    - **Anything else:** skip the field, with a note in the run log.
 
    Update the admin guide first. Add tests, including a 200-row bulk case.
-3. **Fix the dynamic Apex convention violations** (see `dynamic-apex.md`).
-   - **Bug:** `HealthCheckOrgShapeChecks` looks for a `ConnectService` class that does not
-     exist, so it always reports Connect as not installed. Point it at a real Connect class,
-     and update item 4 of `packages/core/integration/c-07-c-11.permissions.md`.
-   - **Uncapped counts:** `ReceiptGapSelector` (on `main`; C-29 replaces it),
-     `CampaignSyncSelector.countAppeals`, `HubErrorCountSelector.countNewErrors`, and
-     `HealthCheckSettingsChecks.errorLogFinding` (use `countNewUpTo`).
-   - **Describes inside loops:** `ImportMatcher.firstNameOf`, `ImportUndoBatch.fieldMap`, and
-     `SettingsService.hasKey` / `SettingsController.toSetting`.
-   - **`HubErrorCountSelector`:** add a field-level check on `Status__c` and a namespace-first
-     lookup.
-   - **Wrong-shape classes:** `ImportEntityProcessors` and `SampleDataModules` should log them.
-     `SampleDataModules` should also cache its lookups.
-   - **CI gaps:**
-     - add a static check for Person Account field references;
-     - extend `check-standard-objects.sh` to cover the declarations in `packages/connect`.
-   - **Tests:**
-     - add a "Campaign unavailable" test seam;
-     - make tests that return early assert both cases.
-4. **Smaller review follow-ups.**
+5. **Smaller review follow-ups.**
    - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
    - X-01: the admin guide should warn against listing `Master` in the record-type filter.
    - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.
+   - X-01: about 30 Opportunity mirror tests return early where Opportunity is absent without
+     asserting that case. Add an `OpportunityMirrorService` unavailable seam, as
+     `CampaignSyncService.unavailableForTest` does for Campaign.
 
 ### Next on the roadmap
 

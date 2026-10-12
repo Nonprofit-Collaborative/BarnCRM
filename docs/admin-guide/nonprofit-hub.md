@@ -49,6 +49,8 @@ Maria has just installed BarnCRM and has the sample data loaded.
    full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
 5. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
    number, click **Open the Error Log** and read the plain-language message on each row.
+   The tile counts up to 999; past that it says `999+`, so a flooded Error Log never slows
+   the home page down.
 6. If someone has paused automation (for example during a large import), a banner sits
    above the checklist saying BarnCRM automation is paused. It disappears by itself
    when the pause expires.

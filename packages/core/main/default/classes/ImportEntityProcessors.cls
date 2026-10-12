@@ -48,7 +48,7 @@ public with sharing class ImportEntityProcessors {
         }
         if (!looked) {
             looked = true;
-            found = resolve();
+            found = resolve(CLASS_NAME);
         }
         return found;
     }
@@ -91,26 +91,34 @@ public with sharing class ImportEntityProcessors {
             tag.getDescribe().getReferenceTo().contains(Import_Batch__c.SObjectType);
     }
 
-    private static ImportEntityProcessor resolve() {
+    /** The class by name, namespace first; tests pass names of their own. */
+    @TestVisible
+    private static ImportEntityProcessor resolve(String className) {
         String prefix = NamespaceUtil.prefix();
         Type processorType = Type.forName(
             String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            CLASS_NAME
+            className
         );
         if (processorType == null) {
-            processorType = Type.forName(CLASS_NAME);
+            processorType = Type.forName(className);
         }
         if (processorType == null) {
             return null;
         }
+        Object candidate;
         try {
-            Object candidate = processorType.newInstance();
-            return candidate instanceof ImportEntityProcessor
-                ? (ImportEntityProcessor) candidate
-                : null;
+            candidate = processorType.newInstance();
         } catch (Exception cannotBuild) {
             ErrorLogger.log(cannotBuild, 'ImportEntityProcessors.resolve');
             return null;
         }
+        if (candidate instanceof ImportEntityProcessor) {
+            return (ImportEntityProcessor) candidate;
+        }
+        ErrorLogger.log(
+            new System.TypeException(className + ' does not implement ImportEntityProcessor'),
+            'ImportEntityProcessors.resolve'
+        );
+        return null;
     }
 }

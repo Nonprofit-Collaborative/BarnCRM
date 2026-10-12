@@ -313,6 +313,7 @@ private class HealthCheckServiceTest {
     @IsTest
     static void industriesObjectsWithoutConnectAreReported() {
         OrgShapeDetector.overrideShape = shape(false, false, true, false);
+        HealthCheckOrgShapeChecks.connectInstalledOverride = false;
 
         HealthCheckService.Finding finding = find(
             HealthCheckService.run(),
@@ -329,6 +330,35 @@ private class HealthCheckServiceTest {
             null,
             finding.fixTarget,
             'There is nothing to click: Connect is a separate install in v0.6.'
+        );
+    }
+
+    @IsTest
+    static void industriesObjectsWithConnectInstalledAreNotReported() {
+        OrgShapeDetector.overrideShape = shape(false, false, true, false);
+        HealthCheckOrgShapeChecks.connectInstalledOverride = true;
+
+        System.assertEquals(
+            null,
+            find(HealthCheckService.run(), 'connect_module_absent'),
+            'With Connect installed there is nothing to suggest.'
+        );
+    }
+
+    /**
+     * The real lookup, not the seam: a class that ships is found, namespace first or bare, and
+     * one that does not is absent. Core's own class stands in for Connect's, which Core's tests
+     * cannot rely on.
+     */
+    @IsTest
+    static void connectDetectionFindsAClassThatShipsAndNotOneThatDoesNot() {
+        System.assert(
+            HealthCheckOrgShapeChecks.classExists('HealthCheckOrgShapeChecks'),
+            'A class that ships is found.'
+        );
+        System.assert(
+            !HealthCheckOrgShapeChecks.classExists('ConnectService'),
+            'The old marker names a class nothing ships.'
         );
     }
 
@@ -693,6 +723,53 @@ private class HealthCheckServiceTest {
         }
     }
 
+    /**
+     * A flooded Error Log is counted only up to the cap, so the count cannot spend the
+     * transaction's query rows, and the finding says "N or more" instead of a number it did
+     * not read.
+     */
+    @IsTest
+    static void aFloodedErrorLogIsCountedOnlyToTheCap() {
+        List<Error_Log__c> flood = new List<Error_Log__c>();
+        for (Integer i = 0; i < 200; i++) {
+            flood.add(
+                new Error_Log__c(
+                    Timestamp__c = System.now(),
+                    Context__c = 'Health Check test',
+                    Message__c = 'Entry ' + i,
+                    Severity__c = 'Error',
+                    Status__c = 'New'
+                )
+            );
+        }
+        insert flood;
+        HealthCheckSettingsChecks.errorLogCap = 150;
+        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+        System.runAs(maria) {
+            OrgShapeDetector.overrideShape = shape(false, false, false, false);
+            Integer rowsBefore = Limits.getQueryRows();
+            HealthCheckService.Finding finding = new HealthCheckSettingsChecks.ErrorLogCheck()
+                .run();
+            Integer rowsSpent = Limits.getQueryRows() - rowsBefore;
+
+            System.assertNotEquals(null, finding, 'The flood is still a finding.');
+            String counted = String.format(
+                System.Label.Core_HealthCheck_CountOrMore,
+                new List<Object>{ (150).format() }
+            );
+            System.assert(
+                finding.title.contains(counted),
+                'The title says "150 or more", not a number it did not count: ' + finding.title
+            );
+            System.assert(finding.detail.contains(counted), 'So does the detail.');
+            System.assert(
+                rowsSpent <= 151,
+                'The count read at most the cap plus one rows, not all 200: ' + rowsSpent
+            );
+        }
+    }
+
     @IsTest
     static void noUnreadErrorsMeansNoFinding() {
         User maria = HealthCheckTestHelper.mariaWithManageSettings();
@@ -704,6 +781,41 @@ private class HealthCheckServiceTest {
                 null,
                 find(HealthCheckService.run(), 'error_log_new'),
                 'An empty Error Log produces no finding at all.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aFloodedErrorLogIsCountedUpToTheCap() {
+        List<Error_Log__c> errors = new List<Error_Log__c>();
+        for (Integer i = 0; i < 3; i++) {
+            errors.add(
+                new Error_Log__c(
+                    Timestamp__c = System.now(),
+                    Context__c = 'Health Check test',
+                    Message__c = 'Something went wrong.',
+                    Severity__c = 'Error',
+                    Status__c = 'New'
+                )
+            );
+        }
+        insert errors;
+        HealthCheckSettingsChecks.errorLogCap = 2;
+        User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+        System.runAs(maria) {
+            OrgShapeDetector.overrideShape = shape(false, false, false, false);
+
+            HealthCheckService.Finding finding = find(HealthCheckService.run(), 'error_log_new');
+
+            System.assertNotEquals(null, finding, 'Past the cap there is still a finding.');
+            String counted = String.format(
+                System.Label.Core_HealthCheck_CountOrMore,
+                new List<Object>{ (2).format() }
+            );
+            System.assert(
+                finding.title.contains(counted),
+                'Past the cap the full run says "2 or more": ' + finding.title
             );
         }
     }

@@ -48,8 +48,9 @@ Rules:
 
 | Gate | Catches | Misses |
 | --- | --- | --- |
-| `check-standard-objects.sh` (denylist) | Opportunity, Campaign, Lead, Case, `PersonAccount`, `IsPersonAccount`, `GiftTransaction`, `__dlm`, and the Nonprofit Cloud objects, in Core, Giving, Volunteers, Programs and Funders | Anything not on its list; any file in `packages/connect`; Person Account fields other than `IsPersonAccount` |
+| `check-standard-objects.sh` (denylist) | Opportunity, Campaign, Lead, Case, `PersonAccount`, `IsPersonAccount`, `GiftTransaction`, `__dlm`, and the Nonprofit Cloud objects, in Core, Giving, Volunteers, Programs and Funders; the same names in Connect's object and field declarations (`packages/connect/**/objects/`), outside their prose | Anything not on its list; Connect's Apex, which may name them as strings |
 | `check-object-allowlist.py` (allowlist, every package including Connect and the vendor tree) | Any standard object not listed, in `new X(`, `List<X>`, `X.SObjectType`, `FROM X` | Plain declarations (`Campaign c;`), field tokens (`Account.PersonEmail`) |
+| `check-person-account-fields.py` (every package except the vendor tree) | A Person Account field (`IsPersonAccount`, `PersonEmail`, `Person...`, `__pc`, `__pr`) outside Apex strings and comments, in an `@salesforce/schema` import, a `field-name` attribute, or metadata outside its prose | Custom metadata records (data); a name held as text, which is the allowed seam |
 | Offline Apex compile (`check:apex`) | Nothing about org shape: it compiles against a schema that has everything | |
 
 A `String` constant naming a denied object is exempted by a trailing marker on that line
@@ -59,8 +60,9 @@ only (details in [ci.md](ci.md), "Detection-only exemptions"):
 private static final String PERSON_ACCOUNT_FIELD = 'IsPersonAccount'; // detection-only: field map key
 ```
 
-Neither gate sees a static Person Account field token such as `Account.PersonEmail`. Review
-is the only guard: hold those names as strings, as `ImportMatcher` does.
+A static Person Account field token such as `Account.PersonEmail` fails
+`check-person-account-fields.py`. Hold those names as strings, as `ImportMatcher` does; that
+check has no exemption marker.
 
 ## 3. Discovering a class in another package (`Type.forName`)
 
@@ -94,9 +96,9 @@ Rules:
 
 - **Namespace first, then none.** A class name is not an API name: it takes no `__` suffix.
 - **Look up once per transaction** (`looked` flag in `ImportEntityProcessors.find`).
-- **A class that cannot be built, or is the wrong shape, is absent.** A build failure is
-  logged; `HealthCheckExtensions` also logs a wrong shape. The caller must not fail over a
-  module it can do without.
+- **A class that cannot be built, or is the wrong shape, is absent, and is logged.** A class
+  that is not found at all is the ordinary case and is not logged. The caller must not fail
+  over a module it can do without.
 - **Isolate the call.** `HealthCheckService.run()` turns an extension that throws into one
   `check_failed_...` finding; the rest of the report stands.
 - **Only names the package owns reach `Type.forName`**: a constant, a registry row, or an
@@ -283,7 +285,9 @@ insert runs it once per 200 records.
   the present branch must assert something real (`ImportPersonAccountTest`, guarded by
   `orgHasPersonAccounts()`).
 - **Force the other shape with seams**, not with the org: `OrgShapeDetector.overrideShape`,
-  `CustomPermissionSelector.holdersOverride`, the resolver overrides in section 3.
+  `CustomPermissionSelector.holdersOverride`, the resolver overrides in section 3,
+  `CampaignSyncService.unavailableForTest` (Campaign absent: `CampaignSyncUnavailableTest`),
+  `HealthCheckOrgShapeChecks.connectInstalledOverride`, `HubErrorCountSelector.absentForTest`.
 - **Test orgs:** `oi-test` and `oi-pa` both have Person Accounts and the Sales Cloud objects
   (see [ci.md](ci.md)). Every feature-present branch runs on them; no feature-absent branch
   does.

@@ -360,6 +360,30 @@ private class SettingsServiceTest {
         );
     }
 
+    /**
+     * The console asks once per Setting Definition row. The type and its fields are cached for
+     * the transaction, so asking again gives the same answer, an absent object included.
+     */
+    @IsTest
+    static void hasKeyAnswersEveryRowFromTheSameLookup() {
+        Test.startTest();
+        for (Integer row = 0; row < 200; row++) {
+            Assert.isTrue(SettingsService.hasKey('Nonprofit_Settings__c', TEXT_KEY), 'Row ' + row);
+            Assert.isFalse(
+                SettingsService.hasKey('Not_A_Settings_Object__c', TEXT_KEY),
+                'An object the org lacks has no keys, row ' + row
+            );
+        }
+        Test.stopTest();
+
+        Assert.areEqual(
+            SettingsService.typeByName('Nonprofit_Settings__c'),
+            SettingsService.typeByName(' nonprofit_settings__c '),
+            'The cached lookup ignores case and spacing, like the describe it replaces'
+        );
+        Assert.isNull(SettingsService.typeByName('Not_A_Settings_Object__c'), 'Absent stays null');
+    }
+
     @IsTest
     static void readsSettingsWithoutQueryingEveryTime() {
         Test.startTest();
@@ -579,6 +603,78 @@ private class SettingsServiceTest {
         Assert.isTrue(
             stored.Relationship_Auto_Reciprocal__c,
             'And the shipped defaults it never asked about, rather than a false nobody chose'
+        );
+    }
+
+    /**
+     * Two administrators with the console open: this transaction read its copy, then the other
+     * one saved the naming pattern. The cache here never heard of that save.
+     */
+    private static Id staleCopyThenAnotherSave() {
+        stubDefinitions();
+        insert new Nonprofit_Settings__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Household_Name_Pattern__c = 'The {LastName} Family',
+            Auto_Create_Households__c = true
+        );
+        Assert.areEqual(
+            'The {LastName} Family',
+            SettingsService.getSettings().Household_Name_Pattern__c,
+            'This transaction holds its copy'
+        );
+        Nonprofit_Settings__c theirs = [
+            SELECT Id
+            FROM Nonprofit_Settings__c
+            WHERE SetupOwnerId = :UserInfo.getOrganizationId()
+        ];
+        theirs.Household_Name_Pattern__c = '{LastName} Household';
+        update theirs;
+        return theirs.Id;
+    }
+
+    @IsTest
+    static void aSaveKeepsAKeyAnotherAdministratorSavedMeanwhile() {
+        Id recordId = staleCopyThenAnotherSave();
+
+        Test.startTest();
+        SettingsService.saveValues(new Map<String, Object>{ CHECKBOX_KEY => false });
+        Test.stopTest();
+
+        Nonprofit_Settings__c saved = [
+            SELECT Household_Name_Pattern__c, Auto_Create_Households__c
+            FROM Nonprofit_Settings__c
+            WHERE Id = :recordId
+        ];
+        Assert.isFalse(saved.Auto_Create_Households__c, 'The key Maria changed is saved');
+        Assert.areEqual(
+            '{LastName} Household',
+            saved.Household_Name_Pattern__c,
+            'And the pattern the other administrator saved is not written back from her stale copy'
+        );
+        List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
+        Assert.areEqual(1, changes.size(), 'One audit row, for the one key she changed');
+    }
+
+    @IsTest
+    static void aValueComparedAgainstTheStoredRecordNotAStaleCopy() {
+        Id recordId = staleCopyThenAnotherSave();
+
+        Test.startTest();
+        SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
+        Test.stopTest();
+
+        Assert.areEqual(
+            'The {LastName} Family',
+            [SELECT Household_Name_Pattern__c FROM Nonprofit_Settings__c WHERE Id = :recordId]
+            .Household_Name_Pattern__c,
+            'Her value matched only her stale copy, and it is still saved over the stored one'
+        );
+        List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
+        Assert.areEqual(1, changes.size(), 'The change is audited');
+        Assert.areEqual(
+            '{LastName} Household',
+            changes[0].Old_Value__c,
+            'With the old value that was really stored, not the one in her copy'
         );
     }
 }

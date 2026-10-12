@@ -255,7 +255,9 @@ public with sharing class AutomationControl {
 
     private static Datetime writePausedUntil(Datetime until) {
         requirePermission();
-        Datetime previous = SettingsService.getSettingsForUpdate().Automation_Paused_Until__c;
+        // Read under the lock the save below also takes, so the audit row's old value is the
+        // one stored, not one another person replaced a moment ago.
+        Datetime previous = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
         AutomationSettingsWriter.savePausedUntil(until);
         SettingsService.clearCache();
         SettingsService.logChange(
