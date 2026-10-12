@@ -614,7 +614,7 @@ private class CorePostInstallTest {
         Test.stopTest();
 
         Assert.areEqual(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_STANDALONE,
             CoexistenceService.getCurrentMode(),
             'A fresh install takes the mode detection recommends, so Maria is not asked first.'
         );

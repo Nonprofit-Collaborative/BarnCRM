@@ -119,16 +119,23 @@ public with sharing class OrgShapeDetector {
     }
 
     /**
-     * The coexistence mode this org shape calls for (plan Section 4.5). Agentforce Nonprofit
+     * The coexistence mode this org shape calls for (plan Section 4.5). Nonprofit Cloud
      * wins over NPSP: an org with both is a Nonprofit Cloud org that also has the older
-     * package in it, and Person Accounts decide how households have to be built.
+     * package in it. A mode named after a product is recommended only where that product is
+     * detected (NEXT-core-names-other-products-only-when-detected.md), so an org with Person
+     * Accounts and neither product is Standalone; its people still get junction membership
+     * (CoexistenceService.withMembership).
      */
     public static String recommendedCoexistenceMode() {
-        OrgShape shape = detect();
-        if (shape.hasIndustriesNonprofit == true || shape.hasPersonAccounts == true) {
+        return recommendedCoexistenceMode(detect());
+    }
+
+    /** The same rule for a given shape, so the Setup Assistant can ask it of its own. */
+    public static String recommendedCoexistenceMode(OrgShape shape) {
+        if (shape != null && shape.hasIndustriesNonprofit == true) {
             return CoexistenceService.MODE_AGENTFORCE_NONPROFIT;
         }
-        if (shape.hasNpsp == true) {
+        if (shape != null && shape.hasNpsp == true) {
             return CoexistenceService.MODE_NPSP;
         }
         return CoexistenceService.MODE_STANDALONE;

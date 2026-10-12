@@ -127,7 +127,13 @@ private class HealthCheckServiceTest {
     @IsTest
     static void contactMembershipWithPersonAccountsIsAnError() {
         OrgShapeDetector.overrideShape = shape(false, true, false, false);
-        CoexistenceService.setMode(CoexistenceService.MODE_STANDALONE);
+        // Saved straight through the settings write: CoexistenceService would now propose
+        // the junction alongside the mode in a Person Accounts org, which is the fix itself.
+        SettingsService.saveValues(
+            new Map<String, Object>{
+                CoexistenceService.KEY_COEXISTENCE_MODE => CoexistenceService.MODE_STANDALONE
+            }
+        );
 
         HealthCheckService.Finding finding = find(
             HealthCheckService.run(),
@@ -1137,7 +1143,7 @@ private class HealthCheckServiceTest {
         System.assertEquals(
             System.Label.Core_CoexistenceMode_AgentforceNonprofit,
             HealthCheckService.modeLabel(CoexistenceService.MODE_AGENTFORCE_NONPROFIT),
-            'Agentforce Nonprofit coexistence has a name a person recognizes.'
+            'Nonprofit Cloud coexistence has a name a person recognizes.'
         );
     }
 

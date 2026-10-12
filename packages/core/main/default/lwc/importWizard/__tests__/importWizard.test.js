@@ -445,6 +445,31 @@ describe('the import wizard', () => {
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).expectedAmount).toBe(125.5);
   });
 
+  it('offers no gift column without a module, and leaves a suggested one unloaded', async () => {
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [
+          { source: 'Last Name', target: 'Contact1.LastName' },
+          { source: 'Email', target: 'Contact1.Email' },
+          { source: 'Notes', target: 'Gift.Amount__c' }
+        ]
+      })
+    );
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const pickers = element.shadowRoot.querySelectorAll(
+      '[data-id="column-row"] lightning-combobox'
+    );
+    const labels = pickers[0].options.map((option) => option.label);
+    expect(labels.some((label) => label.startsWith('Gift'))).toBe(false);
+    expect(pickers[2].value).toBe('Ignore');
+    expect(pickers[0].value).toBe('Contact1.LastName');
+  });
+
   it('shows how gifts match scheduled payments, from the template, and saves the choice', async () => {
     getEntityTargets.mockResolvedValue([{ value: 'Gift.Amount__c', label: 'Gift: amount' }]);
     getTemplates.mockResolvedValue([

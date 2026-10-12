@@ -10,8 +10,8 @@ object references: those live only in the Connect module, behind dynamic Apex.
   Household membership (contact mode and junction mode via `HouseholdService`),
   Relationships, Affiliations, and Addresses (`Address__c`).
 - **BarnCRM app**: the Lightning app and its tabs (Home, Households, Contacts,
-  Organizations, Import, Reports, BarnCRM Settings). Module-specific tabs (Gifts, Volunteers,
-  Programs, Funders) are added by those packages when installed.
+  Organizations, Import, Reports, BarnCRM Settings). Each module adds its own tabs (Volunteers, for
+  example) when it is installed.
 - **Settings framework**: the BarnCRM Settings console (LWC-based), protected hierarchy
   Custom Settings for simple toggles, custom objects for structured configuration, and Custom
   Metadata Types for package-shipped defaults. The console's rows come from

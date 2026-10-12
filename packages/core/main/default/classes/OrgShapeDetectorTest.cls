@@ -186,24 +186,24 @@ private class OrgShapeDetectorTest {
     }
 
     @IsTest
-    static void personAccountsRecommendAgentforceNonprofit() {
+    static void personAccountsAloneRecommendStandalone() {
         OrgShapeDetector.overrideShape = shapeWith(false, true, false);
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_STANDALONE,
             OrgShapeDetector.recommendedCoexistenceMode(),
-            'A Person Accounts org is an Agentforce Nonprofit org.'
+            'Person Accounts without Nonprofit Cloud name no product, so the org is Standalone.'
         );
     }
 
     @IsTest
-    static void industriesObjectsRecommendAgentforceNonprofit() {
+    static void industriesObjectsRecommendNonprofitCloudCoexistence() {
         OrgShapeDetector.overrideShape = shapeWith(false, false, true);
 
         System.assertEquals(
             CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
             OrgShapeDetector.recommendedCoexistenceMode(),
-            'Nonprofit Cloud gift objects mean Agentforce Nonprofit coexistence.'
+            'Nonprofit Cloud gift objects mean Nonprofit Cloud coexistence.'
         );
     }
 
@@ -219,13 +219,19 @@ private class OrgShapeDetectorTest {
     }
 
     @IsTest
-    static void agentforceNonprofitWinsOverNpsp() {
-        OrgShapeDetector.overrideShape = shapeWith(true, true, false);
+    static void nonprofitCloudWinsOverNpsp() {
+        OrgShapeDetector.overrideShape = shapeWith(true, true, true);
 
         System.assertEquals(
             CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
             OrgShapeDetector.recommendedCoexistenceMode(),
-            'When both are present, Person Accounts decide how households are built.'
+            'When both products are present, Nonprofit Cloud decides.'
+        );
+        OrgShapeDetector.overrideShape = shapeWith(true, true, false);
+        System.assertEquals(
+            CoexistenceService.MODE_NPSP,
+            OrgShapeDetector.recommendedCoexistenceMode(),
+            'NPSP with Person Accounts and no Nonprofit Cloud is NPSP coexistence.'
         );
     }
 

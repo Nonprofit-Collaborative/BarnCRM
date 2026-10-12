@@ -343,16 +343,16 @@ public with sharing class SetupAssistantService {
 
     /** The coexistence mode the assistant recommends for what detection found (plan Section 4.5). */
     public static String recommendedMode() {
-        String shape = detectedShape();
-        if (shape == SHAPE_PERSON_ACCOUNTS) {
-            return MODE_AGENTFORCE;
-        }
-        return shape == SHAPE_NPSP ? MODE_NPSP : MODE_STANDALONE;
+        return OrgShapeDetector.recommendedCoexistenceMode(orgShape());
     }
 
-    /** The three modes, so the page can offer a different one than the recommendation. */
+    /**
+     * The modes this org is offered, so the page can offer a different one than the
+     * recommendation: Standalone, plus a product's mode only where that product is detected,
+     * plus whatever is saved already (CoexistenceService.availableModes).
+     */
     public static List<String> modes() {
-        return new List<String>{ MODE_STANDALONE, MODE_NPSP, MODE_AGENTFORCE };
+        return CoexistenceService.availableModes(orgShape());
     }
 
     private static OrgShapeDetector.OrgShape orgShape() {

@@ -286,6 +286,9 @@ public with sharing class SettingsController {
             ? null
             : HELP_BASE + definition.Help_Path__c;
         setting.options = toOptions(definition);
+        if (isCoexistenceMode(settingsObject, definition.Setting_Key__c)) {
+            setting.options = offeredModesOnly(setting.options);
+        }
         if (isComponent) {
             setting.checked = false;
             return setting;
@@ -316,6 +319,27 @@ public with sharing class SettingsController {
             options.add(option);
         }
         return options;
+    }
+
+    private static Boolean isCoexistenceMode(String settingsObject, String key) {
+        return SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
+            CoexistenceService.KEY_COEXISTENCE_MODE.equalsIgnoreCase(key);
+    }
+
+    /**
+     * The coexistence options this org is offered: a mode named after another Salesforce
+     * product appears only where that product is detected, or where it is already saved
+     * (CoexistenceService.availableModes), in the order the definition lists them.
+     */
+    private static List<Option> offeredModesOnly(List<Option> options) {
+        Set<String> offered = new Set<String>(CoexistenceService.availableModes());
+        List<Option> kept = new List<Option>();
+        for (Option option : options) {
+            if (offered.contains(option.value)) {
+                kept.add(option);
+            }
+        }
+        return kept;
     }
 
     private static AuraHandledException asAuraException(String message) {

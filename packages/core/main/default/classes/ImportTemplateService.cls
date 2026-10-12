@@ -5,7 +5,7 @@
  * becomes a real `Import_Template__c` record the first time it is seen, matched by template
  * key, and is never overwritten afterwards, so an administrator's edit survives every
  * upgrade. Person Mode is the one value taken from the org rather than from the shipped row
- * (R-IT3): a Nonprofit Cloud or Agentforce Nonprofit org that stores people as person
+ * (R-IT3): a Nonprofit Cloud org that stores people as person
  * Accounts gets templates that say so.
  */
 @NamespaceAccessible

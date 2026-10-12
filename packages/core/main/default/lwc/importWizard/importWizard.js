@@ -112,22 +112,11 @@ const TARGETS = [
 ];
 
 /**
- * The gift columns offered where no module that loads gifts is installed: recognized, kept
- * with the row, and loaded by nothing. Where one is installed its own targets replace these
- * (R-IR6).
+ * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
+ * the targets an installed module supplies: with none installed, Core offers no gift column
+ * at all, and a suggested one becomes "Do not load" (the staged row still keeps the whole
+ * original line). NEXT-core-names-other-products-only-when-detected.md.
  */
-const GIFT_TARGETS_NOT_LOADED = [
-  { value: 'Gift.Amount__c', label: 'Gift: amount (kept with the row, not loaded yet)' },
-  { value: 'Gift.Gift_Date__c', label: 'Gift: date (kept with the row, not loaded yet)' },
-  { value: 'Gift.Type__c', label: 'Gift: payment method (kept with the row, not loaded yet)' },
-  {
-    value: 'Gift.Payment_Reference__c',
-    label: 'Gift: payment reference (kept with the row, not loaded yet)'
-  },
-  { value: 'Allocation.Fund', label: 'Gift: fund (kept with the row, not loaded yet)' }
-];
-
-/** The row entities a module outside Core loads (R-IR6). */
 const DEFERRED_ENTITY_PREFIXES = ['Gift.', 'Allocation.', 'SoftCredit.', 'Tribute.'];
 
 const RULES = [
@@ -376,8 +365,11 @@ export default class ImportWizard extends LightningElement {
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
     const parsed = JSON.parse(suggested || '{}');
+    const offered = new Set(this.targetOptions.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
-      targets[column.source] = column.target;
+      targets[column.source] = this.isOfferedTarget(column.target, offered)
+        ? column.target
+        : IGNORE;
     });
     this.columns = this.headers.map((heading) => ({
       key: heading,
@@ -397,11 +389,18 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
-    const giftTargets =
-      this.entityTargets.length > 0 ? this.entityTargets : GIFT_TARGETS_NOT_LOADED;
     return [{ label: doNotLoad, value: IGNORE }]
       .concat(TARGETS)
-      .concat(giftTargets.map((target) => ({ value: target.value, label: target.label })));
+      .concat(this.entityTargets.map((target) => ({ value: target.value, label: target.label })));
+  }
+
+  /**
+   * Whether a suggested target can be shown as chosen. A column a module would load is
+   * suggested only while that module offers it; without one it is left as "Do not load".
+   */
+  isOfferedTarget(target, offered) {
+    const deferred = DEFERRED_ENTITY_PREFIXES.some((prefix) => (target || '').startsWith(prefix));
+    return !deferred || offered.has(target);
   }
 
   /** Whether any column is mapped to something a module outside Core loads. */

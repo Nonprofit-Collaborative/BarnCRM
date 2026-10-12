@@ -56,8 +56,8 @@ function agentforceReport(overrides = {}) {
     canManageSettings: true,
     modeNeedsAttention: true,
     currentModeLabel: 'not confirmed yet',
-    recommendedModeLabel: 'Agentforce Nonprofit coexistence',
-    orgShapeSummary: 'Person Accounts enabled. Agentforce Nonprofit objects detected.',
+    recommendedModeLabel: 'Nonprofit Cloud coexistence',
+    orgShapeSummary: 'Person Accounts enabled. Nonprofit Cloud objects detected.',
     orgShape: { hasPersonAccounts: true, hasIndustriesNonprofit: true },
     // Both come from Apex, which computes them from the running namespace. Unmanaged, which
     // is what the scratch orgs are, they look like this.

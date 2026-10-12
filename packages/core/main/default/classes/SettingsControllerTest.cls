@@ -98,6 +98,10 @@ private class SettingsControllerTest {
     @IsTest
     static void showsEverySectionWithItsSettings() {
         stubDefinitions();
+        // An org with the Nonprofit Cloud objects, so both stubbed coexistence choices apply.
+        OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+        shape.hasIndustriesNonprofit = true;
+        OrgShapeDetector.overrideShape = shape;
 
         Test.startTest();
         SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
@@ -137,6 +141,51 @@ private class SettingsControllerTest {
             byName.get(SettingSections.AUTOMATION).settings[0].component,
             'A section another feature renders arrives as a component to load'
         );
+    }
+
+    @IsTest
+    static void offersAProductsCoexistenceModeOnlyWhereThatProductIsDetected() {
+        stubDefinitions();
+        OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+        Test.startTest();
+        List<SettingsController.Option> fresh = coexistenceOptions();
+        SettingsService.saveValues(
+            new Map<String, Object>{
+                'Coexistence_Mode__c' => CoexistenceService.MODE_AGENTFORCE_NONPROFIT
+            }
+        );
+        List<SettingsController.Option> saved = coexistenceOptions();
+        Test.stopTest();
+
+        Assert.areEqual(
+            1,
+            fresh.size(),
+            'An org without Nonprofit Cloud is offered Standalone only'
+        );
+        Assert.areEqual(
+            CoexistenceService.MODE_STANDALONE,
+            fresh[0].value,
+            'Standalone is always there'
+        );
+        Assert.areEqual(
+            2,
+            saved.size(),
+            'A mode already saved stays visible, so the choice is never hidden from its maker'
+        );
+    }
+
+    private static List<SettingsController.Option> coexistenceOptions() {
+        for (
+            SettingsController.SectionModel section : SettingsController.getConsoleModel().sections
+        ) {
+            for (SettingsController.SettingModel setting : section.settings) {
+                if (setting.key == 'Coexistence_Mode__c') {
+                    return setting.options;
+                }
+            }
+        }
+        return new List<SettingsController.Option>();
     }
 
     @IsTest

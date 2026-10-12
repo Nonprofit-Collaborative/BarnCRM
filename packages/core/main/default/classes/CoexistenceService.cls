@@ -58,8 +58,9 @@ public with sharing class CoexistenceService {
      * Set the mode from detection, but only when the org has not chosen one. An
      * administrator's choice is never overwritten. Returns the mode in force afterward.
      *
-     * Agentforce Nonprofit implies junction membership: in a Person Accounts org the person
-     * is an account, so contact mode cannot express a household. The two values are written
+     * Nonprofit Cloud coexistence, and any org with Person Accounts, implies junction
+     * membership: the person is an account, so contact mode cannot express a household. The
+     * two values are written
      * together, in one save, so the org is never briefly in an impossible state. The
      * membership half is only proposed, like the rest: an administrator who already chose the
      * simple way keeps it, and Health Check says so if people stored as accounts appear.
@@ -91,17 +92,62 @@ public with sharing class CoexistenceService {
     }
 
     /**
+     * The modes this org is offered, in the order a person reads them
+     * (NEXT-core-names-other-products-only-when-detected.md). Standalone always; a mode named
+     * after another Salesforce product only when detection finds that product, because Core
+     * names no other product in an org that does not have it. The mode already saved is
+     * always included, so a choice made earlier is never hidden from the person who made it.
+     */
+    public static List<String> availableModes(OrgShapeDetector.OrgShape shape) {
+        String current = getCurrentMode();
+        List<String> modes = new List<String>{ MODE_STANDALONE };
+        if ((shape != null && shape.hasNpsp == true) || MODE_NPSP.equals(current)) {
+            modes.add(MODE_NPSP);
+        }
+        if (
+            (shape != null && shape.hasIndustriesNonprofit == true) ||
+            MODE_AGENTFORCE_NONPROFIT.equals(current)
+        ) {
+            modes.add(MODE_AGENTFORCE_NONPROFIT);
+        }
+        return modes;
+    }
+
+    /** The same, for the shape detection reports for this org. */
+    public static List<String> availableModes() {
+        OrgShapeDetector.OrgShape shape;
+        try {
+            shape = OrgShapeDetector.detect();
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'BarnCRM coexistence modes');
+        }
+        return availableModes(shape);
+    }
+
+    /**
      * The coexistence mode to write, with junction membership alongside it when the mode
-     * calls for that and nobody has chosen a way of belonging yet. A choice already made is
+     * or the org calls for that and nobody has chosen a way of belonging yet: Nonprofit Cloud
+     * coexistence, or any mode in an org with Person Accounts. A choice already made is
      * left alone, whichever way it went: forcing the junction over an explicit choice would
      * also be the destructive switch the settings write refuses.
      */
     private static Map<String, Object> withMembership(String mode) {
         Map<String, Object> values = new Map<String, Object>{ KEY_COEXISTENCE_MODE => mode };
-        if (MODE_AGENTFORCE_NONPROFIT.equals(mode) && !membershipModeChosen()) {
+        Boolean needsJunction = MODE_AGENTFORCE_NONPROFIT.equals(mode) || hasPersonAccounts();
+        if (needsJunction && !membershipModeChosen()) {
             values.put(KEY_MEMBERSHIP_MODE, MEMBERSHIP_JUNCTION);
         }
         return values;
+    }
+
+    private static Boolean hasPersonAccounts() {
+        try {
+            OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
+            return shape != null && shape.hasPersonAccounts == true;
+        } catch (Exception e) {
+            ErrorLogger.log(e, 'BarnCRM coexistence modes');
+            return false;
+        }
     }
 
     /**
@@ -227,7 +273,7 @@ public with sharing class CoexistenceService {
      * Settings permission: the coexistence mode governs how the whole package behaves, so it
      * is an administrator's decision even where the calling code forgot to say so.
      *
-     * Agentforce Nonprofit brings junction household membership with it, in the same audited
+     * Nonprofit Cloud brings junction household membership with it, in the same audited
      * save, because in a Person Accounts org the person is an account and contact membership
      * cannot express a household.
      */

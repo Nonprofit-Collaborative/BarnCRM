@@ -59,9 +59,9 @@ private class CoexistenceServiceTest {
         Test.stopTest();
 
         System.assertEquals(
-            CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
+            CoexistenceService.MODE_STANDALONE,
             applied,
-            'A Person Accounts org is an Agentforce Nonprofit org.'
+            'Person Accounts alone name no other product, so the org is Standalone.'
         );
         System.assertEquals(
             CoexistenceService.MEMBERSHIP_JUNCTION,
@@ -102,12 +102,12 @@ private class CoexistenceServiceTest {
         System.assertEquals(
             CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
             CoexistenceService.getCurrentMode(),
-            'Agentforce Nonprofit coexistence can be chosen by hand.'
+            'Nonprofit Cloud coexistence can be chosen by hand.'
         );
         System.assertEquals(
             CoexistenceService.MEMBERSHIP_JUNCTION,
             CoexistenceService.getMembershipMode(),
-            'Choosing Agentforce Nonprofit by hand still brings junction membership with it.'
+            'Choosing Nonprofit Cloud by hand still brings junction membership with it.'
         );
     }
 
@@ -160,7 +160,7 @@ private class CoexistenceServiceTest {
             System.assertEquals(
                 CoexistenceService.MODE_AGENTFORCE_NONPROFIT,
                 CoexistenceService.getCurrentMode(),
-                'Agentforce Nonprofit coexistence can be applied by an administrator.'
+                'Nonprofit Cloud coexistence can be applied by an administrator.'
             );
         }
     }
@@ -239,7 +239,7 @@ private class CoexistenceServiceTest {
     static void anExplicitContactChoiceSurvivesAgentforceNonprofitDetection() {
         // Maria's org has Person Accounts switched on but stores everyone as a contact, and
         // she chose the simple way of belonging on purpose. Neither detection nor choosing
-        // the Agentforce Nonprofit mode by hand is allowed to override that choice.
+        // the Nonprofit Cloud mode by hand is allowed to override that choice.
         SettingsService.saveValues(
             new Map<String, Object>{
                 CoexistenceService.KEY_MEMBERSHIP_MODE => CoexistenceService.MEMBERSHIP_CONTACT
