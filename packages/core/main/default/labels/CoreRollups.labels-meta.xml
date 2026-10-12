@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error returned when a mode value is not one of the three.</shortDescription>
-        <value>That is not a rollup mode. Choose Real time, Scheduled, or Both.</value>
+        <value>That is not a rollup mode. Choose Instantly, Every night, or Both (recommended).</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorInvalidOperator</fullName>

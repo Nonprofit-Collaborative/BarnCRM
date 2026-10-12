@@ -79,6 +79,11 @@ const PAGE = {
   stale: false,
   defaultMode: 'Both',
   modes: ['Real-time', 'Scheduled', 'Both'],
+  modeOptions: [
+    { value: 'Real-time', label: 'Instantly' },
+    { value: 'Scheduled', label: 'Every night' },
+    { value: 'Both', label: 'Both (recommended)' }
+  ],
   rollups: [ROLLUP]
 };
 
@@ -112,6 +117,20 @@ describe('c-rollup-definitions', () => {
     expect(rows[0].textContent).toContain('Household total giving');
     expect(rows[0].textContent).toContain('SUM Amount__c on Gift__c');
     expect(rows[0].textContent).toContain('Account.Total_Giving__c');
+  });
+
+  it('offers the modes by the names an administrator reads, keeping the stored values', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    const combobox = element.shadowRoot.querySelector('lightning-combobox');
+    expect(combobox.options).toEqual([
+      { value: 'Real-time', label: 'Instantly' },
+      { value: 'Scheduled', label: 'Every night' },
+      { value: 'Both', label: 'Both (recommended)' }
+    ]);
+    expect(combobox.value).toBe('Both');
   });
 
   it('warns when the rollups have not run inside the freshness window', async () => {

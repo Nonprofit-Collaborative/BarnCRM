@@ -64,8 +64,19 @@ public with sharing class RollupController {
         public String defaultMode { get; set; }
         @AuraEnabled
         public List<String> modes { get; set; }
+        /** The same modes with the names an administrator reads (R-R4): Instantly, and so on. */
+        @AuraEnabled
+        public List<ModeOption> modeOptions { get; set; }
         @AuraEnabled
         public List<RollupView> rollups { get; set; }
+    }
+
+    /** One mode: the stored value and the name the picklist gives it. */
+    public class ModeOption {
+        @AuraEnabled
+        public String value { get; set; }
+        @AuraEnabled
+        public String label { get; set; }
     }
 
     @AuraEnabled(cacheable=true)
@@ -174,6 +185,7 @@ public with sharing class RollupController {
             RollupService.MODE_SCHEDULED,
             RollupService.MODE_BOTH
         };
+        page.modeOptions = modeOptions(page.modes);
         page.rollups = new List<RollupView>();
         for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
             page.rollups.add(toView(definition));
@@ -202,6 +214,25 @@ public with sharing class RollupController {
         view.filterJson = definition.Filter_JSON__c;
         view.targetFilterJson = definition.Target_Filter_JSON__c;
         return view;
+    }
+
+    /** The modes in the order given, each named by the Mode picklist's own label. */
+    private static List<ModeOption> modeOptions(List<String> modes) {
+        Map<String, String> labelByValue = new Map<String, String>();
+        for (
+            Schema.PicklistEntry entry : Rollup_Definition__c.Mode__c.getDescribe()
+                .getPicklistValues()
+        ) {
+            labelByValue.put(entry.getValue(), entry.getLabel());
+        }
+        List<ModeOption> options = new List<ModeOption>();
+        for (String mode : modes) {
+            ModeOption option = new ModeOption();
+            option.value = mode;
+            option.label = labelByValue.containsKey(mode) ? labelByValue.get(mode) : mode;
+            options.add(option);
+        }
+        return options;
     }
 
     private static Boolean isKnownMode(String mode) {

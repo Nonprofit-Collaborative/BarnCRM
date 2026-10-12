@@ -96,7 +96,11 @@ export default class RollupDefinitions extends LightningElement {
     return this.isReadOnly || this.busy;
   }
 
+  /** The modes by the names an administrator reads (Instantly, Every night, Both (recommended)). */
   get modeOptions() {
+    if (this.page && this.page.modeOptions) {
+      return this.page.modeOptions.map((option) => ({ label: option.label, value: option.value }));
+    }
     const modes = this.page && this.page.modes ? this.page.modes : [];
     return modes.map((mode) => ({ label: mode, value: mode }));
   }

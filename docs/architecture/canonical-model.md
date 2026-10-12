@@ -1174,9 +1174,6 @@ missed; it is the mode the packaged giving definitions ship with, because it is 
 combination that keeps the numbers visibly right (Principle 2). Real-time needs a trigger on
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
-Until the engine of `decisions/NEXT-barncrm-owns-its-rollup-engine.md` ships, real time runs
-only for Gift and Commitment sources (and Contact and Household Member changes), and the
-queued path does not exist: a bulk change runs in the background through the old engine.
 
 **R-R5 Freshness.** Last Calculated on the definition answers "when was this number last
 calculated" for the admin looking at the rollup list. The record page answer comes from
@@ -1248,6 +1245,13 @@ whose totals a run confirmed without changing keeps its earlier stamp; the defin
 Calculated is what says the run happened. Stamping every record on every run would rewrite
 every target record every night, which is the load the changed-only rule removes.
 
+**R-R14 One full run at a time, and nothing lost when a chunk stops.** A full recalculation
+(the nightly run, Recalculate, Recalculate all) does not start while another is running: the
+second start is refused, names the running job, and tells the admin to try again when it
+finishes. A chunk of a full run that the platform stops with an error the run cannot catch
+(a governor limit) has its target records written to the Rollup Queue (Section 14A), so they
+are recalculated within minutes rather than at the next night.
+
 ### Salesforce implementation
 
 - **Object:** `Rollup_Definition__c`, listed and edited in the settings console.
@@ -1281,16 +1285,17 @@ every target record every night, which is the load the changed-only rule removes
   how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
   set when the Rollup Builder ships). Long text attributes record that they changed, not the
   values.
-- **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser`, `RollupBatch`,
-  `RollupScheduler`, with apex-rollup behind `RollupAdapter` (ADR-0015) until BarnCRM's own
-  aggregation core replaces it (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`). That core
-  is `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source
-  queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
+- **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
+  in front of BarnCRM's own aggregation core (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`;
+  apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the
+  comparison `RollupEngineComparison` makes before they are deleted). That core is
+  `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
   `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
   `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
   nightly recalculation: one batch pass per target entity in turn, records with many source rows
-  in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13); an
-  invocable recalculation action for Flow follows.
+  in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13, one
+  run at a time, R-R14) with `RollupRecalcErrorHandler` queueing a stopped chunk's records from
+  `BatchApexErrorEvent` (R-R14); an invocable recalculation action for Flow follows.
 
 ## 14A. Rollup Queue
 
@@ -5429,10 +5434,6 @@ is closed deliberately rather than discovered.
 
 | Rule | Gap | Why it is open |
 |---|---|---|
-| R-R4, R-R11 (Section 14) | Real time does not run for Gift Allocation and Soft Credit sources, so fund totals and soft credit totals move only in the nightly run or on Recalculate. | The current engine throws on both (a parent-field source on the fund last gift date, and the household token path on soft credits), so their registry rows wait for the new engine's trigger collection (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, slice S6). |
-| R-R1 (Section 14) | The household soft credit totals (paths through `{Household}` with an alternative) are not calculated. | The current engine is handed a token path it cannot resolve. Fixed by the new engine's calculator (slice S5); the tests are written and switched off until then. |
-| R-R8 (Section 14) | Target filters are ignored, so Household total giving and Account total giving can overwrite each other on a household that also gives in its own name. | Fixed by construction in the new engine (slice S5) rather than patched into the old one. |
-| R-R5, R-R13 (Section 14) | A recalculation does not stamp the records it wrote, and a definition is marked calculated when its run is queued. | Fixed in the new engine (slices S5 and S7). |
 
 R-M3's Primary Contact mirror was closed on 2026-09-23 by C-22 (ADR-0044, primary contact
 mirrors the primary member).
@@ -5615,3 +5616,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
 | v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |
+| v0.6 | 2026-10-12 | Rollup engine swap (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S8). No object or field added. BarnCRM's own engine is the only path for real time, the queue, Recalculate, Recalculate all and the nightly run; `RollupBatch` is removed. The Mode picklist labels become Instantly, Every night and Both (recommended) on `Rollup_Definition__c`, `Rollup_Definition_Default__mdt` and the `Rollup_Mode_Default__c` setting, stored values unchanged. R-R4 loses its interim sentence; new R-R14 (one full run at a time, and a stopped chunk's records are queued). The four rollup rows in Section 30 are closed. |

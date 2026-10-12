@@ -156,3 +156,17 @@ painful in DLRS is mitigated as follows:
   generate and deploy the trigger and test with `RunSpecifiedTests`, plain failure messages and
   the separate deploy permission; S17, remove the trigger with the last rollup, uninstall
   guidance and the Health Check finding; and the operations slice after S8 (decision 10).
+- The swap (S8) makes BarnCRM's engine the only path for real time, the queue, Recalculate,
+  Recalculate all and the nightly run, and deletes `RollupBatch`. The vendored tree,
+  `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` stay in the repository, reached by no
+  run, until the comparison of decision 1 is made: `RollupEngineComparison`, an Apex utility a
+  developer or administrator runs on a test org, calculates a sample of target records with both
+  engines inside a savepoint it rolls back and lists every value that differs
+  (`docs/contributor-guide/rollup-engine-comparison.md`). S9 deletes them once every difference
+  is explained.
+- Decision 6's finalizer cannot apply to a batch (a `System.Finalizer` attaches only to a
+  Queueable). The full recalculation batch instead raises `BatchApexErrorEvent`
+  (`Database.RaisesPlatformEvents`), and a handler writes a stopped chunk's records to the
+  Rollup Queue, which retries them with the queue's own finalizer and backoff. Only one full
+  run goes at a time: a second start (Recalculate all during the nightly run) is refused with
+  the running job named (canonical model R-R14).
