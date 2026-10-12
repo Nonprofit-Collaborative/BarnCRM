@@ -8,12 +8,12 @@ without reading anything else. It asks its questions one screen at a time, in th
 makes each answer easy, and it remembers where you got to. Close the browser in the middle
 of step four and come back tomorrow: the assistant opens on step four.
 
-How many steps you see depends on what is installed. BarnCRM Core on its own asks seven
-questions. When the **Giving** module is installed as well, Giving adds its own: a step for
-the default fund and appeal, the receipt details on the identity step, and a first gift to
-check everything with, which makes eight steps. This page numbers the steps as they appear
-with Giving installed and marks what comes from Giving. Without Giving, the steps after step
-two move up by one.
+How many steps you see depends on what is installed. BarnCRM Core on its own asks eight
+questions, starting with which edition you want. When the **Giving** module is installed as
+well, Giving adds its own: a step for the default fund and appeal, the receipt details on the
+identity step, and a first gift to check everything with, which makes nine steps. This page
+numbers the steps as they appear with Giving installed and marks what comes from Giving.
+Without Giving, the steps after step three move up by one.
 
 Nothing it asks is permanent. Every answer is a setting you can change later on the
 BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
@@ -41,15 +41,17 @@ the Access page.
 
 Two things sit outside the assistant, because Salesforce does not let an app do them:
 
-- **Creating a Salesforce user** who has never signed in. Step four links you to the Setup
+- **Creating a Salesforce user** who has never signed in. Step five links you to the Setup
   page that does it, then you come back and give the new person a role.
-- **Installing another BarnCRM module.** Step six tells you which modules are present
-  and links to what each one does.
+- **Installing another BarnCRM module.** Step one opens Salesforce's installer for the
+  module your edition needs, and step seven tells you which modules are present and links
+  to what each one does. You click through Salesforce's install screens yourself: BarnCRM
+  never installs anything for you.
 
-## A five-minute walkthrough, and then the eight steps
+## A five-minute walkthrough, and then the nine steps
 
 Maria has just installed BarnCRM Core and the Giving module in her organization's
-Salesforce org. That org has Person Accounts turned on, which matters in step one and
+Salesforce org. That org has Person Accounts turned on, which matters in step two and
 nowhere else. She has half an hour before her next meeting.
 
 ### Before you start
@@ -63,7 +65,45 @@ ready than to go and find:
 - With Giving: your logo, as a PNG or JPG file.
 - With Giving: a scan of the signature that goes on receipt letters, if you use one.
 
-### Step 1: Confirm how BarnCRM fits your org
+### Step 1: Choose your edition
+
+BarnCRM comes in two editions built from the same parts. Any organization can choose either
+one, and the choice can be changed later.
+
+- **Community Suite**: households, people, organizations, relationships, addresses,
+  importing and everything else in BarnCRM Core. Nothing more to install.
+- **Nonprofit Edition (Impact Suite)**: everything in the Community Suite, plus the Giving
+  module for gifts, funds and receipts. Giving is a separate package.
+
+Choose one and click **Confirm and continue**.
+
+- **Community Suite:** the assistant moves on to step two.
+- **Nonprofit Edition, Giving already installed:** the step says "Giving is installed. Its
+  steps are part of this setup." Click **Next**.
+- **Nonprofit Edition, Giving not installed yet:** the step stays open and says "The
+  Nonprofit Edition needs the Giving module, which is not installed yet." Click **Open the
+  Giving installer**. Salesforce's install screen opens in a new tab: choose who to install
+  for (**Install for Admins Only** is the safe choice; you give people access in step five),
+  click **Install**, and wait for the email that says it finished. Come back to this tab and
+  click **Check again**. The step now says Giving is installed, and Giving's own steps join
+  the assistant.
+
+BarnCRM never installs anything for you: Salesforce does not let one app install another, and
+you should see and approve what goes into your org. If the step says "The Giving install
+link is not published yet.", there is no installable version of Giving to link to yet: click
+**Read about Giving**, and ask whoever gave you BarnCRM for the install link.
+
+Choosing an edition loads no sample data and changes no records. The **Edition** setting, in
+the General section of BarnCRM Settings, holds the same choice. With the Nonprofit Edition,
+step seven also offers the modules that are only for nonprofits.
+
+**What Maria sees:** both editions, with **Nonprofit Edition** already selected because Giving
+is installed in her org. She clicks **Confirm and continue**, reads "Giving is installed",
+and clicks **Next**.
+
+**What she decides:** which edition fits her organization.
+
+### Step 2: Confirm how BarnCRM fits your org
 
 The step reads: "If your org uses Person Accounts, household membership uses the junction
 model so that what you already have keeps working. Confirm that here, or choose a different
@@ -103,7 +143,7 @@ and one button. She clicks it. Two seconds.
 
 **What she decides:** nothing, unless she disagrees with the detection.
 
-### Step 2: Confirm how households are named
+### Step 3: Confirm how households are named
 
 The assistant opens the household naming settings inside the step, with the live preview.
 Choose the pattern for the household name, the formal greeting, and the informal greeting,
@@ -120,7 +160,7 @@ default, and puts it back.
 **What she decides:** whether her households are a Family or a Household. That is genuinely
 the whole decision.
 
-### Step 3: Pick your default fund and appeal (Giving)
+### Step 4: Pick your default fund and appeal (Giving)
 
 This step comes with the **Giving** module, which is a separate package. Without Giving the
 step is not there at all, and the assistant goes straight from naming to access.
@@ -137,7 +177,7 @@ both and clicks **Save**.
 
 **What she decides:** where a gift goes when nobody says.
 
-### Step 4: Give your colleagues access
+### Step 5: Give your colleagues access
 
 Pick one person, pick a role, and click **Give access**. The step confirms with "Access
 given. Add another person, or continue.", and the person box clears so you can do the next
@@ -160,7 +200,7 @@ Staff role and Tom the Read Only role. The step marks itself done.
 **What she decides:** who gets to change settings. Give that to as few people as the work
 allows: settings change how the whole org behaves.
 
-### Step 5: Set your organization's identity
+### Step 6: Set your organization's identity
 
 This is the form the "before you start" list was for. Core asks for two things:
 
@@ -192,31 +232,32 @@ once they are uploaded. The tax identification number box says what one looks li
 **What she decides:** which name is the legal one. If you have a "doing business as" name,
 the legal name goes here and your everyday name goes on the letter text later.
 
-### Step 6: Choose which modules to turn on
+### Step 7: Choose which modules to turn on
 
 A list of the BarnCRM packages that fit your org. Each says **Present** or **Not
 installed**, with a **Learn more** link to that package's description (its README on
-GitHub).
+GitHub). A module that is not installed and has a published version also has an
+**Install** link, which opens Salesforce's installer for it in a new tab.
 
-- Without the Giving module, the list shows Core and Volunteers, plus any other module
-  already installed.
-- With Giving installed, it shows all six: Core, Giving, Volunteers, Programs, Funders, and
-  Connect.
+- With the Community Suite chosen in step one and Giving not installed, the list shows Core
+  and Volunteers, plus any other module already installed.
+- With the Nonprofit Edition chosen, or Giving installed, it shows all six: Core, Giving,
+  Volunteers, Programs, Funders, and Connect.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means
-opening its install link and following the Salesforce install screens, which is why the
-assistant links to instructions rather than doing it for you.
+opening its install link and following the Salesforce install screens yourself: the
+assistant never installs anything for you.
 
-The one-click **Turn on** and **Turn off** actions arrive with the Module Manager in
-version 0.7. Until then this step is a truthful inventory and a set of links.
+The one-click **Turn on** and **Turn off** actions arrive with the Module Manager. Until
+then this step is a truthful inventory and a set of links.
 
 Click **Next** when you have read it. The step marks itself done.
 
 **What Maria sees:** all six packages, Core and Giving present, the other four not
 installed. She makes a note to read about Volunteers this afternoon.
 
-### Step 7: Bring in your data
+### Step 8: Bring in your data
 
 Two buttons, and you may use either, both, or neither:
 
@@ -234,7 +275,7 @@ still being cleaned up.
 
 **What she decides:** practise first, or go straight to the real thing. Practise first.
 
-### Step 8: Check that everything works
+### Step 9: Check that everything works
 
 Follow the short walkthrough: add a person and see their household appear. With the Giving
 module installed, the step also has **Enter your first gift**, which opens the Giving
@@ -245,7 +286,7 @@ works, from donor to household to gift. Come back to the home page afterwards an
 Click **Finish**. The assistant shows the completion screen: every step with its status,
 and how long setup took, measured from the first change you made.
 
-**What Maria sees:** "You are ready", her eight steps, and `21 minutes`. Two buttons sit
+**What Maria sees:** "You are ready", her nine steps, and `21 minutes`. Two buttons sit
 under the summary: **Reopen setup** walks the steps again with her answers intact, and
 **Start setup again** forgets the progress it recorded so the checklist starts from the
 first step. Neither of them empties a setting: a step whose answer is already saved stays
@@ -264,10 +305,14 @@ finished, because it is.
   to the person who uploaded it. Upload the logo and the signature from an account that
   will stay active, ideally the administrator's.
 - **Putting the everyday name in the legal name box.** Letters (and, with Giving, receipts)
-  have to carry the name your official filings carry. If they differ, the legal name goes in step five.
+  have to carry the name your official filings carry. If they differ, the legal name goes in step six.
 - **Expecting the assistant to install a module.** No app can install another package for
-  you. Step six links to what each module does, and a module's steps (Giving's, for
-  example) appear the moment you come back after installing it.
+  you. Step one and step seven open Salesforce's installer in a new tab, where you click
+  through the install yourself. A module's steps (Giving's, for example) appear once you
+  come back and click **Check again**, or reload the home page.
+- **Choosing the Nonprofit Edition and closing the installer tab before it finishes.** The
+  edition is saved, but Giving is not installed until Salesforce's install email arrives.
+  Open the installer again from step one, or from step seven.
 - **Re-running setup to fix one thing.** You do not have to. Every answer is on the
   BarnCRM Settings page, grouped by section, with a search box. Reopen the assistant when
   something big changes, such as a new fiscal year or a merger, not to correct a typo.

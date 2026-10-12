@@ -42,9 +42,10 @@ private class SetupAssistantControllerTest {
         SetupAssistantController.SetupState state = SetupAssistantController.getState();
         Test.stopTest();
 
-        Assert.areEqual(7, state.stepsTotal, 'Core alone has seven setup steps');
-        Assert.areEqual(7, state.steps.size(), 'Every step is sent to the page at once');
-        Assert.isNotNull(state.coexistence, 'Step one needs what detection found');
+        Assert.areEqual(8, state.stepsTotal, 'Core alone has eight setup steps');
+        Assert.areEqual(8, state.steps.size(), 'Every step is sent to the page at once');
+        Assert.isNotNull(state.suite, 'Step one needs the suite and where Giving is');
+        Assert.isNotNull(state.coexistence, 'Step two needs what detection found');
         Assert.areEqual(
             2,
             stepByKey(state.steps, 'identity').fields.size(),
@@ -144,6 +145,78 @@ private class SetupAssistantControllerTest {
             'Confirming the mode is what finishes step one'
         );
         Assert.isNotNull(state.elapsedMinutes, 'The clock starts at the first change Maria makes');
+    }
+
+    @IsTest
+    static void savesTheNonprofitEditionAndFinishesStepOne() {
+        // The shipped Setting Definition rows: the suite is an ordinary setting (C-30).
+        SetupAssistantTestExtension.useNone();
+        ModuleDetectionService.givingPresentOverride = false;
+
+        Test.startTest();
+        SetupAssistantController.SetupState state = SetupAssistantController.applySuite(
+            ModuleDetectionService.SUITE_IMPACT
+        );
+        Test.stopTest();
+
+        Assert.isTrue(
+            stepByKey(state.steps, 'suite').completed,
+            'Saving the edition is what finishes step one'
+        );
+        Assert.areEqual(
+            ModuleDetectionService.SUITE_IMPACT,
+            state.suite.currentSuite,
+            'The page is told what was saved'
+        );
+        Assert.isFalse(state.suite.giving.present, 'Giving is not installed by choosing it');
+        Assert.isTrue(
+            state.suite.giving.docsUrl.endsWith('/giving/README.md'),
+            'The step can say where to read about Giving'
+        );
+        Assert.areEqual(6, state.modules.size(), 'The modules step now offers all six');
+        Assert.areEqual(8, state.stepsTotal, 'No Giving step appears until Giving is installed');
+    }
+
+    @IsTest
+    static void refusesASuiteItDoesNotKnow() {
+        String message;
+
+        Test.startTest();
+        try {
+            SetupAssistantController.applySuite('Enterprise');
+        } catch (AuraHandledException e) {
+            message = e.getMessage();
+        }
+        Test.stopTest();
+
+        Assert.areEqual(
+            System.Label.Core_SuiteChoice_UnknownSuiteError,
+            message,
+            'Only the two suites can be saved'
+        );
+        Assert.isNull(ModuleDetectionService.chosenSuite(), 'And nothing was saved');
+    }
+
+    @IsTest
+    static void preselectsTheNonprofitEditionOnlyWhereSomethingSaysSo() {
+        SetupAssistantTestExtension.useNone();
+        SetupAssistantService.stubbedShape = new OrgShapeDetector.OrgShape();
+        ModuleDetectionService.givingPresentOverride = false;
+
+        Test.startTest();
+        String onAFreshOrg = SetupAssistantController.getState().suite.recommendedSuite;
+        ModuleDetectionService.givingPresentOverride = true;
+        String withGiving = SetupAssistantController.getState().suite.recommendedSuite;
+        ModuleDetectionService.givingPresentOverride = false;
+        OrgShapeDetector.OrgShape npsp = new OrgShapeDetector.OrgShape();
+        npsp.hasNpsp = true;
+        SetupAssistantService.stubbedShape = npsp;
+        String withNpsp = SetupAssistantController.getState().suite.recommendedSuite;
+        Test.stopTest();
+
+        Assert.isNull(onAFreshOrg, 'A fresh org is left to choose for itself');
+        Assert.areEqual(ModuleDetectionService.SUITE_IMPACT, withGiving, 'Giving here suggests it');
+        Assert.areEqual(ModuleDetectionService.SUITE_IMPACT, withNpsp, 'So does NPSP');
     }
 
     @IsTest
@@ -342,7 +415,7 @@ private class SetupAssistantControllerTest {
         );
         Test.stopTest();
 
-        Assert.areEqual(8, state.stepsTotal, 'The module step is counted');
+        Assert.areEqual(9, state.stepsTotal, 'The module step is counted');
         Assert.isTrue(
             stepByKey(state.steps, SetupAssistantTestExtension.STEP_KEY).completed,
             'Choosing the record is what finishes the module step'
@@ -494,7 +567,7 @@ private class SetupAssistantControllerTest {
         Test.startTest();
         System.runAs(david) {
             SetupAssistantController.SetupState state = SetupAssistantController.getState();
-            Assert.areEqual(7, state.steps.size(), 'David sees the same seven steps');
+            Assert.areEqual(8, state.steps.size(), 'David sees the same eight steps');
             Assert.isFalse(state.canEdit, 'David may read the assistant but not change it');
             try {
                 SetupAssistantController.completeStep('modules');

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_SuiteChoice_StepLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: the name of the first step, the suite choice</shortDescription>
+        <value>Choose your edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_StepDescription</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: what the suite choice step asks</shortDescription>
+        <value>Choose the Community Suite for BarnCRM Core on its own, or the Nonprofit Edition, which adds the Giving module. Any organization can choose either, and you can change it later.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: refusal when no known suite was chosen</shortDescription>
+        <value>Choose the Community Suite or the Nonprofit Edition, then click Confirm and continue.</value>
+    </labels>
+</CustomLabels>

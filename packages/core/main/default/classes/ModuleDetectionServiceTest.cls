@@ -95,6 +95,100 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
+    static void offersEveryModuleOnceTheNonprofitEditionIsChosen() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        ModuleDetectionService.givingPresentOverride = false;
+        chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+
+        Test.startTest();
+        List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
+        Test.stopTest();
+
+        Assert.areEqual(
+            6,
+            modules.size(),
+            'Any org that chose the Nonprofit Edition is offered all six, before Giving is here'
+        );
+        Assert.isFalse(modules[1].present, 'And Giving is still shown as not installed');
+    }
+
+    @IsTest
+    static void keepsTheCommunitySuiteToTheModulesThatFitEveryOrg() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        ModuleDetectionService.givingPresentOverride = false;
+        chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+
+        Test.startTest();
+        List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
+        String chosen = ModuleDetectionService.chosenSuite();
+        Test.stopTest();
+
+        Assert.areEqual(ModuleDetectionService.SUITE_COMMUNITY, chosen, 'The saved choice is read');
+        Assert.areEqual(2, modules.size(), 'Core and Volunteers, and nothing only for nonprofits');
+    }
+
+    @IsTest
+    static void linksTheInstallerOnlyForAPublishedModuleThatIsNotHere() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        ModuleDetectionService.givingPresentOverride = false;
+        ModuleDetectionService.installVersionIds = new Map<String, String>{
+            'Giving' => '04t000000000001AAA',
+            'Volunteers' => 'not a version id'
+        };
+        chooseSuite(ModuleDetectionService.SUITE_IMPACT);
+
+        Test.startTest();
+        Map<String, ModuleDetectionService.ModuleInfo> byName = new Map<String, ModuleDetectionService.ModuleInfo>();
+        for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
+            byName.put(module.name, module);
+        }
+        ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+        Test.stopTest();
+
+        Assert.areEqual(
+            '/packaging/installPackage.apexp?p0=04t000000000001AAA',
+            byName.get('Giving').installUrl,
+            'A published module that is not here links to Salesforce\'s installer'
+        );
+        Assert.areEqual(
+            byName.get('Giving').installUrl,
+            giving.installUrl,
+            'The suite step links to the same installer'
+        );
+        Assert.isNull(byName.get('Volunteers').installUrl, 'Anything but a version Id is no link');
+        Assert.isNull(byName.get('Programs').installUrl, 'An unpublished module has no link');
+        Assert.isNull(
+            byName.get('Core').installUrl,
+            'Core is here, so there is nothing to install'
+        );
+    }
+
+    @IsTest
+    static void offersNoInstallerForAModuleThatIsHere() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+        ModuleDetectionService.givingPresentOverride = true;
+        ModuleDetectionService.installVersionIds = new Map<String, String>{
+            'Giving' => '04t000000000001AAA'
+        };
+
+        Test.startTest();
+        ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
+        Test.stopTest();
+
+        Assert.isTrue(giving.present, 'Giving is here');
+        Assert.isNull(giving.installUrl, 'So the step offers no installer');
+        Assert.isTrue(giving.docsUrl.endsWith('/giving/README.md'), 'Its description is linked');
+    }
+
+    private static void chooseSuite(String suite) {
+        insert new BarnCRM_Settings__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Suite__c = suite
+        );
+        SettingsService.clearCaches();
+    }
+
+    @IsTest
     static void answersHonestlyOnACoreOnlyOrg() {
         Test.startTest();
         Boolean givingPresent = ModuleDetectionService.isGivingPresent();

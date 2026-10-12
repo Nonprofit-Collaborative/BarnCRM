@@ -3,10 +3,11 @@
  * steps, says how each one finishes, and remembers where Maria got to, so that closing the
  * browser in the middle of step four opens on step four tomorrow.
  *
- * Core ships seven neutral steps. A dependent package adds its own steps, fields and wording
- * through `SetupAssistantExtension` (C-29, ADR-0059): Giving adds the fund and appeal step and
- * the receipt fields, which makes eight. A step's fields are data, rendered by one Core panel
- * and saved through `SettingsService` on the settings object each field names.
+ * Core ships eight neutral steps, the first of which asks which suite (C-30,
+ * NEXT-suite-choice-is-the-first-setup-step.md). A dependent package adds its own steps, fields
+ * and wording through `SetupAssistantExtension` (C-29, ADR-0059): Giving adds the fund and
+ * appeal step and the receipt fields, which makes nine. A step's fields are data, rendered by
+ * one Core panel and saved through `SettingsService` on the settings object each field names.
  *
  * A step is finished when the administrator finishes it, or when the setting that step
  * exists to fill in already has a value. A step can also be skipped, which moves it out of
@@ -101,7 +102,7 @@ public with sharing class SetupAssistantService {
         /** True when saving the panel's fields also moves on to the next step. */
         @AuraEnabled
         public Boolean advanceOnSave;
-        /** Where the step sits: Core's steps are 10 to 80 in tens, a module fills the gaps. */
+        /** Where the step sits: Core's are 5, then 10 to 80 in tens; a module fills the gaps. */
         public Integer sortOrder;
 
         /** A step, or a contribution to a Core step when the key is one of Core's. */
@@ -341,6 +342,24 @@ public with sharing class SetupAssistantService {
         return shape.hasNpsp == true ? SHAPE_NPSP : SHAPE_FRESH;
     }
 
+    /**
+     * The suite the first step preselects: the one already chosen; otherwise the Nonprofit
+     * Edition when Giving is installed or NPSP or Nonprofit Cloud is detected; otherwise null,
+     * so the administrator picks (NEXT-suite-choice-is-the-first-setup-step.md).
+     */
+    public static String recommendedSuite() {
+        String chosen = ModuleDetectionService.chosenSuite();
+        if (chosen != null) {
+            return chosen;
+        }
+        OrgShapeDetector.OrgShape shape = orgShape();
+        Boolean nonprofitProduct =
+            shape != null && (shape.hasNpsp == true || shape.hasIndustriesNonprofit == true);
+        return ModuleDetectionService.isGivingPresent() || nonprofitProduct
+            ? ModuleDetectionService.SUITE_IMPACT
+            : null;
+    }
+
     /** The coexistence mode the assistant recommends for what detection found (plan Section 4.5). */
     public static String recommendedMode() {
         return OrgShapeDetector.recommendedCoexistenceMode(orgShape());
@@ -440,7 +459,7 @@ public with sharing class SetupAssistantService {
     }
 
     /**
-     * Core's seven steps with every installed extension's contributions merged in, sorted and
+     * Core's eight steps with every installed extension's contributions merged in, sorted and
      * numbered. Built once per transaction: the page asks for the steps several times a call.
      */
     private static List<Step> definitions() {
@@ -531,9 +550,19 @@ public with sharing class SetupAssistantService {
         return sortOrder == null ? 1000 : sortOrder;
     }
 
-    /** The seven steps every organization answers, whatever else is installed. */
+    /** The eight steps every organization answers, whatever else is installed. */
     private static List<Step> coreSteps() {
         List<Step> steps = new List<Step>();
+        steps.add(
+            new Step(
+                    'suite',
+                    5,
+                    System.Label.Core_SuiteChoice_StepLabel,
+                    System.Label.Core_SuiteChoice_StepDescription
+                )
+                .withTarget(SettingSections.GENERAL)
+                .completedBy(null, 'Suite__c')
+        );
         steps.add(
             new Step(
                     'coexistence',

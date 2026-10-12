@@ -35,27 +35,29 @@ Maria has just installed BarnCRM and has the sample data loaded.
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
    opens with the heading **Welcome to BarnCRM**.
-2. Read the **Setup checklist**. It opens on the first of eight steps you have not
-   finished, with one sentence saying what that step is for and the count of how far you
-   have got, for example "3 of 8" (seven steps with Core alone, eight with Giving). The steps are guided: each one is done here, on the home
-   page, not somewhere else.
-3. The first step, **Confirm how BarnCRM fits your existing org**, says what it found in
+2. Read the **Setup checklist**. It opens on the first step you have not finished, with
+   one sentence saying what that step is for and the count of how far you have got, for
+   example "3 of 8" (eight steps with Core alone, nine with Giving). The steps are guided:
+   each one is done here, on the home page, not somewhere else.
+3. The first step, **Choose your edition**, asks whether you want the Community Suite or
+   the Nonprofit Edition. Choose **Community Suite** and click **Confirm and continue**.
+4. The next step, **Confirm how BarnCRM fits your existing org**, says what it found in
    your org and recommends a fit. On a fresh org it says "This looks like a fresh org, with
    no other household model and no Person Accounts. BarnCRM can run on its own." and
    recommends **Standalone**. If your org uses Person Accounts, it says so plainly, and
    household membership uses one record per person so that what you already have keeps
    working. Click **Confirm and continue**.
-4. Use **Next**, **Back**, and **Skip for now** to move around. Skipping does not mark a
+5. Use **Next**, **Back**, and **Skip for now** to move around. Skipping does not mark a
    step done: it moves the step out of the way and offers it to you again next time. The
    full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
-5. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
+6. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
    number, click **Open the Error Log** and read the plain-language message on each row.
    The tile counts up to 999; past that it says `999+`, so a flooded Error Log never slows
    the home page down.
-6. If someone has paused automation (for example during a large import), a banner sits
+7. If someone has paused automation (for example during a large import), a banner sits
    above the checklist saying BarnCRM automation is paused. It disappears by itself
    when the pause expires.
-7. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
+8. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
    going back to the app launcher.
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
