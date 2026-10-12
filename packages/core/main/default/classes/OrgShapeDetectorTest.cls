@@ -13,6 +13,24 @@ private class OrgShapeDetectorTest {
     // not compile against it either.
     private static final String NATIVE_HOUSEHOLD_GROUP = 'PartyRelationshipGroup'; // detection-only: describe key, so the absent-object path can be asserted on an org that does not have the object
 
+    private static final String PERSON_ACCOUNT_FIELD = 'ispersonaccount'; // detection-only: Account field map key, so the no-Person-Accounts path can be asserted on any org shape
+
+    @IsTest
+    static void personTypeRecordTypesAreEmptyAndDoNotThrowWithoutPersonAccounts() {
+        Boolean hasPersonAccounts = Schema.SObjectType.Account.fields.getMap()
+            .containsKey(PERSON_ACCOUNT_FIELD);
+
+        Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
+
+        System.assertNotEquals(null, personTypes, 'A set is always returned.');
+        if (!hasPersonAccounts) {
+            System.assert(
+                personTypes.isEmpty(),
+                'Without Person Accounts there are no person types, and no query is made.'
+            );
+        }
+    }
+
     @IsTest
     static void detectPopulatesTheWholeShape() {
         OrgShapeDetector.reset();

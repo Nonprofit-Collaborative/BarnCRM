@@ -463,10 +463,12 @@ private class InboundGiftServiceTest {
 
     @IsTest
     static void aPersonStoredAsAnAccountIsCreditedOnTheAccount() {
+        Set<Id> personTypeIds = OrgShapeSelector.personTypeRecordTypeIds();
+        // IsActive exists on RecordType in every org; an inactive type cannot be inserted against.
         List<RecordType> personTypes = [
             SELECT Id
             FROM RecordType
-            WHERE SobjectType = 'Account' AND IsPersonType = TRUE AND IsActive = TRUE
+            WHERE Id IN :personTypeIds AND IsActive = TRUE
             LIMIT 1
         ];
         if (personTypes.isEmpty()) {
