@@ -40,7 +40,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Multiple email addresses | Major | Gives each person personal, work and alternate email boxes plus a Preferred Email choice that keeps the standard email field in step. | Shipped | C-25 |
 | Automatic household creation switch | Minor | Setting to turn automatic household creation on or off (ships on). | Shipped | C-01 |
 | Delete empty households setting | Minor | Optional tidy-up that removes a household when its last member leaves; ships off, and never removes a household something outside BarnCRM depends on. | Shipped | C-01, ADR-0036 |
-| Households with gifts are kept | Minor | The empty household tidy-up never removes a household that gifts or pledges are credited to, so past gifts keep their household. | Built, not merged (`fix/keep-households-with-gifts`) | new ADR (D-20) |
+| Households with gifts are kept | Minor | The empty household tidy-up never removes a household that gifts or pledges are credited to, so past gifts keep their household. | Shipped | ADR-0070 (D-20) |
 | Membership model chosen at install | Minor | Install looks at the org and picks the simple or flexible membership model; the setting refuses a switch that would hide membership data you already have. | Shipped | C-01 |
 | Greeting tokens and preferred names | Minor | Patterns use first name, last name and salutation tokens, and a person's preferred name replaces the first name in greetings. | Shipped | C-02 |
 | Deceased members in greetings | Minor | Leaves a deceased person out of greetings, with "the late" option in the formal greeting. | Shipped | C-02 |
@@ -98,7 +98,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Import wizard | Major | Uploads a spreadsheet, suggests column mappings, runs a dry run showing what would be created, updated, matched or rejected, then commits with per-row results. | Shipped | C-14 |
 | Import undo | Major | Undoes a committed import within a set window: removes what it created and puts back values it changed, keeping anything that has since gained a life of its own. | Shipped | C-19 |
 | Excel workbook import | Major | Reads .xlsx files directly in the browser, no CSV conversion needed. | Shipped | C-19, ADR-0049 |
-| Import matching rules | Major | Separate matching rules for people and for organizations (email, name plus postal code, or an ID field you choose), set per file in the import wizard. | Built, not merged (`feature/c-32-import-matching-1` to `-6`) | C-32 |
+| Import matching rules | Major | Separate matching rules for people and for organizations (email, name plus postal code, or an ID field you choose), set per file in the import wizard. | Shipped | C-32 |
 | Find | Major | A Find tab that builds a query over one object from lists (no typing a query), shows the matching records, and exports them to CSV. | Built, not merged (`feature/c-34-find-1` to `-8`) | C-34 |
 | Load one object | Major | Inserts, updates or upserts any object, including custom ones, with the same dry run, journal and undo. | Planned (v0.7) | C-33 |
 | Bulk update | Major | Sets, clears or copies up to five fields on the records a Find query returns, with a count preview, journal and undo. | Planned (v0.7) | C-35 |
@@ -113,15 +113,15 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Do not load" remembered | Minor | A column set to Do not load stays that way on the next upload. | Shipped | C-14 |
 | Duplicate-safe new donors | Minor | A new donor appearing on several rows is created once, and the dry run counts them once. | Shipped | C-19 |
 | Person account import | Minor | Imports email, address, opt-outs, birthdate and title onto person accounts and re-finds them on a second load. | Shipped | C-14 |
-| First-name matching guard | Minor | A row whose first name differs from the only match at the same key creates a new person instead of renaming the existing one. | Built, not merged (`feature/import-first-name-match`, in the stack of PR #200) | C-14 (plan 11.2 item 17) |
+| First-name matching guard | Minor | A row whose first name differs from the only match at the same key creates a new person instead of renaming the existing one. | Shipped | C-14 (plan 11.2 item 17) |
 | Neutral import wizard | Minor | Without Giving installed, the wizard offers no gift columns, and the gift templates live in Giving. | Shipped | C-29 |
-| Match by an ID field you choose | Minor | Pick which external ID field a file matches on, for people and for organizations. | Built, not merged (`feature/c-32-import-matching-2` to `-4`) | C-32 |
-| When a row matches several records | Minor | A setting decides what happens when a row matches more than one record: reject the row (the default) or use the most recently changed record; either way the row is flagged for review. | Built, not merged (`feature/c-32-import-matching-2` to `-4`) | C-32 |
-| Values for every row | Minor | Give a value the whole file shares (such as a city missing from every row) once; a row with its own value keeps it. | Built, not merged (`feature/c-32-import-matching-3`, `-4`) | C-32 |
-| Match by Salesforce record ID | Minor | A file that carries Salesforce record IDs matches on them directly. | Built, not merged (`feature/c-32-import-matching-5`, `-6`) | C-32 |
-| Match only | Minor | A file can be set to update records it finds and never create new ones. | Built, not merged (`feature/c-32-import-matching-5`, `-6`) | C-32 |
-| Your own fields in the wizard | Minor | The wizard offers the org's own custom fields as mapping targets. | Built, not merged (`feature/c-32-import-matching-6`) | C-32 |
-| Import undo keeps households with gifts | Minor | Undoing an import keeps a household that gifts or pledges are credited to, and journals why. | Built, not merged (`fix/import-undo-keeps-households-with-gifts`) | C-19, new ADR (D-20) |
+| Match by an ID field you choose | Minor | Pick which external ID field a file matches on, for people and for organizations. | Shipped | C-32 |
+| When a row matches several records | Minor | A setting decides what happens when a row matches more than one record: reject the row (the default) or use the most recently changed record; either way the row is flagged for review. | Shipped | C-32 |
+| Values for every row | Minor | Give a value the whole file shares (such as a city missing from every row) once; a row with its own value keeps it. | Shipped | C-32 |
+| Match by Salesforce record ID | Minor | A file that carries Salesforce record IDs matches on them directly. | Shipped | C-32 |
+| Match only | Minor | A file can be set to update records it finds and never create new ones. | Shipped | C-32 |
+| Your own fields in the wizard | Minor | The wizard offers the org's own custom fields as mapping targets. | Shipped | C-32 |
+| Import undo keeps households with gifts | Minor | Undoing an import keeps a household that gifts or pledges are credited to, and journals why. | Shipped | C-19, ADR-0070 (D-20) |
 | Find conditions | Minor | Conditions on the object's fields and related records, relative dates such as "in the last 30 days", and custom condition logic. | Built, not merged (`feature/c-34-find-1` to `-8`) | C-34 |
 | Saved and shared queries | Minor | Save a Find query under a name to run again, and share it read only with everyone who uses Find. | Built, not merged (`feature/c-34-find-6` to `-8`) | C-34 |
 | Find export | Minor | Exports every matching record (not only the rows on screen) to CSV, up to an export row limit set in the app; results follow each person's own access. | Built, not merged (`feature/c-34-find-7`, `-8`) | C-34 |
@@ -163,9 +163,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Setup Assistant | Major | A guided, resumable eight-step checklist from install to first real record, with Back, Next and Skip. | Shipped | C-12 |
 | Access page | Major | Assigns packaged roles (permission set groups) to colleagues from the app and shows who holds each role. | Shipped | C-06 |
 | Coexistence mode | Major | Detects whether the org also runs NPSP or Nonprofit Cloud, proposes the matching mode (Standalone, NPSP, Nonprofit Cloud) and records it. | Shipped | C-07 |
-| Rearrangeable home page | Major | The home page is built from separate tiles (welcome, setup checklist, errors, Health Check, rollups, seasonal addresses, regular files, quick links) in standard regions, so an admin can rearrange or hide them in App Builder. | Built, not merged (`feature/hub-rebuild-1` to `-5`) | C-03 |
-| Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. | Built, not merged (`feature/c-24-module-manager-1`, `-2`) | C-24 |
-| Suite choice | Major | The Setup Assistant's first step asks Impact Suite or Community Suite and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Built, not merged (`feature/c-30-suite-choice-1`, `-2`) | C-30 |
+| Rearrangeable home page | Major | The home page is built from separate tiles (welcome, setup checklist, errors, Health Check, rollups, seasonal addresses, regular files, quick links) in standard regions, so an admin can rearrange or hide them in App Builder. | Shipped | C-03 |
+| Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. | Shipped | C-24 |
+| Suite choice | Major | The Setup Assistant's first step asks Impact Suite or Community Suite and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
 | Neutral Core | Major | Moves nonprofit wording, the giving and receipt settings and the nonprofit setup steps out of Core into Giving, so Core alone is the Community Suite. | Shipped | C-29, ADR-0059 |
 | Analytics module: field utilization | Major | Shows, per object and record type, how often each field is filled in, with trends over time. | Planned (proposed, not scheduled) | plan 6.1 item 10 |
 | Packaged roles | Minor | Five roles: Admin, Fundraising Staff, Program Staff, Volunteer Coordinator and Read Only; packaged sets are never cloned. | Shipped | C-06 |
@@ -175,8 +175,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Setup progress remembered | Minor | The assistant reopens on the step you reached and collapses to a "Setup complete" tile that can be reopened. | Shipped | C-12 |
 | Organization identity step | Minor | Records the organization's name, tax ID, address and logo in the assistant (used by receipts). | Shipped | C-12 |
 | Modules step | Minor | Shows each package as present or not installed, with links to what it does. | Shipped | C-12 |
-| Modules tile | Minor | A home page tile showing which modules are installed. | Built, not merged (`feature/hub-rebuild-5`) | C-24, ADR-0018 |
-| Pickers in settings | Minor | Settings that name a record or record type offer a picker instead of a typed ID, the fiscal year start is a month list, and each description is read out with its control. | Built, not merged (`feature/ux-core-1`) | C-03, new ADR |
+| Modules tile | Minor | A home page tile showing which modules are installed. | Shipped | C-24, ADR-0018 |
+| Pickers in settings | Minor | Settings that name a record or record type offer a picker instead of a typed ID, the fiscal year start is a month list, and each description is read out with its control. | Shipped | C-03, ADR-0074 |
 | Coexistence options gated by detection | Minor | NPSP and Nonprofit Cloud modes are offered only where that product is detected (or already saved); Standalone is always offered. | Shipped | C-29 follow-up |
 | Installer gets admin access | Minor | The person who installs receives the admin role automatically by a background job after install. | Shipped | C-06 |
 | Sample data | Minor | Loads a realistic demo set (200 households, 440 people, 25 organizations, connections and affiliations) only when an admin asks, and removes it all in one action. | Shipped | C-10 |
@@ -204,7 +204,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Multi-currency warning | Minor | Warns that multiple currencies are not supported yet. | Shipped | C-11 |
 | Stalled digest finding | Minor | Warns when the error digest is scheduled but has not run for two days. | Shipped | C-23 |
 | Module findings extension | Minor | Lets installed modules add their own Health Check findings without Core knowing about them. | Shipped | ADR-0057 |
-| Schedule all nightly jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Connect add), and one fix schedules them all. | Built, not merged (`feature/ux-core-2`; Giving and Connect jobs on `feature/nightly-job-providers`) | C-21, new ADR |
+| Schedule all nightly jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Connect add), and one fix schedules them all. | Shipped | C-21, ADR-0075 |
 | Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Shipped | plan 11.3 |
 
 ### 1.9 Record Pages and App Experience
@@ -218,8 +218,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Activities instead of Chatter | Minor | Packaged records use the activity panel, not a Chatter feed. | Shipped | ADR-0042 |
 | Your own pages win | Minor | A record page you assigned yourself is never replaced. | Shipped | C-08 |
 | Clearer screens | Minor | Save buttons disable while saving, spinners say what they wait for, and errors use plain words. | Shipped | C-01 |
-| Plainer wording | Minor | Import buttons read Preview, Import these rows and Download rejected rows; schedule times name the time zone; errors point to the Error Log; warning icons are announced to screen readers. | Built, not merged (`feature/ux-core-3`) | UX review |
-| Activity actions on the fallback layout | Minor | The packaged account layout includes Log a Call, New Task and New Event, so its activity panel can create activities. | Built, not merged (`fix/account-fallback-activity-actions`) | C-08 |
+| Plainer wording | Minor | Import buttons read Preview, Import these rows and Download rejected rows; schedule times name the time zone; errors point to the Error Log; warning icons are announced to screen readers. | Shipped | UX review |
+| Activity actions on the fallback layout | Minor | The packaged account layout includes Log a Call, New Task and New Event, so its activity panel can create activities. | Shipped | C-08 |
 
 ---
 
@@ -250,7 +250,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Quick Gift Entry conveniences | Minor | Save and new for a stack of checks, a double-tap guard, person-account donor search, and in-kind fields that replace the amount box. | Shipped | G-03, G-18 |
 | Open Batches list | Minor | A half-typed batch is saved and can be picked up later; posted batches are locked. | Shipped | G-17 |
 | In-kind validation rules | Minor | Five rules refuse in-kind mistakes, such as a cash gift left carrying an in-kind value. | Shipped | G-18 |
-| A gift keeps its household | Minor | When a donor moves to another household, past gifts stay with the household they were given to; household totals through current membership follow the person. | Shipped (documented on `docs/gift-household-on-move`) | G-01, new ADR (D-20) |
+| A gift keeps its household | Minor | When a donor moves to another household, past gifts stay with the household they were given to; household totals through current membership follow the person. | Shipped | G-01, ADR-0071 (D-20) |
 | Quick Gift Entry in the utility bar | Minor | Quick Gift Entry opens from the Fundraising app's utility bar on any page. | Shipped | G-03 (UX pass) |
 | "Payment Method" label | Minor | The gift type field is labelled Payment Method in the app and on Quick Gift Entry. | Shipped | G-03 (UX pass) |
 | Gift page polish | Minor | Gift page shows one donor field and shows refund, original gift and matched gift fields only when relevant. | Shipped | G-01 (UX pass) |
@@ -382,7 +382,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Fundraising app | Major | An app with tabs for gifts, funds, appeals, commitments, batches, receipts and Quick Gift Entry. | Shipped | G-06, ADR-0018 |
-| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments and soft credits, and a New Gift action. | Shipped | new ADR (UX pass) |
+| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments and soft credits, and a New Gift action. | Shipped | ADR-0064 (UX pass) |
 | Gift, Commitment and Gift Batch record pages | Minor | Packaged record pages for Giving records, opened automatically in the Fundraising app. | Shipped | ADR-0043 |
 | Giving permission sets | Minor | Giving Admin, Giving Staff and Giving Read Only (assigned in Setup until the Module Manager joins them to roles). | Shipped | C-06 |
 | Giving sample data | Minor | With Giving installed, sample data adds about 700 gifts over three years, funds, appeals, commitments, soft credits, tributes and in-kind gifts, dated relative to load. | Shipped | C-10 |
@@ -416,8 +416,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Idempotent by external ID | Minor | A gift sent twice is recorded once; the same ID with a different amount is refused. | Shipped | X-03 |
 | No invented donors | Minor | A gift for an unknown donor is refused and logged rather than creating a duplicate person. | Shipped | X-03 |
 | API documentation and samples | Minor | Reference and sample requests and responses for developers. | Shipped | X-06 |
-| OpenAPI description of the inbound gift API | Minor | The inbound gift API is published as an OpenAPI 3.1 file, checked in CI against the code. | Built, not merged (`feature/portability-checks`) | X-06 |
-| Using BarnCRM actions with AI | Minor | "Record Inbound Gift" describes itself and every input precisely, so a customer's own Agentforce agent or MCP server can choose and fill it; an admin guide page covers setup, access and cost. BarnCRM ships no AI. | Built, not merged (`feature/ai-ready-invocable-actions`) | X-03 |
+| OpenAPI description of the inbound gift API | Minor | The inbound gift API is published as an OpenAPI 3.1 file, checked in CI against the code. | Shipped | X-06 |
+| Using BarnCRM actions with AI | Minor | "Record Inbound Gift" describes itself and every input precisely, so a customer's own Agentforce agent or MCP server can choose and fill it; an admin guide page covers setup, access and cost. BarnCRM ships no AI. | Shipped | X-03 |
 | Money-only, repeatable export | Minor | Exports only Received, Refunded and Written off gifts; downloading changes nothing. | Shipped | X-04 |
 | Unposted-only export and Mark posted | Minor | Shows only gifts not yet posted and marks the exported gifts posted (with Giving's posting flag). | Shipped | X-04, G-20 |
 | Processor webhooks | Minor | Community-contributed receivers for common payment processors. | Planned (1.x) | X-08 |
@@ -514,8 +514,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | No paid add-on dependency | No Data Cloud, OmniStudio, CRM Analytics, Experience Cloud or Marketing Cloud; standard reports only. | Shipped | ADR-0009 |
 | Settings live in the app | Every admin setting is in the in-app settings console, never only in Setup; documented exceptions (duplicate review permission, lock overrides) say why. | Shipped | plan 4.8 |
 | Permission model | Packaged permission sets and groups never cloned, separate custom permissions for sensitive actions, code that respects sharing and field security, and a small set of documented system-mode writes. | Shipped | C-06, ADR-0021 |
-| Explicit access modes | Every packaged Apex class states its sharing, and every query and save states user or system mode, with a CI check, so nothing relies on a platform default. | Built, not merged (`fix/explicit-access-modes`) | ADR-0021 |
-| Portability checks | CI checks that every packaged object and field is in the canonical model and that shared JavaScript modules stay free of Salesforce imports. | Built, not merged (`feature/portability-checks`) | plan 6.1 item 7 |
+| Explicit access modes | Every packaged Apex class states its sharing, and every query and save states user or system mode, with a CI check, so nothing relies on a platform default. | Shipped | ADR-0021 |
+| Portability checks | CI checks that every packaged object and field is in the canonical model and that shared JavaScript modules stay free of Salesforce imports. | Shipped | plan 6.1 item 7 |
 | AI-readiness pack | Documented export schemas and a canonical-model JSON export so any AI tool can be grounded in clean data. | Planned (post-1.0) | plan 6.1 item 7 |
 | Upgrade-safe defaults | Shipped defaults (rollups, import templates, receipt templates) are copied to editable records, and upgrades add new ones without touching edits. | Shipped | ADR-0006, ADR-0029 |
 | Error logging everywhere | Every module writes failures to the shared Error Log instead of failing silently. | Shipped | C-05 |
