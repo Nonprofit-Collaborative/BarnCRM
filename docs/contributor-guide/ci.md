@@ -322,10 +322,13 @@ once more. A run with any result, including real failures, is never retried. Dep
 that stall are resubmitted too: see "Stalled deploys" under `org-tests`.
 
 **At about 2,200 tests the sf CLI can run out of memory reading the results.** The Node
-process aborts with `JavaScript heap out of memory` after every stage has deployed, the retry
-hits the same wall, and the script posts a failure reading `0 of 0 failed`: no test failed.
-Run the gate with a larger heap:
-`NODE_OPTIONS=--max-old-space-size=8192 scripts/org/run-org-tests.sh <org alias>`.
+process aborts with `JavaScript heap out of memory` after every stage has deployed. The script
+exports `NODE_OPTIONS=--max-old-space-size=8192` itself (a larger heap you set is kept; other
+`NODE_OPTIONS` flags are preserved). If the CLI still crashes, or returns empty or unreadable
+output, the script prints "sf CLI crashed, rerun", exits 3, does not retry, and posts no
+`Org tests (local)` status (it used to post a failure reading `0 of 0 failed`). Rerun the gate.
+The CLI has no option to omit passing-test detail from the JSON, so the payload is not reduced.
+`deploy-packages.sh` has not shown the crash and is unchanged.
 
 **One test depends on Salesforce's own duplicate matching.**
 `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce` asks the platform's
@@ -746,7 +749,7 @@ C-29 stack is still open with a `failure` status on its top head, and two Depend
   which passed 16 times out of 16 when run alone.
 - To land it:
   1. Run one full gate from a clean detached worktree at the top head, with
-     `NODE_OPTIONS=--max-old-space-size=8192 scripts/org/run-org-tests.sh oi-test` (or `oi-pa`).
+     `scripts/org/run-org-tests.sh oi-test` (or `oi-pa`).
      If only the flaky test fails, rerun the gate.
   2. Fast-forward each lower branch to the top head:
      `git push origin 3da9276ad53ed3231e01b314d7e0e6205a23f8e7:refs/heads/feature/c-29-neutral-core-N`
@@ -808,14 +811,7 @@ from both when its PR merges.
    - **Tests:**
      - add a "Campaign unavailable" test seam;
      - make tests that return early assert both cases.
-4. **Raise the sf CLI heap in the org test script.**
-   - Export `NODE_OPTIONS=--max-old-space-size=8192` in `scripts/org/run-org-tests.sh`, and in
-     `scripts/org/deploy-packages.sh` if it needs it.
-   - Detect the out-of-memory signature and report it as a client crash, not as "0 of 0
-     failed".
-   - Consider requesting a smaller result payload.
-   - Update the heap paragraph in this page.
-5. **Smaller review follow-ups.**
+4. **Smaller review follow-ups.**
    - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
    - X-01: the admin guide should warn against listing `Master` in the record-type filter.
    - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.

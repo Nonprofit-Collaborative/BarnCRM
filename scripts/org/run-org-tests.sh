@@ -20,7 +20,8 @@
 # GitHub cannot attach a status to anyway, so that is checked before the long part starts
 # rather than after it.
 #
-# Exit codes: 0 = every test passed and the success status was posted; non-zero otherwise.
+# Exit codes: 0 = every test passed and the success status was posted; 1 = failure status
+# posted or a precondition failed; 3 = the sf CLI crashed, no status posted, rerun.
 
 set -euo pipefail
 
@@ -29,6 +30,21 @@ if [[ -z "$ALIAS" ]]; then
   echo "Usage: run-org-tests.sh <org alias>" >&2
   exit 2
 fi
+
+# The sf CLI runs out of memory reading about 2,200 test results (a JavaScript heap
+# out-of-memory abort). Give Node 8 GB, but respect a caller-supplied heap: keep a larger
+# --max-old-space-size, and keep every other NODE_OPTIONS flag.
+HEAP_MB=8192
+ensure_node_heap() {
+  local opts="${NODE_OPTIONS:-}" current
+  current="$(sed -nE 's/.*--max-old-space-size=([0-9]+).*/\1/p' <<< "$opts" | tail -n 1)"
+  if [[ -n "$current" && "$current" -ge "$HEAP_MB" ]]; then
+    return 0
+  fi
+  opts="$(sed -E 's/(^| )--max-old-space-size=[0-9]+//g; s/^ +//' <<< "$opts")"
+  export NODE_OPTIONS="${opts:+${opts} }--max-old-space-size=${HEAP_MB}"
+}
+ensure_node_heap
 
 CONTEXT="Org tests (local)"
 REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -117,8 +133,21 @@ run_tests() {
 # network error, is retried once after a pause: that is a transient platform fault, not a test
 # result. A run with any result, including real failures, is never retried.
 # An empty output (the CLI died) counts as a platform or network error too.
+# A Node out-of-memory abort leaves one of these in the CLI output. The same wall is hit on a
+# retry, so it is neither retried nor reported as a test result.
+OOM_PATTERN='JavaScript heap out of memory|FATAL ERROR: .*(heap limit|Allocation failed)|Reached heap limit|Allocation failed - JavaScript heap'
+cli_crashed() {
+  if grep -qE "$OOM_PATTERN" "${RESULTS_DIR}/org-tests.err" "${RESULTS_DIR}/org-tests.json" 2>/dev/null; then
+    return 0
+  fi
+  # Empty or unparseable output with no tests run is a dead CLI, not "0 of 0 failed".
+  [[ "$RAN" -eq 0 ]] && ! jq -e '.result.summary' "${RESULTS_DIR}/org-tests.json" > /dev/null 2>&1
+}
 transient_no_results() {
   [[ "$RAN" -eq 0 ]] || return 1
+  if grep -qE "$OOM_PATTERN" "${RESULTS_DIR}/org-tests.err" "${RESULTS_DIR}/org-tests.json" 2>/dev/null; then
+    return 1
+  fi
   [[ ! -s "${RESULTS_DIR}/org-tests.json" ]] && return 0
   grep -qiE 'UNKNOWN_EXCEPTION|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket hang up|ServerUnavailable|Service Unavailable|ClientTimeout|timed? ?out|network' \
     "${RESULTS_DIR}/org-tests.json" "${RESULTS_DIR}/org-tests.err"
@@ -128,6 +157,13 @@ if transient_no_results; then
   echo "== The test run returned no results (platform or network error). Retrying once in ${TEST_RETRY_WAIT_SECONDS}s ==" >&2
   sleep "$TEST_RETRY_WAIT_SECONDS"
   run_tests
+fi
+
+if cli_crashed; then
+  echo "== sf CLI crashed (out of memory, or no readable output), rerun. No test result is known," >&2
+  echo "   so no \"${CONTEXT}\" status was posted on ${SHA:0:7}. Heap was ${NODE_OPTIONS}. ==" >&2
+  echo "Output: ${RESULTS_DIR}/org-tests.err and ${RESULTS_DIR}/org-tests.json" >&2
+  exit 3
 fi
 
 if [[ "$OUTCOME" == "Passed" && "$FAILING" -eq 0 && "$RAN" -gt 0 ]]; then
