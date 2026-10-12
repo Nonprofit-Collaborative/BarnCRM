@@ -175,7 +175,7 @@ private class SetupAssistantServiceTest {
             'A Nonprofit Cloud org is recognised by its shape, not by asking Maria'
         );
         Assert.areEqual(
-            SetupAssistantService.MODE_AGENTFORCE,
+            SetupAssistantService.MODE_NONPROFIT_CLOUD,
             recommended,
             'And it is recommended the coexistence mode built for it'
         );

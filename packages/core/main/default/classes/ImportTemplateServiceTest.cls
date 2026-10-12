@@ -264,14 +264,14 @@ private class ImportTemplateServiceTest {
     }
 
     @IsTest
-    static void donationMatchingIsHeldOnTheTemplateAndCheckedFirst() {
+    static void paymentMatchingIsHeldOnTheTemplateAndCheckedFirst() {
         Import_Template__c template = ImportTestDataFactory.template(
             ImportTestDataFactory.donorMapping(),
             ImportTemplateService.RULE_EMAIL
         );
 
         Test.startTest();
-        ImportTemplateService.saveDonationMatching(template.Id, 'match only', 3, 0.5);
+        ImportTemplateService.savePaymentMatching(template.Id, 'match only', 3, 0.5);
         Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
         List<String> refusals = new List<String>();
         for (
@@ -282,7 +282,7 @@ private class ImportTemplateServiceTest {
             }
         ) {
             try {
-                ImportTemplateService.saveDonationMatching(
+                ImportTemplateService.savePaymentMatching(
                     template.Id,
                     (String) attempt[0],
                     (Integer) attempt[1],
@@ -292,27 +292,27 @@ private class ImportTemplateServiceTest {
                 refusals.add(e.getMessage());
             }
         }
-        ImportTemplateService.saveDonationMatching(template.Id, null, null, null);
+        ImportTemplateService.savePaymentMatching(template.Id, null, null, null);
         Test.stopTest();
 
         Assert.areEqual(
             'Match only',
-            saved.Donation_Matching__c,
+            saved.Payment_Matching__c,
             'Stored as the picklist spells it.'
         );
         Assert.areEqual(3, saved.Match_Date_Window_Days__c, 'The window.');
         Assert.isTrue(saved.Match_Amount_Tolerance__c == 0.5, 'The tolerance.');
         Assert.areEqual(
             new List<String>{
-                Label.Core_Import_ErrorDonationMatchingUnknown,
-                Label.Core_Import_ErrorDonationMatchingRange,
-                Label.Core_Import_ErrorDonationMatchingRange
+                Label.Core_Import_ErrorPaymentMatchingUnknown,
+                Label.Core_Import_ErrorPaymentMatchingRange,
+                Label.Core_Import_ErrorPaymentMatchingRange
             },
             refusals,
             'An unknown behaviour and a negative number are refused.'
         );
         Import_Template__c cleared = ImportTemplateSelector.selectById(template.Id);
-        Assert.isNull(cleared.Donation_Matching__c, 'Empty means the default.');
+        Assert.isNull(cleared.Payment_Matching__c, 'Empty means the default.');
         Assert.isNull(cleared.Match_Date_Window_Days__c, 'And the setting is used.');
     }
 }

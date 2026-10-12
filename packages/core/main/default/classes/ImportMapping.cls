@@ -40,7 +40,7 @@ public with sharing class ImportMapping {
 
     /**
      * The virtual attribute that holds a whole name in one column. The processor splits it
-     * into a first and a last name, because a great many donor lists have only this.
+     * into a first and a last name, because a great many contact lists have only this.
      */
     @NamespaceAccessible
     public static final String ATTRIBUTE_FULL_NAME = 'FullName';

@@ -45,7 +45,7 @@ private class HouseholdMemberTriggerHandlerTest {
     @IsTest
     static void endingAMembershipTodayTakesThePersonOutOfTheHousehold() {
         setUp();
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Delete_Empty_Households__c = false;
         HouseholdTestDataFactory.save(settings);
         Household_Member__c row = membership(john.Id);
@@ -61,7 +61,7 @@ private class HouseholdMemberTriggerHandlerTest {
     @IsTest
     static void changingTheHouseholdOnAMembershipCorrectsBoth() {
         setUp();
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Delete_Empty_Households__c = false;
         HouseholdTestDataFactory.save(settings);
         Account other = HouseholdTestDataFactory.newHousehold('Other');
@@ -101,7 +101,7 @@ private class HouseholdMemberTriggerHandlerTest {
     @IsTest
     static void restoringAMembershipCountsThePersonAgain() {
         setUp();
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Delete_Empty_Households__c = false;
         HouseholdTestDataFactory.save(settings);
         Household_Member__c row = membership(john.Id);

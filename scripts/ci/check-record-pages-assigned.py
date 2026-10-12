@@ -11,7 +11,7 @@ page, so the component is on a page nobody opens.
 This is the same defect class as an unreachable component, one level up: it deploys, every
 test passes, and the administrator sees none of it until they wire it up by hand in the
 Lightning App Builder. It ran because `Household_Record_Page` carried `householdMembersPanel`
-and `Nonprofit_Hub.app-meta.xml` carried no `actionOverrides` at all, so the household
+and `BarnCRM.app-meta.xml` carried no `actionOverrides` at all, so the household
 walkthrough failed at step 4 on every fresh install, and because `Gift_Record_Page` and
 `Commitment_Record_Page` were stranded the same way in the Fundraising app.
 

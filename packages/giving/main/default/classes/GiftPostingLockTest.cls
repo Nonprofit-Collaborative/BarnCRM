@@ -524,7 +524,7 @@ private class GiftPostingLockTest {
     private static User maria() {
         User maria = TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             PermissionSet granted = new PermissionSet(

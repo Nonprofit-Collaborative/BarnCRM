@@ -1,6 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import hasManageSettings from '@salesforce/customPermission/Manage_Nonprofit_Settings';
+import hasManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import preview from '@salesforce/apex/HouseholdController.preview';
 import getNamingSettings from '@salesforce/apex/HouseholdController.getNamingSettings';
 import recomputeAll from '@salesforce/apex/HouseholdController.recomputeAll';

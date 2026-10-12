@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Designated to this fund in the current fiscal year. The fiscal year runs from the fiscal year start month in Nonprofit Settings, and an allocation falls in it by the date of its gift.</value>
+        <value xsi:type="xsd:string">Designated to this fund in the current fiscal year. The fiscal year runs from the fiscal year start month in BarnCRM Settings, and an allocation falls in it by the date of its gift.</value>
     </values>
     <values>
         <field>Definition_Key__c</field>

@@ -6,5 +6,5 @@
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Admin Group</label>
-  <permissionSets>Nonprofit_Admin</permissionSets>
+  <permissionSets>BarnCRM_Admin</permissionSets>
 </PermissionSetGroup>

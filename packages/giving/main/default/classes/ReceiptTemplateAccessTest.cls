@@ -78,7 +78,7 @@ private class ReceiptTemplateAccessTest {
         Test.startTest();
         try {
             ReceiptTemplateService.restoreDefaults();
-            Assert.fail('A user without Manage Nonprofit Settings created the shipped letters.');
+            Assert.fail('A user without Manage BarnCRM Settings created the shipped letters.');
         } catch (ReceiptTemplateService.ReceiptTemplateException refused) {
             Assert.areEqual(
                 Label.Giving_Receipt_NoTemplatePermission,
@@ -105,7 +105,7 @@ private class ReceiptTemplateAccessTest {
         Test.startTest();
         try {
             ReceiptTemplateService.saveBody(letter.Id, '<p>Send us more money.</p>');
-            Assert.fail('A user without Manage Nonprofit Settings rewrote a receipt letter.');
+            Assert.fail('A user without Manage BarnCRM Settings rewrote a receipt letter.');
         } catch (ReceiptTemplateService.ReceiptTemplateException refused) {
             Assert.areEqual(
                 Label.Giving_Receipt_NoTemplatePermission,
@@ -137,7 +137,7 @@ private class ReceiptTemplateAccessTest {
         Test.startTest();
         try {
             ReceiptTemplateService.activate(second.Id);
-            Assert.fail('A user without Manage Nonprofit Settings changed the letter in use.');
+            Assert.fail('A user without Manage BarnCRM Settings changed the letter in use.');
         } catch (ReceiptTemplateService.ReceiptTemplateException refused) {
             Assert.areEqual(
                 Label.Giving_Receipt_NoTemplatePermission,
@@ -192,7 +192,7 @@ private class ReceiptTemplateAccessTest {
                     FROM Receipt_Template__c
                     WHERE Type__c = :ReceiptNumberSequence.TYPE_PER_GIFT AND Active__c = TRUE
                 ],
-                'The shipped per gift letter was materialized once, without Manage Nonprofit Settings.'
+                'The shipped per gift letter was materialized once, without Manage BarnCRM Settings.'
             );
         }
     }

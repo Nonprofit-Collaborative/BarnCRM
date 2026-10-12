@@ -684,7 +684,7 @@ public with sharing class AddressService {
     }
 
     private static String behavior() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         String value = settings == null ? null : settings.Contact_Address_Change_Behavior__c;
         return String.isBlank(value) ? BEHAVIOR_UPDATE_HOUSEHOLD : value;
     }

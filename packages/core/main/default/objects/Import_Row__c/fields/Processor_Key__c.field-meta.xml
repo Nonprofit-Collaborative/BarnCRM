@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Processor_Key__c</fullName>
-  <description>In a dry run, a digest the entity processor writes for what this row would load that a later row may name again (for Giving, the gift's external ID), so a later chunk can find it as the commit will (R-IR6). Empty otherwise. Indexed, compared only, never shown.</description>
+  <description>In a dry run, a digest the entity processor writes for what this row would load that a later row may name again (for example, the external ID of the record it loads), so a later chunk can find it as the commit will (R-IR6). Empty otherwise. Indexed, compared only, never shown.</description>
   <externalId>true</externalId>
   <label>Processor Key</label>
   <length>16</length>
