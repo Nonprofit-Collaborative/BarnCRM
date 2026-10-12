@@ -255,7 +255,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Payment Method" label | Minor | The gift type field is labelled Payment Method in the app and on Quick Gift Entry. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | G-03 (UX pass) |
 | Gift page polish | Minor | Gift page shows one donor field and shows refund, original gift and matched gift fields only when relevant. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | G-01 (UX pass) |
 | Quick Gift Entry messages and new donors | Minor | A problem is shown on the field it concerns, the donor picker offers the standard new person form, and batch lines name their line number for screen readers. | Built, not merged (`feature/ux-gift-entry-1`, PR #208) | G-03, G-17 (UX pass) |
-| Pay a scheduled pledge payment | Minor | Quick Gift Entry and Gift Batches list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Planned (in progress; first part on `feature/gift-entry-pays-installment-1`) | G-03, G-17, G-24 |
+| Pay a scheduled pledge payment | Minor | Quick Gift Entry and the Gift Batches "Pays" column list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Built, not merged (`feature/gift-entry-pays-installment-1` to `-3`) | G-03, G-17, G-24 |
 | Stock and planned gift types | Minor | Extra fields for stock and planned gifts. | Planned (1.x) | G-21 |
 
 ### 2.2 Pledges and Recurring
