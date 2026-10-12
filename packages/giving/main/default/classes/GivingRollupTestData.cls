@@ -38,8 +38,8 @@ public class GivingRollupTestData {
     public static final String FUND_COUNT = 'Fund_Gift_Count';
 
     /**
-     * Creates the shipped rollups, as the Giving install does. From here on every save of a gift,
-     * soft credit, allocation or commitment runs the real-time rollups.
+     * Creates the shipped rollups, as the Giving install does. From here on every save of a gift
+     * or a commitment runs the real-time rollups.
      */
     public static void installShippedRollups() {
         RollupService.ensureDefaults();
