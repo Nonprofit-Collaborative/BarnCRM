@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: the list of affiliations could not be read</shortDescription>
-        <value>Open Impact could not read these affiliations. The error log has the details.</value>
+        <value>BarnCRM could not read these affiliations. The error log has the details.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimaryButton</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Affiliation card: the primary organization could not be changed</shortDescription>
-        <value>Open Impact could not make that the primary affiliation. The error log has the details.</value>
+        <value>BarnCRM could not make that the primary affiliation. The error log has the details.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_MakePrimarySuccess</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: the primary affiliation could not be settled</shortDescription>
-        <value>Open Impact could not settle this person's primary affiliation, so nothing was saved. The error log has the details.</value>
+        <value>BarnCRM could not settle this person's primary affiliation, so nothing was saved. The error log has the details.</value>
     </labels>
     <labels>
         <fullName>Core_Affiliation_SaveFailed</fullName>

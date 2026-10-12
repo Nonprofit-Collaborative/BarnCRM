@@ -2,9 +2,9 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <isExposed>true</isExposed>
-  <masterLabel>Open Impact Settings</masterLabel>
+  <masterLabel>BarnCRM Settings</masterLabel>
   <description>
-    Every Open Impact setting on one page, grouped into sections, searchable, with a
+    Every BarnCRM setting on one page, grouped into sections, searchable, with a
     description under each control.
   </description>
   <capabilities>

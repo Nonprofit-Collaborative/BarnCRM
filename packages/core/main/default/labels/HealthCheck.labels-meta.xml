@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when the viewer cannot run the access checks.</shortDescription>
-        <value>Sign in as an Open Impact Admin to see the access checks</value>
+        <value>Sign in as a BarnCRM Admin to see the access checks</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationFix</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the paused automation finding.</shortDescription>
-        <value>Open Impact automation is paused</value>
+        <value>BarnCRM automation is paused</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationRunningDetail</fullName>
@@ -158,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that the gift mirror lives in the Connect module.</shortDescription>
-        <value>This org has Agentforce Nonprofit Gift Transaction objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside Open Impact, the mirror arrives with the Connect module.</value>
+        <value>This org has Agentforce Nonprofit Gift Transaction objects and the Connect module is not installed. Nothing is broken. If you want Nonprofit Cloud's own summaries to keep working alongside BarnCRM, the mirror arrives with the Connect module.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ConnectMissingTitle</fullName>
@@ -237,8 +237,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: Setup and Open Impact fiscal year start months differ</shortDescription>
-        <value>Open Impact starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total Open Impact calculates is measured from the first, and reports grouped by fiscal year are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
+        <shortDescription>Health Check detail: Setup and BarnCRM fiscal year start months differ</shortDescription>
+        <value>BarnCRM starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total BarnCRM calculates is measured from the first, and reports grouped by fiscal year are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FiscalYearMismatchTitle</fullName>
@@ -302,7 +302,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sentence under the Health Check heading.</shortDescription>
-        <value>What Open Impact found in your org, and what to do about it.</value>
+        <value>What BarnCRM found in your org, and what to do about it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_LoadFailed</fullName>
@@ -350,7 +350,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that the coexistence mode matches the org.</shortDescription>
-        <value>This org is set to {0}, which is what Open Impact recommends for what is installed here.</value>
+        <value>This org is set to {0}, which is what BarnCRM recommends for what is installed here.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeMatchTitle</fullName>
@@ -382,7 +382,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that nobody has confirmed a coexistence mode.</shortDescription>
-        <value>Open Impact is running as {0} because nobody has confirmed a mode yet. This org looks like {1}. Confirm it before you create households or load data.</value>
+        <value>BarnCRM is running as {0} because nobody has confirmed a mode yet. This org looks like {1}. Confirm it before you create households or load data.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeUnsetTitle</fullName>
@@ -398,7 +398,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that multiple currencies are not supported yet.</shortDescription>
-        <value>Open Impact does not convert between currencies yet. Nothing will break, but totals add up amounts as they were entered. Keep amounts in one currency until currency support ships.</value>
+        <value>BarnCRM does not convert between currencies yet. Nothing will break, but totals add up amounts as they were entered. Keep amounts in one currency until currency support ships.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MultiCurrencyTitle</fullName>
@@ -438,7 +438,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains that nobody holds the Nonprofit Admin role.</shortDescription>
-        <value>Nobody in this org has the Open Impact Admin role, so nobody can change settings and parts of Open Impact will refuse to run. Assign it to yourself on the Access page.</value>
+        <value>Nobody in this org has the BarnCRM Admin role, so nobody can change settings and parts of BarnCRM will refuse to run. Assign it to yourself on the Access page.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoAdminTitle</fullName>
@@ -446,7 +446,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the missing administrator finding.</shortDescription>
-        <value>No one is assigned the Open Impact Admin role</value>
+        <value>No one is assigned the BarnCRM Admin role</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoFindings</fullName>
@@ -454,7 +454,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when there is nothing to report.</shortDescription>
-        <value>Nothing to report. Open Impact is set up correctly.</value>
+        <value>Nothing to report. BarnCRM is set up correctly.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoHouseholdCreationDetail</fullName>
@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>The org shape sentence, with what was detected and the recommended mode.</shortDescription>
-        <value>{0} Open Impact supports this org shape directly. The coexistence mode it recommends is {1}. Shield Platform Encryption cannot be detected from inside the app: if your org uses it, say so before you load data.</value>
+        <value>{0} BarnCRM supports this org shape directly. The coexistence mode it recommends is {1}. Shield Platform Encryption cannot be detected from inside the app: if your org uses it, say so before you load data.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_OrgShapeTitle</fullName>
@@ -542,7 +542,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Orphan findings in an org that also has Nonprofit Cloud households.</shortDescription>
-        <value>This org also has Nonprofit Cloud households, and Open Impact cannot see who belongs to those, so some of these may be in one.</value>
+        <value>This org also has Nonprofit Cloud households, and BarnCRM cannot see who belongs to those, so some of these may be in one.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdContactDetail</fullName>
@@ -574,7 +574,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when someone without the permission tries to change a setting.</shortDescription>
-        <value>You need the Manage Open Impact Settings permission to change this. Ask an administrator for the Open Impact Admin role.</value>
+        <value>You need the Manage BarnCRM Settings permission to change this. Ask an administrator for the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PersonAccountsDetected</fullName>
@@ -590,7 +590,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown to someone who can read the report but not act on it.</shortDescription>
-        <value>You can read this report but not change anything. Ask an administrator for the Manage Open Impact Settings permission.</value>
+        <value>You can read this report but not change anything. Ask an administrator for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RecommendedModeLabel</fullName>
@@ -614,7 +614,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: shipped rollups missing. {0} count, {1} names.</shortDescription>
-        <value>Open Impact ships totals this org does not have: {1}. The fix creates each one exactly as shipped, and each starts calculating straight away. Your own totals are not touched.</value>
+        <value>BarnCRM ships totals this org does not have: {1}. The fix creates each one exactly as shipped, and each starts calculating straight away. Your own totals are not touched.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RollupsMissingFix</fullName>
@@ -702,7 +702,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: import templates missing. {0} count, {1} names.</shortDescription>
-        <value>Open Impact ships import templates this org does not have: {1}. The fix creates each one exactly as shipped. Your own templates are not touched.</value>
+        <value>BarnCRM ships import templates this org does not have: {1}. The fix creates each one exactly as shipped. Your own templates are not touched.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_TemplatesMissingFix</fullName>
@@ -749,8 +749,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that active users hold no Open Impact role.</shortDescription>
-        <value>{0} active users have a Salesforce license but none of the Open Impact roles, so the Open Impact app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use Open Impact.</value>
+        <shortDescription>Explains that active users hold no BarnCRM role.</shortDescription>
+        <value>{0} active users have a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use BarnCRM.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_UsersWithoutAccessTitle</fullName>

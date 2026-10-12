@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Is_Reciprocal_Managed__c</fullName>
   <defaultValue>true</defaultValue>
-  <description>Whether Open Impact keeps the other side of this connection in step with this record. Clear it to hold the two sides differently.</description>
-  <inlineHelpText>Whether Open Impact keeps the other side of this connection in step with this record. Clear it to hold the two sides differently.</inlineHelpText>
+  <description>Whether BarnCRM keeps the other side of this connection in step with this record. Clear it to hold the two sides differently.</description>
+  <inlineHelpText>Whether BarnCRM keeps the other side of this connection in step with this record. Clear it to hold the two sides differently.</inlineHelpText>
   <label>Keep Both Sides In Step</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>

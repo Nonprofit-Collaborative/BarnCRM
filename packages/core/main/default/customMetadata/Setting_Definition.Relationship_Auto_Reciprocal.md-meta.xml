@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Enter a relationship once, from either person, and Open Impact writes the other side and keeps it in step: the same status, the same dates, the same description, and the matching type. Switch this off only if another system writes both sides for you. Switching it off leaves the pairs that already exist exactly as they are.</value>
+    <value xsi:type="xsd:string">Enter a relationship once, from either person, and BarnCRM writes the other side and keeps it in step: the same status, the same dates, the same description, and the matching type. Switch this off only if another system writes both sides for you. Switching it off leaves the pairs that already exist exactly as they are.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

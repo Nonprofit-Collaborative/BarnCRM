@@ -3,10 +3,10 @@
   <customSettingsType>Hierarchy</customSettingsType>
   <description>
     The organization's simple, org-wide toggles and values. Protected so that it never appears as
-    editable configuration in subscriber Setup: every value is written by the Open Impact Settings
+    editable configuration in subscriber Setup: every value is written by the BarnCRM Settings
     console.
   </description>
   <enableFeeds>false</enableFeeds>
-  <label>Open Impact Settings</label>
+  <label>BarnCRM Settings</label>
   <visibility>Protected</visibility>
 </CustomObject>

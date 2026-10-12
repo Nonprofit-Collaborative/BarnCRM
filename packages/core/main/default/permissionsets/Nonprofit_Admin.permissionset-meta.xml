@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Open Impact Admin</label>
+  <label>BarnCRM Admin</label>
   <description>
-    Maria, the operations manager who configures Open Impact. Grants the settings
+    Maria, the operations manager who configures BarnCRM. Grants the settings
     console, automation control, and the Error Log. Later features add to this set: it is never
     meant to be cloned.
   </description>

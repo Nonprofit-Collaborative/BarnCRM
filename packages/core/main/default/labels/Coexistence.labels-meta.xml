@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: simple mode would hide membership records; names how many</shortDescription>
-        <value>You cannot switch to the simple way of belonging yet. {0} people belong to a household through a membership record, and the simple way cannot see those records: their households would be counted as empty, renamed, and possibly deleted. Moving them needs a migration, which Open Impact does not do yet, so keep the flexible way for now.</value>
+        <value>You cannot switch to the simple way of belonging yet. {0} people belong to a household through a membership record, and the simple way cannot see those records: their households would be counted as empty, renamed, and possibly deleted. Moving them needs a migration, which BarnCRM does not do yet, so keep the flexible way for now.</value>
     </labels>
     <labels>
         <fullName>Core_Coexistence_SwitchToJunctionRefused</fullName>
@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: flexible mode would strand linked people; names how many</shortDescription>
-        <value>You cannot switch to the flexible way of belonging yet. {0} people are linked straight to their household and have no membership record, so the flexible way would not show them in any household. Moving them needs a migration, which Open Impact does not do yet, so keep the simple way for now.</value>
+        <value>You cannot switch to the flexible way of belonging yet. {0} people are linked straight to their household and have no membership record, so the flexible way would not show them in any household. Moving them needs a migration, which BarnCRM does not do yet, so keep the simple way for now.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipHiddenTitle</fullName>

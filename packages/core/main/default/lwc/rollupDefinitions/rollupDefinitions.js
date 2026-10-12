@@ -37,7 +37,7 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 /**
  * The Rollups page of the Nonprofit Settings console.
  *
- * It shows every total Open Impact keeps up to date, what each one counts, when it was last
+ * It shows every total BarnCRM keeps up to date, what each one counts, when it was last
  * calculated, and whether the nightly run is scheduled. An administrator can switch a rollup off,
  * change when it is recalculated, and recalculate one on its own or all of them at once. It never
  * shows the vendored engine's own configuration, which is the whole point of ADR-0015.

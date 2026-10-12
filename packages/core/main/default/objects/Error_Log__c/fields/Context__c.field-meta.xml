@@ -3,7 +3,7 @@
   <fullName>Context__c</fullName>
   <description>The feature or source that produced the error, in plain language.</description>
   <externalId>false</externalId>
-  <inlineHelpText>Which part of Open Impact this came from.</inlineHelpText>
+  <inlineHelpText>Which part of BarnCRM this came from.</inlineHelpText>
   <label>Context</label>
   <length>255</length>
   <required>false</required>

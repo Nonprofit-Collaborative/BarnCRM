@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Relationship_Auto_Reciprocal__c</fullName>
   <defaultValue>true</defaultValue>
-  <description>Whether Open Impact creates and maintains the other side of every relationship. On by default.</description>
+  <description>Whether BarnCRM creates and maintains the other side of every relationship. On by default.</description>
   <inlineHelpText>Keep both sides of a relationship in step.</inlineHelpText>
   <label>Relationship Auto Reciprocal</label>
   <type>Checkbox</type>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The catalog of packaged automations Open Impact ships, materialized into Automation Setting
+    The catalog of packaged automations BarnCRM ships, materialized into Automation Setting
     records on install and on upgrade without touching the administrator's own on and off choices.
   </description>
   <label>Automation Registry</label>

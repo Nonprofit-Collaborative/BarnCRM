@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Latest_Verified_Date__c</fullName>
-  <description>When verification last succeeded. Open Impact never writes this field; it exists so a verification app can.</description>
-  <inlineHelpText>When verification last succeeded. Open Impact never writes this field; it exists so a verification app can.</inlineHelpText>
+  <description>When verification last succeeded. BarnCRM never writes this field; it exists so a verification app can.</description>
+  <inlineHelpText>When verification last succeeded. BarnCRM never writes this field; it exists so a verification app can.</inlineHelpText>
   <label>Latest Verified Date</label>
   <required>false</required>
   <trackTrending>false</trackTrending>

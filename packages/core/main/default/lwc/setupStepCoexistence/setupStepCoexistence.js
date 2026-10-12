@@ -22,7 +22,7 @@ const MODE_TEXT = {
 };
 
 /**
- * Step one: what Open Impact found in this org, in plain words, leading with the
+ * Step one: what BarnCRM found in this org, in plain words, leading with the
  * Nonprofit Cloud case, and the mode it recommends because of it.
  */
 export default class SetupStepCoexistence extends LightningElement {

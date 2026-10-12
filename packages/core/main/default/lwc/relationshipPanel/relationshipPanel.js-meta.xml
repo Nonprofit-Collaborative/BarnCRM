@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <isExposed>true</isExposed>
   <masterLabel>Relationships</masterLabel>
-  <description>Every relationship one person has, read from their side, with the other side kept in step by Open Impact.</description>
+  <description>Every relationship one person has, read from their side, with the other side kept in step by BarnCRM.</description>
   <targets>
     <target>lightning__RecordPage</target>
   </targets>

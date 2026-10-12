@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Verification_Status__c</fullName>
-  <description>Whether an address verification service has confirmed this address. Open Impact never writes this field; it exists so a verification app can.</description>
-  <inlineHelpText>Whether an address verification service has confirmed this address. Open Impact never writes this field; it exists so a verification app can.</inlineHelpText>
+  <description>Whether an address verification service has confirmed this address. BarnCRM never writes this field; it exists so a verification app can.</description>
+  <inlineHelpText>Whether an address verification service has confirmed this address. BarnCRM never writes this field; it exists so a verification app can.</inlineHelpText>
   <label>Verification Status</label>
   <required>false</required>
   <trackTrending>false</trackTrending>

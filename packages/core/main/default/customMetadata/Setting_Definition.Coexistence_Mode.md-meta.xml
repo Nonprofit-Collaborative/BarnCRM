@@ -30,7 +30,7 @@
     <field>Description__c</field>
     <value
       xsi:type="xsd:string"
-    >Records what is already installed in this org. Agentforce Nonprofit coexistence is for a Nonprofit Cloud org, usually with Person Accounts on, and puts household membership on the junction. NPSP coexistence records that the Nonprofit Success Pack is here; in this version it changes no household behaviour, and NPSP's own household accounts are left alone. Standalone is for an org with neither and also changes no behaviour. Open Impact reads your org and recommends one: you confirm it, and you can change it later.</value>
+    >Records what is already installed in this org. Agentforce Nonprofit coexistence is for a Nonprofit Cloud org, usually with Person Accounts on, and puts household membership on the junction. NPSP coexistence records that the Nonprofit Success Pack is here; in this version it changes no household behaviour, and NPSP's own household accounts are left alone. Standalone is for an org with neither and also changes no behaviour. BarnCRM reads your org and recommends one: you confirm it, and you can change it later.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

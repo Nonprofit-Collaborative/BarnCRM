@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Open Impact Staff</label>
+  <label>BarnCRM Staff</label>
   <description>
     David, Priya, and everyone else doing the day job. Reads the Error Log so that a problem can be
-    described accurately, and changes nothing about how Open Impact is configured.
+    described accurately, and changes nothing about how BarnCRM is configured.
   </description>
   <applicationVisibilities>
     <application>Nonprofit_Hub</application>

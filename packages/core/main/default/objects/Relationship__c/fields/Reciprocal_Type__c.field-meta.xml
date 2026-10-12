@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Reciprocal_Type__c</fullName>
-  <description>What this person is to the other one. Open Impact fills this in from the shipped type mapping and it is the type the other side of the connection carries.</description>
-  <inlineHelpText>What this person is to the other one. Open Impact fills this in from the shipped type mapping and it is the type the other side of the connection carries.</inlineHelpText>
+  <description>What this person is to the other one. BarnCRM fills this in from the shipped type mapping and it is the type the other side of the connection carries.</description>
+  <inlineHelpText>What this person is to the other one. BarnCRM fills this in from the shipped type mapping and it is the type the other side of the connection carries.</inlineHelpText>
   <label>Reciprocal Type</label>
   <required>false</required>
   <trackTrending>false</trackTrending>

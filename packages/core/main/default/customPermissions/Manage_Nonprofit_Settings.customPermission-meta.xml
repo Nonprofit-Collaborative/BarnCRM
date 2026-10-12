@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Lets a user change Open Impact settings, including turning an automation off and pausing all
+    Lets a user change BarnCRM settings, including turning an automation off and pausing all
     automation. Users without it see the settings pages read only.
   </description>
   <isLicensed>false</isLicensed>
-  <label>Manage Open Impact Settings</label>
+  <label>Manage BarnCRM Settings</label>
 </CustomPermission>

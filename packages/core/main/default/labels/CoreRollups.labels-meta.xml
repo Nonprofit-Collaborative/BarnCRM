@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Intro line on the Rollups page.</shortDescription>
-        <value>Every total Open Impact keeps up to date for you, and when each one was last calculated.</value>
+        <value>Every total BarnCRM keeps up to date for you, and when each one was last calculated.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_GroupHousehold</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Message shown to a user without the settings permission.</shortDescription>
-        <value>You can see these totals but not change them. Ask an administrator for the Manage Open Impact Settings permission.</value>
+        <value>You can see these totals but not change them. Ask an administrator for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorNoPermission</fullName>
@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error returned when a filter document names an unsupported operator.</shortDescription>
-        <value>That filter uses a comparison Open Impact does not understand. Rebuild the filter on the Rollups page.</value>
+        <value>That filter uses a comparison BarnCRM does not understand. Rebuild the filter on the Rollups page.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorInvalidFilter</fullName>
@@ -286,7 +286,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>No rollups yet</shortDescription>
-        <value>No rollups are set up yet. Restore the shipped rollups to start with the ones Open Impact provides.</value>
+        <value>No rollups are set up yet. Restore the shipped rollups to start with the ones BarnCRM provides.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ColumnTarget</fullName>

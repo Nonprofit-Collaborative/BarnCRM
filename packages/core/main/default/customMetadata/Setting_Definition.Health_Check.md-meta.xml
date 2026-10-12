@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">What Open Impact found in your org, whether the settings match it, who can get into the app, and anything currently in the way. Every finding says what to do about it, and most of them have a button that takes you there. Run it after you install, after you add people, and any time something feels wrong.</value>
+    <value xsi:type="xsd:string">What BarnCRM found in your org, whether the settings match it, who can get into the app, and anything currently in the way. Every finding says what to do about it, and most of them have a button that takes you there. Run it after you install, after you add people, and any time something feels wrong.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the label of the coexistence mode chooser</shortDescription>
-        <value>How Open Impact fits this org</value>
+        <value>How BarnCRM fits this org</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModeNpsp</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice when the household naming panel is not in this org</shortDescription>
-        <value>The household naming screen is not in this org yet, so there is nothing to confirm here. Skip this step, and Open Impact will name households with the pattern it ships until you change it.</value>
+        <value>The household naming screen is not in this org yet, so there is nothing to confirm here. Skip this step, and BarnCRM will name households with the pattern it ships until you change it.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_NextButton</fullName>
@@ -270,7 +270,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice for someone who can read but not change it</shortDescription>
-        <value>You can read the setup steps but not change them. Ask whoever installed Open Impact to add you to the Open Impact Admin role on the Access page.</value>
+        <value>You can read the setup steps but not change them. Ask whoever installed BarnCRM to add you to the BarnCRM Admin role on the Access page.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_RecommendedLabel</fullName>
@@ -342,7 +342,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what detection found in an org with nothing else installed</shortDescription>
-        <value>This looks like a fresh org, with neither NPSP nor Person Accounts. Open Impact can run on its own.</value>
+        <value>This looks like a fresh org, with neither NPSP nor Person Accounts. BarnCRM can run on its own.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ShapeNpsp</fullName>
@@ -350,7 +350,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what detection found in an org with NPSP installed</shortDescription>
-        <value>NPSP is installed in this org. Open Impact can adopt the household accounts you already have rather than building new ones.</value>
+        <value>NPSP is installed in this org. BarnCRM can adopt the household accounts you already have rather than building new ones.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ShapePersonAccounts</fullName>
@@ -398,7 +398,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the name of step one</shortDescription>
-        <value>Confirm how Open Impact fits your existing org</value>
+        <value>Confirm how BarnCRM fits your existing org</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step2Description</fullName>
@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what step four is for</shortDescription>
-        <value>Pick a person and a role, and Open Impact gives them the right access. People who have never signed in have to be created in Salesforce Setup first.</value>
+        <value>Pick a person and a role, and BarnCRM gives them the right access. People who have never signed in have to be created in Salesforce Setup first.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step4Label</fullName>
@@ -510,7 +510,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: coexistence mode from the page is not one of the three</shortDescription>
-        <value>That is not a way Open Impact can fit an org, so nothing changed. Refresh the page and try again.</value>
+        <value>That is not a way BarnCRM can fit an org, so nothing changed. Refresh the page and try again.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_UnknownStepError</fullName>
@@ -518,7 +518,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: step key from the page is not a shipped step</shortDescription>
-        <value>That setup step is not one Open Impact knows about, so nothing was recorded. Refresh the page and try again.</value>
+        <value>That setup step is not one BarnCRM knows about, so nothing was recorded. Refresh the page and try again.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_UploadHelp</fullName>

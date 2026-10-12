@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: banner shown while all packaged automation is paused</shortDescription>
-        <value>Open Impact automation is paused. Households and greetings are not being updated until it resumes.</value>
+        <value>BarnCRM automation is paused. Households and greetings are not being updated until it resumes.</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_ChecklistHeading</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: quick link to the Nonprofit Settings tab</shortDescription>
-        <value>Open Impact Settings</value>
+        <value>BarnCRM Settings</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinksHeading</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Hub home: the page heading</shortDescription>
-        <value>Welcome to Open Impact</value>
+        <value>Welcome to BarnCRM</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_WelcomeMessage</fullName>

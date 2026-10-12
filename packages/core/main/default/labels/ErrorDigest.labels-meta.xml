@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest run summary: nobody to send to.</shortDescription>
-        <value>Nobody to send the digest to: no active user holds the Manage Open Impact Settings permission and no addresses are listed. No email sent.</value>
+        <value>Nobody to send the digest to: no active user holds the Manage BarnCRM Settings permission and no addresses are listed. No email sent.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_SummaryNotSent</fullName>
@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest email subject; {0} is a count.</shortDescription>
-        <value>Open Impact: {0} new Error Log entries</value>
+        <value>BarnCRM: {0} new Error Log entries</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_SenderName</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest email sender display name.</shortDescription>
-        <value>Open Impact</value>
+        <value>BarnCRM</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_Intro</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest email footer: why you get it and where to stop it.</shortDescription>
-        <value>You receive this because you look after Open Impact in this Salesforce org. Change who receives it, or stop it, in Open Impact Settings under Error Log.</value>
+        <value>You receive this because you look after BarnCRM in this Salesforce org. Change who receives it, or stop it, in BarnCRM Settings under Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_NoSource</fullName>
@@ -150,7 +150,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: the permission a change needs.</shortDescription>
-        <value>Scheduling or sending the error digest needs the Manage Open Impact Settings permission, which comes with the Open Impact Admin role.</value>
+        <value>Scheduling or sending the error digest needs the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_UnexpectedError</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel introduction.</shortDescription>
-        <value>One short email a day or a week to the people who look after Open Impact, counting the new Error Log entries by source and severity with a link to each. Nothing is sent when nothing is new.</value>
+        <value>One short email a day or a week to the people who look after BarnCRM, counting the new Error Log entries by source and severity with a link to each. Nothing is sent when nothing is new.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_LastRunTitle</fullName>
@@ -246,7 +246,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: the default recipients.</shortDescription>
-        <value>everyone with the Manage Open Impact Settings permission:</value>
+        <value>everyone with the Manage BarnCRM Settings permission:</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_NoRecipients</fullName>
@@ -254,7 +254,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: nobody would receive it.</shortDescription>
-        <value>nobody yet. List your users' email addresses below, or give someone the Open Impact Admin role.</value>
+        <value>nobody yet. List your users' email addresses below, or give someone the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_ReadOnly</fullName>
@@ -262,7 +262,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: read only notice.</shortDescription>
-        <value>You can see the error digest but not change it. Ask for the Manage Open Impact Settings permission.</value>
+        <value>You can see the error digest but not change it. Ask for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_Capped</fullName>

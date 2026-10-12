@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Seasonal swap: two seasonal addresses cover the same day</shortDescription>
-        <value>Two seasonal addresses for the same household or person cover today, so Open Impact used the one that was added first. Open the record and change the dates on one of them so only one seasonal address covers each day.</value>
+        <value>Two seasonal addresses for the same household or person cover today, so BarnCRM used the one that was added first. Open the record and change the dates on one of them so only one seasonal address covers each day.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_HubLink</fullName>
@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule change refused without Manage Nonprofit Settings</shortDescription>
-        <value>You need the Manage Open Impact Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the Open Impact Admin access level.</value>
+        <value>You need the Manage BarnCRM Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the BarnCRM Admin access level.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_ReadOnly</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Note shown to a user who can see the panel but not change it</shortDescription>
-        <value>You can see when the swap last ran. Changing the schedule needs the Manage Open Impact Settings permission.</value>
+        <value>You can see when the swap last ran. Changing the schedule needs the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_RunNow</fullName>

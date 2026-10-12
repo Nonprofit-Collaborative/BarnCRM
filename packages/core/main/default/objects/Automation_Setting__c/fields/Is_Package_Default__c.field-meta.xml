@@ -3,7 +3,7 @@
   <fullName>Is_Package_Default__c</fullName>
   <defaultValue>false</defaultValue>
   <description>Whether this record was materialized from the shipped registry rather than created by hand.</description>
-  <inlineHelpText>Checked when Open Impact created this row itself.</inlineHelpText>
+  <inlineHelpText>Checked when BarnCRM created this row itself.</inlineHelpText>
   <label>Package Default</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>

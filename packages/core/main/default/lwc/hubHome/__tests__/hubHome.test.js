@@ -74,7 +74,7 @@ function model(overrides) {
       {
         key: 'coexistence',
         position: 1,
-        label: 'Confirm how Open Impact fits your existing org',
+        label: 'Confirm how BarnCRM fits your existing org',
         description: 'Person Accounts orgs use the junction model.',
         targetType: 'Settings',
         target: 'General',

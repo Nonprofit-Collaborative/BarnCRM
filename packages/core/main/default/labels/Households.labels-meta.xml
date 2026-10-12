@@ -54,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Move a person: the org stores this person as an account</shortDescription>
-        <value>This person is stored as an account, so they can only be moved when your org uses the flexible way of belonging to a household. Change that setting in Open Impact Settings first.</value>
+        <value>This person is stored as an account, so they can only be moved when your org uses the flexible way of belonging to a household. Change that setting in BarnCRM Settings first.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorMoveNoEditAccess</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>The user may not change settings</shortDescription>
-        <value>You do not have permission to do this. Recomputing every household needs the Manage Open Impact Settings permission: ask your administrator.</value>
+        <value>You do not have permission to do this. Recomputing every household needs the Manage BarnCRM Settings permission: ask your administrator.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorNotAHousehold</fullName>
@@ -117,8 +117,8 @@
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Empty household kept because records outside Open Impact point at it</shortDescription>
-        <value>Open Impact left the empty household {0} ({1}) in place. Nobody belongs to it in Open Impact, but records outside Open Impact still point at it, and deleting the household would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
+        <shortDescription>Empty household kept because records outside BarnCRM point at it</shortDescription>
+        <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting the household would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
     </labels>
     <labels>
         <fullName>Core_Households_LatePrefix</fullName>

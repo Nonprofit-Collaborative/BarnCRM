@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: explains why creating a user happens in Setup</shortDescription>
-        <value>Open Impact cannot create a person or hand out a Salesforce license. Create the user in Setup first, then come back here and give them a role.</value>
+        <value>BarnCRM cannot create a person or hand out a Salesforce license. Create the user in Setup first, then come back here and give them a role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_CreateUserLink</fullName>
@@ -94,7 +94,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when removing the only remaining Nonprofit Admin</shortDescription>
-        <value>You cannot remove the last person from the Open Impact Admin role. Give the role to someone else first.</value>
+        <value>You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorNoPermission</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when the user may not change roles</shortDescription>
-        <value>You do not have permission to change roles. The Manage Open Impact Settings permission is required, and it comes with the Open Impact Admin role.</value>
+        <value>You do not have permission to change roles. The Manage BarnCRM Settings permission is required, and it comes with the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorRoleNotFound</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when the chosen role is missing from the org</shortDescription>
-        <value>That role was not found. Reload the page, and if it still does not appear, upgrade or reinstall Open Impact Core.</value>
+        <value>That role was not found. Reload the page, and if it still does not appear, upgrade or reinstall BarnCRM Core.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorRolesNotVisible</fullName>
@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when the person is not allowed to read the roles at all</shortDescription>
-        <value>You can see this page but you cannot see who holds each role. Ask someone with the Open Impact Admin role to tell you, or to give you that role.</value>
+        <value>You can see this page but you cannot see who holds each role. Ask someone with the BarnCRM Admin role to tell you, or to give you that role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorUnexpected</fullName>
@@ -174,7 +174,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: notice shown to a user who may look but not change roles</shortDescription>
-        <value>You can see this page but you cannot change roles. Ask someone with the Open Impact Admin role to make the change, or to give you that role.</value>
+        <value>You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_RemoveButton</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: warning shown before someone removes their own admin role</shortDescription>
-        <value>You are about to remove your own Open Impact Admin role. You will lose access to Open Impact Settings.</value>
+        <value>You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings.</value>
     </labels>
     <labels>
         <fullName>Core_Access_ToastErrorTitle</fullName>

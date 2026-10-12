@@ -3,7 +3,7 @@
   <fullName>Coexistence_Mode__c</fullName>
   <defaultValue>&quot;Standalone&quot;</defaultValue>
   <description>How this org coexists with what is already installed: Standalone, NPSP, or AgentforceNonprofit. Text rather than a picklist because custom settings do not support picklists (ADR-0019).</description>
-  <inlineHelpText>How Open Impact works alongside what you already have.</inlineHelpText>
+  <inlineHelpText>How BarnCRM works alongside what you already have.</inlineHelpText>
   <label>Coexistence Mode</label>
   <length>40</length>
   <required>false</required>

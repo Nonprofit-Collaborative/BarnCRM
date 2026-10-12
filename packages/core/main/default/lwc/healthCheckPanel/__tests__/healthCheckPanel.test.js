@@ -103,7 +103,7 @@ function agentforceReport(overrides = {}) {
       {
         key: 'shipped_rollups_missing',
         title: '2 shipped rollups are missing',
-        detail: 'Open Impact ships totals this org does not have: Total Gifts, Last Gift Date.',
+        detail: 'BarnCRM ships totals this org does not have: Total Gifts, Last Gift Date.',
         severity: 'Warning',
         category: 'Settings',
         fixLabel: 'Restore shipped rollups',

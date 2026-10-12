@@ -12,7 +12,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">A short email summarizing the new Error Log entries, sent to the people who look after Open Impact. Schedule it here, see when it last ran and what it did, or send one now. It counts entries by source and severity and links to each one; it never copies what an entry says.</value>
+    <value xsi:type="xsd:string">A short email summarizing the new Error Log entries, sent to the people who look after BarnCRM. Schedule it here, see when it last ran and what it did, or send one now. It counts entries by source and severity and links to each one; it never copies what an entry says.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
