@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>File_Values_JSON__c</fullName>
+  <description>Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document. A row's own value wins, then these, then the template's defaults (R-IB14).</description>
+  <inlineHelpText>Values given to every row of this file that has none of its own.</inlineHelpText>
+  <label>File Values</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>
