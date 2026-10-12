@@ -294,7 +294,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: defaults could not be read</shortDescription>
-        <value>The form could not load its settings. Ask your administrator to check the default fund and default appeal in Nonprofit Settings.</value>
+        <value>The form could not load its settings. Ask your administrator to check the default fund and default appeal in BarnCRM Settings.</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_ErrorUnexpected</fullName>

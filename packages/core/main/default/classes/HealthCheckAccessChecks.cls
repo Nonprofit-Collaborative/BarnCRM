@@ -64,7 +64,7 @@ public with sharing class HealthCheckAccessChecks {
         }
 
         return new HealthCheckService.Finding(
-                'no_nonprofit_admin',
+                'no_admin',
                 System.Label.Core_HealthCheck_NoAdminTitle,
                 System.Label.Core_HealthCheck_NoAdminDetail,
                 HealthCheckService.SEVERITY_ERROR,

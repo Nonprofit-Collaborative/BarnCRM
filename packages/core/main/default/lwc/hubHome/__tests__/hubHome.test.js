@@ -143,6 +143,14 @@ describe('c-hub-home', () => {
     expect(link).not.toBeNull();
   });
 
+  it('says the cap with a plus when there are more errors than the tile counts', async () => {
+    getHomeModel.mockResolvedValue(model({ newErrorCount: 999, newErrorCountCapped: true }));
+    const element = build();
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="error-count"]').textContent).toBe('999+');
+  });
+
   it('says setup completed when the install logged nothing', async () => {
     countInstallProblems.mockResolvedValue(0);
     const element = build();

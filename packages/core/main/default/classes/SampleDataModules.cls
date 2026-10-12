@@ -23,6 +23,9 @@ public with sharing class SampleDataModules {
     @TestVisible
     private static List<SampleDataModule> moduleOverride;
 
+    /** Each class looked up so far this transaction, null when it is not installed. */
+    private static Map<String, SampleDataModule> found = new Map<String, SampleDataModule>();
+
     /** Every module sample data set this org actually has, in load order. */
     public static List<SampleDataModule> installed() {
         if (moduleOverride != null) {
@@ -30,7 +33,10 @@ public with sharing class SampleDataModules {
         }
         List<SampleDataModule> modules = new List<SampleDataModule>();
         for (String className : MODULE_CLASS_NAMES) {
-            SampleDataModule module = resolve(className);
+            if (!found.containsKey(className)) {
+                found.put(className, resolve(className));
+            }
+            SampleDataModule module = found.get(className);
             if (module != null) {
                 modules.add(module);
             }
@@ -93,9 +99,11 @@ public with sharing class SampleDataModules {
 
     /**
      * One module class as an instance, or null when the package is not installed, the class
-     * is not reachable, or it does not implement the interface. A module that cannot be
-     * built is not an error: an org without Giving is the ordinary case.
+     * is not reachable, or it does not implement the interface. A module that is not installed
+     * is not an error: an org without Giving is the ordinary case. One that cannot be built,
+     * or is the wrong shape, is logged, because it means a package shipped a broken module.
      */
+    @TestVisible
     private static SampleDataModule resolve(String className) {
         String prefix = NamespaceUtil.prefix();
         Type moduleType = Type.forName(
@@ -115,6 +123,13 @@ public with sharing class SampleDataModules {
             ErrorLogger.log(cannotBuild, 'SampleDataModules.resolve');
             return null;
         }
-        return candidate instanceof SampleDataModule ? (SampleDataModule) candidate : null;
+        if (candidate instanceof SampleDataModule) {
+            return (SampleDataModule) candidate;
+        }
+        ErrorLogger.log(
+            new System.TypeException(className + ' does not implement SampleDataModule'),
+            'SampleDataModules.resolve'
+        );
+        return null;
     }
 }

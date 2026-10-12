@@ -57,10 +57,10 @@ choose to save anyway.
 4. Choose the person's name to open their record. On the right of the page the **Potential
    Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
    merge**, pick the values to keep, and confirm. This is Salesforce's own merge, and it keeps
-   the gifts, activities and files of both. BarnCRM then adds the kept person to any
-   household the other one belonged to, and recalculates their giving totals straight away.
-   A household the other person leaves empty is kept, not deleted, because gifts are credited
-   to it: merge it into the kept person's household with **Merge households** (step 6).
+   the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
+   kept person to any household the other one belonged to, and recalculates their totals
+   straight away. A household the other person leaves empty is kept, not deleted, because
+   records can still point at it: merge it into the kept person's household with **Merge households** (step 6).
 5. Back on the Duplicates panel, refresh. The pair is gone.
 6. If the scan found two households, choose **Merge households** on the pair. You see the two
    side by side, the fields where they disagree, and which one is kept. Choose the household to
@@ -112,8 +112,8 @@ example because a duplicate rule was switched off during the scan, or could not 
 suggestions. The details are in the **Error Log**, under the context "Duplicate scan". Fix the
 cause and scan again: pairs already found are not suggested twice.
 
-**After merging two people, an empty household is left.** That is on purpose. Gifts given
-while the other person lived there still name that household. Until you merge it, Health Check
+**After merging two people, an empty household is left.** That is on purpose. Records made
+while the other person lived there (with Giving, their gifts) still name that household. Until you merge it, Health Check
 lists it under **Households have nobody in them**. Merge it into the kept person's household
 from this panel or with **Merge or split** on the household's page.
 

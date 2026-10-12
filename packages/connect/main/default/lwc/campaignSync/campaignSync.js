@@ -67,7 +67,9 @@ export default class CampaignSync extends LightningElement {
     if (!this.loaded || this.status.linkedCount == null || this.status.appealCount == null) {
       return undefined;
     }
-    return counts.replace('{0}', this.status.linkedCount).replace('{1}', this.status.appealCount);
+    const linked = `${this.status.linkedCount}${this.status.linkedCountCapped ? '+' : ''}`;
+    const appeals = `${this.status.appealCount}${this.status.appealCountCapped ? '+' : ''}`;
+    return counts.replace('{0}', linked).replace('{1}', appeals);
   }
 
   get noAccessShown() {

@@ -1,6 +1,6 @@
 /**
  * LWC-facing entry points for the sampleDataManager component (C-10). Loading and
- * removing check the Manage_Nonprofit_Settings custom permission before doing anything;
+ * removing check the Manage_BarnCRM_Settings custom permission before doing anything;
  * getStatus() is readable by anyone so the card can show read-only counts.
  *
  * This is the one place a synchronous sample data failure is written to the Error Log:
@@ -9,7 +9,7 @@
 public with sharing class SampleDataController {
     /**
      * Injected by the tests so the permitted path can be asserted in an org where the
-     * Manage_Nonprofit_Settings custom permission (owned by another feature) is not
+     * Manage_BarnCRM_Settings custom permission (owned by another feature) is not
      * assigned to the running user. Null in production, where the real check runs.
      */
     @TestVisible
@@ -59,7 +59,7 @@ public with sharing class SampleDataController {
         if (permissionOverride != null) {
             return permissionOverride;
         }
-        return FeatureManagement.checkPermission('Manage_Nonprofit_Settings');
+        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
     }
 
     /**

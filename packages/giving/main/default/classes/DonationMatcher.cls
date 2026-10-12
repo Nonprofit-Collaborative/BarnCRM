@@ -37,7 +37,7 @@ public with sharing class DonationMatcher {
 
     /** How this template's gifts are matched: its own values, else the org's, else the defaults. */
     public DonationMatcher(Import_Template__c template) {
-        String chosen = template == null ? null : template.Donation_Matching__c;
+        String chosen = template == null ? null : template.Payment_Matching__c;
         behaviour = String.isBlank(chosen) ? MATCH_OR_CREATE : chosen;
         Decimal days = template == null ? null : template.Match_Date_Window_Days__c;
         days = days != null ? days : setting(KEY_WINDOW);

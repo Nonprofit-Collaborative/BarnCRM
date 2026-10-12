@@ -7,5 +7,5 @@
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Program Staff</label>
-  <permissionSets>Nonprofit_Staff</permissionSets>
+  <permissionSets>BarnCRM_Staff</permissionSets>
 </PermissionSetGroup>
