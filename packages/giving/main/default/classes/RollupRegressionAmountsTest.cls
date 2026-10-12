@@ -61,8 +61,8 @@ private class RollupRegressionAmountsTest {
         Account household = GivingRollupTestData.account(ana.AccountId);
         Assert.areEqual(150, household.Total_Giving__c, 'The household holds the same');
         Assert.areEqual(1, household.Gift_Count__c, 'And gave once');
-        // The fund after a refund is asserted by the recalculation below; in real time it waits
-        // for Gift Allocation to be registered in slice S6.
+        // The fund after a refund is asserted by the recalculation below; in real time Gift
+        // Allocation is registered (slice S6) but runs on the own engine only until slice S8.
     }
 
     /**

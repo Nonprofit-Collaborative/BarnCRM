@@ -15,7 +15,8 @@
  * switched off, each naming the slice that switches it on. A disabled test found to pass on
  * today's engine is switched on at once.
  *
- * Slice S5 switched on the household token tests. They run on BarnCRM's own engine: each calls
+ * Slice S5 switched on the household token tests, and slice S6 the saved credit and moving person
+ * tests, with Soft Credit registered for real time. They run on BarnCRM's own engine: each calls
  * `GivingRollupTestData.useOwnEngine()` first, which routes `RollupService` to `RollupEngine` for
  * that test only, until slice S8 swaps the engine for everyone and removes the call.
  *
@@ -201,14 +202,12 @@ private class RollupRegressionHouseholdsTest {
     }
 
     /**
-     * DISABLED until slice S6 (trigger collection, instant path). Add `@IsTest` back in that
-     * slice.
-     *
-     * A soft credit saved now moves the household soft credit total without a recalculation, as
-     * the person's own soft credit total already does.
+     * Switched on in slice S6. A soft credit saved now moves the household soft credit total
+     * without a recalculation, as the person's own soft credit total does.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aSavedSoftCreditUpdatesTheHousehold() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
             'Ana',
@@ -228,15 +227,14 @@ private class RollupRegressionHouseholdsTest {
     }
 
     /**
-     * DISABLED until slice S6 (Contact and Household Member changes mark both households).
-     * Add `@IsTest` back in that slice.
-     *
-     * Ana moves from the Nolan household to the Lindqvist household. A total reached through
-     * `{Household}` is the household she is in now, so her soft credit leaves the old household's
-     * total and joins the new one's, with no recalculation.
+     * Switched on in slice S6 (a person's move marks both households). Ana moves from the Nolan
+     * household to the Lindqvist household. A total reached through `{Household}` is the household
+     * she is in now, so her soft credit leaves the old household's total and joins the new one's,
+     * with no recalculation.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aPersonWhoMovesTakesTheirSoftCreditsWithThem() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
             'Ana',
@@ -269,6 +267,47 @@ private class RollupRegressionHouseholdsTest {
             GivingRollupTestData.account(bea.AccountId).Total_Soft_Credits__c,
             'The household Ana joined'
         );
+    }
+
+    /**
+     * Junction mode: Ana's membership moves from the Garcia household to the Lee household. Her
+     * soft credit, reached through `{Household}`, follows her: both households are marked by the
+     * membership change. Her own gift does not: the household on a gift is written when the gift
+     * is saved and never derived again (R-G2), so Garcia keeps the giving total.
+     */
+    @IsTest
+    static void aMemberWhoMovesTakesCreditsButNotGivingInJunctionMode() {
+        GivingRollupTestData.useOwnEngine();
+        RecognitionTestData.useJunctionMembership();
+        Account garcia = RecognitionTestData.household('The Garcia Family');
+        Account lee = RecognitionTestData.household('The Lee Family');
+        Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
+        Contact luis = RecognitionTestData.person('Luis', 'Garcia', null);
+        Contact wei = RecognitionTestData.person('Wei', 'Lee', null);
+        RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
+        RecognitionTestData.membership(garcia.Id, luis.Id, 'Member');
+        RecognitionTestData.membership(lee.Id, wei.Id, 'Head');
+        GivingRollupTestData.installShippedRollups();
+
+        Test.startTest();
+        RecognitionTestData.gift(ana.Id, null, 100);
+        Gift__c weisGift = RecognitionTestData.gift(wei.Id, null, 500);
+        GivingRollupTestData.nextSave();
+        insert solicitorCredit(weisGift.Id, ana.Id, 500);
+        GivingRollupTestData.nextSave();
+        HouseholdService.moveMembers(new Set<Id>{ ana.Id }, lee.Id);
+        Test.stopTest();
+
+        Account left = GivingRollupTestData.account(garcia.Id);
+        Account joined = GivingRollupTestData.account(lee.Id);
+        Assert.areEqual(
+            0,
+            GivingRollupTestData.valueOf(left.Total_Soft_Credits__c),
+            'The credit left Garcia'
+        );
+        Assert.areEqual(500, joined.Total_Soft_Credits__c, 'And joined Lee');
+        Assert.areEqual(100, left.Total_Giving__c, 'Ana\'s gift stays with Garcia (R-G2)');
+        Assert.areEqual(500, joined.Total_Giving__c, 'Lee has only Wei\'s gift');
     }
 
     /**

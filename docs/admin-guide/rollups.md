@@ -217,8 +217,9 @@ BarnCRM is replacing its rollup engine. Until the new engine ships:
 - **"Rollups last calculated" on a record** is set when a gift is saved, not by the nightly
   run or **Recalculate**, and the Rollups page can show a rollup as calculated as soon as its
   run starts.
-- **The queue, the Rollup Builder and instant totals on your own objects** do not exist yet.
-  A bulk change runs its totals in the background with the current engine.
+- **The queue, the Rollup Builder and instant totals on your own objects** are not in use
+  yet. A bulk change runs its totals in the background with the current engine. You may
+  see a **Rollup Queue** object in Setup: it stays empty until the new engine ships.
 
 ## A five-minute walkthrough
 
@@ -276,15 +277,18 @@ checking, and look at the **Needs attention** list in the Rollup Builder if a nu
 has not moved.
 
 **Switching off a rollup automation and forgetting it (with Giving).** Instantly and Both
-work because Giving runs an automation each time a gift or a commitment is saved. They are
-listed on the **Automation** page as **Update rollups when a gift changes** and **Update
-rollups when a commitment changes**. Switching one off, or pausing all automation for a
-data load, leaves the totals it feeds where they were. A rollup in **Both (recommended)**
-mode is put right by the nightly run; one in **Instantly** mode stays behind until you click
-**Recalculate** on its row. Switch the automation back on afterwards.
+work because Giving runs an automation each time a gift, a commitment, a gift allocation or
+a soft credit is saved. They are listed on the **Automation** page as **Update rollups when
+a gift changes**, **Update rollups when a commitment changes**, **Update rollups when a gift
+allocation changes** and **Update rollups when a soft credit changes**. Switching one off,
+or pausing all automation for a data load, leaves the totals it feeds where they were. A
+rollup in **Both (recommended)** mode is put right by the nightly run; one in **Instantly**
+mode stays behind until you click **Recalculate** on its row. Switch the automation back on
+afterwards.
 
-For now, fund totals and soft credit totals are not updated when a gift allocation or a
-soft credit is saved (see [Current limits](#current-limits)).
+For now, the gift allocation and soft credit automations are listed but do not move any
+total yet: fund totals and soft credit totals wait for the new engine (see
+[Current limits](#current-limits)).
 
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is

@@ -6,18 +6,22 @@
  * through its Automation Registry rows. These tests save records and read the totals back without
  * ever asking for a recalculation: if a total moved, the save moved it.
  *
- * Gift Allocation and Soft Credit are registered in slice S6, with the new engine, because
- * today's engine throws on their shipped definitions (see the two disabled tests below). The
- * handler logs the exception and the save stands, but no total on those objects would move.
+ * Gift Allocation and Soft Credit are registered in slice S6. Today's engine throws on their
+ * shipped definitions, so `RollupService` hands those to BarnCRM's own engine only, and the tests
+ * on them call `GivingRollupTestData.useOwnEngine()` until slice S8 swaps the engine for everyone.
  *
  * Today's engine finishes a real-time run in a queued job, so the totals are read after
  * `Test.stopTest`, which runs that job. The stricter promise, totals right before the save
- * returns, is `theTotalsAreRightInTheSameTransaction` below, which is switched on with the new
- * engine's instant path (slice S6).
+ * returns, is `theTotalsAreRightInTheSameTransaction` below, on the own engine's instant path.
  */
 @IsTest
 private class GiftRealTimeRollupTest {
-    private static final Set<String> GIVING_SOURCES = new Set<String>{ 'Gift__c', 'Commitment__c' };
+    private static final Set<String> GIVING_SOURCES = new Set<String>{
+        'Gift__c',
+        'Commitment__c',
+        'Gift_Allocation__c',
+        'Soft_Credit__c'
+    };
 
     @TestSetup
     static void makeData() {
@@ -43,7 +47,7 @@ private class GiftRealTimeRollupTest {
         Assert.areEqual(
             GIVING_SOURCES,
             registered,
-            'Gift and Commitment run the real-time rollups when saved.'
+            'Gift, Commitment, Gift Allocation and Soft Credit run the real-time rollups.'
         );
     }
 
@@ -72,17 +76,14 @@ private class GiftRealTimeRollupTest {
     }
 
     /**
-     * DISABLED until slice S6 (Gift Allocation registered with the new engine). Add `@IsTest`
-     * back in that slice, with the Gift Allocation registry row.
-     *
-     * The allocation a gift is given to the default fund moves that fund's total. Today's engine
-     * refuses the shipped "Fund last gift date" rollup, whose source attribute is on the parent
-     * gift (`Gift__r.Gift_Date__c`): Rollup.getRollup throws IllegalArgumentException "At least
-     * one of the following values is null ... Child rollup field: null", and because every fund
-     * rollup goes to the engine in one call, no fund total is written.
+     * Switched on in slice S6, on the own engine. The allocation a gift is given to the default
+     * fund moves that fund's total. Today's engine refuses the shipped "Fund last gift date"
+     * rollup, whose source attribute is on the parent gift (`Gift__r.Gift_Date__c`), with
+     * IllegalArgumentException "Child rollup field: null" in Rollup.getRollup.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aSavedGiftUpdatesTheFundItIsAllocatedTo() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = [SELECT Id FROM Contact LIMIT 1];
         Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
 
@@ -97,17 +98,14 @@ private class GiftRealTimeRollupTest {
     }
 
     /**
-     * DISABLED until slice S6 (Soft Credit registered with the new engine). Add `@IsTest` back in
-     * that slice, with the Soft Credit registry row.
-     *
-     * Bea solicited Ana's gift. Her soft credit total moves when the credit is saved. Today's
-     * engine throws NullPointerException in Rollup.fillWrapper (via getParentQueryWrapper) on the
-     * household soft credit rollups, whose `{Household}` path the adapter hands over as a rollup
-     * started from the parent; the one call carries every soft credit rollup, so Bea's own total
-     * is not written either.
+     * Switched on in slice S6, on the own engine. Bea solicited Ana's gift. Her soft credit total
+     * moves when the credit is saved. Today's engine throws NullPointerException in
+     * Rollup.fillWrapper on the household soft credit rollups, whose `{Household}` path it cannot
+     * follow.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void aSavedSoftCreditUpdatesThePersonCredited() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = [SELECT Id FROM Contact LIMIT 1];
         Contact bea = GivingTestDataFactory.insertHouseholdContact(
             'The Lindqvist Family',
@@ -204,20 +202,18 @@ private class GiftRealTimeRollupTest {
             Assert.areEqual(250, household.Total_Giving__c, 'Each household\'s total');
             Assert.areEqual(10, household.Gift_Count__c, 'Each household\'s gift count');
         }
-        // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo, switched on in
-        // slice S6 with real time on Gift Allocation.
+        // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo, on the own
+        // engine.
     }
 
     /**
-     * DISABLED until slice S6 (instant path in the new engine). Add `@IsTest` back in that slice.
-     *
-     * The promise rollup proposal D4 makes for an ordinary save: the totals are right before the
-     * save returns, with no queued job in between. Today's engine finishes a real-time run in a
-     * queued job, so the totals are still blank at the assertion below and this test fails by
-     * design until the instant path lands.
+     * Switched on in slice S6, on the own engine's instant path. The promise rollup proposal D4
+     * makes for an ordinary save: the totals are right before the save returns, with no queued
+     * job in between.
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void theTotalsAreRightInTheSameTransaction() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
 
         Test.startTest();

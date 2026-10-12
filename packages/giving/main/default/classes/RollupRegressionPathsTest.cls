@@ -76,8 +76,8 @@ private class RollupRegressionPathsTest {
             GivingRollupTestData.account(ana.AccountId).Total_Giving__c,
             'The household follows'
         );
-        // The fund side of a correction is asserted by movingAnAllocationMovesItBetweenFunds,
-        // switched on in slice S6 with real time on Gift Allocation.
+        // The fund side of a correction is asserted by movingAnAllocationMovesItBetweenFunds and
+        // aStatusChangeMovesTheFundTotal, on the own engine.
     }
 
     /** A pending gift counts nowhere until it is received. */
@@ -223,16 +223,13 @@ private class RollupRegressionPathsTest {
     }
 
     /**
-     * DISABLED until slice S6 (Gift Allocation registered with the new engine). Add `@IsTest`
-     * back in that slice.
-     *
-     * An allocation moved to another fund moves the money between the two fund totals. Today's
-     * engine throws IllegalArgumentException in Rollup.getRollup on the shipped "Fund last gift
-     * date" rollup ("Child rollup field: null", its source is the parent `Gift__r.Gift_Date__c`),
-     * so no fund total is written in real time, and Gift Allocation is not registered yet.
+     * Switched on in slice S6, on the own engine (fund totals read the parent gift, which today's
+     * engine refuses). An allocation moved to another fund moves the money between the two fund
+     * totals: the fund it left and the fund it joined are both recalculated (R-R11).
      */
-    @SuppressWarnings('PMD.ApexUnitTestMethodShouldHaveIsTestAnnotation, PMD.UnusedPrivateMethod')
+    @IsTest
     static void movingAnAllocationMovesItBetweenFunds() {
+        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
         Fund__c building = GivingTestDataFactory.buildFund('Building', false);
@@ -265,6 +262,78 @@ private class RollupRegressionPathsTest {
             0,
             GivingRollupTestData.valueOf(fromFund.Gift_Count__c),
             'General does not'
+        );
+    }
+
+    /**
+     * The fund totals count received gifts only, read through the allocation's gift. A gift put
+     * back to Pending leaves the fund total although no allocation was saved (R-R11).
+     */
+    @IsTest
+    static void aStatusChangeMovesTheFundTotal() {
+        GivingRollupTestData.useOwnEngine();
+        Contact ana = ana();
+        Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
+        Gift__c kept = GivingTestDataFactory.buildGift(ana.Id, 40);
+        Gift__c reopened = GivingTestDataFactory.buildGift(ana.Id, 60);
+
+        Test.startTest();
+        insert new List<Gift__c>{ kept, reopened };
+        Decimal before = GivingRollupTestData.fund(general.Id).Total_Raised__c;
+        GivingRollupTestData.nextSave();
+        update new Gift__c(Id = reopened.Id, Status__c = 'Pending');
+        Test.stopTest();
+
+        Fund__c fund = GivingRollupTestData.fund(general.Id);
+        Assert.areEqual(100, before, 'Both gifts while received');
+        Assert.areEqual(40, fund.Total_Raised__c, 'Only the gift still received');
+        Assert.areEqual(1, fund.Gift_Count__c, 'Only the gift still received');
+    }
+
+    /**
+     * A gift deleted takes its allocation and its soft credit with it, which fire no trigger of
+     * their own: the fund and the person credited lose it, and get it back when it is restored.
+     */
+    @IsTest
+    static void aDeletedGiftLeavesTheFundAndTheCreditAndComesBack() {
+        GivingRollupTestData.useOwnEngine();
+        Contact ana = ana();
+        Contact bea = bea();
+        Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
+        Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 75);
+
+        Test.startTest();
+        insert gift;
+        GivingRollupTestData.nextSave();
+        insert new Soft_Credit__c(
+            Gift__c = gift.Id,
+            Contact__c = bea.Id,
+            Role__c = 'Solicitor',
+            Amount__c = 75
+        );
+        GivingRollupTestData.nextSave();
+        delete gift;
+        Fund__c fundAfterDelete = GivingRollupTestData.fund(general.Id);
+        Contact beaAfterDelete = GivingRollupTestData.person(bea.Id);
+        GivingRollupTestData.nextSave();
+        undelete gift;
+        Test.stopTest();
+
+        Assert.areEqual(
+            0,
+            GivingRollupTestData.valueOf(fundAfterDelete.Total_Raised__c),
+            'The fund lost the deleted gift'
+        );
+        Assert.areEqual(
+            0,
+            GivingRollupTestData.valueOf(beaAfterDelete.Total_Soft_Credits__c),
+            'Bea lost the credit'
+        );
+        Assert.areEqual(75, GivingRollupTestData.fund(general.Id).Total_Raised__c, 'Restored');
+        Assert.areEqual(
+            75,
+            GivingRollupTestData.person(bea.Id).Total_Soft_Credits__c,
+            'Bea has the credit again'
         );
     }
 
@@ -351,5 +420,57 @@ private class RollupRegressionPathsTest {
         for (Account household : [SELECT Total_Giving__c FROM Account WHERE Id IN :householdIds]) {
             Assert.areEqual(300, household.Total_Giving__c, 'Each household follows');
         }
+    }
+
+    /**
+     * The 250 against 300 case again at three hundred gifts, thirty donors of ten: past one
+     * trigger chunk of 200, so each save reaches the rollups in two runs. Whether a run is
+     * recalculated in the save or queued and caught up by the Rollup Queue's processor, every
+     * donor and household is the corrected 300 and nothing is left queued.
+     */
+    @IsTest
+    static void threeHundredCorrectionsThroughTheQueueAreAllCounted() {
+        GivingRollupTestData.useOwnEngine();
+        List<String> names = new List<String>();
+        for (Integer i = 0; i < 30; i++) {
+            names.add('Donor' + i);
+        }
+        List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
+        Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
+        List<Gift__c> gifts = new List<Gift__c>();
+        for (Contact donor : donors) {
+            gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
+        }
+
+        Test.startTest();
+        insert gifts;
+        GivingRollupTestData.nextSave();
+        List<Gift__c> corrections = new List<Gift__c>();
+        for (Gift__c gift : gifts) {
+            corrections.add(new Gift__c(Id = gift.Id, Amount__c = 30));
+        }
+        update corrections;
+        Test.stopTest();
+
+        Assert.areEqual(300, corrections.size(), 'The bulk case is three hundred records');
+        Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Queue__c], 'Nothing left queued');
+        Set<Id> householdIds = new Set<Id>();
+        for (Contact donor : [
+            SELECT AccountId, Total_Giving__c, Gift_Count__c
+            FROM Contact
+            WHERE Id IN :donors
+        ]) {
+            Assert.areEqual(300, donor.Total_Giving__c, 'Ten corrected gifts of 30');
+            Assert.areEqual(10, donor.Gift_Count__c, 'Still ten gifts');
+            householdIds.add(donor.AccountId);
+        }
+        for (Account household : [SELECT Total_Giving__c FROM Account WHERE Id IN :householdIds]) {
+            Assert.areEqual(300, household.Total_Giving__c, 'Each household follows');
+        }
+        Assert.areEqual(
+            300,
+            GivingRollupTestData.fund(general.Id).Gift_Count__c,
+            'Every gift on the fund'
+        );
     }
 }
