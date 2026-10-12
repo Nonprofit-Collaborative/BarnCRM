@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_FieldUtilization_JobLabel</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: the weekly job's name in Health Check</shortDescription>
+        <value>Weekly field utilization count</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NoRecordType</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: records that have no record type</shortDescription>
+        <value>No record type</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NothingChosen</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: Count now with nothing chosen</shortDescription>
+        <value>Choose at least one kind of record to count, then save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_PermissionRequired</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: change refused without the permission</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to change this.</value>
+    </labels>
+    <labels>
         <fullName>Core_FieldUtilization_RunSkipped</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -15,5 +47,29 @@
         <protected>false</protected>
         <shortDescription>Field utilization: run summary sentence</shortDescription>
         <value>Counted {0} fields on {1} kinds of records. {2} could not be counted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_TooMany</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: the chosen objects do not fit</shortDescription>
+        <value>Those choices do not fit. Choose fewer kinds of records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_UnexpectedError</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: unexpected error on the page</shortDescription>
+        <value>Something went wrong on the Field Utilization page. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_UnknownObject</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: a chosen object cannot be counted</shortDescription>
+        <value>{0} cannot be counted. Choose from the list.</value>
     </labels>
 </CustomLabels>
