@@ -72,7 +72,7 @@ Opportunity mirror page says so.
    Opportunities does not create, and thank donors for, a gift for every one of them.
 3. Still in **Giving**, open **Opportunity mirror** (the row shows only to someone with the
    permission set). Click **Run now** once, to copy what you already have, and **Schedule
-   nightly**, so the mirror catches up every night at 01:30. The page shows when the last run
+   nightly run**, so the mirror catches up every night at 1:30 AM, in your organization's time zone. The page shows when the last run
    completed and what it did, and Health Check warns if two days pass without one.
 
 **Whose access the copy uses.** Opportunities are written with the access of the person saving
@@ -84,7 +84,7 @@ Opportunity. Give fundraising staff Opportunity create and edit access in Setup 
 Opportunity at once. The Error Log has one Warning when such a person creates or changes gifts;
 imports add none, and the nightly run catches them up. That catch-up looks at every gift without
 an Opportunity and every linked gift changed since the last run; with hundreds of thousands of
-gifts the run takes longer to start, which does not matter at 01:30.
+gifts the run takes longer to start, which does not matter at 1:30 AM.
 
 **Two switches, one of them in charge.** **Opportunity mirror direction** decides what the
 mirror does. The **Opportunity mirror** row on the Automation page is the switch every BarnCRM automation has: switched off, it stops the copy made when a gift is saved and the runs.

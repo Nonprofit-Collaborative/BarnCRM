@@ -430,7 +430,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Page introduction</shortDescription>
-    <value>Keeps gifts and Salesforce Opportunities in step, in the direction chosen in BarnCRM Settings. Run now copies what is waiting; the nightly run catches up every night at 01:30.</value>
+    <value>Keeps gifts and Salesforce Opportunities in step, in the direction chosen in BarnCRM Settings. Run now copies what is waiting; the nightly run catches up every night at 1:30 AM, in your organization's time zone.</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_DirectionGifts</fullName>
@@ -470,7 +470,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Button: schedule the nightly run</shortDescription>
-    <value>Schedule nightly</value>
+    <value>Schedule nightly run</value>
   </labels>
   <labels>
     <fullName>Connect_OpportunityMirror_StopSchedule</fullName>

@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: the job is scheduled; the next run follows.</shortDescription>
-        <value>Scheduled every morning at 7:00. Next run:</value>
+        <value>Scheduled every morning at 7:00 AM, in your organization's time zone. Next run:</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_ScheduleButton</fullName>
@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: schedule button.</shortDescription>
-        <value>Schedule</value>
+        <value>Schedule daily run</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_StopButton</fullName>
@@ -222,7 +222,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error digest panel: stop button.</shortDescription>
-        <value>Stop</value>
+        <value>Stop daily run</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_SendNow</fullName>

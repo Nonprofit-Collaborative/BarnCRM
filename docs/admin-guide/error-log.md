@@ -68,8 +68,8 @@ If nothing new has arrived, no email is sent at all.
    the email address of an active user of your Salesforce: the digest is never sent to
    anyone outside it, and an address that is not a user's is refused when you save.
 3. In **Digest frequency**, choose **Every day** or **Once a week**, then click **Save**.
-4. In the **Error digest** panel, click **Schedule**. The panel now says the digest is
-   scheduled and when it runs next: every morning at 7:00, after the nightly jobs, so their
+4. In the **Error digest** panel, click **Schedule daily run**. The panel now says the digest is
+   scheduled and when it runs next: every morning at 7:00 AM in your organization's time zone, after the nightly jobs, so their
    problems are in it. A weekly digest checks every morning and sends once seven days have
    passed since the last one.
 5. Click **Send now** to try it. If there are new entries, the email arrives in a minute or
@@ -77,7 +77,7 @@ If nothing new has arrived, no email is sent at all.
 
 The panel always shows when the digest last ran, what it did in one sentence (for example
 "Sent 7 new entries to 2 people" or "Nothing new since Sep 23, 7:00 AM: no email sent"),
-and who it goes to. Click **Stop** to switch it off.
+and who it goes to. Click **Stop daily run** to switch it off.
 
 Sending the digest does not use up your organization's daily email allowance: it goes to
 users of your own Salesforce, which the platform does not count. At most 50 people receive
@@ -116,7 +116,7 @@ Maria has heard from a colleague that "something did not save this morning."
   every day). Whoever administers your Salesforce can change the setting.
 - **Deactivating the person who scheduled the digest.** The digest runs as that person, so
   it stops. Health Check warns when a scheduled digest has not run for two days: open the
-  Error Log section of BarnCRM Settings, click **Stop**, then **Schedule** again as
+  Error Log section of BarnCRM Settings, click **Stop daily run**, then **Schedule daily run** again as
   yourself.
 - **Marking entries Acknowledged and expecting them in the digest.** The digest counts only
   entries that are still New, because those are the ones nobody has looked at.

@@ -8,7 +8,7 @@ If your donors and gifts are in the Nonprofit Success Pack (NPSP), BarnCRM ships
 ready-made import mappings that read NPSP's own exports: your contacts, and the payments your
 donors made, from people and from organizations. You export each file with Data Loader or
 Workbench, without renaming a column, and load it through the **Import** tab like any other
-file, with a dry run first and an undo afterwards.
+file, with a preview first and an undo afterwards.
 
 The mappings only name columns. Nothing in BarnCRM depends on NPSP being installed.
 
@@ -29,7 +29,7 @@ org that already had the generic mappings, add them once from Health Check:
 
 Before loading gifts, create in BarnCRM every appeal the gifts name, with the same names
 as your NPSP campaigns (see [Appeals](appeals.md)), and a default fund (see [Funds](funds.md)).
-A gift naming an appeal BarnCRM does not have is rejected in the dry run, naming it.
+A gift naming an appeal BarnCRM does not have is rejected in the preview, naming it.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -40,13 +40,13 @@ in section 4 produce. Create a default fund called **General Fund** and an appea
 1. Open the **Import** tab, select **NPSP: contacts**, then **Next**, and upload
    `npsp-contacts.csv`. Every column is already mapped: the home email to the personal email,
    the work email to the work email, the preferred email to the preferred email, and so on.
-2. Dry run, then commit. Ana Okafor and Robert Hale are created, each with a household of their
+2. Preview, then import. Ana Okafor and Robert Hale are created, each with a household of their
    own. Robert is marked deceased and do not call.
 3. Import `npsp-payments.csv` with **NPSP: opportunities and payments**. Leave donation matching
-   at **Match or create**. The dry run says 2 rows would create a gift and 1 would be rejected:
+   at **Match or create**. The preview says 2 rows would create a gift and 1 would be rejected:
    "The tribute type Honor is not one BarnCRM knows. Use one of: In honor of, In memory
    of."
-4. Commit. Open Ana Okafor: she has a gift of 150.00 by Card with the appeal Year End 2024, and
+4. Import these rows. Open Ana Okafor: she has a gift of 150.00 by Card with the appeal Year End 2024, and
    a gift of 50.00 by Check, reference 3312, in memory of Grace Okafor. She was found by her
    email, not created again.
 5. In the file, replace `Honor` with `In honor of`, and load it again. The two gifts already
@@ -60,7 +60,7 @@ Do it in this order. People come before gifts because the contacts file carries 
 full details (address, phones, preferences), which a gift file does not. A donor the gift file
 names on several rows is created once either way, but only with the few details a gift row
 has. With the people already loaded, every gift row finds its donor by email. An export of up
-to 500,000 rows can be dry run as one file; split anything larger.
+to 500,000 rows can be previewed as one file; split anything larger.
 
 1. **Appeals and funds.** Create them in BarnCRM by hand, with the names your NPSP
    campaigns and general accounting units have. There is no import for them yet.
@@ -116,7 +116,7 @@ to 500,000 rows can be dry run as one file; split anything larger.
 5. **Translate what does not match,** with **Find and Replace** on one column at a time:
    - Tribute type: `Honor` becomes `In honor of`, and `Memorial` becomes `In memory of`.
    - Payment method: BarnCRM reads Cash, Check, Card, ACH, Stock and In-kind, plus common
-     words such as "Credit Card" and "EFT". Any other value is rejected in the dry run, naming
+     words such as "Credit Card" and "EFT". Any other value is rejected in the preview, naming
      it and the values to use.
 6. **One tribute per opportunity.** A tribute belongs to the opportunity, so every payment of
    it carries the tribute. Where an opportunity has several payments, clear the four tribute
@@ -183,15 +183,15 @@ already loaded are matched, not duplicated.
 address, so **Email exact** had nothing to match or group their payments on, and each payment
 created them. Give such donors an email address before the export, or choose **Name plus
 postal code**, which the payment file also carries (read its warning on the matching step
-first). Either way, check the dry run's "would create" count: a donor who can be matched is
+first). Either way, check the preview's "would create" count: a donor who can be matched is
 created once however many payments they made, and a couple at one address are told apart by
 first name.
 
 **A donor was created twice after a payment file.** A row is matched only to a person with
 the same first name, so a payment row spelling the donor's first name differently from your
 org ("Bob" for Robert, "J." for John, an accent added or dropped) creates a new person
-rather than renaming the one you have (see [Importing](importing.md)). Check the dry run's
-"would create" count before you commit, and fix the spelling in the file, or merge afterwards.
+rather than renaming the one you have (see [Importing](importing.md)). Check the preview's
+"would create" count before you import, and fix the spelling in the file, or merge afterwards.
 
 **Salesforce warned about duplicates and the import saved the people anyway.** A duplicate
 rule set to alert does not stop an import. Run the duplicate scan afterwards

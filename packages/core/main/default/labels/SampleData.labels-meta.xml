@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sample Data card title</shortDescription>
-        <value>Sample Data</value>
+        <value>Sample data</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_ConfirmButton</fullName>
@@ -70,7 +70,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load Sample Data button</shortDescription>
-        <value>Load Sample Data</value>
+        <value>Load sample data</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadConfirmBody</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load confirmation dialog body</shortDescription>
-        <value>This adds 200 households, 440 contacts, 25 organizations, and the connections and affiliations between them to this org, plus sample records for each installed module. Only load sample data into a scratch org, sandbox, or demo org, never into production.</value>
+        <value>This adds 200 households, 440 contacts, 25 organizations, and the relationships and affiliations between them to this org, plus sample records for each installed module. Only load sample data into a scratch org, sandbox, or demo org, never into production.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadConfirmTitle</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationships count label</shortDescription>
-        <value>Connections</value>
+        <value>Relationships</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_AffiliationsLabel</fullName>
@@ -182,7 +182,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Remove Sample Data button</shortDescription>
-        <value>Remove Sample Data</value>
+        <value>Remove sample data</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_RemoveConfirmBody</fullName>
@@ -238,7 +238,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Loading status badge</shortDescription>
-        <value>Loading...</value>
+        <value>Loading</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_StatusNotLoaded</fullName>

@@ -3,7 +3,7 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Duplicate Review</label>
   <description>
-    Optional (C-20): duplicate suggestions, for users with a Sales Cloud or Service Cloud license
+    Optional: duplicate suggestions, for users with a Sales Cloud or Service Cloud license
     only. Salesforce gives no other license, Salesforce Platform included, access to duplicate
     record sets. In no role on purpose.
   </description>

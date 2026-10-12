@@ -3,7 +3,7 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Admin</label>
   <description>
-    Maria, the operations manager who configures BarnCRM. Grants the settings
+    For the person who configures BarnCRM. Grants the settings
     console, automation control, and the Error Log. Later features add to this set: it is never
     meant to be cloned.
   </description>

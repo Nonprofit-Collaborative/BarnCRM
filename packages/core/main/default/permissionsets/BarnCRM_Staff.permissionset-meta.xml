@@ -3,7 +3,7 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Staff</label>
   <description>
-    David, Priya, and everyone else doing the day job. Reads the Error Log so that a problem can be
+    For everyone doing the day job. Reads the Error Log so that a problem can be
     described accurately, and changes nothing about how BarnCRM is configured.
   </description>
   <applicationVisibilities>

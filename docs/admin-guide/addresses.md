@@ -41,8 +41,8 @@ Then switch on the seasonal address swap, which is off until you switch it on.
 
 5. Stay on the **Addresses** page. Under **Seasonal address swap** you will see
    "The nightly swap is not scheduled, so seasonal addresses will not move on their own."
-6. Choose **Schedule the nightly swap**. The message changes to "The swap runs every night at
-   12:30 AM" and the date of the next run appears under it.
+6. Choose **Schedule nightly run**. The message changes to "The swap runs every night at
+   12:30 AM, in your organization's time zone" and the date of the next run appears under it.
 7. Choose **Run the swap now** once, so you do not have to wait until tomorrow to see that it
    works. Refresh the page after a minute: **Seasonal addresses last swapped** shows the time
    it finished and a sentence saying how many addresses moved.
@@ -123,7 +123,7 @@ Still the Garcia household, and still five minutes. This time you are proving to
 that the nightly job really works, before the winter mailing goes out.
 
 1. Open **BarnCRM Settings** and choose **Addresses**. Under **Seasonal address swap**,
-   choose **Schedule the nightly swap** if it is not already scheduled.
+   choose **Schedule nightly run** if it is not already scheduled.
 2. Open **The Garcia Family** and look at the **Addresses** card. The Arizona address you
    added is of type **Seasonal** and reads "Used from January 1 to March 31". The **Default**
    badge is on the home address.

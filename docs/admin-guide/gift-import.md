@@ -6,7 +6,7 @@ Importing gifts loads a spreadsheet of gifts, with the donor on each row, throug
 **Import** tab you use for people. Each row becomes an ordinary gift: the donor is found or
 created, the gift is allocated to the fund you name (or split across several), and a soft
 credit and an in honor or in memory tribute can come with it. Nothing is written until you
-have seen a dry run, and a gift import can be undone like any other import.
+have seen a preview, and a gift import can be undone like any other import.
 
 When a gift pays a pledge or a monthly gift the donor already has, BarnCRM can find the
 scheduled payment it pays and link the two, so the pledge balance goes down on its own. This
@@ -19,7 +19,7 @@ Settings** permission to import, and the Giving admin role to create gifts; the 
 page gives both to a BarnCRM Admin. The importer must also be able to delete gifts (Giving
 Admin can; Giving Staff cannot), because a row is saved whole or not at all: when a gift's soft
 credit or tribute is refused, the import removes the gift it had just made. Without that right
-every gift row is rejected, in the dry run too, saying so.
+every gift row is rejected, in the preview too, saying so.
 
 Two settings decide how donation matching behaves when a mapping does not say:
 
@@ -50,15 +50,15 @@ Start with a small file: five gifts, each with a donor name, an email, an amount
    section 5).
 4. Under **Control totals**, type the number of rows and the total of the amounts from your
    deposit slip or your processor's report. Both are optional.
-5. Select **Dry run**. The counts say how many rows would create a gift, how many match a
+5. Select **Preview**. The counts say how many rows would create a gift, how many match a
    gift you already have, and how many would be rejected, with the reason for each. The run
    log says whether the control totals match, and how many gifts would pay a scheduled
    payment.
 6. If a row is rejected (a fund name spelled differently, a date BarnCRM cannot read),
-   fix the file and dry run again.
-7. Select **Commit**. Open one of the donors: the new gift is on their record, allocated to
+   fix the file and preview again.
+7. Select **Import these rows**. Open one of the donors: the new gift is on their record, allocated to
    the fund you named, and its **Created By Import Batch** links back to the import.
-8. Load the same file again and dry run it. Every row now says it matches a gift you already
+8. Load the same file again and preview it. Every row now says it matches a gift you already
    have, because of the external ID column. Nothing would be created twice.
 
 ## 4. What a row can say
@@ -123,9 +123,9 @@ Each mapping says what to do, on the matching step of the wizard:
 The same step lets a mapping use its own window and allowed difference instead of the ones in
 **BarnCRM Settings**. Leave them empty to use the settings.
 
-The commit matches under the choice, window and allowed difference the dry run used. If you
-change them on the mapping, or in **BarnCRM Settings**, after a dry run, run the dry run
-again: the commit keeps to what the last dry run showed you.
+The import matches under the choice, window and allowed difference the preview used. If you
+change them on the mapping, or in **BarnCRM Settings**, after a preview, run the preview
+again: the import keeps to what the last preview showed you.
 
 ## 6. Undoing a gift import
 
@@ -150,7 +150,7 @@ complete.
 ## 7. Common mistakes
 
 **`The books are closed through...` on a row.** The row's gift is dated in a closed accounting
-period, and the dry run refuses it as the import would. Date it after the close date, or ask
+period, and the preview refuses it as the import would. Date it after the close date, or ask
 the administrator (see [Posting and Closed Periods](posting-and-closed-periods.md)).
 
 **Rows rejected with "Not attempted: this chunk ran out of room".** One gift in the chunk was
@@ -165,14 +165,14 @@ an accounting code that matches the file.
 format your own Salesforce locale shows dates. An Excel workbook's date cells are always read
 correctly.
 
-**The commit button refuses: "the control totals do not match".** The dry run counted a
+**The Import these rows button refuses: "the control totals do not match".** The preview counted a
 different number of rows, or a different total, from the ones you typed. Check the run log
 for both numbers. Either the file is not the one you meant (a report cut short, a row
-duplicated) or a total was typed wrong. Fix whichever is wrong and dry run again.
+duplicated) or a total was typed wrong. Fix whichever is wrong and preview again.
 
 **A gift did not pay the pledge you expected.** The payment was outside the date window, the
 amounts differed by more than the allowed difference, or the pledge belongs to somebody the
-row did not resolve to. The dry run's run log counts the gifts that would pay a scheduled
+row did not resolve to. The preview's run log counts the gifts that would pay a scheduled
 payment. Widen the window on the mapping, or check that the donor columns match the pledge's
 donor.
 

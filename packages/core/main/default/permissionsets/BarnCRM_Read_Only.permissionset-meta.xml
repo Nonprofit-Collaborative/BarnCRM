@@ -2,7 +2,7 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Read Only</label>
-  <description>Tom and Jen, who look but do not change. Read access only, everywhere.</description>
+  <description>For people who look but do not change. Read access only, everywhere.</description>
   <applicationVisibilities>
     <application>BarnCRM</application>
     <visible>true</visible>
