@@ -4593,10 +4593,13 @@ the browser being closed and the interruption halfway down the pile.
 | Payment Reference | text | no | The check number or deposit reference, which is what makes a batch reconcilable against the bank statement. |
 | Fund | reference(Fund) | no | The fund this gift is designated to, when it differs from the batch's. |
 | Appeal | reference(Appeal) | no | The appeal this gift responded to, when it differs from the batch's. |
+| Installment | reference(Installment) | no | The scheduled payment this line's gift pays, chosen by the person or chosen in advance as the only suggestion (R-GR5, R-DM8). Empty means a gift on its own. |
 | Gift | reference(Gift) | computed | The gift this line produced, written by posting and empty before it (R-GB6). |
 
 ### Relationships
 
+- **Gift Batch Row to Installment**, many to one, optional; cleared if the installment is
+  deleted.
 - **Gift Batch Row to Gift Batch**, many to one, master-detail, not reparentable.
 - **Gift Batch Row to Donor**, many to one, to exactly one of Donor Contact or Donor Account
   by the time the batch posts (Section 4 "Person references").
@@ -4621,7 +4624,15 @@ entered one at a time with its description.
 added to the batch or changed. The one change allowed is the platform clearing Gift when
 that gift is deleted, because refusing it would let a posted batch stop a gift from ever
 being deleted. Deleting a line of a posted batch is refused by the entry screen but not by
-the database: see "Known gaps in shipped rules" in Section 30.
+the database: see "Known gaps in shipped rules" in Section 30. The platform clearing
+Installment when that installment is deleted is allowed for the same reason.
+
+**R-GR5 A line pays the payment it names, or nothing.** A line's Installment is offered and
+suggested as R-DM8 says, using the line's date or the batch's (R-GB1). Posting checks every
+named installment again, in the posting user's mode, before any gift is created: one that is
+no longer a candidate of the line's donor refuses the post and names the line (R-GB5). A
+posted gift carries the line's Installment and that installment's Commitment. Two lines may
+name one installment.
 
 ### Salesforce implementation
 
@@ -4640,6 +4651,7 @@ the database: see "Known gaps in shipped rules" in Section 30.
 | Payment Reference | `Payment_Reference__c` | Text(255), the length of the gift's |
 | Fund | `Fund__c` | Lookup to `Fund__c` |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
+| Installment | `Installment__c` | Lookup to `Installment__c`, cleared if the installment is deleted |
 | Gift | `Gift__c` | Lookup to `Gift__c`, cleared if the gift is deleted |
 
 - **Validation rule:** `Posted_Batch_Rows_Are_Final` (R-GR4).
@@ -4779,8 +4791,24 @@ from the batch, never from the template or the settings, so an edit made after t
 cannot make the commit match, refuse or create what the dry run did not show. A batch with no
 recorded values, or values that cannot be read, falls back to the template.
 
+**R-DM8 A gift entry screen suggests, and a person decides.** Quick Gift Entry (G-03) and a
+gift batch line (G-17, R-GR5, checked again at posting) offer the chosen donor's candidates (R-DM2, with no date bound) as payments the new gift can pay,
+with None always offered. A candidate whose due date and expected amount fall within R-DM3's
+window and tolerance, taken from the org's settings (no template is involved), is marked
+suggested. It is chosen in advance only when it is the only one suggested, and then it is
+shown chosen with a note saying why; otherwise None is chosen. R-DM4's choice by closest date
+and R-DM5's behaviours do not apply: the person sees the choice and may change it. The save
+checks the chosen installment again in the saving user's mode: it must still be a candidate of
+the gift's donor, and a gift of goods (R-G12) pays none; otherwise the save is refused, beside
+the choice, and nothing is written. A gift saved with a choice carries the Installment and
+that installment's Commitment, and the numbers follow as in R-DM6. Two gifts may pay one
+installment: each counts toward it.
+
 ### Salesforce implementation
 
+- **Gift entry:** `GiftEntryPayments` (the candidates for a donor, the suggestion and the
+  check at save, R-DM8), using `DonationMatcher.matching` for R-DM3 and
+  `InstallmentSelector.selectOpenForDonors` for R-DM2.
 - **Service:** `GiftImportProcessor` (the `ImportEntityProcessor` Core finds by name),
   `GiftImportRow` (one row's gift as read), `GiftImportReferences` (funds and appeals),
   `GiftImportCredits` (soft credit and tribute), `GiftImportSelector` (funds, appeals and open
@@ -6179,6 +6207,8 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |
 | v0.6 | 2026-10-12 | Rollup engine swap (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S8). No object or field added. BarnCRM's own engine is the only path for real time, the queue, Recalculate, Recalculate all and the nightly run; `RollupBatch` is removed. The Mode picklist labels become Instantly, Every night and Both (recommended) on `Rollup_Definition__c`, `Rollup_Definition_Default__mdt` and the `Rollup_Mode_Default__c` setting, stored values unchanged. R-R4 loses its interim sentence; new R-R14 (one full run at a time, and a stopped chunk's records are queued). The four rollup rows in Section 30 are closed. |
 | v0.6 | 2026-10-12 | Rollup operations slice (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, decision 10). `Rollup_Definition__c.Aggregate__c` gains COUNT_DISTINCT, ANY, NONE, TEXT_LIST and TEXT_LIST_DISTINCT, and the definition gains `Delimiter__c` (Comma, Semicolon, New line). New rule R-R15 says which target types each aggregate fills (checkbox targets for ANY and NONE, text targets for FIRST, LAST and the text lists), how blanks, ties, order, the delimiter and the field length are handled, and that every aggregate stays exact under recompute. R-R10 records what the save checks today. The shipped-default type `Rollup_Definition_Default__mdt` keeps its seven aggregates and has no delimiter: no shipped rollup uses the new ones. |
+| v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-NEXT, `NEXT-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
+| v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`NEXT-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
 
 ---
 ## 32. Entity ownership by package

@@ -581,4 +581,128 @@ private class GiftBatchServiceTest {
         Assert.isNull(after.Gift__c, 'The line no longer points at the deleted gift.');
         Assert.areEqual(100, after.Amount__c, 'What the line says was typed is unchanged.');
     }
+
+    /** Ana's pledge of 1,200 in twelve monthly payments of 100 from the batch date. */
+    private static List<Installment__c> pledgeOf(Id contactId) {
+        Commitment__c pledge = new Commitment__c(
+            Type__c = 'Pledge',
+            Status__c = 'Active',
+            Donor_Contact__c = contactId,
+            Amount__c = 100,
+            Frequency__c = 'Monthly',
+            Start_Date__c = Date.newInstance(2026, 3, 14),
+            Expected_Total__c = 1200,
+            Installments_Planned__c = 12
+        );
+        insert pledge;
+        return [
+            SELECT Id, Commitment__c, Expected_Amount__c
+            FROM Installment__c
+            WHERE Commitment__c = :pledge.Id
+            ORDER BY Sequence__c
+        ];
+    }
+
+    @IsTest
+    static void aLineThatPaysAPaymentPostsAGiftThatPaysIt() {
+        fund('General', true);
+        User fundraiser = david();
+
+        System.runAs(fundraiser) {
+            Contact ana = person();
+            List<Installment__c> payments = pledgeOf(ana.Id);
+            Gift_Batch__c tuesday = batch(100, null, null);
+            Gift_Batch_Row__c paying = line(tuesday.Id, ana.Id, null, 100);
+            paying.Installment__c = payments[0].Id;
+            insert paying;
+
+            Test.startTest();
+            GiftBatchService.PostOutcome outcome = GiftBatchService.post(tuesday.Id);
+            Test.stopTest();
+
+            Assert.isTrue(outcome.success, 'The batch posts: ' + outcome.formError);
+            Gift__c gift = [SELECT Installment__c, Commitment__c FROM Gift__c];
+            Assert.areEqual(payments[0].Id, gift.Installment__c, 'The gift pays the payment.');
+            Assert.areEqual(payments[0].Commitment__c, gift.Commitment__c, 'Of Ana\'s pledge.');
+            Assert.areEqual(
+                'Paid',
+                [SELECT Status__c FROM Installment__c WHERE Id = :payments[0].Id].Status__c,
+                'The payment is paid.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aLinePayingSomeoneElsesPaymentIsNamedAndNothingPosts() {
+        fund('General', true);
+        User fundraiser = david();
+
+        System.runAs(fundraiser) {
+            Contact ana = person();
+            Account riverside = organization();
+            List<Installment__c> payments = pledgeOf(ana.Id);
+            Gift_Batch__c tuesday = batch(200, null, null);
+            Gift_Batch_Row__c honest = line(tuesday.Id, ana.Id, null, 100);
+            Gift_Batch_Row__c wrong = line(tuesday.Id, null, riverside.Id, 100);
+            wrong.Installment__c = payments[0].Id;
+            insert new List<Gift_Batch_Row__c>{ honest, wrong };
+
+            Test.startTest();
+            GiftBatchService.PostOutcome outcome = GiftBatchService.post(tuesday.Id);
+            Test.stopTest();
+
+            Assert.isFalse(outcome.success, 'The batch does not post.');
+            Assert.areEqual(1, outcome.lineProblems.size(), 'One line is wrong.');
+            Assert.areEqual(2, outcome.lineProblems[0].lineNumber, 'The second line is named.');
+            Assert.areEqual(
+                Label.Giving_GiftBatch_ErrorRowPaymentNotOpen,
+                outcome.lineProblems[0].message,
+                'It says the payment cannot be paid by this line.'
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'Nothing was created.');
+        }
+    }
+
+    @IsTest
+    static void twoHundredLinesPayingPaymentsPostInOneGo() {
+        fund('General', true);
+        User fundraiser = david();
+
+        System.runAs(fundraiser) {
+            Contact ana = person();
+            List<Installment__c> payments = pledgeOf(ana.Id);
+            Gift_Batch__c yearEnd = batch(200 * 6, null, null);
+            List<Gift_Batch_Row__c> rows = new List<Gift_Batch_Row__c>();
+            for (Integer index = 0; index < 200; index++) {
+                Gift_Batch_Row__c row = line(yearEnd.Id, ana.Id, null, 6);
+                row.Installment__c = payments[Math.mod(index, payments.size())].Id;
+                rows.add(row);
+            }
+            insert rows;
+
+            Test.startTest();
+            GiftBatchService.PostOutcome outcome = GiftBatchService.post(yearEnd.Id);
+            Test.stopTest();
+
+            Assert.isTrue(outcome.success, 'A full stack posts: ' + outcome.formError);
+            Assert.areEqual(
+                200,
+                [
+                    SELECT COUNT()
+                    FROM Gift__c
+                    WHERE Installment__c != NULL AND Commitment__c != NULL
+                ],
+                'Every gift pays the payment its line named.'
+            );
+            Assert.areEqual(
+                payments.size(),
+                [
+                    SELECT COUNT()
+                    FROM Installment__c
+                    WHERE Commitment__c = :payments[0].Commitment__c AND Status__c != 'Scheduled'
+                ],
+                'Every payment received something.'
+            );
+        }
+    }
 }

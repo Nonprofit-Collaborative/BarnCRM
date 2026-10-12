@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import QuickGiftEntry from 'c/quickGiftEntry';
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
+import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -27,6 +28,12 @@ jest.mock('@salesforce/apex/QuickGiftEntryController.getDefaults', () => ({ defa
 jest.mock('@salesforce/apex/QuickGiftEntryController.saveGift', () => ({ default: jest.fn() }), {
   virtual: true
 });
+
+jest.mock(
+  '@salesforce/apex/QuickGiftEntryController.getPaymentChoices',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 const DEFAULTS = {
   giftDate: '2026-09-07',
@@ -233,7 +240,8 @@ describe('c-quick-gift-entry', () => {
         fundId: DEFAULTS.defaultFundId,
         paymentReference: null,
         inKindDescription: null,
-        fairMarketValue: null
+        fairMarketValue: null,
+        installmentId: null
       }
     });
     expect(pick(element, 'saved')).not.toBeNull();
@@ -431,5 +439,149 @@ describe('c-quick-gift-entry', () => {
 
     expect(pick(element, 'saved')).not.toBeNull();
     expect(pick(element, 'save-warning')).not.toBeNull();
+  });
+
+  describe('pays a scheduled payment', () => {
+    const MARCH = 'a01000000000001AAA';
+    const APRIL = 'a01000000000002AAA';
+    const choicesWith = (suggested) => ({
+      choices: [
+        {
+          value: MARCH,
+          label: 'Pledge CM-000001, payment 1, due 3/15/2026, 50.00 expected',
+          suggested: suggested.includes(MARCH)
+        },
+        {
+          value: APRIL,
+          label: 'Pledge CM-000001, payment 2, due 4/15/2026, 50.00 expected',
+          suggested: suggested.includes(APRIL)
+        }
+      ],
+      suggestedId: suggested.length === 1 ? suggested[0] : null,
+      suggestedCount: suggested.length
+    });
+
+    /** Lets the pause before a lookup pass, and the lookup answer. */
+    async function lookUp() {
+      jest.runOnlyPendingTimers();
+      await settle();
+    }
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+      getPaymentChoices.mockResolvedValue(choicesWith([MARCH]));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('shows no list until a donor who owes a payment is chosen', async () => {
+      getPaymentChoices.mockResolvedValue({ choices: [], suggestedId: null, suggestedCount: 0 });
+      const element = build();
+      await settle();
+      expect(pick(element, 'pays')).toBeNull();
+
+      await enterAGift(element);
+      await lookUp();
+
+      expect(getPaymentChoices).toHaveBeenCalledWith({
+        donorContactId: CONTACT_ID,
+        donorAccountId: null,
+        giftDate: '2026-09-07',
+        amount: 50
+      });
+      expect(pick(element, 'pays')).toBeNull();
+    });
+
+    it('chooses the only suggestion in advance, on screen, and says why', async () => {
+      const element = build();
+      await settle();
+
+      await enterAGift(element);
+      await lookUp();
+
+      const pays = pick(element, 'pays');
+      expect(pays.value).toBe(MARCH);
+      expect(pays.options[0].value).toBe('');
+      expect(pays.options.map((option) => option.value)).toEqual(['', MARCH, APRIL]);
+      expect(pick(element, 'pays-note').textContent).not.toBe('');
+
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBe(MARCH);
+    });
+
+    it('chooses nothing when two payments are suggested', async () => {
+      getPaymentChoices.mockResolvedValue(choicesWith([MARCH, APRIL]));
+      const element = build();
+      await settle();
+
+      await enterAGift(element);
+      await lookUp();
+
+      expect(pick(element, 'pays').value).toBe('');
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('keeps None once the person chose it, when the amount changes', async () => {
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+
+      change(pick(element, 'pays'), { value: '' });
+      change(pick(element, 'amount'), { value: '50.00' });
+      await lookUp();
+
+      expect(pick(element, 'pays').value).toBe('');
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('forgets the choice when the donor changes', async () => {
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+      getPaymentChoices.mockResolvedValue({ choices: [], suggestedId: null, suggestedCount: 0 });
+
+      change(pick(element, 'donor-person'), { recordId: '003000000000000BBB' });
+      await lookUp();
+
+      expect(pick(element, 'pays')).toBeNull();
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('sends no payment with a gift of goods', async () => {
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+
+      change(pick(element, 'gift-type'), { value: 'In-kind' });
+      await settle();
+      expect(pick(element, 'pays')).toBeNull();
+      change(pick(element, 'in-kind-description'), { value: 'Two chairs' });
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('says the payments could not be loaded and still lets the gift be saved', async () => {
+      getPaymentChoices.mockRejectedValue({ body: { message: 'boom' } });
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+
+      expect(pick(element, 'pays-error')).not.toBeNull();
+      expect(pick(element, 'save').disabled).toBe(false);
+    });
   });
 });

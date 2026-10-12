@@ -92,6 +92,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0081](0081-data-transform-document.md) | Column changes as a declarative transform document, and import matching through the org's duplicate rules | Accepted (builder decision) |
 | [NEXT](NEXT-rollup-totals-in-the-target-record-currency.md) | Rollup totals are in the target record's currency | Accepted (owner decision) |
 | [NEXT](NEXT-barncrm-owns-its-rollup-engine.md) | BarnCRM owns its rollup engine (supersedes ADR-0015, amends ADR-0011) | Accepted (owner decision) |
+| [NEXT](NEXT-gift-entry-pays-a-scheduled-payment.md) | Gift entry screens suggest the scheduled payment a gift pays, and a person decides | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

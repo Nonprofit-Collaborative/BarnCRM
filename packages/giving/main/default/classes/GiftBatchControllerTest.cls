@@ -30,6 +30,62 @@ private class GiftBatchControllerTest {
     }
 
     @IsTest
+    static void eachLineIsOfferedItsDonorsPaymentsAndTheChoiceIsSaved() {
+        User fundraiser = david();
+        System.runAs(fundraiser) {
+            Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+            insert ana;
+            Commitment__c pledge = new Commitment__c(
+                Type__c = 'Pledge',
+                Status__c = 'Active',
+                Donor_Contact__c = ana.Id,
+                Amount__c = 100,
+                Frequency__c = 'Monthly',
+                Start_Date__c = Date.today(),
+                Expected_Total__c = 300,
+                Installments_Planned__c = 3
+            );
+            insert pledge;
+            Installment__c first = [
+                SELECT Id
+                FROM Installment__c
+                WHERE Commitment__c = :pledge.Id
+                ORDER BY Sequence__c
+                LIMIT 1
+            ];
+            Gift_Batch__c tuesday = batch(100);
+            GiftBatchController.Line anas = typed(ana.Id, 100);
+            anas.key = 'new-1';
+            anas.giftDate = Date.today();
+            GiftBatchController.Line nobodys = typed(null, 25);
+            nobodys.key = 'new-2';
+
+            Test.startTest();
+            Map<String, GiftEntryPayments.Choices> byKey = new Map<String, GiftEntryPayments.Choices>();
+            for (
+                GiftEntryPayments.Choices choices : GiftBatchController.getPaymentChoices(
+                    tuesday.Id,
+                    new List<GiftBatchController.Line>{ anas, nobodys }
+                )
+            ) {
+                byKey.put(choices.key, choices);
+            }
+            anas.installmentId = first.Id;
+            GiftBatchController.BatchView saved = GiftBatchController.saveLines(
+                tuesday.Id,
+                new List<GiftBatchController.Line>{ anas },
+                null
+            );
+            Test.stopTest();
+
+            Assert.areEqual(3, byKey.get('new-1').choices.size(), 'Ana owes three payments.');
+            Assert.areEqual(first.Id, byKey.get('new-1').suggestedId, 'The only match is chosen.');
+            Assert.isTrue(byKey.get('new-2').choices.isEmpty(), 'No donor, nothing owed.');
+            Assert.areEqual(first.Id, saved.lines[0].installmentId, 'The choice is saved.');
+        }
+    }
+
+    @IsTest
     static void aNewBatchOpensEmptyWithItsDefaultsAndNoInKindMethod() {
         User fundraiser = david();
         System.runAs(fundraiser) {

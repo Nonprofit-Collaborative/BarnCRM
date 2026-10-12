@@ -99,7 +99,57 @@ public with sharing class GiftBatchService {
                 );
             }
         }
+        Map<Id, Installment__c> payments = confirmedPayments(batch, rows);
+        for (Integer index = 0; index < rows.size(); index++) {
+            Gift_Batch_Row__c row = rows[index];
+            if (row.Installment__c != null && !payments.containsKey(row.Id)) {
+                problems.add(
+                    new LineProblem(
+                        row.Id,
+                        index + 1,
+                        Label.Giving_GiftBatch_ErrorRowPaymentNotOpen
+                    )
+                );
+            }
+        }
         return problems;
+    }
+
+    /**
+     * R-GR5: for each line that names a scheduled payment its donor may still pay, that payment
+     * with its commitment, by line. A line missing from the result named one it may not pay.
+     */
+    public static Map<Id, Installment__c> confirmedPayments(
+        Gift_Batch__c batch,
+        List<Gift_Batch_Row__c> rows
+    ) {
+        List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
+        Map<String, Id> chosen = new Map<String, Id>();
+        for (Gift_Batch_Row__c row : rows) {
+            if (row.Installment__c == null) {
+                continue;
+            }
+            Resolved values = new Resolved(batch, row);
+            requests.add(
+                new GiftEntryPayments.Request(
+                    row.Id,
+                    row.Donor_Contact__c,
+                    row.Donor_Account__c,
+                    values.giftDate,
+                    row.Amount__c
+                )
+            );
+            chosen.put(row.Id, row.Installment__c);
+        }
+        Map<Id, Installment__c> byRow = new Map<Id, Installment__c>();
+        if (requests.isEmpty()) {
+            return byRow;
+        }
+        Map<String, Installment__c> confirmed = GiftEntryPayments.confirm(requests, chosen);
+        for (String rowId : confirmed.keySet()) {
+            byRow.put(Id.valueOf(rowId), confirmed.get(rowId));
+        }
+        return byRow;
     }
 
     /**
@@ -190,9 +240,13 @@ public with sharing class GiftBatchService {
     ) {
         List<Gift__c> gifts = new List<Gift__c>();
         List<Resolved> resolved = new List<Resolved>();
+        // validateRows refused any line naming a payment it may not pay; read again here so each
+        // gift carries its payment's commitment as it stands (R-GR5).
+        Map<Id, Installment__c> payments = confirmedPayments(batch, rows);
         for (Gift_Batch_Row__c row : rows) {
             Resolved values = new Resolved(batch, row);
             resolved.add(values);
+            Installment__c payment = payments.get(row.Id);
             gifts.add(
                 new Gift__c(
                     Donor_Contact__c = row.Donor_Contact__c,
@@ -202,7 +256,9 @@ public with sharing class GiftBatchService {
                     Type__c = values.paymentMethod,
                     Status__c = GIFT_STATUS_RECEIVED,
                     Appeal__c = values.appealId,
-                    Payment_Reference__c = row.Payment_Reference__c
+                    Payment_Reference__c = row.Payment_Reference__c,
+                    Installment__c = payment == null ? null : payment.Id,
+                    Commitment__c = payment == null ? null : payment.Commitment__c
                 )
             );
         }

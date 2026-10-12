@@ -38,6 +38,34 @@ public with sharing class QuickGiftEntryController {
     }
 
     /**
+     * The scheduled payments the donor still owes, for the "Pays a scheduled payment" list
+     * (R-DM8), with the one suggestion chosen in advance only when it is the only one. Not
+     * cacheable: a payment paid a minute ago must not be offered again.
+     */
+    @AuraEnabled
+    public static GiftEntryPayments.Choices getPaymentChoices(
+        String donorContactId,
+        String donorAccountId,
+        Date giftDate,
+        Decimal amount
+    ) {
+        try {
+            GiftEntryPayments.Request request = new GiftEntryPayments.Request(
+                'gift',
+                asId(donorContactId, Contact.SObjectType),
+                asId(donorAccountId, Account.SObjectType),
+                giftDate,
+                amount
+            );
+            return GiftEntryPayments.forRequests(new List<GiftEntryPayments.Request>{ request })
+                .get('gift');
+        } catch (Exception e) {
+            ErrorLogger.log(e, CONTEXT + '.getPaymentChoices');
+            throw asAuraException(Label.Giving_GiftEntryPays_ErrorLoad);
+        }
+    }
+
+    /**
      * Saves one gift and, when a fund was chosen, points the gift's single allocation at it.
      * Returns a result the component can render: the saved gift's name and id, or the
      * errors that stopped it.
@@ -55,6 +83,12 @@ public with sharing class QuickGiftEntryController {
         }
         try {
             Gift__c gift = input.toGift();
+            if (!applyChosenPayment(gift, input)) {
+                result.fieldErrors.add(
+                    new FieldError('installmentId', Label.Giving_GiftEntryPays_ErrorNotOpen)
+                );
+                return result;
+            }
             Database.insert(gift, true, AccessLevel.USER_MODE);
             Boolean applyChosenFundWasApplied = applyChosenFund(
                 gift,
@@ -97,6 +131,37 @@ public with sharing class QuickGiftEntryController {
                 new Map<Id, Id>{ gift.Id => fundId }
             )
             .contains(gift.Id);
+    }
+
+    /**
+     * R-DM8: the payment the person chose is checked again now, because it can have been paid
+     * or its pledge closed since the list was drawn. The gift then carries it and its pledge,
+     * and the gift triggers apply it (R-DM6). Returns false when the choice no longer stands.
+     */
+    private static Boolean applyChosenPayment(Gift__c gift, GiftInput input) {
+        Id chosen = asId(input.installmentId, Installment__c.SObjectType);
+        if (chosen == null) {
+            return true;
+        }
+        Installment__c installment = GiftEntryPayments.confirm(
+                new List<GiftEntryPayments.Request>{
+                    new GiftEntryPayments.Request(
+                        'gift',
+                        gift.Donor_Contact__c,
+                        gift.Donor_Account__c,
+                        gift.Gift_Date__c,
+                        gift.Amount__c
+                    )
+                },
+                new Map<String, Id>{ 'gift' => chosen }
+            )
+            .get('gift');
+        if (installment == null) {
+            return false;
+        }
+        gift.Installment__c = installment.Id;
+        gift.Commitment__c = installment.Commitment__c;
+        return true;
     }
 
     private static String nameOf(Id giftId) {
@@ -265,6 +330,9 @@ public with sharing class QuickGiftEntryController {
         public String inKindDescription;
         @AuraEnabled
         public Decimal fairMarketValue;
+        /** The scheduled payment this gift pays, or empty for a gift on its own (R-DM8). */
+        @AuraEnabled
+        public String installmentId;
 
         public List<FieldError> validate() {
             List<FieldError> errors = new List<FieldError>();
@@ -289,6 +357,7 @@ public with sharing class QuickGiftEntryController {
                     new FieldError('fundId', Label.Giving_QuickGiftEntry_ErrorFundUnavailable)
                 );
             }
+            validatePayment(errors);
             return errors;
         }
 
@@ -321,6 +390,20 @@ public with sharing class QuickGiftEntryController {
             if (this.amount == null || this.amount <= 0) {
                 errors.add(
                     new FieldError('amount', Label.Giving_QuickGiftEntry_ErrorAmountRequired)
+                );
+            }
+        }
+
+        /** A gift of goods pays no scheduled payment (R-DM8), and the choice must be one. */
+        private void validatePayment(List<FieldError> errors) {
+            if (String.isBlank(this.installmentId)) {
+                return;
+            }
+            if (isInKind()) {
+                errors.add(new FieldError('installmentId', Label.Giving_GiftEntryPays_ErrorInKind));
+            } else if (asId(this.installmentId, Installment__c.SObjectType) == null) {
+                errors.add(
+                    new FieldError('installmentId', Label.Giving_GiftEntryPays_ErrorNotOpen)
                 );
             }
         }
