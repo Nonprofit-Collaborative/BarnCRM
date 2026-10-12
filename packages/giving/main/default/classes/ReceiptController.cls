@@ -173,6 +173,19 @@ public with sharing class ReceiptController {
         }
     }
 
+    /**
+     * The draft letter filled in for a sample gift. Not cacheable: the draft changes with every
+     * edit, and the answer depends on settings that change on another page.
+     */
+    @AuraEnabled
+    public static String previewTemplate(String receiptType, String body) {
+        try {
+            return ReceiptTemplateService.preview(receiptType, body);
+        } catch (Exception failure) {
+            throw asUserError(failure, 'ReceiptController.previewTemplate', null);
+        }
+    }
+
     @AuraEnabled
     public static void activateTemplate(Id templateId) {
         try {
@@ -239,7 +252,7 @@ public with sharing class ReceiptController {
             view.id = template.Id;
             view.name = template.Name;
             view.type = template.Type__c;
-            view.body = template.Body__c;
+            view.body = ReceiptTemplateService.letterOf(template.Body__c);
             view.active = template.Active__c;
             views.add(view);
         }

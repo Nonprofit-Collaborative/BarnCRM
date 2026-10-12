@@ -3,25 +3,25 @@
     <div class="slds-var-p-horizontal_medium">
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
-      <template if:true={hasError}>
+      <template lwc:if={hasError}>
         <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
 
-      <template if:true={hasNotice}>
+      <template lwc:if={hasNotice}>
         <p data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
           {noticeMessage}
         </p>
       </template>
 
-      <template if:true={showOffNotice}>
+      <template lwc:if={showOffNotice}>
         <p data-id="off-notice" class="slds-text-body_small slds-var-m-bottom_small">
           {labels.off}
         </p>
       </template>
 
-      <template if:true={hasPage}>
+      <template lwc:if={hasPage}>
         <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.queueHeading}</h3>
         <dl class="slds-dl_horizontal slds-var-m-bottom_small">
           <dt class="slds-dl_horizontal__label">{labels.emailQueue}</dt>
@@ -42,7 +42,7 @@
           <dd data-id="next-run" class="slds-dl_horizontal__detail">{nextRunText}</dd>
         </dl>
 
-        <template if:true={showQueueCapped}>
+        <template lwc:if={showQueueCapped}>
           <p data-id="queue-capped" class="slds-text-body_small slds-var-m-bottom_small">
             {labels.queueCapped}
           </p>
@@ -76,11 +76,11 @@
       </template>
 
       <h3 class="slds-text-heading_small">{labels.rulesHeading}</h3>
-      <template if:true={showNoRules}>
+      <template lwc:if={showNoRules}>
         <p data-id="no-rules" class="slds-text-body_regular">{labels.noRules}</p>
       </template>
-      <template if:true={hasRules}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+      <template lwc:if={hasRules}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
           <thead>
             <tr class="slds-line-height_reset">
               <th scope="col">{labels.columnOrder}</th>
@@ -93,8 +93,8 @@
           <tbody>
             <template for:each={rules} for:item="rule">
               <tr key={rule.id} data-id="rule">
-                <td>{rule.order}</td>
-                <td>
+                <td data-label={labels.columnOrder}>{rule.order}</td>
+                <td data-label={labels.columnRule}>
                   <lightning-button
                     data-id="rule-link"
                     data-record-id={rule.id}
@@ -103,39 +103,106 @@
                     onclick={handleOpenRule}
                   ></lightning-button>
                   <span data-id="rule-active" class="slds-text-body_small">{rule.activeText}</span>
+                  <template lwc:if={canManage}>
+                    <lightning-button
+                      data-id="rule-edit"
+                      data-record-id={rule.id}
+                      class="slds-var-m-left_x-small"
+                      variant="base"
+                      label={labels.editRule}
+                      title={rule.editTitle}
+                      onclick={handleEditRule}
+                    ></lightning-button>
+                  </template>
                 </td>
-                <td>{rule.channel}</td>
-                <td>
-                  <template if:true={rule.templateMissing}>
+                <td data-label={labels.columnChannel}>{rule.channel}</td>
+                <td data-label={labels.columnTemplate}>
+                  <template lwc:if={rule.templateMissing}>
                     <span data-id="template-missing" class="slds-text-color_error">
                       {rule.templateText}
                     </span>
                   </template>
-                  <template if:false={rule.templateMissing}>
+                  <template lwc:else>
                     <span data-id="template-name">{rule.templateText}</span>
                   </template>
                 </td>
-                <td data-id="rule-matches">{rule.matchesText}</td>
+                <td data-id="rule-matches" data-label={labels.columnMatches}>{rule.matchesText}</td>
               </tr>
             </template>
           </tbody>
         </table>
       </template>
 
-      <div class="slds-var-m-top_small slds-var-m-bottom_medium">
-        <lightning-button
-          data-id="new-rule"
-          label={labels.newRule}
-          onclick={handleNewRule}
-        ></lightning-button>
-      </div>
+      <template lwc:if={showRuleForm}>
+        <div data-id="rule-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
+          <h3 class="slds-text-heading_small slds-var-m-bottom_small">{ruleFormHeading}</h3>
+          <lightning-record-edit-form
+            object-api-name="Acknowledgment_Rule__c"
+            record-id={editingRuleId}
+            onsubmit={handleRuleSubmit}
+            onsuccess={handleRuleSaved}
+          >
+            <lightning-messages></lightning-messages>
+            <lightning-input-field field-name="Name"></lightning-input-field>
+            <lightning-input-field field-name="Order__c"></lightning-input-field>
+            <lightning-input-field field-name="Active__c"></lightning-input-field>
+            <lightning-input-field
+              data-id="rule-channel"
+              field-name="Channel__c"
+              onchange={handleChannelChange}
+            ></lightning-input-field>
+            <template lwc:if={ruleIsEmail}>
+              <lightning-combobox
+                data-id="rule-template"
+                label={labels.templateField}
+                field-level-help={labels.templateFieldHelp}
+                placeholder={labels.templatePlaceholder}
+                options={templateOptions}
+                value={ruleTemplate}
+                message-when-value-missing={labels.templateRequired}
+                required
+                onchange={handleRuleTemplateChange}
+              ></lightning-combobox>
+            </template>
+            <lightning-input-field field-name="Minimum_Amount__c"></lightning-input-field>
+            <lightning-input-field field-name="Maximum_Amount__c"></lightning-input-field>
+            <lightning-input-field field-name="Gift_Type__c"></lightning-input-field>
+            <lightning-input-field field-name="Appeal__c"></lightning-input-field>
+            <lightning-input-field field-name="First_Gift_Only__c"></lightning-input-field>
+            <lightning-input-field field-name="Description__c"></lightning-input-field>
+            <div class="slds-var-m-top_small">
+              <lightning-button
+                data-id="rule-cancel"
+                label={labels.cancelRule}
+                onclick={handleCancelRule}
+              ></lightning-button>
+              <lightning-button
+                data-id="rule-save"
+                class="slds-var-m-left_x-small"
+                variant="brand"
+                type="submit"
+                label={labels.saveRule}
+              ></lightning-button>
+            </div>
+          </lightning-record-edit-form>
+        </div>
+      </template>
+      <template lwc:elseif={canManage}>
+        <div class="slds-var-m-top_small slds-var-m-bottom_medium">
+          <lightning-button
+            data-id="new-rule"
+            label={labels.newRule}
+            onclick={handleNewRule}
+          ></lightning-button>
+        </div>
+      </template>
 
       <h3 class="slds-text-heading_small">{labels.runsHeading}</h3>
-      <template if:true={showNoRuns}>
+      <template lwc:if={showNoRuns}>
         <p data-id="no-runs" class="slds-text-body_regular">{labels.noRuns}</p>
       </template>
-      <template if:true={hasRuns}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+      <template lwc:if={hasRuns}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
           <thead>
             <tr class="slds-line-height_reset">
               <th scope="col">{labels.columnRun}</th>
@@ -149,17 +216,17 @@
           <tbody>
             <template for:each={runs} for:item="run">
               <tr key={run.id} data-id="run">
-                <td>{run.name}</td>
-                <td>{run.channel}</td>
-                <td data-id="run-status">{run.status}</td>
-                <td data-id="run-sent">{run.sent}</td>
-                <td data-id="run-errors">{run.errors}</td>
-                <td>
+                <td data-label={labels.columnRun}>{run.name}</td>
+                <td data-label={labels.columnChannel}>{run.channel}</td>
+                <td data-id="run-status" data-label={labels.columnStatus}>{run.status}</td>
+                <td data-id="run-sent" data-label={labels.columnSent}>{run.sent}</td>
+                <td data-id="run-errors" data-label={labels.columnErrors}>{run.errors}</td>
+                <td data-label={labels.columnFinished}>
                   {run.finishedText}
-                  <template if:true={run.hasFile}>
+                  <template lwc:if={run.hasFile}>
                     <a data-id="merge-file" href={run.fileUrl}>{labels.downloadFile}</a>
                   </template>
-                  <template if:true={run.waitingToBeMarkedSent}>
+                  <template lwc:if={run.waitingToBeMarkedSent}>
                     <lightning-button
                       data-id="mark-sent"
                       data-record-id={run.id}
@@ -169,27 +236,6 @@
                     ></lightning-button>
                   </template>
                 </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </template>
-
-      <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.templatesHeading}</h3>
-      <p class="slds-text-body_small slds-var-m-bottom_small">{labels.templatesIntro}</p>
-      <template if:true={hasTemplates}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">{labels.columnLabel}</th>
-              <th scope="col">{labels.columnDeveloperName}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={page.templates} for:item="template">
-              <tr key={template.developerName} data-id="template">
-                <td>{template.label}</td>
-                <td data-id="template-developer-name">{template.developerName}</td>
               </tr>
             </template>
           </tbody>

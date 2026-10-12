@@ -39,7 +39,7 @@ runs. This is the step that makes a payment turn Overdue on its own.
 Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly jobs**.
 The page opens with a line for each job, then one button.
 
-Choose **Schedule the nightly jobs**. Three jobs are scheduled at once:
+Choose **Schedule nightly run**. Three jobs are scheduled at once:
 
 | Job | Runs at | What it does |
 |---|---|---|
@@ -68,15 +68,14 @@ the job has not run at all.
 Three things the page can tell you:
 
 - **Not scheduled.** Nobody has switched the jobs on in this org. Nothing is late, because
-  nothing was ever going to run. The button under the line says **Schedule the nightly
-  jobs**.
+  nothing was ever going to run. The button under the line says **Schedule nightly run**.
 - **Scheduled, with a last run and a next run.** This is the normal state.
 - **Scheduled but has not run in more than 36 hours.** Something stopped the job. Open the
   **Error Log** in BarnCRM Settings: a job that fails writes there and carries on with
   the rest of its work rather than stopping, so the log tells you which commitment or which
   payment is the problem.
 
-**Stop the nightly jobs** unschedules all three. Nothing already generated or already
+**Stop nightly run** unschedules all three. Nothing already generated or already
 marked Overdue is changed; the schedules simply stop being extended and payments stop
 turning Overdue.
 

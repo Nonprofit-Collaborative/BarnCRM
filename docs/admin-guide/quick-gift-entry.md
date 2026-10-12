@@ -67,6 +67,16 @@ Five gifts take about a minute once the rhythm is there. Nothing here needs a la
 
 ## Common mistakes
 
+**The donor is not in BarnCRM yet.** Common at an event. Leave the donor toggle on
+**Person** and tap **Not in the list? Add a new person** under the donor box. The standard
+new person form opens; fill it in and save. You come back to Quick Gift Entry with what you
+had typed still there: search for the new person in the donor box and pick them. For a new
+organization, create it from the Organizations tab first.
+
+**A field shows a message after you tap Save.** The message sits under the field it is
+about, and the cursor moves to the first one. Fix that field and its message goes away;
+then tap Save again.
+
 **Picking the wrong donor because two people share a name.** The donor box shows the
 name only. Before you save, check the name in the box is the person you meant; after you
 save, the confirmation link opens the gift so you can look. If you saved a gift against

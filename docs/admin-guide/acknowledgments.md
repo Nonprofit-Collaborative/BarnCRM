@@ -25,18 +25,17 @@ Everything is in the app, with one exception noted at step 3.
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
-   BarnCRM ships one to start from, called **BarnCRM: thank you for your gift**. The
-   Acknowledgments page lists every email template your org has, with the **developer name**
-   of each, which is the name you type into a rule. This is the one place you may find
-   yourself in Setup, under Email Templates, and it is where Salesforce keeps template
-   editing for everybody.
-4. Create your rules with **New rule**. Each rule has:
+   BarnCRM ships one to start from, called **BarnCRM: thank you for your gift**. Writing or
+   changing a template is the one place you may find yourself in Setup, under Email
+   Templates, and it is where Salesforce keeps template editing for everybody.
+4. Create your rules with **New rule** on the Acknowledgments page. The rule form opens on the
+   page itself; to change a rule later, click **Edit** beside it. Each rule has:
    - an **order**, lowest first. The first rule that matches a gift wins, so put your most
      specific rule at the top;
    - a **channel**: Email, Letter, or None. None means gifts like this do not get a thank
      you at all;
-   - an **email template**, the developer name from step 3, required when the channel is
-     Email;
+   - an **email template**, chosen by name from the list of your org's active templates,
+     required when the channel is Email;
    - **minimum** and **maximum amount**, either or both, or neither for any amount. Both
      ends are included: a rule from 100 to 1000 matches a gift of exactly 100 and a gift of
      exactly 1000;
@@ -57,8 +56,8 @@ Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**. Turn on
    **Acknowledge gifts**.
-2. Choose **New rule**. Name it `Everything else`, order `100`, channel `Email`, email
-   template `BarnCRM_Thank_You`. Save.
+2. Choose **New rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
+   **BarnCRM: thank you for your gift** as the email template. Save.
 3. Choose **New rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum
    amount `1000`. Save. You now have two rules: gifts of $1,000 and up get a letter,
    everything else gets an email.
@@ -81,12 +80,12 @@ matches everything, so if it sits above your major gift rule, your major donors 
 standard email. Fix the order numbers, lowest for the most specific rule. Changing a rule
 takes effect for gifts still in the queue: nothing is stored on a gift until it is sent.
 
-**A template name that does not exist.** The rule wants the **developer name** of the email
-template (`BarnCRM_Thank_You`), not its label ("BarnCRM: thank you for your gift").
-If you type the label the page shows **Template not found** beside the rule, and any
-acknowledgment that tries to use it is marked Failed with that reason rather than sending an
-empty message. The list on the Acknowledgments page has both names side by side, so copy the
-one on the right.
+**A template that is no longer there.** If the template a rule uses is deleted or switched
+off, the page shows **Template not found** beside the rule, and any acknowledgment that
+tries to use it is marked Failed with that reason rather than sending an empty message.
+Click **Edit** beside the rule and choose another template. The same happens to a rule
+created on the standard record page with a template name typed by hand, which is why rules
+are best created on the Acknowledgments page.
 
 **An organization gift with nobody to email.** A gift credited to an organization that has no
 primary contact has no email address to send to. The run counts it under **could not be

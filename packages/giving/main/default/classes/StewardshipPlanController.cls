@@ -17,6 +17,10 @@
 public with sharing class StewardshipPlanController {
     private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Stewardship plans page';
+    private static final String PLAN_KEY_FALLBACK = 'plan';
+
+    /** The key field holds 80 characters; this leaves room for a number suffix. */
+    private static final Integer PLAN_KEY_BASE_LENGTH = 70;
 
     public class PageModel {
         @AuraEnabled
@@ -119,22 +123,31 @@ public with sharing class StewardshipPlanController {
      * A validation rule that refuses the save is passed back in its own words rather than replaced
      * with a general apology: the rules on this object say something an administrator can act on,
      * for example that a minimum amount means nothing on a manual plan.
+     *
+     * The plan key is not asked for (ADR-NEXT,
+     * `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`): a new plan gets one
+     * made from its name, and an edit never changes it, because the key is what keeps a plan
+     * recognizable after it is renamed. A caller that does pass a key for a new plan keeps it.
      */
     @AuraEnabled
     public static Id saveTemplate(TemplateModel template) {
         requireEdit();
-        if (template == null || String.isBlank(template.name) || String.isBlank(template.planKey)) {
+        if (template == null || String.isBlank(template.name)) {
             throw refuse(Label.Giving_Stewardship_ErrorNameRequired);
         }
         Stewardship_Plan_Template__c record = new Stewardship_Plan_Template__c(
             Id = template.recordId,
             Name = template.name.trim(),
-            Plan_Key__c = template.planKey.trim(),
             Trigger_Event__c = template.triggerEvent,
             Minimum_Amount__c = template.minimumAmount,
             Description__c = template.description,
             Active__c = template.active == true
         );
+        if (template.recordId == null) {
+            record.Plan_Key__c = String.isNotBlank(template.planKey)
+                ? template.planKey.trim()
+                : uniquePlanKeyFor(record.Name);
+        }
         save(record);
         return record.Id;
     }
@@ -235,6 +248,30 @@ public with sharing class StewardshipPlanController {
         } catch (Exception failure) {
             throw report(failure);
         }
+    }
+
+    /**
+     * A key made from the plan's name: lower case, words joined by underscores, at most
+     * `PLAN_KEY_BASE_LENGTH` characters, and a number added when another plan already has it, so
+     * "First gift welcome" becomes `first_gift_welcome`, then `first_gift_welcome_2`. A name
+     * with no letters or digits in it (one written entirely in another script, say) falls back
+     * to `plan`. The key field is unique and not case sensitive, so the comparison is too.
+     */
+    @TestVisible
+    private static String uniquePlanKeyFor(String name) {
+        String base = name.toLowerCase().replaceAll('[^a-z0-9]+', '_').replaceAll('^_+|_+$', '');
+        if (String.isBlank(base)) {
+            base = PLAN_KEY_FALLBACK;
+        }
+        base = base.left(PLAN_KEY_BASE_LENGTH).removeEnd('_');
+        Set<String> taken = StewardshipSelector.selectPlanKeysStartingWith(base);
+        String candidate = base;
+        Integer suffix = 2;
+        while (taken.contains(candidate)) {
+            candidate = base + '_' + suffix;
+            suffix++;
+        }
+        return candidate;
     }
 
     /** Where a new step goes when the administrator did not say: at the end. */

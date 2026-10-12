@@ -110,6 +110,33 @@ private class AcknowledgmentControllerTest {
         );
     }
 
+    /** The page shows the template the way the picker offers it: by its name. */
+    @IsTest
+    static void aRuleShowsItsTemplateByName() {
+        AcknowledgmentTestData.enable();
+        EmailTemplate shipped = [
+            SELECT Name, DeveloperName
+            FROM EmailTemplate
+            WHERE DeveloperName = 'BarnCRM_Thank_You'
+            LIMIT 1
+        ];
+        insert AcknowledgmentTestData.buildRule(
+            'Everything else',
+            100,
+            AcknowledgmentRuleService.CHANNEL_EMAIL,
+            shipped.DeveloperName
+        );
+
+        AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
+
+        Assert.isTrue(view.rules[0].templateFound, 'The shipped template is found.');
+        Assert.areEqual(
+            shipped.Name,
+            view.rules[0].templateLabel,
+            'It is shown by the name an administrator recognizes, not the developer name.'
+        );
+    }
+
     @IsTest
     static void aUserWithoutThePermissionIsToldRatherThanRefusedSilently() {
         AcknowledgmentTestData.enable();

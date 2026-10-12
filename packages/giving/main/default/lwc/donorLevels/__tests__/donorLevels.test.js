@@ -138,6 +138,24 @@ describe('c-donor-levels', () => {
     expect(activeCells[1].textContent.trim()).toBe('Inactive');
   });
 
+  it('stacks the ladder on a small screen, each cell naming its column', async () => {
+    const element = createComponent();
+    getLadder.emit(LADDER);
+    await flush();
+
+    const table = element.shadowRoot.querySelector('table');
+    expect(table.classList.contains('slds-max-medium-table_stacked')).toBe(true);
+    const firstRow = element.shadowRoot.querySelector('[data-id="rung"]');
+    const columns = [...firstRow.querySelectorAll('td')].map((cell) => cell.dataset.label);
+    expect(columns).toEqual([
+      'c.Giving_DonorLevels_ColumnLevel',
+      'c.Giving_DonorLevels_ColumnFrom',
+      'c.Giving_DonorLevels_ColumnUpTo',
+      'c.Giving_DonorLevels_ColumnDonors',
+      'c.Giving_DonorLevels_ColumnActive'
+    ]);
+  });
+
   it('says donors have never been placed when nothing has run yet', async () => {
     const element = createComponent();
     getLadder.emit({ ...LADDER, lastRecalculated: null });

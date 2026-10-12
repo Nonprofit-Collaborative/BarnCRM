@@ -30,8 +30,17 @@ import LAST_RUN from '@salesforce/label/c.Giving_Acknowledgments_LastRun';
 import NEVER_RUN from '@salesforce/label/c.Giving_Acknowledgments_NeverRun';
 import RULES_HEADING from '@salesforce/label/c.Giving_Acknowledgments_RulesHeading';
 import NEW_RULE from '@salesforce/label/c.Giving_Acknowledgments_NewRule';
-import TEMPLATES_HEADING from '@salesforce/label/c.Giving_Acknowledgments_TemplatesHeading';
-import TEMPLATES_INTRO from '@salesforce/label/c.Giving_Acknowledgments_TemplatesIntro';
+import EDIT_RULE from '@salesforce/label/c.Giving_Acknowledgments_EditRule';
+import EDIT_RULE_OF from '@salesforce/label/c.Giving_Acknowledgments_EditRuleOf';
+import NEW_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_NewRuleHeading';
+import EDIT_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_EditRuleHeading';
+import TEMPLATE_FIELD from '@salesforce/label/c.Giving_Acknowledgments_TemplateField';
+import TEMPLATE_FIELD_HELP from '@salesforce/label/c.Giving_Acknowledgments_TemplateFieldHelp';
+import TEMPLATE_PLACEHOLDER from '@salesforce/label/c.Giving_Acknowledgments_TemplatePlaceholder';
+import TEMPLATE_REQUIRED from '@salesforce/label/c.Giving_Acknowledgments_TemplateRequired';
+import SAVE_RULE from '@salesforce/label/c.Giving_Acknowledgments_SaveRule';
+import CANCEL_RULE from '@salesforce/label/c.Giving_Acknowledgments_CancelRule';
+import RULE_SAVED from '@salesforce/label/c.Giving_Acknowledgments_RuleSaved';
 import RUNS_HEADING from '@salesforce/label/c.Giving_Acknowledgments_RunsHeading';
 import NO_RUNS from '@salesforce/label/c.Giving_Acknowledgments_NoRuns';
 import TEMPLATE_NOT_FOUND from '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound';
@@ -42,8 +51,6 @@ import COLUMN_ORDER from '@salesforce/label/c.Giving_Acknowledgments_ColumnOrder
 import COLUMN_CHANNEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnChannel';
 import COLUMN_TEMPLATE from '@salesforce/label/c.Giving_Acknowledgments_ColumnTemplate';
 import COLUMN_MATCHES from '@salesforce/label/c.Giving_Acknowledgments_ColumnMatches';
-import COLUMN_LABEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnLabel';
-import COLUMN_DEVELOPER_NAME from '@salesforce/label/c.Giving_Acknowledgments_ColumnDeveloperName';
 import COLUMN_RUN from '@salesforce/label/c.Giving_Acknowledgments_ColumnRun';
 import COLUMN_STATUS from '@salesforce/label/c.Giving_Acknowledgments_ColumnStatus';
 import COLUMN_SENT from '@salesforce/label/c.Giving_Acknowledgments_ColumnSent';
@@ -53,12 +60,18 @@ import DOWNLOAD_FILE from '@salesforce/label/c.Giving_Acknowledgments_DownloadFi
 import ANY_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_AnyAmount';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
+const CHANNEL_EMAIL = 'Email';
 
 /**
  * The thank you queue, as Maria reads it: what is waiting, what would send it, and the three
- * buttons that do it. The rules themselves are edited as records, so this page navigates to them
- * rather than carrying a second editor, which is the same choice the Donor Levels page made
- * (ADR-0028, ADR-0032).
+ * buttons that do it.
+ *
+ * A rule is created and edited here, in a standard record edit form, rather than on the
+ * standard New page, for one reason: a rule names its email template by developer name, and no
+ * lookup to `EmailTemplate` is possible (ADR-0032). So the template is a picker built from the
+ * templates this page already lists, offered by name, and every other field is the standard
+ * input field with its own validation (ADR-NEXT,
+ * `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`).
  */
 export default class Acknowledgments extends NavigationMixin(LightningElement) {
   labels = {
@@ -82,8 +95,13 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     neverRun: NEVER_RUN,
     rulesHeading: RULES_HEADING,
     newRule: NEW_RULE,
-    templatesHeading: TEMPLATES_HEADING,
-    templatesIntro: TEMPLATES_INTRO,
+    editRule: EDIT_RULE,
+    templateField: TEMPLATE_FIELD,
+    templateFieldHelp: TEMPLATE_FIELD_HELP,
+    templatePlaceholder: TEMPLATE_PLACEHOLDER,
+    templateRequired: TEMPLATE_REQUIRED,
+    saveRule: SAVE_RULE,
+    cancelRule: CANCEL_RULE,
     runsHeading: RUNS_HEADING,
     noRuns: NO_RUNS,
     inactive: INACTIVE,
@@ -92,8 +110,6 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     columnChannel: COLUMN_CHANNEL,
     columnTemplate: COLUMN_TEMPLATE,
     columnMatches: COLUMN_MATCHES,
-    columnLabel: COLUMN_LABEL,
-    columnDeveloperName: COLUMN_DEVELOPER_NAME,
     columnRun: COLUMN_RUN,
     columnStatus: COLUMN_STATUS,
     columnSent: COLUMN_SENT,
@@ -107,6 +123,12 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
   errorMessage;
   noticeMessage;
   busy = false;
+
+  /** The rule form: closed, open on a new rule (null id), or open on an existing one. */
+  showRuleForm = false;
+  editingRuleId;
+  ruleChannel;
+  ruleTemplate;
 
   @wire(getPage)
   wiredResult(result) {
@@ -144,8 +166,25 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     return !!this.page && !this.hasRuns;
   }
 
-  get hasTemplates() {
-    return !!(this.page && this.page.templates && this.page.templates.length);
+  get canManage() {
+    return !!this.page && this.page.canManage === true;
+  }
+
+  /** The templates the org has, offered by name; the rule stores the developer name. */
+  get templateOptions() {
+    const templates = (this.page && this.page.templates) || [];
+    return templates.map((template) => ({
+      label: template.label,
+      value: template.developerName
+    }));
+  }
+
+  get ruleIsEmail() {
+    return this.ruleChannel === CHANNEL_EMAIL;
+  }
+
+  get ruleFormHeading() {
+    return this.editingRuleId ? EDIT_RULE_HEADING : NEW_RULE_HEADING;
   }
 
   get showQueueCapped() {
@@ -181,9 +220,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     }
     return this.page.rules.map((rule) => ({
       ...rule,
-      templateText: rule.templateFound ? rule.template : TEMPLATE_NOT_FOUND,
+      templateText: rule.templateFound ? rule.templateLabel : TEMPLATE_NOT_FOUND,
       templateMissing: rule.templateFound === false,
       activeText: rule.active ? '' : this.labels.inactive,
+      editTitle: EDIT_RULE_OF.replace('{0}', rule.name),
       matchesText: this.describe(rule)
     }));
   }
@@ -242,10 +282,56 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
   }
 
   handleNewRule() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__objectPage',
-      attributes: { objectApiName: 'Acknowledgment_Rule__c', actionName: 'new' }
-    });
+    this.openRuleForm(undefined);
+  }
+
+  handleEditRule(event) {
+    this.openRuleForm(event.currentTarget.dataset.recordId);
+  }
+
+  openRuleForm(ruleId) {
+    const rule = ruleId ? this.page.rules.find((row) => row.id === ruleId) : undefined;
+    this.errorMessage = undefined;
+    this.noticeMessage = undefined;
+    this.editingRuleId = ruleId;
+    // A new rule starts on Email, the field's default, so the picker shows from the start.
+    this.ruleChannel = rule ? rule.channel : CHANNEL_EMAIL;
+    this.ruleTemplate = rule ? rule.template : undefined;
+    this.showRuleForm = true;
+  }
+
+  handleChannelChange(event) {
+    this.ruleChannel = event.detail.value;
+  }
+
+  handleRuleTemplateChange(event) {
+    this.ruleTemplate = event.detail.value;
+  }
+
+  handleCancelRule() {
+    this.showRuleForm = false;
+  }
+
+  /**
+   * The template goes in with the fields the form collected. The validation rule on the object
+   * still refuses an email rule with no template; checking here first only says so beside the
+   * picker instead of at the top of the form.
+   */
+  handleRuleSubmit(event) {
+    event.preventDefault();
+    const fields = { ...event.detail.fields };
+    if (this.ruleIsEmail && !this.ruleTemplate) {
+      this.template.querySelector('[data-id="rule-template"]').reportValidity();
+      return;
+    }
+    fields.Email_Template__c = this.ruleIsEmail ? this.ruleTemplate : null;
+    this.template.querySelector('lightning-record-edit-form').submit(fields);
+  }
+
+  handleRuleSaved() {
+    this.showRuleForm = false;
+    this.noticeMessage = RULE_SAVED;
+    return refreshApex(this.wiredPage);
   }
 
   handleOpenRule(event) {

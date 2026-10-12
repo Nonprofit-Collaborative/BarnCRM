@@ -17,6 +17,14 @@
     <value>Balanced: the lines add up to the control total.</value>
   </labels>
   <labels>
+    <fullName>Giving_GiftBatch_CellLabel</fullName>
+    <categories>Giving, Gift Batch</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Gift batch: hidden label of a cell, {0} is the column and {1} the line number</shortDescription>
+    <value>{0}, line {1}</value>
+  </labels>
+  <labels>
     <fullName>Giving_GiftBatch_ColumnAmount</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
@@ -95,6 +103,14 @@
     <protected>false</protected>
     <shortDescription>Gift batch: control total caption</shortDescription>
     <value>Control total</value>
+  </labels>
+  <labels>
+    <fullName>Giving_GiftBatch_DonorKind</fullName>
+    <categories>Giving, Gift Batch</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Gift batch: hidden label of the person or organization choice</shortDescription>
+    <value>Person or organization</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_DonorPlaceholder</fullName>
@@ -325,8 +341,8 @@
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Gift batch: remove a line</shortDescription>
-    <value>Remove line</value>
+    <shortDescription>Gift batch: remove a line, {0} is the line number</shortDescription>
+    <value>Remove line {0}</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_Save</fullName>
@@ -361,11 +377,19 @@
     <value>Unsaved changes</value>
   </labels>
   <labels>
+    <fullName>Giving_GiftBatch_UseComputer</fullName>
+    <categories>Giving, Gift Batch</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Gift batch: note shown on a phone</shortDescription>
+    <value>Batches are easier on a computer. On a phone, scroll the lines sideways to reach every column, or use Quick Gift Entry for a single gift.</value>
+  </labels>
+  <labels>
     <fullName>Giving_GiftBatch_Working</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: request in progress</shortDescription>
-    <value>Working...</value>
+    <value>Working</value>
   </labels>
 </CustomLabels>

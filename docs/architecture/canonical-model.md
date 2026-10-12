@@ -3245,11 +3245,12 @@ charity describes the property and the donor values it.
 
 **R-RC13 What the document is branded with, and what it is valid without.** Every document
 prints the organization's legal name and address and its tax identification number. The name
-and address come from the template where the template placed the token for them, and from a
-block the package prints above the letter where it did not, on the same reasoning as the gift
-lines of R-RC8: an administrator who deletes the letterhead out of a template has not thereby
-issued a receipt with no organization on it. The tax identification number prints in the
-signature block.
+and address are the letterhead, and the letterhead is code, not template (ADR-NEXT,
+`NEXT-receipt-letters-are-edited-as-rich-text.md`): the package prints them in a block above
+the letter whatever the letter says, so an administrator editing the letter can neither delete
+nor misplace them. A letter saved before that decision still carries its own letterhead block
+(`class="letterhead"`); while it does, the package prints the logo only, and the letter's
+block prints the name. The tax identification number prints in the signature block.
 
 The logo is optional, is printed only when the organization has uploaded one and left the
 Print Logo On Receipts setting on, and is sized by one setting.
@@ -3508,7 +3509,7 @@ about which thank you takes precedence.
 | Active | boolean | yes (defaults true) | Whether the rule takes part in matching. An inactive rule matches nothing and is kept rather than deleted. |
 | Order | integer | yes | Where the rule sits in the list. The lowest numbered matching rule wins. |
 | Channel | picklist(Email, Letter, None) | yes | How the donor is thanked, or that this kind of gift is not acknowledged. |
-| Email Template | text | conditional | The developer name of the standard email template this rule sends; required when Channel is Email. |
+| Email Template | text | conditional | The developer name of the standard email template this rule sends; required when Channel is Email. Chosen from a picker of the org's active templates, by name, on the Acknowledgments page (ADR-NEXT, `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
 | Minimum Amount | currency | no | The smallest gift this rule matches. Empty means no lower bound. |
 | Maximum Amount | currency | no | The largest gift this rule matches. Empty means no upper bound. |
 | Gift Type | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | no | The one gift type this rule matches. Empty means any type. |
@@ -3755,7 +3756,7 @@ belong to the people who have to do them.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | What the administrator calls the plan, for example "First gift welcome". |
-| Plan Key | text | yes | A stable key, unique, so a shipped default is recognized on upgrade without matching on a name the administrator may have changed. |
+| Plan Key | text | yes | A stable key, unique, so a shipped default is recognized on upgrade without matching on a name the administrator may have changed. Generated from the plan name when an administrator creates a plan, made unique with a number suffix, and never shown or changed afterwards (ADR-NEXT, `NEXT-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
 | Active | boolean | yes (defaults false) | Whether the plan can start. An inactive template keeps the plans it already started. |
 | Trigger Event | picklist(Manual, First gift, Gift received, Commitment started) | yes | What starts a plan from this template. Manual means a person starts it and nothing starts it automatically. Commitment started means a pledge or a recurring gift became active (R-SP3a). |
 | Minimum Amount | currency | no | For the two gift events, the smallest gift that starts a plan. Blank means any amount. |

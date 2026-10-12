@@ -142,7 +142,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that schedules the jobs</shortDescription>
-    <value>Schedule the nightly jobs</value>
+    <value>Schedule nightly run</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_StopButton</fullName>
@@ -150,7 +150,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that stops the jobs</shortDescription>
-    <value>Stop the nightly jobs</value>
+    <value>Stop nightly run</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_RunNow</fullName>

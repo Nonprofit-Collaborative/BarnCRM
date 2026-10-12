@@ -336,4 +336,139 @@ describe('c-acknowledgments', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="error-message"]')).not.toBeNull();
   });
+
+  it('shows a rule template by the name the administrator recognizes', async () => {
+    const element = createComponent();
+    const rules = PAGE.rules.map((rule) => {
+      if (!rule.template) {
+        return rule;
+      }
+      return { ...rule, templateFound: true, templateLabel: 'BarnCRM: thank you for your gift' };
+    });
+    getPage.emit({ ...PAGE, rules });
+    await flush();
+
+    const shown = element.shadowRoot.querySelectorAll('[data-id="template-name"]')[1];
+    expect(shown.textContent.trim()).toBe('BarnCRM: thank you for your gift');
+    expect(element.shadowRoot.textContent).not.toContain('BarnCRM_Thank_You');
+  });
+
+  it('opens a new rule on the page with a template picker built from the templates', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    element.shadowRoot.querySelector('[data-id="new-rule"]').click();
+    await flush();
+
+    const form = element.shadowRoot.querySelector('lightning-record-edit-form');
+    expect(form).not.toBeNull();
+    expect(form.recordId).toBeUndefined();
+    const picker = element.shadowRoot.querySelector('[data-id="rule-template"]');
+    expect(picker.options).toEqual([
+      { label: 'BarnCRM: thank you for your gift', value: 'BarnCRM_Thank_You' }
+    ]);
+    expect(picker.required).toBe(true);
+  });
+
+  it('hides the template picker for a letter rule', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    element.shadowRoot.querySelector('[data-id="new-rule"]').click();
+    await flush();
+    element.shadowRoot
+      .querySelector('[data-id="rule-channel"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Letter' } }));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="rule-template"]')).toBeNull();
+  });
+
+  it('edits an existing rule with its template already chosen', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    element.shadowRoot.querySelectorAll('[data-id="rule-edit"]')[1].click();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('lightning-record-edit-form').recordId).toBe(
+      'a06000000000002AAA'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="rule-template"]').value).toBe(
+      'BarnCRM_Thank_You'
+    );
+  });
+
+  it('saves the chosen template with the rule', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="new-rule"]').click();
+    await flush();
+
+    element.shadowRoot
+      .querySelector('[data-id="rule-template"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'BarnCRM_Thank_You' } }));
+    const form = element.shadowRoot.querySelector('lightning-record-edit-form');
+    const submitted = jest.fn();
+    form.submit = submitted;
+    form.dispatchEvent(
+      new CustomEvent('submit', {
+        detail: { fields: { Name: 'Everything else' } },
+        cancelable: true
+      })
+    );
+    await flush();
+
+    expect(submitted).toHaveBeenCalledWith({
+      Name: 'Everything else',
+      Email_Template__c: 'BarnCRM_Thank_You'
+    });
+  });
+
+  it('does not submit an email rule with no template', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="new-rule"]').click();
+    await flush();
+
+    const form = element.shadowRoot.querySelector('lightning-record-edit-form');
+    const submitted = jest.fn();
+    form.submit = submitted;
+    form.dispatchEvent(
+      new CustomEvent('submit', { detail: { fields: { Name: 'No template' } }, cancelable: true })
+    );
+    await flush();
+
+    expect(submitted).not.toHaveBeenCalled();
+  });
+
+  it('closes the form and says so when the rule is saved', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="new-rule"]').click();
+    await flush();
+
+    element.shadowRoot
+      .querySelector('lightning-record-edit-form')
+      .dispatchEvent(new CustomEvent('success', { detail: { id: 'a06000000000003AAA' } }));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="rule-form"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]')).not.toBeNull();
+  });
+
+  it('offers no rule editing to somebody who cannot manage settings', async () => {
+    const element = createComponent();
+    getPage.emit({ ...PAGE, canManage: false });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="new-rule"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="rule-edit"]')).toBeNull();
+  });
 });

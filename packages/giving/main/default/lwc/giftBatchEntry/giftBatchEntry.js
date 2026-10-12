@@ -1,6 +1,7 @@
 import { LightningElement, api, wire } from 'lwc';
 import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import FORM_FACTOR from '@salesforce/client/formFactor';
 
 import CONTROL_TOTAL from '@salesforce/schema/Gift_Batch__c.Control_Total__c';
 import STATUS from '@salesforce/schema/Gift_Batch__c.Status__c';
@@ -34,6 +35,9 @@ import person from '@salesforce/label/c.Giving_GiftBatch_Person';
 import organization from '@salesforce/label/c.Giving_GiftBatch_Organization';
 import donorPlaceholder from '@salesforce/label/c.Giving_GiftBatch_DonorPlaceholder';
 import removeLine from '@salesforce/label/c.Giving_GiftBatch_RemoveLine';
+import cellLabel from '@salesforce/label/c.Giving_GiftBatch_CellLabel';
+import donorKind from '@salesforce/label/c.Giving_GiftBatch_DonorKind';
+import useComputer from '@salesforce/label/c.Giving_GiftBatch_UseComputer';
 import addLine from '@salesforce/label/c.Giving_GiftBatch_AddLine';
 import saveButton from '@salesforce/label/c.Giving_GiftBatch_Save';
 import postButton from '@salesforce/label/c.Giving_GiftBatch_Post';
@@ -79,13 +83,13 @@ export default class GiftBatchEntry extends LightningElement {
     columnGift,
     fromBatchHelp,
     donorPlaceholder,
-    removeLine,
     addLine,
     saveButton,
     postButton,
     working,
     noLines,
-    unsaved
+    unsaved,
+    useComputer
   };
 
   fundObject = FUND_OBJECT.objectApiName;
@@ -197,6 +201,11 @@ export default class GiftBatchEntry extends LightningElement {
     ];
   }
 
+  /** The grid is nine columns wide, so a phone gets a note that a computer is easier. */
+  get isPhone() {
+    return FORM_FACTOR === 'Small';
+  }
+
   get showKind() {
     return this.loaded && !this.batch.hasPersonAccounts;
   }
@@ -215,8 +224,28 @@ export default class GiftBatchEntry extends LightningElement {
       methodValue: line.paymentMethod || '',
       giftUrl: line.giftId ? `/lightning/r/${line.giftId}/view` : null,
       errors: (this.lineErrors[line.id] || []).join(' '),
-      hasErrors: Boolean(this.lineErrors[line.id])
+      hasErrors: Boolean(this.lineErrors[line.id]),
+      cellLabels: this.cellLabelsFor(index + 1)
     }));
+  }
+
+  /**
+   * Every row repeats the same inputs, so each hidden label carries the line number: a
+   * screen reader then says "Amount, line 3" rather than "Amount" nine times over.
+   */
+  cellLabelsFor(number) {
+    const label = (column) => cellLabel.replace('{0}', column).replace('{1}', number);
+    return {
+      kind: label(donorKind),
+      donor: label(columnDonor),
+      amount: label(columnAmount),
+      reference: label(columnReference),
+      date: label(columnDate),
+      method: label(columnMethod),
+      fund: label(columnFund),
+      appeal: label(columnAppeal),
+      remove: removeLine.replace('{0}', number)
+    };
   }
 
   lineFor(event) {

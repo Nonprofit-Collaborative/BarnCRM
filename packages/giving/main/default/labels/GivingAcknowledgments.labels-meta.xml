@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments: an unexpected failure, with the log pointed at</shortDescription>
-    <value>Something went wrong on the acknowledgments page. It has been written to the Error Log with the detail.</value>
+    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgment_SendFailedUnknown</fullName>
@@ -273,20 +273,92 @@
     <value>New rule</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_TemplatesHeading</fullName>
+    <fullName>Giving_Acknowledgments_EditRule</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Acknowledgments page: the templates section heading</shortDescription>
-    <value>Email templates in this org</value>
+    <shortDescription>Acknowledgments page: button, edit a rule</shortDescription>
+    <value>Edit</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_TemplatesIntro</fullName>
+    <fullName>Giving_Acknowledgments_EditRuleOf</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Acknowledgments page: how a rule names a template</shortDescription>
-    <value>A rule names its template by developer name, the one on the right. Edit the wording of a template in Salesforce Setup, under Email Templates.</value>
+    <shortDescription>Acknowledgments page: edit button title, names the rule</shortDescription>
+    <value>Edit the rule {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_NewRuleHeading</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: heading of the form for a new rule</shortDescription>
+    <value>New rule</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_EditRuleHeading</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: heading of the form for a rule</shortDescription>
+    <value>Edit rule</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_TemplateField</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: field, the email template a rule sends</shortDescription>
+    <value>Email template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_TemplateFieldHelp</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: help for the email template picker</shortDescription>
+    <value>The email this rule sends. The list shows every active email template in your org. To add a template or change its wording, use Setup, under Email Templates.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_TemplatePlaceholder</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: the template picker before a choice</shortDescription>
+    <value>Choose a template</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_TemplateRequired</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: an email rule has no template</shortDescription>
+    <value>An email rule needs an email template. Choose one from the list.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_SaveRule</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: button, save the rule</shortDescription>
+    <value>Save</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_CancelRule</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: button, close the rule form</shortDescription>
+    <value>Cancel</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_RuleSaved</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Acknowledgments page: a rule was saved</shortDescription>
+    <value>The rule has been saved.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_RunsHeading</fullName>
@@ -326,7 +398,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: an action failed</shortDescription>
-    <value>That did not work.</value>
+    <value>That did not work. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ColumnRule</fullName>
@@ -367,22 +439,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the column describing what a rule matches</shortDescription>
     <value>Matches</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_ColumnLabel</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the template label column</shortDescription>
-    <value>Template name</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_ColumnDeveloperName</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the template developer name column</shortDescription>
-    <value>Developer name</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ColumnRun</fullName>

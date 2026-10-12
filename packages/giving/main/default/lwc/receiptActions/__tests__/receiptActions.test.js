@@ -22,11 +22,46 @@ jest.mock(
   () => ({ default: jest.fn(() => Promise.resolve({ receiptNumber: 'HFH-2026-000002' })) }),
   { virtual: true }
 );
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/label/c.Giving_Receipt_IssuedMessage',
+  () => ({ default: 'Receipt {0} has been issued.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Giving_Receipt_UnexpectedError',
+  () => ({ default: 'That did not work.' }),
+  { virtual: true }
+);
 
 const GIFT_ID = 'a00000000000001';
+const DOCUMENT_ID = '069000000000001';
+
+const ISSUED = {
+  id: 'a02000000000001',
+  receiptNumber: 'HFH-2026-000001',
+  status: 'Issued',
+  amount: 250,
+  contentDocumentId: DOCUMENT_ID
+};
 
 function build() {
   const element = createElement('c-receipt-actions', { is: ReceiptActions });
@@ -37,6 +72,10 @@ function build() {
 
 function flush() {
   return Promise.resolve();
+}
+
+function byId(element, id) {
+  return element.shadowRoot.querySelector(`[data-id="${id}"]`);
 }
 
 describe('c-receipt-actions', () => {
@@ -52,64 +91,81 @@ describe('c-receipt-actions', () => {
     getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: false, receipts: [] });
     await flush();
 
-    const buttons = element.shadowRoot.querySelectorAll('lightning-button');
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0].label).toBe('Issue receipt');
+    expect(byId(element, 'issue')).not.toBeNull();
+    expect(byId(element, 'none-yet')).not.toBeNull();
+    expect(byId(element, 'void-and-reissue')).toBeNull();
   });
 
   it('offers void and reissue once the gift is receipted, and never a plain edit', async () => {
     const element = build();
-    getGiftReceiptState.emit({
-      canIssue: true,
-      alreadyReceipted: true,
-      receipts: [
-        {
-          id: 'a02000000000001',
-          receiptNumber: 'HFH-2026-000001',
-          status: 'Issued',
-          amount: 250
-        }
-      ]
-    });
+    getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: true, receipts: [ISSUED] });
     await flush();
 
-    const labels = Array.from(element.shadowRoot.querySelectorAll('lightning-button')).map(
-      (button) => button.label
-    );
-    expect(labels).toEqual(['Void and reissue']);
+    expect(byId(element, 'void-and-reissue')).not.toBeNull();
+    expect(byId(element, 'issue')).toBeNull();
   });
 
   it('refuses to void without a reason, and does not call the server', async () => {
     const element = build();
-    getGiftReceiptState.emit({
-      canIssue: true,
-      alreadyReceipted: true,
-      receipts: [
-        {
-          id: 'a02000000000001',
-          receiptNumber: 'HFH-2026-000001',
-          status: 'Issued',
-          amount: 250
-        }
-      ]
-    });
+    const toasts = jest.fn();
+    element.addEventListener('lightning__showtoast', toasts);
+    getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: true, receipts: [ISSUED] });
     await flush();
 
-    element.shadowRoot.querySelector('lightning-button').click();
+    byId(element, 'void-and-reissue').click();
     await flush();
 
     expect(voidAndReissue).not.toHaveBeenCalled();
+    expect(toasts).toHaveBeenCalled();
+    expect(toasts.mock.calls[0][0].detail.variant).toBe('warning');
   });
 
-  it('issues a receipt when asked', async () => {
+  it('issues a receipt when asked, and names it in the success message', async () => {
     const element = build();
+    const toasts = jest.fn();
+    element.addEventListener('lightning__showtoast', toasts);
     getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: false, receipts: [] });
     await flush();
 
-    element.shadowRoot.querySelector('lightning-button').click();
+    byId(element, 'issue').click();
+    await flush();
     await flush();
 
     expect(issueReceipt).toHaveBeenCalledWith({ giftId: GIFT_ID });
+    expect(toasts.mock.calls[0][0].detail.message).toBe('Receipt HFH-2026-000001 has been issued.');
+  });
+
+  it('opens the receipt PDF in the standard file preview', async () => {
+    const element = build();
+    getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: true, receipts: [ISSUED] });
+    await flush();
+
+    byId(element, 'view-pdf').click();
+
+    const pageReference = mockNavigate.mock.calls[0][0];
+    expect(pageReference.type).toBe('standard__namedPage');
+    expect(pageReference.attributes.pageName).toBe('filePreview');
+    expect(pageReference.state.selectedRecordId).toBe(DOCUMENT_ID);
+  });
+
+  it('offers no PDF link for a receipt that has no file', async () => {
+    const element = build();
+    getGiftReceiptState.emit({
+      canIssue: true,
+      alreadyReceipted: true,
+      receipts: [{ ...ISSUED, contentDocumentId: null }]
+    });
+    await flush();
+
+    expect(byId(element, 'view-pdf')).toBeNull();
+  });
+
+  it('shows a plain apology when the server gives no reason', async () => {
+    const element = build();
+    getGiftReceiptState.error({});
+    await flush();
+
+    expect(byId(element, 'load-error').textContent).toBe('That did not work.');
   });
 
   it('offers nothing to a user who cannot issue receipts', async () => {

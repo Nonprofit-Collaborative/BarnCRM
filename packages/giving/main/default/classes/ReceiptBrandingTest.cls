@@ -78,17 +78,45 @@ private class ReceiptBrandingTest {
         );
     }
 
+    /**
+     * A letter saved before the package printed the letterhead keeps its own block, and the
+     * package does not print the name a second time (ADR-NEXT point 3).
+     */
     @IsTest
-    static void aTemplateThatNamesTheOrganizationIsNotGivenASecondCopyOfIt() {
+    static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
         Test.startTest();
-        String html = receiptFrom(ReceiptTestDataFactory.perGiftTemplateBody());
+        String html = receiptFrom(
+            '<div class="letterhead"><h1>{{OrganizationName}}</h1></div>' + BARE_TEMPLATE
+        );
         Test.stopTest();
 
         Assert.isFalse(
             html.contains('class="orgname"'),
             'The package does not print a name the letter already printed: ' + html
         );
-        Assert.isTrue(html.contains('Hope For Homes'), 'The letter still prints it: ' + html);
+        Assert.isTrue(html.contains('<h1>Hope For Homes</h1>'), 'The letter prints it: ' + html);
+    }
+
+    /**
+     * The letterhead is code, not template (ADR-NEXT point 2). A letter that only mentions the
+     * organization in a sentence used to lose the letterhead, because the test was for the token.
+     */
+    @IsTest
+    static void aLetterThatMentionsTheOrganizationInASentenceStillGetsTheLetterhead() {
+        Test.startTest();
+        String html = receiptFrom(
+            '<p>Thank you for supporting {{OrganizationName}}, {{DonorName}}.</p>'
+        );
+        Test.stopTest();
+
+        Assert.isTrue(
+            html.contains('<p class="orgname">Hope For Homes</p>'),
+            'The letterhead prints above the letter: ' + html
+        );
+        Assert.isTrue(
+            html.contains('Thank you for supporting Hope For Homes'),
+            'And the sentence keeps its token: ' + html
+        );
     }
 
     @IsTest
