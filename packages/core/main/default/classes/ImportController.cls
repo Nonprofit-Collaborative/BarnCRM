@@ -181,6 +181,30 @@ public with sharing class ImportController {
         public String values;
     }
 
+    /** How many rows the changed values are shown for, in the wizard and after a dry run. */
+    @TestVisible
+    private static final Integer CHANGED_SAMPLE_ROWS = 5;
+
+    /** One cell before and after its column's changes (R-IT15). */
+    public class ChangedValue {
+        @AuraEnabled
+        public Integer rowNumber;
+        @AuraEnabled
+        public String column;
+        @AuraEnabled
+        public String before;
+        @AuraEnabled
+        public String after;
+    }
+
+    /** What a column's changes would do to the sample rows, and what stops them saving. */
+    public class ChangesPreview {
+        @AuraEnabled
+        public List<String> problems = new List<String>();
+        @AuraEnabled
+        public List<ChangedValue> samples = new List<ChangedValue>();
+    }
+
     /** True when the running user may upload and commit an import. */
     @AuraEnabled(cacheable=true)
     public static Boolean canImport() {
@@ -640,6 +664,92 @@ public with sharing class ImportController {
             return result;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getRows');
+        }
+    }
+
+    /**
+     * What a column's changes do to the first rows of the file, and what is wrong with them
+     * (R-IT15). Nothing is saved: the wizard shows this while the admin edits the steps.
+     *
+     * @param source the column the steps belong to
+     * @param transformsJson the steps, as the mapping document holds them
+     * @param sampleRowsJson the first rows of the file, each a map of column name to value
+     */
+    @AuraEnabled
+    public static ChangesPreview previewChanges(
+        String source,
+        String transformsJson,
+        String sampleRowsJson
+    ) {
+        try {
+            enforcePermission();
+            ChangesPreview preview = new ChangesPreview();
+            List<DataTransform.Step> steps = DataTransform.parse(transformsJson);
+            preview.problems = DataTransform.problems(steps);
+            List<Object> rows = String.isBlank(sampleRowsJson)
+                ? new List<Object>()
+                : (List<Object>) JSON.deserializeUntyped(sampleRowsJson);
+            for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
+                Map<String, String> values = new Map<String, String>();
+                Map<String, Object> row = (Map<String, Object>) rows[i];
+                for (String column : row.keySet()) {
+                    Object value = row.get(column);
+                    values.put(
+                        ImportMapping.key(column),
+                        value == null ? null : String.valueOf(value).trim()
+                    );
+                }
+                ChangedValue sample = new ChangedValue();
+                sample.rowNumber = i + 2;
+                sample.column = source;
+                sample.before = values.get(ImportMapping.key(source));
+                sample.after = DataTransform.apply(steps, sample.before, values);
+                preview.samples.add(sample);
+            }
+            return preview;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.previewChanges');
+        }
+    }
+
+    /**
+     * Each changed value of the batch's first rows, before and after (R-IT15), for the results
+     * screen of a dry run. Empty when the mapping changes nothing.
+     */
+    @AuraEnabled
+    public static List<ChangedValue> getChangedValues(String batchId) {
+        try {
+            List<ChangedValue> result = new List<ChangedValue>();
+            Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
+            Import_Template__c template = batch == null
+                ? null
+                : ImportTemplateSelector.selectById(batch.Import_Template__c);
+            if (template == null) {
+                return result;
+            }
+            ImportMapping mapping = ImportMapping.parse(
+                template.Column_Mapping_JSON__c,
+                template.Default_Values_JSON__c
+            );
+            if (mapping.transformsBySourceKey().isEmpty()) {
+                return result;
+            }
+            List<Import_Row__c> rows = ImportRowSelector.selectByBatch(batchId, 0);
+            for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
+                for (List<String> cell : ImportRowProcessor.changedValues(rows[i], mapping)) {
+                    ChangedValue changed = new ChangedValue();
+                    changed.rowNumber = rows[i].Row_Number__c == null
+                        ? null
+                        : rows[i].Row_Number__c.intValue();
+                    changed.column = cell[0];
+                    changed.before = cell[1];
+                    changed.after = cell[2];
+                    result.add(changed);
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getChangedValues');
         }
     }
 

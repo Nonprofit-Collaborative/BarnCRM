@@ -65,6 +65,9 @@ public with sharing class ImportMapping {
          */
         @AuraEnabled
         public String lookupField;
+        /** The steps that change this column's values before they are used (R-IT15). */
+        @AuraEnabled
+        public List<DataTransform.Step> transforms;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the
@@ -74,6 +77,7 @@ public with sharing class ImportMapping {
             this.source = null;
             this.target = null;
             this.lookupField = null;
+            this.transforms = null;
         }
 
         @NamespaceAccessible
@@ -310,6 +314,52 @@ public with sharing class ImportMapping {
                 TARGET_IGNORE.equalsIgnoreCase(column.target.trim())
             ) {
                 result.add(key(column.source));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The steps of each column that has any (R-IT15), keyed as `targetsBySourceKey` keys
+     * them. A column set to Do not load is left out, since nothing of it is used.
+     */
+    @NamespaceAccessible
+    public Map<String, List<DataTransform.Step>> transformsBySourceKey() {
+        Map<String, List<DataTransform.Step>> result = new Map<String, List<DataTransform.Step>>();
+        for (Column column : columns) {
+            if (
+                column == null ||
+                String.isBlank(column.source) ||
+                isIgnored(column.target) ||
+                column.transforms == null ||
+                column.transforms.isEmpty()
+            ) {
+                continue;
+            }
+            result.put(key(column.source), column.transforms);
+        }
+        return result;
+    }
+
+    /**
+     * What is wrong with the columns' steps, one sentence per column naming it, or an empty
+     * list. A mapping is not saved while this is not empty (R-IT15).
+     */
+    @NamespaceAccessible
+    public List<String> transformProblems() {
+        List<String> result = new List<String>();
+        for (Column column : columns) {
+            if (column == null || column.transforms == null || column.transforms.isEmpty()) {
+                continue;
+            }
+            List<String> problems = DataTransform.problems(column.transforms);
+            if (!problems.isEmpty()) {
+                result.add(
+                    String.format(
+                        Label.Core_Import_ErrorColumnChanges,
+                        new List<String>{ column.source, String.join(problems, ' ') }
+                    )
+                );
             }
         }
         return result;

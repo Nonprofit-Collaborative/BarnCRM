@@ -335,6 +335,11 @@ public with sharing class ImportTemplateService {
         if (!ImportObjectSchema.loadsOneObject(template) && !mapping.identifiesSomebody()) {
             throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
         }
+        // A broken step is skipped on read, so it is refused here, where the admin can fix it.
+        List<String> changeProblems = mapping.transformProblems();
+        if (!changeProblems.isEmpty()) {
+            throw new ImportException(String.join(changeProblems, ' '));
+        }
         template.Column_Mapping_JSON__c = mapping.serialize();
         template.Matching_Rule__c = normalizedRule(matchingRule);
         Database.update(template, AccessLevel.USER_MODE);

@@ -307,13 +307,14 @@ public with sharing class ImportRowProcessor {
         Outcome outcome
     ) {
         Map<String, String> targets = mapping.targetsBySourceKey();
+        Map<String, List<DataTransform.Step>> transforms = mapping.transformsBySourceKey();
         List<Working> working = new List<Working>();
         for (Import_Row__c row : rows) {
             startPass(row, ImportRowSelector.passOf(batch));
             Working item = new Working();
             item.row = row;
             item.values = rawValues(row);
-            item.byEntity = groupByEntity(item.values, targets, mapping.defaults);
+            item.byEntity = groupByEntity(item.values, targets, transforms, mapping.defaults);
             splitFullNames(item.byEntity);
             // A record ID matches and is never written to a field (R-IT10).
             item.givenOrganizationId = takeId(item.byEntity, ImportMapping.ENTITY_ORGANIZATION);
@@ -339,15 +340,45 @@ public with sharing class ImportRowProcessor {
     }
 
     /**
-     * A row's values by entity and attribute, with the mapping's values for every row filled in
-     * where the row has none: what the one-object loader reads a row as (R-IT12).
+     * A row's values by entity and attribute, after each column's changes (R-IT15), with the
+     * mapping's values for every row filled in where the row has none: what the one-object
+     * loader reads a row as (R-IT12).
      */
     @NamespaceAccessible
     public static Map<String, Map<String, String>> valuesByEntity(
         Import_Row__c row,
         ImportMapping mapping
     ) {
-        return groupByEntity(rawValues(row), mapping.targetsBySourceKey(), mapping.defaults);
+        return groupByEntity(
+            rawValues(row),
+            mapping.targetsBySourceKey(),
+            mapping.transformsBySourceKey(),
+            mapping.defaults
+        );
+    }
+
+    /**
+     * Each changed cell of a row, before and after its column's changes (R-IT15), keyed by the
+     * column as the mapping names it, in the mapping's order. What the dry run shows.
+     */
+    @NamespaceAccessible
+    public static List<List<String>> changedValues(Import_Row__c row, ImportMapping mapping) {
+        List<List<String>> result = new List<List<String>>();
+        Map<String, String> values = rawValues(row);
+        Map<String, List<DataTransform.Step>> transforms = mapping.transformsBySourceKey();
+        for (ImportMapping.Column column : mapping.columns) {
+            String sourceKey = column == null ? null : ImportMapping.key(column.source);
+            if (sourceKey == null || !transforms.containsKey(sourceKey)) {
+                continue;
+            }
+            String before = values.get(sourceKey);
+            String after = DataTransform.apply(transforms.get(sourceKey), before, values);
+            // equals, not ==, which ignores capitals and would hide a change to them.
+            if (before == null ? after != null : !before.equals(after)) {
+                result.add(new List<String>{ column.source, before, after });
+            }
+        }
+        return result;
     }
 
     /** The row's uploaded values, keyed the way a mapping's source columns are keyed. */
@@ -374,15 +405,24 @@ public with sharing class ImportRowProcessor {
         return result;
     }
 
-    /** entity to attribute to value, with the template's defaults filled in where empty. */
+    /**
+     * entity to attribute to value, after each column's changes, with the template's defaults
+     * filled in where empty. The changes read the row's uploaded values, never each other's
+     * output, so the order of the columns does not matter (R-IT15).
+     */
     private static Map<String, Map<String, String>> groupByEntity(
         Map<String, String> values,
         Map<String, String> targets,
+        Map<String, List<DataTransform.Step>> transforms,
         List<ImportMapping.Assignment> defaults
     ) {
         Map<String, Map<String, String>> result = new Map<String, Map<String, String>>();
         for (String sourceKey : targets.keySet()) {
             String value = values.get(sourceKey);
+            List<DataTransform.Step> steps = transforms.get(sourceKey);
+            if (steps != null) {
+                value = DataTransform.apply(steps, value, values);
+            }
             if (String.isBlank(value)) {
                 continue;
             }

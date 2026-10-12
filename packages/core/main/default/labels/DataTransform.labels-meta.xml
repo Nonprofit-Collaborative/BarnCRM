@@ -56,4 +56,12 @@
         <shortDescription>Column changes: a text, value or separator is too long</shortDescription>
         <value>Text in a change can be at most 255 characters, and a separator at most 10.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_ErrorColumnChanges</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: a column&apos;s changes cannot be saved</shortDescription>
+        <value>The changes to column {0} cannot be saved. {1}</value>
+    </labels>
 </CustomLabels>
