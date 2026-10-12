@@ -1,104 +1,130 @@
 <template>
   <div class="slds-p-around_medium">
-    <template if:true={loadError}>
-      <p class="slds-text-color_error slds-m-bottom_small">{loadError}</p>
+    <template lwc:if={loadError}>
+      <p data-id="load-error" class="slds-text-color_error slds-m-bottom_small">{loadError}</p>
     </template>
 
     <lightning-tabset>
-      <lightning-tab label="Receipt templates">
-        <template if:false={hasTemplates}>
-          <p class="slds-text-body_regular slds-m-bottom_small">
-            This org has no receipt letters. BarnCRM creates the two it ships when the package
-            is installed, so if they are missing that step did not finish. Restore them here, then
-            edit the wording.
+      <lightning-tab label={labels.templatesTab}>
+        <template lwc:if={hasTemplates}>
+          <template lwc:if={readOnly}>
+            <p data-id="read-only" class="slds-text-body_small slds-m-bottom_small">
+              {labels.readOnly}
+            </p>
+          </template>
+
+          <lightning-combobox
+            data-id="letter"
+            label={labels.letterPicker}
+            value={selectedTemplateId}
+            options={templateOptions}
+            onchange={handleTemplateChange}
+          ></lightning-combobox>
+
+          <p class="slds-text-body_small slds-m-top_small">{labels.letterheadNote}</p>
+
+          <lightning-input-rich-text
+            data-id="editor"
+            class="slds-m-top_small"
+            label={labels.editor}
+            label-visible
+            formats={formats}
+            value={draftBody}
+            disabled={readOnly}
+            onchange={handleBodyChange}
+          ></lightning-input-rich-text>
+
+          <div class="slds-m-top_small">
+            <lightning-button
+              data-id="save"
+              label={labels.save}
+              variant="brand"
+              disabled={cannotEdit}
+              onclick={handleSave}
+            ></lightning-button>
+            <lightning-button
+              data-id="preview"
+              class="slds-m-left_x-small"
+              label={labels.preview}
+              disabled={busy}
+              onclick={handlePreview}
+            ></lightning-button>
+            <template lwc:if={showUseLetter}>
+              <lightning-button
+                data-id="use-letter"
+                class="slds-m-left_x-small"
+                label={labels.useLetter}
+                disabled={cannotEdit}
+                onclick={handleActivate}
+              ></lightning-button>
+            </template>
+          </div>
+
+          <template lwc:if={previewHtml}>
+            <div data-id="preview-box" class="slds-box slds-m-top_medium">
+              <h3 class="slds-text-heading_small">{labels.previewHeading}</h3>
+              <p class="slds-text-body_small slds-m-bottom_small">{labels.previewNote}</p>
+              <lightning-formatted-rich-text value={previewHtml}></lightning-formatted-rich-text>
+            </div>
+          </template>
+
+          <p class="slds-text-body_small slds-m-top_small">{labels.taxNote}</p>
+
+          <p class="slds-text-body_small slds-m-top_small">{labels.tokensIntro}</p>
+          <ul class="slds-list_dotted">
+            <template for:each={tokens} for:item="token">
+              <li key={token}>{token}</li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p data-id="no-templates" class="slds-text-body_regular slds-m-bottom_small">
+            {labels.noTemplates}
           </p>
           <lightning-button
-            label="Restore the shipped letters"
+            data-id="restore"
+            label={labels.restore}
             variant="brand"
             disabled={cannotEdit}
             onclick={handleRestore}
           ></lightning-button>
         </template>
-
-        <template if:true={hasTemplates}>
-        <lightning-combobox
-          label="Letter"
-          value={selectedTemplateId}
-          options={templateOptions}
-          onchange={handleTemplateChange}
-        ></lightning-combobox>
-
-        <lightning-textarea
-          class="slds-m-top_small"
-          label="The letter donors read"
-          value={draftBody}
-          onchange={handleBodyChange}
-        ></lightning-textarea>
-
-        <div class="slds-m-top_small">
-          <lightning-button
-            label="Save"
-            variant="brand"
-            disabled={cannotEdit}
-            onclick={handleSave}
-          ></lightning-button>
-          <template if:false={selectedIsActive}>
-            <lightning-button
-              class="slds-m-left_x-small"
-              label="Use this letter"
-              disabled={cannotEdit}
-              onclick={handleActivate}
-            ></lightning-button>
-          </template>
-        </div>
-
-        <p class="slds-text-body_small slds-m-top_small">
-          The tax wording is not in this letter and cannot be edited. Whatever you write here, BarnCRM
-          adds the sentences a valid receipt must carry: whether goods or services were
-          provided, the quid pro quo disclosure with its good faith estimate and deductible amount,
-          and the intangible religious benefits sentence.
-        </p>
-
-        <p class="slds-text-body_small slds-m-top_small">Tokens you can use:</p>
-        <ul class="slds-list_dotted">
-          <template for:each={tokens} for:item="token">
-            <li key={token}>{token}</li>
-          </template>
-        </ul>
-        </template>
       </lightning-tab>
 
-      <lightning-tab label="Year end statements">
+      <lightning-tab label={labels.statementsTab}>
         <lightning-input
+          data-id="statement-year"
           type="number"
-          label="Statement year"
+          label={labels.statementYear}
           value={statementYear}
           onchange={handleYearChange}
         ></lightning-input>
         <div class="slds-m-top_small">
           <lightning-button
-            label="Generate"
+            data-id="generate"
+            label={labels.generate}
             variant="brand"
             disabled={busy}
             onclick={handleGenerate}
           ></lightning-button>
           <lightning-button
+            data-id="refresh"
             class="slds-m-left_x-small"
-            label="Refresh"
+            label={labels.refresh}
             onclick={handleRefreshRuns}
           ></lightning-button>
         </div>
 
-        <template if:true={hasRuns}>
+        <template lwc:if={hasRuns}>
           <table class="slds-table slds-table_bordered slds-m-top_medium">
             <thead>
               <tr class="slds-line-height_reset">
-                <th scope="col">Run</th>
-                <th scope="col">Year</th>
-                <th scope="col">Status</th>
-                <th scope="col">Donors</th>
-                <th scope="col">Issued</th>
-                <th scope="col">Errors</th>
+                <th scope="col">{labels.columnRun}</th>
+                <th scope="col">{labels.columnYear}</th>
+                <th scope="col">{labels.columnStatus}</th>
+                <th scope="col">{labels.columnDonors}</th>
+                <th scope="col">{labels.columnIssued}</th>
+                <th scope="col">{labels.columnErrors}</th>
               </tr>
             </thead>
             <tbody>
@@ -115,10 +141,9 @@
             </tbody>
           </table>
         </template>
-
-        <template if:false={hasRuns}>
-          <p class="slds-text-body_regular slds-m-top_medium">
-            No statement run has been started yet.
+        <template lwc:else>
+          <p data-id="no-runs" class="slds-text-body_regular slds-m-top_medium">
+            {labels.noRuns}
           </p>
         </template>
       </lightning-tab>

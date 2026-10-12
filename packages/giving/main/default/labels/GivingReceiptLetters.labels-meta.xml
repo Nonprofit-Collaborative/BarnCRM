@@ -1,6 +1,118 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
+    <fullName>Giving_Receipt_TemplatesTab</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: tab, the receipt letters</shortDescription>
+    <value>Receipt templates</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_StatementsTab</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: tab, year end statements</shortDescription>
+    <value>Year end statements</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NoTemplates</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: the org has no receipt letters</shortDescription>
+    <value>This org has no receipt letters. BarnCRM creates the two it ships when the package is installed, so if they are missing that step did not finish. Restore them here, then edit the wording.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_RestoreButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: button, restore the shipped letters</shortDescription>
+    <value>Restore the shipped letters</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_LetterPicker</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: field, which letter to edit</shortDescription>
+    <value>Letter</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_LetterOption</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: one letter in the picker, name and kind</shortDescription>
+    <value>{0} ({1})</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_LetterOptionOff</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: one letter not in use, name and kind</shortDescription>
+    <value>{0} ({1}), not in use</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_EditorLabel</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: field, the letter text</shortDescription>
+    <value>The letter donors read</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_LetterheadNote</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: the letterhead is not in the letter</shortDescription>
+    <value>Your organization's name, address and logo print above this letter on every document. To change them, change your organization and receipt settings, not the letter.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_SaveButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: button, save the letter</shortDescription>
+    <value>Save</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_UseLetterButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: button, switch this letter on</shortDescription>
+    <value>Use this letter</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_PreviewButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: button, preview the letter</shortDescription>
+    <value>Preview</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_PreviewHeading</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: heading of the preview</shortDescription>
+    <value>Preview for a sample gift</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_PreviewNote</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: what the preview shows</shortDescription>
+    <value>This shows the wording with the sentences BarnCRM adds. To check the printed page, issue a receipt for a test gift.</value>
+  </labels>
+  <labels>
     <fullName>Giving_Receipt_PreviewDonor</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -15,5 +127,189 @@
     <protected>false</protected>
     <shortDescription>Receipts page: sample receipt number in the preview</shortDescription>
     <value>SAMPLE-000001</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NoPreviewTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, preview failed</shortDescription>
+    <value>No preview</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_TaxNote</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: the tax wording cannot be edited</shortDescription>
+    <value>The tax wording is not in this letter and cannot be edited. Whatever you write here, BarnCRM adds the sentences a valid receipt must carry: whether goods or services were provided, the quid pro quo disclosure with its good faith estimate and deductible amount, and the intangible religious benefits sentence.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_TokensIntro</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: list of tokens follows</shortDescription>
+    <value>Tokens you can use. Type each one exactly as shown, with both pairs of braces:</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_StatementYear</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: field, the statement year</shortDescription>
+    <value>Statement year</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_GenerateButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: button, generate statements</shortDescription>
+    <value>Generate</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_RefreshButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: button, refresh the runs</shortDescription>
+    <value>Refresh</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnRun</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: column, run name</shortDescription>
+    <value>Run</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnYear</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: column, statement year</shortDescription>
+    <value>Year</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnDonors</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: column, donors processed</shortDescription>
+    <value>Donors</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnErrors</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: column, errors</shortDescription>
+    <value>Errors</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NoRuns</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: no statement run yet</shortDescription>
+    <value>No statement run has been started yet.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_RestoredTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, letters restored</shortDescription>
+    <value>Letters restored</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_RestoredMessage</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast, letters restored</shortDescription>
+    <value>The letters BarnCRM ships are back.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NotRestoredTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, letters not restored</shortDescription>
+    <value>Letters not restored</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_SavedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, letter saved</shortDescription>
+    <value>Letter saved</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_SavedMessage</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast, letter saved</shortDescription>
+    <value>Your receipt letter has been saved.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NotSavedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, letter not saved</shortDescription>
+    <value>Letter not saved</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ActivatedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, letter switched on</shortDescription>
+    <value>Letter switched on</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ActivatedMessage</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast, letter switched on</shortDescription>
+    <value>This letter is now the one BarnCRM uses.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NotActivatedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, letter not switched on</shortDescription>
+    <value>Letter not switched on</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_StartedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, statement run started</shortDescription>
+    <value>Statements started</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_StartedMessage</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast, statement run started</shortDescription>
+    <value>Year end statements are being generated. Click Refresh to see the run's progress below.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NotStartedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts page: toast title, statement run not started</shortDescription>
+    <value>Statements not started</value>
   </labels>
 </CustomLabels>
