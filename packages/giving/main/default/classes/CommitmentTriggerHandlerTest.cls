@@ -26,7 +26,7 @@ private class CommitmentTriggerHandlerTest {
             Donor_Contact__c = donorId,
             Amount__c = 100,
             Frequency__c = 'Monthly',
-            Start_Date__c = Date.newInstance(2026, 10, 1),
+            Start_Date__c = Date.today(),
             Expected_Total__c = 300,
             Installments_Planned__c = 3
         );
@@ -98,7 +98,7 @@ private class CommitmentTriggerHandlerTest {
             ORDER BY Sequence__c
         ];
         Assert.areEqual(
-            Date.newInstance(2026, 10, 8),
+            Date.today().addDays(7),
             schedule[1].Due_Date__c,
             'A weekly schedule puts the second payment a week after the first.'
         );
@@ -119,7 +119,7 @@ private class CommitmentTriggerHandlerTest {
         ];
         insert new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Received',
@@ -157,7 +157,7 @@ private class CommitmentTriggerHandlerTest {
         ];
         insert new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Received',

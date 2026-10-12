@@ -45,7 +45,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void generatesTwelveMonthlyInstallmentsForAPledge() {
         Contact person = donor();
-        Date start = Date.newInstance(2026, 10, 1);
+        Date start = Date.today();
         Commitment__c pledge = newPledge(person.Id, start);
 
         Test.startTest();
@@ -61,7 +61,7 @@ private class CommitmentServiceTest {
             'The first payment falls on the start date.'
         );
         Assert.areEqual(
-            Date.newInstance(2027, 9, 1),
+            start.addMonths(11),
             schedule[11].Due_Date__c,
             'The last payment falls eleven months later.'
         );
@@ -72,7 +72,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void countsInstallmentsFromTheTotalWhenNoneArePlanned() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         pledge.Installments_Planned__c = null;
         pledge.Expected_Total__c = 250;
         pledge.Amount__c = 100;
@@ -222,7 +222,7 @@ private class CommitmentServiceTest {
         Contact person = donor();
         List<Commitment__c> pledges = new List<Commitment__c>();
         for (Integer index = 0; index < 200; index++) {
-            Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+            Commitment__c pledge = newPledge(person.Id, Date.today());
             pledge.Installments_Planned__c = 4;
             pledge.Expected_Total__c = 400;
             pledge.End_Date__c = null;
@@ -244,14 +244,14 @@ private class CommitmentServiceTest {
     @IsTest
     static void marksTheFirstInstallmentPaidWhenAGiftArrives() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         insert pledge;
         CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
         List<Installment__c> schedule = installmentsOf(pledge.Id);
 
         Gift__c gift = new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Received',
@@ -274,14 +274,14 @@ private class CommitmentServiceTest {
     @IsTest
     static void marksAnInstallmentPartiallyPaid() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         insert pledge;
         CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
         List<Installment__c> schedule = installmentsOf(pledge.Id);
 
         Gift__c gift = new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 40,
             Type__c = 'Check',
             Status__c = 'Received',
@@ -304,14 +304,14 @@ private class CommitmentServiceTest {
     @IsTest
     static void appliesAGiftThatNamesOnlyTheCommitment() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         insert pledge;
         CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
         List<Installment__c> schedule = installmentsOf(pledge.Id);
 
         Gift__c gift = new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Received',
@@ -334,7 +334,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void completesAPledgeThatHasBeenPaidInFull() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         pledge.Expected_Total__c = 100;
         pledge.Installments_Planned__c = 1;
         pledge.End_Date__c = null;
@@ -343,7 +343,7 @@ private class CommitmentServiceTest {
 
         Gift__c gift = new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Received',
@@ -406,7 +406,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void rebuildsUnpaidInstallmentsWhenTheAmountChanges() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         pledge.Installments_Planned__c = 4;
         pledge.Expected_Total__c = 400;
         pledge.End_Date__c = null;
@@ -433,7 +433,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void leavesAPaidInstallmentAloneWhenTheScheduleChanges() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         pledge.Installments_Planned__c = 3;
         pledge.Expected_Total__c = 300;
         pledge.End_Date__c = null;
@@ -443,7 +443,7 @@ private class CommitmentServiceTest {
 
         Gift__c gift = new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Received',
@@ -469,7 +469,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void pausesResumesCancelsAndCompletes() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         insert pledge;
         CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
         Set<Id> ids = new Set<Id>{ pledge.Id };
@@ -509,7 +509,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void refusesAStatusChangeThatIsNotAllowed() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         pledge.Status__c = 'Cancelled';
         insert pledge;
 
@@ -528,7 +528,7 @@ private class CommitmentServiceTest {
     @IsTest
     static void keepsAnInstallmentAPendingGiftPointsAtWhenTheScheduleShrinks() {
         Contact person = donor();
-        Commitment__c pledge = newPledge(person.Id, Date.newInstance(2026, 10, 1));
+        Commitment__c pledge = newPledge(person.Id, Date.today());
         pledge.Installments_Planned__c = 4;
         pledge.Expected_Total__c = 400;
         pledge.End_Date__c = null;
@@ -541,7 +541,7 @@ private class CommitmentServiceTest {
         // point at the payment and must not have that payment removed from under it.
         insert new Gift__c(
             Donor_Contact__c = person.Id,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = 100,
             Type__c = 'Check',
             Status__c = 'Pending',

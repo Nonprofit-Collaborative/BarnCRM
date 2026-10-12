@@ -16,7 +16,7 @@ private class CommitmentControllerTest {
             Donor_Contact__c = donorId,
             Amount__c = 100,
             Frequency__c = 'Monthly',
-            Start_Date__c = Date.newInstance(2026, 10, 1),
+            Start_Date__c = Date.today(),
             Expected_Total__c = 300,
             Installments_Planned__c = 3
         );
@@ -30,7 +30,7 @@ private class CommitmentControllerTest {
         input.commitmentType = 'Pledge';
         input.amount = 100;
         input.frequency = 'Monthly';
-        input.startDate = Date.newInstance(2026, 10, 1);
+        input.startDate = Date.today();
         input.expectedTotal = 1200;
         input.installmentsPlanned = 12;
 
