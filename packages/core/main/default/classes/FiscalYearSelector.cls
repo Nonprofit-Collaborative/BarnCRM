@@ -1,7 +1,7 @@
 /**
  * The month this org's fiscal year starts in Setup (feature C-11, ADR-0025).
  *
- * BarnCRM holds its own fiscal year in `Nonprofit_Settings__c.Fiscal_Year_Start_Month__c`
+ * BarnCRM holds its own fiscal year in `BarnCRM_Settings__c.Fiscal_Year_Start_Month__c`
  * and every rollup window is computed from it (rule R-R3). The packaged retention reports
  * cannot read that setting: a report filter expresses a relative year with a fiscal year date
  * literal, which resolves against the org's fiscal year in Setup. The two therefore have to

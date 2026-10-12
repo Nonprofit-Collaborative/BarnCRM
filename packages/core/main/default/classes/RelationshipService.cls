@@ -59,7 +59,7 @@ public with sharing class RelationshipService {
      * (ADR-0035). Only an explicit false switches the upkeep off.
      */
     public static Boolean isAutoReciprocalOn() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings == null || settings.Relationship_Auto_Reciprocal__c != false;
     }
 

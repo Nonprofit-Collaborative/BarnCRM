@@ -153,12 +153,12 @@
         <value>Load the sample data</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_ModeAgentforce</fullName>
+        <fullName>Core_SetupAssistant_ModeNonprofitCloud</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: the name of the Agentforce Nonprofit coexistence mode</shortDescription>
-        <value>Agentforce Nonprofit coexistence</value>
+        <shortDescription>Setup assistant: the mode name offered when Salesforce gift objects are found</shortDescription>
+        <value>Nonprofit Cloud coexistence</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModeLabel</fullName>
@@ -173,7 +173,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: the name of the NPSP coexistence mode</shortDescription>
+        <shortDescription>Setup assistant: the mode name offered when a household package is found</shortDescription>
         <value>NPSP coexistence</value>
     </labels>
     <labels>
@@ -245,7 +245,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: link to where a step's answers live in Nonprofit Settings</shortDescription>
+        <shortDescription>Setup assistant: link to where a step's answers live in Settings</shortDescription>
         <value>Where this lives in Settings</value>
     </labels>
     <labels>
@@ -342,14 +342,14 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what detection found in an org with nothing else installed</shortDescription>
-        <value>This looks like a fresh org, with neither NPSP nor Person Accounts. BarnCRM can run on its own.</value>
+        <value>This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ShapeNpsp</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: what detection found in an org with NPSP installed</shortDescription>
+        <shortDescription>Setup assistant: what detection found when a household package is installed</shortDescription>
         <value>NPSP is installed in this org. BarnCRM can adopt the household accounts you already have rather than building new ones.</value>
     </labels>
     <labels>
@@ -357,8 +357,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: what detection found in a Nonprofit Cloud org</shortDescription>
-        <value>Your org uses Person Accounts, as Nonprofit Cloud orgs do. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working.</value>
+        <shortDescription>Setup assistant: what detection found in an org with Person Accounts</shortDescription>
+        <value>Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you already have keeps working.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_SkipButton</fullName>
@@ -390,7 +390,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what step one is for</shortDescription>
-        <value>If your org uses Person Accounts, as Nonprofit Cloud orgs do, household membership uses the junction model so that what you already have keeps working. Confirm that here, or choose a different fit.</value>
+        <value>If your org uses Person Accounts, household membership uses the junction model so that what you already have keeps working. Confirm that here, or choose a different fit.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step1Label</fullName>

@@ -1,11 +1,11 @@
 /**
- * The Accounting Periods page of the Nonprofit Settings console (G-20, R-G14, ADR-0053).
+ * The Accounting Periods page of the BarnCRM Settings console (G-20, R-G14, ADR-0053).
  *
  * It holds the one setting that closes the books: `Giving_Settings__c.Books_Closed_Through__c`.
  * The setting has no Setting Definition row naming its key, so the console's generic save cannot
  * reach it; this page is the only way it changes, and it enforces what a close date means:
  *
- * - the date moves forward only, for anyone with Manage Nonprofit Settings;
+ * - the date moves forward only, for anyone with Manage BarnCRM Settings;
  * - it is at least two days before today, so a refund or write-off, which is dated today, lands
  *   in an open period. Two, not one: `Date.today()` is the running user's day, and a user whose
  *   time zone is ahead of the org's could otherwise close the org's today;
@@ -15,7 +15,7 @@
  * Every change is recorded as a Setting Change, as the console records its own.
  */
 public with sharing class AccountingPeriodController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Accounting periods page';
     private static final String REOPEN_CONTEXT = 'Posting lock override';
     private static final String SETTING_NAME = 'Giving_Settings__c.Books_Closed_Through__c';
@@ -55,7 +55,9 @@ public with sharing class AccountingPeriodController {
             if (!canManage()) {
                 throw new AccountingPeriodException(Label.Giving_Periods_PermissionRequired);
             }
-            Date current = GiftPostingLock.closedThrough();
+            // Locked, so whether this save reopens a period, and the audit row's old value, are
+            // decided from what is stored, not from a value another person replaced a moment ago.
+            Date current = AccountingPeriodWriter.lockedClosedThrough();
             if (closeDate == current) {
                 return currentView();
             }

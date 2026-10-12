@@ -1,7 +1,7 @@
 /**
  * Tests the LWC-facing entry points of SampleDataController: the permitted load, remove
  * and status paths, the permission-denied path as a Standard User who does not hold the
- * Manage_Nonprofit_Settings custom permission, and the already-loaded error reaching the
+ * Manage_BarnCRM_Settings custom permission, and the already-loaded error reaching the
  * component as an AuraHandledException carrying the label text.
  *
  * The permitted paths set the @TestVisible permissionOverride because the custom

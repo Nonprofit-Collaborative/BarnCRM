@@ -45,6 +45,9 @@ jobs:
       - name: Check standard object references
         run: bash scripts/ci/check-standard-objects.sh
 
+      - name: Check Person Account fields are reached only by name
+        run: python3 scripts/ci/check-person-account-fields.py
+
       - name: Check every object named in packages is on the allowlist
         run: python3 scripts/ci/check-object-allowlist.py
 
@@ -204,7 +207,7 @@ jobs:
       - name: Give the test user the packaged admin roles
         if: steps.check.outputs.enabled == 'true'
         run: |
-          for ps in Nonprofit_Admin Giving_Admin; do
+          for ps in BarnCRM_Admin Giving_Admin; do
             sf org assign permset --name "$ps" --target-org testorg --json > assign.json || true
             if jq -e '.result.failures[]? | select(.message | test("Duplicate") | not)' assign.json > /dev/null; then
               cat assign.json

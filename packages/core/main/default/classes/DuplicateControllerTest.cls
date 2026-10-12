@@ -69,7 +69,7 @@ private class DuplicateControllerTest {
         DuplicateController.DuplicateView view = DuplicateController.getView();
         Test.stopTest();
 
-        Assert.isTrue(view.canManage, 'The test user holds Manage Nonprofit Settings.');
+        Assert.isTrue(view.canManage, 'The test user holds Manage BarnCRM Settings.');
         Assert.areEqual(1, view.suggestions.size(), 'The one suggestion is listed.');
         DuplicateController.SuggestionView suggestion = view.suggestions[0];
         Assert.areEqual(2, suggestion.records.size(), 'Both people are named.');
@@ -194,7 +194,7 @@ private class DuplicateControllerTest {
         System.runAs(staff) {
             try {
                 DuplicateController.startScan();
-                Assert.fail('A scan needs Manage Nonprofit Settings.');
+                Assert.fail('A scan needs Manage BarnCRM Settings.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
                     Label.Core_Duplicates_ErrorPermissionRequired,
@@ -204,7 +204,7 @@ private class DuplicateControllerTest {
             }
             try {
                 DuplicateController.mergeHouseholds(null, null, null, null);
-                Assert.fail('A merge from the panel needs Manage Nonprofit Settings.');
+                Assert.fail('A merge from the panel needs Manage BarnCRM Settings.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
                     Label.Core_Duplicates_ErrorPermissionRequired,
@@ -276,7 +276,7 @@ private class DuplicateControllerTest {
             insert admin;
             insert new PermissionSetAssignment(
                 AssigneeId = admin.Id,
-                PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'Nonprofit_Admin']
+                PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'BarnCRM_Admin']
                 .Id
             );
         }

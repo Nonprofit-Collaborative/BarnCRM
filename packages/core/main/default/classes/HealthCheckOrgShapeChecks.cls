@@ -13,9 +13,18 @@
 public with sharing class HealthCheckOrgShapeChecks {
     /**
      * An Apex class the Connect package ships, used to tell whether Connect is installed
-     * without referencing it at compile time.
+     * without referencing it at compile time. It is the class Core already discovers for
+     * Connect's Health Check findings (`HealthCheckExtensions.EXTENSION_CLASSES`, ADR-0057),
+     * so the name is a contract Connect keeps anyway.
      */
-    private static final String CONNECT_MARKER_CLASS = 'ConnectService';
+    private static final String CONNECT_MARKER_CLASS = 'ConnectHealthCheckExtension';
+
+    /** Set by tests to see Connect as installed (true) or absent (false) without the package. */
+    @TestVisible
+    private static Boolean connectInstalledOverride;
+
+    /** Whether Connect is installed, looked up once per transaction. */
+    private static Boolean connectInstalled;
 
     /** What this org has installed, and the mode that shape recommends. */
     public class OrgShapeCheck implements HealthCheckService.Check {
@@ -289,7 +298,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         ) {
             return null;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         if (settings != null && settings.Auto_Create_Households__c == true) {
             return null;
         }
@@ -362,7 +371,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         if (shape == null || shape.hasIndustriesNonprofit != true) {
             return null;
         }
-        if (Type.forName(CONNECT_MARKER_CLASS) != null) {
+        if (isConnectInstalled()) {
             return null;
         }
 
@@ -373,6 +382,34 @@ public with sharing class HealthCheckOrgShapeChecks {
             HealthCheckService.SEVERITY_INFO,
             HealthCheckService.CATEGORY_ORG_SHAPE
         );
+    }
+
+    private static Boolean isConnectInstalled() {
+        if (connectInstalledOverride != null) {
+            return connectInstalledOverride;
+        }
+        if (connectInstalled == null) {
+            connectInstalled = classExists(CONNECT_MARKER_CLASS);
+        }
+        return connectInstalled;
+    }
+
+    /**
+     * Whether an Apex class of this name is visible: in this package's namespace first, then
+     * with none (today, and unmanaged deploys). A class name is not an API name, so the prefix
+     * goes in without its `__` (dynamic-apex.md section 3).
+     */
+    @TestVisible
+    private static Boolean classExists(String className) {
+        String prefix = NamespaceUtil.prefix();
+        Type found = Type.forName(
+            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
+            className
+        );
+        if (found == null) {
+            found = Type.forName(className);
+        }
+        return found != null;
     }
 
     private static HealthCheckService.Finding multiCurrencyFinding(

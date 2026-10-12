@@ -1,6 +1,6 @@
 /**
  * The nightly seasonal address swap's schedule, and the two buttons on the Addresses page of
- * the Nonprofit Settings console that start and stop it.
+ * the BarnCRM Settings console that start and stop it.
  *
  * The schedule is an administrator's, not Setup's: it is started and stopped from the settings
  * console, which is what "every admin setting lives in the in-app console" means for something

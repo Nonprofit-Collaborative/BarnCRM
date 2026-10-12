@@ -8,7 +8,7 @@ private class DonationMatcherTest {
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
         );
     }
 
@@ -67,7 +67,7 @@ private class DonationMatcherTest {
 
     private static Import_Template__c template(String behaviour, Integer days, Decimal allowed) {
         return new Import_Template__c(
-            Donation_Matching__c = behaviour,
+            Payment_Matching__c = behaviour,
             Match_Date_Window_Days__c = days,
             Match_Amount_Tolerance__c = allowed
         );
@@ -446,7 +446,7 @@ private class DonationMatcherTest {
             // Between the preview and the commit, somebody says nothing may match.
             update new Import_Template__c(
                 Id = template.Id,
-                Donation_Matching__c = DonationMatcher.NEVER_MATCH
+                Payment_Matching__c = DonationMatcher.NEVER_MATCH
             );
             runPass(batch.Id, false);
             Test.stopTest();
@@ -505,7 +505,7 @@ private class DonationMatcherTest {
             first = ImportBatchSelector.selectById(batch.Id).Processor_Settings_JSON__c;
             update new Import_Template__c(
                 Id = template.Id,
-                Donation_Matching__c = DonationMatcher.MATCH_ONLY,
+                Payment_Matching__c = DonationMatcher.MATCH_ONLY,
                 Match_Date_Window_Days__c = 3
             );
             runPass(batch.Id, true);

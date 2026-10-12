@@ -75,7 +75,7 @@ public with sharing class ErrorDigestService {
         Datetime runAt = System.now();
         // Locked until this run ends, so Send now and the scheduled run take turns: the second
         // reads the window the first moved, and never sends the same entries again.
-        Nonprofit_Settings__c settings = OrgSettingsSystemWriter.lockStored();
+        BarnCRM_Settings__c settings = OrgSettingsSystemWriter.lockStored();
         if (settings == null) {
             settings = SettingsService.getSettings();
         }

@@ -1,6 +1,6 @@
 /**
  * The Giving half of the C-10 sample data set: Core finds this class by name, so the same
- * Load Sample Data action in the Nonprofit Settings console fills an org that has Giving
+ * Load Sample Data action in the BarnCRM Settings console fills an org that has Giving
  * with funds, appeals, three years of gifts, pledges, soft credits and tributes, and the
  * same Remove Sample Data action takes them away again (ADR-0017, SampleDataModule).
  *

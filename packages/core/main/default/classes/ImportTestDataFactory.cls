@@ -7,7 +7,7 @@
 @IsTest
 @NamespaceAccessible
 public class ImportTestDataFactory {
-    /** The mapping the shipped generic donor list starts with, as a document. */
+    /** The mapping the shipped generic contact list starts with, as a document. */
     @NamespaceAccessible
     public static String donorMapping() {
         ImportMapping mapping = new ImportMapping();
@@ -23,7 +23,7 @@ public class ImportTestDataFactory {
     @NamespaceAccessible
     public static Import_Template__c template(String mappingDocument, String matchingRule) {
         Import_Template__c template = new Import_Template__c(
-            Name = 'Test donor list',
+            Name = 'Test contact list',
             Template_Key__c = 'test_donor_list_' +
                 String.valueOf(Math.abs(Crypto.getRandomInteger())),
             Column_Mapping_JSON__c = mappingDocument,
@@ -87,7 +87,7 @@ public class ImportTestDataFactory {
         return reload(batch.Id);
     }
 
-    /** One row of a generic donor list. */
+    /** One row of a generic contact list. */
     @NamespaceAccessible
     public static Map<String, String> donorRow(
         String firstName,

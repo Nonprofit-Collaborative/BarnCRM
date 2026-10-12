@@ -91,5 +91,5 @@ while [[ "$ELAPSED" -lt "$MAX_WAIT_SECONDS" ]]; do
 done
 
 echo "Sample data load did not finish within ${MAX_WAIT_SECONDS}s." >&2
-echo "Check Setup > Apex Jobs, or open Nonprofit Settings > Sample Data in the org, for progress." >&2
+echo "Check Setup > Apex Jobs, or open BarnCRM Settings > Sample Data in the org, for progress." >&2
 exit 1
