@@ -1,4 +1,4 @@
-# ADR-NEXT: Interaction notes are completed tasks logged through one packaged action
+# ADR-0089: Interaction notes are completed tasks logged through one packaged action
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12

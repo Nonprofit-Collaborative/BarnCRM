@@ -2,7 +2,7 @@
  * Stores, for the running user, the release whose What's new notes they dismissed (C-27).
  *
  * DOCUMENTED EXCEPTION to the user-mode DML rule (plan Section 7.2), under ADR-0021 and
- * ADR-NEXT (`NEXT-whats-new-from-packaged-release-notes.md`). `Whats_New_Seen__c` is a
+ * ADR-0087 (`0087-whats-new-from-packaged-release-notes.md`). `Whats_New_Seen__c` is a
  * protected hierarchy custom setting, so no permission set can grant a subscriber user access
  * to it, and every BarnCRM user, Read Only included, must be able to dismiss the card.
  *

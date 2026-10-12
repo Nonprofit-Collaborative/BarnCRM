@@ -2,7 +2,7 @@
  * The rollup engine, as the rest of BarnCRM sees it.
  *
  * Everything a feature, a trigger, a batch or the console needs is here, and the engine behind it
- * is BarnCRM's own (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, slice S8). Three things
+ * is BarnCRM's own (`decisions/0082-barncrm-owns-its-rollup-engine.md`, slice S8). Three things
  * happen:
  *
  * - **Real time.** A trigger on a source entity calls `runRealTime`. `RollupChanges` works out

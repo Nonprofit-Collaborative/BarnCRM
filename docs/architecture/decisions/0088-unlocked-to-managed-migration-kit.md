@@ -1,4 +1,4 @@
-# ADR-NEXT: Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API
+# ADR-0088: Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API
 
 **Status:** Proposed
 **Date:** 2026-10-12

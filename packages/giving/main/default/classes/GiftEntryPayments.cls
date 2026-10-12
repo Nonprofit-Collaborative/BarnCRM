@@ -1,6 +1,6 @@
 /**
  * Which scheduled payment a gift typed on a gift entry screen pays (canonical model R-DM8,
- * ADR-NEXT `NEXT-gift-entry-pays-a-scheduled-payment.md`).
+ * ADR-0084 `0084-gift-entry-pays-a-scheduled-payment.md`).
  *
  * The candidates are donation matching's (R-DM2) and the suggestion is its window and
  * tolerance (R-DM3, through `DonationMatcher.matching`), so a gift typed on a screen and the

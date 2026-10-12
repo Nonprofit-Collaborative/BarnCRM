@@ -1,4 +1,4 @@
-# ADR-NEXT: Flow templates: which automations get one, how they are named, and what they leave out
+# ADR-0090: Flow templates: which automations get one, how they are named, and what they leave out
 
 **Status:** Accepted (builder decision, owner to confirm)
 **Date:** 2026-10-12

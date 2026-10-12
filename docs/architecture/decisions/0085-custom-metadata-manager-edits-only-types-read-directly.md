@@ -1,6 +1,6 @@
-# ADR-NEXT: The custom metadata manager edits only types BarnCRM reads directly
+# ADR-0085: The custom metadata manager edits only types BarnCRM reads directly
 
-**Status:** Proposed
+**Status:** Accepted (owner standing instruction to proceed as recommended, 2026-10-12; to be amended if he decides otherwise)
 **Date:** 2026-10-12
 **Source:** plan Section 6.1 item 9 (CMDT Manager, for consideration); ADR-0006 (D-06)
 

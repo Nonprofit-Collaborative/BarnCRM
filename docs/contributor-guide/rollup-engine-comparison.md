@@ -3,7 +3,7 @@
 Since slice S8, every rollup run uses BarnCRM's own engine. The vendored apex-rollup tree
 (`packages/core/vendor/apex-rollup`), `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` stay
 in the repository, reached by no run, until this comparison is clean
-(`docs/architecture/decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup proposal D9 and
+(`docs/architecture/decisions/0082-barncrm-owns-its-rollup-engine.md`, rollup proposal D9 and
 Section 6 step 5). Slice S9 deletes them after that.
 
 `RollupEngineComparison` calculates the same target records with both engines and lists every

@@ -4,7 +4,7 @@
  * The notes are the shipped `Release_Note__mdt` records of every installed package, read as
  * shipped: they hold no organization data. What a person has already seen is their own
  * user-level `Whats_New_Seen__c` record (canonical model Section 12A, rules R-WN1 to R-WN4,
- * ADR-NEXT `NEXT-whats-new-from-packaged-release-notes.md`).
+ * ADR-0087 `0087-whats-new-from-packaged-release-notes.md`).
  */
 public with sharing class WhatsNewController {
     // At most four parts of at most four digits: 19 characters, within Last_Seen_Version__c.

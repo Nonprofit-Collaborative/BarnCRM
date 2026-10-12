@@ -1,6 +1,6 @@
-# ADR-NEXT: Field utilization ships in Core, counts in user mode, and keeps weekly snapshots
+# ADR-0086: Field utilization ships in Core, counts in user mode, and keeps weekly snapshots
 
-**Status:** Proposed (builder decision, awaiting owner confirmation)
+**Status:** Accepted (builder decision, accepted as recommended under the owner standing instruction, 2026-10-12)
 **Date:** 2026-10-12
 **Source:** plan Section 6.1 item 10 (Analytics module, field utilization first; Brandon,
 2026-09-23), plan Section 6.2 rule 5, ADR-0003, ADR-0038, ADR-0047
@@ -72,6 +72,6 @@ Lightning session cannot call the org's own APIs without a self-callout (ADR-004
   keys. The tracked list fits 255 characters, which limits an org to roughly eight to twelve
   objects at a time; the page says so when a choice does not fit.
 - An org without a record-wide reader gets partial counts, stated on the page and in the guide.
-- Registration with Health Check depends on `NightlyJobs` (ADR-NEXT,
+- Registration with Health Check depends on `NightlyJobs` (ADR-0086,
   health-check-schedules-every-nightly-job) and is added when both are on main.
 - Revisit the size limit and the chunk size after the 1M-gift scale test (plan v0.11).

@@ -1,4 +1,4 @@
-# ADR-NEXT: Rollup totals are in the target record's currency
+# ADR-0083: Rollup totals are in the target record's currency
 
 **Status:** Accepted (owner decision, 2026-10-12, rollup comparison recommendations)
 **Date:** 2026-10-12

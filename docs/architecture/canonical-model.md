@@ -901,8 +901,8 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 ### Field utilization keys
 
-Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-NEXT
-`NEXT-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
+Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-0086
+`0086-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
 scheduling its job from the console (ADR-0038), so it has no on and off key.
 
 | Key | Type | Default | Definition |
@@ -976,8 +976,8 @@ With no notes shipped, Dismiss stores nothing.
 
 - **Custom setting:** `Whats_New_Seen__c`, hierarchy, protected, with user-level records only
   (`SetupOwnerId` is the person). Not a key on `BarnCRM_Settings__c`, because a user-level
-  record of that setting would hide the organization's values from that person (ADR-NEXT,
-  `NEXT-whats-new-from-packaged-release-notes.md`).
+  record of that setting would hide the organization's values from that person (ADR-0087,
+  `0087-whats-new-from-packaged-release-notes.md`).
 
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
@@ -1112,7 +1112,7 @@ refuses the whole deployment.
 Relationship Type is the one shipped list that also holds the organization's own rows,
 because the relationship service reads it directly rather than through a materialized
 copy. Administrators add, edit and archive their rows from the Custom metadata page in
-BarnCRM Settings (ADR-NEXT, `NEXT-custom-metadata-manager-edits-only-types-read-directly.md`).
+BarnCRM Settings (ADR-0085, `0085-custom-metadata-manager-edits-only-types-read-directly.md`).
 
 ### Release Note
 
@@ -1173,7 +1173,7 @@ configuration surface of the rollup engine (plan Section 4.10, feature C-13). An
 administrator creates and edits these with a filter builder, and never types SOQL (plan
 Section 2.3): today on the Rollups page of the settings console, and once it ships in the
 Rollup Builder, a tab of its own where every rollup, shipped or admin-made, is created and
-edited (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`).
+edited (`decisions/0082-barncrm-owns-its-rollup-engine.md`).
 
 ### Attributes
 
@@ -1475,7 +1475,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   set when the Rollup Builder ships). Long text attributes record that they changed, not the
   values.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
-  in front of BarnCRM's own aggregation core (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`;
+  in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
   apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the
   comparison `RollupEngineComparison` makes before they are deleted). That core is
   `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
@@ -1493,7 +1493,7 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 The list of target records waiting for their totals to be recalculated, and of the ones that
 could not be. A bulk change (R-R4) writes the records it affected here instead of
 recalculating them in the same save, and one background processor works through the list
-(`decisions/NEXT-barncrm-owns-its-rollup-engine.md`). It is also what the Rollup Builder's
+(`decisions/0082-barncrm-owns-its-rollup-engine.md`). It is also what the Rollup Builder's
 "Needs attention" list reads and what its Retry acts on, so one entity serves as queue,
 failure list and retry.
 
@@ -6119,8 +6119,8 @@ permission and, because every bulk update starts from a Find query, `Find_And_Ex
 ### Definition
 
 One count of how many records hold a value in one field, for one object and one record type,
-taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-NEXT
-`NEXT-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
+taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-0086
+`0086-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
 a run is the set of rows sharing it, and a trend is the same object, field and record type
 across runs. Neutral: it names no nonprofit concept and is in Core.
 
@@ -6208,8 +6208,8 @@ account: when it happened, what kind of interaction it was, who took part and wh
 
 An interaction note is not an entity of its own. It is a completed platform activity (a Task)
 logged through the packaged action "Log an interaction". The package adds no object, no field
-on Task or Activity, and no automation on Task (ADR-NEXT,
-`NEXT-interaction-notes-are-completed-tasks.md`).
+on Task or Activity, and no automation on Task (ADR-0089,
+`0089-interaction-notes-are-completed-tasks.md`).
 
 ### Attributes
 
@@ -6237,7 +6237,7 @@ on Task or Activity, and no automation on Task (ADR-NEXT,
 interaction happened. Next steps are an open task, not a field on the note.
 
 **R-IN2 Visibility follows the record.** A note is readable by anyone who can see the person or
-the account it is on. There is no per-note confidentiality (ADR-NEXT, owner question).
+the account it is on. There is no per-note confidentiality (ADR-0089, owner question).
 
 **R-IN3 Where it shows.** A note logged on a person shows on the person's timeline and on the
 timeline of the account their contact points at: the household in contact mode, the employer
@@ -6422,14 +6422,14 @@ mirrors the primary member).
 | v0.7 | 2026-10-12 | C-28 Data hygiene console. No object or field added. New rule R-SQ6: the Data Hygiene tab builds each check's query document in code, counts it in user mode over the same document, and opens it in Find by saving an unshared Saved Query owned by the person. The checks read rules already defined: R-C1 and R-M2 (no household), R-H11 (Member Count), R-M4 (a membership naming nobody), R-AD1 (an address with no owner), R-AD3 (the default address) and R-AD6 (Verification Status). ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`. |
 | v0.7 | 2026-10-12 | C-33 load one object (ADR-0080, `0080-import-load-one-object.md`). `Import_Template__c` gains `Target_Object__c`, `Load_Operation__c`, `Load_Match_Field__c` and `Lookup_Not_Found__c`; `Import_Journal__c.Phase__c` gains Created. R-IT12 (a template that loads one object: insert, update by record Id, upsert by external ID), R-IT13 (lookup columns by ID, name or a unique field) and R-IT14 (the allow-list of objects and the fields never written) added. R-IT1 gains the `Record` entity and `lookupField`; R-IR1, R-IB8, R-IB9 and R-IJ3 say how a one-object import's creations are journaled and undone; Import Row's Resulting Record and Processor Key serve one-object rows. |
 | v0.7 | 2026-10-12 | C-37 data transforms and dedupe on import (ADR-0081, `0081-data-transform-document.md`). R-IT1 columns gain `transforms`; R-IT15 (the transform document and the `DataTransform` engine shared with bulk update) and R-IT16 (matching through the org's active duplicate rules) added. `Import_Template__c` gains `Use_Duplicate_Rules__c`; `Import_Row__c` gains `Duplicate_Rule_Match__c`. |
-| v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |
-| v0.6 | 2026-10-12 | Rollup engine swap (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S8). No object or field added. BarnCRM's own engine is the only path for real time, the queue, Recalculate, Recalculate all and the nightly run; `RollupBatch` is removed. The Mode picklist labels become Instantly, Every night and Both (recommended) on `Rollup_Definition__c`, `Rollup_Definition_Default__mdt` and the `Rollup_Mode_Default__c` setting, stored values unchanged. R-R4 loses its interim sentence; new R-R14 (one full run at a time, and a stopped chunk's records are queued). The four rollup rows in Section 30 are closed. |
-| v0.6 | 2026-10-12 | Rollup operations slice (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, decision 10). `Rollup_Definition__c.Aggregate__c` gains COUNT_DISTINCT, ANY, NONE, TEXT_LIST and TEXT_LIST_DISTINCT, and the definition gains `Delimiter__c` (Comma, Semicolon, New line). New rule R-R15 says which target types each aggregate fills (checkbox targets for ANY and NONE, text targets for FIRST, LAST and the text lists), how blanks, ties, order, the delimiter and the field length are handled, and that every aggregate stays exact under recompute. R-R10 records what the save checks today. The shipped-default type `Rollup_Definition_Default__mdt` keeps its seven aggregates and has no delimiter: no shipped rollup uses the new ones. |
-| v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-NEXT, `NEXT-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
-| v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`NEXT-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
-| post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-NEXT `NEXT-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
-| v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-NEXT, `NEXT-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
-| v0.9 | 2026-10-12 | C-39 interaction notes (ADR-NEXT, `NEXT-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
+| v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/0082-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |
+| v0.6 | 2026-10-12 | Rollup engine swap (`decisions/0082-barncrm-owns-its-rollup-engine.md`, rollup slice S8). No object or field added. BarnCRM's own engine is the only path for real time, the queue, Recalculate, Recalculate all and the nightly run; `RollupBatch` is removed. The Mode picklist labels become Instantly, Every night and Both (recommended) on `Rollup_Definition__c`, `Rollup_Definition_Default__mdt` and the `Rollup_Mode_Default__c` setting, stored values unchanged. R-R4 loses its interim sentence; new R-R14 (one full run at a time, and a stopped chunk's records are queued). The four rollup rows in Section 30 are closed. |
+| v0.6 | 2026-10-12 | Rollup operations slice (`decisions/0082-barncrm-owns-its-rollup-engine.md`, decision 10). `Rollup_Definition__c.Aggregate__c` gains COUNT_DISTINCT, ANY, NONE, TEXT_LIST and TEXT_LIST_DISTINCT, and the definition gains `Delimiter__c` (Comma, Semicolon, New line). New rule R-R15 says which target types each aggregate fills (checkbox targets for ANY and NONE, text targets for FIRST, LAST and the text lists), how blanks, ties, order, the delimiter and the field length are handled, and that every aggregate stays exact under recompute. R-R10 records what the save checks today. The shipped-default type `Rollup_Definition_Default__mdt` keeps its seven aggregates and has no delimiter: no shipped rollup uses the new ones. |
+| v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-0084, `0084-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
+| v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`0084-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
+| post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
+| v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
+| v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
 
 ---
 ## 32. Entity ownership by package

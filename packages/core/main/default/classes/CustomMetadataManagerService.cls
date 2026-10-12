@@ -4,7 +4,7 @@
  * and never a row the package ships.
  *
  * Only the types in the registry below can be changed, with only the fields named there
- * (ADR-NEXT, NEXT-custom-metadata-manager-edits-only-types-read-directly.md; canonical model
+ * (ADR-0085, 0085-custom-metadata-manager-edits-only-types-read-directly.md; canonical model
  * R-D2). Saving is a metadata deployment: it is validated here, built into a container, and
  * enqueued; CustomMetadataDeployCallback records how it ended.
  */

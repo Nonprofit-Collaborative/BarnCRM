@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exports BarnCRM records from a pilot org and reimports them after the managed install.
 
-C-31, ADR-NEXT (NEXT-unlocked-to-managed-migration-kit.md). The administrator's procedure is
+C-31, ADR-0088 (0088-unlocked-to-managed-migration-kit.md). The administrator's procedure is
 docs/admin-guide/moving-to-managed-packages.md; how this works is
 docs/contributor-guide/migration-kit.md.
 

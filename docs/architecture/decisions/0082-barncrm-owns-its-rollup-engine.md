@@ -1,4 +1,4 @@
-# ADR-NEXT: BarnCRM owns its rollup engine
+# ADR-0082: BarnCRM owns its rollup engine
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-12: decisions D1 to D9 of the rollup
 proposal, with amendments A1 and A2). Supersedes ADR-0015. Amends ADR-0011: its reuse-first

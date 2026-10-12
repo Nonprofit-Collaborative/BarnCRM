@@ -1,4 +1,4 @@
-# ADR-NEXT: Gift entry screens suggest the scheduled payment a gift pays, and a person decides
+# ADR-0084: Gift entry screens suggest the scheduled payment a gift pays, and a person decides
 
 **Status:** Accepted
 **Date:** 2026-10-12

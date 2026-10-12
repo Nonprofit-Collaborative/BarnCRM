@@ -32,7 +32,7 @@ const POLL_ATTEMPTS = 20;
  * The Custom metadata page in BarnCRM Settings: the organization's own rows of each editable
  * list, which it can add, edit, archive and restore, above the rows BarnCRM ships, which it
  * can only read. Saving is a metadata deployment, so the page waits on its outcome
- * (NEXT-custom-metadata-manager-edits-only-types-read-directly.md).
+ * (0085-custom-metadata-manager-edits-only-types-read-directly.md).
  */
 export default class CustomMetadataManager extends LightningElement {
   types = [];

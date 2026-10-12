@@ -1,5 +1,5 @@
 /**
- * Currency for rollup totals (ADR-NEXT, `NEXT-rollup-totals-in-the-target-record-currency.md`).
+ * Currency for rollup totals (ADR-0083, `0083-rollup-totals-in-the-target-record-currency.md`).
  *
  * In a single-currency org nothing here changes a value: amounts are added as entered, which is
  * what BarnCRM totals have always done.

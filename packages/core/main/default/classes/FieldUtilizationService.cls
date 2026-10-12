@@ -1,6 +1,6 @@
 /**
  * Counts how many records hold a value in each field, per object and record type (plan
- * Section 6.1 item 10, canonical model Section 29F, ADR-NEXT field-utilization-ships-in-core).
+ * Section 6.1 item 10, canonical model Section 29F, ADR-0086 field-utilization-ships-in-core).
  *
  * Every query and write is in user mode (R-FU3): a run counts what its runner can see. Object
  * and field names come only from describe (R-FU1), so no text a person typed reaches a query.

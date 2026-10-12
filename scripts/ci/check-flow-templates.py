@@ -3,8 +3,8 @@
 
 ADR-0040 says customization is "switch ours off, run yours": each switchable automation has
 a Flow template a customer can Save As and own. Some automations cannot be copied into a
-flow faithfully, and for those the admin guide page says why (ADR-NEXT,
-NEXT-flow-templates-which-automations-get-one.md). Nothing else notices when a new
+flow faithfully, and for those the admin guide page says why (ADR-0090,
+0090-flow-templates-which-automations-get-one.md). Nothing else notices when a new
 automation ships with neither, so this check does.
 
 For each Core Automation Registry row that is not marked Always Runs, one of these holds:

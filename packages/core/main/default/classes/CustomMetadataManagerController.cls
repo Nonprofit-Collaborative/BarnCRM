@@ -1,8 +1,8 @@
 /**
  * The custom metadata manager's Apex surface. Every method, reading included, checks
  * `Manage_BarnCRM_Metadata` first: the console shows the page only to holders, and saving
- * changes the org's metadata (ADR-NEXT,
- * NEXT-custom-metadata-manager-edits-only-types-read-directly.md).
+ * changes the org's metadata (ADR-0085,
+ * 0085-custom-metadata-manager-edits-only-types-read-directly.md).
  */
 public with sharing class CustomMetadataManagerController {
     private static final String PERMISSION = 'Manage_BarnCRM_Metadata';

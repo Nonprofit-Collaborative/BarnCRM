@@ -1,4 +1,4 @@
-# ADR-NEXT: What's new is read from packaged release notes and remembered per person
+# ADR-0087: What's new is read from packaged release notes and remembered per person
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12

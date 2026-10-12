@@ -1,6 +1,6 @@
 # ADR-0015: Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter
 
-**Status:** Superseded by `NEXT-barncrm-owns-its-rollup-engine.md` (owner decision, 2026-10-12):
+**Status:** Superseded by `0082-barncrm-owns-its-rollup-engine.md` (owner decision, 2026-10-12):
 BarnCRM replaces apex-rollup with its own aggregation core and removes the vendored tree after a
 clean comparison run. Until then this decision describes the engine that runs. Previously:
 Accepted (builder decision under ADR-0011; vendored as source, not a package dependency)

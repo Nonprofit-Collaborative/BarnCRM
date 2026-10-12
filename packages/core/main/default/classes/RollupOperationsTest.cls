@@ -1,6 +1,6 @@
 /**
- * The operations slice of BarnCRM's own rollup engine (ADR-NEXT
- * `NEXT-barncrm-owns-its-rollup-engine.md`, decision 10; canonical model R-R15): ANY and NONE
+ * The operations slice of BarnCRM's own rollup engine (ADR-0082
+ * `0082-barncrm-owns-its-rollup-engine.md`, decision 10; canonical model R-R15): ANY and NONE
  * into checkboxes and FIRST and LAST into text, on the instant path and in the full
  * recalculation. COUNT_DISTINCT and the text lists are in `RollupTextListsTest`.
  *

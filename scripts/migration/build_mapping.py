@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the migration kit's export and reimport mapping from the package source.
 
-C-31, ADR-NEXT (NEXT-unlocked-to-managed-migration-kit.md). The mapping lists every packaged
+C-31, ADR-0088 (0088-unlocked-to-managed-migration-kit.md). The mapping lists every packaged
 object and field whose records an uninstall deletes, in the order reimport loads them. It is
 generated, never hand-edited, so a new object or field is covered by running this again. The
 only hand-kept part is overrides.json beside this file.

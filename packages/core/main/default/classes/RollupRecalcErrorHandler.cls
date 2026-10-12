@@ -1,6 +1,6 @@
 /**
  * Puts the records of a full recalculation chunk the platform stopped into the Rollup Queue
- * (canonical model R-R14, `decisions/NEXT-barncrm-owns-its-rollup-engine.md`).
+ * (canonical model R-R14, `decisions/0082-barncrm-owns-its-rollup-engine.md`).
  *
  * `RollupFullRecalcBatch` catches what it can, but a governor limit ends a chunk with nothing
  * caught and nothing saved. A `System.Finalizer` cannot be attached to a batch job, so the batch

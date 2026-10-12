@@ -1,6 +1,6 @@
 /**
  * Runs BarnCRM's own rollup engine and the vendored apex-rollup engine over the same records and
- * reports where their answers differ (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, the
+ * reports where their answers differ (`decisions/0082-barncrm-owns-its-rollup-engine.md`, the
  * comparison the vendored tree's deletion waits for). How to run it, and what a difference
  * means: `docs/contributor-guide/rollup-engine-comparison.md`.
  *

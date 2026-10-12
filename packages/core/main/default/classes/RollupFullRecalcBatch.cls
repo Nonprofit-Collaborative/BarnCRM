@@ -1,7 +1,7 @@
 /**
  * The full recalculation of BarnCRM's own rollup engine: the nightly run, Recalculate and
  * Recalculate all (rollup proposal, Part 2 section 4, "Full recalculation" and "Skew";
- * `decisions/NEXT-barncrm-owns-its-rollup-engine.md` decisions 5 and 6).
+ * `decisions/0082-barncrm-owns-its-rollup-engine.md` decisions 5 and 6).
  *
  * One pass per target entity, in turn. A pass is a batch over every record of the entity in Id
  * order, and each chunk recalculates every definition that writes the entity together through

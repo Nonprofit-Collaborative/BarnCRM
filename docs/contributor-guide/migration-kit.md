@@ -1,7 +1,7 @@
 # Migration kit (unlocked to managed)
 
 The kit in `scripts/migration/` moves a production pilot from the unlocked packages to the
-managed packages (C-31, ADR-NEXT `NEXT-unlocked-to-managed-migration-kit.md`). The
+managed packages (C-31, ADR-0088 `0088-unlocked-to-managed-migration-kit.md`). The
 administrator's procedure is [Moving a pilot to the managed packages](../admin-guide/moving-to-managed-packages.md);
 this page is how the kit works and how to keep it right as the packages grow.
 

@@ -1,6 +1,6 @@
 /**
- * COUNT_DISTINCT and the text lists of BarnCRM's own rollup engine (ADR-NEXT
- * `NEXT-barncrm-owns-its-rollup-engine.md`, decision 10; canonical model R-R15), on the instant
+ * COUNT_DISTINCT and the text lists of BarnCRM's own rollup engine (ADR-0082
+ * `0082-barncrm-owns-its-rollup-engine.md`, decision 10; canonical model R-R15), on the instant
  * path and in the full recalculation. Any, None, First and Last are in `RollupOperationsTest`.
  *
  * Core holds no giving objects, so people (Contact) roll up to their organization (`AccountId`),

@@ -1,6 +1,6 @@
 /**
- * C-39 interaction notes (canonical model Section 29G, ADR-NEXT
- * NEXT-interaction-notes-are-completed-tasks.md).
+ * C-39 interaction notes (canonical model Section 29G, ADR-0089
+ * 0089-interaction-notes-are-completed-tasks.md).
  *
  * An interaction note is a completed Task logged through the packaged action
  * Log_Interaction, and the package ships no code for it. These tests hold the platform to

@@ -1,5 +1,5 @@
 /**
- * Currency in rollup totals (ADR-NEXT, `NEXT-rollup-totals-in-the-target-record-currency.md`).
+ * Currency in rollup totals (ADR-0083, `0083-rollup-totals-in-the-target-record-currency.md`).
  *
  * The arithmetic is tested with test rates in every org. The live test asserts what the org can
  * show: amounts as entered in a single-currency org, and conversion into the target record's
