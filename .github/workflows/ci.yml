@@ -57,6 +57,9 @@ jobs:
       - name: Check custom labels against the platform limits
         run: python3 scripts/ci/check-labels.py
 
+      - name: Check the uninstall report counts every object a module owns
+        run: python3 scripts/ci/check-module-objects.py
+
       - name: Check no tracked symlink leaves the repository
         run: bash scripts/ci/check-symlinks.sh
 

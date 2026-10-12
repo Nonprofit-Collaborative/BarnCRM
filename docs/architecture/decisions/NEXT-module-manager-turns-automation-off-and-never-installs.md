@@ -49,7 +49,7 @@ of data that would be lost. Three platform facts limit what Core can do:
    `ModuleManagerService`, and `scripts/ci/check-module-objects.py` fails when that list and the
    module's `objects/` folder disagree.
 7. **The Module Manager lives in BarnCRM Settings**, as a component row in the General section,
-   and the Setup Assistant's modules step links to it.
+   and the Setup Assistant's modules step says where it is.
 
 ## Alternatives considered
 
