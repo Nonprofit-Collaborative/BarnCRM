@@ -120,3 +120,8 @@ Accounting Code, Fund Id, Appeal Id) and its outputs are Outcome, Gift Id, Error
 Message, with the same values and the same rules. A rejected gift does not fail the flow:
 check Outcome in a Decision element. One flow run can send many gifts; each gets its own
 result, and one gift's refusal does not stop the others.
+
+The action's descriptions are written so that a customer's own AI assistant (their
+Agentforce agent, or their own Hosted MCP server) can choose and fill it in as well. BarnCRM
+ships no AI and calls no AI service; see
+[Using BarnCRM actions with your own AI assistant](../admin-guide/using-barncrm-actions-with-ai.md).
