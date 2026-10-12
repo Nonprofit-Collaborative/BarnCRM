@@ -48,8 +48,11 @@ You are David, and a check from Maria's neighbour arrived this morning.
    at zero, and describe the goods: [In-kind gifts](in-kind-gifts.md).)
 6. Choose `Spring appeal` in **Appeal** and save.
 7. Look at the saved gift. **Gift Date** is today, because you left it blank. **Household**
-   shows the donor's household, filled in by BarnCRM rather than by you, which is what
-   keeps household totals right after somebody moves house or marries.
+   shows the donor's household, filled in by BarnCRM rather than by you. The gift stays
+   with that household: if the donor later moves to another household, this gift still
+   counts for the household it was given from, and only their new gifts count for the new
+   one. Merging two households is different: the gifts of both come with the household you
+   keep.
 8. Scroll to **Gift Allocations**. There is one allocation, for the whole 250, designated to
    `General`. You never asked for it: a gift with no designation is allocated in full to the
    default fund, so no money is missing from fund reporting.

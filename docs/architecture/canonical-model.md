@@ -2042,7 +2042,7 @@ refund is another gift rather than an edit (ADR-0010).
 | Name | text | computed | The gift's identifier, assigned automatically. |
 | Donor Contact | reference(Contact) | conditional | The person credited with the gift, where people are Contacts. |
 | Donor Account | reference(Organization) | conditional | The account credited with the gift: an organization, a household giving in its own name, or a person Account. |
-| Household | reference(Household) | computed | The household credited with the gift, derived from the donor (R-G2). |
+| Household | reference(Household) | computed | The household credited with the gift, derived from the donor when the gift is given and kept when the donor later moves households (R-G2). |
 | Gift Date | date | yes | The date the gift was received, which is the date that appears on the receipt. |
 | Amount | decimal | yes | The money received, negative for a refund or a write-off, and zero on an in-kind gift, which is goods rather than money (R-G12). |
 | Type | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | yes | How the gift arrived. |
@@ -2090,9 +2090,15 @@ person-account test in Section 4, never by a static field reference.
 **R-G2 Household is derived.** Household is written by the package, not by the user: from
 the donor contact's household through `HouseholdService`, from the person Account's
 household the same way in junction mode, from the Donor Account itself when that account
-is a household, and left empty when the donor is an organization. It is recomputed when
-the donor changes and when the donor's household membership changes, which is what keeps
-household totals correct after a merge, split, or reparent (R-H12, R-H13).
+is a household, and left empty when the donor is an organization. It is derived when the
+gift is saved and recomputed only when the gift's donor changes. A gift stays credited to
+the household it was credited to when it was given: when the donor later moves households
+(a reparent, a split, or a membership ending), their past gifts stay with the household
+they left and only gifts given after the move are credited to the new one (ADR-NEXT,
+`NEXT-a-gift-keeps-the-household-it-was-given-to.md`; R-H12). A household merge is not a
+move: the platform account merge carries the merged household's gifts to the survivor
+(R-H13). Household rollups reached through current membership, such as automatic household
+soft credits, follow current membership instead.
 
 **R-G3 Refunds and write-offs.** A refund or a write-off is a new gift with a negative
 Amount and Original Gift set, never an edit and never a deletion (ADR-0010). The package
@@ -5526,3 +5532,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
 | v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
 | v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
+| v0.6 | 2026-10-12 | A gift keeps the household it was given to (ADR-NEXT, `NEXT-a-gift-keeps-the-household-it-was-given-to.md`; plan decision D-20). No object or field added. R-G2 amended: a gift's Household is derived when the gift is saved and again when its donor changes, and is not recomputed when the donor's household membership changes, so a donor who moves households leaves their past gifts with the household they were given to. A household merge still carries the merged household's gifts to the survivor (R-H13). Household rollups reached through current membership, such as automatic household soft credits, follow current membership. The Gift Household attribute says so. This matches what the Giving trigger already did. |

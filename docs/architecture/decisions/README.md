@@ -73,6 +73,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
 | [NEXT](NEXT-import-matches-a-person-only-by-their-first-name.md) | An import matches a person with a first name only by that first name | Accepted |
 | [NEXT](NEXT-import-matching-per-entity-and-per-file-values.md) | Import matching per entity, a rule for several matches, and values for every row of a file | Accepted |
+| [NEXT](NEXT-a-gift-keeps-the-household-it-was-given-to.md) | A gift keeps the household it was given to when the donor moves (amends R-G2) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
