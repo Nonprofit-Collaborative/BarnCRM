@@ -1,5 +1,5 @@
 /**
- * Reads the shipped Setting Definition rows that tell the Nonprofit Settings console
+ * Reads the shipped Setting Definition rows that tell the BarnCRM Settings console
  * what to show, in the order the console shows them.
  *
  * The rows are package-shipped custom metadata holding no organization data, and every save

@@ -22,7 +22,17 @@ public with sharing class CampaignSyncController {
         public Integer appealCount;
         @AuraEnabled
         public Integer linkedCount;
+        /** True when there are more appeals than `appealCount`, the most the page counts. */
+        @AuraEnabled
+        public Boolean appealCountCapped;
+        /** True when more appeals have a Campaign than `linkedCount`. */
+        @AuraEnabled
+        public Boolean linkedCountCapped;
     }
+
+    /** The page counts this many appeals and then says "more". A test lowers it. */
+    @TestVisible
+    private static Integer countCap = 10000;
 
     @AuraEnabled
     public static Status getStatus() {
@@ -86,9 +96,13 @@ public with sharing class CampaignSyncController {
         current.canManage = AutomationControl.canManage();
         current.running = CampaignSyncSelector.hasRunningJob(CampaignSyncBatch.CLASS_NAME);
         if (Schema.SObjectType.Appeal__c.isAccessible()) {
-            current.appealCount = CampaignSyncSelector.countAppeals(false);
+            Integer appeals = CampaignSyncSelector.countAppeals(false, countCap + 1);
+            current.appealCountCapped = appeals > countCap;
+            current.appealCount = current.appealCountCapped ? countCap : appeals;
             if (Appeal__c.Campaign_Id__c.getDescribe().isAccessible()) {
-                current.linkedCount = CampaignSyncSelector.countAppeals(true);
+                Integer linked = CampaignSyncSelector.countAppeals(true, countCap + 1);
+                current.linkedCountCapped = linked > countCap;
+                current.linkedCount = current.linkedCountCapped ? countCap : linked;
             }
         }
         return current;

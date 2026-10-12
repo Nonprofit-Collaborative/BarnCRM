@@ -3,7 +3,7 @@
   <fullName>Opportunity_Mirror_Direction__c</fullName>
   <description>
     Which way the Opportunity mirror copies: Off, GiftsToOpportunities or OpportunitiesToGifts.
-    Empty reads as Off. Set in the Giving section of Nonprofit Settings.
+    Empty reads as Off. Set in the Giving section of BarnCRM Settings.
   </description>
   <externalId>false</externalId>
   <inlineHelpText>

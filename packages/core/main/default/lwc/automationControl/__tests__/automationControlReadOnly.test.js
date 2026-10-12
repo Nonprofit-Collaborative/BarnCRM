@@ -27,8 +27,8 @@ jest.mock(
   { virtual: true }
 );
 
-// David has no Manage Nonprofit Settings permission, so the page opens read only.
-jest.mock('@salesforce/customPermission/Manage_Nonprofit_Settings', () => ({ default: false }), {
+// David has no Manage BarnCRM Settings permission, so the page opens read only.
+jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: false }), {
   virtual: true
 });
 
@@ -36,7 +36,7 @@ jest.mock(
   '@salesforce/label/c.Core_AutomationControl_ReadOnly',
   () => ({
     default:
-      'You can read this page but not change it. Ask your administrator for the Manage Nonprofit Settings permission.'
+      'You can read this page but not change it. Ask your administrator for the Manage BarnCRM Settings permission.'
   }),
   { virtual: true }
 );
@@ -73,7 +73,7 @@ describe('c-automation-control without the settings permission', () => {
 
     const notice = element.shadowRoot.querySelector('[data-id="read-only-notice"]');
     expect(notice).not.toBeNull();
-    expect(notice.textContent).toContain('Manage Nonprofit Settings');
+    expect(notice.textContent).toContain('Manage BarnCRM Settings');
     expect(element.shadowRoot.querySelector('[data-id="pause-button"]').disabled).toBe(true);
     expect(element.shadowRoot.querySelector('[data-id="resume-button"]').disabled).toBe(true);
     expect(element.shadowRoot.querySelector('[data-id="pause-hours"]').disabled).toBe(true);

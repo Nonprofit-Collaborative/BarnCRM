@@ -223,7 +223,7 @@ public with sharing class HouseholdService {
 
     @NamespaceAccessible
     public static Boolean isJunctionMode() {
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings != null &&
             MODE_JUNCTION.equalsIgnoreCase(settings.Household_Membership_Mode__c);
     }
@@ -896,7 +896,7 @@ public with sharing class HouseholdService {
         if (automaticCreationSuspended) {
             return false;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings != null && settings.Auto_Create_Households__c == true;
     }
 
@@ -932,7 +932,7 @@ public with sharing class HouseholdService {
         if (!automaticCreationEnabled()) {
             return;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         Id recordTypeId = householdRecordTypeId();
         if (recordTypeId == null) {
             ErrorLogger.log(
@@ -1166,7 +1166,7 @@ public with sharing class HouseholdService {
             );
             return;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         creatingAutomaticHouseholds = true;
         try {
             List<Account> households = new List<Account>();
@@ -1200,7 +1200,7 @@ public with sharing class HouseholdService {
     private static Account newHousehold(
         List<Person> members,
         Id recordTypeId,
-        Nonprofit_Settings__c settings
+        BarnCRM_Settings__c settings
     ) {
         String namePattern = settings == null ? null : settings.Household_Name_Pattern__c;
         String formalPattern = settings == null ? null : settings.Formal_Greeting_Pattern__c;
@@ -1771,7 +1771,7 @@ public with sharing class HouseholdService {
         Set<Id> withPrimary = new Set<Id>();
         for (Account household : households) {
             // Only a household. An organization shares the Primary Contact field (R-O3),
-            // where it names the person the nonprofit deals with rather than a member, and
+            // where it names the person the organization deals with rather than a member, and
             // household upkeep never touches it.
             Boolean isHousehold = recordTypeId != null && household.RecordTypeId == recordTypeId;
             if (isHousehold && household.Primary_Contact__c != null) {
@@ -1850,7 +1850,7 @@ public with sharing class HouseholdService {
         if (householdIds == null || householdIds.isEmpty()) {
             return;
         }
-        Nonprofit_Settings__c settings = SettingsService.getSettings();
+        BarnCRM_Settings__c settings = SettingsService.getSettings();
         if (settings == null || settings.Delete_Empty_Households__c != true) {
             return;
         }

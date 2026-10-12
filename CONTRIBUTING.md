@@ -78,7 +78,7 @@ CI enforces what it can; reviewers enforce the rest.
 - Apex: one class per responsibility, with role suffixes: `*Service`, `*Selector`, `*Domain` or `*TriggerHandler`, `*Controller`, `*Batch`, `*Queueable`, `*Schedulable`, `*Test`.
 - LWC: component names describe the screen, for example `settingsConsole`, `householdNamingPreview`, `importWizard`.
 - Custom labels: `Module_Screen_Purpose`, for example `Giving_ReceiptPage_IssuedStamp`.
-- Custom permissions: `Manage_Nonprofit_Settings`, `Enter_Gifts`, `Issue_Receipts`, `Manage_Volunteers`, `Manage_Programs`, `View_Funder_Pipeline`.
+- Custom permissions: `Manage_BarnCRM_Settings`, `Enter_Gifts`, `Issue_Receipts`, `Manage_Volunteers`, `Manage_Programs`, `View_Funder_Pipeline`.
 
 ## The four non-negotiables
 

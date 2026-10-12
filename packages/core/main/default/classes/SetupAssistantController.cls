@@ -4,11 +4,11 @@
  * stopped at without a chain of round trips. A step's fields, Core's or a module's, are saved
  * by one method that accepts only the keys that step declares (C-29, ADR-0059).
  *
- * Every method that changes something checks the `Manage_Nonprofit_Settings` custom
+ * Every method that changes something checks the `Manage_BarnCRM_Settings` custom
  * permission first, logs what went wrong, and returns a message Maria can act on.
  */
 public with sharing class SetupAssistantController {
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'Setup Assistant';
 
     /** Everything the assistant needs to draw itself. */

@@ -12,6 +12,7 @@
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "check:namespace": "bash scripts/ci/check-namespace.sh",
     "check:standard-objects": "bash scripts/ci/check-standard-objects.sh",
+    "check:person-account-fields": "python3 scripts/ci/check-person-account-fields.py",
     "check:object-allowlist": "python3 scripts/ci/check-object-allowlist.py",
     "check:custom-metadata": "python3 scripts/ci/check-custom-metadata.py",
     "check:symlinks": "bash scripts/ci/check-symlinks.sh",
@@ -36,7 +37,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jest": "29.16.6",
     "husky": "9.1.7",
-    "lint-staged": "17.5.1",
+    "lint-staged": "17.6.0",
     "prettier": "3.9.9",
     "prettier-plugin-apex": "2.3.0"
   }

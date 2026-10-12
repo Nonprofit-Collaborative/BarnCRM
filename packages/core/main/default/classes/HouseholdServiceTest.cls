@@ -183,7 +183,7 @@ private class HouseholdServiceTest {
      */
     @IsTest
     static void aPersonWhoseHouseholdCannotBeCreatedIsNotSavedWithoutOne() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Household_Name_Pattern__c = 'Z'.repeat(240) + ' {LastName}';
@@ -232,7 +232,7 @@ private class HouseholdServiceTest {
      */
     @IsTest
     static void aPersonWhoseHouseholdCannotBeCreatedIsNotSavedWithoutOneInJunctionMode() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_JUNCTION
         );
         settings.Household_Name_Pattern__c = 'Z'.repeat(240) + ' {LastName}';
@@ -273,7 +273,7 @@ private class HouseholdServiceTest {
 
     @IsTest
     static void noHouseholdIsCreatedWhenTheSettingIsOff() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Auto_Create_Households__c = false;
@@ -315,7 +315,7 @@ private class HouseholdServiceTest {
 
     @IsTest
     static void anEmptyHouseholdIsKeptWhenTheSettingIsOff() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.settings(
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
             HouseholdTestDataFactory.MODE_CONTACT
         );
         settings.Delete_Empty_Households__c = false;
@@ -377,7 +377,7 @@ private class HouseholdServiceTest {
 
     @IsTest
     static void junctionModeEndsTheOldMembershipWhenSomeoneMoves() {
-        Nonprofit_Settings__c settings = HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+        BarnCRM_Settings__c settings = HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
         // The household John leaves has to still be there afterwards for this test to be
         // able to look at what happened to his membership of it. Household Member cascades
         // from its household, so tidying the emptied household away would take the ended

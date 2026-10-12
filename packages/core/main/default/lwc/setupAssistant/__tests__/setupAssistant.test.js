@@ -100,13 +100,13 @@ function state(overrides = {}) {
     elapsedMinutes: 21,
     coexistence: {
       detectedShape: 'PersonAccounts',
-      recommendedMode: 'AgentforceNonprofit',
+      recommendedMode: 'NonprofitCloud',
       currentMode: null,
-      modes: ['Standalone', 'NPSP', 'AgentforceNonprofit']
+      modes: ['Standalone', 'NPSP', 'NonprofitCloud']
     },
     modules: [{ name: 'Core', present: true, docsUrl: 'https://example.invalid/core' }],
     roles: [
-      { developerName: 'Nonprofit_Admin', label: 'BarnCRM Admin' },
+      { developerName: 'BarnCRM_Admin', label: 'BarnCRM Admin' },
       { developerName: 'Program_Staff', label: 'Program Staff' }
     ],
     importAvailable: false,
@@ -183,10 +183,10 @@ describe('c-setup-assistant', () => {
 
     element.shadowRoot
       .querySelector('c-setup-step-coexistence')
-      .dispatchEvent(new CustomEvent('confirm', { detail: { mode: 'AgentforceNonprofit' } }));
+      .dispatchEvent(new CustomEvent('confirm', { detail: { mode: 'NonprofitCloud' } }));
     await settle();
 
-    expect(applyCoexistence).toHaveBeenCalledWith({ mode: 'AgentforceNonprofit' });
+    expect(applyCoexistence).toHaveBeenCalledWith({ mode: 'NonprofitCloud' });
   });
 
   it('skips a step without marking it done', async () => {
@@ -280,7 +280,7 @@ describe('c-setup-assistant', () => {
 
     const options = element.shadowRoot.querySelector('lightning-combobox').options;
     expect(options).toEqual([
-      { label: 'BarnCRM Admin', value: 'Nonprofit_Admin' },
+      { label: 'BarnCRM Admin', value: 'BarnCRM_Admin' },
       { label: 'Program Staff', value: 'Program_Staff' }
     ]);
   });

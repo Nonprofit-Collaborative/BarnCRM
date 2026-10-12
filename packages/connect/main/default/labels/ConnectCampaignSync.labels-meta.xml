@@ -86,7 +86,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync page: the setting is off</shortDescription>
-    <value>Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of Nonprofit Settings, then come back to sync your appeals.</value>
+    <value>Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.</value>
   </labels>
   <labels>
     <fullName>Connect_CampaignSync_SwitchedOn</fullName>
@@ -118,7 +118,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync page: viewer cannot sync all</shortDescription>
-    <value>Only someone with the Manage Nonprofit Settings permission can sync all appeals.</value>
+    <value>Only someone with the Manage BarnCRM Settings permission can sync all appeals.</value>
   </labels>
   <labels>
     <fullName>Connect_CampaignSync_SyncAll</fullName>

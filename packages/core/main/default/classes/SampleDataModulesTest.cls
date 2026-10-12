@@ -151,4 +151,42 @@ private class SampleDataModulesTest {
         );
         System.assertEquals(709, counts[0].recordCount);
     }
+
+    @IsTest
+    static void aClassOfTheWrongShapeIsLeftOutAndLogged() {
+        // A real class with a no-argument constructor that is not a SampleDataModule.
+        SampleDataModule module = SampleDataModules.resolve('SampleDataModules');
+        Test.getEventBus().deliver();
+
+        System.assertEquals(null, module, 'only a class that implements the interface is used');
+        System.assertEquals(
+            1,
+            [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataModules.resolve'],
+            'a module shipped in the wrong shape is written to the Error Log'
+        );
+    }
+
+    @IsTest
+    static void aModuleThatIsNotInstalledIsNotAnError() {
+        SampleDataModule module = SampleDataModules.resolve('NoSuchSampleDataModuleFu3');
+        Test.getEventBus().deliver();
+
+        System.assertEquals(null, module, 'a module that is not installed contributes nothing');
+        System.assertEquals(
+            0,
+            [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataModules.resolve'],
+            'an org without the module is the ordinary case, not an error'
+        );
+    }
+
+    @IsTest
+    static void installedModulesAreLookedUpOncePerTransaction() {
+        List<SampleDataModule> first = SampleDataModules.installed();
+        List<SampleDataModule> second = SampleDataModules.installed();
+
+        System.assertEquals(first.size(), second.size(), 'the same modules both times');
+        for (Integer index = 0; index < first.size(); index++) {
+            System.assert(first[index] === second[index], 'the cached instance is reused');
+        }
+    }
 }

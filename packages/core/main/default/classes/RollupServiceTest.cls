@@ -42,7 +42,7 @@ private class RollupServiceTest {
         // right to refuse a mode the shipped row does not offer, and what is being measured
         // here is what the reader does with a stored value that is wrong anyway, which is how
         // an org upgraded from an older row would arrive.
-        Nonprofit_Settings__c settings = Nonprofit_Settings__c.getOrgDefaults();
+        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
         settings.Rollup_Mode_Default__c = 'Nonsense';
         TestDataFactory.saveSettings(settings);
 

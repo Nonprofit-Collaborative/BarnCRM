@@ -1,7 +1,7 @@
 /**
  * The entry points the import wizard and the results screen call (C-14).
  *
- * Everything that changes anything checks the Manage Nonprofit Settings custom permission
+ * Everything that changes anything checks the Manage BarnCRM Settings custom permission
  * first. The read that only shows a batch's progress does not, so a colleague watching a long
  * import does not need the administrator's permission to see how it is going.
  *
@@ -11,7 +11,7 @@
 public with sharing class ImportController {
     /**
      * Injected by the tests so the permitted path can be asserted in an org where the
-     * Manage_Nonprofit_Settings custom permission is not assigned to the running user. Null
+     * Manage_BarnCRM_Settings custom permission is not assigned to the running user. Null
      * in production, where the real check runs.
      */
     @TestVisible
@@ -41,7 +41,7 @@ public with sharing class ImportController {
         public String sourceName;
         /** How this template's gifts are matched to scheduled payments (R-IT7). */
         @AuraEnabled
-        public String donationMatching;
+        public String paymentMatching;
         @AuraEnabled
         public Integer matchDateWindowDays;
         @AuraEnabled
@@ -92,9 +92,9 @@ public with sharing class ImportController {
     public class BatchOptions {
         public Integer expectedCount;
         public Decimal expectedAmount;
-        /** True when the wizard showed the donation matching choices, which are then saved. */
-        public Boolean saveDonationMatching;
-        public String donationMatching;
+        /** True when the wizard showed the payment matching choices, which are then saved. */
+        public Boolean savePaymentMatching;
+        public String paymentMatching;
         public Integer matchDateWindowDays;
         public Decimal matchAmountTolerance;
     }
@@ -156,7 +156,7 @@ public with sharing class ImportController {
                     : String.valueOf(template.Last_Import_Date__c);
                 view.isRecurring = template.Is_Recurring__c;
                 view.sourceName = template.Source_Name__c;
-                view.donationMatching = template.Donation_Matching__c;
+                view.paymentMatching = template.Payment_Matching__c;
                 view.matchDateWindowDays = template.Match_Date_Window_Days__c == null
                     ? null
                     : template.Match_Date_Window_Days__c.intValue();
@@ -229,10 +229,10 @@ public with sharing class ImportController {
             enforcePermission();
             BatchOptions options = parseOptions(optionsJson);
             ImportTemplateService.saveMapping(templateId, mappingDocument, matchingRule);
-            if (options.saveDonationMatching == true) {
-                ImportTemplateService.saveDonationMatching(
+            if (options.savePaymentMatching == true) {
+                ImportTemplateService.savePaymentMatching(
                     templateId,
-                    options.donationMatching,
+                    options.paymentMatching,
                     options.matchDateWindowDays,
                     options.matchAmountTolerance
                 );
@@ -462,7 +462,7 @@ public with sharing class ImportController {
         if (permissionOverride != null) {
             return permissionOverride;
         }
-        return FeatureManagement.checkPermission('Manage_Nonprofit_Settings');
+        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
     }
 
     /**

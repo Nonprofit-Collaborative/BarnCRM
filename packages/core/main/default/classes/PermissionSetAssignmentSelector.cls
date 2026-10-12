@@ -93,7 +93,7 @@ public with sharing class PermissionSetAssignmentSelector {
 
     /**
      * Counts the active users assigned to one permission set group.
-     * Used to stop the last Nonprofit Admin removing themselves.
+     * Used to stop the last BarnCRM Admin removing themselves.
      *
      * @param groupId the permission set group Id to count
      * @return how many active users hold the group

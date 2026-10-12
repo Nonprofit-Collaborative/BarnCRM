@@ -1,12 +1,12 @@
 /**
  * Maria opens the console and changes a setting. David opens the same page without the
- * Manage Nonprofit Settings permission and gets a read-only view that names the permission.
+ * Manage BarnCRM Settings permission and gets a read-only view that names the permission.
  */
 @IsTest
 private class SettingsControllerTest {
     private static final String TEXT_KEY = 'Household_Name_Pattern__c';
     private static final String CHECKBOX_KEY = 'Auto_Create_Households__c';
-    private static final String EDIT_PERMISSION = 'Manage_Nonprofit_Settings';
+    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
 
     @TestSetup
     static void makeData() {
@@ -52,7 +52,7 @@ private class SettingsControllerTest {
                 Section__c = SettingSections.GENERAL,
                 Module__c = 'Core',
                 Data_Type__c = 'Picklist',
-                Picklist_Values__c = 'Standalone:On its own;AgentforceNonprofit:Alongside Nonprofit Cloud',
+                Picklist_Values__c = 'Standalone:On its own;NonprofitCloud:Alongside Nonprofit Cloud',
                 Sort_Order__c = 1
             ),
             new Setting_Definition__mdt(
@@ -98,6 +98,10 @@ private class SettingsControllerTest {
     @IsTest
     static void showsEverySectionWithItsSettings() {
         stubDefinitions();
+        // An org with the Nonprofit Cloud objects, so both stubbed coexistence choices apply.
+        OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+        shape.hasIndustriesNonprofit = true;
+        OrgShapeDetector.overrideShape = shape;
 
         Test.startTest();
         SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
@@ -137,6 +141,51 @@ private class SettingsControllerTest {
             byName.get(SettingSections.AUTOMATION).settings[0].component,
             'A section another feature renders arrives as a component to load'
         );
+    }
+
+    @IsTest
+    static void offersAProductsCoexistenceModeOnlyWhereThatProductIsDetected() {
+        stubDefinitions();
+        OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+
+        Test.startTest();
+        List<SettingsController.Option> fresh = coexistenceOptions();
+        SettingsService.saveValues(
+            new Map<String, Object>{
+                'Coexistence_Mode__c' => CoexistenceService.MODE_NONPROFIT_CLOUD
+            }
+        );
+        List<SettingsController.Option> saved = coexistenceOptions();
+        Test.stopTest();
+
+        Assert.areEqual(
+            1,
+            fresh.size(),
+            'An org without Nonprofit Cloud is offered Standalone only'
+        );
+        Assert.areEqual(
+            CoexistenceService.MODE_STANDALONE,
+            fresh[0].value,
+            'Standalone is always there'
+        );
+        Assert.areEqual(
+            2,
+            saved.size(),
+            'A mode already saved stays visible, so the choice is never hidden from its maker'
+        );
+    }
+
+    private static List<SettingsController.Option> coexistenceOptions() {
+        for (
+            SettingsController.SectionModel section : SettingsController.getConsoleModel().sections
+        ) {
+            for (SettingsController.SettingModel setting : section.settings) {
+                if (setting.key == 'Coexistence_Mode__c') {
+                    return setting.options;
+                }
+            }
+        }
+        return new List<SettingsController.Option>();
     }
 
     @IsTest
@@ -212,7 +261,7 @@ private class SettingsControllerTest {
         stubDefinitions();
         Assert.isTrue(
             FeatureManagement.checkPermission(EDIT_PERMISSION),
-            'The permission set built in setup carries Manage Nonprofit Settings'
+            'The permission set built in setup carries Manage BarnCRM Settings'
         );
 
         Test.startTest();

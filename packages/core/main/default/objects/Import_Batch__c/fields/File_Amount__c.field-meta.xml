@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>File_Amount__c</fullName>
-  <description>The total of the file's gift amounts as the last dry run or commit read them, every row with a readable amount counted, rejected or not. Written by the package only when a module that loads gifts is installed (R-IB10).</description>
+  <description>The total of the file's amounts as the last dry run or commit read them, every row with a readable amount counted, rejected or not. Written by the package only when a module that loads amounts is installed (R-IB10).</description>
   <externalId>false</externalId>
-  <inlineHelpText>What the file's gift amounts added up to when it was last read.</inlineHelpText>
+  <inlineHelpText>What the file's amounts added up to when it was last read.</inlineHelpText>
   <label>File Amount</label>
   <precision>16</precision>
   <required>false</required>

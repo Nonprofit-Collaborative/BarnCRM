@@ -28,7 +28,7 @@ const TOKENS = [
 ];
 
 /**
- * The Receipts panel in the Nonprofit Settings console: the letters, and the year end run.
+ * The Receipts panel in the BarnCRM Settings console: the letters, and the year end run.
  *
  * The panel deliberately does not offer a way to edit the tax sentences. They are not on this
  * screen because they are not editable: whatever the letter says, BarnCRM adds what IRS
@@ -103,7 +103,7 @@ export default class ReceiptSettings extends LightningElement {
     return this.working;
   }
 
-  /** Saving and switching a letter on both need Manage Nonprofit Settings, so both read this. */
+  /** Saving and switching a letter on both need Manage BarnCRM Settings, so both read this. */
   get cannotEdit() {
     return this.working || !this.canManage;
   }
