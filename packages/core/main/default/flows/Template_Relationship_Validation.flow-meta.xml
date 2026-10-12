@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <assignments>
+    <description>Fills in what this person is to the other one, from the relationship type mapping, and settles the status against the dates: an end date means Former, clearing an end date means Current, and an empty status means Current.</description>
+    <name>Settle_Values</name>
+    <label>Settle values</label>
+    <locationX>176</locationX>
+    <locationY>431</locationY>
+    <assignmentItems>
+      <assignToReference>$Record.Reciprocal_Type__c</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>fReciprocalType</elementReference>
+      </value>
+    </assignmentItems>
+    <assignmentItems>
+      <assignToReference>$Record.Status__c</assignToReference>
+      <operator>Assign</operator>
+      <value>
+        <elementReference>fStatus</elementReference>
+      </value>
+    </assignmentItems>
+    <connector>
+      <targetReference>Check_People</targetReference>
+    </connector>
+  </assignments>
+  <customErrors>
+    <name>Refuse_Duplicate</name>
+    <label>Refuse duplicate</label>
+    <locationX>50</locationX>
+    <locationY>1055</locationY>
+    <customErrorMessages>
+      <errorMessage>{!fDuplicateMessage}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Person_Ambiguous</name>
+    <label>Refuse person ambiguous</label>
+    <locationX>50</locationX>
+    <locationY>647</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Relationship_PersonAmbiguous}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Person_Missing</name>
+    <label>Refuse person missing</label>
+    <locationX>314</locationX>
+    <locationY>647</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Relationship_PersonRequired}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <customErrors>
+    <name>Refuse_Same_Person</name>
+    <label>Refuse same person</label>
+    <locationX>578</locationX>
+    <locationY>647</locationY>
+    <customErrorMessages>
+      <errorMessage>{!$Label.Core_Relationship_SamePerson}</errorMessage>
+      <isFieldError>false</isFieldError>
+    </customErrorMessages>
+  </customErrors>
+  <decisions>
+    <description>Both sides name exactly one person (a contact or a person held as an account, not both), and the two people are different.</description>
+    <name>Check_People</name>
+    <label>Check people</label>
+    <locationX>446</locationX>
+    <locationY>539</locationY>
+    <defaultConnector>
+      <targetReference>Key_Changed</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Well formed</defaultConnectorLabel>
+    <rules>
+      <name>Person_Ambiguous</name>
+      <conditionLogic>(1 AND 2) OR (3 AND 4)</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Person_Account__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Related_Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Related_Person_Account__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Person_Ambiguous</targetReference>
+      </connector>
+      <label>Two people on one side</label>
+    </rules>
+    <rules>
+      <name>Person_Missing</name>
+      <conditionLogic>(1 AND 2) OR (3 AND 4)</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Person_Account__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Related_Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Related_Person_Account__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Person_Missing</targetReference>
+      </connector>
+      <label>A side with no person</label>
+    </rules>
+    <rules>
+      <name>Same_Person</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>fFromId</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <elementReference>fToId</elementReference>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Same_Person</targetReference>
+      </connector>
+      <label>Same person on both sides</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>Refuses the save when the same relationship is already on file.</description>
+    <name>Found_Duplicate</name>
+    <label>Found duplicate</label>
+    <locationX>182</locationX>
+    <locationY>947</locationY>
+    <defaultConnectorLabel>No duplicate</defaultConnectorLabel>
+    <rules>
+      <name>Duplicate</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>varClashName</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Refuse_Duplicate</targetReference>
+      </connector>
+      <label>Duplicate</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>Looks for a duplicate only when the relationship is new or its people or type changed, so changing only a description never finds the record itself.</description>
+    <name>Key_Changed</name>
+    <label>Key changed</label>
+    <locationX>842</locationX>
+    <locationY>647</locationY>
+    <defaultConnectorLabel>Unchanged</defaultConnectorLabel>
+    <rules>
+      <name>Check_For_Duplicate</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>fKeyChanged</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Get_Duplicate</targetReference>
+      </connector>
+      <label>Check for duplicate</label>
+    </rules>
+  </decisions>
+  <description
+  >Template for the automation "Check relationships before saving" (registry row Relationship_Validation). Save As a new flow, change your copy, activate it, then switch ours off on the Automation page of BarnCRM Settings. Fills in the reciprocal type and settles the status against the dates, then refuses a relationship that names one person twice, that does not name a person on both sides, or that is already on file. Unlike ours it compares each relationship with those already saved, not with others in the same import. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  <environments>Default</environments>
+  <formulas>
+    <description>The same message BarnCRM shows, with both people and the relationship already on file filled in.</description>
+    <name>fDuplicateMessage</name>
+    <dataType>String</dataType>
+    <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE({!$Label.Core_Relationship_Duplicate}, "{0}", {!fFromName}), "{1}", {!fToName}), "{2}", {!varClashName})</expression>
+  </formulas>
+  <formulas>
+    <description>The person on this side, whether held as a contact or as an account.</description>
+    <name>fFromId</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Contact__c}, {!$Record.Person_Account__c})</expression>
+  </formulas>
+  <formulas>
+    <name>fFromName</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Contact__r.Name}, BLANKVALUE({!$Record.Person_Account__r.Name}, {!$Label.Core_Relationship_UnnamedPerson}))</expression>
+  </formulas>
+  <formulas>
+    <description>True for a new relationship with a type, and for an edit that changed either person or the type.</description>
+    <name>fKeyChanged</name>
+    <dataType>Boolean</dataType>
+    <expression
+    >AND(NOT(ISBLANK(TEXT({!$Record.Type__c}))), OR(ISBLANK({!$Record__Prior.Id}), {!fFromId} &lt;&gt; BLANKVALUE({!$Record__Prior.Contact__c}, BLANKVALUE({!$Record__Prior.Person_Account__c}, "")), {!fToId} &lt;&gt; BLANKVALUE({!$Record__Prior.Related_Contact__c}, BLANKVALUE({!$Record__Prior.Related_Person_Account__c}, "")), TEXT({!$Record.Type__c}) &lt;&gt; TEXT({!$Record__Prior.Type__c})))</expression>
+  </formulas>
+  <formulas>
+    <description>What this person is to the other one: the mapped type, or Other when the type has no mapping. Empty when the relationship has no type.</description>
+    <name>fReciprocalType</name>
+    <dataType>String</dataType>
+    <expression>IF(ISBLANK(TEXT({!$Record.Type__c})), "", BLANKVALUE({!varMappedType}, "Other"))</expression>
+  </formulas>
+  <formulas>
+    <description>An end date means Former. Clearing an end date means Current. An empty status means Current. Otherwise the status is left as the person set it.</description>
+    <name>fStatus</name>
+    <dataType>String</dataType>
+    <expression>IF(NOT(ISBLANK({!$Record.End_Date__c})), "Former", IF(NOT(ISBLANK({!$Record__Prior.End_Date__c})), "Current", IF(ISBLANK(TEXT({!$Record.Status__c})), "Current", TEXT({!$Record.Status__c}))))</expression>
+  </formulas>
+  <formulas>
+    <description>The person on the other side, whether held as a contact or as an account.</description>
+    <name>fToId</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Related_Contact__c}, {!$Record.Related_Person_Account__c})</expression>
+  </formulas>
+  <formulas>
+    <name>fToName</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Related_Contact__r.Name}, BLANKVALUE({!$Record.Related_Person_Account__r.Name}, {!$Label.Core_Relationship_UnnamedPerson}))</expression>
+  </formulas>
+  <interviewLabel>BarnCRM template: Check relationships before saving {!$Flow.CurrentDateTime}</interviewLabel>
+  <isTemplate>true</isTemplate>
+  <label>BarnCRM template: Check relationships before saving</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <recordLookups>
+    <description>The same relationship already on file: this person, that person, this type. A to B as Parent and B to A as Child are two sides, not duplicates.</description>
+    <name>Get_Duplicate</name>
+    <label>Get duplicate</label>
+    <locationX>182</locationX>
+    <locationY>839</locationY>
+    <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Found_Duplicate</targetReference>
+    </connector>
+    <filterLogic>(1 OR 2) AND (3 OR 4) AND 5 AND 6</filterLogic>
+    <filters>
+      <field>Contact__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fFromId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Person_Account__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fFromId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Related_Contact__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fToId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Related_Person_Account__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fToId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Type__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Type__c</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Id</field>
+      <operator>NotEqualTo</operator>
+      <value>
+        <elementReference>$Record.Id</elementReference>
+      </value>
+    </filters>
+    <getFirstRecordOnly>true</getFirstRecordOnly>
+    <object>Relationship__c</object>
+    <outputAssignments>
+      <assignToReference>varClashName</assignToReference>
+      <field>Name</field>
+    </outputAssignments>
+  </recordLookups>
+  <recordLookups>
+    <description>The shipped mapping row for this type. Edit the Relationship Type custom metadata, not this flow, to change what the other side becomes.</description>
+    <name>Get_Type_Mapping</name>
+    <label>Get type mapping</label>
+    <locationX>176</locationX>
+    <locationY>323</locationY>
+    <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Settle_Values</targetReference>
+    </connector>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Type__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Type__c</elementReference>
+      </value>
+    </filters>
+    <getFirstRecordOnly>true</getFirstRecordOnly>
+    <object>Relationship_Type__mdt</object>
+    <outputAssignments>
+      <assignToReference>varMappedType</assignToReference>
+      <field>Reciprocal_Type__c</field>
+    </outputAssignments>
+  </recordLookups>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Get_Type_Mapping</targetReference>
+    </connector>
+    <object>Relationship__c</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordBeforeSave</triggerType>
+  </start>
+  <status>Draft</status>
+  <variables>
+    <description>The name of the relationship already on file, when this one duplicates it.</description>
+    <name>varClashName</name>
+    <dataType>String</dataType>
+    <isCollection>false</isCollection>
+    <isInput>false</isInput>
+    <isOutput>false</isOutput>
+  </variables>
+  <variables>
+    <description>The reciprocal type the mapping gives this type, when the mapping has a row for it.</description>
+    <name>varMappedType</name>
+    <dataType>String</dataType>
+    <isCollection>false</isCollection>
+    <isInput>false</isInput>
+    <isOutput>false</isOutput>
+  </variables>
+</Flow>

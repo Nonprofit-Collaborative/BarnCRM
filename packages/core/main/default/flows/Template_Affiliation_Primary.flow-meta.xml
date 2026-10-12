@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <decisions>
+    <description>A current affiliation marked primary takes the primary flag from every other affiliation of the same person.</description>
+    <name>Is_Current_Primary</name>
+    <label>Is current primary</label>
+    <locationX>176</locationX>
+    <locationY>323</locationY>
+    <defaultConnector>
+      <targetReference>Get_Newest_Primary</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Not primary</defaultConnectorLabel>
+    <rules>
+      <name>Current_Primary</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Is_Primary__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Record.Status__c</leftValueReference>
+        <operator>NotEqualTo</operator>
+        <rightValue>
+          <stringValue>Former</stringValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Clear_Other_Primaries</targetReference>
+      </connector>
+      <label>Current primary</label>
+    </rules>
+  </decisions>
+  <decisions>
+    <description>The Primary Affiliation field lives on the contact or on the person account, whichever holds this person.</description>
+    <name>Person_Held_As</name>
+    <label>Person held as</label>
+    <locationX>176</locationX>
+    <locationY>731</locationY>
+    <defaultConnector>
+      <targetReference>Update_Person_Account</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Account</defaultConnectorLabel>
+    <rules>
+      <name>Held_As_Contact</name>
+      <conditionLogic>and</conditionLogic>
+      <conditions>
+        <leftValueReference>$Record.Contact__c</leftValueReference>
+        <operator>IsNull</operator>
+        <rightValue>
+          <booleanValue>false</booleanValue>
+        </rightValue>
+      </conditions>
+      <connector>
+        <targetReference>Update_Contact</targetReference>
+      </connector>
+      <label>Contact</label>
+    </rules>
+  </decisions>
+  <description
+  >Template for the automation "Keep one primary affiliation per person" (registry row Affiliation_Primary). Save As a new flow, change your copy, activate it, then switch ours off on the Automation page of BarnCRM Settings. Copy the delete template too. Makes sure at most one current affiliation per person is primary and copies that organization to the person's Primary Affiliation field. When an affiliation moves to another person, the first person's field is refreshed the next time one of their affiliations is saved. Your copy does not read our switch or the pause: activating it is its switch. See the admin guide page flow-templates.md.</description>
+  <environments>Default</environments>
+  <formulas>
+    <description>The person this affiliation is for, whether held as a contact or as an account.</description>
+    <name>fPersonId</name>
+    <dataType>String</dataType>
+    <expression>BLANKVALUE({!$Record.Contact__c}, {!$Record.Person_Account__c})</expression>
+  </formulas>
+  <interviewLabel>BarnCRM template: Keep one primary affiliation per person {!$Flow.CurrentDateTime}</interviewLabel>
+  <isTemplate>true</isTemplate>
+  <label>BarnCRM template: Keep one primary affiliation per person</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <recordLookups>
+    <description>The person's newest current primary affiliation. After the step before, that is this one when it is primary. When none is left, the Primary Affiliation field is emptied.</description>
+    <name>Get_Newest_Primary</name>
+    <label>Get newest primary</label>
+    <locationX>176</locationX>
+    <locationY>623</locationY>
+    <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+    <connector>
+      <targetReference>Person_Held_As</targetReference>
+    </connector>
+    <filterLogic>(1 OR 2) AND 3 AND 4</filterLogic>
+    <filters>
+      <field>Contact__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fPersonId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Person_Account__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fPersonId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Is_Primary__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <booleanValue>true</booleanValue>
+      </value>
+    </filters>
+    <filters>
+      <field>Status__c</field>
+      <operator>NotEqualTo</operator>
+      <value>
+        <stringValue>Former</stringValue>
+      </value>
+    </filters>
+    <getFirstRecordOnly>true</getFirstRecordOnly>
+    <object>Affiliation__c</object>
+    <outputAssignments>
+      <assignToReference>varPrimaryOrganization</assignToReference>
+      <field>Organization__c</field>
+    </outputAssignments>
+    <sortField>CreatedDate</sortField>
+    <sortOrder>Desc</sortOrder>
+  </recordLookups>
+  <recordUpdates>
+    <description>Clears the primary flag on the person's other affiliations.</description>
+    <name>Clear_Other_Primaries</name>
+    <label>Clear other primaries</label>
+    <locationX>50</locationX>
+    <locationY>431</locationY>
+    <connector>
+      <targetReference>Get_Newest_Primary</targetReference>
+    </connector>
+    <filterLogic>(1 OR 2) AND 3 AND 4</filterLogic>
+    <filters>
+      <field>Contact__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fPersonId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Person_Account__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>fPersonId</elementReference>
+      </value>
+    </filters>
+    <filters>
+      <field>Is_Primary__c</field>
+      <operator>EqualTo</operator>
+      <value>
+        <booleanValue>true</booleanValue>
+      </value>
+    </filters>
+    <filters>
+      <field>Id</field>
+      <operator>NotEqualTo</operator>
+      <value>
+        <elementReference>$Record.Id</elementReference>
+      </value>
+    </filters>
+    <inputAssignments>
+      <field>Is_Primary__c</field>
+      <value>
+        <booleanValue>false</booleanValue>
+      </value>
+    </inputAssignments>
+    <object>Affiliation__c</object>
+  </recordUpdates>
+  <recordUpdates>
+    <description>Copies the primary organization to the contact.</description>
+    <name>Update_Contact</name>
+    <label>Update contact</label>
+    <locationX>50</locationX>
+    <locationY>839</locationY>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Id</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Contact__c</elementReference>
+      </value>
+    </filters>
+    <inputAssignments>
+      <field>Primary_Affiliation__c</field>
+      <value>
+        <elementReference>varPrimaryOrganization</elementReference>
+      </value>
+    </inputAssignments>
+    <object>Contact</object>
+  </recordUpdates>
+  <recordUpdates>
+    <description>Copies the primary organization to the person held as an account.</description>
+    <name>Update_Person_Account</name>
+    <label>Update person account</label>
+    <locationX>314</locationX>
+    <locationY>839</locationY>
+    <filterLogic>and</filterLogic>
+    <filters>
+      <field>Id</field>
+      <operator>EqualTo</operator>
+      <value>
+        <elementReference>$Record.Person_Account__c</elementReference>
+      </value>
+    </filters>
+    <inputAssignments>
+      <field>Primary_Affiliation__c</field>
+      <value>
+        <elementReference>varPrimaryOrganization</elementReference>
+      </value>
+    </inputAssignments>
+    <object>Account</object>
+  </recordUpdates>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Is_Current_Primary</targetReference>
+    </connector>
+    <filterFormula>NOT(AND(ISBLANK({!$Record.Contact__c}), ISBLANK({!$Record.Person_Account__c})))</filterFormula>
+    <object>Affiliation__c</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordAfterSave</triggerType>
+  </start>
+  <status>Draft</status>
+  <variables>
+    <description>The organization of the person's primary affiliation, or empty when there is none.</description>
+    <name>varPrimaryOrganization</name>
+    <dataType>String</dataType>
+    <isCollection>false</isCollection>
+    <isInput>false</isInput>
+    <isOutput>false</isOutput>
+  </variables>
+</Flow>

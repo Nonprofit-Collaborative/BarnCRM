@@ -110,6 +110,10 @@ as ours in a few places, and you should know where before you switch ours off.
   both sides are going and does nothing extra. The delete template cannot tell, and Salesforce
   may refuse the delete with a message that a record is already being deleted. Delete one side:
   the other goes with it.
+- **Moving an affiliation to a different person.** Ours refreshes the Primary Affiliation
+  field on both people. A copy of the template refreshes the person the affiliation now
+  belongs to; the first person's field catches up the next time one of their affiliations is
+  saved.
 - **The relationships template does not read Keep both sides of relationships in step in
   BarnCRM Settings.** Activating your flow is the choice.
 - **Two people editing both sides of one relationship in the same save.** Ours lets one of
