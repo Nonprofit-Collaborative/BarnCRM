@@ -279,8 +279,8 @@ has not moved.
 **Switching off a rollup automation and forgetting it (with Giving).** Instantly and Both
 work because Giving runs an automation each time a gift, a commitment, a gift allocation or
 a soft credit is saved. They are listed on the **Automation** page as **Update rollups when
-a gift changes**, **Update rollups when a commitment changes**, **Update rollups when a gift
-allocation changes** and **Update rollups when a soft credit changes**. Switching one off,
+a gift changes**, **Update rollups when a commitment changes**, **Update rollups for gift
+allocations** and **Update rollups for soft credits**. Switching one off,
 or pausing all automation for a data load, leaves the totals it feeds where they were. A
 rollup in **Both (recommended)** mode is put right by the nightly run; one in **Instantly**
 mode stays behind until you click **Recalculate** on its row. Switch the automation back on
