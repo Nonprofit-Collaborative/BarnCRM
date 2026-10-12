@@ -160,6 +160,37 @@ public with sharing class FindController {
         }
     }
 
+    /** The document's summary, counted or totalled as the person (C-36, R-SQ9). */
+    @AuraEnabled
+    public static FindSummary.SummaryResult summarize(String queryJson) {
+        try {
+            requirePermission();
+            return FindSummary.summarize(queryJson);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Summarize a Find query');
+        }
+    }
+
+    /**
+     * Saves values edited in the results grid (C-36, R-SQ10). Needs the bulk update permission
+     * as well as Find's (R-BU6).
+     */
+    @AuraEnabled
+    public static FindInlineEditService.SaveSummary saveEdits(
+        String objectApiName,
+        String editsJson
+    ) {
+        try {
+            requirePermission();
+            if (!BulkUpdateController.hasPermission()) {
+                throw new FindException(System.Label.Core_BulkUpdate_ErrorNoPermission);
+            }
+            return FindInlineEditService.save(objectApiName, editsJson);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Save edits in Find');
+        }
+    }
+
     /** One export page in Id order, after the last Id the browser has read (R-SQ3). */
     @AuraEnabled
     public static QueryResult exportPage(String queryJson, String afterId) {
@@ -324,7 +355,8 @@ public with sharing class FindController {
         if (
             !(caught instanceof FindException) &&
             !(caught instanceof QueryCompiler.QueryCompilerException) &&
-            !(caught instanceof QueryFieldCatalog.QueryFieldCatalogException)
+            !(caught instanceof QueryFieldCatalog.QueryFieldCatalogException) &&
+            !(caught instanceof BulkUpdateFields.BulkUpdateException)
         ) {
             ErrorLogger.log(caught, context);
             message = System.Label.Core_Find_UnexpectedError;
