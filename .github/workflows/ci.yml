@@ -81,6 +81,9 @@ jobs:
       - name: Check every setting that ships switched on actually reads on
         run: python3 scripts/ci/check-setting-defaults.py
 
+      - name: Check every switchable Core automation has a Flow template or a reason
+        run: python3 scripts/ci/check-flow-templates.py
+
       - name: Fail on em dash characters
         run: |
           set +e

@@ -145,8 +145,13 @@ Salesforce org is needed for this job. Steps:
    silently, which is a defect only an org run finds (ADR-0035). This ran because C-15 had
    been writing one side of every relationship since it merged: the reciprocal upkeep read
    its own shipped default as false.
-17. A grep check that fails the build if any tracked file contains an em dash character.
-18. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
+17. `scripts/ci/check-flow-templates.py`, failing the build if a switchable Core automation
+   has neither a Flow template (`Template_<registry name>`) nor a row on
+   `docs/admin-guide/flow-templates.md` saying why it has none, or if a template ships active
+   or not marked as a template (ADR-0040, ADR-NEXT
+   `NEXT-flow-templates-which-automations-get-one.md`).
+18. A grep check that fails the build if any tracked file contains an em dash character.
+19. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
    The results are uploaded as a build artifact (`code-analyzer-results.html` and
    `code-analyzer-results.json`) even if the job fails, so anyone can download and read
@@ -176,6 +181,7 @@ npm run check:components-reachable
 npm run check:record-pages-assigned
 npm run check:canonical-model
 npm run check:setting-defaults
+npm run check:flow-templates
 npm run check:apex
 npm run check:analyzer
 ```
