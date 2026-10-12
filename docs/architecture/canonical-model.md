@@ -827,7 +827,7 @@ assistant that wrote them (they are Giving keys from v0.6, Section 21A).
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
-| `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. |
+| `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
@@ -1061,8 +1061,10 @@ step writes `Default_Fund__c` and `Default_Appeal__c` in the same place.
 One calculated number: which records are counted, how they reach the record that shows
 the number, what is aggregated, and when it is recalculated. This is the whole
 configuration surface of the rollup engine (plan Section 4.10, feature C-13). An
-administrator creates and edits these in the settings console with a filter builder, and
-never types SOQL (plan Section 2.3).
+administrator creates and edits these with a filter builder, and never types SOQL (plan
+Section 2.3): today on the Rollups page of the settings console, and once it ships in the
+Rollup Builder, a tab of its own where every rollup, shipped or admin-made, is created and
+edited (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`).
 
 ### Attributes
 
@@ -1083,7 +1085,7 @@ never types SOQL (plan Section 2.3).
 | Fiscal Year Aware | boolean | yes (defaults false) | Whether the calculation is limited to one fiscal year window. |
 | Fiscal Year Offset | integer | conditional | Which window: 0 this fiscal year, -1 last, -2 two years ago; required when Fiscal Year Aware is true. |
 | Fiscal Date Attribute | text | conditional | The date attribute the window is measured on, for example the gift date; required when Fiscal Year Aware is true and the attribute being aggregated is not itself the date. |
-| Mode | picklist(Real-time, Scheduled, Both) | yes | When the number is recalculated; defaults from the org's rollup mode default. |
+| Mode | picklist(Real-time, Scheduled, Both) | yes | When the number is recalculated (R-R4); defaults from the org's rollup mode default. Shown to the admin as Instantly, Every night and Both (recommended). |
 | Last Calculated | datetime | computed | When this definition last completed a calculation, of any scope. |
 | Is Package Default | boolean | yes (defaults false) | Marks a definition materialized from a shipped default rather than created by the admin. |
 | Active | boolean | yes (defaults true) | Whether the engine runs this definition; turning it off never deletes the values already calculated. |
@@ -1162,10 +1164,19 @@ attribute being aggregated is used.
 Windows are never stored on the definition, so changing the fiscal year start month and
 recalculating is enough to correct every fiscal rollup in the org.
 
-**R-R4 Modes.** Real-time recalculates in the transaction that changed a source record.
-Scheduled recalculates in the nightly batch. Both does the first and reconciles with the
-second, and it is the mode the packaged giving definitions ship with, because it is the
-combination that keeps the numbers visibly right (Principle 2).
+**R-R4 Modes.** Real-time (shown as Instantly) keeps the number current as source records
+change: a normal save updates the totals in the same save, and a bulk change (an import, a
+data loader run, a large update, or any save that is already running in the background) is
+queued (Section 14A) and finishes within minutes. Scheduled (shown as Every night)
+recalculates in the nightly full run. Both (shown as Both (recommended)) does the first and
+reconciles with the second, so the nightly run is the safety net for anything the first
+missed; it is the mode the packaged giving definitions ship with, because it is the
+combination that keeps the numbers visibly right (Principle 2). Real-time needs a trigger on
+the source entity (R-R12); where there is none, the definition is recalculated only by the
+nightly run and on demand. The stored values are unchanged; only what the admin reads is.
+Until the engine of `decisions/NEXT-barncrm-owns-its-rollup-engine.md` ships, real time runs
+only for Gift and Commitment sources (and Contact and Household Member changes), and the
+queued path does not exist: a bulk change runs in the background through the old engine.
 
 **R-R5 Freshness.** Last Calculated on the definition answers "when was this number last
 calculated" for the admin looking at the rollup list. The record page answer comes from
@@ -1202,6 +1213,41 @@ aggregate must suit the source attribute type, and FIRST and LAST must have an O
 Attribute. A definition that fails validation is not saved, and the message names the
 problem in plain language.
 
+**R-R11 Recompute, and what marks a target.** Every calculation, instant, queued, nightly
+or on demand, recomputes each affected target record from all its source records; nothing
+is added to or subtracted from a stored total, which is what makes R-R9 hold when two
+calculations overlap. A source change marks a target record for recalculation when it
+touches an attribute a definition reads: the source, order-by and fiscal date attributes,
+the path attributes, any attribute named in the filter, and attributes read through a
+relationship (for example a gift's status, which the fund totals read from Gift Allocation
+as `Gift__r.Status__c`). A changed path marks both the old and the new target; a delete
+marks the old target, including when a parent record is deleted and its source records go
+with it, which fires no trigger on them (deleting a gift removes its allocations, so the
+gift's delete marks their funds); an undelete marks the target again. A person who changes
+household marks both households, in both membership modes. All active definitions on one
+target entity are calculated together, one write per target record, and a value that did
+not change is not written.
+
+**R-R12 Where real time comes from.** Each package ships the trigger registration for its
+own source entities (Automation Registry, Section 13). An administrator's own entity has no
+packaged trigger, so real time on it comes from one of two places: a trigger the Rollup
+Builder generates and deploys for the administrator (one line that hands the changed
+records to the engine, plus its test, named from the entity so the same code is produced in
+every org), or a record-triggered Flow built from the shipped template. Editing a rollup
+never regenerates the trigger, because the rollup's settings live only in the definition.
+When the last active definition on that entity is removed, the Builder offers to remove the
+generated trigger, and Health Check reports a generated trigger that no active definition
+uses. A generated trigger is switched off like any other automation, through an Automation
+Setting row (Section 10) the Builder creates with Is Package Default false.
+
+**R-R13 Freshness stamps are written when the work is done.** A calculation writes
+`Rollups_Last_Calculated__c` on a target record in the same write as its totals (Section
+26), and a definition's Last Calculated is set when the run that covers it has finished,
+not when it was queued (R-R5). Because unchanged values are not written (R-R11), a record
+whose totals a run confirmed without changing keeps its earlier stamp; the definition's Last
+Calculated is what says the run happened. Stamping every record on every run would rewrite
+every target record every night, which is the load the changed-only rule removes.
+
 ### Salesforce implementation
 
 - **Object:** `Rollup_Definition__c`, listed and edited in the settings console.
@@ -1223,15 +1269,99 @@ problem in plain language.
 | Fiscal Year Aware | `Fiscal_Year_Aware__c` | Checkbox |
 | Fiscal Year Offset | `Fiscal_Year_Offset__c` | Number (0 decimals) |
 | Fiscal Date Attribute | `Fiscal_Date_Field__c` | Text |
-| Mode | `Mode__c` | Picklist: Real-time, Scheduled, Both |
+| Mode | `Mode__c` | Picklist: Real-time, Scheduled, Both (labels Instantly, Every night, Both (recommended); the same on `Rollup_Mode_Default__c`) |
 | Last Calculated | `Last_Calculated__c` | DateTime |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
 | Active | `Active__c` | Checkbox |
 
 - **Shipped defaults:** `Rollup_Definition_Default__mdt` (Section 13).
 - **Settings keys:** `Fiscal_Year_Start_Month__c`, `Rollup_Mode_Default__c` (Section 12).
+- **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
+  Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed
+  how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
+  set when the Rollup Builder ships). Long text attributes record that they changed, not the
+  values.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser`, `RollupBatch`,
-  `RollupScheduler`, subject to the vendoring evaluation in ADR-0011.
+  `RollupScheduler`, with apex-rollup behind `RollupAdapter` (ADR-0015) until BarnCRM's own
+  aggregation core replaces it (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`): a planner,
+  a calculator, the writer, a queue processor (Section 14A), a full recalculation batch and an
+  invocable recalculation action for Flow.
+
+## 14A. Rollup Queue
+
+### Definition
+
+The list of target records waiting for their totals to be recalculated, and of the ones that
+could not be. A bulk change (R-R4) writes the records it affected here instead of
+recalculating them in the same save, and one background processor works through the list
+(`decisions/NEXT-barncrm-owns-its-rollup-engine.md`). It is also what the Rollup Builder's
+"Needs attention" list reads and what its Retry acts on, so one entity serves as queue,
+failure list and retry.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The entry's identifier, assigned automatically. |
+| Target Entity | text | yes | The entity whose records are listed, for example Account or Fund. |
+| Record Ids | long text | yes | The identifiers of the target records to recalculate, at most 200, held as text (R-RQ2). |
+| Record Count | integer | yes | How many identifiers Record Ids holds, so "records waiting" is a sum rather than a parse. |
+| Status | picklist(Pending, Failed) | yes (defaults Pending) | Pending: waiting for the processor. Failed: tried five times without success; waits for Retry. |
+| Attempts | integer | yes (defaults 0) | How many times the processor has tried these records. |
+| Next Attempt | datetime | no | The earliest time the processor tries these records again after a failure; empty means now. |
+| Last Error | long text | no | What went wrong on the last attempt, in plain language first, for the Needs attention list. |
+
+### Relationships
+
+- None. Record Ids and Target Entity are text, never references (R-RQ2), and an entry is not
+  tied to a Rollup Definition: it lists records, and every active definition on their target
+  entity is recalculated for them (R-R11).
+
+### Rules
+
+**R-RQ1 Append-only for writers.** A transaction that changes source records inserts entries
+(one per target entity, split at 200 identifiers) and never updates or deletes one. Only the
+processor updates or deletes entries. Two writers therefore never contend for the same entry.
+
+**R-RQ2 Identifiers as text.** A reference to the target would lock the target record when the
+entry is inserted, so a large import touching one household would queue behind itself.
+Identifiers held as text lock nothing. The cost is that an entry is not reportable by target;
+the Needs attention list resolves the names.
+
+**R-RQ3 How the processor works.** It reads Pending entries whose Next Attempt has passed,
+merges and sorts their identifiers, recalculates a slice (R-R11), and deletes the entries it
+finished. Target records that failed are written back as a new entry with Attempts increased
+and Next Attempt set later each time; after the fifth attempt the entry is Failed. The
+processor runs again while Pending entries remain. A second processor started by accident is
+harmless, because recalculation recomputes (R-R11).
+
+**R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
+back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
+(which deletes it). Each processor and nightly run writes one summary entry to the Error Log
+(Section 9) when anything failed, so the Hub's error tile sees it.
+
+**R-RQ5 Written in system mode.** Entries are the engine's own bookkeeping and are written
+under ADR-0021, so a gift saved by a user who cannot see the queue still queues its totals.
+The engine's automation switch and the global pause (Section 10) stop entries being written
+and processed; the nightly run puts the totals right afterwards in Both mode.
+
+### Salesforce implementation
+
+- **Object:** `Rollup_Queue__c`, auto-number Name with format `RQ-{0000000}`, private sharing,
+  readable by the BarnCRM Admin permission set and written only by the engine.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Target Entity | `Target_Object__c` | Text (80) |
+| Record Ids | `Record_Ids__c` | Long Text Area |
+| Record Count | `Record_Count__c` | Number (0 decimals) |
+| Status | `Status__c` | Picklist: Pending, Failed |
+| Attempts | `Attempts__c` | Number (0 decimals) |
+| Next Attempt | `Next_Attempt__c` | DateTime |
+| Last Error | `Last_Error__c` | Long Text Area |
+
+- **Service:** the queue processor of the new engine; the Rollup Builder's Needs attention
+  list reads and retries entries.
 
 ---
 
@@ -4376,7 +4506,10 @@ or `Contact__c` on Soft Credit.
 The fund definitions aggregate Gift Allocation but filter and read attributes on the
 parent gift, written with a relationship-qualified name such as `Gift__r.Status__c`. That
 is a requirement on the aggregation engine, recorded here so that it is part of the
-vendoring evaluation in ADR-0011 rather than a surprise during the build.
+vendoring evaluation in ADR-0011 rather than a surprise during the build. It has a second
+half that R-R11 states: a change to the gift (its status, or its delete, which removes its
+allocations without firing their trigger) has to mark the gift's funds for recalculation,
+because the allocation row the fund total counts was not itself saved.
 
 Appeal donor count is deliberately absent: counting distinct donors is not one of the
 seven aggregates the engine offers (plan Section 4.10), and a grouped report answers it
@@ -5291,9 +5424,13 @@ is closed deliberately rather than discovered.
 
 | Rule | Gap | Why it is open |
 |---|---|---|
+| R-R4, R-R11 (Section 14) | Real time does not run for Gift Allocation and Soft Credit sources, so fund totals and soft credit totals move only in the nightly run or on Recalculate. | The current engine throws on both (a parent-field source on the fund last gift date, and the household token path on soft credits), so their registry rows wait for the new engine's trigger collection (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, slice S6). |
+| R-R1 (Section 14) | The household soft credit totals (paths through `{Household}` with an alternative) are not calculated. | The current engine is handed a token path it cannot resolve. Fixed by the new engine's calculator (slice S5); the tests are written and switched off until then. |
+| R-R8 (Section 14) | Target filters are ignored, so Household total giving and Account total giving can overwrite each other on a household that also gives in its own name. | Fixed by construction in the new engine (slice S5) rather than patched into the old one. |
+| R-R5, R-R13 (Section 14) | A recalculation does not stamp the records it wrote, and a definition is marked calculated when its run is queued. | Fixed in the new engine (slices S5 and S7). |
 
-None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-23 by C-22
-(ADR-0044, primary contact mirrors the primary member).
+R-M3's Primary Contact mirror was closed on 2026-09-23 by C-22 (ADR-0044, primary contact
+mirrors the primary member).
 | R-M3 (Section 6) | The primary member is not mirrored to the household's Primary Contact. | `Primary_Contact__c` is a lookup to Contact, so it cannot name a person stored as a Person Account, which is the org shape junction membership serves. Closing the gap means changing the field (a Contact and Account pair, per Section 4) or dropping the second half of the rule. Needs an ADR either way. |
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
 
@@ -5377,6 +5514,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Naming Pattern (shipped default) | Core | v0.1 | 13 |
 | Automation Registry (shipped default) | Core | v0.1 | 13 |
 | Rollup Definition | Core | v0.2 | 14 |
+| Rollup Queue | Core | v0.6 (rollup engine) | 14A |
 | Rollup Definition Default (shipped default) | Core | v0.2 | 13 |
 | Import Template | Core | v0.2 | 15 |
 | Import Template Default (shipped default) | Core | v0.2 | 13 |
@@ -5471,3 +5609,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |

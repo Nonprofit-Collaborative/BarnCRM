@@ -128,12 +128,97 @@ Two settings on the same page change how every rollup behaves:
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
   begin. Set it to the month your fiscal year starts. Changing it and recalculating is
   all that is needed to correct every year based total in the org.
-- **Default rollup mode** decides how a newly created rollup starts out: Real time,
-  Scheduled, or Both.
+- **Default rollup mode** decides how a newly created rollup starts out: **Instantly**,
+  **Every night**, or **Both (recommended)**. The next section says what each one means.
 
 You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
 the Rollups page still opens and still shows every total and its last calculated time; the
 controls are simply read only.
+
+## When a total is recalculated: the three modes
+
+Every rollup has a mode. Until the new rollup engine ships, the Mode list still shows the
+older names, given here in brackets.
+
+| Mode | What happens |
+|---|---|
+| **Instantly** (Real time) | A gift saved by a person updates the totals in the same save: when the page refreshes, the household's total giving already includes it. A bulk change (an import, a data loader run, a big update, or anything already running in the background) is put in a queue instead, and the totals catch up within minutes. |
+| **Every night** (Scheduled) | Recalculated in the nightly run at 2:00 AM, and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
+| **Both (recommended)** (Both) | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
+
+"Instantly" needs BarnCRM to see the change as it happens. It does for gifts, pledges and
+other BarnCRM records. For a total that counts records from one of your own objects, see
+[Instant totals on your own objects](#instant-totals-on-your-own-objects-coming) below;
+without that, such a total is calculated every night and on demand only.
+
+## The Rollup Builder (coming)
+
+The Rollup Builder is coming with the new rollup engine. It will be a tab of its own,
+**Rollup Builder**, where you create a new total and edit any existing one, shipped or your
+own, without typing a query. It walks you through five steps:
+
+1. **Where should the number appear?** The record and the field that show the total. If
+   the field does not exist yet, it links you to Setup to create it.
+2. **What should be counted?** The records that feed the total, and, for a person's
+   records, whether the total lands on the person or on their household.
+3. **How should it be calculated?** Total, count, smallest, largest, average, first or
+   last, and the time window: all time, this fiscal year, last fiscal year, or two years ago.
+4. **Which records count?** Conditions you pick from lists, read back as a sentence
+   ("Gifts whose Status is Received, Refunded or Written off").
+5. **Check and save.** Pick a real record and see what the total would be next to what the
+   record shows now, and how many records the rollup will maintain. Then choose its mode
+   and save.
+
+The Builder also has a **Needs attention** list: records waiting in the queue, records whose
+totals could not be saved and why, and **Retry**. Before **Recalculate all** it tells you how
+long the run is likely to take and, during working hours, offers to run it tonight instead.
+Until the Builder ships, use the Rollups page described above.
+
+## Instant totals on your own objects (coming)
+
+BarnCRM can only ship automation for its own records. If you build a rollup that counts
+records from an object your organization created (for example volunteer hours on a custom
+Shift object), the Rollup Builder will offer to make it instant by adding a small piece of
+automation for you:
+
+- One click deploys a one-line trigger on your object and a test for it. The trigger only
+  tells BarnCRM which records changed; how the total is calculated stays in the rollup, so
+  editing the rollup later never changes the code.
+- It runs only its own test while deploying, so tests elsewhere in your org that already
+  fail do not block it. If the deploy does fail, the Builder says why in plain words and what
+  to do next.
+- You need the **Customize Application** and **Modify All Data** permissions and the
+  BarnCRM permission to deploy rollup triggers, and you authorize the connection once. If you
+  do not have them, the Builder says "Ask a Salesforce admin, or use the Flow template."
+- Try it in a sandbox first. The trigger has the same name in every org, so moving it to
+  production with a change set gives the same result as deploying it from the Builder there.
+- When you remove the last rollup on that object, the Builder offers to remove the trigger
+  too. Health Check reports a BarnCRM trigger that no rollup uses any more. Remove these
+  triggers before uninstalling BarnCRM.
+
+If you prefer no code in your org, a **Recalculate rollups** Flow template does the same job:
+copy it, point it at your object, and activate it. Because a Flow cannot react to a record
+being restored from the recycle bin, keep such rollups in **Both (recommended)**.
+
+## Current limits
+
+BarnCRM is replacing its rollup engine. Until the new engine ships:
+
+- **Fund totals and soft credit totals update every night, not instantly.** Saving a gift
+  allocation or a soft credit does not move them, and neither does changing a gift's status
+  or deleting a gift as far as its funds are concerned. Keep those rollups in **Both** or
+  **Every night**; the nightly run, or **Recalculate**, brings them up to date.
+- **Household soft credit totals are not calculated.** Total soft credits and Soft credit
+  count on a household stay empty or out of date. A person's own soft credit totals are right.
+- **A household that gives in its own name can show only part of its total giving.** When a
+  gift names the household as the account that gave it, the household and account total
+  giving rollups can overwrite each other on that record. **Recalculate** does not reliably
+  fix it.
+- **"Rollups last calculated" on a record** is set when a gift is saved, not by the nightly
+  run or **Recalculate**, and the Rollups page can show a rollup as calculated as soon as its
+  run starts.
+- **The queue, the Rollup Builder and instant totals on your own objects** do not exist yet.
+  A bulk change runs its totals in the background with the current engine.
 
 ## A five-minute walkthrough
 
@@ -150,11 +235,12 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    last calculated. The names begin with the kind of record the number lands on, so
    **Household total giving**, **Account total giving**, and **Contact total giving** sit
    next to each other.
-3. Find **Household total giving** and change its **Mode** from **Both** to
-   **Scheduled**. The change saves as you make it and the row now says Scheduled. That
-   total will now be recalculated in the nightly run rather than the moment a gift is
-   saved. Change it back to **Both** when you have looked at it; Both is the setting that
-   keeps the number visibly right.
+3. Find **Household total giving** and change its **Mode** from **Both (recommended)** to
+   **Every night** (shown as Both and Scheduled until the new engine ships). The change
+   saves as you make it and the row shows the new mode. That total will now be recalculated
+   in the nightly run rather than the moment a gift is saved. Change it back to **Both
+   (recommended)** when you have looked at it; it is the setting that keeps the number
+   visibly right.
 4. Click **Recalculate** on that row. The page says "Recalculation started" and the row's
    last calculated time moves to a moment ago when the run finishes. **Recalculate all**
    at the top does the same for every scheduled rollup at once.
@@ -178,22 +264,27 @@ in **Total giving**. Adding the two together double counts the gift, which is wh
 two numbers and not one. Report on whichever answers your question, and say which one you
 used.
 
-**Expecting a nightly total to change immediately.** A rollup in **Scheduled** mode is
+**Expecting a nightly total to change immediately.** A rollup in **Every night** mode is
 recalculated once a night, so a record entered this afternoon does not move it until
 tomorrow morning. That is what the last calculated time is there to tell you. If a total
-needs to be right the moment a record is saved, set it to **Real time** or **Both**.
+needs to be right the moment a record is saved, set it to **Instantly** or **Both
+(recommended)**.
 
-**Switching off a rollup automation and forgetting it (with Giving).** Real time and Both
+**Expecting an import's totals the moment it finishes.** Totals from a bulk change are
+queued and catch up within minutes, not in the same instant. Give it a few minutes before
+checking, and look at the **Needs attention** list in the Rollup Builder if a number still
+has not moved.
+
+**Switching off a rollup automation and forgetting it (with Giving).** Instantly and Both
 work because Giving runs an automation each time a gift or a commitment is saved. They are
 listed on the **Automation** page as **Update rollups when a gift changes** and **Update
 rollups when a commitment changes**. Switching one off, or pausing all automation for a
-data load, leaves the totals it feeds where they were. A rollup in **Both** mode is put
-right by the nightly run; one in **Real time** mode stays behind until you click
+data load, leaves the totals it feeds where they were. A rollup in **Both (recommended)**
+mode is put right by the nightly run; one in **Instantly** mode stays behind until you click
 **Recalculate** on its row. Switch the automation back on afterwards.
 
 For now, fund totals and soft credit totals are not updated when a gift allocation or a
-soft credit is saved. Keep those rollups in **Both** or **Scheduled** mode: the nightly
-run, or **Recalculate**, brings them up to date.
+soft credit is saved (see [Current limits](#current-limits)).
 
 **Turning a rollup off and expecting the number to clear.** Setting a rollup to inactive
 stops it being recalculated; it does not erase the values already on the records. That is
