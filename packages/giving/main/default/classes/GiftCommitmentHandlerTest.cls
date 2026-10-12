@@ -17,6 +17,10 @@ private class GiftCommitmentHandlerTest {
         return person;
     }
 
+    /**
+     * The schedule starts today, so its first payment is never past due (and so never
+     * Overdue) on whatever day the tests run.
+     */
     private static Commitment__c pledgeWithSchedule(Id donorId) {
         Commitment__c pledge = new Commitment__c(
             Type__c = 'Pledge',
@@ -24,7 +28,7 @@ private class GiftCommitmentHandlerTest {
             Donor_Contact__c = donorId,
             Amount__c = 100,
             Frequency__c = 'Monthly',
-            Start_Date__c = Date.newInstance(2026, 10, 1),
+            Start_Date__c = Date.today(),
             Expected_Total__c = 300,
             Installments_Planned__c = 3
         );
@@ -36,7 +40,7 @@ private class GiftCommitmentHandlerTest {
     private static Gift__c giftFor(Id donorId, Id commitmentId, Id installmentId, Decimal amount) {
         return new Gift__c(
             Donor_Contact__c = donorId,
-            Gift_Date__c = Date.newInstance(2026, 10, 1),
+            Gift_Date__c = Date.today(),
             Amount__c = amount,
             Type__c = 'Check',
             Status__c = 'Received',
