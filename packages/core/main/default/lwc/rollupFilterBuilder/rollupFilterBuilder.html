@@ -1,0 +1,114 @@
+<template>
+    <fieldset class="slds-form-element">
+        <template lwc:if={label}>
+            <legend class="slds-form-element__legend slds-form-element__label">{label}</legend>
+        </template>
+        <template for:each={rows} for:item="row">
+            <div key={row.key} class="slds-grid slds-gutters_x-small slds-wrap slds-var-m-bottom_x-small" data-id="condition">
+                <div class="slds-col slds-shrink-none slds-align-bottom slds-var-p-bottom_x-small">{row.number}</div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <lightning-combobox
+                        data-id={row.id}
+                        data-role="field"
+                        label={labels.field}
+                        value={row.field}
+                        options={fieldOptions}
+                        disabled={disabled}
+                        onchange={handleField}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <lightning-combobox
+                        data-id={row.id}
+                        data-role="operator"
+                        label={labels.operator}
+                        value={row.operator}
+                        options={row.operatorOptions}
+                        disabled={disabled}
+                        onchange={handleOperator}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <template lwc:if={row.needsValue}>
+                        <template lwc:if={row.isBoolean}>
+                            <lightning-combobox
+                                data-id={row.id}
+                                data-role="value"
+                                label={labels.value}
+                                value={row.valueText}
+                                options={row.booleanOptions}
+                                disabled={disabled}
+                                onchange={handleValue}
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:if={row.isPicklistOne}>
+                            <lightning-combobox
+                                data-id={row.id}
+                                data-role="value"
+                                label={labels.value}
+                                value={row.value}
+                                options={row.picklistOptions}
+                                disabled={disabled}
+                                onchange={handleValue}
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:if={row.isPicklistChoice}>
+                            <lightning-checkbox-group
+                                data-id={row.id}
+                                data-role="value"
+                                label={labels.value}
+                                value={row.valueList}
+                                options={row.picklistOptions}
+                                disabled={disabled}
+                                onchange={handleValue}
+                            ></lightning-checkbox-group>
+                        </template>
+                        <template lwc:if={row.isTyped}>
+                            <lightning-input
+                                data-id={row.id}
+                                data-role="value"
+                                type={row.inputType}
+                                label={labels.value}
+                                value={row.valueText}
+                                field-level-help={row.valueHelp}
+                                step="any"
+                                disabled={disabled}
+                                onchange={handleValue}
+                            ></lightning-input>
+                        </template>
+                    </template>
+                </div>
+                <div class="slds-col slds-shrink-none slds-align-bottom">
+                    <lightning-button-icon
+                        data-id={row.id}
+                        data-role="remove"
+                        icon-name="utility:delete"
+                        alternative-text={row.removeLabel}
+                        title={row.removeLabel}
+                        disabled={disabled}
+                        onclick={handleRemove}
+                    ></lightning-button-icon>
+                </div>
+            </div>
+        </template>
+        <lightning-button
+            data-id="add-condition"
+            icon-name="utility:add"
+            label={labels.addCondition}
+            disabled={disabled}
+            onclick={handleAdd}
+        ></lightning-button>
+        <template lwc:if={showLogic}>
+            <lightning-input
+                class="slds-var-m-top_small"
+                data-id="logic"
+                label={labels.logic}
+                value={logic}
+                field-level-help={labels.logicHelp}
+                disabled={disabled}
+                onchange={handleLogic}
+            ></lightning-input>
+        </template>
+        <p class="slds-var-m-top_small slds-text-color_weak" data-id="sentence" aria-live="polite">{sentence}</p>
+    </fieldset>
+</template>

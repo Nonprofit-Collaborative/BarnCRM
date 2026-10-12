@@ -128,4 +128,244 @@
         <shortDescription>Notice when a rollup is saved while a full recalculation runs.</shortDescription>
         <value>Rollup saved. A full recalculation is already running, so click Recalculate on its row after that finishes.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupFilter_AddCondition</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter builder button that adds a condition row.</shortDescription>
+        <value>Add condition</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Field</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter builder label for the field of a condition.</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Operator</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter builder label for the comparison of a condition.</shortDescription>
+        <value>Comparison</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Value</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter builder label for the value of a condition.</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Remove</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter builder remove button text. {0} is the condition number.</shortDescription>
+        <value>Remove condition {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Logic</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter builder label for the logic string.</shortDescription>
+        <value>Combine conditions</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_LogicHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help for the logic string.</shortDescription>
+        <value>Leave empty to require every condition. Or type the condition numbers with AND, OR, NOT and brackets, for example 1 AND (2 OR 3).</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_ListHelp</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help for a list of values.</shortDescription>
+        <value>Separate the values with commas.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_EveryRecord</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter sentence when there are no conditions.</shortDescription>
+        <value>Every record counts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Whose</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter sentence. {0} is the records, {1} the conditions.</shortDescription>
+        <value>{0} whose {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_And</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Word joining two conditions in the filter sentence.</shortDescription>
+        <value>and</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Or</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Word for either of two conditions or values in the filter sentence.</shortDescription>
+        <value>or</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_Not</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Word negating a condition in the filter sentence.</shortDescription>
+        <value>not</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_True</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Checked value of a checkbox in a filter condition.</shortDescription>
+        <value>True</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_False</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Unchecked value of a checkbox in a filter condition.</shortDescription>
+        <value>False</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_ErrorIncomplete</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter error: a condition is not filled in. {0} is its number.</shortDescription>
+        <value>Condition {0} needs a field, a comparison and a value. Fill it in or remove it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_ErrorLogic</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter error: the logic string is not valid. {0} is the condition count.</shortDescription>
+        <value>Combine conditions can use only the numbers 1 to {0}, AND, OR, NOT and brackets.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpEquals</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: equals.</shortDescription>
+        <value>is</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpNotEquals</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: not equals.</shortDescription>
+        <value>is not</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpLessThan</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: less than.</shortDescription>
+        <value>is less than</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpLessOrEqual</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: less than or equal.</shortDescription>
+        <value>is at most</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpGreaterThan</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: greater than.</shortDescription>
+        <value>is greater than</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpGreaterOrEqual</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: greater than or equal.</shortDescription>
+        <value>is at least</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpContains</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: contains.</shortDescription>
+        <value>contains</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpDoesNotContain</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: does not contain.</shortDescription>
+        <value>does not contain</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpStartsWith</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: starts with.</shortDescription>
+        <value>starts with</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpIsNull</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: is null.</shortDescription>
+        <value>is blank</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpIsNotNull</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: is not null.</shortDescription>
+        <value>is not blank</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpIn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: in a list.</shortDescription>
+        <value>is one of</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupFilter_OpNotIn</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Filter comparison: not in a list.</shortDescription>
+        <value>is none of</value>
+    </labels>
 </CustomLabels>
