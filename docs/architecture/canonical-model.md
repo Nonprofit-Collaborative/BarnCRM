@@ -941,6 +941,52 @@ definition.
 
 ---
 
+## 12A. What's New Seen
+
+### Definition
+
+For one person, the newest release whose notes they have dismissed from the What's new card on
+the BarnCRM home page (C-27). It exists so that each person sees each release's notes once. It
+holds no setting anybody chooses: it is written only by that person's Dismiss.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Person | reference(User) | yes | The person this record belongs to. One record per person at most. |
+| Last Seen Version | text (20) | no | The release version, as dot separated numbers such as 0.12, that was current when this person last dismissed the card. |
+
+### Rules
+
+**R-WN1 Per person only.** A record belongs to one person. No organization-wide or profile
+value exists, and none is read: a person with no record has never dismissed the card.
+**R-WN2 What is shown.** The current version is the highest version among the shipped Release
+Note records (Section 13). A person with no record sees the notes of the current version only.
+A person with a record sees every note whose version is higher than their Last Seen Version,
+newest version first. A person whose Last Seen Version is the current one or higher sees
+nothing.
+**R-WN3 Versions compare as numbers.** Versions are compared part by part as whole numbers, so
+0.12 is newer than 0.9, and a missing part counts as zero, so 0.12 and 0.12.0 are the same
+release. A version that is not dot separated whole numbers is ignored: a note carrying one is
+never shown, and a stored Last Seen Version carrying one reads as no record.
+**R-WN4 Dismiss.** Dismissing stores the current version as the person's Last Seen Version.
+With no notes shipped, Dismiss stores nothing.
+
+### Salesforce implementation
+
+- **Custom setting:** `Whats_New_Seen__c`, hierarchy, protected, with user-level records only
+  (`SetupOwnerId` is the person). Not a key on `BarnCRM_Settings__c`, because a user-level
+  record of that setting would hide the organization's values from that person (ADR-NEXT,
+  `NEXT-whats-new-from-packaged-release-notes.md`).
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Last Seen Version | `Last_Seen_Version__c` | Text(20) | Written in system mode by `WhatsNewSeenWriter` (ADR-0021), for the running user only. |
+
+- **Service:** `WhatsNewController`, with the LWC `whatsNew` on the BarnCRM home page.
+
+---
+
 ## 13. Shipped defaults (custom metadata)
 
 Package-shipped defaults are read-only to admins and are materialized into the
@@ -1067,6 +1113,23 @@ Relationship Type is the one shipped list that also holds the organization's own
 because the relationship service reads it directly rather than through a materialized
 copy. Administrators add, edit and archive their rows from the Custom metadata page in
 BarnCRM Settings (ADR-NEXT, `NEXT-custom-metadata-manager-edits-only-types-read-directly.md`).
+
+### Release Note
+
+`Release_Note__mdt` (C-27): the notes the What's new card on the BarnCRM home page shows after
+an upgrade, one record per note. Unlike the types above it is never materialized into records:
+it is read as shipped (R-WN2, Section 12A). The type belongs to Core, and any package that
+depends on Core may ship its own records; Core never names them.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the note. |
+| Label | `MasterLabel` | text | The note's name in Setup; not shown on the card. |
+| Version | `Version__c` | text (20) | The product release this note describes, as dot separated numbers such as 0.12. One numbering for every package, because a release ships them together. |
+| Headline | `Headline__c` | text (255) | The note in one line, shown in bold. |
+| Details | `Details__c` | long text | Optional. Plain text, one point per line; each line is shown as one item under the headline. |
+| Sort Order | `Sort_Order__c` | number | Optional. The order of this note within its version, lowest first; a note without one comes last. |
+| Module | `Module__c` | text (40) | Optional. The package the note describes, for example Giving, shown beside the headline. |
 
 ### Rules
 
@@ -6302,6 +6365,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-NEXT, `NEXT-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
 | v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`NEXT-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
 | post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-NEXT `NEXT-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
+| v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-NEXT, `NEXT-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 
 ---
 ## 32. Entity ownership by package
@@ -6344,6 +6408,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
 | Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29F, 12 |
+| What's New Seen | Core | v0.6 | 12A |
+| Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |

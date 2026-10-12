@@ -154,3 +154,4 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |
 | C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
 | Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
+| C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module | v0.6 |
