@@ -20,15 +20,15 @@ Salesforce licensing rule:
 **Who can review duplicates.** Salesforce keeps possible duplicates in records called duplicate
 record sets, and gives access to them only to users with a **Sales Cloud or Service Cloud
 license**. No other license can have it, Salesforce Platform included. So BarnCRM puts that
-access in its own permission set, **Open Impact Duplicate Review**, which is in no role. In Setup,
+access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In Setup,
 open **Users**, choose each person who will review duplicates, and under **Permission Set
-Assignments** add **Open Impact Duplicate Review**. Salesforce refuses the assignment for a user
+Assignments** add **BarnCRM Duplicate Review**. Salesforce refuses the assignment for a user
 without one of those licenses. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
 
-1. Open the **Open Impact** app and choose **Open Impact Settings**.
+1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
 2. In the left navigation choose **Households**, and scroll to **Duplicates**.
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
@@ -49,7 +49,7 @@ on purpose: open any sample person, note their email address, and create a new c
 the same first name, last name and email. Salesforce warns you that a similar record exists;
 choose to save anyway.
 
-1. Open **Open Impact Settings**, choose **Households**, and scroll to **Duplicates**.
+1. Open **BarnCRM Settings**, choose **Households**, and scroll to **Duplicates**.
 2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
 3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
@@ -98,12 +98,12 @@ the members, recalculates the totals and renames the household; Salesforce's own
 does none of that, which is why the household record page does not offer it.
 
 **A colleague sees the panel but the buttons are missing.** Scanning, dismissing and merging
-from this panel need the Manage Open Impact Settings permission, which the Open Impact Admin
-permission set grants, and access to duplicate record sets, which the Open Impact Duplicate Review
+from this panel need the Manage BarnCRM Settings permission, which the BarnCRM Admin
+permission set grants, and access to duplicate record sets, which the BarnCRM Duplicate Review
 permission set grants.
 
 **The panel says suggestions need access to duplicate record sets.** The person
-viewing it does not have Open Impact Duplicate Review, or has a license that cannot have it.
+viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.
 Assign the permission set in Setup (see How to turn it on). A Salesforce Platform user cannot
 be given it at all; ask a colleague with a Sales Cloud or Service Cloud license to review.
 

@@ -20,12 +20,12 @@ the thank you is yours to write and rewrite, and the receipt is not.
 
 Everything is in the app, with one exception noted at step 3.
 
-1. Open **Open Impact Settings**, then **Giving**, then **Acknowledgments**.
+1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**.
 2. Turn on **Acknowledge gifts**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
-   BarnCRM ships one to start from, called **Open Impact: thank you for your gift**. The
+   BarnCRM ships one to start from, called **BarnCRM: thank you for your gift**. The
    Acknowledgments page lists every email template your org has, with the **developer name**
    of each, which is the name you type into a rule. This is the one place you may find
    yourself in Setup, under Email Templates, and it is where Salesforce keeps template
@@ -55,10 +55,10 @@ Everything is in the app, with one exception noted at step 3.
 
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
-1. Open **Open Impact Settings**, then **Giving**, then **Acknowledgments**. Turn on
+1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**. Turn on
    **Acknowledge gifts**.
 2. Choose **New rule**. Name it `Everything else`, order `100`, channel `Email`, email
-   template `Open_Impact_Thank_You`. Save.
+   template `BarnCRM_Thank_You`. Save.
 3. Choose **New rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum
    amount `1000`. Save. You now have two rules: gifts of $1,000 and up get a letter,
    everything else gets an email.
@@ -82,7 +82,7 @@ standard email. Fix the order numbers, lowest for the most specific rule. Changi
 takes effect for gifts still in the queue: nothing is stored on a gift until it is sent.
 
 **A template name that does not exist.** The rule wants the **developer name** of the email
-template (`Open_Impact_Thank_You`), not its label ("Open Impact: thank you for your gift").
+template (`BarnCRM_Thank_You`), not its label ("BarnCRM: thank you for your gift").
 If you type the label the page shows **Template not found** beside the rule, and any
 acknowledgment that tries to use it is marked Failed with that reason rather than sending an
 empty message. The list on the Acknowledgments page has both names side by side, so copy the

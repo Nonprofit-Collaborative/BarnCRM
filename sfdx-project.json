@@ -6,49 +6,49 @@
     {
       "path": "packages/core",
       "default": true,
-      "package": "Open Impact Core",
+      "package": "BarnCRM Core",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT"
     },
     {
       "path": "packages/giving",
       "default": false,
-      "package": "Open Impact Giving",
+      "package": "BarnCRM Giving",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "Open Impact Core" }]
+      "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
       "path": "packages/volunteers",
       "default": false,
-      "package": "Open Impact Volunteers",
+      "package": "BarnCRM Volunteers",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "Open Impact Core" }]
+      "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
       "path": "packages/programs",
       "default": false,
-      "package": "Open Impact Programs",
+      "package": "BarnCRM Programs",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "Open Impact Core" }]
+      "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
       "path": "packages/funders",
       "default": false,
-      "package": "Open Impact Funders",
+      "package": "BarnCRM Funders",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "Open Impact Core" }, { "package": "Open Impact Giving" }]
+      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Giving" }]
     },
     {
       "path": "packages/connect",
       "default": false,
-      "package": "Open Impact Connect",
+      "package": "BarnCRM Connect",
       "versionName": "v0.1",
       "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "Open Impact Core" }, { "package": "Open Impact Giving" }]
+      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Giving" }]
     }
   ]
 }

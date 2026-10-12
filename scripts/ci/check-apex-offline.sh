@@ -38,7 +38,7 @@ if [[ ! -s "$CP_FILE" ]]; then
   cat > "$POM_FILE" <<EOF
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>openimpact.tools</groupId>
+  <groupId>barncrm.tools</groupId>
   <artifactId>apex-ls-runner</artifactId>
   <version>1.0</version>
   <dependencies>

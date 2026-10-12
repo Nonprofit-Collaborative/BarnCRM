@@ -29,15 +29,15 @@ Who can do what comes from the permission set somebody already holds:
 
 | Permission set | What they can do with the three addresses |
 |---|---|
-| Open Impact Admin | Read and change all three addresses and the choice |
-| Open Impact Staff | Read and change all three addresses and the choice |
-| Open Impact Read Only | Read them, change nothing |
+| BarnCRM Admin | Read and change all three addresses and the choice |
+| BarnCRM Staff | Read and change all three addresses and the choice |
+| BarnCRM Read Only | Read them, change nothing |
 
 ## A five-minute walkthrough
 
 Maria does this from the sample data.
 
-1. Open the **Open Impact** app, click the **Contacts** tab, and open **Maria
+1. Open the **BarnCRM** app, click the **Contacts** tab, and open **Maria
    Whitfield**.
 2. Look at the **Email addresses** section. The three boxes, **Personal Email**, **Work
    Email** and **Alternate Email**, are empty, and **Preferred Email** is empty too. The

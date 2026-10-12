@@ -1,4 +1,4 @@
-# Open Impact Volunteers
+# BarnCRM Volunteers
 
 ## Purpose
 
@@ -10,7 +10,7 @@ Iteration **0.7**.
 
 ## Depends on
 
-- Open Impact Core
+- BarnCRM Core
 
 ## Status
 

@@ -1,4 +1,4 @@
-# Open Impact Core
+# BarnCRM Core
 
 Core is the foundation package. Every other BarnCRM module depends on it, and it depends on
 nothing else. It contains no Opportunity, Campaign, Case, Lead, Person Account, or Industries
@@ -9,10 +9,10 @@ object references: those live only in the Connect module, behind dynamic Apex.
 - **Constituent model**: Contacts, Accounts (Household and Organization record types),
   Household membership (contact mode and junction mode via `HouseholdService`),
   Relationships, Affiliations, and Addresses (`Address__c`).
-- **Open Impact app**: the Lightning app and its tabs (Home, Households, Contacts,
-  Organizations, Import, Reports, Open Impact Settings). Module-specific tabs (Gifts, Volunteers,
+- **BarnCRM app**: the Lightning app and its tabs (Home, Households, Contacts,
+  Organizations, Import, Reports, BarnCRM Settings). Module-specific tabs (Gifts, Volunteers,
   Programs, Funders) are added by those packages when installed.
-- **Settings framework**: the Open Impact Settings console (LWC-based), protected hierarchy
+- **Settings framework**: the BarnCRM Settings console (LWC-based), protected hierarchy
   Custom Settings for simple toggles, custom objects for structured configuration, and Custom
   Metadata Types for package-shipped defaults. The console's rows come from
   `Setting_Definition__mdt`, so a feature adds its settings to the console by shipping rows
@@ -137,7 +137,7 @@ two handlers, their triggers, and their `Automation_Registry__mdt` records in on
 
 `CorePostInstall` implements `InstallHandler`. It runs after the package is installed and
 after every upgrade, and it does two things: it makes sure the installing user can open
-Open Impact Settings, and it creates the Rollup Definitions the packages ship.
+BarnCRM Settings, and it creates the Rollup Definitions the packages ship.
 
 Without the first, a fresh install leaves the console read only for everybody, including
 the System Administrator who installed it, because a custom permission is not implied by

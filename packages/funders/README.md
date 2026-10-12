@@ -1,4 +1,4 @@
-# Open Impact Funders
+# BarnCRM Funders
 
 ## Purpose
 
@@ -11,8 +11,8 @@ Iteration **0.9**.
 
 ## Depends on
 
-- Open Impact Core
-- Open Impact Giving
+- BarnCRM Core
+- BarnCRM Giving
 
 ## Status
 

@@ -1,5 +1,5 @@
 {
-  "orgName": "Open Impact Sales Cloud",
+  "orgName": "BarnCRM Sales Cloud",
   "edition": "Enterprise",
   "hasSampleData": false,
   "features": ["EnableSetPasswordInApi"],

@@ -1,4 +1,4 @@
-# Open Impact Connect
+# BarnCRM Connect
 
 ## Purpose
 
@@ -14,8 +14,8 @@ Iteration **0.6**.
 
 ## Depends on
 
-- Open Impact Core
-- Open Impact Giving
+- BarnCRM Core
+- BarnCRM Giving
 
 ## Status
 

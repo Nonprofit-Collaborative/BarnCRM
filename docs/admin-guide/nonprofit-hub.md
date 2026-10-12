@@ -1,8 +1,8 @@
-# The Open Impact app
+# The BarnCRM app
 
 ## What it does
 
-The Open Impact app is the app you work in every day, whatever kind of organization you are.
+The BarnCRM app is the app you work in every day, whatever kind of organization you are.
 Before version 0.6 it was called the Nonprofit Hub. It gives you one home page that tells
 you what to do next, a setup checklist that remembers how far you got, and a short list of
 the places you go most: your households, your people, your organizations, and your
@@ -13,12 +13,12 @@ is the answer to that question. You start here.
 
 ## How to turn it on
 
-There is nothing to turn on. The app is installed with Open Impact Core. The Giving module
+There is nothing to turn on. The app is installed with BarnCRM Core. The Giving module
 adds its own app, **Fundraising**, for entering gifts and reading the giving numbers; the
 home page lists it under **Modules** once Giving is installed.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
-2. Type `Open Impact` and choose **Open Impact**.
+2. Type `BarnCRM` and choose **BarnCRM**.
 3. Click the star next to the app name if you want it to open by default.
 
 Everyone who has been given a BarnCRM role can open the Hub. Two things on the home
@@ -27,14 +27,14 @@ page are for administrators only:
 - The **Errors to review** tile counts only errors you are allowed to see, and the Error
   Log tab itself is on the administrator role.
 - The **Setup checklist** can be read by anyone, but only a person with the **Manage
-  Open Impact Settings** permission can finish a step or change a setting.
+  BarnCRM Settings** permission can finish a step or change a setting.
 
 ## A five-minute walkthrough
 
 Maria has just installed BarnCRM and has the sample data loaded.
 
-1. Open the app launcher, type `Open Impact`, and choose **Open Impact**. The home page
-   opens with the heading **Welcome to Open Impact**.
+1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
+   opens with the heading **Welcome to BarnCRM**.
 2. Read the **Setup checklist**. It opens on the first of eight steps you have not
    finished, with one sentence saying what that step is for and the count of how far you
    have got, for example "3 of 8" (seven steps with Core alone, eight with Giving). The steps are guided: each one is done here, on the home
@@ -52,7 +52,7 @@ Maria has just installed BarnCRM and has the sample data loaded.
 6. If someone has paused automation (for example during a large import), a banner sits
    above the checklist saying BarnCRM automation is paused. It disappears by itself
    when the pause expires.
-7. Use **Quick links** to open Households, Organizations, or Open Impact Settings without
+7. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
    going back to the app launcher.
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
@@ -61,7 +61,7 @@ whether anything went wrong.
 ## Common mistakes
 
 - **Looking for the app in Setup.** BarnCRM is an app, not a Setup page. Use the app
-  launcher, not the gear icon. If `Open Impact` does not appear in the app launcher, you
+  launcher, not the gear icon. If `BarnCRM` does not appear in the app launcher, you
   have not been assigned a BarnCRM role: ask whoever installed the package to add you
   on the Access page.
 - **Treating Skip for now as done.** Skipping moves you on without finishing the step, on

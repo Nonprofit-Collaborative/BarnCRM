@@ -1,4 +1,4 @@
-# Open Impact Programs
+# BarnCRM Programs
 
 ## Purpose
 
@@ -10,7 +10,7 @@ Iteration **0.8**.
 
 ## Depends on
 
-- Open Impact Core
+- BarnCRM Core
 
 ## Status
 

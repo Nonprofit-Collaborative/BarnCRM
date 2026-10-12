@@ -778,9 +778,9 @@ settings console can write them synchronously and so that they are cacheable (De
 D-06).
 
 Core is neutral (plan Section 4.1, C-29, ADR-0059): a key lives here only if Core reads it or
-it means the same thing to any organization. The console and the object are labelled **Open
-Impact Settings**; the API name `Nonprofit_Settings__c` is unchanged until the product name
-pass (ADR-0059 decision 6). Seven keys this section listed before v0.6, the tax
+it means the same thing to any organization. The console and the object are labelled **BarnCRM
+Settings**; the API name `Nonprofit_Settings__c` is unchanged (ADR-0059 decision 6; the
+`Nonprofit_*` API names are a separate pending decision). Seven keys this section listed before v0.6, the tax
 identification number, the four receipt signer and file keys, and the default fund and
 appeal, are read only by Giving and moved to `Giving_Settings__c` (Section 21A) in C-29, with
 their API names and definitions unchanged.
@@ -869,7 +869,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage Open Impact Settings. |
+| `Error_Digest_Recipients__c` | text (255) | empty | The email addresses of the users who receive the error digest, separated by commas. Each has to belong to an active user of this org. Empty sends it to every active user holding Manage BarnCRM Settings. |
 | `Error_Digest_Frequency__c` | picklist(Daily, Weekly) | Daily | How often the error digest may be sent. Stored as text (ADR-0019); empty reads as Daily. |
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
@@ -901,7 +901,7 @@ definition.
 - **Service:** `SettingsService`, with the console LWCs `settingsConsole`,
   `settingsSearch`, `householdNamingSettings`.
 - **Permission:** editing requires the `Manage_Nonprofit_Settings` custom permission, labelled
-  Manage Open Impact Settings; users without it see a read-only view naming the permission.
+  Manage BarnCRM Settings; users without it see a read-only view naming the permission.
 
 ---
 
@@ -2543,7 +2543,7 @@ only by adding a row to the table above in the pull request that adds the field 
 R-N5 apply unchanged).
 
 **R-GS2 One console, several settings objects.** The Giving keys appear in the same
-Open Impact Settings console as the Core keys, in the Giving section (the moved receipt
+BarnCRM Settings console as the Core keys, in the Giving section (the moved receipt
 identity keys in the Organization section, beside the legal name they print with). The console reaches
 them because each shipped `Setting_Definition__mdt` row names its settings object, so an
 administrator never learns that there is more than one place the values are stored.
@@ -5418,7 +5418,7 @@ so nothing below that is nonprofit-specific ships in Core.
 
 | Component | Package | Mechanism |
 |---|---|---|
-| Hub app (labelled Open Impact), Home, Households, Organizations, Import and Settings tabs | Core | Metadata |
+| Hub app (labelled BarnCRM), Home, Households, Organizations, Import and Settings tabs | Core | Metadata |
 | Fundraising app (the nonprofit app) and its tabs | Giving | Metadata (ADR-0018) |
 | Setup Assistant: seven neutral steps (fit, naming, access, identity, modules, data, check) | Core | `SetupAssistantService` |
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
@@ -5426,7 +5426,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
 | Roles: Admin, Program Staff, Volunteer Coordinator, Read Only | Core | Permission set groups |
 | Role: Fundraising Staff | Giving | Permission set group |
-| Custom permission Manage Open Impact Settings | Core | Metadata |
+| Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
@@ -5455,4 +5455,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.5 | 2026-09-24 | C-14 dry run at scale. `Import_Row__c` gains `Person_1_Key__c`, `Person_2_Key__c`, `Person_1_Name_Key__c`, `Person_2_Name_Key__c`, `Organization_Key__c` and `Processor_Key__c`, indexed digests a dry run writes on the row that would create a record or load an external ID. R-IB12 and R-IR6: the digests are looked up per chunk instead of carried in the batch's state, so a dry run's heap no longer grows with the rows before the chunk. |
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
-| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled Open Impact Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |

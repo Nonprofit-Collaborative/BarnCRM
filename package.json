@@ -1,8 +1,8 @@
 {
-  "name": "open-impact",
+  "name": "barncrm",
   "private": true,
   "version": "0.1.0",
-  "description": "Open Impact: free open source Salesforce managed packages for small nonprofits.",
+  "description": "BarnCRM: free open source Salesforce managed packages for small nonprofits.",
   "scripts": {
     "lint": "eslint \"packages/**/lwc/**/*.js\" --no-error-on-unmatched-pattern",
     "lint:fix": "eslint \"packages/**/lwc/**/*.js\" --fix --no-error-on-unmatched-pattern",

@@ -1,4 +1,4 @@
-# Open Impact Giving
+# BarnCRM Giving
 
 ## Purpose
 
@@ -12,7 +12,7 @@ Iteration **0.2**.
 
 ## Depends on
 
-- Open Impact Core
+- BarnCRM Core
 
 ## What is here now
 

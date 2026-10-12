@@ -8,7 +8,7 @@ without reading anything else. It asks its questions one screen at a time, in th
 makes each answer easy, and it remembers where you got to. Close the browser in the middle
 of step four and come back tomorrow: the assistant opens on step four.
 
-How many steps you see depends on what is installed. Open Impact Core on its own asks seven
+How many steps you see depends on what is installed. BarnCRM Core on its own asks seven
 questions. When the **Giving** module is installed as well, Giving adds its own: a step for
 the default fund and appeal, the receipt details on the identity step, and a first gift to
 check everything with, which makes eight steps. This page numbers the steps as they appear
@@ -16,16 +16,16 @@ with Giving installed and marks what comes from Giving. Without Giving, the step
 two move up by one.
 
 Nothing it asks is permanent. Every answer is a setting you can change later on the
-Open Impact Settings page, and you can re-run the whole assistant whenever your organization
+BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
 changes.
 
 ## How to turn it on
 
-There is nothing to turn on. The Setup Assistant is the Open Impact home page until you
+There is nothing to turn on. The Setup Assistant is the BarnCRM home page until you
 finish it.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
-2. Type `Open Impact` and choose **Open Impact**.
+2. Type `BarnCRM` and choose **BarnCRM**.
 3. The home page opens on the assistant, at the first step you have not finished.
 
 When every step is done, the assistant collapses to a small **Setup complete** tile that
@@ -33,10 +33,10 @@ shows how many steps you finished. The tile has a **Reopen setup** button, so th
 is always one click away, and it opens straight back on the first step rather than on the
 completion screen.
 
-You need the **Manage Open Impact Settings** permission to change anything in the assistant.
+You need the **Manage BarnCRM Settings** permission to change anything in the assistant.
 Everyone else sees the same steps, reads the same explanations, and cannot save. If you can
 read but not save, the assistant says so at the top and names the permission you are
-missing. Ask whoever installed BarnCRM to add you to the **Open Impact Admin** role on
+missing. Ask whoever installed BarnCRM to add you to the **BarnCRM Admin** role on
 the Access page.
 
 Two things sit outside the assistant, because Salesforce does not let an app do them:
@@ -48,7 +48,7 @@ Two things sit outside the assistant, because Salesforce does not let an app do 
 
 ## A five-minute walkthrough, and then the eight steps
 
-Maria has just installed Open Impact Core and the Giving module in her organization's
+Maria has just installed BarnCRM Core and the Giving module in her organization's
 Nonprofit Cloud org. That org has Person Accounts turned on, which matters in step one and
 nowhere else. She has half an hour before her next meeting.
 
@@ -74,7 +74,7 @@ BarnCRM looks at your org and tells you what it found, in plain words:
   they do today. Confirming this mode switches household membership to those membership
   records, and from then on saving a new person creates their household and their
   membership of it, exactly as it does in the simple mode. The switch that governs that is
-  "create a household automatically" on the Households page of Open Impact Settings.
+  "create a household automatically" on the Households page of BarnCRM Settings.
 - **"NPSP is installed in this org."** BarnCRM recommends **NPSP coexistence**, which
   records that NPSP is here. In this version it changes no behaviour: BarnCRM builds its
   own households and leaves NPSP's alone.
@@ -131,7 +131,7 @@ one. Give access to as many colleagues as you like, one at a time. The roles are
 
 | Role | Who it is for |
 |---|---|
-| Open Impact Admin | Maria: everything, including settings |
+| BarnCRM Admin | Maria: everything, including settings |
 | Fundraising Staff (comes with Giving) | David: gifts, donors, receipts |
 | Program Staff | Priya: participants and services |
 | Volunteer Coordinator | Volunteer jobs, shifts, and hours |
@@ -238,7 +238,7 @@ finished, because it is.
   the home page the assistant opens on it again.
 - **Marking coexistence mode and then changing your mind quietly.** Changing the mode later
   is allowed and is a real change: it changes how household membership is tracked from that
-  point on. Change it on the Open Impact Settings page, read the note there first, and do it
+  point on. Change it on the BarnCRM Settings page, read the note there first, and do it
   before you import, not after.
 - **Uploading the logo from a colleague's login, then deactivating them.** The file belongs
   to the person who uploaded it. Upload the logo and the signature from an account that
@@ -249,5 +249,5 @@ finished, because it is.
   you. Step six gives you the link and the instructions, and the Giving steps appear the
   moment you come back after installing it.
 - **Re-running setup to fix one thing.** You do not have to. Every answer is on the
-  Open Impact Settings page, grouped by section, with a search box. Reopen the assistant when
+  BarnCRM Settings page, grouped by section, with a search box. Reopen the assistant when
   something big changes, such as a new fiscal year or a merger, not to correct a typo.

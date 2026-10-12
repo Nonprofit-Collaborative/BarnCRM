@@ -1,8 +1,8 @@
 {
-  "Username": "platformuser@<alias>.openimpact.test",
+  "Username": "platformuser@<alias>.barncrm.test",
   "LastName": "Platform User",
   "Alias": "oiplat",
-  "Email": "platformuser@<alias>.openimpact.test",
+  "Email": "platformuser@<alias>.barncrm.test",
   "TimeZoneSidKey": "America/New_York",
   "LocaleSidKey": "en_US",
   "EmailEncodingKey": "UTF-8",

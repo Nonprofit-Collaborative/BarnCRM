@@ -20,7 +20,7 @@ BarnCRM is in early development. The current work is v0.1, the foundation and th
 - v0.1 (foundation and households) in progress.
 - No releases yet. No package versions exist and nothing is installable.
 - Namespace pending: development is namespace-agnostic until the namespace is registered.
-- Name: the product is BarnCRM, chosen after the working title "Open Impact" was found to be in use. The packaged labels and API names still carry the old title until a later code pass (see ADR-NEXT and docs/product-plan.md Section 8.3).
+- Name: the product is BarnCRM, chosen after the working title "Open Impact" was found to be in use. The packaged labels and API names carry the new name too (see ADR-NEXT and docs/product-plan.md Section 8.3).
 - Governance for v0.x: benevolent dictator (the project owner), moving to a maintainers group with a documented decision process by v1.0.
 
 ## Packages
@@ -29,7 +29,7 @@ BarnCRM is a Core package plus optional module packages that depend on Core.
 
 | Package | Contains | Depends on | First ships |
 |---|---|---|---|
-| Core | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the Open Impact app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, rollup engine, Import framework, health check | (none) | v0.1 |
+| Core | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, rollup engine, Import framework, health check | (none) | v0.1 |
 | Giving | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core | v0.2 |
 | Connect | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Agentforce Nonprofit), inbound gift REST API, accounting export | Core, Giving | v0.6 |
 | Volunteers | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core | v0.7 |

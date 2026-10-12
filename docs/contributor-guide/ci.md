@@ -615,7 +615,7 @@ deploy time, so if the type ever gains one, revisit the exemption.
 because an NPSP export heads its columns with NPSP's own prefixed names (`npe01__`, `npsp__`).
 It lists them and does not fail on them. Its pattern is anchored to the path part of each
 `grep -rn` line, so a line in any other file that names such a path is still checked. Its
-literal `openimpact__` check still covers them.
+literal `barncrm__` check still covers them.
 
 ## What happens when the secrets are missing
 
