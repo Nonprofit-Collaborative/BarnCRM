@@ -13,8 +13,6 @@
  * than when it finishes (bug 5). The tests that encode the right answers are written now and
  * switched off, each naming the slice that switches it on (proposal migration step 3: these are
  * fixed in the new engine, not patched into the old one).
- *
- * These tests have not been executed: no Salesforce org exists in this environment.
  */
 @IsTest
 private class RollupRegressionTargetsTest {

@@ -9,15 +9,14 @@
  * (`Contact__c > {Household} | Account__c > {Household}`). Reading today's adapter and engine
  * says they cannot work yet: the adapter hands a token path to the engine as a rollup started
  * from the parent with the source record's own Id as its lookup, so a recalculation matches no
- * household, and a real-time run on Soft Credit is skipped because the source is not the target
- * object. The tests that encode the right answer are therefore written now and switched off, each
- * naming the slice that switches it on. An org run should confirm the reading: a disabled test
- * that already passes is switched on at once.
+ * household, and on oi-test a real-time run on Soft Credit threw NullPointerException in
+ * Rollup.fillWrapper (via getParentQueryWrapper), which is why Soft Credit is not registered for
+ * real time until slice S6. The tests that encode the right answer are therefore written now and
+ * switched off, each naming the slice that switches it on. A disabled test found to pass on
+ * today's engine is switched on at once.
  *
  * The `Account__c > {Household}` alternative resolves a person stored as an account, which needs
  * a Person Account org; it is not covered here.
- *
- * These tests have not been executed: no Salesforce org exists in this environment.
  */
 @IsTest
 private class RollupRegressionHouseholdsTest {
