@@ -72,4 +72,324 @@
         <shortDescription>Shown when Find fails for a reason it cannot explain.</shortDescription>
         <value>Something went wrong in Find. It has been recorded in the Error Log. Try again, and tell your administrator if it happens again.</value>
     </labels>
+    <labels>
+        <fullName>Core_Find_Title</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the Find page.</shortDescription>
+        <value>Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Intro</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Intro line on the Find page.</shortDescription>
+        <value>Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Object</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the object picker on the Find page.</shortDescription>
+        <value>Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChooseObject</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Placeholder of the object picker on the Find page.</shortDescription>
+        <value>Choose an object</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Columns</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the column chooser on the Find page.</shortDescription>
+        <value>Columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_AvailableFields</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Left list heading of the column chooser.</shortDescription>
+        <value>Available fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChosenFields</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Right list heading of the column chooser.</shortDescription>
+        <value>Columns, in order</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_AddFieldsFrom</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the picker that adds a related record's fields to the columns.</shortDescription>
+        <value>Add fields from</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChooseLookup</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Placeholder of the related record picker.</shortDescription>
+        <value>Choose a related record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Conditions</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading of the conditions section on the Find page.</shortDescription>
+        <value>Conditions</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SortBy</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the sort field picker.</shortDescription>
+        <value>Sort by</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_NoSort</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sort picker option for no particular order.</shortDescription>
+        <value>No particular order</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Direction</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the sort direction picker.</shortDescription>
+        <value>Direction</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Ascending</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sort direction option: ascending.</shortDescription>
+        <value>Ascending</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Descending</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sort direction option: descending.</shortDescription>
+        <value>Descending</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RowsToShow</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the rows to show input.</shortDescription>
+        <value>Rows to show</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Soql</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the read only SOQL box on the Find page.</shortDescription>
+        <value>Query (read only)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SoqlHelp</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help text of the read only SOQL box.</shortDescription>
+        <value>The query Find runs, in SOQL, for anyone who wants to check it or copy it. Find does not accept typed SOQL.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Run</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that runs the query.</shortDescription>
+        <value>Run</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Export</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that exports every matching record to CSV.</shortDescription>
+        <value>Export to CSV</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Exporting</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Progress while exporting. {0}: rows read so far.</shortDescription>
+        <value>Exporting: {0} rows so far.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportDone</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice when an export finished. {0}: rows exported.</shortDescription>
+        <value>Exported {0} rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportStopped</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice when an export stopped at the limit. {0}: the limit.</shortDescription>
+        <value>Exported {0} rows, the export row limit. Narrow the conditions, or ask an administrator to raise the limit.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ResultCount</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Line above the results. {0}: rows shown.</shortDescription>
+        <value>{0} rows shown.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ResultsCapped</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Line when results reached rows to show. {0}: rows shown.</shortDescription>
+        <value>Showing the first {0} rows. Export to get every matching record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_NoResults</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown when a query matched nothing.</shortDescription>
+        <value>No records match these conditions.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SavedQueries</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the saved query picker.</shortDescription>
+        <value>Saved queries</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChooseSaved</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Placeholder of the saved query picker.</shortDescription>
+        <value>Open a saved query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SharedBy</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved query option of another person. {0}: name, {1}: owner.</shortDescription>
+        <value>{0} (shared by {1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_QueryName</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the saved query name input.</shortDescription>
+        <value>Query name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Share</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Checkbox that shares a saved query.</shortDescription>
+        <value>Show to everyone who uses Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Save</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that saves the query.</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SaveAs</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that saves a copy of the query under a new name.</shortDescription>
+        <value>Save as</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Delete</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that deletes the open saved query.</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_New</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that clears Find to start a new query.</shortDescription>
+        <value>New query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SavedNotice</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after a query is saved. {0}: its name.</shortDescription>
+        <value>Saved {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_DeletedNotice</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after a query is deleted. {0}: its name.</shortDescription>
+        <value>Deleted {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_FixConditions</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Run or Save is pressed with conditions to fix.</shortDescription>
+        <value>Fix the conditions marked below, then try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChooseColumns</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Run or Save is pressed with no columns.</shortDescription>
+        <value>Choose at least one column.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Loading</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Assistive text while Find works.</shortDescription>
+        <value>Working</value>
+    </labels>
 </CustomLabels>
