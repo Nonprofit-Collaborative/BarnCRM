@@ -136,4 +136,156 @@
         <shortDescription>Custom metadata page: the user lacks Manage BarnCRM Metadata</shortDescription>
         <value>You need the BarnCRM Metadata Admin permission set to change custom metadata. Ask your administrator to add it.</value>
     </labels>
+    <labels>
+        <fullName>Core_CmdtManager_AddButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that opens the form for a new row</shortDescription>
+        <value>Add</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_EditAction</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: row action that opens the row in the form</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_ArchiveAction</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: row action that stops a row being used</shortDescription>
+        <value>Archive</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RestoreAction</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: row action that brings an archived row back</shortDescription>
+        <value>Restore</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_SaveButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that saves the form</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_CancelButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that closes the form without saving</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NameField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the row's name, column and form box</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StatusColumn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: column saying whether the row is in use</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StatusInUse</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the row is used</shortDescription>
+        <value>In use</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StatusArchived</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the row is archived and not used</shortDescription>
+        <value>Archived</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_OwnHeading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading above the organization's own rows</shortDescription>
+        <value>Added by your organization</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_OwnEmpty</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the organization has added no rows</shortDescription>
+        <value>Nothing added yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_ShippedHeading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading above the read-only shipped rows</shortDescription>
+        <value>Shipped with BarnCRM</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NewTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading of the form for a new row</shortDescription>
+        <value>New row</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_EditTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading of the form for a row; names the row</shortDescription>
+        <value>Edit {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_Saving</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: a save has started in the background</shortDescription>
+        <value>Saving. Salesforce applies the change in the background, usually within a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_Saved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: a save finished; names the row</shortDescription>
+        <value>Saved. {0} is in the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StillSaving</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: a save has not finished after a minute</shortDescription>
+        <value>Still saving. Click Check again in a minute. If it failed, the reason is in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_CheckAgain</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that reloads the list and the save's outcome</shortDescription>
+        <value>Check again</value>
+    </labels>
 </CustomLabels>
