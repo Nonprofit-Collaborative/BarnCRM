@@ -48,6 +48,22 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Gift_Batch__c</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People, with their giving</comment>
+    <content>Giving_Contact_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>People, with their giving</comment>
+    <content>Giving_Contact_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Contact</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#0B5CAB</headerColor>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>

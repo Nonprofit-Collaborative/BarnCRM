@@ -3092,8 +3092,8 @@ nothing packaged to conflict with it (ADR-0006).
 | Maximum Amount | `Maximum_Amount__c` | Currency |
 | Active | `Active__c` | Checkbox |
 
-- **Fields on Account** (shipped by Giving, on the Household, Organization, and person
-  layouts):
+- **Fields on Account** (shipped by Giving, shown read only in the Giving section of
+  Giving's own Account and Contact record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -4389,8 +4389,8 @@ why the definition keeps its own Last Calculated as well.
 
 ### Salesforce implementation
 
-- **Fields on Account** (shipped by Giving, shown on the Household and Organization
-  layouts and, in Person Account orgs, on the person layout):
+- **Fields on Account** (shipped by Giving, shown read only in the Giving section of
+  Giving's own Account and Contact record pages, ADR-NEXT on the donor record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -5456,3 +5456,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
 | v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-10-12 | UX review item 2 (ADR-NEXT, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
