@@ -224,7 +224,7 @@ Two buttons, and you may use either, both, or neither:
   organizations in your org so you can practise on something that is not your real data.
   You can remove it again from the same panel.
 - **Import a spreadsheet** opens the Import tab, where you upload your file, map your
-  columns, run a dry run, and see what would happen before anything is created.
+  columns, run a preview, and see what would happen before anything is created.
 
 If the Import tab is not in your org yet, the step says so rather than sending you to a
 page that does not exist, and the same is true of the sample data loader.

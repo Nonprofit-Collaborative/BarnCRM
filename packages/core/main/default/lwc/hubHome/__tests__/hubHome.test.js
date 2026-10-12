@@ -254,6 +254,10 @@ describe('c-hub-home', () => {
     expect(warning).not.toBeNull();
     expect(warning.getAttribute('aria-live')).toBe('polite');
     expect(warning.querySelector('lightning-icon')).not.toBeNull();
+    // A screen reader hears "Warning", not the tile heading a second time.
+    expect(warning.querySelector('lightning-icon').alternativeText).toContain(
+      'Core_HubHome_WarningIcon'
+    );
   });
 
   it('lists the files that arrive regularly, and says which were never imported', async () => {

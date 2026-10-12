@@ -35,7 +35,7 @@ BarnCRM Admin role includes. Without it you can still read most of the report: t
 so at the top and the Fix buttons are hidden. Three checks are skipped for you rather than
 answered wrongly, because Salesforce only lets you see your own access: who holds the
 BarnCRM Admin role, who holds the Override Receipt Lock permission (asked only where Giving is installed), and how many errors
-nobody has read. In their place you get one line, **Sign in as a BarnCRM Admin to see the
+nobody has read. In their place you get one line, **Only a BarnCRM Admin can see the
 access checks**.
 
 ## A five-minute walkthrough
@@ -204,8 +204,8 @@ today are the ones somebody has to group by hand later.
 
 **Ignoring the red membership finding in a Person Accounts org.** "Household membership does
 not fit Person Accounts" is red for a reason: in that state, new households are built through
-the person's account, which in a Person Accounts org is the person. Click **Switch to junction
-membership** and the app fixes it for you. The longer it waits, the more households have to be
+the person's account, which in a Person Accounts org is the person. Click **Switch to the flexible
+way** and the app fixes it for you. The longer it waits, the more households have to be
 sorted out afterward.
 
 **Fixing access by editing profiles.** Health Check counts the packaged roles the Access page
@@ -216,7 +216,7 @@ list them, because the packaged roles are what the app relies on.
 **Reading the access findings from someone else's screen.** Salesforce only lets a person see
 their own access, so for anyone without the Manage BarnCRM Settings permission Health Check
 skips the two access counts rather than printing a number it cannot stand behind. If the report
-you are looking at says **Sign in as a BarnCRM Admin to see the access checks**, that is why:
+you are looking at says **Only a BarnCRM Admin can see the access checks**, that is why:
 run it again as an administrator.
 
 **Treating the Override Receipt Lock finding as a formality (with Giving).** It is amber rather than red

@@ -62,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Schedule change refused without Manage BarnCRM Settings</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the BarnCRM Admin access level.</value>
+        <value>You need the Manage BarnCRM Settings permission to start, stop, or run the seasonal address swap. Ask your administrator for the BarnCRM Admin role.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_ReadOnly</fullName>
@@ -102,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Status shown when the nightly swap is scheduled</shortDescription>
-        <value>The swap runs every night at 12:30 AM.</value>
+        <value>The swap runs every night at 12:30 AM, in your organization's time zone.</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_ScheduleButton</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that starts the nightly swap</shortDescription>
-        <value>Schedule the nightly swap</value>
+        <value>Schedule nightly run</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_Stale</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that stops the nightly swap</shortDescription>
-        <value>Stop the nightly swap</value>
+        <value>Stop nightly run</value>
     </labels>
     <labels>
         <fullName>Core_SeasonalAddress_UnexpectedError</fullName>

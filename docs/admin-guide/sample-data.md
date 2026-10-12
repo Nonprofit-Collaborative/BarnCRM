@@ -11,7 +11,7 @@ one action when you are done with it.
 Sample data is never loaded for you. Installing or upgrading BarnCRM does not load it, the
 Setup Assistant does not load it unless you choose to, and no scheduled job loads it. It
 arrives only when someone with the **Manage BarnCRM Settings** permission selects **Load
-Sample Data** (developers' scratch-org scripts load it too, in their own test orgs).
+sample data** (developers' scratch-org scripts load it too, in their own test orgs).
 
 What loads, exactly:
 
@@ -54,9 +54,9 @@ has to stay removable.
 ## 2. How to turn it on
 
 1. Open **BarnCRM Settings**.
-2. In the **General** section, find **Sample Data** and open it. If you do not see it,
+2. In the **General** section, find **Sample data** and open it. If you do not see it,
    type "sample" in the settings search box.
-3. Read the warning, then select **Load Sample Data**.
+3. Read the warning, then select **Load sample data**.
 4. Confirm in the dialog. Loading runs in the background; the card shows progress and
    updates automatically until it finishes. With Giving installed there are several
    thousand records to write, so allow a few minutes rather than one.
@@ -66,7 +66,7 @@ has to stay removable.
    until you recalculate, or until tonight, those fields are empty while the gift records
    themselves are all there.
 
-If you came here from the Setup Assistant, the same **Sample Data** step takes you to
+If you came here from the Setup Assistant, the same **Sample data** step takes you to
 this screen. Loading sample data is entirely optional; skipping it does not block any
 other step.
 
@@ -86,7 +86,7 @@ household records, names, greetings, member counts, and Members panel.
 
 ## 3. A five-minute walkthrough (as Maria)
 
-1. Open **BarnCRM Settings**, go to **Sample Data**, and select **Load Sample Data**.
+1. Open **BarnCRM Settings**, go to **Sample data**, and select **Load sample data**.
    Confirm the dialog. Wait for the card to show **Loaded**, with counts for households,
    contacts, organizations, connections, affiliations, and, with Giving installed, gifts.
 2. Open the **Households** tab. Use the list view search to find "Garcia" and open
@@ -114,7 +114,7 @@ household records, names, greetings, member counts, and Members panel.
 8. With Giving installed, open the **Giving Overview** dashboard. If the numbers are empty, go to **BarnCRM
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
-9. Return to **BarnCRM Settings**, **Sample Data**, and select **Remove Sample Data**.
+9. Return to **BarnCRM Settings**, **Sample data**, and select **Remove sample data**.
    Confirm the dialog. The card returns to **Not loaded** and every record the loader
    created is gone: households, contacts, organizations, connections, affiliations, and the
    gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
@@ -125,13 +125,13 @@ household records, names, greetings, member counts, and Members panel.
 
 - **Loading sample data into a production org.** Sample data is meant for scratch orgs,
   sandboxes, and demos, never for the org your organization runs on day to day. The
-  warning on the Sample Data card says so before you confirm; if you see real
+  warning on the Sample data card says so before you confirm; if you see real
   records in a report next to "Garcia Family" or "Staff Household," you loaded it by
-  mistake. Remove it right away with **Remove Sample Data**, and audit any receipts,
+  mistake. Remove it right away with **Remove sample data**, and audit any receipts,
   exports, or emails sent while it was present.
 - **Trying to load twice.** Loading again while sample data is already present shows a
   message that it is already loaded. Remove it first if you want a fresh copy. While a
-  load is still running, both **Load Sample Data** and **Remove Sample Data** are
+  load is still running, both **Load sample data** and **Remove sample data** are
   unavailable: removing halfway through would delete households the loader is still
   attaching people to.
 - **Assuming removal is instant.** Removal deletes several thousand records with Giving
@@ -148,7 +148,7 @@ household records, names, greetings, member counts, and Members panel.
   are contacts even where your own people are stored as accounts. That is a limit of the
   sample set, not of households: the households, memberships, names, greetings, and counts
   all work the same way they will with your own records.
-- **Not having the permission.** If the **Load Sample Data** button does not appear, you
+- **Not having the permission.** If the **Load sample data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.
 

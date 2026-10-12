@@ -6,13 +6,13 @@ Importing loads a spreadsheet of people, households, and organizations into Barn
 without a consultant, and, with the Giving module installed, their gifts too
 ([Importing gifts](gift-import.md)). You upload the file, BarnCRM suggests which column means what,
 you say how a row should be matched against records you already have, and then you run a
-**dry run** that tells you exactly what would be created, updated, matched, or rejected
-before anything is written. When the preview looks right you commit it, and the results
+**preview** that tells you exactly what would be created, updated, matched, or rejected
+before anything is written. When the preview looks right you import it, and the results
 screen tells you what happened, row by row, including every row that failed and why.
 
 Every record an import creates is tagged with the import it came from, so six months
 later you can still answer "where did these 400 households come from".
-And for 30 days after you commit it, an import can be undone: the records it created are
+And for 30 days after you import it, an import can be undone: the records it created are
 removed and the values it changed are put back (section 5).
 
 ## 2. How to turn it on
@@ -29,7 +29,7 @@ A few things are worth knowing before your first large file:
    limit error; raise it only if a very large file is running slowly and nothing else
    fires on save.
 3. **Days an import can be undone** is 30 unless you change it, and can be anything from 1
-   to 365. Each import keeps the window it was committed with.
+   to 365. Each import keeps the window it was imported with.
 4. **Import** on the same page has an **Open the import wizard** link, which is the same
    place the **Import** tab takes you.
 5. With the Giving module installed, the same page has the two payment matching settings
@@ -61,18 +61,18 @@ or six rows.
    under each rule before you change it: **Name plus postal code** will treat two
    different people who share a name at one address as the same person.
 5. Optionally, under **Control totals**, type how many rows the file should have (and, with
-   Giving, for a gift file, what its amounts should add up to). The dry run checks them and a commit is
+   Giving, for a gift file, what its amounts should add up to). The preview checks them and the import is
    refused while they do not match.
-6. Select **Dry run**. Nothing is written. When it finishes you see four counts, "would
+6. Select **Preview**. Nothing is written. When it finishes you see four counts, "would
    create", "would update", "would match and change nothing", and "would be rejected",
    and a table of the rejected rows with the reason for each one. Select **Download
    exceptions** to get those rows back as a CSV you can fix in your spreadsheet. A new
    person or organization that appears on several rows is counted once as "would create";
-   their later rows count as matching them, which is what the commit will do. A person on
+   their later rows count as matching them, which is what the import will do. A person on
    twelve rows of the file becomes one person with one household, not twelve.
-7. If the preview is wrong, fix the file or the mapping and dry run again. Nothing you
+7. If the preview is wrong, fix the file or the mapping and preview again. Nothing you
    have done so far has changed a record.
-8. When the preview is right, select **Commit**. Processing runs in the background and
+8. When the preview is right, select **Import these rows**. Processing runs in the background and
    the screen updates as it goes.
 9. The results screen shows the same four counts for what actually happened, the run log,
    and links to the records. Select **View rows** to see every row and what became of it.
@@ -118,7 +118,7 @@ Three things are worth knowing about it.
 - **Where only one person has that email, or surname and postal code, a row with another
   first name matches them.** Today, with only John Smith at an address, a "Jane Smith" row
   at that address is matched to John and his first name is changed to Jane. Check the dry
-  run's Updated rows for this before you commit. (This rule is under review.) Loading the same file again finds each of
+  run's Updated rows for this before you import. (This rule is under review.) Loading the same file again finds each of
   them rather than adding the second person again. Two people on one row with the same
   matching details and the same first name cannot be told apart: that row is rejected.
   Under the email rule, a second person who shares the first person's email needs a last
@@ -126,7 +126,7 @@ Three things are worth knowing about it.
 
 ## 5. Undoing an import
 
-An import you regret can be undone for 30 days after you commit it. Undo removes the
+An import you regret can be undone for 30 days after you import it. Undo removes the
 people, households and organizations that import created (and, with Giving, its gifts), and
 puts back the values it changed on records you already had. It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
@@ -161,8 +161,8 @@ An undo that stops part way, for example because of a limit error, shows **Undo 
 Select **Undo** again: it finishes the job without repeating what it already did.
 
 **Days an import can be undone** in **BarnCRM Settings**, **Import**, sets the window, from
-1 to 365 days. The window is fixed when an import is committed, so changing the setting only
-affects imports you commit afterwards.
+1 to 365 days. The window is fixed when an import runs, so changing the setting only
+affects imports you run afterwards.
 
 ## 6. Files that arrive every month
 
@@ -180,8 +180,8 @@ imported, oldest first, and **Never** for one you have not loaded yet. When a da
 than you expect, that file has not been loaded this month.
 
 Marking a mapping recurring changes nothing about how its files are imported. BarnCRM
-never fetches or loads a file on its own: every file is still uploaded, dry run and
-committed by a person, because an import nobody watched is an import nobody checked.
+never fetches or loads a file on its own: every file is still uploaded, previewed and
+imported by a person, because an import nobody watched is an import nobody checked.
 
 ## 7. Common mistakes
 
@@ -194,17 +194,17 @@ browser too old to open a workbook says so; save the sheet as CSV instead. So do
 too large to open in the browser (more than 500,000 rows or 1,000 columns, or a sheet over
 100 MB once unpacked).
 
-**"This import is already running a dry run or a commit."** Only one run of an import goes
+**"This import is already running a preview or an import."** Only one run of an import goes
 at a time. Wait for the one running to finish (its results appear when it does), then start
 again. While it runs, rows it has not reached yet still show the previous run's result.
 
-**An import shows Failed although you did not see it fail.** Salesforce stopped its dry run or
-commit before it finished (for example, the job was aborted in Setup). If it was a dry run,
-run the dry run again. If it was a commit, part of the file may already be loaded, and a
-committed import cannot be dry run or committed again: undo it, which removes what it loaded
+**An import shows Failed although you did not see it fail.** Salesforce stopped its preview or
+import before it finished (for example, the job was aborted in Setup). If it was a preview,
+preview again. If it was an import, part of the file may already be loaded, and a
+finished import cannot be previewed or imported again: undo it, which removes what it loaded
 (anything changed since it stopped is kept), then upload the file as a new import.
 
-**"No column was matched to a name or an email."** The dry run refuses to run when the
+**"No column was matched to a name or an email."** The preview refuses to run when the
 mapping has no way to identify a person or an organization. Usually the file's header row
 is not the first row: a title line or a blank line above it means BarnCRM read the
 wrong row as the header. Delete the rows above the header in your spreadsheet and upload
@@ -213,7 +213,7 @@ again.
 **Every row comes back as "would create" when you expected updates.** The matching rule
 is not finding your existing records. **Email exact** matches only when the email in the
 file is exactly the email on the record, so a file of work addresses will not match
-people whose personal address you hold. Run a dry run with a different rule, or add an
+people whose personal address you hold. Run a preview with a different rule, or add an
 external identifier column to the file and use **External ID**.
 
 **Rows rejected with "Required value missing: last name".** A person needs a last name.
@@ -230,11 +230,11 @@ a smaller file, and import that file on its own.
 saves past a duplicate rule set to alert, as a bulk load does, so a couple at one address or
 a person resembling someone already here is not rejected. Afterwards run the duplicate scan
 (see [Duplicates](duplicates.md)) to review any pair it made. A duplicate rule set to
-**Block** still blocks: those rows are rejected with the rule's message, although the dry run
-counted them as would create, because a dry run saves nothing for the rule to check.
+**Block** still blocks: those rows are rejected with the rule's message, although the preview
+counted them as would create, because a preview saves nothing for the rule to check.
 
 **The run log says "Not loaded: you do not have access to" a field.** Your user may not
-edit that field, so its column was skipped on every row, in the dry run and in the commit, and
+edit that field, so its column was skipped on every row, in the preview and in the import, and
 the rest of each row loaded. The run log names each such field once. The BarnCRM Admin role
 lets you edit the standard fields import mappings use (see "Fields the BarnCRM Admin role
 can import" below), so this usually means a column mapped to some other field, or a user
@@ -246,17 +246,17 @@ missing values.
 matching rule uses (for example Email under **Email exact**), so nobody in the file could be
 found by it, and a person your org holds only by that field counts as new. Where people
 are person accounts this can be one of the two postal codes (mailing or billing) while the
-other still matches. Do not commit: ask your Salesforce administrator
-for access to the field, then dry run again.
+other still matches. Do not import: ask your Salesforce administrator
+for access to the field, then preview again.
 
 **Columns for amounts, dates and the like were set to Do not load.** Only a module can load
 them (the Giving module loads gifts), so without one BarnCRM offers nowhere to put them and
 suggests **Do not load**. Nothing is lost: the staged row still keeps the whole original
 line. With Giving installed, see [Importing gifts](gift-import.md).
 
-**"The control totals do not match."** The dry run counted a different number of rows (or,
+**"The control totals do not match."** The preview counted a different number of rows (or,
 with Giving, a different total of gift amounts) from the control totals you typed. The run log gives both
-numbers. Fix the file or the totals and dry run again; the commit is refused until they agree.
+numbers. Fix the file or the totals and preview again; the import is refused until they agree.
 
 ## Fields the BarnCRM Admin role can import
 

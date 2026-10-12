@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when the viewer cannot run the access checks.</shortDescription>
-        <value>Sign in as a BarnCRM Admin to see the access checks</value>
+        <value>Only a BarnCRM Admin can see the access checks</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationFix</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: households with no current member.</shortDescription>
-        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. Open each one to add a member, merge it into another household, or delete it. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. Open each one to add a member, merge it into another household, or delete it. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_EmptyHouseholdsTitle</fullName>
@@ -358,7 +358,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains why contact membership does not work with Person Accounts.</shortDescription>
-        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to junction membership fixes it, and the households you already have are not changed.</value>
+        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to the flexible way of belonging fixes it, and the households you already have are not changed.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipFix</fullName>
@@ -366,7 +366,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that switches household membership to the junction.</shortDescription>
-        <value>Switch to junction membership</value>
+        <value>Switch to the flexible way</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipTitle</fullName>
@@ -598,7 +598,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: contacts with no account, in contact mode.</shortDescription>
-        <value>These contacts have no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>These contacts have no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail</fullName>
@@ -606,7 +606,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: people with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names these people, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>No current household membership names these people, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdTitle</fullName>

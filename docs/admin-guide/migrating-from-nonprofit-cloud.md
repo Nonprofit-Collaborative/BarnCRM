@@ -8,7 +8,7 @@ If your donors and gifts are in Salesforce Nonprofit Cloud, BarnCRM
 ships four ready-made import mappings that read Nonprofit Cloud's own exports: your people, and
 your gifts with the funds they were designated to. You export each file with Data Loader or
 Workbench, without renaming a column, and load it through the **Import** tab like any other
-file, with a dry run first and an undo afterwards.
+file, with a preview first and an undo afterwards.
 
 The mappings only name columns. Nothing in BarnCRM depends on Nonprofit Cloud being
 installed, so they work the same whether you are moving to a new org or loading into the org
@@ -33,7 +33,7 @@ opens. In an org that already had the generic mappings, add them once from Healt
 Before loading gifts, create in BarnCRM every fund and appeal the gifts name, with the same
 names they have in Nonprofit Cloud (see [Funds](funds.md) and [Appeals](appeals.md)), and mark
 one fund as the default. A gift naming a fund or appeal BarnCRM does not have is rejected
-in the dry run, naming it.
+in the preview, naming it.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -44,14 +44,14 @@ in section 4 produce. Create a default fund called **General Fund**, a fund call
 1. Open the **Import** tab, select **Nonprofit Cloud: person accounts**, then **Next**, and
    upload `npc-person-accounts.csv`. Every column is already mapped, `PersonEmail` to
    the person's email, `PersonMailingCity` to their mailing city, and so on.
-2. Dry run, then commit. Ana Okafor and Wei Lee are created, each with a household of their
+2. Preview, then import. Ana Okafor and Wei Lee are created, each with a household of their
    own.
 3. Import `npc-gift-transactions.csv` with **Nonprofit Cloud: gift transactions**.
-   Leave donation matching at **Match or create**. The dry run says 2 rows would create a gift
+   Leave donation matching at **Match or create**. The preview says 2 rows would create a gift
    and 2 would be rejected. The rejected two are the two lines of one gift split across two
    funds, each saying "The split adds up to 300.00, not the gift amount of 500.00." (and 200.00
    for the other). Section 5 explains why, and how to load it.
-4. Commit. Open Ana Okafor: she has two gifts, one of 250.00 to Scholarships with the appeal
+4. Import these rows. Open Ana Okafor: she has two gifts, one of 250.00 to Scholarships with the appeal
    Spring Appeal and the payment method Card, one of 100.00 to General Fund. She was found by
    her email, not created again.
 5. Import `npc-undesignated-gifts.csv` with **Nonprofit Cloud: undesignated
@@ -60,7 +60,7 @@ in section 4 produce. Create a default fund called **General Fund**, a fund call
    gifts**. Riverside Foundation is created as an organization and gives one gift of 1,000.00,
    split 600.00 to Scholarships and 400.00 to General Fund. This file is the split gift of
    step 3 done the right way: two lines combined into one row.
-7. Load any of the gift files again and dry run it. Every gift row says it matches a gift you
+7. Load any of the gift files again and preview it. Every gift row says it matches a gift you
    already have: the gift transaction's record ID is each gift's external ID, so nothing is
    created twice.
 
@@ -70,7 +70,7 @@ Do it in this order. People come before gifts because the people file carries ea
 full details (address, phones, preferences), which a gift file does not. A donor the gift file
 names on several rows is created once either way, but only with the few details a gift row
 has. With the people already loaded, every gift row finds its donor by email. An export of up
-to 500,000 rows can be dry run as one file; split anything larger.
+to 500,000 rows can be previewed as one file; split anything larger.
 
 1. **Funds and appeals.** Create them in BarnCRM by hand, with the names they have in
    Nonprofit Cloud (gift designations and campaigns). There is no import for them yet.
@@ -142,7 +142,7 @@ to 500,000 rows can be dry run as one file; split anything larger.
    lines. Section 5 says why.
 8. **Translate what does not match.** Payment methods: BarnCRM reads Cash, Check, Card,
    ACH, Stock and In-kind, plus common words such as "Credit Card", "EFT" and "Wire Transfer".
-   Any other value is rejected in the dry run, naming it and the values to use; use **Find and
+   Any other value is rejected in the preview, naming it and the values to use; use **Find and
    Replace** in the spreadsheet on that column.
 9. **Recreate what the mappings do not load** (section 6).
 
@@ -198,7 +198,7 @@ that keeps people as person accounts:
   accounts mapping is for loading into a new org, where people are stored as contacts.
 - An organization donor is found by name only if its account is a BarnCRM organization.
   A business account of another record type gets a new BarnCRM organization of the same
-  name. Check the dry run's "would create" count for organizations before you commit.
+  name. Check the preview's "would create" count for organizations before you import.
 
 ## 8. Common mistakes
 
@@ -210,12 +210,12 @@ that keeps people as person accounts:
 address, so **Email exact** had nothing to match or group their rows on, and each row created
 them. Give such donors an email address before the export, or choose **Name plus postal
 code**, which the gift files also carry (read its warning on the matching step first). Either
-way, check the dry run's "would create" count: a donor who can be matched is created once
+way, check the preview's "would create" count: a donor who can be matched is created once
 however many gifts they have, and a couple at one address are told apart by first name.
 
 **A person's first name changed after a gift file.** Where only one person has the row's email,
 a row with a different first name is matched to them and their first name is updated (see
-[Importing](importing.md)). Check the dry run's Updated rows before you commit, and correct the
+[Importing](importing.md)). Check the preview's Updated rows before you import, and correct the
 file where a gift names the donor differently, for example "Bob" for "Robert".
 
 **Salesforce warned about duplicates and the import saved the people anyway.** A duplicate

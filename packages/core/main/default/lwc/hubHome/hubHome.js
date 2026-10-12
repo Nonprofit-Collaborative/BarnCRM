@@ -34,6 +34,7 @@ import RECURRING_NEVER from '@salesforce/label/c.Core_HubHome_RecurringNever';
 import RECURRING_LINK from '@salesforce/label/c.Core_HubHome_RecurringLink';
 import NEW_HOUSEHOLD from '@salesforce/label/c.Core_HubHomeActions_NewHousehold';
 import NEW_HOUSEHOLD_NAME_PLACEHOLDER from '@salesforce/label/c.Core_Households_NamePlaceholder';
+import WARNING_ICON from '@salesforce/label/c.Core_HubHome_WarningIcon';
 
 const HOUSEHOLD_RECORD_TYPE = 'Household';
 
@@ -45,6 +46,8 @@ export default class HubHome extends NavigationMixin(LightningElement) {
     pausedBanner: PAUSED_BANNER,
     errorTileHeading: ERROR_TILE_HEADING,
     errorTileLink: ERROR_TILE_LINK,
+    // A warning icon is announced as a warning, not as the tile it sits on.
+    warningIcon: WARNING_ICON,
     installCompleted: INSTALL_COMPLETED,
     installProblems: INSTALL_PROBLEMS,
     quickLinksHeading: QUICK_LINKS_HEADING,
