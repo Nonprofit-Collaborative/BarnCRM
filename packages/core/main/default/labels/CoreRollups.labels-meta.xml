@@ -320,4 +320,28 @@
         <shortDescription>Rollups: log entry when a merge's totals are left to the nightly run.</shortDescription>
         <value>A merge of {0} records left too little room to recalculate the kept records' totals now. They are recalculated in tonight's run.</value>
     </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueSaveFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: why a record's totals could not be saved.</shortDescription>
+        <value>The totals could not be saved: {0} BarnCRM tries again automatically, and the nightly run puts them right if it still cannot.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueRunStopped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: why a background recalculation stopped.</shortDescription>
+        <value>The background recalculation stopped before it finished: {0} BarnCRM tries these records again, a few at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueRunSummary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log summary when queued totals could not be saved.</shortDescription>
+        <value>{0} records' totals could not be saved in the background and wait in the Rollup Queue. They are tried again automatically; after five tries they wait for Retry.</value>
+    </labels>
 </CustomLabels>

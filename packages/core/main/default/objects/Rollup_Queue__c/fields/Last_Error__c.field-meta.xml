@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Last_Error__c</fullName>
+  <description>What went wrong on the last attempt, in plain language first, for the Needs attention list (R-RQ4).</description>
+  <inlineHelpText>What went wrong the last time these totals were tried.</inlineHelpText>
+  <label>Last Error</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

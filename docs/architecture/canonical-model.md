@@ -1283,9 +1283,12 @@ every target record every night, which is the load the changed-only rule removes
   values.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser`, `RollupBatch`,
   `RollupScheduler`, with apex-rollup behind `RollupAdapter` (ADR-0015) until BarnCRM's own
-  aggregation core replaces it (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`): a planner,
-  a calculator, the writer, a queue processor (Section 14A), a full recalculation batch and an
-  invocable recalculation action for Flow.
+  aggregation core replaces it (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`). That core
+  is `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source
+  queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
+  `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11) and
+  `RollupQueue` (the queue processor, Section 14A); a full recalculation batch and an invocable
+  recalculation action for Flow follow.
 
 ## 14A. Rollup Queue
 
@@ -1360,8 +1363,8 @@ and processed; the nightly run puts the totals right afterwards in Both mode.
 | Next Attempt | `Next_Attempt__c` | DateTime |
 | Last Error | `Last_Error__c` | Long Text Area |
 
-- **Service:** the queue processor of the new engine; the Rollup Builder's Needs attention
-  list reads and retries entries.
+- **Service:** `RollupQueue`, which writes entries and is the one processor (a Queueable with a
+  finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 
 ---
 

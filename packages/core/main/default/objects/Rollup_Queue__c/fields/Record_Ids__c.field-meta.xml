@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Record_Ids__c</fullName>
+  <description>The ids of the records to recalculate, at most 200, separated by commas. Held as text so that queuing a record never locks it (R-RQ2).</description>
+  <inlineHelpText>The records whose totals are waiting.</inlineHelpText>
+  <label>Record Ids</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>
