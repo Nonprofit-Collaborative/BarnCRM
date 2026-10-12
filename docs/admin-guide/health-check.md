@@ -2,7 +2,7 @@
 
 ## What it does
 
-Health Check looks at your org and tells you, in plain language, whether Open Impact is set
+Health Check looks at your org and tells you, in plain language, whether BarnCRM is set
 up the way it should be. It reports what it found in your org (what else is installed, which
 licenses are in play), whether your coexistence mode matches that, who can and cannot get
 into the app, and anything that is currently getting in the way, such as paused automation
@@ -17,7 +17,7 @@ Run it after you install, after you add people, and any time something feels wro
 
 ## How to turn it on
 
-Health Check is on as soon as Open Impact is installed. There is nothing to enable and
+Health Check is on as soon as BarnCRM is installed. There is nothing to enable and
 nothing to configure.
 
 1. Open the **Open Impact** app.
@@ -40,24 +40,24 @@ access checks**.
 
 ## A five-minute walkthrough
 
-Maria has just installed Open Impact into her organization's Nonprofit Cloud org. Person
+Maria has just installed BarnCRM into her organization's Nonprofit Cloud org. Person
 Accounts are on. She has not set anything up yet.
 
 1. Maria opens the **Open Impact** app, clicks **Open Impact Settings**, and chooses
    **Health**.
 2. The first card is **What we found in your org**. It reads:
    **Person Accounts enabled. Agentforce Nonprofit objects detected.** Under it, the card
-   shows the mode this org is in now and the mode Open Impact recommends:
+   shows the mode this org is in now and the mode BarnCRM recommends:
    **Agentforce Nonprofit coexistence**.
 3. Below the card, the findings are grouped: **Your org**, **Licenses**, **Access**, and
    **Settings**. Each finding has an icon: a red circle for something that needs fixing, an
    amber triangle for something to be aware of, a blue dot for information.
 4. The first finding is blue, **Your org at a glance**, and it repeats what was found in a
-   sentence, adds that Open Impact supports this org shape directly, and says that Shield
+   sentence, adds that BarnCRM supports this org shape directly, and says that Shield
    Platform Encryption cannot be detected from inside the app. If her org uses it, she should
    say so before she loads data.
 5. The next finding is amber: **Coexistence mode is not confirmed yet**. It explains that
-   Open Impact is running as Standalone but this org is a Nonprofit Cloud org, and that until
+   BarnCRM is running as Standalone but this org is a Nonprofit Cloud org, and that until
    she confirms, households will be built the wrong way for Person Accounts. There is a
    button, **Use recommended mode**.
 6. Maria clicks **Use recommended mode**. The page saves Agentforce Nonprofit coexistence,
@@ -67,7 +67,7 @@ Accounts are on. She has not set anything up yet.
    She clicks **Open the Access page**, which takes her to the Access section of Open Impact
    Settings, adds herself, and comes back to Health.
 8. Another finding is amber: **4 users cannot see the app**. Four active users have a
-   Salesforce license but none of the Open Impact roles, so the Open Impact app is invisible to
+   Salesforce license but none of the BarnCRM roles, so the Open Impact app is invisible to
    them. She clicks **Open the Access page** again and assigns roles.
 9. There is a blue finding too: **The Gift Transaction mirror is in the Connect module**.
    Her org has Nonprofit Cloud gift objects and the Connect module is not installed, so if she
@@ -90,20 +90,20 @@ recommendation in step 5 is **NPSP coexistence**. Everything else is the same.
 | Your org | Whether household membership is still set to the person's account while Person Accounts are on, which does not work. |
 | Your org | Whether your org has Nonprofit Cloud gift objects while the Connect module is not installed. |
 | Settings | Whether household membership uses membership records while automatic household creation is off, which means no new person gets a household. |
-| Licenses | Whether the org uses more than one currency, which Open Impact does not support yet. |
+| Licenses | Whether the org uses more than one currency, which BarnCRM does not support yet. |
 | Access | Whether anyone holds the Open Impact Admin role. |
-| Access | Whether active users with a Salesforce license have no Open Impact role at all. |
+| Access | Whether active users with a Salesforce license have no BarnCRM role at all. |
 | Access | With Giving: whether anyone holds the Override Receipt Lock permission, which is meant to be granted for one correction and taken away again. |
-| Settings | Whether Open Impact automation is paused, and says so plainly when it is running. A pause that nothing is set to end, or that ends more than 24 hours from now, is a warning. |
+| Settings | Whether BarnCRM automation is paused, and says so plainly when it is running. A pause that nothing is set to end, or that ends more than 24 hours from now, is a warning. |
 | Settings | Whether there are new entries in the Error Log that nobody has looked at. |
 | Settings | Whether the error digest is scheduled but has not run for more than two days, which usually means the person who scheduled it was deactivated. |
 | Settings | Whether anybody is in no household while every new person is meant to get one. |
 | Settings | Whether any household has nobody in it. |
 | Settings | Whether the fiscal year in Setup is the same month as the fiscal year start month in Open Impact Settings. |
 | Settings | With Giving: whether receipts have been voided with the reason "Generation failed", which is a receipt run that did not finish. |
-| Settings | Whether any of the totals Open Impact ships are missing from the Rollups page. |
-| Settings | Whether any Open Impact automation is missing its on and off switch on the Automation page. |
-| Settings | Whether any import template Open Impact ships is missing from the Import page. |
+| Settings | Whether any of the totals BarnCRM ships are missing from the Rollups page. |
+| Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
+| Settings | Whether any import template BarnCRM ships is missing from the Import page. |
 | Settings | Whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | Whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Connect: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
@@ -116,10 +116,10 @@ nothing looks broken and the cost arrives months later, so each is explained in 
 
 | Finding | What it means | Why it matters | What to do |
 |---|---|---|---|
-| **Someone can override the receipt lock** | One or more active people hold the **Override Receipt Lock** permission. Open Impact ships it assigned to nobody. | That permission is the only way to change or delete a gift that carries a receipt number. It is meant to be granted in Setup for one correction and removed the same day. Left assigned, the guarantee that a receipted gift cannot change quietly stops being a guarantee, and nothing in the app will tell you again. | Read the names in the finding. If nobody is in the middle of a correction right now, open **Setup, Custom Permissions, Override Receipt Lock** and take it off the permission set or profile that grants it. Every change made with it is already in the Error Log at Warning severity, so you can see what it was used for. |
-| **Your two fiscal years disagree** | The fiscal year in **Setup** starts in a different month from **Fiscal Year Start Month** in Open Impact Settings. | Open Impact computes Giving This Year, Giving Last Year and Giving Two Years Ago from its own setting, and the packaged retention reports (LYBUNT, SYBUNT, new versus retained, conversion) read the fiscal year from Setup. When the two disagree, every one of those numbers is measured on a different year boundary. Nothing errors: a donor simply appears on the LYBUNT list while their Giving This Year is not zero, and usually nobody asks until a year end number is questioned. | Decide which month is right, then set both to it: **Setup, Company Information, Fiscal Year**, and **Open Impact Settings, General, Fiscal Year Start Month**. The **Open general settings** button on the finding takes you to the second one. Recalculate rollups afterwards. |
-| **Receipts failed to generate** | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, Open Impact records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
-| **Gifts in a closed period are not posted** | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and Open Impact can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Connect. Without Connect, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
+| **Someone can override the receipt lock** | One or more active people hold the **Override Receipt Lock** permission. BarnCRM ships it assigned to nobody. | That permission is the only way to change or delete a gift that carries a receipt number. It is meant to be granted in Setup for one correction and removed the same day. Left assigned, the guarantee that a receipted gift cannot change quietly stops being a guarantee, and nothing in the app will tell you again. | Read the names in the finding. If nobody is in the middle of a correction right now, open **Setup, Custom Permissions, Override Receipt Lock** and take it off the permission set or profile that grants it. Every change made with it is already in the Error Log at Warning severity, so you can see what it was used for. |
+| **Your two fiscal years disagree** | The fiscal year in **Setup** starts in a different month from **Fiscal Year Start Month** in Open Impact Settings. | BarnCRM computes Giving This Year, Giving Last Year and Giving Two Years Ago from its own setting, and the packaged retention reports (LYBUNT, SYBUNT, new versus retained, conversion) read the fiscal year from Setup. When the two disagree, every one of those numbers is measured on a different year boundary. Nothing errors: a donor simply appears on the LYBUNT list while their Giving This Year is not zero, and usually nobody asks until a year end number is questioned. | Decide which month is right, then set both to it: **Setup, Company Information, Fiscal Year**, and **Open Impact Settings, General, Fiscal Year Start Month**. The **Open general settings** button on the finding takes you to the second one. Recalculate rollups afterwards. |
+| **Receipts failed to generate** | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, BarnCRM records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
+| **Gifts in a closed period are not posted** | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Connect. Without Connect, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
 | **The Opportunity mirror has not run** | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of Open Impact Settings, read **Last completed run**, then **Stop nightly run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
 
 ## How a fix button works
@@ -176,7 +176,7 @@ Each finding counts up to 1,000 and then says **More than 1,000**, so a large or
 answer quickly, and links the first five records, oldest first. The counts use your own
 access, so these two findings are shown only to people with the Manage Open Impact Settings
 permission. In an org that also has Nonprofit Cloud households, some of the people and
-households listed may belong to one: Open Impact cannot see that membership, and the finding
+households listed may belong to one: BarnCRM cannot see that membership, and the finding
 says so.
 
 The four checks about shipped totals, switches, templates and the nightly run are shown only to
@@ -189,8 +189,7 @@ saying so, and the details are written to the Error Log.
 ## Common mistakes
 
 **Treating an amber finding as a failure.** Amber means "be aware of this", not "broken".
-Multi-currency, for example, is amber forever if your org uses more than one currency: Open
-Impact will not break, it simply does not do currency conversion yet, and there is nothing
+Multi-currency, for example, is amber forever if your org uses more than one currency: BarnCRM will not break, it simply does not do currency conversion yet, and there is nothing
 you can do to make the finding go away.
 
 **Leaving "no new person is getting a household" unfixed.** That red finding means household

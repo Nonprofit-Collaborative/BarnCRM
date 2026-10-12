@@ -10,7 +10,7 @@ Most people you know have more than one email address: one at home, one at work,
 sometimes a third. Salesforce gives a person one email box, so keeping the other addresses
 usually means a note somewhere nobody reads.
 
-Open Impact gives each person three email boxes, personal, work and alternate, and one
+BarnCRM gives each person three email boxes, personal, work and alternate, and one
 choice: which of them you write to. Whatever you choose is copied into the ordinary email
 box on the person, so every mailing, every acknowledgment and every list view sends to the
 right address without anybody having to remember which one it was.
@@ -69,7 +69,7 @@ the ordinary email box catches up on that save.
 
 **"It will not let me save."**
 You chose an address that is empty. The message names the one you chose: fill that address
-in, or choose one of the others. Open Impact will not empty the ordinary email box for you,
+in, or choose one of the others. BarnCRM will not empty the ordinary email box for you,
 because a person with no email address stops getting every mailing you send and nobody would
 notice for months.
 

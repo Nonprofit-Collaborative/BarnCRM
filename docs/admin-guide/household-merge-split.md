@@ -119,7 +119,7 @@ message is "You need edit access to both households to merge them."
 **"After the merge the household name is not what I chose."**
 If you left the "custom name" box unchecked, the name is recalculated from the members after
 the merge, which is usually what you want: the household now holds more people. To keep the
-exact name you chose, tick the custom name option in the comparison. That tells Open Impact
+exact name you chose, tick the custom name option in the comparison. That tells BarnCRM
 to stop recalculating this household's name and greetings, and your wording stands.
 
 **"I split someone out and the old household disappeared."**
@@ -131,7 +131,7 @@ households and their giving history.
 
 Salesforce records account merges itself. The surviving household's history shows the merge
 and who did it, and the records that moved carry their own history, so a merge is auditable
-without Open Impact writing a second log of its own. Open Impact does not add an Error Log
+without BarnCRM writing a second log of its own. BarnCRM does not add an Error Log
 entry for a successful merge, only for one that fails.
 
 ## Field reference

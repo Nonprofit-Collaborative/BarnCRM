@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Open Impact is at Phase 0 / v0.1. There are no releases: no package versions exist, nothing is installable, and the namespace is not registered.
+BarnCRM is at Phase 0 / v0.1. There are no releases: no package versions exist, nothing is installable, and the namespace is not registered.
 
 | Version | Supported |
 |---|---|
@@ -13,7 +13,7 @@ Once versions are published, this table will list which of them receive security
 
 ## Reporting a vulnerability
 
-Please report security issues privately, through GitHub private vulnerability reporting on this repository: go to the Security tab of https://github.com/Nonprofit-Collaborative/OpenImpact and choose "Report a vulnerability".
+Please report security issues privately, through GitHub private vulnerability reporting on this repository: go to the Security tab of https://github.com/Nonprofit-Collaborative/BarnCRM and choose "Report a vulnerability".
 
 Do not open a public issue, a pull request, or a discussion post for a suspected vulnerability. Do not post details on social media or a community forum before we have had a chance to respond.
 
@@ -42,10 +42,10 @@ These are targets for a small volunteer project, not a contractual commitment.
 
 ## Scope notes
 
-Open Impact is a Salesforce managed package that runs inside your own Salesforce org, which shapes what a vulnerability here can be:
+BarnCRM is a Salesforce managed package that runs inside your own Salesforce org, which shapes what a vulnerability here can be:
 
 - **No external callouts by default.** The packages do not call out to third-party services during normal operation.
-- **No data leaves the org.** There is no Open Impact server, no hosted component, and no vendor copy of your constituent data.
+- **No data leaves the org.** There is no BarnCRM server, no hosted component, and no vendor copy of your constituent data.
 - **Telemetry is opt-in and off by default**, and anonymous when it is on.
 - **REST endpoints exist only in the Connect package** (the inbound gift API), are authenticated, and are documented. Connect is optional and is not installed unless you install it.
 - Issues in Salesforce itself, rather than in this code, belong to Salesforce: report those through https://trust.salesforce.com. We are happy to help you tell the difference.

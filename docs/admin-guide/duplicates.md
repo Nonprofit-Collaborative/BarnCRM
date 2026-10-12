@@ -6,7 +6,7 @@ Finds people and households that are in your database twice, and helps you deal 
 pair at a time. Salesforce does the finding, with the duplicate rules every org starts with:
 it warns the person typing that somebody similar already exists. What Salesforce does not do
 in most editions is look through the records you already have, so a spreadsheet imported last
-year is never checked against itself. Open Impact adds that scan, lists every pair on one page,
+year is never checked against itself. BarnCRM adds that scan, lists every pair on one page,
 and puts the household merge one click away.
 
 Nothing is ever merged or deleted for you. Every merge is a pair you looked at and confirmed.
@@ -14,12 +14,12 @@ Nothing is ever merged or deleted for you. Every merge is a pair you looked at a
 ## How to turn it on
 
 There is nothing to install. Salesforce switches on its standard duplicate rules for people
-and accounts in every new org, and Open Impact uses them. There is one Setup step, because of a
+and accounts in every new org, and BarnCRM uses them. There is one Setup step, because of a
 Salesforce licensing rule:
 
 **Who can review duplicates.** Salesforce keeps possible duplicates in records called duplicate
 record sets, and gives access to them only to users with a **Sales Cloud or Service Cloud
-license**. No other license can have it, Salesforce Platform included. So Open Impact puts that
+license**. No other license can have it, Salesforce Platform included. So BarnCRM puts that
 access in its own permission set, **Open Impact Duplicate Review**, which is in no role. In Setup,
 open **Users**, choose each person who will review duplicates, and under **Permission Set
 Assignments** add **Open Impact Duplicate Review**. Salesforce refuses the assignment for a user
@@ -57,7 +57,7 @@ choose to save anyway.
 4. Choose the person's name to open their record. On the right of the page the **Potential
    Duplicates** card names the other record. Choose **View Duplicates**, then **Compare and
    merge**, pick the values to keep, and confirm. This is Salesforce's own merge, and it keeps
-   the gifts, activities and files of both. Open Impact then adds the kept person to any
+   the gifts, activities and files of both. BarnCRM then adds the kept person to any
    household the other one belonged to, and recalculates their giving totals straight away.
    A household the other person leaves empty is kept, not deleted, because gifts are credited
    to it: merge it into the kept person's household with **Merge households** (step 6).
@@ -87,7 +87,7 @@ matching rule in Setup, and scan again.
 organizations with Salesforce's own tools.
 
 **A pair of person accounts never appears either.** If your org stores people as person
-accounts, merge two of them with Salesforce's own account merge. Open Impact handles it as it
+accounts, merge two of them with Salesforce's own account merge. BarnCRM handles it as it
 does a merge of two contacts: the kept person joins every household the other one belonged
 to, each household keeps its primary member, an emptied household is kept, and the kept
 person's totals are recalculated straight away.

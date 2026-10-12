@@ -3,7 +3,7 @@
 ## What it does
 
 Open Impact Settings (called Nonprofit Settings before version 0.6) is the one page where
-everything about how Open Impact behaves is changed: how households are named, which
+everything about how BarnCRM behaves is changed: how households are named, which
 automations run, who has access, and how this org fits alongside anything you already had.
 Settings are grouped into sections on the left, every setting has a plain-language
 description under it, and there is a search box for when you

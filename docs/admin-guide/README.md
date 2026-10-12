@@ -5,7 +5,7 @@
 One page per feature, written **before** the Lightning web component that implements it,
 for Maria.
 
-Maria is the Operations Manager who installs and configures Open Impact. She is
+Maria is the Operations Manager who installs and configures BarnCRM. She is
 comfortable with spreadsheets and modern web apps. She has no technical background, no
 full-time Salesforce administrator to call, and no budget for a consultant. If she cannot
 do the thing by following the page, the feature is not done (Principle 1, plan Section

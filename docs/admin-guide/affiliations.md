@@ -14,7 +14,7 @@ have simply written down where they work.
 
 ## How to turn it on
 
-Affiliations is part of Core and is on as soon as Open Impact is installed. There is nothing
+Affiliations is part of Core and is on as soon as BarnCRM is installed. There is nothing
 to install, no Setup step, and no setting to choose: an affiliation means the same thing in
 every organization, so there is nothing to configure.
 

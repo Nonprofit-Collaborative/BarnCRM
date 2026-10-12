@@ -1,6 +1,6 @@
 # Open Impact Core
 
-Core is the foundation package. Every other Open Impact module depends on it, and it depends on
+Core is the foundation package. Every other BarnCRM module depends on it, and it depends on
 nothing else. It contains no Opportunity, Campaign, Case, Lead, Person Account, or Industries
 object references: those live only in the Connect module, behind dynamic Apex.
 
@@ -193,7 +193,7 @@ a source deployment runs no post-install script.
 
 Core carries one third party dependency, as source rather than as a package: the
 [apex-rollup](https://github.com/jamessimone/apex-rollup) aggregation engine (MIT, James Simone),
-under `packages/core/vendor/apex-rollup/`. It is driven through an adapter Open Impact owns, and
+under `packages/core/vendor/apex-rollup/`. It is driven through an adapter BarnCRM owns, and
 `Rollup_Definition__c` stays the only rollup configuration an administrator ever sees.
 
 - **What was taken, what was changed, and how to take a newer version:**

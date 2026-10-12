@@ -2,7 +2,7 @@
 
 ## What it does
 
-Open Impact records fundraising efforts as appeals. Salesforce has its own object for the
+BarnCRM records fundraising efforts as appeals. Salesforce has its own object for the
 same idea, the Campaign, and many tools only understand that one: Campaign Members, email
 marketing apps, event tools, and the Campaign reports your team may already use.
 
@@ -62,7 +62,7 @@ Admin permission set has it) as well as Campaign access.
 
 **Two switches, one of them in charge.** **Copy appeals to Campaigns** in Open Impact Settings
 is the switch that decides whether Campaign sync is on. The **Campaign sync** row on the
-Automation page is the pause every Open Impact automation has. It stops only the copy made
+Automation page is the pause every BarnCRM automation has. It stops only the copy made
 when an appeal is saved, and it does nothing while **Copy appeals to Campaigns** is off. Leave
 it on, and use **Copy appeals to Campaigns** to turn the feature on or off. **Sync all
 appeals** follows **Copy appeals to Campaigns** alone.

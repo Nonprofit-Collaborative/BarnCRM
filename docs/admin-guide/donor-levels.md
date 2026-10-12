@@ -4,7 +4,7 @@
 
 Donor levels put your organization's own names on your donors: Friend, Sustainer,
 Leadership Circle, whatever your ladder calls them. You set the rungs and the amount each
-one starts at, and Open Impact keeps every household, organization, and person on the
+one starts at, and BarnCRM keeps every household, organization, and person on the
 right rung as their giving changes, without anybody running a report or updating a field.
 
 Each donor record also keeps the level they were on before and the date they moved, so
@@ -103,7 +103,7 @@ gaps. Rungs that overlap are not an error either: the higher rung wins.
 intended. The level says what the donor's current total earns, because a level that
 disagreed with the total on the same page would be worse than no level. The rung they left
 stays in **Previous donor level** and the date is on the record. If your organization
-awards a level permanently, record that on the donor rather than expecting Open Impact to
+awards a level permanently, record that on the donor rather than expecting BarnCRM to
 hold a number it can no longer see.
 
 **Deleting a rung wipes it from the donors who held it.** Deleting a level record removes
@@ -117,5 +117,5 @@ anything in it yet. That is correct for an annual society and startling if you d
 mean it. If you want a ladder that never resets, the source is **Total giving**.
 
 **Wanting a window we do not offer, such as the last twelve months.** A level can only be
-measured on a total Open Impact already keeps. If you need a different window, add the
+measured on a total BarnCRM already keeps. If you need a different window, add the
 rollup you want on the Rollups page first; the level source then has a number to read.

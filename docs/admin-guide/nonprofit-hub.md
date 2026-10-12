@@ -21,7 +21,7 @@ home page lists it under **Modules** once Giving is installed.
 2. Type `Open Impact` and choose **Open Impact**.
 3. Click the star next to the app name if you want it to open by default.
 
-Everyone who has been given an Open Impact role can open the Hub. Two things on the home
+Everyone who has been given a BarnCRM role can open the Hub. Two things on the home
 page are for administrators only:
 
 - The **Errors to review** tile counts only errors you are allowed to see, and the Error
@@ -31,7 +31,7 @@ page are for administrators only:
 
 ## A five-minute walkthrough
 
-Maria has just installed Open Impact and has the sample data loaded.
+Maria has just installed BarnCRM and has the sample data loaded.
 
 1. Open the app launcher, type `Open Impact`, and choose **Open Impact**. The home page
    opens with the heading **Welcome to Open Impact**.
@@ -39,7 +39,7 @@ Maria has just installed Open Impact and has the sample data loaded.
    finished, with one sentence saying what that step is for and the count of how far you
    have got, for example "3 of 8" (seven steps with Core alone, eight with Giving). The steps are guided: each one is done here, on the home
    page, not somewhere else.
-3. The first step, **Confirm how Open Impact fits your existing org**, says what it found in
+3. The first step, **Confirm how BarnCRM fits your existing org**, says what it found in
    your org. If your org uses Person Accounts, as Nonprofit Cloud orgs do, it says so
    plainly, recommends Agentforce Nonprofit coexistence, and household membership uses the
    junction model so that what you already have keeps working. Click **Confirm and
@@ -50,7 +50,7 @@ Maria has just installed Open Impact and has the sample data loaded.
 5. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
    number, click **Open the Error Log** and read the plain-language message on each row.
 6. If someone has paused automation (for example during a large import), a banner sits
-   above the checklist saying Open Impact automation is paused. It disappears by itself
+   above the checklist saying BarnCRM automation is paused. It disappears by itself
    when the pause expires.
 7. Use **Quick links** to open Households, Organizations, or Open Impact Settings without
    going back to the app launcher.
@@ -60,9 +60,9 @@ whether anything went wrong.
 
 ## Common mistakes
 
-- **Looking for the app in Setup.** Open Impact is an app, not a Setup page. Use the app
+- **Looking for the app in Setup.** BarnCRM is an app, not a Setup page. Use the app
   launcher, not the gear icon. If `Open Impact` does not appear in the app launcher, you
-  have not been assigned an Open Impact role: ask whoever installed the package to add you
+  have not been assigned a BarnCRM role: ask whoever installed the package to add you
   on the Access page.
 - **Treating Skip for now as done.** Skipping moves you on without finishing the step, on
   purpose, so that a step waiting for a module you have not installed does not block you. A

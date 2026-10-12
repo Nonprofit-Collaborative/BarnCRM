@@ -8,14 +8,14 @@ permission set is, and you never have to open Salesforce Setup to change someone
 page also shows you, at a glance, who currently holds each role, so you can answer "who can
 change our settings?" in a few seconds.
 
-Roles ship with Open Impact and are kept up to date for you.
+Roles ship with BarnCRM and are kept up to date for you.
 
 One thing they do not do yet. A role today carries what Core provides, and nothing a
 module adds: the Giving module ships its own **Giving Admin**, **Giving Staff** and
 **Giving Read Only** permission sets, and no role includes them. Until the Module Manager
 in version 0.7 joins the two up, somebody with the Fundraising Staff role sees households
 and people but no gifts, and a Salesforce administrator has to assign the module's
-permission set in Setup alongside the role. That is the one place Open Impact still sends
+permission set in Setup alongside the role. That is the one place BarnCRM still sends
 you to Setup for access, and it is a gap rather than a design.
 
 Open Impact Core ships four roles. The Fundraising Staff role comes with the Giving module,
@@ -37,7 +37,7 @@ to, not through the record it is about.
 
 | Person | What they hold | Can they open a receipt PDF |
 |---|---|---|
-| Maria, who configures Open Impact | Open Impact Admin, plus Giving Admin | Yes |
+| Maria, who configures BarnCRM | Open Impact Admin, plus Giving Admin | Yes |
 | David, who enters the gifts | Fundraising Staff, plus Giving Staff | Yes |
 | Tom, on the board | Read Only, plus Giving Read Only | Yes, read only |
 | Priya, who coordinates volunteers | Volunteer Coordinator, and no Giving set | No |
@@ -62,7 +62,7 @@ Nobody can edit or delete a receipt PDF, whatever they hold. See
 There is nothing to turn on. Access is part of Open Impact Core and appears in Open Impact
 Settings as soon as the package is installed.
 
-The person who installs Open Impact is given the Open Impact Admin role automatically, at
+The person who installs BarnCRM is given the Open Impact Admin role automatically, at
 install and again at every upgrade, so there is always at least one person who can use this
 page. If that person was you, you can start straight away.
 
@@ -105,7 +105,7 @@ role they already have changes nothing and reports no error.
 
 ## What still needs Setup
 
-Open Impact can give a person a role, but it cannot create the person or hand out a
+BarnCRM can give a person a role, but it cannot create the person or hand out a
 Salesforce license. Only Salesforce Setup can do that, because licenses are billed and
 managed by Salesforce rather than by an installed app.
 
@@ -127,7 +127,7 @@ If someone has left and you deactivated them, their name will not appear here, w
 correct: a deactivated user cannot sign in at all, so there is no role to remove.
 
 **You gave someone a role and they still cannot see anything.** A role controls what a
-person can do inside Open Impact. It does not sign them in. Check that the person has a
+person can do inside BarnCRM. It does not sign them in. Check that the person has a
 Salesforce license in Setup, and that they are opening the Open Impact app rather than
 another app. If they see the app but no records, the records may be private and simply
 owned by someone else, which is a sharing setting rather than a role.

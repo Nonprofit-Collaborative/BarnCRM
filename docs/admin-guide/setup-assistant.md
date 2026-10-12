@@ -2,7 +2,7 @@
 
 ## What it does
 
-The Setup Assistant is the guided path from "I just installed Open Impact" to "we are
+The Setup Assistant is the guided path from "I just installed BarnCRM" to "we are
 working with real records", in under thirty minutes, without opening Salesforce Setup and
 without reading anything else. It asks its questions one screen at a time, in the order that
 makes each answer easy, and it remembers where you got to. Close the browser in the middle
@@ -36,14 +36,14 @@ completion screen.
 You need the **Manage Open Impact Settings** permission to change anything in the assistant.
 Everyone else sees the same steps, reads the same explanations, and cannot save. If you can
 read but not save, the assistant says so at the top and names the permission you are
-missing. Ask whoever installed Open Impact to add you to the **Open Impact Admin** role on
+missing. Ask whoever installed BarnCRM to add you to the **Open Impact Admin** role on
 the Access page.
 
 Two things sit outside the assistant, because Salesforce does not let an app do them:
 
 - **Creating a Salesforce user** who has never signed in. Step four links you to the Setup
   page that does it, then you come back and give the new person a role.
-- **Installing another Open Impact module.** Step six tells you which modules are present
+- **Installing another BarnCRM module.** Step six tells you which modules are present
   and links to the install instructions for the rest.
 
 ## A five-minute walkthrough, and then the eight steps
@@ -63,22 +63,22 @@ ready than to go and find:
 - With Giving: your logo, as a PNG or JPG file.
 - With Giving: a scan of the signature that goes on receipt letters, if you use one.
 
-### Step 1: Confirm how Open Impact fits your org
+### Step 1: Confirm how BarnCRM fits your org
 
-Open Impact looks at your org and tells you what it found, in plain words:
+BarnCRM looks at your org and tells you what it found, in plain words:
 
 - **"Your org uses Person Accounts, as Nonprofit Cloud orgs do."** This is Maria's case.
-  Open Impact recommends **Agentforce Nonprofit coexistence**: households are tracked with
+  BarnCRM recommends **Agentforce Nonprofit coexistence**: households are tracked with
   a membership record for each person, so a person can belong to more than one household
   and nothing you already have is disturbed. Your existing records keep working exactly as
   they do today. Confirming this mode switches household membership to those membership
   records, and from then on saving a new person creates their household and their
   membership of it, exactly as it does in the simple mode. The switch that governs that is
   "create a household automatically" on the Households page of Open Impact Settings.
-- **"NPSP is installed in this org."** Open Impact recommends **NPSP coexistence**, which
-  records that NPSP is here. In this version it changes no behaviour: Open Impact builds its
+- **"NPSP is installed in this org."** BarnCRM recommends **NPSP coexistence**, which
+  records that NPSP is here. In this version it changes no behaviour: BarnCRM builds its
   own households and leaves NPSP's alone.
-- **"This looks like a fresh org."** Open Impact recommends **Standalone**, the simplest
+- **"This looks like a fresh org."** BarnCRM recommends **Standalone**, the simplest
   arrangement.
 
 Read the recommendation, then click **Confirm and continue**. If you know something the
@@ -96,7 +96,7 @@ Choose the pattern for the household name, the formal greeting, and the informal
 and watch five sample households, which ship with the product, change as you type.
 
 Click **Save**, and the step completes itself. If your org does not have the household
-naming screen yet, the step says so and tells you that Open Impact will name households
+naming screen yet, the step says so and tells you that BarnCRM will name households
 with the pattern it ships until you change it.
 
 **What Maria sees:** `The Smith Family`, `Mr. and Mrs. John Smith`, `John and Jane`. She
@@ -180,7 +180,7 @@ the legal name goes here and your everyday name goes on the letter text later.
 
 ### Step 6: Choose which modules to turn on
 
-A list of the six Open Impact packages: Core, Giving, Volunteers, Programs, Funders, and
+A list of the six BarnCRM packages: Core, Giving, Volunteers, Programs, Funders, and
 Connect. Each says **Present** or **Not installed**, with a link to what it does.
 
 Core is always present. The rest are separate packages, and a module that is not installed

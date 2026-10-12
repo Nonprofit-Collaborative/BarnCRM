@@ -2,7 +2,7 @@
 
 ## What it does
 
-Open Impact records money received as gifts. Salesforce's own sales object, the Opportunity,
+BarnCRM records money received as gifts. Salesforce's own sales object, the Opportunity,
 is what NPSP, many fundraising apps and many online giving tools use for the same thing. The
 Opportunity mirror keeps the two in step, in one direction you choose.
 
@@ -11,7 +11,7 @@ Opportunity mirror keeps the two in step, in one direction you choose.
   rollups and soft credits during a move from NPSP, Campaign totals, or an app that only knows
   Opportunities.
 - **Opportunities to Gifts.** Every won Opportunity becomes a gift. Choose this when your
-  online giving tool writes Opportunities, so its donations arrive in Open Impact as gifts.
+  online giving tool writes Opportunities, so its donations arrive in BarnCRM as gifts.
 
 Only one direction can be on. Changing it later never copies anything twice, because each gift
 remembers its Opportunity in its **Opportunity ID**, whichever side came first.
@@ -30,11 +30,11 @@ remembers its Opportunity in its **Opportunity ID**, whichever side came first.
 A new Opportunity is named after the donor and the date, and uses the Donation record type
 when your org has one. If that record type's sales process does not include your won or lost
 stage, Salesforce refuses the Opportunity and the Error Log says so: add the stage to the sales
-process. For a donor who is a contact, the Account is the Open Impact household; in an org
+process. For a donor who is a contact, the Account is the BarnCRM household; in an org
 running NPSP alongside, that is not the NPSP household account, so NPSP's household totals do
 not include these Opportunities. Pending and Cancelled gifts get no Opportunity. A refund or write-off,
 which is its own gift with a negative amount, gets its own Opportunity with that negative
-amount, so an NPSP total goes down exactly as the Open Impact total does. NPSP still counts that
+amount, so an NPSP total goes down exactly as the BarnCRM total does. NPSP still counts that
 Opportunity as one more gift, and counts an in-kind gift's Opportunity, whose amount is zero:
 the totals agree, the counts are NPSP's own.
 
@@ -84,8 +84,7 @@ an Opportunity and every linked gift changed since the last run; with hundreds o
 gifts the run takes longer to start, which does not matter at 01:30.
 
 **Two switches, one of them in charge.** **Opportunity mirror direction** decides what the
-mirror does. The **Opportunity mirror** row on the Automation page is the switch every Open
-Impact automation has: switched off, it stops the copy made when a gift is saved and the runs.
+mirror does. The **Opportunity mirror** row on the Automation page is the switch every BarnCRM automation has: switched off, it stops the copy made when a gift is saved and the runs.
 While automation is paused, or the switch is off, a run does nothing and the Error Log says so
 once: Giving's own rules are paused too, and a gift made then would never get its household or
 fund.
