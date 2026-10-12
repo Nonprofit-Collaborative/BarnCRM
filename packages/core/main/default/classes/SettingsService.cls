@@ -24,6 +24,8 @@ public with sharing class SettingsService {
     private static final String CACHE_KEY = 'orgDefaults';
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
+    public static final String RECORD = 'Record';
+    public static final String RECORD_TYPE_LIST = 'RecordTypeList';
 
     /**
      * The Core checkbox settings that ship switched on, and the reason this map has to exist.
@@ -263,8 +265,18 @@ public with sharing class SettingsService {
      * controller cannot store a value the console would never offer.
      */
     private static void checkAllowedValue(Setting_Definition__mdt definition, Object newValue) {
+        if (definition == null || newValue == null) {
+            return;
+        }
+        if (RECORD.equalsIgnoreCase(definition.Data_Type__c)) {
+            checkRecord(definition, String.valueOf(newValue));
+            return;
+        }
+        if (RECORD_TYPE_LIST.equalsIgnoreCase(definition.Data_Type__c)) {
+            checkRecordTypes(definition, String.valueOf(newValue));
+            return;
+        }
         if (
-            definition == null ||
             !PICKLIST.equalsIgnoreCase(definition.Data_Type__c) ||
             String.isBlank(definition.Picklist_Values__c) ||
             newValue == null
@@ -283,6 +295,52 @@ public with sharing class SettingsService {
             }
         }
         throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+    }
+
+    /** A Record row holds the Id of a record of its own object, and nothing else (ADR-NEXT). */
+    private static void checkRecord(Setting_Definition__mdt definition, String candidate) {
+        Schema.SObjectType expected = recordObjectType(definition);
+        Id recordId;
+        try {
+            recordId = Id.valueOf(candidate);
+        } catch (Exception notAnId) {
+            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+        }
+        if (expected == null || recordId.getSObjectType() != expected) {
+            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+        }
+    }
+
+    /** A Record Type List row names only record types its object has (ADR-NEXT). */
+    private static void checkRecordTypes(Setting_Definition__mdt definition, String candidate) {
+        Set<String> known = new Set<String>();
+        for (Schema.RecordTypeInfo info : recordTypes(recordObjectType(definition))) {
+            known.add(info.getDeveloperName());
+        }
+        for (String name : candidate.split(',')) {
+            if (String.isNotBlank(name) && !known.contains(name.trim())) {
+                throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+            }
+        }
+    }
+
+    /** The object a Record or Record Type List row is about, or null when this org lacks it. */
+    public static Schema.SObjectType recordObjectType(Setting_Definition__mdt definition) {
+        return definition == null ? null : typeByName(definition.Record_Object__c);
+    }
+
+    /** The active record types of an object an administrator can choose, master excluded. */
+    public static List<Schema.RecordTypeInfo> recordTypes(Schema.SObjectType type) {
+        List<Schema.RecordTypeInfo> chosen = new List<Schema.RecordTypeInfo>();
+        if (type == null) {
+            return chosen;
+        }
+        for (Schema.RecordTypeInfo info : type.getDescribe().getRecordTypeInfos()) {
+            if (info.isActive() && !info.isMaster()) {
+                chosen.add(info);
+            }
+        }
+        return chosen;
     }
 
     /**

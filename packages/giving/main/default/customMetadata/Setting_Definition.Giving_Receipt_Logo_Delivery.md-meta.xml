@@ -20,7 +20,11 @@
   </values>
   <values>
     <field>Data_Type__c</field>
-    <value xsi:type="xsd:string">Text</value>
+    <value xsi:type="xsd:string">Picklist</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:type="xsd:string">File download:File download, the usual route;Embedded image:Embedded image;Document server:Document server</value>
   </values>
   <values>
     <field>Sort_Order__c</field>
@@ -28,7 +32,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How the logo image reaches the PDF: File download, Embedded image, or Document server. Leave it empty unless your logo does not print, or unless BarnCRM support asks you to change it: empty means the route the product ships with, which is File download.</value>
+    <value xsi:type="xsd:string">How the logo image reaches the PDF. Leave it on File download, the route the product ships with, unless your logo does not print or BarnCRM support asks you to change it.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

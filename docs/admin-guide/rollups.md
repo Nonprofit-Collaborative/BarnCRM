@@ -126,7 +126,7 @@ on the records.
 Two settings on the same page change how every rollup behaves:
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
-  begin. Set it to the month your fiscal year starts. Changing it and recalculating is
+  begin. Choose the month your fiscal year starts from the list. Changing it and recalculating is
   all that is needed to correct every year based total in the org.
 - **Default rollup mode** decides how a newly created rollup starts out: Real time,
   Scheduled, or Both.

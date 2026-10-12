@@ -63,10 +63,10 @@ Still in the Receipts section:
   no logo is a valid receipt**, so this costs you nothing legally.
 - **Logo width in millimetres.** Forty is about a third of the width of the page, which suits
   a wide wordmark. A tall square logo usually wants twenty five.
-- **Logo delivery route.** Leave it empty. It exists because how an image reaches the PDF has
+- **Logo delivery route.** Leave it empty or on File download, which is the same thing. It exists because how an image reaches the PDF has
   not been confirmed in a real org yet (see the last section of this page), and it lets you or
-  BarnCRM support try another route without waiting for a new version. The three values it
-  accepts are `File download`, `Embedded image` and `Document server`.
+  BarnCRM support try another route without waiting for a new version. Its dropdown offers
+  the three routes: File download, Embedded image and Document server.
 
 ### 4. Write your two letters
 

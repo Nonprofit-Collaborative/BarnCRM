@@ -42,10 +42,9 @@ the totals agree, the counts are NPSP's own.
 date you set: the donor is the Opportunity's primary contact (or its Account when it has none),
 the amount and date are the Opportunity's, the type is Other, the status Received, and the
 appeal is the one whose Campaign is the Opportunity's Campaign. To make gifts from some kinds of
-Opportunity only, list their record types' API names, separated by commas, in **Opportunity
-mirror record types** (for example `Donation,Major_Gift`); left empty, every won Opportunity
-after the start date counts, and a name your org does not have is named in a Warning in the
-Error Log. The start date is read in your organization's default time zone. The gift then gets its fund,
+Opportunity only, tick their record types under **Opportunity mirror record types** (for
+example Donation and Major Gift); with none ticked, every won Opportunity after the start date
+counts. A record type that is later deleted or renamed is named in a Warning in the Error Log. The start date is read in your organization's default time zone. The gift then gets its fund,
 household and thank-you status from your Giving settings, like any gift. A gift is never
 changed afterwards, even if its Opportunity is: the reconciliation shows the difference.
 

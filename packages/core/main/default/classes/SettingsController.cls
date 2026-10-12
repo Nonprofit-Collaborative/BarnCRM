@@ -50,6 +50,9 @@ public with sharing class SettingsController {
         public Boolean checked;
         @AuraEnabled
         public List<Option> options;
+        /** The object a Record row picks from, with this org's namespace (ADR-NEXT). */
+        @AuraEnabled
+        public String objectApiName;
     }
 
     public class Option {
@@ -286,6 +289,9 @@ public with sharing class SettingsController {
             ? null
             : HELP_BASE + definition.Help_Path__c;
         setting.options = toOptions(definition);
+        if (!addRecordChoices(definition, setting)) {
+            return null;
+        }
         if (isCoexistenceMode(settingsObject, definition.Setting_Key__c)) {
             setting.options = offeredModesOnly(setting.options);
         }
@@ -297,6 +303,38 @@ public with sharing class SettingsController {
         setting.value = SettingsService.asText(value);
         setting.checked = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c) && value == true;
         return setting;
+    }
+
+    /**
+     * Gives a Record row its object and a Record Type List row its choices, read from describe
+     * (ADR-NEXT). False when the row names an object this org does not have, which leaves the
+     * row out as a missing settings object does.
+     */
+    private static Boolean addRecordChoices(
+        Setting_Definition__mdt definition,
+        SettingModel setting
+    ) {
+        Boolean isRecord = SettingsService.RECORD.equalsIgnoreCase(definition.Data_Type__c);
+        Boolean isRecordTypes = SettingsService.RECORD_TYPE_LIST.equalsIgnoreCase(
+            definition.Data_Type__c
+        );
+        if (!isRecord && !isRecordTypes) {
+            return true;
+        }
+        Schema.SObjectType type = SettingsService.recordObjectType(definition);
+        if (type == null) {
+            return false;
+        }
+        setting.objectApiName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        if (isRecordTypes) {
+            for (Schema.RecordTypeInfo info : SettingsService.recordTypes(type)) {
+                Option option = new Option();
+                option.value = info.getDeveloperName();
+                option.label = info.getName();
+                setting.options.add(option);
+            }
+        }
+        return true;
     }
 
     private static List<Option> toOptions(Setting_Definition__mdt definition) {

@@ -367,4 +367,55 @@ private class SettingsControllerTest {
         Assert.isNotNull(changes[0].changedBy, 'The row names who changed it');
         Assert.isNotNull(changes[0].changedAt, 'The row says when');
     }
+
+    @IsTest
+    static void aRecordRowNamesItsObjectAndARecordTypeRowListsItsChoices() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+            new Setting_Definition__mdt(
+                DeveloperName = 'Picked_Account',
+                MasterLabel = 'Picked account',
+                Setting_Key__c = 'Organization_Legal_Name__c',
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = SettingsService.RECORD,
+                Record_Object__c = 'Account',
+                Sort_Order__c = 1
+            ),
+            new Setting_Definition__mdt(
+                DeveloperName = 'Picked_Record_Types',
+                MasterLabel = 'Picked record types',
+                Setting_Key__c = 'Formal_Greeting_Pattern__c',
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = SettingsService.RECORD_TYPE_LIST,
+                Record_Object__c = 'Account',
+                Sort_Order__c = 2
+            ),
+            new Setting_Definition__mdt(
+                DeveloperName = 'Picked_From_Nowhere',
+                MasterLabel = 'Picked from an object this org lacks',
+                Setting_Key__c = 'Informal_Greeting_Pattern__c',
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = SettingsService.RECORD,
+                Record_Object__c = 'Not_An_Object_Here__c',
+                Sort_Order__c = 3
+            )
+        };
+
+        Test.startTest();
+        SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+        Test.stopTest();
+
+        List<SettingsController.SettingModel> rows = model.sections[0].settings;
+        Assert.areEqual(2, rows.size(), 'A row about an object this org lacks is left out');
+        Assert.areEqual('Account', rows[0].objectApiName, 'The picker is told its object');
+        Assert.areEqual(
+            SettingsService.recordTypes(Account.SObjectType).size(),
+            rows[1].options.size(),
+            'Every active record type is offered'
+        );
+        Assert.isNotNull(rows[1].options[0].label, 'Each choice carries the label Setup shows');
+        Assert.isNotNull(rows[1].options[0].value, 'Each choice stores its developer name');
+    }
 }

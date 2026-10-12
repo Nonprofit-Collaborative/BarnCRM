@@ -677,4 +677,101 @@ private class SettingsServiceTest {
             'With the old value that was really stored, not the one in her copy'
         );
     }
+
+    private static final String RECORD_KEY = 'Organization_Legal_Name__c';
+    private static final String RECORD_TYPES_KEY = 'Formal_Greeting_Pattern__c';
+
+    /** A Record row on Account and a Record Type List row on Account, both on Core keys. */
+    private static void stubPickerDefinitions() {
+        SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+            new Setting_Definition__mdt(
+                DeveloperName = 'Picked_Account',
+                MasterLabel = 'Picked account',
+                Setting_Key__c = RECORD_KEY,
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = SettingsService.RECORD,
+                Record_Object__c = 'Account',
+                Sort_Order__c = 1
+            ),
+            new Setting_Definition__mdt(
+                DeveloperName = 'Picked_Record_Types',
+                MasterLabel = 'Picked record types',
+                Setting_Key__c = RECORD_TYPES_KEY,
+                Section__c = SettingSections.GENERAL,
+                Module__c = 'Core',
+                Data_Type__c = SettingsService.RECORD_TYPE_LIST,
+                Record_Object__c = 'Account',
+                Sort_Order__c = 2
+            )
+        };
+    }
+
+    /** An Id of the given object that no record needs to carry: only its prefix is read. */
+    private static String idOf(Schema.SObjectType type) {
+        return type.getDescribe().getKeyPrefix() + '000000000001AAA';
+    }
+
+    private static String refusalOf(String key, Object value) {
+        try {
+            SettingsService.saveValues(new Map<String, Object>{ key => value });
+        } catch (SettingsService.SettingsException e) {
+            return e.getMessage();
+        }
+        return null;
+    }
+
+    @IsTest
+    static void aRecordSettingTakesOnlyARecordOfItsObject() {
+        stubPickerDefinitions();
+        String accountId = idOf(Account.SObjectType);
+
+        Test.startTest();
+        String wrongObject = refusalOf(RECORD_KEY, idOf(Contact.SObjectType));
+        String notAnId = refusalOf(RECORD_KEY, 'General Fund');
+        String accepted = refusalOf(RECORD_KEY, accountId);
+        Test.stopTest();
+
+        Assert.areEqual(
+            System.Label.Core_Settings_InvalidValueError,
+            wrongObject,
+            'A record of another object is refused'
+        );
+        Assert.areEqual(
+            System.Label.Core_Settings_InvalidValueError,
+            notAnId,
+            'A name typed instead of a picked record is refused'
+        );
+        Assert.isNull(accepted, 'A record of the row object is accepted');
+        Assert.areEqual(
+            accountId,
+            String.valueOf(SettingsService.getValue(RECORD_KEY)),
+            'The picked record Id is what is stored'
+        );
+    }
+
+    @IsTest
+    static void aRecordTypeListTakesOnlyRecordTypesTheObjectHas() {
+        stubPickerDefinitions();
+        List<Schema.RecordTypeInfo> offered = SettingsService.recordTypes(Account.SObjectType);
+        Assert.isFalse(offered.isEmpty(), 'Core ships active Account record types');
+        String known = offered[0].getDeveloperName();
+
+        Test.startTest();
+        String unknown = refusalOf(RECORD_TYPES_KEY, known + ',Not_A_Record_Type');
+        String accepted = refusalOf(RECORD_TYPES_KEY, known);
+        String cleared = refusalOf(RECORD_TYPES_KEY, '');
+        Test.stopTest();
+
+        Assert.areEqual(
+            System.Label.Core_Settings_InvalidValueError,
+            unknown,
+            'A record type the object does not have is refused, with the known one beside it'
+        );
+        Assert.isNull(accepted, 'A record type the object has is accepted');
+        Assert.isNull(cleared, 'None ticked is accepted and means every record type');
+        for (Schema.RecordTypeInfo info : offered) {
+            Assert.isTrue(info.isActive() && !info.isMaster(), 'Only active real record types');
+        }
+    }
 }
