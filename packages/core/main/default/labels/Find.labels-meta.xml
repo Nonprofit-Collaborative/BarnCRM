@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Find_ErrorInvalidQuery</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a Find query document cannot be read.</shortDescription>
+        <value>This query could not be read. Open it again from Find, or build it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorFieldCount</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a Find query has no columns or more than 20.</shortDescription>
+        <value>Choose from 1 to 20 columns.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorRowLimit</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: rows to show is out of range.</shortDescription>
+        <value>Rows to show must be a whole number from 1 to 2000.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorSortField</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a field cannot be sorted on. {0}: the field.</shortDescription>
+        <value>This field cannot be used to sort: {0}. Choose another.</value>
+    </labels>
+</CustomLabels>

@@ -7,6 +7,11 @@
  * without passing through here: every operator is checked against a fixed list, every string value
  * is escaped, and a logic string that is not made of condition numbers and the words AND, OR and
  * NOT is refused.
+ *
+ * Two renderings share that parsing. `toWhereClause` writes escaped literals, which the rollup
+ * engine reads. `toBoundClause` (Find, C-34) checks every field against the running user's
+ * describe of a named object and puts every value in a bind variable (FilterValueBinder), so
+ * nothing typed is ever concatenated into the query (plan Section 4.9, ADR-0047).
  */
 public with sharing class RollupFilterParser {
     /** Raised when a filter document cannot be turned into a where clause. */
@@ -62,6 +67,20 @@ public with sharing class RollupFilterParser {
      * is empty. The caller joins the result with any other fragment it has.
      */
     public static String toWhereClause(String filterDocument) {
+        return compile(filterDocument, null);
+    }
+
+    /**
+     * Renders a filter document over one object with every value in a bind variable. The clause
+     * is empty when the document is; the binder carries the values and the display rendering.
+     */
+    public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName) {
+        FilterValueBinder binder = new FilterValueBinder(objectApiName);
+        binder.clause = compile(filterDocument, binder);
+        return binder;
+    }
+
+    private static String compile(String filterDocument, FilterValueBinder binder) {
         if (String.isBlank(filterDocument)) {
             return '';
         }
@@ -91,7 +110,7 @@ public with sharing class RollupFilterParser {
             String conditionId = condition.get('id') == null
                 ? String.valueOf(fallbackId)
                 : String.valueOf(condition.get('id'));
-            String clause = renderCondition(condition);
+            String clause = renderCondition(condition, binder);
             clauseByConditionId.put(conditionId, clause);
             inOrder.add(clause);
         }
@@ -103,12 +122,20 @@ public with sharing class RollupFilterParser {
         return renderLogic(logic, clauseByConditionId);
     }
 
-    /** One condition as `Field operator value`. */
-    private static String renderCondition(Map<String, Object> condition) {
+    /**
+     * One condition as `Field operator value`. With a binder, the field is checked against the
+     * running user's describe and every value becomes a bind variable; without one, values are
+     * escaped literals for the rollup engine.
+     */
+    private static String renderCondition(Map<String, Object> condition, FilterValueBinder binder) {
         String fieldName = (String) condition.get('field');
         String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
         if (String.isBlank(fieldName) || FIELD_NAME.matcher(fieldName).matches() == false) {
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+        }
+        if (binder != null) {
+            fieldName = binder.useField(fieldName, operator);
+            return binder.render(fieldName, operator, condition.get('value'));
         }
         if (DATE_LITERAL_BY_OPERATOR.containsKey(operator)) {
             return fieldName + ' = ' + DATE_LITERAL_BY_OPERATOR.get(operator);
@@ -148,7 +175,7 @@ public with sharing class RollupFilterParser {
     }
 
     /** The day count of `last n days`: a whole number from 1 to MAX_DAYS, or a refusal. */
-    private static Integer dayCount(Object rawValue) {
+    public static Integer dayCount(Object rawValue) {
         Decimal days;
         try {
             days = rawValue == null ? null : Decimal.valueOf(String.valueOf(rawValue).trim());

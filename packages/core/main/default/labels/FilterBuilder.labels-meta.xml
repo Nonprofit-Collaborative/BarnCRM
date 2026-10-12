@@ -424,4 +424,20 @@
         <shortDescription>Summary text for the last N days operator. {0}: the number of days.</shortDescription>
         <value>is in the last {0} days</value>
     </labels>
+    <labels>
+        <fullName>Core_Filter_ErrorOperatorType</fullName>
+        <categories>Filter</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: operator does not suit the field. {0}: field, {1}: operator.</shortDescription>
+        <value>The operator {1} does not suit the field {0}. Choose another operator.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Filter_ErrorValueType</fullName>
+        <categories>Filter</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a value does not fit its field. {0}: the field.</shortDescription>
+        <value>The value for {0} does not fit that field. Check the condition and try again.</value>
+    </labels>
 </CustomLabels>
