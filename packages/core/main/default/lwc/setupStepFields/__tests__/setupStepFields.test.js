@@ -4,21 +4,20 @@ import SetupStepFields from 'c/setupStepFields';
 jest.mock('@salesforce/user/Id', () => ({ default: '005000000000001AAA' }), { virtual: true });
 
 const mockNavigate = jest.fn();
-jest.mock(
-  'lightning/navigation',
-  () => {
-    const Navigate = Symbol('Navigate');
-    const NavigationMixin = (Base) =>
-      class extends Base {
-        [Navigate](...args) {
-          mockNavigate(...args);
-        }
-      };
-    NavigationMixin.Navigate = Navigate;
-    return { NavigationMixin, __esModule: true };
-  },
-  { virtual: true }
-);
+// Not virtual: sfdx-lwc-jest resolves lightning/navigation to a stub file, and a virtual mock of a
+// resolvable module is matched to the component's import unreliably in a parallel run, so the
+// component sometimes got the stub's empty Navigate and mockNavigate saw no call.
+jest.mock('lightning/navigation', () => {
+  const Navigate = Symbol('Navigate');
+  const NavigationMixin = (Base) =>
+    class extends Base {
+      [Navigate](...args) {
+        mockNavigate(...args);
+      }
+    };
+  NavigationMixin.Navigate = Navigate;
+  return { NavigationMixin, __esModule: true };
+});
 
 // The organization step as it arrives with a module installed: Core's two fields and the
 // fields a stand-in module adds, matching SetupAssistantTestExtension (ADR-0059, C-29).
@@ -60,6 +59,10 @@ function withValues(values) {
 }
 
 describe('c-setup-step-fields', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+  });
+
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
