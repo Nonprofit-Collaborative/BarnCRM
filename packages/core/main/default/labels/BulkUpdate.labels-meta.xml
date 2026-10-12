@@ -80,4 +80,68 @@
         <shortDescription>Why a field cannot be bulk updated: its type cannot be set in bulk.</shortDescription>
         <value>values of this type cannot be set in bulk.</value>
     </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorNoChanges</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a bulk update has no change.</shortDescription>
+        <value>Add at least one change: a field, and what to do with it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorTooManyChanges</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more than five changes.</shortDescription>
+        <value>A bulk update changes at most five fields. Remove a change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorDuplicateField</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the same field is changed twice.</shortDescription>
+        <value>{0} is changed twice. Keep one change for each field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorRequired</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a required field cannot be cleared.</shortDescription>
+        <value>{0} is required, so it cannot be cleared.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorIncompatibleCopy</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a copy between fields of different types.</shortDescription>
+        <value>{0} cannot be copied into {1}. Choose a field of a matching type.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorNothingMatches</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the query matches no record.</shortDescription>
+        <value>No records match this query, so there is nothing to update.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorOverLimit</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more records match than the run limit.</shortDescription>
+        <value>More than {0} records match, the run limit for one bulk update. Narrow the query, or run it in parts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorTooManyToCount</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: too many records to count in one request.</shortDescription>
+        <value>Too many records match to count in one go. Narrow the query, or run it in parts.</value>
+    </labels>
 </CustomLabels>
