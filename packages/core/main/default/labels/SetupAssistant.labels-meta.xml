@@ -77,8 +77,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: label in front of how long setup took, in minutes</shortDescription>
-        <value>Setup took, in minutes</value>
+        <shortDescription>Setup assistant: how long setup took; {0} is the number of minutes</shortDescription>
+        <value>Time taken: {0} minutes</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_FinishButton</fullName>
@@ -390,7 +390,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what step one is for</shortDescription>
-        <value>If your org uses Person Accounts, household membership uses the junction model so that what you already have keeps working. Confirm that here, or choose a different fit.</value>
+        <value>If your org uses Person Accounts, household membership uses the flexible way of belonging, with one membership record per person, so that what you already have keeps working. Confirm that here, or choose a different fit.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_Step1Label</fullName>

@@ -105,9 +105,9 @@ and clicks **Next**.
 
 ### Step 2: Confirm how BarnCRM fits your org
 
-The step reads: "If your org uses Person Accounts, household membership uses the junction
-model so that what you already have keeps working. Confirm that here, or choose a different
-fit." BarnCRM then looks at your org and tells you what it found, in plain words:
+The step reads: "If your org uses Person Accounts, household membership uses the flexible way
+of belonging, with one membership record per person, so that what you already have keeps
+working. Confirm that here, or choose a different fit." BarnCRM then looks at your org and tells you what it found, in plain words:
 
 - **"Your org uses Person Accounts. Household membership is tracked with one record per
   person, so a person can be in more than one household and everything you already have
@@ -286,7 +286,7 @@ works, from donor to household to gift. Come back to the home page afterwards an
 Click **Finish**. The assistant shows the completion screen: every step with its status,
 and how long setup took, measured from the first change you made.
 
-**What Maria sees:** "You are ready", her nine steps, and `21 minutes`. Two buttons sit
+**What Maria sees:** "You are ready", her nine steps, and "Time taken: 21 minutes". Two buttons sit
 under the summary: **Reopen setup** walks the steps again with her answers intact, and
 **Start setup again** forgets the progress it recorded so the checklist starts from the
 first step. Neither of them empties a setting: a step whose answer is already saved stays

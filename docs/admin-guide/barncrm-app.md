@@ -21,20 +21,33 @@ Giving, that is the **Fundraising** app).
 2. Type `BarnCRM` and choose **BarnCRM**.
 3. Click the star next to the app name if you want it to open by default.
 
-Everyone who has been given a BarnCRM role can open the Hub. Two things on the home
-page are for administrators only:
+Everyone who has been given a BarnCRM role can open the app. The home page shows each
+person what they can act on:
 
-- The **Errors to review** tile counts only errors you are allowed to see, and the Error
-  Log tab itself is on the administrator role.
-- The **Setup checklist** can be read by anyone, but only a person with the **Manage
-  BarnCRM Settings** permission can finish a step or change a setting.
+| Part of the home page | Who sees it |
+|---|---|
+| **Welcome to BarnCRM**, the **New household** button, and the paused automation banner | Everyone |
+| **Setup checklist** (or the **Setup complete** tile once it is finished) | Administrators |
+| **Health Check** | Administrators |
+| **Errors to review** | Administrators |
+| **Rollups last completed** | Administrators |
+| **Seasonal addresses last swapped** | Administrators |
+| **Files that arrive regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
+| **Quick links** | Everyone |
+
+"Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
+**BarnCRM Admin** role carries. Staff without it see a shorter page: the welcome, the
+**New household** button, and the quick links. They are not shown a checklist they cannot
+finish or an error count for a log they cannot open.
 
 ## A five-minute walkthrough
 
-Maria has just installed BarnCRM and has the sample data loaded.
+Maria has just installed BarnCRM and has the sample data loaded. She has the BarnCRM
+Admin role.
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
-   opens with the heading **Welcome to BarnCRM**.
+   opens with the heading **Welcome to BarnCRM** and the sentence "Start with the setup
+   checklist below."
 2. Read the **Setup checklist**. It opens on the first step you have not finished, with
    one sentence saying what that step is for and the count of how far you have got, for
    example "3 of 8" (eight steps with Core alone, nine with Giving). The steps are guided:
@@ -50,18 +63,49 @@ Maria has just installed BarnCRM and has the sample data loaded.
 5. Use **Next**, **Back**, and **Skip for now** to move around. Skipping does not mark a
    step done: it moves the step out of the way and offers it to you again next time. The
    full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
-6. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
+6. Below the checklist, the **Health Check** lists anything BarnCRM found in your org that
+   needs attention, with a button to fix it where it can. The full guide is
+   [health-check.md](health-check.md).
+7. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
    number, click **Open the Error Log** and read the plain-language message on each row.
    The tile counts up to 999; past that it says `999+`, so a flooded Error Log never slows
    the home page down.
-7. If someone has paused automation (for example during a large import), a banner sits
-   above the checklist saying BarnCRM automation is paused. It disappears by itself
-   when the pause expires.
-8. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
-   going back to the app launcher.
+8. Look at **Rollups last completed** and **Seasonal addresses last swapped**. Each says
+   when that nightly job last finished. If one is more than 36 hours late, the tile says so
+   in words, next to a warning icon, and its link opens the settings page where you can run
+   it.
+9. If someone has paused automation (for example during a large import), a banner under
+   the welcome says BarnCRM automation is paused. It disappears by itself when the pause
+   expires.
+10. Use **Quick links** to open Households, Organizations, or BarnCRM Settings without
+    going back to the app launcher.
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
 whether anything went wrong.
+
+When every step is done, the checklist collapses to a small **Setup complete** tile, and
+the welcome sentence points at the tabs instead of the checklist.
+
+## Rearranging the home page
+
+The home page is a standard Lightning page, and each tile on it is its own component, so
+you can move, remove, or add tiles in the Lightning App Builder without any code.
+
+1. Open the home page, click the gear icon, then **Edit Page**.
+2. Drag a tile to another region, or select it and click the delete icon to remove it.
+   The BarnCRM tiles are listed under **Custom** with names that start with
+   **BarnCRM Home**, plus **Health Check**.
+3. To add something of your own, drag in a standard component: **List View** (for example
+   your households), **Report Chart**, or **Rich Text** for a note to your team.
+4. To show a tile only to some people, select it and use **Set Component Visibility**. The
+   administrator tiles use the filter **Permissions, Custom Permission, Manage BarnCRM
+   Settings, equals true**. Use the same filter to hide your own tiles from staff.
+5. Click **Save**. If the App Builder says the page cannot be edited because it came with
+   the package, click **Save As** to make your own copy, then **Activation** to make the
+   copy the home page of the BarnCRM app.
+
+A copy you made does not receive changes from later BarnCRM versions. After an upgrade,
+compare it with the page that came with the package.
 
 ## Common mistakes
 
@@ -69,6 +113,9 @@ whether anything went wrong.
   launcher, not the gear icon. If `BarnCRM` does not appear in the app launcher, you
   have not been assigned a BarnCRM role: ask whoever installed the package to add you
   on the Access page.
+- **Wondering where the checklist went for a staff member.** The checklist, the Health
+  Check and the status tiles show only to people with the Manage BarnCRM Settings
+  permission. A staff member sees the welcome and the quick links, on purpose.
 - **Treating Skip for now as done.** Skipping moves you on without finishing the step, on
   purpose, so that a step waiting for a module you have not installed does not block you. A
   skipped step is still waiting for you next time.

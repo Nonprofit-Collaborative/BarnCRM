@@ -41,6 +41,28 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
+jest.mock(
+  '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel',
+  () => ({ default: 'Time taken: {0} minutes' }),
+  { virtual: true }
+);
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 
 const STEP_DEFINITIONS = [
   ['coexistence', 'Confirm how BarnCRM fits your existing org', 'Setting'],
@@ -474,7 +496,9 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).not.toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="elapsed"]').textContent).toContain('21');
+    expect(element.shadowRoot.querySelector('[data-id="elapsed"]').textContent.trim()).toBe(
+      'Time taken: 21 minutes'
+    );
     expect(element.shadowRoot.querySelectorAll('li')).toHaveLength(8);
 
     click(element, 'reopen');
@@ -580,5 +604,36 @@ describe('c-setup-assistant', () => {
       'Choose your edition'
     );
     expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.giving.present).toBe(true);
+  });
+
+  it('opens the settings section a step belongs to by page reference, not by URL', async () => {
+    const element = build();
+    await settle();
+
+    click(element, 'section-link');
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'BarnCRM_Settings' },
+      state: { c__section: 'General' }
+    });
+  });
+
+  it('opens the Import tab by page reference from the data step', async () => {
+    getState.mockResolvedValue(
+      state({
+        importAvailable: true,
+        completedKeys: ['coexistence', 'naming', 'moduledefaults', 'access', 'identity', 'modules']
+      })
+    );
+    const element = build();
+    await settle();
+
+    click(element, 'import-link');
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Import' }
+    });
   });
 });
