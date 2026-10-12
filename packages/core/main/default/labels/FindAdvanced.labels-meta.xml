@@ -88,4 +88,196 @@
         <shortDescription>Run log of a save from Find's grid. {0} user, {1} time, {2}-{5}.</shortDescription>
         <value>Edited in Find by {0} on {1}: {2}, {3} saved, {4} already held the values, {5} refused.</value>
     </labels>
+    <labels>
+        <fullName>Core_Find_Summarize</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button and heading: summarize the query's records.</shortDescription>
+        <value>Summarize</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SummaryFunction</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: what the summary works out.</shortDescription>
+        <value>Summary</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Count</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: count the records.</shortDescription>
+        <value>Count of records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Sum</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: total of a number field.</shortDescription>
+        <value>Total of</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Min</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: lowest value of a field.</shortDescription>
+        <value>Lowest</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Max</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: highest value of a field.</shortDescription>
+        <value>Highest</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SummaryField</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the field a total, lowest or highest measures.</shortDescription>
+        <value>Field to measure</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_GroupBy</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the field a summary is grouped by.</shortDescription>
+        <value>Group by</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_NoGroup</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Group by choice: one line for every record.</shortDescription>
+        <value>No grouping (one line)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Group</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary table column: the group.</shortDescription>
+        <value>Group</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Result</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary table column: the count or total.</shortDescription>
+        <value>Result</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Blank</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary group for records with the field empty.</shortDescription>
+        <value>(blank)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SummaryCapped</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Note: a summary has more groups than shown. {0} is the cap.</shortDescription>
+        <value>Showing the first {0} groups. Narrow the conditions to see the rest.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TypeQuery</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button and heading: type a query as text.</shortDescription>
+        <value>Type a query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_QueryText</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the typed query text box.</shortDescription>
+        <value>Query (SOQL)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_QueryTextHelp</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help: what a typed query is and what happens to it.</shortDescription>
+        <value>SELECT, FROM, WHERE, ORDER BY and LIMIT. Find reads the text into the builder and checks it like any built query; the text itself is never run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_UseQuery</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: read the typed query into the builder.</shortDescription>
+        <value>Use this query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextSyntax</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal. {0} is the words Find stopped at.</shortDescription>
+        <value>Find could not read the query near: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextMixed</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: AND and OR mixed without brackets.</shortDescription>
+        <value>Add brackets where AND and OR are mixed, for example A AND (B OR C).</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextLike</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: a LIKE pattern. {0} is the pattern.</shortDescription>
+        <value>LIKE takes 'text%' (starts with) or '%text%' (contains), without _. Change {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: related records in the wrong place.</shortDescription>
+        <value>Write related records as Id IN (SELECT ...) or Id NOT IN (SELECT ...), joined to the other conditions with AND.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextUnsupported</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: unsupported words. {0} is the words.</shortDescription>
+        <value>Find queries do not support this: {0}. Use Summarize for totals and groups.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextOneSort</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: more than one sort field.</shortDescription>
+        <value>Sort by one field only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextEmpty</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: the text box is empty.</shortDescription>
+        <value>Type a query first.</value>
+    </labels>
 </CustomLabels>

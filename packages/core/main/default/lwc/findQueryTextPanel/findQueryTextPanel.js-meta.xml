@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Typing a Find query: reads SOQL text into the query document in the browser and hands it to
+    findRecords (canonical model R-SQ7). Nested in findRecords.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
