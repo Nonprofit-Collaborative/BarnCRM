@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The filter document of canonical model R-R2 without markup: operators by field type, value
+    kinds, typed values, and condition logic checks. Imported by the filter builder and Find.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
