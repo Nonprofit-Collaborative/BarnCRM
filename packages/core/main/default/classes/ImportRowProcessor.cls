@@ -59,49 +59,29 @@ public with sharing class ImportRowProcessor {
     private static ChunkPeople keysBeingCreated = new ChunkPeople();
 
     /**
-     * The new people of one chunk: how many are created under each key, and which people
-     * (by first-name key) hold each shared key, counting a couple not yet created as two, so
-     * a row naming one partner alone is never given the other (R-IB12).
+     * The new people of one chunk: how many are created under each key, and the couples'
+     * second people still to be created, so a row naming one of them alone waits for them
+     * rather than creating them twice (R-IB12).
      */
     private class ChunkPeople {
         Map<String, Integer> created = new Map<String, Integer>();
-        Map<String, Set<String>> people = new Map<String, Set<String>>();
         /** The first-name keys of couples' second people the chunk has yet to create. */
         Set<String> waitingSeconds = new Set<String>();
-
-        void hold(String shared, String person) {
-            if (!people.containsKey(shared)) {
-                people.put(shared, new Set<String>());
-            }
-            people.get(shared).add(person);
-        }
-
-        Integer holding(String shared) {
-            return people.containsKey(shared) ? people.get(shared).size() : 0;
-        }
     }
 
-    /** Counts the couples of the chunk, found by nobody yet, before anybody is created. */
+    /** Notes the couples' second people of the chunk, found by nobody yet, before any save. */
     private static ChunkPeople chunkPeople(List<Working> working) {
         ChunkPeople chunk = new ChunkPeople();
         for (Working item : working) {
-            for (Integer which = 1; which <= 2; which++) {
-                String key = which == 1 ? item.personKey1 : item.personKey2;
-                Id found = which == 1 ? item.person1Id : item.person2Id;
-                Boolean coming = which == 1 ? item.comingPerson1 : item.comingPerson2;
-                String shared = ImportMatcher.baseKey(key);
-                if (
-                    item.error == null &&
-                    key != null &&
-                    shared != key &&
-                    found == null &&
-                    !coming
-                ) {
-                    chunk.hold(shared, key);
-                    if (which == 2) {
-                        chunk.waitingSeconds.add(key);
-                    }
-                }
+            String key = item.personKey2;
+            if (
+                item.error == null &&
+                key != null &&
+                ImportMatcher.baseKey(key) != key &&
+                item.person2Id == null &&
+                !item.comingPerson2
+            ) {
+                chunk.waitingSeconds.add(key);
             }
         }
         return chunk;
@@ -588,10 +568,10 @@ public with sharing class ImportRowProcessor {
         ) {
             return;
         }
-        String first1 = ImportMatcher.nameKey(
+        String first1 = ImportMatcher.comparableFirstName(
             attribute(item.byEntity, ImportMapping.ENTITY_CONTACT_1, 'FirstName')
         );
-        String first2 = ImportMatcher.nameKey(
+        String first2 = ImportMatcher.comparableFirstName(
             attribute(item.byEntity, ImportMapping.ENTITY_CONTACT_2, 'FirstName')
         );
         if (first1 == first2) {
@@ -708,7 +688,9 @@ public with sharing class ImportRowProcessor {
             return key;
         }
         String entity = isFirst ? ImportMapping.ENTITY_CONTACT_1 : ImportMapping.ENTITY_CONTACT_2;
-        String first = ImportMatcher.nameKey(attribute(item.byEntity, entity, 'FirstName'));
+        String first = ImportMatcher.comparableFirstName(
+            attribute(item.byEntity, entity, 'FirstName')
+        );
         return first == null ? null : ImportMatcher.firstNameKey(key, first);
     }
 
@@ -738,11 +720,11 @@ public with sharing class ImportRowProcessor {
     /**
      * Finds one person of each row among those already there: in the org, and in a dry run
      * among the people earlier chunks would create, which the commit will have created by the
-     * time it reaches this chunk (R-IB12). The first name is asked first. The shared key alone
-     * finds a person only when one record holds it, or when the row gives no first name (the
-     * earliest then). A person the shared key cannot tell apart from another holding it, such
-     * as a partner, is not found here, and is created unless an earlier row of the chunk
-     * creates them. A row's two people sharing one key are found by first name only. In a
+     * time it reaches this chunk (R-IB12). A row giving a first name finds only a person with
+     * that first name: one holding the shared key under another first name, or under none, is
+     * taken to be somebody else, so the row's person is created unless an earlier row of the
+     * chunk creates them, and nobody is renamed. The shared key alone finds a person only when
+     * the row gives no first name (the earliest holder then), and a blank renames nobody. In a
      * dry run the earlier chunks' people are asked for by digest, for this chunk's keys only.
      */
     private static void findPerson(
@@ -767,14 +749,15 @@ public with sharing class ImportRowProcessor {
                 found == null &&
                 named != null &&
                 count(earlier, digest(PERSON_DIGEST, named)) > 0;
-            // A key whose lookup stopped at the row cap may have a holder unseen: first name only.
+            // A row giving a first name is found by it or created, never given whoever else
+            // holds the shared key (R-IB12). A key whose lookup stopped at the row cap may have
+            // a holder unseen, so it finds nobody by itself either.
             if (
                 found == null &&
                 !coming &&
                 shared == key &&
-                !ImportMatcher.wasCutOff(shared) &&
-                (named == null ||
-                held == 1)
+                named == null &&
+                !ImportMatcher.wasCutOff(shared)
             ) {
                 found = matches.get(shared);
                 coming = found == null && heldEarlier > 0;
@@ -793,9 +776,9 @@ public with sharing class ImportRowProcessor {
 
     /**
      * Which person an earlier row of this chunk creates is this one, by the key to share, or
-     * null when this row creates them. By first name first; by the shared key alone only when
-     * nobody held it before the chunk and one person of the chunk holds it, or the row gives no
-     * first name. `created` counts the people of the chunk holding each key (R-IB12).
+     * null when this row creates them. A row giving a first name shares only a person of that
+     * first name; one giving none shares by the shared key alone, when nobody held it before
+     * the chunk. `created` counts the people of the chunk holding each key (R-IB12).
      */
     private static String keyToShare(Working item, Boolean isFirst, ChunkPeople chunk) {
         String key = isFirst ? item.personKey1 : item.personKey2;
@@ -803,15 +786,12 @@ public with sharing class ImportRowProcessor {
             return null;
         }
         String named = namedKey(item, isFirst);
-        if (named != null && count(chunk.created, named) > 0) {
-            return named;
+        if (named != null) {
+            return count(chunk.created, named) > 0 ? named : null;
         }
         String shared = ImportMatcher.baseKey(key);
         Integer heldBefore = isFirst ? item.heldBefore1 : item.heldBefore2;
-        Boolean alone = named == null
-            ? count(chunk.created, shared) > 0
-            : count(chunk.created, shared) == 1 && chunk.holding(shared) == 1;
-        return shared == key && heldBefore == 0 && alone ? shared : null;
+        return shared == key && heldBefore == 0 && count(chunk.created, shared) > 0 ? shared : null;
     }
 
     /**
@@ -838,9 +818,6 @@ public with sharing class ImportRowProcessor {
         List<String> finding = keysFinding(item, isFirst);
         for (String key : finding) {
             chunk.created.put(key, count(chunk.created, key) + 1);
-        }
-        if (!finding.isEmpty()) {
-            chunk.hold(finding[0], finding[1]);
         }
         return finding;
     }

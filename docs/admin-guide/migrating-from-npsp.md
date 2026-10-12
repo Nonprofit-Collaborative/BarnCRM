@@ -187,9 +187,11 @@ first). Either way, check the dry run's "would create" count: a donor who can be
 created once however many payments they made, and a couple at one address are told apart by
 first name.
 
-**A person's first name changed after a payment file.** Where only one person has the row's
-email, a row with a different first name is matched to them and their first name is updated
-(see [Importing](importing.md)). Check the dry run's Updated rows before you commit.
+**A donor was created twice after a payment file.** A row is matched only to a person with
+the same first name, so a payment row spelling the donor's first name differently from your
+org ("Bob" for Robert, "J." for John, an accent added or dropped) creates a new person
+rather than renaming the one you have (see [Importing](importing.md)). Check the dry run's
+"would create" count before you commit, and fix the spelling in the file, or merge afterwards.
 
 **Salesforce warned about duplicates and the import saved the people anyway.** A duplicate
 rule set to alert does not stop an import. Run the duplicate scan afterwards

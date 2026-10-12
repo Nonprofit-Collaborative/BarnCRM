@@ -1603,24 +1603,25 @@ rows of the chunk and against earlier chunks, in the commit and the dry run alik
 same file again matches both rather than creating the second again. Every person an import
 creates is remembered under both the shared key and the narrowed one.
 
-**A person is found by first name before a shared key.** Under the same two rules, a row's
-person with a first name is looked for first by the key narrowed to it, in the org, among the
-people earlier chunks create and among those earlier rows of the chunk create. The shared key
-alone finds them only when exactly one person holds it, or when the row gives no first name
-(the earliest holder then). When several hold the shared key (a couple, or two couples at one
-address) and none has their first name, the person is created: a new record is the safe
-failure, where taking somebody else would rename them. A couple of the chunk not yet created
-counts as two holders, so a row naming one partner alone is never given the other. A row
-naming alone the second person of a couple of the same chunk waits until the couple is saved
-(first people are saved before second people) and then shares that partner, so both rows
-name one person in the couple's one household, whichever row comes first. A lookup of the
-org reads at most 5,000 records, filtered on both the last names and the postal codes of the
-chunk; where it stops at that cap, another holder of the key may be unseen, so the keys it
-covers find a person by first name only, and otherwise create them, and a warning is logged. First names
-are compared ignoring case and surrounding spaces but not accents: "Jáne" is not "Jane", so an
-accented spelling of a name held with another spelling is created. One consequence follows the
-rule: where one record holds the shared key, a row with a different first name still matches
-it, as the rule has always matched, and its first name is updated. A row whose two people also
+**A person with a first name is found only by it (ADR-NEXT).** Under the same two rules, a
+row's person with a first name is looked for by the key narrowed to it, in the org, among the
+people earlier chunks create and among those earlier rows of the chunk create, and nowhere
+else. A record holding the shared key under another first name, or under none, is somebody
+else: the person is created, and that record is neither matched nor renamed, however many
+records hold the key (one, as with John Smith alone at a postal code and a "Jane Smith" row,
+or several, as with a couple). A new record is the safe failure, left for the duplicate scan
+(R-DP3); taking somebody else would rename them. The shared key alone finds a person only when
+the row gives no first name (the earliest holder then), and since a blank incoming value never
+clears a stored one, such a row renames nobody. A row naming alone the second person of a
+couple of the same chunk waits until the couple is saved (first people are saved before second
+people) and then shares that partner, so both rows name one person in the couple's one
+household, whichever row comes first. A lookup of the org reads at most 5,000 records,
+filtered on both the last names and the postal codes of the chunk; where it stops at that cap,
+another holder of the key may be unseen, so a row with no first name finds nobody by those
+keys and its person is created, and a warning is logged. First names are compared ignoring
+case, surrounding spaces and runs of inner spaces ("Mary  Ann" is "Mary Ann"), and nothing
+else: "Jáne" is not "Jane", an initial ("J.") is not the name it stands for, and there is no
+short-form matching ("Bob" is not "Robert"), so each is created. A row whose two people also
 share a first name cannot be told apart and is rejected, saying so. Under the Email rule a
 second person with no last name of their own therefore matches only a record with the same
 email and first name; otherwise they are to be created, and are rejected without a last name
@@ -5456,3 +5457,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
 | v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
 | v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |

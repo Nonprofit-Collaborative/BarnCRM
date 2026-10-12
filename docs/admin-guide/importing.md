@@ -107,16 +107,21 @@ Three things are worth knowing about it.
 - **A couple who share an email, or a surname and postal code, are still two people.** When
   the matching rule would find both people on a row by the same email or surname and postal
   code, BarnCRM tells them apart by first name. A row naming one of them alone is matched
-  by first name too, so "Jane Smith" finds Jane, not John. When several people share the
-  email, or the surname and postal code, and none has the row's first name, a new person is
-  created rather than a guess made. First names are compared ignoring capitals but not
-  accents: "Jáne" and "Jane" are different names. A row naming Jane alone in the same file
-  as the couple's row finds the same Jane, in the couple's household, whichever row comes
-  first.
-- **Where only one person has that email, or surname and postal code, a row with another
-  first name matches them.** Today, with only John Smith at an address, a "Jane Smith" row
-  at that address is matched to John and his first name is changed to Jane. Check the dry
-  run's Updated rows for this before you commit. (This rule is under review.) Loading the same file again finds each of
+  by first name too, so "Jane Smith" finds Jane, not John. A row naming Jane alone in the
+  same file as the couple's row finds the same Jane, in the couple's household, whichever
+  row comes first.
+- **A row with a different first name is a different person.** With only John Smith at an
+  address, a "Jane Smith" row at that address creates Jane; John is not matched and is
+  never renamed. The same holds under the email rule for a shared email, for a person you
+  already have with no first name, and for people created earlier in the same file. First
+  names are compared ignoring capitals and extra spaces ("JANE", " Jane " and "jane" are one
+  name), but nothing else: an accent ("Jáne"), an initial ("J." for John) or a short form
+  ("Bob" for Robert) is a different name, and a new person is created. Check the dry run's
+  "would create" count before you commit; a file that spells names differently from your
+  org creates people you may need to merge (see [Duplicates](duplicates.md)).
+- **A row with no first name matches on the rest.** It finds the person with that email, or
+  surname and postal code (the oldest record when several share it), and leaves their first
+  name as it is: an empty cell never clears or renames anything. Loading the same file again finds each of
   them rather than adding the second person again. Two people on one row with the same
   matching details and the same first name cannot be told apart: that row is rejected.
   Under the email rule, a second person who shares the first person's email needs a last
@@ -210,8 +215,10 @@ again.
 **Every row comes back as "would create" when you expected updates.** The matching rule
 is not finding your existing records. **Email exact** matches only when the email in the
 file is exactly the email on the record, so a file of work addresses will not match
-people whose personal address you hold. Run a dry run with a different rule, or add an
-external identifier column to the file and use **External ID**.
+people whose personal address you hold. A row whose first name is spelled differently from
+the record ("Bob" for Robert, "J." for John) is also created, under either rule, rather than
+renaming the record. Run a dry run with a different rule, fix the spellings in the file, or
+add an external identifier column to the file and use **External ID**.
 
 **Rows rejected with "Required value missing: last name".** A person needs a last name.
 Rows where the name column is empty, or where a single "Full Name" column was mapped to
