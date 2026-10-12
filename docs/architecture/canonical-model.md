@@ -759,6 +759,7 @@ what. Required by the C-03 acceptance criterion that every settings change is lo
 | New Value | long text | no | The value after the change, blank when the setting was cleared. |
 | Changed By | reference(User) | yes | The user who made the change. |
 | Changed At | datetime | yes | When the change was saved. |
+| Deployment Id | text (18) | no | For a change made through the custom metadata manager, the metadata deployment that applied it; blank for every other change. The manager reads it to tell the page the save finished (R-S6). |
 
 ### Rules
 
@@ -775,13 +776,19 @@ was written with.
 not only as text. A Datetime handed in as a Datetime is stored as it is: `String.valueOf`
 of a Datetime is not the ISO 8601 form the service parses back, so a round trip through
 text would refuse the package's own writes.
+**R-S6** A custom metadata record changed through the custom metadata manager is audited
+once the deployment succeeds, not when it is requested: the deployment's callback writes
+one Setting Change with Setting Name `<Type>.<DeveloperName>`, the old and new values as
+JSON, Changed By set to the user who saved, and Deployment Id set. A failed deployment
+writes no Setting Change; it writes an Error Log entry whose Record Reference is the
+deployment Id.
 
 ### Salesforce implementation
 
 - **Object:** `Setting_Change__c` with `Setting_Name__c`, `Old_Value__c`, `New_Value__c`
-  (Long Text Area), `Changed_By__c` (Lookup to User), `Changed_At__c` (DateTime). The
-  record name is the auto number `SC-{000000}`.
-- **Service:** `SettingsService`.
+  (Long Text Area), `Changed_By__c` (Lookup to User), `Changed_At__c` (DateTime),
+  `Deployment_Id__c` (Text 18). The record name is the auto number `SC-{000000}`.
+- **Service:** `SettingsService`; `CustomMetadataDeployCallback` for R-S6.
 
 ---
 
@@ -1055,18 +1062,35 @@ read by the relationship service when it maintains the other side of a connectio
 | Type | `Type__c` | text | The type as it appears in the Type picklist. |
 | Reciprocal Type | `Reciprocal_Type__c` | text | The type the other side takes, for example Child for Parent. |
 | Is Gendered | `Is_Gendered__c` | boolean | Whether the reciprocal depends on a person's gender; false on every shipped row, and the package ships no gendered mapping. |
-| Active | `Active__c` | boolean | Whether this mapping is applied. |
+| Active | `Active__c` | boolean | Whether this mapping is applied. Clearing it is how an administrator archives a row they added (R-D2). |
 | Description | `Description__c` | long text | What this relationship means, in nonprofit language. |
+| Is Shipped | `Is_Shipped__c` | boolean, default false | True on every row the package ships; false on a row an administrator added through the custom metadata manager. A shipped row is read only in the app (R-D2). |
 
 The API names are given here, as they are for Automation Registry above, because the
 shipped records name fields and a record that names a field its type does not define
 refuses the whole deployment.
 
-### Rule
+Relationship Type is the one shipped list that also holds the organization's own rows,
+because the relationship service reads it directly rather than through a materialized
+copy. Administrators add, edit and archive their rows from the Custom metadata page in
+BarnCRM Settings (ADR-NEXT, `NEXT-custom-metadata-manager-edits-only-types-read-directly.md`).
+
+### Rules
 
 **R-D1** These lists are the **starting inventory** for the iterations covered here and
 each feature pull request may extend them. Any new custom metadata field is added to the
 tables above before the metadata file is created.
+**R-D2** The custom metadata manager edits only the types registered in
+`CustomMetadataManagerService` as admin-editable; today that is Relationship Type alone.
+For a registered type: a row with `Is_Shipped__c` true is never changed by the manager;
+a row the manager creates has `Is_Shipped__c` false, is not protected, and has a
+DeveloperName starting `Org_`, a prefix no shipped row uses, so a later package version
+can never ship a row with the same name; archiving clears the type's active field and
+restoring sets it, since the Apex Metadata API cannot delete a record. Types materialized
+into custom object records (Rollup Definition Default, Import Template Default, Receipt
+Template Default) and types that describe packaged code or pages (Automation Registry,
+Setting Definition) are not registered: the admin edits the materialized records instead,
+and a row they added to the code catalogs would point at nothing.
 
 ---
 

@@ -1,0 +1,110 @@
+<template>
+    <template lwc:if={errorMessage}>
+        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+    </template>
+    <p class="slds-var-m-bottom_small" role="status" aria-live="polite" data-id="status">{statusMessage}</p>
+
+    <template for:each={sections} for:item="section">
+        <section key={section.typeName} class="slds-var-m-bottom_medium" data-type={section.typeName}>
+            <h3 class="slds-text-heading_small">{section.label}</h3>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">{section.help}</p>
+
+            <h4 class="slds-text-title_bold slds-var-m-top_small">{labels.ownHeading}</h4>
+            <template lwc:if={section.hasOwnRows}>
+                <lightning-datatable
+                    key-field="developerName"
+                    data={section.ownRows}
+                    columns={section.ownColumns}
+                    hide-checkbox-column
+                    data-type={section.typeName}
+                    data-id="own-rows"
+                    onrowaction={handleRowAction}
+                ></lightning-datatable>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-body_small" data-id="own-empty">{labels.ownEmpty}</p>
+            </template>
+            <lightning-button
+                class="slds-var-m-top_x-small"
+                label={labels.add}
+                data-type={section.typeName}
+                data-id="add"
+                disabled={disabled}
+                onclick={handleAdd}
+            ></lightning-button>
+
+            <template lwc:if={section.showForm}>
+                <div class="slds-box slds-var-m-top_small" role="region" aria-label={formTitle} data-id="form">
+                    <h4 class="slds-text-title_bold">{formTitle}</h4>
+                    <lightning-input
+                        label={labels.name}
+                        value={form.label}
+                        max-length="40"
+                        required
+                        data-id="name"
+                        onchange={handleNameChange}
+                    ></lightning-input>
+                    <template for:each={formFields} for:item="field">
+                        <div key={field.apiName}>
+                            <template lwc:if={field.isChoice}>
+                                <lightning-combobox
+                                    label={field.label}
+                                    value={field.value}
+                                    options={field.choices}
+                                    required={field.required}
+                                    data-field={field.apiName}
+                                    onchange={handleFieldChange}
+                                ></lightning-combobox>
+                            </template>
+                            <template lwc:if={field.isLong}>
+                                <lightning-textarea
+                                    label={field.label}
+                                    value={field.value}
+                                    required={field.required}
+                                    data-field={field.apiName}
+                                    onchange={handleFieldChange}
+                                ></lightning-textarea>
+                            </template>
+                            <template lwc:if={field.isText}>
+                                <lightning-input
+                                    label={field.label}
+                                    value={field.value}
+                                    max-length={field.maxLength}
+                                    required={field.required}
+                                    data-field={field.apiName}
+                                    onchange={handleFieldChange}
+                                ></lightning-input>
+                            </template>
+                        </div>
+                    </template>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button
+                            variant="brand"
+                            label={labels.save}
+                            data-id="save"
+                            disabled={disabled}
+                            onclick={handleSave}
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            label={labels.cancel}
+                            data-id="cancel"
+                            onclick={handleCancel}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <h4 class="slds-text-title_bold slds-var-m-top_medium">{labels.shippedHeading}</h4>
+            <lightning-datatable
+                key-field="developerName"
+                data={section.shippedRows}
+                columns={section.shippedColumns}
+                hide-checkbox-column
+                data-id="shipped-rows"
+            ></lightning-datatable>
+        </section>
+    </template>
+
+    <lightning-button label={labels.checkAgain} data-id="check-again" onclick={handleCheckAgain}></lightning-button>
+</template>

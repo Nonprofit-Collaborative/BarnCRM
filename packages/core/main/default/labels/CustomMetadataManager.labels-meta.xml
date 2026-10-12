@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_CmdtManager_UnknownType</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the list is not one the page can change</shortDescription>
+        <value>That list cannot be changed here. Reload the page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RecordNotFound</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the row is no longer in the list</shortDescription>
+        <value>That row is no longer in the list. Click Check again to refresh it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_ShippedReadOnly</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the row ships with BarnCRM; names the row</shortDescription>
+        <value>{0} ships with BarnCRM and cannot be changed here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NameRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the Name box is empty</shortDescription>
+        <value>Enter a name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NameTooLong</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: the name is over 40 characters</shortDescription>
+        <value>Keep the name to 40 characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_FieldRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: a required box is empty; names the box</shortDescription>
+        <value>Enter {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_FieldTooLong</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: a value is too long; names the box and the limit</shortDescription>
+        <value>Keep {0} to {1} characters or fewer.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NotAChoice</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: value missing from a picklist; value, field, object</shortDescription>
+        <value>{0} is not a choice in the {1} list on {2}. Add it in Setup (Object Manager, {2}, Fields, {1}), then save again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DuplicateActive</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused: another active row uses the value; value, row name</shortDescription>
+        <value>{0} already has an active row, {1}. Only one active row can use it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DeployRefused</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save refused by Salesforce before it started</shortDescription>
+        <value>Salesforce did not accept the change, so nothing was saved. If BarnCRM was installed as a package, turn on Deploy Metadata from Non-Certified Package Versions via Apex in Setup (Apex Settings), then save again. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DeployFailed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log entry: the background save failed; row name, reason</shortDescription>
+        <value>The change to {0} was not saved: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_DeployFailedNoReason</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log entry: the background save failed with no reason given</shortDescription>
+        <value>Salesforce gave no reason. Try again, and if it fails again, make the change in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_LoadError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the list could not be read</shortDescription>
+        <value>The list could not be read. Reload the page, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_SaveError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the save could not be started</shortDescription>
+        <value>The change could not be saved. Nothing was changed. Try again, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RelationshipTypes</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading for the relationship types list</shortDescription>
+        <value>Relationship types</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RelationshipTypesHelp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: what the relationship types list is for</shortDescription>
+        <value>What the other side of a relationship becomes. Add a choice to the Type list on a relationship in Setup first, and add both sides of a pair.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_PermissionRequired</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the user lacks Manage BarnCRM Metadata</shortDescription>
+        <value>You need the BarnCRM Metadata Admin permission set to change custom metadata. Ask your administrator to add it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_AddButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that opens the form for a new row</shortDescription>
+        <value>Add</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_EditAction</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: row action that opens the row in the form</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_ArchiveAction</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: row action that stops a row being used</shortDescription>
+        <value>Archive</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_RestoreAction</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: row action that brings an archived row back</shortDescription>
+        <value>Restore</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_SaveButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that saves the form</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_CancelButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that closes the form without saving</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NameField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the row's name, column and form box</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StatusColumn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: column saying whether the row is in use</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StatusInUse</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the row is used</shortDescription>
+        <value>In use</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StatusArchived</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the row is archived and not used</shortDescription>
+        <value>Archived</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_OwnHeading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading above the organization's own rows</shortDescription>
+        <value>Added by your organization</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_OwnEmpty</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: the organization has added no rows</shortDescription>
+        <value>Nothing added yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_ShippedHeading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading above the read-only shipped rows</shortDescription>
+        <value>Shipped with BarnCRM</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_NewTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading of the form for a new row</shortDescription>
+        <value>New row</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_EditTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: heading of the form for a row; names the row</shortDescription>
+        <value>Edit {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_Saving</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: a save has started in the background</shortDescription>
+        <value>Saving. Salesforce applies the change in the background, usually within a minute.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_Saved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: a save finished; names the row</shortDescription>
+        <value>Saved. {0} is in the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_StillSaving</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: a save has not finished after a minute</shortDescription>
+        <value>Still saving. Click Check again in a minute. If it failed, the reason is in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_CmdtManager_CheckAgain</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Custom metadata page: button that reloads the list and the save's outcome</shortDescription>
+        <value>Check again</value>
+    </labels>
+</CustomLabels>

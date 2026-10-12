@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Custom metadata</label>
+  <protected>false</protected>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Custom_Metadata_Manager</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">General</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Component</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Component__c</field>
+    <value xsi:type="xsd:string">customMetadataManager</value>
+  </values>
+  <values>
+    <field>Required_Permission__c</field>
+    <value xsi:type="xsd:string">Manage_BarnCRM_Metadata</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Add your own entries to the lists BarnCRM keeps as custom metadata, such as relationship types, and change or archive them. The entries BarnCRM ships are listed too, and cannot be changed. Saving takes about a minute, because Salesforce applies it in the background.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">custom-metadata.md</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">6</value>
+  </values>
+</CustomMetadata>

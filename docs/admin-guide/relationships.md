@@ -66,6 +66,8 @@ The list ships ready to use, and none of it depends on anyone's gender.
 | Employer contact | Colleague |
 | Other | Other |
 
+To add your own types, such as Mentor and Mentee, see [Custom metadata](custom-metadata.md).
+
 ## A five-minute walkthrough
 
 You are Maria. Your Executive Director wants to know which of your members are related to
