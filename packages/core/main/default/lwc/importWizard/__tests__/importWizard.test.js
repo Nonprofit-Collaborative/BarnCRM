@@ -13,6 +13,10 @@ import getRows from '@salesforce/apex/ImportController.getRows';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
 import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
+import getLoadableObjects from '@salesforce/apex/ImportController.getLoadableObjects';
+import createObjectTemplate from '@salesforce/apex/ImportController.createObjectTemplate';
+import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
+import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -51,6 +55,20 @@ jest.mock('@salesforce/apex/ImportController.getEntityTargets', () => ({ default
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getMatchFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getLoadableObjects', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/ImportController.createObjectTemplate',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/apex/ImportController.getObjectFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getKeyFields', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -735,5 +753,218 @@ describe('the import wizard', () => {
     element.shadowRoot.querySelector('[data-id="file-value-row"] lightning-button-icon').click();
     await flush();
     expect(element.shadowRoot.querySelectorAll('[data-id="file-value-row"]')).toHaveLength(0);
+  });
+});
+
+describe('the import wizard loading one object', () => {
+  const OBJECT_TEMPLATE = {
+    id: 'a05',
+    name: 'Program sessions',
+    matchingRule: 'Email exact',
+    mapping: '{"version":1,"columns":[]}',
+    targetObject: 'Program_Session__c',
+    targetObjectLabel: 'Program Session',
+    loadOperation: 'Insert',
+    loadOperations: ['Insert', 'Update by record Id', 'Upsert by external ID'],
+    lookupNotFound: 'Reject the row'
+  };
+  const SESSIONS = 'Session Key,Program,Notes\nS-1,Reading,first\nS-2,Math,';
+
+  beforeEach(() => {
+    canImport.mockResolvedValue(true);
+    getTemplates.mockResolvedValue([OBJECT_TEMPLATE]);
+    getEntityTargets.mockResolvedValue([]);
+    getMatchFields.mockResolvedValue({ contact: [], account: [] });
+    getObjectFields.mockResolvedValue([
+      { value: 'Record.Id', label: 'Salesforce record ID', isLookup: false, lookupFields: [] },
+      { value: 'Record.Session_Key__c', label: 'Session Key', isLookup: false, lookupFields: [] },
+      {
+        value: 'Record.Program__c',
+        label: 'Program',
+        isLookup: true,
+        lookupFields: [
+          { value: 'Id', label: 'Salesforce record ID' },
+          { value: 'Name', label: 'Program Name' }
+        ]
+      }
+    ]);
+    getKeyFields.mockResolvedValue([{ value: 'Session_Key__c', label: 'Session Key' }]);
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [
+          { source: 'Session Key', target: 'Record.Session_Key__c' },
+          { source: 'Program', target: 'Record.Program__c', lookupField: 'Name' },
+          { source: 'Notes', target: 'Contact1.Email' }
+        ]
+      })
+    );
+    saveFile.mockResolvedValue('069000000000001');
+    createBatch.mockResolvedValue(DRY_RUN_BATCH);
+    stageRows.mockResolvedValue(2);
+    startDryRun.mockResolvedValue(DRY_RUN_BATCH);
+    getBatch.mockResolvedValue(DRY_RUN_BATCH);
+    getRows.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  async function toColumnsStep() {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, SESSIONS, 'sessions.csv');
+    return element;
+  }
+
+  function loadOptions(element) {
+    return element.shadowRoot.querySelector('[data-id="load-options"]');
+  }
+
+  it('creates a one-object mapping from the objects the user may load and chooses it', async () => {
+    getTemplates.mockResolvedValue([TEMPLATE]);
+    getLoadableObjects.mockResolvedValue([
+      { value: 'Program_Session__c', label: 'Program Session' }
+    ]);
+    createObjectTemplate.mockResolvedValue(OBJECT_TEMPLATE);
+    const element = render();
+    await flush();
+    click(element, 'choose-object');
+    await flush();
+    const object = element.shadowRoot.querySelector('[data-id="new-object"]');
+    expect(object.options).toEqual([{ label: 'Program Session', value: 'Program_Session__c' }]);
+    expect(element.shadowRoot.querySelector('[data-id="create-object-template"]').disabled).toBe(
+      true
+    );
+    object.dispatchEvent(new CustomEvent('change', { detail: { value: 'Program_Session__c' } }));
+    const name = element.shadowRoot.querySelector('[data-id="new-template-name"]');
+    name.value = 'Program sessions';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'create-object-template');
+    await flush();
+
+    expect(createObjectTemplate).toHaveBeenCalledWith({
+      name: 'Program sessions',
+      objectName: 'Program_Session__c'
+    });
+    expect(element.shadowRoot.querySelector('[data-id="template"]').value).toBe('a05');
+    expect(element.shadowRoot.querySelector('[data-id="new-object"]')).toBeNull();
+  });
+
+  it('offers the object fields, and a lookup picker that keeps the saved choice', async () => {
+    const element = await toColumnsStep();
+    expect(getObjectFields).toHaveBeenCalledWith({ templateId: 'a05' });
+    const pickers = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    const values = pickers[0].querySelector('lightning-combobox').options.map((o) => o.value);
+    expect(values).toEqual(['Ignore', 'Record.Id', 'Record.Session_Key__c', 'Record.Program__c']);
+    // A suggestion outside the object is not shown as chosen.
+    expect(pickers[2].querySelector('lightning-combobox').value).toBe('Ignore');
+    const lookups = element.shadowRoot.querySelectorAll('[data-id="lookup-field"]');
+    expect(lookups).toHaveLength(1);
+    expect(lookups[0].value).toBe('Name');
+    expect(lookups[0].options.map((o) => o.value)).toEqual(['Id', 'Name']);
+  });
+
+  it('shows the load choices instead of the people rules, and sends them with the batch', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="rule"]')).toBeNull();
+    const options = loadOptions(element);
+    expect(options.operations).toEqual(OBJECT_TEMPLATE.loadOperations);
+    expect(options.keyFields).toEqual([{ value: 'Session_Key__c', label: 'Session Key' }]);
+
+    options.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Upsert by external ID',
+          matchField: '',
+          lookupNotFound: 'Leave it empty'
+        }
+      })
+    );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
+    options.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Upsert by external ID',
+          matchField: 'Session_Key__c',
+          lookupNotFound: 'Leave it empty'
+        }
+      })
+    );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(false);
+    click(element, 'dry-run');
+    await flush();
+
+    const call = createBatch.mock.calls[0][0];
+    expect(JSON.parse(call.optionsJson).load).toEqual({
+      operation: 'Upsert by external ID',
+      matchField: 'Session_Key__c',
+      lookupNotFound: 'Leave it empty',
+      severalMatches: 'Reject the row'
+    });
+    expect(JSON.parse(call.mappingDocument).columns).toEqual([
+      { source: 'Session Key', target: 'Record.Session_Key__c' },
+      { source: 'Program', target: 'Record.Program__c', lookupField: 'Name' },
+      { source: 'Notes', target: 'Ignore' }
+    ]);
+  });
+
+  it('needs a record ID column before an update can dry run', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Update by record Id',
+          matchField: '',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
+    click(element, 'back');
+    await flush();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    rows[2]
+      .querySelector('lightning-combobox')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(false);
+  });
+
+  it('never offers the record ID or the upsert key as a value for every row', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Upsert by external ID',
+          matchField: 'Session_Key__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    click(element, 'add-file-value');
+    await flush();
+    const target = element.shadowRoot.querySelector(
+      '[data-id="file-value-row"] lightning-combobox'
+    );
+    expect(target.options.map((o) => o.value)).toEqual(['Record.Program__c']);
   });
 });

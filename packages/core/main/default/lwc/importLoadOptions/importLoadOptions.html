@@ -1,0 +1,37 @@
+<template>
+    <lightning-combobox
+        data-id="operation"
+        label={labels.operationLabel}
+        value={operation}
+        options={operationOptions}
+        onchange={handleOperationChange}
+    ></lightning-combobox>
+    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="operation-help">{operationHelp}</p>
+    <template lwc:if={isUpsert}>
+        <template lwc:if={hasKeyFields}>
+            <lightning-combobox
+                data-id="match-field"
+                label={labels.matchFieldLabel}
+                value={matchField}
+                options={keyFieldOptions}
+                required
+                onchange={handleMatchFieldChange}
+            ></lightning-combobox>
+        </template>
+        <template lwc:else>
+            <p class="slds-text-color_error slds-text-body_small" data-id="no-key-fields">
+                {labels.noKeyFields}
+            </p>
+        </template>
+    </template>
+    <lightning-radio-group
+        class="slds-var-m-top_small"
+        data-id="not-found"
+        name="lookup-not-found"
+        label={labels.notFoundLabel}
+        value={lookupNotFound}
+        options={notFoundOptions}
+        onchange={handleNotFoundChange}
+    ></lightning-radio-group>
+    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="not-found-help">{notFoundHelp}</p>
+</template>

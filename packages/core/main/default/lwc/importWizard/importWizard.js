@@ -15,6 +15,10 @@ import getRows from '@salesforce/apex/ImportController.getRows';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
 import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
+import getLoadableObjects from '@salesforce/apex/ImportController.getLoadableObjects';
+import createObjectTemplate from '@salesforce/apex/ImportController.createObjectTemplate';
+import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
+import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 
 import cardTitle from '@salesforce/label/c.Core_Import_CardTitle';
 import stepTemplate from '@salesforce/label/c.Core_Import_StepTemplate';
@@ -86,6 +90,13 @@ import targetOrganizationField from '@salesforce/label/c.Core_Import_TargetOrgan
 import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdFieldName';
 import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
 import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
+import loadObjectHeading from '@salesforce/label/c.Core_Import_LoadObjectHeading';
+import loadObjectHelp from '@salesforce/label/c.Core_Import_LoadObjectHelp';
+import loadObjectLabel from '@salesforce/label/c.Core_Import_LoadObjectLabel';
+import loadObjectNameLabel from '@salesforce/label/c.Core_Import_LoadObjectNameLabel';
+import loadObjectCreateButton from '@salesforce/label/c.Core_Import_LoadObjectCreateButton';
+import lookupFieldLabel from '@salesforce/label/c.Core_Import_LookupFieldLabel';
+import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
 
 /** Fills a label's {0} with a value. */
 function format(label, value) {
@@ -180,6 +191,12 @@ const RECORD_ID_TARGETS = [
   { value: 'Organization.Id', label: format(targetOrganizationField, recordIdFieldName) }
 ];
 
+/** The row entity of a mapping that loads one object (R-IT12), and its record ID target. */
+const RECORD_PREFIX = 'Record.';
+const RECORD_ID = 'Record.Id';
+/** How a lookup column names its parent unless told otherwise (R-IT13). */
+const LOOKUP_BY_ID = 'Id';
+
 /**
  * The import wizard (C-14): choose a mapping, upload a file, check the columns, choose how
  * rows are matched, dry run, commit, and see the result.
@@ -233,6 +250,17 @@ export default class ImportWizard extends LightningElement {
   /** Values for every row of this file (R-IB14), as typed: { key, target, value }. */
   fileValues = [];
   fileValueCounter = 0;
+  /** A mapping that loads one object (R-IT12, R-IT13): its fields, and how each row loads. */
+  objectFields = [];
+  keyFields = [];
+  loadOperation = INSERT;
+  loadMatchField = '';
+  lookupNotFound = LOOKUP_REJECT;
+  /** The new one-object mapping being made on the first step. */
+  choosingObject = false;
+  loadableObjects = [];
+  newObjectName;
+  newTemplateName = '';
 
   labels = {
     cardTitle,
@@ -281,7 +309,13 @@ export default class ImportWizard extends LightningElement {
     fileValueTargetLabel,
     fileValueLabel,
     matchOnlyLabel,
-    matchOnlyHelp
+    matchOnlyHelp,
+    loadObjectHeading,
+    loadObjectHelp,
+    loadObjectLabel,
+    loadObjectNameLabel,
+    loadObjectCreateButton,
+    lookupFieldLabel
   };
 
   async connectedCallback() {
@@ -347,9 +381,76 @@ export default class ImportWizard extends LightningElement {
     this.organizationRule = (template && template.organizationRule) || 'Name exact';
     this.organizationMatchField = (template && template.organizationMatchField) || '';
     this.severalMatches = (template && template.severalMatches) || SEVERAL_REJECT;
+    this.loadOperation = (template && template.loadOperation) || INSERT;
+    this.loadMatchField = (template && template.loadMatchField) || '';
+    this.lookupNotFound = (template && template.lookupNotFound) || LOOKUP_REJECT;
+    this.objectFields = [];
+    this.keyFields = [];
     // A mapping saved before a field could be chosen starts with the first one offered.
     if (this.isPersonExternalId && !this.personMatchField && this.personFields.length > 0) {
       this.personMatchField = this.personFields[0].value;
+    }
+  }
+
+  /** Whether the chosen mapping loads one object rather than people (R-IT12). */
+  get loadsOneObject() {
+    return Boolean(this.selectedTemplate && this.selectedTemplate.targetObject);
+  }
+
+  get loadsPeople() {
+    return !this.loadsOneObject;
+  }
+
+  /** The operations the chosen object allows: Update only for people (R-IT14). */
+  get loadOperations() {
+    return (this.selectedTemplate && this.selectedTemplate.loadOperations) || [];
+  }
+
+  /** Opens the new one-object mapping, asking for the objects the user may load (R-IT14). */
+  async handleChooseObject() {
+    this.message = undefined;
+    this.choosingObject = true;
+    if (this.loadableObjects.length > 0) {
+      return;
+    }
+    try {
+      this.loadableObjects = (await getLoadableObjects()) || [];
+    } catch (error) {
+      this.message = this.errorText(error);
+    }
+  }
+
+  get objectOptions() {
+    return this.loadableObjects.map((object) => ({ label: object.label, value: object.value }));
+  }
+
+  handleNewObjectChange(event) {
+    this.newObjectName = event.detail.value;
+  }
+
+  handleNewTemplateNameChange(event) {
+    this.newTemplateName = event.target.value;
+  }
+
+  get cannotCreateObjectTemplate() {
+    return !this.newObjectName || !String(this.newTemplateName || '').trim();
+  }
+
+  /** Creates the one-object mapping and chooses it. */
+  async handleCreateObjectTemplate() {
+    this.message = undefined;
+    try {
+      const created = await createObjectTemplate({
+        name: this.newTemplateName,
+        objectName: this.newObjectName
+      });
+      this.templates = this.templates.concat([created]);
+      this.selectTemplate(created.id);
+      this.choosingObject = false;
+      this.newObjectName = undefined;
+      this.newTemplateName = '';
+    } catch (error) {
+      this.message = this.errorText(error);
     }
   }
 
@@ -460,19 +561,31 @@ export default class ImportWizard extends LightningElement {
   }
 
   async buildColumns(file) {
+    if (this.loadsOneObject && this.objectFields.length === 0) {
+      // The object's fields and keys, from the running user's describe (R-IT12).
+      const [fields, keys] = await Promise.all([
+        getObjectFields({ templateId: this.templateId }),
+        getKeyFields({ templateId: this.templateId })
+      ]);
+      this.objectFields = fields || [];
+      this.keyFields = keys || [];
+    }
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
+    const lookups = {};
     const parsed = JSON.parse(suggested || '{}');
     const offered = new Set(this.targetOptions.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
       targets[column.source] = this.isOfferedTarget(column.target, offered)
         ? column.target
         : IGNORE;
+      lookups[column.source] = column.lookupField;
     });
     this.columns = this.headers.map((heading) => ({
       key: heading,
       source: heading,
       target: targets[heading] || IGNORE,
+      lookupField: lookups[heading] || LOOKUP_BY_ID,
       samples: this.records
         .slice(0, SAMPLE_VALUES)
         .map((record) => record[heading])
@@ -487,6 +600,12 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
+    if (this.loadsOneObject) {
+      // The object's own fields, from describe (R-IT12).
+      return [{ label: doNotLoad, value: IGNORE }].concat(
+        this.objectFields.map((field) => ({ label: field.label, value: field.value }))
+      );
+    }
     const all = [{ label: doNotLoad, value: IGNORE }]
       .concat(TARGETS)
       .concat(RECORD_ID_TARGETS)
@@ -548,6 +667,9 @@ export default class ImportWizard extends LightningElement {
    * suggested only while that module offers it; without one it is left as "Do not load".
    */
   isOfferedTarget(target, offered) {
+    if (this.loadsOneObject) {
+      return offered.has(target);
+    }
     const deferred = DEFERRED_ENTITY_PREFIXES.some((prefix) => (target || '').startsWith(prefix));
     return !deferred || offered.has(target);
   }
@@ -616,6 +738,15 @@ export default class ImportWizard extends LightningElement {
     if (this.matchOnly) {
       options.matchOnly = true;
     }
+    if (this.loadsOneObject) {
+      // A one-object mapping's load choices, saved on the template (R-IT12, R-IT13).
+      options.load = {
+        operation: this.loadOperation,
+        matchField: this.loadOperation === UPSERT ? this.loadMatchField : null,
+        lookupNotFound: this.lookupNotFound,
+        severalMatches: this.severalMatches
+      };
+    }
     if (this.showExpectedAmount) {
       // Shown only where a module loads gifts, and saved on the template only then (R-IT7).
       const days = String(this.matchDateWindowDays || '').trim();
@@ -634,16 +765,73 @@ export default class ImportWizard extends LightningElement {
     const source = event.target.dataset.source;
     const target = event.detail.value;
     this.columns = this.columns.map((column) => {
-      return column.source === source ? { ...column, target } : column;
+      return column.source === source ? { ...column, target, lookupField: LOOKUP_BY_ID } : column;
+    });
+  }
+
+  /** How a lookup column names its parent (R-IT13). */
+  handleLookupFieldChange(event) {
+    const source = event.target.dataset.source;
+    const lookupField = event.detail.value;
+    this.columns = this.columns.map((column) => {
+      return column.source === source ? { ...column, lookupField } : column;
+    });
+  }
+
+  /** The columns as the picker shows them, with a lookup's second picker where it has one. */
+  get columnRows() {
+    return this.columns.map((column) => {
+      const field = this.loadsOneObject
+        ? this.objectFields.find((each) => each.value === column.target)
+        : undefined;
+      const isLookup = Boolean(field && field.isLookup);
+      return {
+        ...column,
+        isLookup,
+        lookupOptions: isLookup
+          ? (field.lookupFields || []).map((each) => ({ label: each.label, value: each.value }))
+          : []
+      };
     });
   }
 
   get mappingDocument() {
     return JSON.stringify({
       version: 1,
-      columns: this.columns.map((column) => ({ source: column.source, target: column.target })),
+      columns: this.columns.map((column) => {
+        const mapped = { source: column.source, target: column.target };
+        if (this.loadsOneObject && column.lookupField && column.lookupField !== LOOKUP_BY_ID) {
+          mapped.lookupField = column.lookupField;
+        }
+        return mapped;
+      }),
       defaults: []
     });
+  }
+
+  /**
+   * Whether a one-object mapping can load (R-IT12): a column on the object, the record ID
+   * under an update, and under an upsert a chosen key field that a column feeds.
+   */
+  get mapsTheObject() {
+    const targets = this.columns.map((column) => column.target || '');
+    if (!targets.some((target) => target.startsWith(RECORD_PREFIX))) {
+      return false;
+    }
+    if (this.loadOperation === UPDATE) {
+      return targets.includes(RECORD_ID);
+    }
+    if (this.loadOperation === UPSERT) {
+      const key = (RECORD_PREFIX + this.loadMatchField).toLowerCase();
+      return Boolean(this.loadMatchField) && targets.some((target) => target.toLowerCase() === key);
+    }
+    return true;
+  }
+
+  handleLoadOptionsChange(event) {
+    this.loadOperation = event.detail.operation;
+    this.loadMatchField = event.detail.matchField || '';
+    this.lookupNotFound = event.detail.lookupNotFound;
   }
 
   get mapsSomebody() {
@@ -779,6 +967,16 @@ export default class ImportWizard extends LightningElement {
    * person, since every row would then be one person.
    */
   get fileValueTargetOptions() {
+    if (this.loadsOneObject) {
+      // Every row would name the same record (R-IT12).
+      const key = this.loadOperation === UPSERT ? RECORD_PREFIX + this.loadMatchField : null;
+      return this.targetOptions.filter(
+        (option) =>
+          option.value !== IGNORE &&
+          option.value !== RECORD_ID &&
+          (!key || option.value.toLowerCase() !== key.toLowerCase())
+      );
+    }
     const personField = this.isPersonExternalId ? this.personMatchField : null;
     return this.targetOptions.filter((option) => {
       if (option.value === IGNORE) {
@@ -1031,6 +1229,9 @@ export default class ImportWizard extends LightningElement {
 
   /** An External ID rule needs a field to match on before anything can be matched (R-IT8). */
   get cannotDryRun() {
+    if (this.loadsOneObject) {
+      return !this.mapsTheObject || this.records.length === 0;
+    }
     return (
       !this.mapsSomebody ||
       this.records.length === 0 ||

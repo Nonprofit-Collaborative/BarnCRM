@@ -208,4 +208,164 @@
         <shortDescription>Undo: a journaled record was not created by this import's commit</shortDescription>
         <value>Kept: this record was not created by the person who ran this import while it ran, so the undo left it in place.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: heading and button of the one-object mapping section</shortDescription>
+        <value>Load one object</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a one-object mapping is for</shortDescription>
+        <value>For a file that is not a list of people: program sessions, volunteer hours, or a corrected export of one of your objects.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for the object a new mapping loads</shortDescription>
+        <value>Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectNameLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: name of a new one-object mapping</shortDescription>
+        <value>Mapping name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectCreateButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button that creates a one-object mapping</shortDescription>
+        <value>Create</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for the field a lookup column names its record by</shortDescription>
+        <value>Find it by</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadOperationLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for what each row does to the object</shortDescription>
+        <value>What each row does</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationInsert</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Insert load operation</shortDescription>
+        <value>Insert</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationUpdate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Update by record ID load operation</shortDescription>
+        <value>Update by record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationUpsert</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Upsert by external ID load operation</shortDescription>
+        <value>Upsert by external ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadInsertHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Insert does and risks</shortDescription>
+        <value>Creates a new record for every row. Risk: loading the same file twice creates every record twice.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadUpdateHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Update by record ID does and risks</shortDescription>
+        <value>Changes the record whose Salesforce record ID is in the row; map that column to Salesforce record ID. Nothing is created. Risk: a wrong ID changes the wrong record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadUpsertHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Upsert by external ID does and risks</shortDescription>
+        <value>Finds the record by the ID field you choose and changes it, or creates one when no record has that value. Risk: a value typed into the wrong row changes the wrong record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadMatchFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for the external ID field an upsert matches on</shortDescription>
+        <value>Match rows on</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadNoKeyFields</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the object has no external ID field to upsert on</shortDescription>
+        <value>This object has no field marked External ID that you can read, so rows cannot be upserted. Choose another action.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupNotFoundLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a row does when a lookup finds no record</shortDescription>
+        <value>When a lookup finds no record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupRejectOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: option to reject a row whose lookup finds nothing</shortDescription>
+        <value>Reject the row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupLeaveEmptyOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: option to load a row with the lookup left empty</shortDescription>
+        <value>Leave it empty</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupRejectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what rejecting a row with a missing lookup risks</shortDescription>
+        <value>The row is rejected and listed with the reason. Risk: you fix those rows and load them again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupLeaveEmptyHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what leaving a missing lookup empty risks</shortDescription>
+        <value>The row loads without that lookup, and the run log says so. Risk: records arrive without the link you meant them to have.</value>
+    </labels>
 </CustomLabels>
