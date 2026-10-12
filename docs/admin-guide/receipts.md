@@ -129,8 +129,8 @@ Start from the sample data.
    You will see a receipt number appear on the gift, and a PDF in the Files list on the gift
    and on the receipt. Deliberately not on the donor's household: see "Give people access"
    above.
-4. Open the PDF. It states your organization's name and address at the top, the amount, the
-   date, your tax identification number, and the sentence "No goods or services were provided
+4. Click **View PDF** beside the receipt on the panel. It states your organization's name
+   and address at the top, the amount, the date, your tax identification number, and the sentence "No goods or services were provided
    in exchange for this contribution." If you have uploaded a logo, it is above the name; if
    it is missing, read the last section of this page before you go looking for a mistake.
 5. Now break it on purpose. Try to change the gift's amount. The save is refused with "This

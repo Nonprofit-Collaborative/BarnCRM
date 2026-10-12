@@ -1,24 +1,25 @@
 <template>
-  <lightning-card title="Receipts" icon-name="standard:document">
+  <lightning-card title={labels.title} icon-name="standard:document">
     <div class="slds-p-horizontal_medium">
-      <template if:true={loadError}>
-        <p class="slds-text-color_error">{loadError}</p>
+      <template lwc:if={loadError}>
+        <p data-id="load-error" class="slds-text-color_error">{loadError}</p>
       </template>
 
-      <template if:true={hasReceipts}>
+      <template lwc:if={hasReceipts}>
         <table class="slds-table slds-table_bordered slds-table_cell-buffer">
           <thead>
             <tr class="slds-line-height_reset">
-              <th scope="col">Number</th>
-              <th scope="col">Status</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Issued</th>
-              <th scope="col">Void reason</th>
+              <th scope="col">{labels.columnNumber}</th>
+              <th scope="col">{labels.columnStatus}</th>
+              <th scope="col">{labels.columnAmount}</th>
+              <th scope="col">{labels.columnIssued}</th>
+              <th scope="col">{labels.columnVoidReason}</th>
+              <th scope="col">{labels.columnFile}</th>
             </tr>
           </thead>
           <tbody>
-            <template for:each={receipts} for:item="receipt">
-              <tr key={receipt.id}>
+            <template for:each={rows} for:item="receipt">
+              <tr key={receipt.id} data-id="receipt-row">
                 <td>{receipt.receiptNumber}</td>
                 <td>{receipt.status}</td>
                 <td>
@@ -33,20 +34,32 @@
                   ></lightning-formatted-date-time>
                 </td>
                 <td>{receipt.voidReason}</td>
+                <td>
+                  <template lwc:if={receipt.contentDocumentId}>
+                    <lightning-button
+                      data-id="view-pdf"
+                      data-document-id={receipt.contentDocumentId}
+                      variant="base"
+                      label={labels.viewPdf}
+                      title={receipt.viewPdfTitle}
+                      onclick={handleViewPdf}
+                    ></lightning-button>
+                  </template>
+                </td>
               </tr>
             </template>
           </tbody>
         </table>
       </template>
-
-      <template if:false={hasReceipts}>
-        <p class="slds-text-body_regular">No receipt has been issued for this gift yet.</p>
+      <template lwc:else>
+        <p data-id="none-yet" class="slds-text-body_regular">{labels.noneYet}</p>
       </template>
 
-      <template if:true={canIssue}>
+      <template lwc:if={canIssue}>
         <div class="slds-m-top_medium">
           <lightning-button
-            label="Issue receipt"
+            data-id="issue"
+            label={labels.issue}
             variant="brand"
             disabled={busy}
             onclick={handleIssue}
@@ -54,25 +67,24 @@
         </div>
       </template>
 
-      <template if:true={canReissue}>
+      <template lwc:if={canReissue}>
         <div class="slds-m-top_medium">
           <lightning-input
-            label="Why is this receipt being voided?"
+            data-id="void-reason"
+            label={labels.voidReason}
             value={reason}
             onchange={handleReasonChange}
           ></lightning-input>
           <div class="slds-m-top_small">
             <lightning-button
-              label="Void and reissue"
+              data-id="void-and-reissue"
+              label={labels.voidAndReissue}
               variant="destructive-text"
               disabled={busy}
               onclick={handleVoidAndReissue}
             ></lightning-button>
           </div>
-          <p class="slds-text-body_small slds-m-top_x-small">
-            The receipt the donor already has is never changed or deleted. Voiding records why, and
-            the replacement takes the next number.
-          </p>
+          <p class="slds-text-body_small slds-m-top_x-small">{labels.voidNote}</p>
         </div>
       </template>
     </div>
