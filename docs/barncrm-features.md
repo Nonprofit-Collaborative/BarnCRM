@@ -1,6 +1,6 @@
 # BarnCRM feature catalog
 
-BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for any organization, plus optional modules for giving, integrations, volunteers, programs and funders. This catalog lists what each package does, grouped by module and category, Major features first, with the status of each item as of 2026-10-12 (main at PR #183).
+BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for any organization, plus optional modules for giving, integrations, volunteers, programs and funders. This catalog lists what each package does, grouped by module and category, Major features first, with the status of each item as of 2026-10-12 (main at PR #181 plus the landing batches).
 
 **How this is kept current:** the catalog is updated in the same pull request that adds, changes, or removes a feature. A branch that builds a feature sets its row to "Built, not merged" with the branch name; the merge makes it "Shipped".
 
@@ -26,7 +26,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ## 1. Core
 
-**Suite:** both. Core is neutral: households, relationships, addresses, import, rollups, settings, Health Check and the Setup Assistant carry no nonprofit wording (C-29, merged in PR #163). On main the app and settings page are labelled with the old working title; the BarnCRM names are in open PRs #184 to #187 and #195. Core installed alone is the Community Suite.
+**Suite:** both. Core is neutral: households, relationships, addresses, import, rollups, settings, Health Check and the Setup Assistant carry no nonprofit wording (C-29, merged in PR #163). The BarnCRM names landed in PR #181. Core installed alone is the Community Suite.
 
 ### 1.1 People and Households
 
@@ -177,12 +177,12 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Modules step | Minor | Shows each package as present or not installed, with links to what it does. | Shipped | C-12 |
 | Modules tile | Minor | A home page tile showing which modules are installed. | Built, not merged (`feature/hub-rebuild-5`) | C-24, ADR-0018 |
 | Pickers in settings | Minor | Settings that name a record or record type offer a picker instead of a typed ID, the fiscal year start is a month list, and each description is read out with its control. | Built, not merged (`feature/ux-core-1`) | C-03, new ADR |
-| Coexistence options gated by detection | Minor | NPSP and Nonprofit Cloud modes are offered only where that product is detected (or already saved); Standalone is always offered. | Built, not merged (`feature/neutral-core-3`, PR #196) | C-29 follow-up |
+| Coexistence options gated by detection | Minor | NPSP and Nonprofit Cloud modes are offered only where that product is detected (or already saved); Standalone is always offered. | Shipped | C-29 follow-up |
 | Installer gets admin access | Minor | The person who installs receives the admin role automatically by a background job after install. | Shipped | C-06 |
 | Sample data | Minor | Loads a realistic demo set (200 households, 440 people, 25 organizations, connections and affiliations) only when an admin asks, and removes it all in one action. | Shipped | C-10 |
-| Neutral sample organizations | Minor | Sample organizations become mostly businesses, schools and clubs, and the guide states sample data is never loaded automatically. | Built, not merged (`feature/neutral-core-4`, PR #197) | C-29 follow-up |
-| Package labels renamed to BarnCRM | Minor | Renames the app, settings ("BarnCRM Settings"), roles, folders, templates and API names from the old working title to BarnCRM. | Built, not merged (`feature/barncrm-rename-1` to `-4`, `feature/neutral-core-2`, `feature/barncrm-api-names-1` to `-3`; PRs #184 to #187, #195, #198 to #200) | plan 11.3 item 6 |
-| Faster, safer settings saves | Minor | A settings save writes only the keys that changed, under a lock, so two admins saving at once do not undo each other. | Built, not merged (`feature/fu-1-settings-writers-1`, PR #188) | plan 11.3 |
+| Neutral sample organizations | Minor | Sample organizations become mostly businesses, schools and clubs, and the guide states sample data is never loaded automatically. | Shipped | C-29 follow-up |
+| Package labels renamed to BarnCRM | Minor | Renames the app, settings ("BarnCRM Settings"), roles, folders, templates and API names from the old working title to BarnCRM. | Shipped (PR #181) | plan 11.3 item 6 |
+| Faster, safer settings saves | Minor | A settings save writes only the keys that changed, under a lock, so two admins saving at once do not undo each other. | Shipped | plan 11.3 |
 | What's new after upgrade | Minor | A "What's new" card on the home page summarizes what changed after an upgrade, hidden once read and when nothing is new. | Built, not merged (`feature/c-27-whats-new-1`, `-2`) | C-27, new ADR |
 | Unlocked-to-managed migration kit | Minor | Moves a production pilot from unlocked to managed packages: check, export, reimport with every record link translated, and verify record by record. | Built, not merged (`feature/c-31-migration-kit-1` to `-3`) | C-31, new ADR |
 | Telemetry (opt-in) | Minor | Anonymous, opt-in usage counts (installed modules, org shape, error counts), off by default. | Planned (v0.11) | C-26 |
@@ -205,7 +205,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Stalled digest finding | Minor | Warns when the error digest is scheduled but has not run for two days. | Shipped | C-23 |
 | Module findings extension | Minor | Lets installed modules add their own Health Check findings without Core knowing about them. | Shipped | ADR-0057 |
 | Schedule all nightly jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Connect add), and one fix schedules them all. | Built, not merged (`feature/ux-core-2`; Giving and Connect jobs on `feature/nightly-job-providers`) | C-21, new ADR |
-| Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Built, not merged (`feature/fu-3-dynamic-apex-2`, PR #191) | plan 11.3 |
+| Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Shipped | plan 11.3 |
 
 ### 1.9 Record Pages and App Experience
 
@@ -251,10 +251,10 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Open Batches list | Minor | A half-typed batch is saved and can be picked up later; posted batches are locked. | Shipped | G-17 |
 | In-kind validation rules | Minor | Five rules refuse in-kind mistakes, such as a cash gift left carrying an in-kind value. | Shipped | G-18 |
 | A gift keeps its household | Minor | When a donor moves to another household, past gifts stay with the household they were given to; household totals through current membership follow the person. | Shipped (documented on `docs/gift-household-on-move`) | G-01, new ADR (D-20) |
-| Quick Gift Entry in the utility bar | Minor | Quick Gift Entry opens from the Fundraising app's utility bar on any page. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | G-03 (UX pass) |
-| "Payment Method" label | Minor | The gift type field is labelled Payment Method in the app and on Quick Gift Entry. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | G-03 (UX pass) |
-| Gift page polish | Minor | Gift page shows one donor field and shows refund, original gift and matched gift fields only when relevant. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | G-01 (UX pass) |
-| Quick Gift Entry messages and new donors | Minor | A problem is shown on the field it concerns, the donor picker offers the standard new person form, and batch lines name their line number for screen readers. | Built, not merged (`feature/ux-gift-entry-1`, PR #208) | G-03, G-17 (UX pass) |
+| Quick Gift Entry in the utility bar | Minor | Quick Gift Entry opens from the Fundraising app's utility bar on any page. | Shipped | G-03 (UX pass) |
+| "Payment Method" label | Minor | The gift type field is labelled Payment Method in the app and on Quick Gift Entry. | Shipped | G-03 (UX pass) |
+| Gift page polish | Minor | Gift page shows one donor field and shows refund, original gift and matched gift fields only when relevant. | Shipped | G-01 (UX pass) |
+| Quick Gift Entry messages and new donors | Minor | A problem is shown on the field it concerns, the donor picker offers the standard new person form, and batch lines name their line number for screen readers. | Shipped | G-03, G-17 (UX pass) |
 | Pay a scheduled pledge payment | Minor | Quick Gift Entry and the Gift Batches "Pays" column list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Built, not merged (`feature/gift-entry-pays-installment-1` to `-3`) | G-03, G-17, G-24 |
 | Stock and planned gift types | Minor | Extra fields for stock and planned gifts. | Planned (1.x) | G-21 |
 
@@ -303,8 +303,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Standard email templates | Minor | Thank-you emails use ordinary Salesforce email templates, with a packaged sample template. | Shipped | G-12 |
 | No double thanks | Minor | A gift cannot be thanked twice, even if a batch is retried. | Shipped | G-12 |
 | Send Acknowledgments permission | Minor | Separate permission for sending thank-yous. | Shipped | G-12 |
-| Thank-you greets "friend" | Minor | The thank-you email greets "friend" when the person has no first name. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | G-12 (UX pass) |
-| Acknowledgment rules edited in the app | Minor | Rules are created and edited on the Acknowledgments page with the email template chosen by name; a new stewardship plan's key is made from its name. | Built, not merged (`feature/ux-receipts-4`, PR #212) | G-12, G-15 (UX pass) |
+| Thank-you greets "friend" | Minor | The thank-you email greets "friend" when the person has no first name. | Shipped | G-12 (UX pass) |
+| Acknowledgment rules edited in the app | Minor | Rules are created and edited on the Acknowledgments page with the email template chosen by name; a new stewardship plan's key is made from its name. | Shipped | G-12, G-15 (UX pass) |
 | Which total a ladder measures | Minor | Setting chooses total giving, this fiscal year, last fiscal year or largest gift. | Shipped | G-14 |
 | Levels follow refunds down | Minor | A refund can move a donor down a level. | Shipped | G-14 |
 | Level movement list views | Minor | Shows who joined or left a level, placed on save, nightly and by "Recalculate now". | Shipped | G-14 |
@@ -332,9 +332,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Receipt file access | Minor | Receipt files follow access to the receipt and gift, not the donor, with role-based read access. | Shipped | ADR-0034 |
 | Issue Receipts permission | Minor | Separate permission for issuing, voiding and starting receipt runs. | Shipped | G-13 |
 | Failed receipt finding | Minor | Health Check counts receipts voided because generation failed. | Shipped | C-11 |
-| View PDF link | Minor | Each receipt in the Receipts panel has a View PDF link to the standard file preview. | Built, not merged (`feature/ux-receipts-1`, PR #209) | G-13 (UX pass) |
-| Letterhead on every receipt | Minor | The organization's name and address print above every receipt and statement, whatever the letter says, with a preview that writes nothing. | Built, not merged (`feature/ux-receipts-2`, PR #210) | G-13 (UX pass) |
-| Receipt letter editor and preview | Minor | Receipt letters are edited in a rich text editor limited to what the PDF prints, with a preview of the unsaved draft for a sample gift. | Built, not merged (`feature/ux-receipts-3`, PR #211) | G-13 (UX pass) |
+| View PDF link | Minor | Each receipt in the Receipts panel has a View PDF link to the standard file preview. | Shipped | G-13 (UX pass) |
+| Letterhead on every receipt | Minor | The organization's name and address print above every receipt and statement, whatever the letter says, with a preview that writes nothing. | Shipped | G-13 (UX pass) |
+| Receipt letter editor and preview | Minor | Receipt letters are edited in a rich text editor limited to what the PDF prints, with a preview of the unsaved draft for a sample gift. | Shipped | G-13 (UX pass) |
 
 ### 2.7 Accounting Controls
 
@@ -382,14 +382,14 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Fundraising app | Major | An app with tabs for gifts, funds, appeals, commitments, batches, receipts and Quick Gift Entry. | Shipped | G-06, ADR-0018 |
-| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments and soft credits, and a New Gift action. | Built, not merged (`feature/ux-giving-pages-1`, `-2`; PRs #205, #206) | new ADR (UX pass) |
+| Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments and soft credits, and a New Gift action. | Shipped | new ADR (UX pass) |
 | Gift, Commitment and Gift Batch record pages | Minor | Packaged record pages for Giving records, opened automatically in the Fundraising app. | Shipped | ADR-0043 |
 | Giving permission sets | Minor | Giving Admin, Giving Staff and Giving Read Only (assigned in Setup until the Module Manager joins them to roles). | Shipped | C-06 |
 | Giving sample data | Minor | With Giving installed, sample data adds about 700 gifts over three years, funds, appeals, commitments, soft credits, tributes and in-kind gifts, dated relative to load. | Shipped | C-10 |
 | Giving settings pages | Minor | Acknowledgments, receipts, donor levels, stewardship plans, nightly jobs and accounting periods are all set in the settings console. | Shipped | ADR-0020 |
-| Fundraising app navigation and fallback layouts | Minor | Adds Contacts, Households, Organizations and Commitments tabs, plain list view names, and a fallback layout for each object. | Built, not merged (`feature/ux-giving-pages-3`, PR #207) | UX pass |
+| Fundraising app navigation and fallback layouts | Minor | Adds Contacts, Households, Organizations and Commitments tabs, plain list view names, and a fallback layout for each object. | Shipped | UX pass |
 | Giving owns the nonprofit setup steps | Minor | Giving contributes its own Setup Assistant steps (default fund and appeal, organization identity) and Health Check questions. | Shipped | C-29 |
-| Giving settings that ship on stay on | Minor | The first Giving settings save no longer switches off settings that ship on (apply gifts to installments, household soft credits, receipt logo). | Built, not merged (`feature/fu-1-settings-writers-2`, PR #189) | plan 11.3 |
+| Giving settings that ship on stay on | Minor | The first Giving settings save no longer switches off settings that ship on (apply gifts to installments, household soft credits, receipt logo). | Shipped | plan 11.3 |
 
 ---
 
