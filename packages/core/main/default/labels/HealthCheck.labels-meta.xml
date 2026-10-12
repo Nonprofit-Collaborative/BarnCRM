@@ -169,6 +169,14 @@
         <value>The Gift Transaction mirror is in the Connect module</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_CountOrMore</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stands in for a count that reached its cap. {0} the cap.</shortDescription>
+        <value>{0} or more</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_CurrentModeLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>

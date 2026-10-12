@@ -10,21 +10,37 @@
  *
  * 1. **Permission enforced before this class is reached.** `AccountingPeriodController` checks
  *    Manage Nonprofit Settings, and Override Posting Lock for a date that reopens a period,
- *    before its only call here.
+ *    before its call to save.
  * 2. **Inputs validated by the caller.** The date is typed as a Date and checked to be before
  *    today; no text reaches this class.
  * 3. **Only package owned fields.** One field on the Giving settings org default.
- * 4. **Reads that reach a user stay in user mode.** There are no reads here beyond the org
- *    default this class writes back.
+ * 4. **Reads that reach a user stay in user mode.** The one read here is the stored close date,
+ *    locked so the controller decides from the value it is about to replace; the page itself
+ *    reads the date through `GiftPostingLock`, as before.
  */
 public with sharing class AccountingPeriodWriter {
+    /**
+     * The stored close date, read under a lock that holds until the transaction ends, so two
+     * people closing or reopening at once take turns instead of both deciding from the same
+     * value. Null when no period is closed.
+     */
+    public static Date lockedClosedThrough() {
+        Giving_Settings__c stored = (Giving_Settings__c) OrgSettingsSystemWriter.lockStored(
+            Giving_Settings__c.SObjectType
+        );
+        return stored?.Books_Closed_Through__c;
+    }
+
+    /**
+     * Saves the close date and nothing else. A first save keeps the checkboxes that ship on
+     * (OrgSettingsSystemWriter).
+     */
     public static void saveClosedThrough(Date closeDate) {
-        Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-        settings.Books_Closed_Through__c = closeDate;
-        if (settings.Id == null) {
-            settings.SetupOwnerId = UserInfo.getOrganizationId();
-        }
-        Database.upsert(settings, true, AccessLevel.SYSTEM_MODE);
-        SettingsService.clearCaches();
+        OrgSettingsSystemWriter.save(
+            Giving_Settings__c.SObjectType,
+            new Map<Schema.SObjectField, Object>{
+                Giving_Settings__c.Books_Closed_Through__c => closeDate
+            }
+        );
     }
 }

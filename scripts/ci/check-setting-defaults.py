@@ -15,10 +15,18 @@ was expected, because the other side of a relationship was never written. No off
 could see it: the field metadata was right, the Apex compiled, and the assumption that joined
 them was invisible.
 
-The gate: a checkbox on a hierarchy custom setting that declares a default of true has to be
-registered in `SHIPPED_DEFAULTS` in SettingsService, which puts the value on the record for an
-org that has never saved one, or be listed in KNOWN_UNREGISTERED below with a reason. The
-listed ones are also checked, so an entry cannot outlive the field it excuses.
+The gate, for Core: a checkbox on `Nonprofit_Settings__c` that declares a default of true has
+to be registered in `SHIPPED_DEFAULTS` in SettingsService, which puts the value on the record
+for an org that has never saved one, or be listed in KNOWN_UNREGISTERED below with a reason.
+The listed ones are also checked, so an entry cannot outlive the field it excuses.
+
+For a module's settings object, Core cannot name the fields, so a first save takes the
+checkbox defaults from the field metadata itself (`SettingsService.firstSaveRecord`), and the
+module's readers treat a missing record as the shipped value. What can still go wrong is a
+module class saving the record `getOrgDefaults()` returned, with its checkboxes false, which
+is how Giving switched three shipped features off. So the gate also fails on a class outside
+the tests that takes a settings record from `getOrgDefaults()` and hands it to DML: such a
+save goes through `OrgSettingsSystemWriter` instead.
 """
 
 import glob
@@ -34,28 +42,11 @@ CORE_SETTINGS = "Nonprofit_Settings__c"
 # Checkboxes that ship on and are deliberately not registered, with the reason. An entry here
 # says the shipped default is not applied for that field today: it is a known gap, recorded
 # rather than hidden, and it is checked, so it cannot name a field that no longer qualifies.
-KNOWN_UNREGISTERED = {
-    (
-        "Giving_Settings__c",
-        "Auto_Apply_Gifts_To_Installments__c",
-    ): "A module settings object is read through SettingsService.getValue, which returns null "
-    "rather than false while no record exists, and CommitmentService.autoApplyGifts treats "
-    "null as on. The gap reopens once a record is created for some other key, and closing it "
-    "needs the same mechanism on the module read path.",
-    (
-        "Giving_Settings__c",
-        "Automatic_Household_Soft_Credits__c",
-    ): "Read through SettingsService.getValue by SoftCreditService."
-    "automaticHouseholdCreditsEnabled, which treats null as on. Same gap as "
-    "Auto_Apply_Gifts_To_Installments__c.",
-    (
-        "Giving_Settings__c",
-        "Receipt_Print_Logo__c",
-    ): "Read through SettingsService.getValue by ReceiptLogoSource.printLogo, which treats null "
-    "as on, because an organization that uploaded a logo in the Setup Assistant expects to see "
-    "it and the setting exists to turn that off rather than on. Same gap as "
-    "Auto_Apply_Gifts_To_Installments__c, and it closes with the same mechanism.",
-}
+KNOWN_UNREGISTERED = {}
+
+APEX_CLASSES = "packages/*/main/default/classes/*.cls"
+# The one class allowed to write a settings record it was handed.
+SYSTEM_WRITER = "OrgSettingsSystemWriter.cls"
 
 
 def q(tag):
@@ -126,13 +117,20 @@ def main():
 
     problems = []
     checked = 0
+    from_metadata = 0
     declared = set()
+    settings_objects = []
 
     for object_name, fields_dir in hierarchy_setting_objects():
+        settings_objects.append(object_name)
         for field_name in ships_on(fields_dir):
             checked += 1
             key = (object_name, field_name)
             declared.add(key)
+            if object_name != CORE_SETTINGS and key not in registered:
+                # A module's first save takes this default from the field metadata.
+                from_metadata += 1
+                continue
             if key in registered:
                 if not registered[key]:
                     problems.append(
@@ -142,19 +140,14 @@ def main():
                 continue
             if key in KNOWN_UNREGISTERED:
                 continue
-            registerable = object_name == CORE_SETTINGS
             problems.append(
                 f"{object_name}.{field_name} declares defaultValue true, but Apex never sees "
                 f"that default: getOrgDefaults() returns false for it until the org saves its "
                 f"settings, so whatever this setting guards does nothing on a fresh install "
-                + (
-                    "and says nothing about it. Register it in SettingsService.SHIPPED_DEFAULTS."
-                    if registerable
-                    else "and says nothing about it. A module settings object has no shipped "
-                    "default mechanism yet, so add one or list the field in "
-                    "KNOWN_UNREGISTERED in this script with the reason."
-                )
+                f"and says nothing about it. Register it in SettingsService.SHIPPED_DEFAULTS."
             )
+
+    problems.extend(raw_settings_saves(settings_objects))
 
     for key in sorted(KNOWN_UNREGISTERED):
         if key not in declared:
@@ -185,9 +178,48 @@ def main():
 
     print(
         f"Checked {checked} checkbox settings that ship switched on: "
-        f"{len(registered)} registered, {len(KNOWN_UNREGISTERED)} recorded as known gaps."
+        f"{len(registered)} registered, {from_metadata} applied from module field metadata, "
+        f"{len(KNOWN_UNREGISTERED)} recorded as known gaps; no raw settings saves."
     )
     return 0
+
+
+def is_test_class(path, source):
+    return path.endswith("Test.cls") or re.search(r"^\s*@IsTest\b", source, re.I | re.M)
+
+
+def raw_settings_saves(settings_objects):
+    """Classes that save a settings record taken from getOrgDefaults(), outside the tests."""
+    names = "|".join(re.escape(name) for name in settings_objects)
+    if not names:
+        return []
+    taken = re.compile(r"(\w+)\s*=\s*(?:" + names + r")\.getOrgDefaults\(\)")
+    problems = []
+    for path in sorted(glob.glob(APEX_CLASSES)):
+        if os.path.basename(path) == SYSTEM_WRITER:
+            continue
+        with open(path, encoding="utf-8") as handle:
+            source = handle.read()
+        if is_test_class(path, source):
+            continue
+        variables = set(taken.findall(source))
+        # A record wrapped in a list before the DML is the same save.
+        for variable in list(variables):
+            wrapped = r"(\w+)\s*=\s*new\s+List<\w+>\s*\{\s*" + variable + r"\s*\}"
+            variables.update(re.findall(wrapped, source))
+        for variable in sorted(variables):
+            dml = (
+                r"(Database\.(?:insert|update|upsert)\(\s*" + variable + r"\b"
+                r"|\b(?:insert|update|upsert)\s+" + variable + r"\s*;)"
+            )
+            if re.search(dml, source, re.I):
+                problems.append(
+                    f"{path} saves `{variable}`, a settings record taken from getOrgDefaults(). "
+                    f"On an org that has never saved, its checkboxes are false, so this save "
+                    f"switches off every feature that ships on. Save only the keys through "
+                    f"OrgSettingsSystemWriter.save(type, values) instead."
+                )
+    return problems
 
 
 if __name__ == "__main__":

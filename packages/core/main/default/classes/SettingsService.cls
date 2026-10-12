@@ -38,9 +38,9 @@ public with sharing class SettingsService {
      *
      * The default is applied to the record only while the org has never saved one. From the
      * first save onwards the stored value governs, including a deliberate false, and the first
-     * save carries these defaults into the record it creates, because `applyValues` clones the
-     * record this method returns. So an administrator who saves some unrelated setting does not
-     * silently switch a shipped feature off.
+     * save carries these defaults into the record it creates, because every first save starts
+     * from `firstSaveRecord` (OrgSettingsSystemWriter). So an administrator who saves some
+     * unrelated setting does not silently switch a shipped feature off.
      *
      * A field belongs here when it ships on. `scripts/ci/check-setting-defaults.py` fails the
      * build when a checkbox that ships on is missing from it (ADR-0035).
@@ -156,22 +156,29 @@ public with sharing class SettingsService {
         return getSettings();
     }
 
+    /**
+     * Validates the given values, then saves only the ones that differ from what is stored.
+     *
+     * The comparison is made against the stored record, read under a lock that holds until this
+     * transaction ends, not against the cached copy: a cached copy can predate another person's
+     * save, and comparing against it would audit the wrong old value. Only the changed keys are
+     * written (OrgSettingsSystemWriter), so a key another person saved in the meantime is never
+     * written back as this transaction first read it.
+     */
     private static SObject applyValues(
         String settingsObject,
         Map<String, Object> values,
         Boolean requireDefinition
     ) {
         Schema.SObjectType type = settingsType(settingsObject);
-        SObject record = orgDefault(type);
         if (values == null || values.isEmpty()) {
-            return record;
+            return orgDefault(type);
         }
         String objectName = localName(type);
         Map<String, Setting_Definition__mdt> rows = definitionsByKey(objectName);
-        record = record.clone(true, true, true, true);
-        if (record.Id == null) {
-            record.put(SETUP_OWNER, UserInfo.getOrganizationId());
-        }
+        SObject storedRecord = OrgSettingsSystemWriter.lockStored(type);
+        SObject record = storedRecord != null ? storedRecord : orgDefault(type);
+        Map<Schema.SObjectField, Object> changed = new Map<Schema.SObjectField, Object>();
         List<Setting_Change__c> changes = new List<Setting_Change__c>();
         Datetime changedAt = System.now();
         for (String key : values.keySet()) {
@@ -192,7 +199,7 @@ public with sharing class SettingsService {
             }
             refuseIfMembershipDataWouldBeStranded(token, oldText, newText);
             refuseIfDigestRecipientsAreNotUsers(token, newText);
-            record.put(token, newValue);
+            changed.put(token, newValue);
             changes.add(
                 new Setting_Change__c(
                     Setting_Name__c = objectName + '.' + localName,
@@ -206,14 +213,10 @@ public with sharing class SettingsService {
         if (changes.isEmpty()) {
             return record;
         }
-        Boolean firstSave = record.Id == null;
-        SettingsWriter.saveOrgDefault(record);
-        if (firstSave && isCoreSettings(type)) {
-            SettingsWriter.saveOrgDefault(blanksKeptBlank(type, record));
-        }
+        SettingsWriter.saveOrgDefault(type, storedRecord, changed);
         Database.insert(changes, AccessLevel.USER_MODE);
         clearCaches();
-        return record;
+        return orgDefault(type);
     }
 
     /**
@@ -340,6 +343,46 @@ public with sharing class SettingsService {
         return withShippedDefaults(
             new Nonprofit_Settings__c(SetupOwnerId = UserInfo.getOrganizationId())
         );
+    }
+
+    /**
+     * The same for any settings object. Core's gets `SHIPPED_DEFAULTS`. A module's gets the
+     * checkbox defaults its own field metadata declares, because Core cannot name a module's
+     * fields (ADR-0059) and the module's readers already treat an unsaved checkbox as its
+     * shipped value. Without this, a module's first save (a nightly job recording its run, say)
+     * stored every checkbox nobody touched as false, and switched off the features that ship
+     * on (ADR-0035, "the second half of the same trap").
+     *
+     * Only checkboxes are taken from the declared defaults. Every other field is left unset, as
+     * it was before, so this changes nothing but the one value a record cannot leave blank.
+     */
+    @NamespaceAccessible
+    public static SObject firstSaveRecord(Schema.SObjectType type) {
+        if (isCoreSettings(type)) {
+            return firstSaveRecord();
+        }
+        SObject record = type.newSObject();
+        record.put(SETUP_OWNER, UserInfo.getOrganizationId());
+        SObject declared = type.newSObject(null, true);
+        for (Schema.SObjectField field : checkboxFields(type)) {
+            Object shipped = declared.get(field);
+            if (shipped != null) {
+                record.put(field, shipped);
+            }
+        }
+        return record;
+    }
+
+    /** The custom checkbox fields of a settings object, from the cached field map. */
+    private static List<Schema.SObjectField> checkboxFields(Schema.SObjectType type) {
+        List<Schema.SObjectField> checkboxes = new List<Schema.SObjectField>();
+        for (Schema.SObjectField field : fieldsByLocalName(type).values()) {
+            Schema.DescribeFieldResult describe = field.getDescribe();
+            if (describe.isCustom() && describe.getType() == Schema.DisplayType.BOOLEAN) {
+                checkboxes.add(field);
+            }
+        }
+        return checkboxes;
     }
 
     /**
@@ -645,15 +688,6 @@ public with sharing class SettingsService {
 
     private static String storedOrDefault(String stored, Set<String> allowed, String fallback) {
         return String.isNotBlank(stored) && allowed.contains(stored) ? stored : fallback;
-    }
-
-    /**
-     * A fresh copy of the org level settings to write to. Never the cached instance, so that a
-     * failed write cannot leave a half-changed value in this transaction's cache.
-     */
-    @NamespaceAccessible
-    public static Nonprofit_Settings__c getSettingsForUpdate() {
-        return Nonprofit_Settings__c.getOrgDefaults();
     }
 
     /**
