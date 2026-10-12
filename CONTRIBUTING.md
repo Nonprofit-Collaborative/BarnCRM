@@ -1,6 +1,6 @@
-# Contributing to Open Impact
+# Contributing to BarnCRM
 
-Thank you for being here. Open Impact is a free, open source suite of Salesforce managed packages for small and medium nonprofits, and it is built to be contributed to: small modules, clear contracts between them, a scratch org that works in under ten minutes, and documentation written as part of every feature rather than after it.
+Thank you for being here. BarnCRM is a free, open source suite of Salesforce managed packages for small and medium nonprofits, and it is built to be contributed to: small modules, clear contracts between them, a scratch org that works in under ten minutes, and documentation written as part of every feature rather than after it.
 
 The project is at Phase 0 / v0.1. Nothing is installable yet, no package versions exist, and the namespace is not registered, so contributions right now are source, docs, tests, and design feedback.
 
@@ -22,8 +22,8 @@ Administrators are contributors too. You do not need to write Apex to make this 
 Read [docs/contributor-guide/environment.md](docs/contributor-guide/environment.md) first. The short version:
 
 ```bash
-git clone https://github.com/Nonprofit-Collaborative/OpenImpact.git
-cd OpenImpact
+git clone https://github.com/Nonprofit-Collaborative/BarnCRM.git
+cd BarnCRM
 npm install
 scripts/org/create-scratch-org.sh platform-only
 npm test
@@ -136,4 +136,4 @@ Participation is covered by our [Code of Conduct](CODE_OF_CONDUCT.md). Please re
 
 ## License
 
-Open Impact is licensed under the [Apache License, Version 2.0](LICENSE) (Decision D-08). By contributing with a DCO sign-off, you agree that your contribution is offered under that license.
+BarnCRM is licensed under the [Apache License, Version 2.0](LICENSE) (Decision D-08). By contributing with a DCO sign-off, you agree that your contribution is offered under that license.

@@ -5,7 +5,7 @@
 Relationships records how the people in your database are connected to each other: who is
 married to whom, whose child is at the same school, which two board members are siblings,
 and which friend introduced your largest donor. You enter the connection once, from either
-person, and Open Impact writes the other side for you, so the wife's record shows her
+person, and BarnCRM writes the other side for you, so the wife's record shows her
 husband and the husband's record shows his wife without anyone typing it twice.
 
 Because the other side is kept in step, editing or ending a relationship on one person
@@ -14,7 +14,7 @@ connection is current while the matching record says it ended two years ago.
 
 ## How to turn it on
 
-Relationships is part of Core and is on as soon as Open Impact is installed. There is
+Relationships is part of Core and is on as soon as BarnCRM is installed. There is
 nothing to install and no Setup step.
 
 1. Open the **Nonprofit Hub** app and choose **Nonprofit Settings**.
@@ -84,7 +84,7 @@ from the sample data.
 4. The card now shows one line: "Luis Garcia, Spouse, Current". Nothing else was asked of
    you.
 5. Open **Luis Garcia**. His **Relationships** card already shows "Harper Garcia, Spouse,
-   Current". You did not enter it. Open Impact wrote it when you saved Harper's.
+   Current". You did not enter it. BarnCRM wrote it when you saved Harper's.
 6. Go back to **Harper Garcia** and choose **Edit** on the Luis line. Set **End date** to
    last month and choose **Save**. The line now reads **Former**.
 7. Open **Luis Garcia** again. His line reads **Former** too, with the same end date. The
@@ -110,7 +110,7 @@ together.
 **Entering both sides by hand.** If you enter Luis as Harper's spouse and then open Luis and
 enter Harper as his spouse, the second save is refused with "Luis Garcia already has this
 relationship with Harper Garcia. Open RL-000123 to change it." That is the feature working:
-the second record already existed, because Open Impact wrote it. Open the record the message
+the second record already existed, because BarnCRM wrote it. Open the record the message
 names instead of creating another one.
 
 **Expecting a relationship to move someone into a household.** It does not, deliberately. A
@@ -125,7 +125,7 @@ record, edit the relationship and set an end date instead: it then reads Former 
 sides and stays on file, which is what you want for anything you may need to explain later.
 
 **Turning the setting off and wondering why nothing mirrors.** With **Keep both sides of a
-relationship in step** switched off, Open Impact writes only the side you entered and
+relationship in step** switched off, BarnCRM writes only the side you entered and
 leaves any pairing it made earlier exactly as it is. Your relationships are still checked:
 duplicates and self relationships are still refused, because the checks are the separate
 **Check relationships before saving** row on the Automation page. Switch the upkeep

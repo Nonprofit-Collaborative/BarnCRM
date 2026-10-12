@@ -8,7 +8,7 @@ created, the gift is allocated to the fund you name (or split across several), a
 credit and an in honor or in memory tribute can come with it. Nothing is written until you
 have seen a dry run, and a gift import can be undone like any other import.
 
-When a gift pays a pledge or a monthly gift the donor already has, Open Impact can find the
+When a gift pays a pledge or a monthly gift the donor already has, BarnCRM can find the
 scheduled payment it pays and link the two, so the pledge balance goes down on its own. This
 is **donation matching** (section 5).
 
@@ -30,7 +30,7 @@ Two settings decide how donation matching behaves when a mapping does not say:
    expected. Raise it (for example to 1.00) if a processor's rounding means amounts are
    sometimes a few cents out.
 
-Open Impact ships a **generic gift list** mapping. It reads donor first name, last name,
+BarnCRM ships a **generic gift list** mapping. It reads donor first name, last name,
 email and organization, gift amount, date, payment method, payment reference and fund. For
 gifts exported from Nonprofit Cloud or NPSP, use the mappings in [Migrating from Nonprofit
 Cloud](migrating-from-nonprofit-cloud.md) or [Migrating from NPSP](migrating-from-npsp.md)
@@ -54,7 +54,7 @@ Start with a small file: five gifts, each with a donor name, an email, an amount
    gift you already have, and how many would be rejected, with the reason for each. The run
    log says whether the control totals match, and how many gifts would pay a scheduled
    payment.
-6. If a row is rejected (a fund name spelled differently, a date Open Impact cannot read),
+6. If a row is rejected (a fund name spelled differently, a date BarnCRM cannot read),
    fix the file and dry run again.
 7. Select **Commit**. Open one of the donors: the new gift is on their record, allocated to
    the fund you named, and its **Created By Import Batch** links back to the import.
@@ -73,7 +73,7 @@ A row is one gift. Besides the donor, it can carry:
   (payment method In-kind) has no amount: leave it empty or 0 and put what the goods were
   worth in **Gift: fair market value**, with **Gift: in-kind description**. A file with no
   payment method column can set one for every row as the mapping's default. Payment method is
-  matched to Open Impact's
+  matched to BarnCRM's
   list whatever the capitals, and common words are understood: "credit card" is Card,
   "cheque" is Check, "bank transfer" is ACH. The appeal is named by its name. Payment
   reference, external ID, in-kind description and benefit description load as they are.
@@ -100,7 +100,7 @@ The donor, if the import created them, stays, and is matched when you load the c
 Donation matching decides what happens when a gift in the file pays something the donor
 already owes: a pledge payment or this month's recurring gift.
 
-Open Impact looks, in this order, for:
+BarnCRM looks, in this order, for:
 
 1. **A gift you already have with the same external ID.** That row is the same gift, loaded
    before. It is matched and nothing changes.
@@ -158,7 +158,7 @@ refused and the rest were retried one at a time until the chunk ran short of roo
 saved for those rows. Load the file again: rows already loaded are matched, not duplicated.
 
 **Rows rejected with "No fund named ...".** The fund in the file is spelled differently from
-the fund in Open Impact. Either rename the column values in your spreadsheet or give the fund
+the fund in BarnCRM. Either rename the column values in your spreadsheet or give the fund
 an accounting code that matches the file.
 
 **Rows rejected because a date cannot be read.** Write dates as `2026-03-15`, or in the

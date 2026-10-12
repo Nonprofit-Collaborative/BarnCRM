@@ -43,7 +43,7 @@ You are David, and the spring letter goes out on Monday.
 
 ## Common mistakes
 
-- **Making an appeal its own parent, or a loop.** Open Impact refuses the save with "An
+- **Making an appeal its own parent, or a loop.** BarnCRM refuses the save with "An
   appeal cannot be its own parent appeal." Choose the larger effort instead, or leave
   **Parent Appeal** empty.
 - **Expecting a parent's Total Raised to include its children.** It does not: a parent's

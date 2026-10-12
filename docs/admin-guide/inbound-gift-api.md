@@ -2,10 +2,9 @@
 
 ## What it does
 
-Your online giving page, payment processor or integration tool can record gifts in Open
-Impact by itself, instead of somebody typing them from an emailed report. It sends each gift
+Your online giving page, payment processor or integration tool can record gifts in BarnCRM by itself, instead of somebody typing them from an emailed report. It sends each gift
 with the donor's email address or record, the amount, how it was paid and, if it wants, the
-fund and appeal. Open Impact records an ordinary gift: it gets its household, its fund,
+fund and appeal. BarnCRM records an ordinary gift: it gets its household, its fund,
 counts in the totals and can be receipted, exactly as if David had typed it.
 
 Sending the same gift twice is safe. Every gift carries the identifier it has in the
@@ -20,7 +19,7 @@ Two ways in, doing the same thing:
 - **The Record Inbound Gift action in Flow**, for anything already inside Salesforce, such
   as a flow that runs when a payment app writes its own record.
 
-Open Impact never creates a donor from a gift. If nobody matches, the gift is refused and
+BarnCRM never creates a donor from a gift. If nobody matches, the gift is refused and
 the refusal is written to the Error Log, so a gift from someone new needs the person added
 first (by hand or with [Importing](importing.md)) and then the gift sent again.
 
@@ -30,13 +29,13 @@ The Connect module has to be installed. The Flow action needs nothing else.
 
 The web address needs a Salesforce user for the sending system to sign in as, and that
 sign-in is set up in Salesforce Setup. It cannot be avoided: how outside systems
-authenticate belongs to Salesforce, not to Open Impact. Do it once, with your developer or
+authenticate belongs to Salesforce, not to BarnCRM. Do it once, with your developer or
 the processor's support team.
 
 1. **Create the user the system signs in as.** In Setup, create a user for the integration,
    for example "Online Giving Integration". A Salesforce Integration user license is the
    usual choice where you have one. The user needs **API Enabled**.
-2. **Give it the Inbound Gift API permission set, and nothing else from Open Impact.** It
+2. **Give it the Inbound Gift API permission set, and nothing else from BarnCRM.** It
    holds exactly what recording a gift needs: reading people, organizations, funds, appeals
    and acknowledgment rules; creating gifts, their fund allocations and the household soft
    credits Giving adds; and the web address. It cannot edit or delete a donor, edit or

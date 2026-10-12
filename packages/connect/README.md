@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Adapters that bridge Open Impact to other systems: Opportunity mirror (NPSP and Sales Cloud),
+Adapters that bridge BarnCRM to other systems: Opportunity mirror (NPSP and Sales Cloud),
 Campaign sync, Gift Transaction mirror (Agentforce Nonprofit), an inbound gift REST API, and an
 accounting export. All references to Opportunity, Campaign, and Industries objects live only
 here, and only behind dynamic Apex, so Connect installs cleanly where those objects do not

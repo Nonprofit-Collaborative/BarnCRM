@@ -4,7 +4,7 @@
 
 Acknowledgments are the thank yous. You write the rules once, in the language you already
 use ("gifts over $1,000 get the director's letter, everything else gets the standard email,
-gifts to the staff giving campaign get nothing"), and Open Impact puts every gift that
+gifts to the staff giving campaign get nothing"), and BarnCRM puts every gift that
 arrives into the right queue.
 
 Emailed thank yous are sent for you, in a batch you press or overnight if you want it. Letter
@@ -25,7 +25,7 @@ Everything is in the app, with one exception noted at step 3.
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
-   Open Impact ships one to start from, called **Open Impact: thank you for your gift**. The
+   BarnCRM ships one to start from, called **Open Impact: thank you for your gift**. The
    Acknowledgments page lists every email template your org has, with the **developer name**
    of each, which is the name you type into a rule. This is the one place you may find
    yourself in Setup, under Email Templates, and it is where Salesforce keeps template
@@ -72,7 +72,7 @@ Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 7. Press **Download letters to merge**. You get a CSV with one row per letter gift: donor
    name, greeting, address, amount, gift date, appeal, fund. Merge it with your own letter,
    print, and then press **Mark as sent** on the run. Until you press it the gifts stay in
-   the letter queue, because Open Impact cannot tell whether you printed anything.
+   the letter queue, because BarnCRM cannot tell whether you printed anything.
 
 ## Common mistakes
 
@@ -94,7 +94,7 @@ sent**, names it in one Error Log entry, and leaves the gift in the queue, which
 means it should have been a letter. Either give the organization a primary contact or write a
 rule that sends organization gifts by letter.
 
-**Thanking somebody twice.** Open Impact will not do it on its own: a gift that has been
+**Thanking somebody twice.** BarnCRM will not do it on its own: a gift that has been
 acknowledged is never returned to the queue by a rule, an edit, or a re-run of a failed
 batch. If you genuinely want to thank a donor again, set the gift's **acknowledgment status**
 back to **To acknowledge**. That is the deliberate act, and afterwards the gift shows two

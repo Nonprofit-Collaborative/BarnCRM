@@ -2,7 +2,7 @@
 
 ## What it does
 
-Open Impact does small pieces of work for you in the background: it creates a household
+BarnCRM does small pieces of work for you in the background: it creates a household
 for a new person, keeps household names and greetings up to date, and so on. Automation
 control is the page where you can see every one of those pieces of work, read what it
 does, and switch it off if it is getting in your way.
@@ -12,7 +12,7 @@ spreadsheet, then let it turn itself back on. You never have to call anyone to g
 unstuck.
 
 A small number of automations are not switches at all. They enforce a rule rather than
-doing something for you, and Open Impact runs them whatever this page says: the receipt
+doing something for you, and BarnCRM runs them whatever this page says: the receipt
 lock on gifts is the first of them. They are still listed here, so you can find them and
 read what they do, but their switch is off, greyed out, and carries a line explaining that
 the automation always runs. See "Automations that always run" below.
@@ -32,7 +32,7 @@ The pause itself, the switches, the banner and the audit trail are all built and
 
 ## How to turn it on
 
-Automation control is on as soon as Open Impact is installed. There is nothing to enable
+Automation control is on as soon as BarnCRM is installed. There is nothing to enable
 and nothing to install: installing or upgrading each package creates the switch for every
 automation it ships, and leaves every switch you already have as you set it. If a switch is
 ever missing, the automation still runs, and Health Check names it and offers to restore it.
@@ -57,7 +57,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
 
 1. Open the **Nonprofit Hub** app and click **Nonprofit Settings**.
 2. In the left navigation, click **Automation**. You see a list of every piece of
-   automation Open Impact ships, each with a plain-language description and a switch.
+   automation BarnCRM ships, each with a plain-language description and a switch.
 3. At the top of the page, choose **2 hours** in the **How long** list, then click
    **Pause all automation**. The page now shows a yellow bar: "Automation is paused until
    3:40 PM. Paused by Maria Lopez. It turns itself back on then." Every switch in the list
@@ -87,7 +87,7 @@ selected, because most spreadsheet loads are done in less. There is no longer ch
 "until I say so": a pause always ends by itself.
 
 When the time is up, automation starts again at that moment, whether or not anybody has the
-page open. Open Impact also writes the end of the pause into the list of recent changes at the
+page open. BarnCRM also writes the end of the pause into the list of recent changes at the
 bottom of Nonprofit Settings, with the time it ended and the name of the person who paused, as
 if they had clicked **Resume automation** themselves. So the list always shows every pause
 with its start and its end.
@@ -96,13 +96,13 @@ Clicking **Resume automation** early, or pausing again to get more time, replace
 scheduled end: the new length counts from the moment you click.
 
 If Health Check says **Automation is paused with no automatic resume**, a pause is in effect
-that nothing is set to end: usually one started before this version of Open Impact, or one
+that nothing is set to end: usually one started before this version of BarnCRM, or one
 set somewhere other than this page. Open this page, click **Resume automation**, and pause
 again for a set time if you still need to.
 
 ## Automations that always run
 
-Pause stops Open Impact filling things in for you. It never stops Open Impact refusing
+Pause stops BarnCRM filling things in for you. It never stops BarnCRM refusing
 something. An automation whose job is to refuse a change, rather than to save you typing,
 is marked as always running, and neither the pause nor its own switch turns it off.
 

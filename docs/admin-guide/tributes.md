@@ -4,7 +4,7 @@
 
 A tribute records that a gift was given in honor of someone or in memory of someone, and
 who should be told about it. It is what turns a memorial gift into the letter a family
-receives. Open Impact keeps the honoree, the person to notify, and the donor's message on
+receives. BarnCRM keeps the honoree, the person to notify, and the donor's message on
 the gift, and tracks whether the notification has gone out, so nobody is thanked twice and
 no family is missed.
 
@@ -16,7 +16,7 @@ made in memory of their mother, not what it was worth.
 Nothing to turn on. Tributes are part of the Giving module.
 
 One piece of first-time setup: the **Tribute** panel lives on a gift's record page, and
-Open Impact ships a page called **Gift Record Page** with the panel already on it. Assign
+BarnCRM ships a page called **Gift Record Page** with the panel already on it. Assign
 it once, as your org default for Gift, and every gift shows the panel from then on. If your
 organization has built a gift record page of its own, add the **Tribute Notification**
 component to that page instead.
@@ -42,7 +42,7 @@ You are David. Start from the sample data.
 2. On the gift, open the **Tributes** related list and press **New**.
 3. Choose the type **In memory of**. In **Honoree name** type a name that is not in your
    database, for example **Rosa Garcia**. Leave the honoree lookup empty: a memorial
-   honoree is very often not a record, and Open Impact does not make you create one.
+   honoree is very often not a record, and BarnCRM does not make you create one.
 4. Fill in the notification. Pick **Harper Garcia** as the **Notification recipient**, because
    the family should hear about the gift. If the family is not in your database, type
    their name and address in **Notification recipient name** instead.
@@ -62,17 +62,17 @@ You are David. Start from the sample data.
    is built for exactly that.
 9. Try one thing that should fail. Open a new gift, add an **In memory of** tribute whose
    honoree is a Contact marked deceased, and make that same person the notification
-   recipient. Save. Open Impact refuses with: **This gift is in memory of the person you
+   recipient. Save. BarnCRM refuses with: **This gift is in memory of the person you
    have chosen to notify. Choose a family member or friend as the notification recipient.**
 
 ## Common mistakes
 
 - **Naming the honoree as the person to notify.** It is one line down in the form, and it
   is the mistake that would send a letter to a family about the person they have just
-  buried. Open Impact refuses the save when the honoree is a record marked deceased, whether
+  buried. BarnCRM refuses the save when the honoree is a record marked deceased, whether
   that person is stored as a Contact or as an Account. It cannot catch a typed name, so read
   the tribute summary back before you post.
-- **Expecting Open Impact to send the letter.** It does not. There is no email or mail
+- **Expecting BarnCRM to send the letter.** It does not. There is no email or mail
   merge behind **Mark notification sent**: the button records that your organization sent
   something, and the address or email you write to is on the recipient's own record. A
   recipient with no address and no email is not refused, because a typed name and a phone

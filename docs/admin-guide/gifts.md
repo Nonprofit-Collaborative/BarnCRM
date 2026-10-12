@@ -3,7 +3,7 @@
 ## What it does
 
 A gift is one transaction that arrived: money, stock or goods, from one donor, on one date.
-David enters the gift, and Open Impact fills in the rest: the household it should be
+David enters the gift, and BarnCRM fills in the rest: the household it should be
 credited to, the date if he leaves it blank, and the fund it is designated to when he does
 not choose one. Because a gift is a record of something that happened, it is never edited
 away: a refund is a separate, linked gift (see the Refunds page).
@@ -29,7 +29,7 @@ once:
 Then give your fundraising staff the **Giving Staff** permission set, and give yourself
 **Giving Admin**. People who only need to see gifts get **Giving Read Only**.
 
-Those three are assigned in Salesforce Setup, which is the one step here that Open Impact
+Those three are assigned in Salesforce Setup, which is the one step here that BarnCRM
 cannot yet do for you: the roles on the Access page carry what Core provides and do not
 include a module's permission sets until the Module Manager arrives in version 0.7.
 
@@ -48,7 +48,7 @@ You are David, and a check from Maria's neighbour arrived this morning.
    at zero, and describe the goods: [In-kind gifts](in-kind-gifts.md).)
 6. Choose `Spring appeal` in **Appeal** and save.
 7. Look at the saved gift. **Gift Date** is today, because you left it blank. **Household**
-   shows the donor's household, filled in by Open Impact rather than by you, which is what
+   shows the donor's household, filled in by BarnCRM rather than by you, which is what
    keeps household totals right after somebody moves house or marries.
 8. Scroll to **Gift Allocations**. There is one allocation, for the whole 250, designated to
    `General`. You never asked for it: a gift with no designation is allocated in full to the
@@ -64,16 +64,15 @@ You are David, and a check from Maria's neighbour arrived this morning.
 Sooner or later an organization holds a receipted gift that is wrong in a way that voiding
 and reissuing cannot reach, for example a receipt number issued against the wrong donor.
 There is one way past the lock. It is deliberately awkward, it lives in Salesforce Setup
-rather than in Open Impact, and every use of it is recorded.
+rather than in BarnCRM, and every use of it is recorded.
 
-**What it is.** A custom permission called **Override Receipt Lock**. Open Impact ships it
+**What it is.** A custom permission called **Override Receipt Lock**. BarnCRM ships it
 assigned to nobody: it is on no permission set and in no permission set group, so no role,
 including Nonprofit Admin, carries it. A user who holds it can save a change to a receipted
 gift's amount, date, donor or receipt number, and can delete a receipted gift. Nobody else
 can, whatever else they are allowed to do.
 
-**The receipt number needs one more thing.** Receipt Number is read only for everyone in Open
-Impact's permission sets, because a receipt number is issued by Open Impact and never typed in
+**The receipt number needs one more thing.** Receipt Number is read only for everyone in BarnCRM's permission sets, because a receipt number is issued by BarnCRM and never typed in
 (see [Receipts](receipts.md)). To change or clear one, the temporary permission set below has
 to grant Edit on that field as well as the custom permission. Grant it there and nowhere else:
 a permission set people already hold is the one you will forget to take it out of.
@@ -84,7 +83,7 @@ the original, so deleting the original would leave that negative gift standing w
 to say what it reverses, and a total that is wrong with no trace of why. Correct a refunded
 gift by working with the refund (see [Refunds](refunds.md)), never by removing the original.
 
-**How to grant it.** There is no screen for this inside Open Impact, on purpose.
+**How to grant it.** There is no screen for this inside BarnCRM, on purpose.
 
 1. In Salesforce, click the gear icon and choose **Setup**.
 2. Enter `Permission Sets` in the Quick Find box and click **Permission Sets**.
@@ -105,7 +104,7 @@ the whole permission set afterwards is better still: a set that exists is a set 
 can be added to later without anyone noticing.
 
 **Every use is logged.** Whenever a change is saved that the lock would otherwise have
-refused, Open Impact writes an entry to the [Error Log](error-log.md) at **Warning**
+refused, BarnCRM writes an entry to the [Error Log](error-log.md) at **Warning**
 severity, naming the gift, its receipt number, and exactly which values changed (or that
 the gift was deleted). Nobody has to remember to record it. Filter the Error Log on
 Severity `Warning` to see every override an org has ever made.
@@ -134,8 +133,8 @@ reaches the problem.
   clearing the receipt number itself.
 - **Typing a receipt number onto a gift.** Receipt Number is read only, and a save that fills
   it in anyway, from a list view, an import or an integration, is refused with "A receipt
-  number is issued by Open Impact when it creates the receipt, and cannot be filled in by
-  hand." A number that Open Impact did not issue belongs to no receipt, locks the gift, can be
+  number is issued by BarnCRM when it creates the receipt, and cannot be filled in by
+  hand." A number that BarnCRM did not issue belongs to no receipt, locks the gift, can be
   handed out again later to somebody's year-end statement, and stops that gift ever being
   receipted. Click **Issue receipt** on the gift instead. Importing historical gifts that
   carry receipt numbers from an old system is the one real case, and it needs the override
@@ -149,7 +148,7 @@ reaches the problem.
   you meant to finish. Enter a split in one go on the gift entry screen, which sends the whole
   split at once. The error names the difference so you can see exactly how much is out.
 - **Mixing amounts and percentages in one split.** Enter a split either way, but not both ways
-  at once: when every row is a percentage and they come to 100, Open Impact works out the
+  at once: when every row is a percentage and they come to 100, BarnCRM works out the
   amounts and puts the odd cent on the largest row. Mix the two and you are back to making the
   amounts add up yourself.
 - **Typing a name for the gift.** You never do: gifts number themselves, `G-000001` and

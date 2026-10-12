@@ -7,7 +7,7 @@
 ## What it does
 
 A household is the group of people you treat as one donor: one mailing, one thank you
-letter, one giving history. Open Impact creates a household for every new person you add,
+letter, one giving history. BarnCRM creates a household for every new person you add,
 in either way of belonging to a household and whichever record your org stores people on,
 keeps track of who belongs to it, and keeps the member count right when people join, move,
 or leave.
@@ -28,7 +28,7 @@ Nonprofit Settings page, so nobody needs to open Salesforce Setup.
 |---|---|---|
 | How people belong to a household | The simple way (one household per person) or the flexible way (a person can belong to more than one household, and you keep the history of who belonged when) | The simple way |
 | Create a household automatically | When you save a new person with no household, one is created for them. This works the same way in both ways of belonging, and for people stored as contacts and for people stored as accounts | On |
-| Delete a household once it is empty | Keeps your list of households clean. A household is left alone when anything outside Open Impact still depends on its account record, so this never removes a household another product built | Off, switch it on if you want it |
+| Delete a household once it is empty | Keeps your list of households clean. A household is left alone when anything outside BarnCRM still depends on its account record, so this never removes a household another product built | Off, switch it on if you want it |
 
 4. Click **Save**. The change applies to the next record anyone saves.
 
@@ -36,8 +36,8 @@ Choose the flexible way if you need one person in two households: a child of div
 parents, or a student with a family address and a campus address. The rest of the product
 behaves the same either way, so it is safe to start simple. Change your mind early, though:
 each way keeps its own record of who belongs where, and the other way cannot see it, so
-once people are in households Open Impact refuses the switch and tells you how many people
-it would affect. Moving them across is a migration, which Open Impact does not do yet.
+once people are in households BarnCRM refuses the switch and tells you how many people
+it would affect. Moving them across is a migration, which BarnCRM does not do yet.
 
 ## A five-minute walkthrough
 
@@ -76,7 +76,7 @@ mode membership is a record of its own. Open the household from the **Households
 from the Household panel on the person, and everything from step 4 on is identical.
 
 One thing the tidy-up will not do: it never deletes a household that something outside
-Open Impact still points at, even when the setting is on and nobody is left in it. It
+BarnCRM still points at, even when the setting is on and nobody is left in it. It
 leaves that household alone and writes an Info entry in the Error Log naming it, so you
 can look at it and decide for yourself.
 
@@ -85,7 +85,7 @@ can look at it and decide for yourself.
 Some orgs, including most Nonprofit Cloud and Agentforce Nonprofit orgs, store each person
 as an account rather than as a contact. Households work there too, with one difference:
 choose the flexible way of belonging to a household. It is the only mode that can hold a
-person who is stored as an account, and Open Impact selects it for you when it is installed
+person who is stored as an account, and BarnCRM selects it for you when it is installed
 and notices your org is shaped that way. It does that only when nobody has chosen a way of
 belonging yet: if you chose the simple way on purpose, because your org has Person Accounts
 switched on but stores everyone as a contact, an install or upgrade leaves your choice
@@ -118,26 +118,26 @@ red finding, with a button that turns it on.
 **"I cannot change how people belong to a household."**
 The two ways of belonging keep separate records of who is in which household, and each is
 invisible to the other. Switching with people already in households would make their
-households read as empty, or leave the people belonging nowhere, so Open Impact refuses
+households read as empty, or leave the people belonging nowhere, so BarnCRM refuses
 and tells you how many people it would affect. Moving them across is a migration, which
-Open Impact does not do yet. If the setting was changed some other way and Health Check
+BarnCRM does not do yet. If the setting was changed some other way and Health Check
 reports household members it cannot see, switch back to the way of belonging the records
 were made in.
 
 **"I deleted the last person and the household is still there."**
-Either "Delete a household once it is empty" is off, or Open Impact deliberately
+Either "Delete a household once it is empty" is off, or BarnCRM deliberately
 left that one alone.
 
 If the setting is off, that is a reasonable choice if you want to keep an empty household
 and its giving history. Delete the household by hand, and turn the setting on if you want
 it done for you next time.
 
-If the setting is on, look in the Error Log. Open Impact never deletes a household that
-something outside Open Impact still points at, because deleting it would delete those
+If the setting is on, look in the Error Log. BarnCRM never deletes a household that
+something outside BarnCRM still points at, because deleting it would delete those
 records too, and it writes an Info entry naming each household it left in place for that
 reason. This happens most often in orgs that also run Salesforce Nonprofit Cloud, where a
 household is a second record attached to the same account and its members are held
-somewhere Open Impact cannot count them: the household looks empty here and is not empty
+somewhere BarnCRM cannot count them: the household looks empty here and is not empty
 there. Open the household, check what else is using it, and delete it by hand if you are
 sure.
 
@@ -149,7 +149,7 @@ is simply absent from it.
 
 **"The primary contact went blank when I moved someone out."**
 That is deliberate. The primary contact has to be somebody who is still in the household,
-so when that person leaves, Open Impact clears the field rather than leaving a name that no
+so when that person leaves, BarnCRM clears the field rather than leaving a name that no
 longer belongs there. It does not choose a replacement for you: click **Make primary**
 on the right person in the household's **Household Members** panel. In the flexible way of
 belonging the field always follows the member marked primary, so that panel is the only

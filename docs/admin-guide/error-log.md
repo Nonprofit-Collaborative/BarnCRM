@@ -2,7 +2,7 @@
 
 ## What it does
 
-When something goes wrong inside Open Impact, it writes down what happened in plain
+When something goes wrong inside BarnCRM, it writes down what happened in plain
 language and puts it somewhere you can read it. That is the Error Log. Instead of a
 technical failure disappearing into a log file only a developer can open, you get a list
 of entries that say what went wrong, which record it happened on, and what to do about it.
@@ -18,7 +18,7 @@ the tile can be placed on any Lightning page. Everything else on this page works
 
 ## How to turn it on
 
-The Error Log is on as soon as Open Impact is installed. Nothing is recorded unless
+The Error Log is on as soon as BarnCRM is installed. Nothing is recorded unless
 something actually fails, so on a healthy organization the list is empty.
 
 You will find it in two places:
@@ -38,7 +38,7 @@ automation, never stops the Error Log from recording a problem.
 ## The error digest email
 
 If nobody opens the Hub for a few days, nobody sees the tile. The error digest fixes that:
-once a day (or once a week), Open Impact emails a short summary of the new entries to the
+once a day (or once a week), BarnCRM emails a short summary of the new entries to the
 people who look after it. It is off until you switch it on.
 
 What the email says:
@@ -127,7 +127,7 @@ Maria has heard from a colleague that "something did not save this morning."
   you. The technical detail underneath is for a support request, and it will not tell you
   anything about your data that the message does not already say.
 - **Expecting an entry for a mistake you made in a spreadsheet.** The Error Log records
-  failures inside Open Impact, not every data problem. A person imported with the wrong
+  failures inside BarnCRM, not every data problem. A person imported with the wrong
   address is a data question, not an error, and it will not appear here.
 - **Assuming an empty list means nothing has failed.** If automation is paused, the work
   that would have failed is not running at all. Check the automation banner on the home

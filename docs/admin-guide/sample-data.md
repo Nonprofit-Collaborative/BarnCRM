@@ -2,7 +2,7 @@
 
 ## 1. What it does
 
-Sample data fills your org with a realistic demo dataset. Use it to see Open Impact working
+Sample data fills your org with a realistic demo dataset. Use it to see BarnCRM working
 with real-looking names, addresses and giving before you import your own list, to train a
 new colleague, or to try a setting change (for example a household naming pattern) against
 data that already has the variety your real list has. You can remove every sample record in
@@ -73,7 +73,7 @@ is joined to their household by a household member record, exactly as your own p
 and the card says so before you load.
 
 One difference to expect in an org that stores people as accounts: the sample people arrive
-as contacts. Open Impact never creates person accounts, so the sample set shows you
+as contacts. BarnCRM never creates person accounts, so the sample set shows you
 households of contacts. Everything else behaves as it will with your own data: the same
 household records, names, greetings, member counts, and Members panel.
 

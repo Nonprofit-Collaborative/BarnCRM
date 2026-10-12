@@ -6,7 +6,7 @@
 
 A commitment is a promise to give. It covers a pledge, where a donor promises a fixed
 total paid over time, and a recurring gift, where a donor gives the same amount on a
-schedule with no end in sight. Open Impact keeps both in one place, works out the
+schedule with no end in sight. BarnCRM keeps both in one place, works out the
 payments that are expected and when, and shows what has been paid and what is still
 outstanding.
 
@@ -26,7 +26,7 @@ Three settings control how the schedules behave. Open **Nonprofit Settings** and
 |---|---|---|
 | Installment generation horizon (months) | How far ahead payments are created for a recurring gift, so an open-ended schedule does not fill the org with rows | 12 |
 | Overdue grace days | How many days an unpaid payment waits after its due date before it is marked Overdue | 5 |
-| Auto-apply gifts to installments | When a gift names a commitment but not a particular payment, whether Open Impact links it to the oldest unpaid payment | On |
+| Auto-apply gifts to installments | When a gift names a commitment but not a particular payment, whether BarnCRM links it to the oldest unpaid payment | On |
 
 Change a value and choose **Save**. The new value applies to the next commitment you
 create or change; existing schedules are left alone until you edit them.
@@ -48,7 +48,7 @@ Choose **Schedule the nightly jobs**. Three jobs are scheduled at once:
 | Donor levels | 03:00 | Places every donor on the rung their giving now reaches |
 
 The times are fixed and are chosen to keep out of the way of the two other nightly jobs
-Open Impact ships: the seasonal address swap at 00:30 and the rollups at 02:00. The top up
+BarnCRM ships: the seasonal address swap at 00:30 and the rollups at 02:00. The top up
 runs before the overdue pass so that the overdue pass sees every payment, and the donor
 levels run an hour after the rollups start so that the totals the ladder reads have
 settled.
@@ -84,7 +84,7 @@ Scheduling and stopping need the **Manage Nonprofit Settings** permission, which
 the Nonprofit Admin permission set. Somebody who has the Giving Admin permission set without
 it can open the page and see whether the jobs are running; the buttons are disabled.
 
-The **payment schedule** card lives on a commitment's record page, and Open Impact ships a
+The **payment schedule** card lives on a commitment's record page, and BarnCRM ships a
 page called **Commitment Record Page** with the card already on it. Assign it once, as your
 org default for Commitment, and every commitment shows the schedule from then on. If your
 organization has built a commitment record page of its own, add the **Commitment Payment
@@ -119,7 +119,7 @@ Start from the sample data. The first part is David's work, the last step is Jen
 11. Choose **Save**, then go back to the commitment. The first payment now reads **Paid**,
     paid to date reads 100, and the balance reads 1,100.
 
-If David had left **Installment** empty, Open Impact would have linked the gift to the
+If David had left **Installment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.
 
 ### David pauses a recurring gift

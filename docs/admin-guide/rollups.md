@@ -13,12 +13,12 @@ up to date for you, but it is maintained by the household automation every time 
 joins or leaves, so it is not on the Rollups page and Recalculate does not touch it. If a
 member count looks wrong, the Households page is where to fix it.
 
-Open Impact calculates them for you and shows you when each one was last calculated, so
+BarnCRM calculates them for you and shows you when each one was last calculated, so
 you never have to guess whether a number on a record is current. If the calculation has
 not run recently, the Hub says so on the home page rather than leaving a stale number
 looking fresh.
 
-## What Open Impact calculates for you
+## What BarnCRM calculates for you
 
 Every total below is created when you install the module that owns it, switched on and
 ready to calculate, and every one of them can then be switched to another mode, made
@@ -65,7 +65,7 @@ about a number that looks wrong:
   once its status is Received, Refunded, or Written off: the three statuses that mean the
   money actually moved. Refunded and Written off are in that list on purpose, and the next
   point says why.
-- **A refunded gift stays in the count and leaves the total.** Open Impact records a
+- **A refunded gift stays in the count and leaves the total.** BarnCRM records a
   refund as a second gift for a negative amount rather than editing or deleting the
   original, so the two cancel out. A donor who gave $250 and had all of it back shows
   **1 gift** and **$0 total giving**. That is deliberate: they did give, once, and the
@@ -112,7 +112,7 @@ already writes is not created, so the two never overwrite each other's total. Pr
 install-time step failed and the Error Log will say why, or if a rollup you need is not
 listed.
 
-It is also the reason to switch a rollup off rather than delete it. Open Impact cannot
+It is also the reason to switch a rollup off rather than delete it. BarnCRM cannot
 tell a rollup you deleted on purpose from one that has never existed, so a deleted rollup
 comes back the next time the package is upgraded or the next time somebody presses this
 button. Clearing the **Active** box is the durable way to say no to a total: an inactive

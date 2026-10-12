@@ -30,7 +30,7 @@ amount greater than zero. Two consequences, both deliberate:
 
 - **A gift that was refunded later is still a gift.** The donor gave. The money went back,
   and their total giving shows that, but they are not a person who never gave.
-- **A refund is never itself a gift.** Open Impact records a refund as a second gift for a
+- **A refund is never itself a gift.** BarnCRM records a refund as a second gift for a
   negative amount, so the amount test leaves it out. A refund dated this year of a gift made
   three years ago does not make its donor a this year donor.
 
@@ -66,7 +66,7 @@ year:
 - **Retained**: they gave this fiscal year and last fiscal year.
 - **Reactivated**: they gave this fiscal year, their first gift was in an earlier year, and
   they gave nothing last fiscal year. This is the donor who gave two years ago, skipped last
-  year, and is back. Every system names this person differently. Open Impact calls them
+  year, and is back. Every system names this person differently. BarnCRM calls them
   reactivated, never new and never retained, and the report tells you which year they first
   gave so you can see how long they were away.
 

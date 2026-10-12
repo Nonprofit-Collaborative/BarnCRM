@@ -7,7 +7,7 @@ for the first time, and three things should happen: a thank-you call this week, 
 packet next week, a check-in call in a month. A plan writes that sequence down once, and
 then lays the tasks out for you every time it applies.
 
-Open Impact can start a plan by itself when a gift arrives or when a pledge begins, or a
+BarnCRM can start a plan by itself when a gift arrives or when a pledge begins, or a
 person can start one by hand on a donor. Either way, the plan creates ordinary Salesforce tasks, assigned to real
 people, with real due dates. Your team works them in the same list they already use.
 
@@ -16,10 +16,10 @@ Three things to hold on to, because they are the questions people ask first:
 - **A plan is laid out once, when it starts.** Editing a template later does not reach back
   into plans already running. The tasks are in somebody's list and they have planned their
   week around them.
-- **Open Impact never deletes a task it created.** Cancelling a plan marks the plan
+- **BarnCRM never deletes a task it created.** Cancelling a plan marks the plan
   cancelled and leaves the tasks alone, because a task is a record of somebody's work.
   Closing the leftovers is theirs to do.
-- **You close a plan yourself.** Open Impact does not mark a plan complete when its last
+- **You close a plan yourself.** BarnCRM does not mark a plan complete when its last
   task closes. See "What this does not do yet" at the end.
 
 ## How to set one up
@@ -33,7 +33,7 @@ copies of it are running right now, and whether it is switched on.
 1. Choose **New plan** and fill in:
    - a **plan name**, the one your team will recognize, for example "First gift welcome";
    - a **plan key**, a short unchanging code such as `first_gift_welcome`. You will not
-     see it again. It is how Open Impact recognizes the plan across upgrades even if you
+     see it again. It is how BarnCRM recognizes the plan across upgrades even if you
      rename it;
    - **what starts it**:
      - **Manual**: nothing starts it automatically. Somebody starts it on a donor.
@@ -84,7 +84,7 @@ laid out, and none of them changes when you edit it.
 
 - **Steps added after the plan started.** They do not appear on plans already running.
   Add the step, and the next plan to start gets it.
-- **A minimum amount on a manual plan.** Open Impact refuses this at save. A minimum only
+- **A minimum amount on a manual plan.** BarnCRM refuses this at save. A minimum only
   means something for the two gift events, and left on a manual plan it reads like a
   condition that is quietly never applied.
 - **Assign To set to Specific user with nobody named.** Refused at save, for the same
@@ -105,7 +105,7 @@ laid out, and none of them changes when you edit it.
 
 ## What this does not do yet
 
-- **Open Impact does not close a plan for you.** When the last task on a plan closes, the
+- **BarnCRM does not close a plan for you.** When the last task on a plan closes, the
   plan stays Running until somebody marks it Complete. Closing it automatically would need
-  Open Impact to put automation on the Task object, which it does not ship. Use the
+  BarnCRM to put automation on the Task object, which it does not ship. Use the
   **Running Plans** list view to see what is still open.

@@ -3,7 +3,7 @@
 ## What it does
 
 Sometimes money goes back: a card is charged twice, a donor asks for a gift to be returned,
-or a check recorded as received bounces and finance writes it off. Open Impact never
+or a check recorded as received bounces and finance writes it off. BarnCRM never
 edits or deletes the original gift, because it really happened and Jen reconciles against
 it. Instead it records a second gift for a negative amount, linked to the original, with
 the reason on it.
@@ -68,7 +68,7 @@ was meant for another organization, and the donor has asked for it back.
 3. Leave the choice at the top on **Refund part or all of this gift**. The amount starts at
    what is left of the gift, which is 250. Change it to 100, type "Donor asked for the
    misdirected portion back" as the reason, and click **Record it**.
-4. Open Impact creates a second gift for minus 100. Open it. Its **Original Gift** points at
+4. BarnCRM creates a second gift for minus 100. Open it. Its **Original Gift** points at
    `G-000001`, its **Donor** and **Appeal** are the same as the original, its **Gift Date**
    is today, its **Status** is `Received` (because the refund itself is a transaction that
    happened), and its **Refund Reason** carries what you typed.
@@ -81,8 +81,7 @@ was meant for another organization, and the donor has asked for it back.
    original's **Status** changes to `Refunded`, because the whole gift has now gone back.
 8. To see a write-off instead, enter a new gift for 500, open it, click **Refund or Write
    Off**, and choose **Write off what is left of this gift** with the reason "Check returned
-   unpaid by the bank". There is no amount to type: a write-off is always what is left. Open
-   Impact creates a linked gift for minus 500 and sets the original's **Status** to
+   unpaid by the bank". There is no amount to type: a write-off is always what is left. BarnCRM creates a linked gift for minus 500 and sets the original's **Status** to
    `Written off`.
 9. To see a cancellation, enter a gift for 75 with **Status** `Pending`, dated last month, then
    edit it and set **Status** to `Cancelled`. It saves, and no negative gift is created. Your
@@ -124,7 +123,7 @@ made it.
   Gift** and **Refund Reason** are filled in by the action and are read only on the page. The
   action is what mirrors the original's designation and updates its status, and a hand-typed
   negative gift would do neither.
-- **Deleting the original to make a refund go away.** Open Impact refuses, with "This gift has
+- **Deleting the original to make a refund go away.** BarnCRM refuses, with "This gift has
   a refund or a write-off linked to it, so it cannot be deleted". If the refund itself was
   recorded in error, delete the refund first.
 - **Expecting totals to move immediately.** Donor, fund and appeal totals are calculated by
