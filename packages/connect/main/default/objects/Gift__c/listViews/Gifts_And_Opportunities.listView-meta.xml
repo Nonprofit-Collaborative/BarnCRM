@@ -9,5 +9,5 @@
   <columns>Status__c</columns>
   <columns>Opportunity_Id__c</columns>
   <filterScope>Everything</filterScope>
-  <label>Gifts and their Opportunities</label>
+  <label>Gifts and Their Opportunities</label>
 </ListView>

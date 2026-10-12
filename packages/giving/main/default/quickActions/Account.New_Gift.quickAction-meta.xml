@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Records a gift from this household or organization, with the donor already filled in.
+  </description>
+  <label>New Gift</label>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <quickActionLayout>
+    <layoutSectionStyle>TwoColumnsLeftToRight</layoutSectionStyle>
+    <quickActionLayoutColumns>
+      <quickActionLayoutItems>
+        <emptySpace>false</emptySpace>
+        <field>Amount__c</field>
+        <uiBehavior>Required</uiBehavior>
+      </quickActionLayoutItems>
+      <quickActionLayoutItems>
+        <emptySpace>false</emptySpace>
+        <field>Gift_Date__c</field>
+        <uiBehavior>Required</uiBehavior>
+      </quickActionLayoutItems>
+      <quickActionLayoutItems>
+        <emptySpace>false</emptySpace>
+        <field>Type__c</field>
+        <uiBehavior>Required</uiBehavior>
+      </quickActionLayoutItems>
+    </quickActionLayoutColumns>
+    <quickActionLayoutColumns>
+      <quickActionLayoutItems>
+        <emptySpace>false</emptySpace>
+        <field>Appeal__c</field>
+        <uiBehavior>Edit</uiBehavior>
+      </quickActionLayoutItems>
+      <quickActionLayoutItems>
+        <emptySpace>false</emptySpace>
+        <field>Status__c</field>
+        <uiBehavior>Required</uiBehavior>
+      </quickActionLayoutItems>
+      <quickActionLayoutItems>
+        <emptySpace>false</emptySpace>
+        <field>Acknowledgment_Status__c</field>
+        <uiBehavior>Required</uiBehavior>
+      </quickActionLayoutItems>
+    </quickActionLayoutColumns>
+  </quickActionLayout>
+  <targetObject>Gift__c</targetObject>
+  <targetParentField>Donor_Account__c</targetParentField>
+  <type>Create</type>
+</QuickAction>

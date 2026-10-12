@@ -13,5 +13,5 @@
     <operation>equals</operation>
     <value>Failed</value>
   </filters>
-  <label>Did Not Go</label>
+  <label>Failed Acknowledgments</label>
 </ListView>

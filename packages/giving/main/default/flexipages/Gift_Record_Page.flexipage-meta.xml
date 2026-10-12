@@ -15,12 +15,24 @@
       <fieldInstance>
         <fieldItem>Record.Donor_Contact__c</fieldItem>
         <identifier>RecordField_DonorContact</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!Record.Donor_Account__c}</leftValue>
+            <operator>EQUAL</operator>
+          </criteria>
+        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <itemInstances>
       <fieldInstance>
         <fieldItem>Record.Donor_Account__c</fieldItem>
         <identifier>RecordField_DonorAccount</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!Record.Donor_Account__c}</leftValue>
+            <operator>NE</operator>
+          </criteria>
+        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <itemInstances>
@@ -151,6 +163,17 @@
       <fieldInstance>
         <fieldItem>Record.Matched_Gift__c</fieldItem>
         <identifier>RecordField_MatchedGift</identifier>
+        <visibilityRule>
+          <booleanFilter>1 OR 2</booleanFilter>
+          <criteria>
+            <leftValue>{!Record.Matched_Gift__c}</leftValue>
+            <operator>NE</operator>
+          </criteria>
+          <criteria>
+            <leftValue>{!Record.Donor_Account__c}</leftValue>
+            <operator>NE</operator>
+          </criteria>
+        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <itemInstances>
@@ -171,6 +194,12 @@
         </fieldInstanceProperties>
         <fieldItem>Record.Original_Gift__c</fieldItem>
         <identifier>RecordField_OriginalGift</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!Record.Original_Gift__c}</leftValue>
+            <operator>NE</operator>
+          </criteria>
+        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <itemInstances>
@@ -181,6 +210,12 @@
         </fieldInstanceProperties>
         <fieldItem>Record.Refund_Reason__c</fieldItem>
         <identifier>RecordField_RefundReason</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!Record.Refund_Reason__c}</leftValue>
+            <operator>NE</operator>
+          </criteria>
+        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <name>Facet-giftFollowUp-column2</name>
@@ -340,6 +375,12 @@
       <componentInstance>
         <componentName>tributeNotification</componentName>
         <identifier>giftTributePanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>runtime_sales_activities:activityPanel</componentName>
+        <identifier>giftActivityPanel</identifier>
       </componentInstance>
     </itemInstances>
     <itemInstances>

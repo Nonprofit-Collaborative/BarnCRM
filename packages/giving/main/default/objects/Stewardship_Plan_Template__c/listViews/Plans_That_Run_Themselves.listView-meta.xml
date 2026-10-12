@@ -15,5 +15,5 @@
     <value>Manual</value>
   </filters>
   <filterScope>Everything</filterScope>
-  <label>Plans That Run Themselves</label>
+  <label>Automatic Plan Templates</label>
 </ListView>

@@ -53,7 +53,7 @@ Pending and Cancelled gifts are left out.
 
 1. Create a gift the way you record any other, from the **Gifts** tab or from **Quick Gift
    Entry**.
-2. Set **Type** to **In-kind**. The amount box disappears, because an in-kind gift has none.
+2. Set **Payment Method** to **In-kind**. The amount box disappears, because an in-kind gift has none.
 3. Fill in **What was given**, written the way the donor should read it on their receipt. "A
    used minibus in working order" is a description. "Vehicle" is not.
 4. Fill in **Fair market value**: what your organization values it at, for your own
@@ -91,7 +91,7 @@ statements](receipts.md)). On the document:
 
 Start from the sample data (see `sample-data.md`), which includes about twenty in-kind gifts.
 
-1. Open **Gifts** and switch to the **All Gifts** list view. Sort or filter by **Type** and
+1. Open **Gifts** and switch to the **All Gifts** list view. Sort or filter by **Payment Method** and
    find one of the **In-kind** gifts. Notice its **Amount** is 0.00 and its **Fair market
    value** is not.
 2. Open the donor of that gift. Compare **Total giving** with **In-kind value**. The gift you
@@ -100,7 +100,7 @@ Start from the sample data (see `sample-data.md`), which includes about twenty i
    different questions.
 3. Now enter one yourself. Open **Quick Gift Entry** (it is on the BarnCRM app, and on
    every household and person page).
-4. Choose the donor, leave the date at today, and set **How it arrived** to **In-kind**. The
+4. Choose the donor, leave the date at today, and set **Payment method** to **In-kind**. The
    amount box disappears and two boxes take its place.
 5. In **What was given**, type what actually arrived, in the words you would be comfortable
    seeing on the donor's receipt: `Sixteen folding tables, used, delivered to the community
@@ -166,7 +166,7 @@ market value stays editable at all times, because it is on no document.
 
 | What you want to report on | Object | Field |
 |---|---|---|
-| Which gifts were goods or services | Gift | Type, value In-kind |
+| Which gifts were goods or services | Gift | Payment Method, value In-kind |
 | What was given | Gift | In-kind Description |
 | What your organization valued it at | Gift | Fair Market Value, never Amount, which is zero |
 | What a donor gave in goods over time | Household, Organization, Person | In-kind Value, In-kind Gift Count |

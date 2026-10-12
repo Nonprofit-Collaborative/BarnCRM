@@ -1992,7 +1992,7 @@ refund is another gift rather than an edit (ADR-0010).
 | Household | reference(Household) | computed | The household credited with the gift, derived from the donor (R-G2). |
 | Gift Date | date | yes | The date the gift was received, which is the date that appears on the receipt. |
 | Amount | decimal | yes | The money received, negative for a refund or a write-off, and zero on an in-kind gift, which is goods rather than money (R-G12). |
-| Type | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | yes | How the gift arrived. |
+| Payment Method | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | yes | How the gift arrived. Labelled Type before v0.6; the API name is still `Type__c`. |
 | Status | picklist(Received, Pending, Refunded, Written off, Cancelled) | yes | Where the gift stands; Received, Refunded and Written off count in the packaged giving totals, so a reversal nets against its original (ADR-0022), and Pending and Cancelled do not. Cancelled is a Pending gift that will never be paid (R-G16). |
 | Appeal | reference(Appeal) | no | The fundraising effort this gift responded to. |
 | Acknowledgment Status | picklist(Not required, To acknowledge, Acknowledged, Do not acknowledge) | yes (defaults To acknowledge) | Whether this gift still needs a thank you. |
@@ -2208,7 +2208,7 @@ receipt.
 | Household | `Household__c` | Lookup to Account |
 | Gift Date | `Gift_Date__c` | Date |
 | Amount | `Amount__c` | Currency |
-| Type | `Type__c` | Picklist: Cash, Check, Card, ACH, Stock, In-kind, Grant, Other |
+| Payment Method | `Type__c` | Picklist: Cash, Check, Card, ACH, Stock, In-kind, Grant, Other |
 | Status | `Status__c` | Picklist: Received, Pending, Refunded, Written off, Cancelled |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
 | Acknowledgment Status | `Acknowledgment_Status__c` | Picklist: Not required, To acknowledge, Acknowledged, Do not acknowledge |
@@ -3103,8 +3103,8 @@ nothing packaged to conflict with it (ADR-0006).
 | Maximum Amount | `Maximum_Amount__c` | Currency |
 | Active | `Active__c` | Checkbox |
 
-- **Fields on Account** (shipped by Giving, on the Household, Organization, and person
-  layouts):
+- **Fields on Account** (shipped by Giving, shown read only in the Giving section of
+  Giving's own Account and Contact record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -4400,8 +4400,8 @@ why the definition keeps its own Last Calculated as well.
 
 ### Salesforce implementation
 
-- **Fields on Account** (shipped by Giving, shown on the Household and Organization
-  layouts and, in Person Account orgs, on the person layout):
+- **Fields on Account** (shipped by Giving, shown read only in the Giving section of
+  Giving's own Account and Contact record pages, ADR-NEXT on the donor record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -5471,3 +5471,6 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-0063). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (ADR-0063). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (ADR-0063). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| v0.6 | 2026-10-12 | UX review item 2 (ADR-NEXT, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
+| v0.6 | 2026-10-12 | UX review item 10. No object or field added. `Gift__c.Type__c` is relabelled Payment Method (label only; the API name is unchanged), so the gift record, Quick Gift Entry, gift batches, import and the accounting export all say payment method. `Gift_Compact` and `Commitment_Overview` gain the donor (`Donor_Contact__c`, `Donor_Account__c`). On `Gift_Record_Page` (Dynamic Forms, ADR-0043) Donor Contact shows only when Donor Account is empty and Donor Account only when it is filled (R-G1 allows one donor), Original Gift and Refund Reason only when filled, and Matched Gift only when filled or when the donor is an account; the page gains the activity panel (ADR-0042). |
+| v0.6 | 2026-10-12 | UX review quick wins. No object or field added. One minimal fallback page layout each (ADR-0043) for Relationship, Affiliation, Receipt, Receipt Run, Acknowledgment, Acknowledgment Rule, Acknowledgment Run, Stewardship Plan and Stewardship Plan Template, which had tabs and no layout. |

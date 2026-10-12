@@ -6,5 +6,5 @@
   <columns>Parent_Appeal__c</columns>
   <columns>Campaign_Id__c</columns>
   <filterScope>Everything</filterScope>
-  <label>Appeals and their Campaigns</label>
+  <label>Appeals and Their Campaigns</label>
 </ListView>

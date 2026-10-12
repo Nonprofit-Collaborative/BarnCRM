@@ -4,7 +4,7 @@
 
 Quick Gift Entry is a one screen form for recording a gift the moment it arrives: at an
 event, at the front desk, or from the mail pile. It asks for the donor, the amount, the
-date, how the gift arrived, and which appeal it answered, and it fills in the rest from
+date, the payment method, and which appeal it answered, and it fills in the rest from
 your settings. It is built for a phone, so David can enter a check while he is standing
 at the gala table and hand the donor a thank you on the spot.
 
@@ -17,7 +17,9 @@ calculated.
 Nothing to install and no Setup step. Quick Gift Entry arrives with the Giving package.
 
 1. Open the **Fundraising** app from the app launcher (the grid of dots in the top left
-   corner). The Giving package ships this app, and Quick Gift Entry is its first tab.
+   corner). The Giving package ships this app, and Quick Gift Entry is its first tab. On a
+   computer it is also in the app's utility bar at the bottom of the screen, so the form
+   opens over whatever page you are on.
 2. Open **BarnCRM Settings**, then **Giving**, and check two values:
    - **Default fund**: the fund a gift is allocated to when nobody picks one. Most
      organizations choose the Annual Fund or the General Fund.
@@ -47,7 +49,7 @@ Do this as David, on a phone, starting from the sample data.
    `Mar`. Tap the right person in the list. Their name stays in the box.
 4. In **Amount**, type `50`.
 5. Leave **Gift date** as today.
-6. In **How it arrived**, choose **Check**.
+6. In **Payment method**, choose **Check**.
 7. In **Check or reference number**, type the number printed on the check, for example
    `1042`. This is the field Jen uses when she reconciles with the bank, so it is worth
    the two seconds.
@@ -106,7 +108,7 @@ For the person building a report later, these are the fields the form writes.
 | Donor, organization | Donor Account |
 | Amount | Amount |
 | Gift date | Gift Date |
-| How it arrived | Type |
+| Payment method | Payment Method |
 | Appeal | Appeal |
 | Fund | the gift's single allocation |
 | Check or reference number | Payment Reference |
