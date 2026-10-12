@@ -128,6 +128,14 @@ not on this page. It is the Override Receipt Lock permission, described under "L
 receipt lock" on the [Gifts page](gifts.md). Every change made with it is written to the
 [Error Log](error-log.md).
 
+## Running your own version instead
+
+If an automation does almost what you want, do not change ours: an upgrade would undo your
+change. Switch ours off here and run your own copy. For most of the automations a flow can
+do, BarnCRM ships a flow template you copy and change: see
+[Your own version of an automation](flow-templates.md). That page also lists the automations
+with no template, and why.
+
 ## Common mistakes
 
 - **Expecting the pause to last longer than 24 hours.** It cannot. For a load that runs
