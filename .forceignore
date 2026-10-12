@@ -3,3 +3,5 @@ jsconfig.json
 .eslintrc.json
 **/__tests__/**
 **/.gitkeep
+**/jsconfig.json
+**/.eslintrc.json
