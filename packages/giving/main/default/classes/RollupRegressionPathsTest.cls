@@ -4,8 +4,8 @@
  *
  * Engine agnostic on purpose. Each test changes records the way staff do, through ordinary saves
  * and the public `RollupService` entry points, and asserts only the values on the target records.
- * Nothing here names the engine behind `RollupService`, so the same tests judge today's engine and
- * the one that replaces it (proposal D1).
+ * Nothing here names the engine behind `RollupService`, so the same tests judged the vendored
+ * engine and judge the one that replaced it (proposal D1).
  *
  * A test method is one transaction, so a test that saves the same record twice marks each later
  * save with `GivingRollupTestData.nextSave()`, as two separate edits would be in an org. Every
@@ -77,7 +77,7 @@ private class RollupRegressionPathsTest {
             'The household follows'
         );
         // The fund side of a correction is asserted by movingAnAllocationMovesItBetweenFunds and
-        // aStatusChangeMovesTheFundTotal, on the own engine.
+        // aStatusChangeMovesTheFundTotal.
     }
 
     /** A pending gift counts nowhere until it is received. */
@@ -223,13 +223,12 @@ private class RollupRegressionPathsTest {
     }
 
     /**
-     * Switched on in slice S6, on the own engine (fund totals read the parent gift, which today's
-     * engine refuses). An allocation moved to another fund moves the money between the two fund
+     * Switched on in slice S6 (fund totals read the parent gift, which the vendored engine
+     * refused). An allocation moved to another fund moves the money between the two fund
      * totals: the fund it left and the fund it joined are both recalculated (R-R11).
      */
     @IsTest
     static void movingAnAllocationMovesItBetweenFunds() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
         Fund__c building = GivingTestDataFactory.buildFund('Building', false);
@@ -271,7 +270,6 @@ private class RollupRegressionPathsTest {
      */
     @IsTest
     static void aStatusChangeMovesTheFundTotal() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
         Gift__c kept = GivingTestDataFactory.buildGift(ana.Id, 40);
@@ -296,7 +294,6 @@ private class RollupRegressionPathsTest {
      */
     @IsTest
     static void aDeletedGiftLeavesTheFundAndTheCreditAndComesBack() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         Contact bea = bea();
         Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
@@ -367,14 +364,12 @@ private class RollupRegressionPathsTest {
     }
 
     /**
-     * Switched on in slice S5, on BarnCRM's own engine: `GivingRollupTestData.useOwnEngine()`
-     * routes `RollupService` to `RollupEngine` for this test until slice S8 swaps the engine for
-     * everyone.
+     * Switched on in slice S5, on BarnCRM's own engine.
      *
      * Two hundred gifts from twenty donors are corrected in one save, as a data fix through the
      * data loader would. Every donor's total is the corrected one (plan Section 7.2).
      *
-     * On oi-test today's engine left 250 (the totals from the insert) instead of 300: the insert
+     * On oi-test the vendored engine left 250 (the totals from the insert) instead of 300: the insert
      * and the correction are two real-time runs queued in one test transaction, and the engine's
      * add-and-subtract update over 200 records was not applied on top of the insert's run. The
      * single-record version (changingTheAmountMovesEveryTotal) passes, so this is the engine's
@@ -383,7 +378,6 @@ private class RollupRegressionPathsTest {
      */
     @IsTest
     static void twoHundredCorrectionsInOneSaveAreAllCounted() {
-        GivingRollupTestData.useOwnEngine();
         List<String> names = new List<String>();
         for (Integer i = 0; i < 20; i++) {
             names.add('Donor' + i);
@@ -430,7 +424,6 @@ private class RollupRegressionPathsTest {
      */
     @IsTest
     static void threeHundredCorrectionsThroughTheQueueAreAllCounted() {
-        GivingRollupTestData.useOwnEngine();
         List<String> names = new List<String>();
         for (Integer i = 0; i < 30; i++) {
             names.add('Donor' + i);

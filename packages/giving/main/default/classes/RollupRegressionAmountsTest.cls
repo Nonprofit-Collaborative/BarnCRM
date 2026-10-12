@@ -4,7 +4,7 @@
  *
  * Engine agnostic on purpose: records are changed through ordinary saves and `GiftService`, totals
  * are calculated through the public `RollupService` entry points, and only target record values
- * are asserted, so the same tests judge today's engine and the one that replaces it.
+ * are asserted, so the same tests judged the vendored engine and judge the one that replaced it.
  *
  * `GiftRollupRefundTest` holds the person's total and count after a refund; this class adds the
  * real-time path, the household, the largest gift and the fund, and the fiscal windows with a
@@ -61,8 +61,7 @@ private class RollupRegressionAmountsTest {
         Account household = GivingRollupTestData.account(ana.AccountId);
         Assert.areEqual(150, household.Total_Giving__c, 'The household holds the same');
         Assert.areEqual(1, household.Gift_Count__c, 'And gave once');
-        // The fund after a refund is asserted by the recalculation below; in real time Gift
-        // Allocation is registered (slice S6) but runs on the own engine only until slice S8.
+        // The fund after a refund is asserted by the recalculation below.
     }
 
     /**

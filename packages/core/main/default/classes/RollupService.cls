@@ -62,15 +62,6 @@ public with sharing class RollupService {
     @TestVisible
     private static Integer instantLimit = 50;
 
-    /**
-     * Did route a test to BarnCRM's own engine before it was the only one. Does nothing now;
-     * removed with its last callers, the Giving tests, in the next part of slice S8.
-     */
-    @NamespaceAccessible
-    public static void useOwnEngineInTests() {
-        return;
-    }
-
     /** The modes a nightly run covers. */
     @NamespaceAccessible
     public static Set<String> scheduledModes() {

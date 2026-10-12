@@ -6,13 +6,12 @@
  * through its Automation Registry rows. These tests save records and read the totals back without
  * ever asking for a recalculation: if a total moved, the save moved it.
  *
- * Gift Allocation and Soft Credit are registered in slice S6. Today's engine throws on their
- * shipped definitions, so `RollupService` hands those to BarnCRM's own engine only, and the tests
- * on them call `GivingRollupTestData.useOwnEngine()` until slice S8 swaps the engine for everyone.
+ * Gift Allocation and Soft Credit are registered too (slice S6), so fund totals and soft credit
+ * totals move with the save as well.
  *
- * Today's engine finishes a real-time run in a queued job, so the totals are read after
- * `Test.stopTest`, which runs that job. The stricter promise, totals right before the save
- * returns, is `theTotalsAreRightInTheSameTransaction` below, on the own engine's instant path.
+ * Most tests read the totals after `Test.stopTest`, so a total that a bulk save queued is caught
+ * up too. The stricter promise, totals right before the save returns, is
+ * `theTotalsAreRightInTheSameTransaction` below, on the instant path.
  */
 @IsTest
 private class GiftRealTimeRollupTest {
@@ -76,14 +75,13 @@ private class GiftRealTimeRollupTest {
     }
 
     /**
-     * Switched on in slice S6, on the own engine. The allocation a gift is given to the default
-     * fund moves that fund's total. Today's engine refuses the shipped "Fund last gift date"
-     * rollup, whose source attribute is on the parent gift (`Gift__r.Gift_Date__c`), with
-     * IllegalArgumentException "Child rollup field: null" in Rollup.getRollup.
+     * The allocation a gift is given to the default fund moves that fund's total, including the
+     * shipped "Fund last gift date" rollup, whose source attribute is on the parent gift
+     * (`Gift__r.Gift_Date__c`). The vendored engine refused it (IllegalArgumentException "Child
+     * rollup field: null" in Rollup.getRollup); BarnCRM's own engine reads it.
      */
     @IsTest
     static void aSavedGiftUpdatesTheFundItIsAllocatedTo() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = [SELECT Id FROM Contact LIMIT 1];
         Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
 
@@ -98,14 +96,13 @@ private class GiftRealTimeRollupTest {
     }
 
     /**
-     * Switched on in slice S6, on the own engine. Bea solicited Ana's gift. Her soft credit total
-     * moves when the credit is saved. Today's engine throws NullPointerException in
+     * Bea solicited Ana's gift. Her soft credit total moves when the credit is saved. The vendored
+     * engine threw NullPointerException in
      * Rollup.fillWrapper on the household soft credit rollups, whose `{Household}` path it cannot
      * follow.
      */
     @IsTest
     static void aSavedSoftCreditUpdatesThePersonCredited() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = [SELECT Id FROM Contact LIMIT 1];
         Contact bea = GivingTestDataFactory.insertHouseholdContact(
             'The Lindqvist Family',
@@ -202,18 +199,16 @@ private class GiftRealTimeRollupTest {
             Assert.areEqual(250, household.Total_Giving__c, 'Each household\'s total');
             Assert.areEqual(10, household.Gift_Count__c, 'Each household\'s gift count');
         }
-        // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo, on the own
-        // engine.
+        // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo.
     }
 
     /**
-     * Switched on in slice S6, on the own engine's instant path. The promise rollup proposal D4
+     * The instant path (slice S6). The promise rollup proposal D4
      * makes for an ordinary save: the totals are right before the save returns, with no queued
      * job in between.
      */
     @IsTest
     static void theTotalsAreRightInTheSameTransaction() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
 
         Test.startTest();

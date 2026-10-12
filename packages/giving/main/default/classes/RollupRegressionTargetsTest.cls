@@ -7,18 +7,15 @@
  *
  * Several shipped rollups write the same field for different kinds of account: Household total
  * giving and Account total giving both write `Total_Giving__c` on Account, kept apart by their
- * target filters (R-R8). Today's engine reads no target filter, so which one wins is decided by
- * run order (bug 2). The freshness stamps are wrong today too: a recalculation never stamps the
- * records it wrote (bug 4), and a definition is marked calculated when its run is queued rather
- * than when it finishes (bug 5). The tests that encode the right answers are written now and
- * switched off, each naming the slice that switches it on (proposal migration step 3: these are
+ * target filters (R-R8). The vendored engine read no target filter, so which one won was decided
+ * by run order (bug 2). Its freshness stamps were wrong too: a recalculation never stamped the
+ * records it wrote (bug 4), and a definition was marked calculated when its run was queued rather
+ * than when it finished (bug 5). The tests that encode the right answers were written then and
+ * switched off, each naming the slice that switched it on (proposal migration step 3: these were
  * fixed in the new engine, not patched into the old one).
  *
  * Slice S5 switched on the target filter and record freshness tests, and slice S7 the definition
- * freshness test. They run on BarnCRM's own
- * engine: each calls `GivingRollupTestData.useOwnEngine()` first, which routes `RollupService` to
- * `RollupEngine` for that test only, until slice S8 swaps the engine for everyone and removes the
- * call.
+ * freshness test, on BarnCRM's own engine, which slice S8 made the only one.
  */
 @IsTest
 private class RollupRegressionTargetsTest {
@@ -47,7 +44,6 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aHouseholdsTotalIsTheHouseholdRollupsAnswer() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         insert new List<Gift__c>{
             GivingTestDataFactory.buildAccountGift(ana.AccountId, 500),
@@ -69,7 +65,6 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aHouseholdsOwnGiftSavedNowKeepsTheHouseholdAnswer() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         GivingRollupTestData.installShippedRollups();
 
@@ -91,7 +86,6 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void anOrganizationsTotalIsTheAccountRollupsAnswer() {
-        GivingRollupTestData.useOwnEngine();
         Account riverbend = GivingTestDataFactory.insertOrganization('Riverbend Manufacturing');
         insert GivingTestDataFactory.buildAccountGift(riverbend.Id, 1000);
         GivingRollupTestData.installShippedRollups();
@@ -161,7 +155,6 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aRecalculationStampsTheRecordsItWrote() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         insert GivingTestDataFactory.buildGift(ana.Id, 100);
         GivingRollupTestData.installShippedRollups();
@@ -198,7 +191,6 @@ private class RollupRegressionTargetsTest {
      */
     @IsTest
     static void aRollupIsNeverMarkedCalculatedBeforeItsTotalsAre() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = ana();
         insert GivingTestDataFactory.buildGift(ana.Id, 100);
         GivingRollupTestData.installShippedRollups();

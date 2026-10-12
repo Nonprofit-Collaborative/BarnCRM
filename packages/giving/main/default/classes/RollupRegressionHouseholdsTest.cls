@@ -6,19 +6,18 @@
  * through the public `RollupService` entry points, and only target record values are asserted.
  *
  * The household soft credit totals reach the household through a mode-resolved token
- * (`Contact__c > {Household} | Account__c > {Household}`). Reading today's adapter and engine
- * says they cannot work yet: the adapter hands a token path to the engine as a rollup started
+ * (`Contact__c > {Household} | Account__c > {Household}`). Reading the vendored adapter and engine
+ * said they could not work: the adapter hands a token path to the engine as a rollup started
  * from the parent with the source record's own Id as its lookup, so a recalculation matches no
  * household, and on oi-test a real-time run on Soft Credit threw NullPointerException in
  * Rollup.fillWrapper (via getParentQueryWrapper), which is why Soft Credit is not registered for
  * real time until slice S6. The tests that encode the right answer are therefore written now and
  * switched off, each naming the slice that switches it on. A disabled test found to pass on
- * today's engine is switched on at once.
+ * the vendored engine was switched on at once.
  *
  * Slice S5 switched on the household token tests, and slice S6 the saved credit and moving person
- * tests, with Soft Credit registered for real time. They run on BarnCRM's own engine: each calls
- * `GivingRollupTestData.useOwnEngine()` first, which routes `RollupService` to `RollupEngine` for
- * that test only, until slice S8 swaps the engine for everyone and removes the call.
+ * tests, with Soft Credit registered for real time, on BarnCRM's own engine, which slice S8 made
+ * the only one.
  *
  * The `Account__c > {Household}` alternative resolves a person stored as an account, which needs
  * a Person Account org; it is not covered here.
@@ -118,7 +117,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aSoftCreditLandsOnTheHouseholdInContactMode() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
             'Ana',
@@ -148,7 +146,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aSoftCreditLandsOnTheHouseholdInJunctionMode() {
-        GivingRollupTestData.useOwnEngine();
         RecognitionTestData.useJunctionMembership();
         Account garcia = RecognitionTestData.household('The Garcia Family');
         Contact ana = RecognitionTestData.person('Ana', 'Garcia', null);
@@ -175,7 +172,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aRefundedCreditNetsOutOfTheHouseholdTotal() {
-        GivingRollupTestData.useOwnEngine();
         RecognitionTestData.setAutomaticHouseholdCredits(true);
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
@@ -207,7 +203,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aSavedSoftCreditUpdatesTheHousehold() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
             'Ana',
@@ -234,7 +229,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aPersonWhoMovesTakesTheirSoftCreditsWithThem() {
-        GivingRollupTestData.useOwnEngine();
         Contact ana = GivingTestDataFactory.insertHouseholdContact(
             'The Nolan Family',
             'Ana',
@@ -277,7 +271,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void aMemberWhoMovesTakesCreditsButNotGivingInJunctionMode() {
-        GivingRollupTestData.useOwnEngine();
         RecognitionTestData.useJunctionMembership();
         Account garcia = RecognitionTestData.household('The Garcia Family');
         Account lee = RecognitionTestData.household('The Lee Family');
@@ -316,7 +309,6 @@ private class RollupRegressionHouseholdsTest {
      */
     @IsTest
     static void twoHundredSoftCreditsReachTwentyHouseholds() {
-        GivingRollupTestData.useOwnEngine();
         List<String> names = new List<String>();
         for (Integer i = 0; i < 20; i++) {
             names.add('Solicitor' + i);
