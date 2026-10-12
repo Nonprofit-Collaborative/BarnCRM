@@ -72,143 +72,161 @@ private class GiftEntryPaymentsTest {
 
     @IsTest
     static void theOnlyMatchingPaymentIsSuggestedAndChosen() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        List<Installment__c> payments = pledge(
-            ana.Id,
-            new Map<Integer, Decimal>{ 1 => 100, 15 => 100, 16 => 50 }
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            List<Installment__c> payments = pledge(
+                ana.Id,
+                new Map<Integer, Decimal>{ 1 => 100, 15 => 100, 16 => 50 }
+            );
 
-        GiftEntryPayments.Choices choices = choicesFor(request('one', ana.Id, 100));
+            GiftEntryPayments.Choices choices = choicesFor(request('one', ana.Id, 100));
 
-        Assert.areEqual(3, choices.choices.size(), 'Every open payment of Ana is offered.');
-        Assert.areEqual(1, choices.suggestedCount, 'Only the 15 March payment of 100 matches.');
-        Assert.areEqual(payments[1].Id, choices.suggestedId, 'The only match is chosen.');
-        Assert.areEqual(
-            payments[0].Id,
-            choices.choices[0].value,
-            'Earliest due first, not the suggestion first.'
-        );
-        Assert.isTrue(choices.choices[1].suggested, 'The match is marked.');
-        Assert.isFalse(choices.choices[0].suggested, '1 March is outside the 7 day window.');
-        Assert.isFalse(choices.choices[2].suggested, '50 is not 100 at a tolerance of zero.');
-        Assert.isTrue(
-            choices.choices[1].label.contains('100.00'),
-            'The label names the expected amount: ' + choices.choices[1].label
-        );
+            Assert.areEqual(3, choices.choices.size(), 'Every open payment of Ana is offered.');
+            Assert.areEqual(1, choices.suggestedCount, 'Only the 15 March payment of 100 matches.');
+            Assert.areEqual(payments[1].Id, choices.suggestedId, 'The only match is chosen.');
+            Assert.areEqual(
+                payments[0].Id,
+                choices.choices[0].value,
+                'Earliest due first, not the suggestion first.'
+            );
+            Assert.isTrue(choices.choices[1].suggested, 'The match is marked.');
+            Assert.isFalse(choices.choices[0].suggested, '1 March is outside the 7 day window.');
+            Assert.isFalse(choices.choices[2].suggested, '50 is not 100 at a tolerance of zero.');
+            Assert.isTrue(
+                choices.choices[1].label.contains('100.00'),
+                'The label names the expected amount: ' + choices.choices[1].label
+            );
+        }
     }
 
     @IsTest
     static void twoMatchingPaymentsAreSuggestedButNeitherIsChosen() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        pledge(ana.Id, new Map<Integer, Decimal>{ 13 => 100, 17 => 100 });
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            pledge(ana.Id, new Map<Integer, Decimal>{ 13 => 100, 17 => 100 });
 
-        GiftEntryPayments.Choices choices = choicesFor(request('two', ana.Id, 100));
+            GiftEntryPayments.Choices choices = choicesFor(request('two', ana.Id, 100));
 
-        Assert.areEqual(2, choices.suggestedCount, 'Both are within the window.');
-        Assert.isNull(choices.suggestedId, 'A person chooses between two; nothing is chosen.');
+            Assert.areEqual(2, choices.suggestedCount, 'Both are within the window.');
+            Assert.isNull(choices.suggestedId, 'A person chooses between two; nothing is chosen.');
+        }
     }
 
     @IsTest
     static void aPaymentOfSomeoneInTheHouseholdIsOfferedAndAStrangersIsNot() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        Contact ben = new Contact(
-            FirstName = 'Ben',
-            LastName = 'Ramirez',
-            AccountId = ana.AccountId
-        );
-        insert ben;
-        List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
-        Contact stranger = GivingTestDataFactory.insertHouseholdContact('Lee', 'Kim', 'Lee');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            Contact ben = new Contact(
+                FirstName = 'Ben',
+                LastName = 'Ramirez',
+                AccountId = ana.AccountId
+            );
+            insert ben;
+            List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
+            Contact stranger = GivingTestDataFactory.insertHouseholdContact('Lee', 'Kim', 'Lee');
 
-        GiftEntryPayments.Choices forBen = choicesFor(request('ben', ben.Id, 100));
-        GiftEntryPayments.Choices forKim = choicesFor(request('kim', stranger.Id, 100));
+            GiftEntryPayments.Choices forBen = choicesFor(request('ben', ben.Id, 100));
+            GiftEntryPayments.Choices forKim = choicesFor(request('kim', stranger.Id, 100));
 
-        Assert.areEqual(payments[0].Id, forBen.suggestedId, 'Ben pays Ana\'s household pledge.');
-        Assert.isTrue(forKim.choices.isEmpty(), 'Another household owes nothing of Ana\'s.');
+            Assert.areEqual(
+                payments[0].Id,
+                forBen.suggestedId,
+                'Ben pays Ana\'s household pledge.'
+            );
+            Assert.isTrue(forKim.choices.isEmpty(), 'Another household owes nothing of Ana\'s.');
+        }
     }
 
     @IsTest
     static void noDonorMeansNoPayments() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
 
-        GiftEntryPayments.Choices choices = choicesFor(request('nobody', null, 100));
+            GiftEntryPayments.Choices choices = choicesFor(request('nobody', null, 100));
 
-        Assert.isTrue(choices.choices.isEmpty(), 'No donor, nothing to pay.');
-        Assert.isNull(choices.suggestedId, 'Nothing is chosen.');
+            Assert.isTrue(choices.choices.isEmpty(), 'No donor, nothing to pay.');
+            Assert.isNull(choices.suggestedId, 'Nothing is chosen.');
+        }
     }
 
     @IsTest
     static void aPaymentOnACancelledPledgeIsNeitherOfferedNorConfirmed() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
-        update new Commitment__c(Id = payments[0].Commitment__c, Status__c = 'Cancelled');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
+            update new Commitment__c(Id = payments[0].Commitment__c, Status__c = 'Cancelled');
 
-        GiftEntryPayments.Choices choices = choicesFor(request('gone', ana.Id, 100));
-        Map<String, Installment__c> confirmed;
-        System.runAs(maria()) {
-            confirmed = GiftEntryPayments.confirm(
-                new List<GiftEntryPayments.Request>{ request('gone', ana.Id, 100) },
-                new Map<String, Id>{ 'gone' => payments[0].Id }
-            );
+            GiftEntryPayments.Choices choices = choicesFor(request('gone', ana.Id, 100));
+            Map<String, Installment__c> confirmed;
+            System.runAs(maria()) {
+                confirmed = GiftEntryPayments.confirm(
+                    new List<GiftEntryPayments.Request>{ request('gone', ana.Id, 100) },
+                    new Map<String, Id>{ 'gone' => payments[0].Id }
+                );
+            }
+
+            Assert.isTrue(choices.choices.isEmpty(), 'A cancelled pledge is owed nothing.');
+            Assert.isFalse(confirmed.containsKey('gone'), 'Its payment cannot be paid.');
         }
-
-        Assert.isTrue(choices.choices.isEmpty(), 'A cancelled pledge is owed nothing.');
-        Assert.isFalse(confirmed.containsKey('gone'), 'Its payment cannot be paid.');
     }
 
     @IsTest
     static void confirmKeepsTheDonorsOwnPaymentAndRefusesSomeoneElses() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        Contact kim = GivingTestDataFactory.insertHouseholdContact('Lee', 'Kim', 'Lee');
-        List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            Contact kim = GivingTestDataFactory.insertHouseholdContact('Lee', 'Kim', 'Lee');
+            List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
 
-        Map<String, Installment__c> confirmed;
-        System.runAs(maria()) {
-            confirmed = GiftEntryPayments.confirm(
-                new List<GiftEntryPayments.Request>{
-                    request('ana', ana.Id, 100),
-                    request('kim', kim.Id, 100)
-                },
-                new Map<String, Id>{ 'ana' => payments[0].Id, 'kim' => payments[0].Id }
+            Map<String, Installment__c> confirmed;
+            System.runAs(maria()) {
+                confirmed = GiftEntryPayments.confirm(
+                    new List<GiftEntryPayments.Request>{
+                        request('ana', ana.Id, 100),
+                        request('kim', kim.Id, 100)
+                    },
+                    new Map<String, Id>{ 'ana' => payments[0].Id, 'kim' => payments[0].Id }
+                );
+            }
+
+            Assert.areEqual(payments[0].Id, confirmed.get('ana').Id, 'Ana may pay her own.');
+            Assert.areEqual(
+                payments[0].Commitment__c,
+                confirmed.get('ana').Commitment__c,
+                'The pledge comes with it.'
             );
+            Assert.isFalse(confirmed.containsKey('kim'), 'Kim may not pay Ana\'s pledge.');
         }
-
-        Assert.areEqual(payments[0].Id, confirmed.get('ana').Id, 'Ana may pay her own.');
-        Assert.areEqual(
-            payments[0].Commitment__c,
-            confirmed.get('ana').Commitment__c,
-            'The pledge comes with it.'
-        );
-        Assert.isFalse(confirmed.containsKey('kim'), 'Kim may not pay Ana\'s pledge.');
     }
 
     /** A batch asks for two hundred gifts at once: one query, each gift its own answer. */
     @IsTest
     static void twoHundredRequestsAreAnsweredTogether() {
-        Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-        Contact kim = GivingTestDataFactory.insertHouseholdContact('Lee', 'Kim', 'Lee');
-        List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
-        List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
-        for (Integer index = 0; index < 200; index++) {
-            Id donor = Math.mod(index, 2) == 0 ? ana.Id : kim.Id;
-            requests.add(request('line' + index, donor, 100));
-        }
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
+            Contact kim = GivingTestDataFactory.insertHouseholdContact('Lee', 'Kim', 'Lee');
+            List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
+            List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
+            for (Integer index = 0; index < 200; index++) {
+                Id donor = Math.mod(index, 2) == 0 ? ana.Id : kim.Id;
+                requests.add(request('line' + index, donor, 100));
+            }
 
-        Map<String, GiftEntryPayments.Choices> answers;
-        Integer queriesBefore;
-        Integer queriesUsed;
-        System.runAs(maria()) {
-            Test.startTest();
-            queriesBefore = Limits.getQueries();
-            answers = GiftEntryPayments.forRequests(requests);
-            queriesUsed = Limits.getQueries() - queriesBefore;
-            Test.stopTest();
-        }
+            Map<String, GiftEntryPayments.Choices> answers;
+            Integer queriesBefore;
+            Integer queriesUsed;
+            System.runAs(maria()) {
+                Test.startTest();
+                queriesBefore = Limits.getQueries();
+                answers = GiftEntryPayments.forRequests(requests);
+                queriesUsed = Limits.getQueries() - queriesBefore;
+                Test.stopTest();
+            }
 
-        Assert.areEqual(200, answers.size(), 'Every line is answered.');
-        Assert.areEqual(payments[0].Id, answers.get('line0').suggestedId, 'Ana\'s line is.');
-        Assert.isTrue(answers.get('line1').choices.isEmpty(), 'Kim\'s line owes nothing.');
-        Assert.isTrue(queriesUsed < 10, 'The lines share their queries: ' + queriesUsed);
+            Assert.areEqual(200, answers.size(), 'Every line is answered.');
+            Assert.areEqual(payments[0].Id, answers.get('line0').suggestedId, 'Ana\'s line is.');
+            Assert.isTrue(answers.get('line1').choices.isEmpty(), 'Kim\'s line owes nothing.');
+            Assert.isTrue(queriesUsed < 10, 'The lines share their queries: ' + queriesUsed);
+        }
     }
 }

@@ -8,7 +8,9 @@
 private class AcknowledgmentControllerTest {
     @TestSetup
     static void setUp() {
-        GivingTestDataFactory.insertDefaultFund();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+        }
     }
 
     private static void twoRules() {
@@ -30,151 +32,171 @@ private class AcknowledgmentControllerTest {
 
     @IsTest
     static void theQueueIsCountedByWhatEachGiftWouldActuallyGet() {
-        AcknowledgmentTestData.enable();
-        twoRules();
-        Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
-        Account organization = GivingTestDataFactory.insertOrganization('Riverside Trust');
-        insert new List<Gift__c>{
-            GivingTestDataFactory.buildGift(donor.Id, 50),
-            GivingTestDataFactory.buildGift(donor.Id, 75),
-            GivingTestDataFactory.buildGift(donor.Id, 2500),
-            GivingTestDataFactory.buildAccountGift(organization.Id, 200)
-        };
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            twoRules();
+            Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
+            Account organization = GivingTestDataFactory.insertOrganization('Riverside Trust');
+            insert new List<Gift__c>{
+                GivingTestDataFactory.buildGift(donor.Id, 50),
+                GivingTestDataFactory.buildGift(donor.Id, 75),
+                GivingTestDataFactory.buildGift(donor.Id, 2500),
+                GivingTestDataFactory.buildAccountGift(organization.Id, 200)
+            };
 
-        Test.startTest();
-        AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
-        Test.stopTest();
+            Test.startTest();
+            AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
+            Test.stopTest();
 
-        Assert.areEqual(
-            2,
-            view.emailQueue,
-            'The two small gifts from a person with an address are the emails waiting.'
-        );
-        Assert.areEqual(1, view.letterQueue, 'The 2500 gift is a letter, by the major gift rule.');
-        Assert.areEqual(
-            1,
-            view.withoutRecipient,
-            'The organization gift matches the email rule but has no primary contact, so it is ' +
-            'counted separately rather than quietly included in a send that would skip it.'
-        );
-        Assert.areEqual(
-            0,
-            view.unmatchedQueue,
-            'Every waiting gift is matched, because the second rule has no criteria on it.'
-        );
+            Assert.areEqual(
+                2,
+                view.emailQueue,
+                'The two small gifts from a person with an address are the emails waiting.'
+            );
+            Assert.areEqual(
+                1,
+                view.letterQueue,
+                'The 2500 gift is a letter, by the major gift rule.'
+            );
+            Assert.areEqual(
+                1,
+                view.withoutRecipient,
+                'The organization gift matches the email rule but has no primary contact, so it is ' +
+                'counted separately rather than quietly included in a send that would skip it.'
+            );
+            Assert.areEqual(
+                0,
+                view.unmatchedQueue,
+                'Every waiting gift is matched, because the second rule has no criteria on it.'
+            );
+        }
     }
 
     @IsTest
     static void aGiftNoRuleCoversIsCountedAsUnmatchedRatherThanHidden() {
-        AcknowledgmentTestData.enable();
-        Acknowledgment_Rule__c narrow = AcknowledgmentTestData.buildRule(
-            'Major gifts only',
-            10,
-            AcknowledgmentRuleService.CHANNEL_LETTER,
-            null
-        );
-        narrow.Minimum_Amount__c = 1000;
-        insert narrow;
-        Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
-        insert GivingTestDataFactory.buildGift(donor.Id, 20);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            Acknowledgment_Rule__c narrow = AcknowledgmentTestData.buildRule(
+                'Major gifts only',
+                10,
+                AcknowledgmentRuleService.CHANNEL_LETTER,
+                null
+            );
+            narrow.Minimum_Amount__c = 1000;
+            insert narrow;
+            Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
+            insert GivingTestDataFactory.buildGift(donor.Id, 20);
 
-        AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
+            AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
 
-        Assert.areEqual(
-            1,
-            view.unmatchedQueue,
-            'A gift waiting that no rule covers is shown, because otherwise an incomplete set of ' +
-            'rules looks exactly like an empty queue.'
-        );
-        Assert.areEqual(0, view.emailQueue, 'And it is not counted as something about to be sent.');
+            Assert.areEqual(
+                1,
+                view.unmatchedQueue,
+                'A gift waiting that no rule covers is shown, because otherwise an incomplete set of ' +
+                'rules looks exactly like an empty queue.'
+            );
+            Assert.areEqual(
+                0,
+                view.emailQueue,
+                'And it is not counted as something about to be sent.'
+            );
+        }
     }
 
     @IsTest
     static void aRuleNamingATemplateThisOrgDoesNotHaveIsFlagged() {
-        AcknowledgmentTestData.enable();
-        Acknowledgment_Rule__c wrong = AcknowledgmentTestData.buildRule(
-            'Typo',
-            10,
-            AcknowledgmentRuleService.CHANNEL_EMAIL,
-            'BarnCRM: thank you for your gift'
-        );
-        insert wrong;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            Acknowledgment_Rule__c wrong = AcknowledgmentTestData.buildRule(
+                'Typo',
+                10,
+                AcknowledgmentRuleService.CHANNEL_EMAIL,
+                'BarnCRM: thank you for your gift'
+            );
+            insert wrong;
 
-        AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
+            AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
 
-        Assert.areEqual(1, view.rules.size(), 'The rule is listed.');
-        Assert.isFalse(
-            view.rules[0].templateFound,
-            'A rule that names a template label rather than a developer name is flagged on the ' +
-            'page, rather than failing silently on the night of the send.'
-        );
+            Assert.areEqual(1, view.rules.size(), 'The rule is listed.');
+            Assert.isFalse(
+                view.rules[0].templateFound,
+                'A rule that names a template label rather than a developer name is flagged on the ' +
+                'page, rather than failing silently on the night of the send.'
+            );
+        }
     }
 
     /** The page shows the template the way the picker offers it: by its name. */
     @IsTest
     static void aRuleShowsItsTemplateByName() {
-        AcknowledgmentTestData.enable();
-        EmailTemplate shipped = [
-            SELECT Name, DeveloperName
-            FROM EmailTemplate
-            WHERE DeveloperName = 'BarnCRM_Thank_You'
-            LIMIT 1
-        ];
-        insert AcknowledgmentTestData.buildRule(
-            'Everything else',
-            100,
-            AcknowledgmentRuleService.CHANNEL_EMAIL,
-            shipped.DeveloperName
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            EmailTemplate shipped = [
+                SELECT Name, DeveloperName
+                FROM EmailTemplate
+                WHERE DeveloperName = 'BarnCRM_Thank_You'
+                LIMIT 1
+            ];
+            insert AcknowledgmentTestData.buildRule(
+                'Everything else',
+                100,
+                AcknowledgmentRuleService.CHANNEL_EMAIL,
+                shipped.DeveloperName
+            );
 
-        AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
+            AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
 
-        Assert.isTrue(view.rules[0].templateFound, 'The shipped template is found.');
-        Assert.areEqual(
-            shipped.Name,
-            view.rules[0].templateLabel,
-            'It is shown by the name an administrator recognizes, not the developer name.'
-        );
+            Assert.isTrue(view.rules[0].templateFound, 'The shipped template is found.');
+            Assert.areEqual(
+                shipped.Name,
+                view.rules[0].templateLabel,
+                'It is shown by the name an administrator recognizes, not the developer name.'
+            );
+        }
     }
 
     @IsTest
     static void aUserWithoutThePermissionIsToldRatherThanRefusedSilently() {
-        AcknowledgmentTestData.enable();
-        twoRules();
-        AcknowledgmentService.sendPermission = false;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
+            twoRules();
+            AcknowledgmentService.sendPermission = false;
 
-        String message;
-        try {
-            AcknowledgmentController.sendEmailsNow();
-        } catch (Exception refused) {
-            message = refused.getMessage();
+            String message;
+            try {
+                AcknowledgmentController.sendEmailsNow();
+            } catch (Exception refused) {
+                message = refused.getMessage();
+            }
+
+            Assert.isNotNull(
+                message,
+                'A user without Send Acknowledgments gets a message naming the permission, not a ' +
+                'button that appears to work.'
+            );
+            Assert.isFalse(
+                AcknowledgmentController.getPage().canSend,
+                'And the page knows to disable the button in the first place.'
+            );
         }
-
-        Assert.isNotNull(
-            message,
-            'A user without Send Acknowledgments gets a message naming the permission, not a ' +
-            'button that appears to work.'
-        );
-        Assert.isFalse(
-            AcknowledgmentController.getPage().canSend,
-            'And the page knows to disable the button in the first place.'
-        );
     }
 
     @IsTest
     static void thePageSaysWhenTheLastSendFinishedAndWhatItDid() {
-        AcknowledgmentTestData.enable();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            AcknowledgmentTestData.enable();
 
-        Test.startTest();
-        AcknowledgmentService.recordLastRun('Emailed thank yous: 12 sent, 0 did not go.');
-        AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
-        Test.stopTest();
+            Test.startTest();
+            AcknowledgmentService.recordLastRun('Emailed thank yous: 12 sent, 0 did not go.');
+            AcknowledgmentController.PageView view = AcknowledgmentController.getPage();
+            Test.stopTest();
 
-        Assert.areEqual(
-            'Emailed thank yous: 12 sent, 0 did not go.',
-            view.lastRunSummary,
-            'A bare timestamp says the job woke up, not that it sent anything (R-AK12).'
-        );
-        Assert.isNotNull(view.lastRun, 'And the time it finished is kept beside it.');
+            Assert.areEqual(
+                'Emailed thank yous: 12 sent, 0 did not go.',
+                view.lastRunSummary,
+                'A bare timestamp says the job woke up, not that it sent anything (R-AK12).'
+            );
+            Assert.isNotNull(view.lastRun, 'And the time it finished is kept beside it.');
+        }
     }
 }

@@ -2,6 +2,7 @@
  * Giving's receipts and acknowledgment ledger are refused by a one-object load through Core's
  * extension seam, and its everyday records are not (canonical model R-IT14).
  */
+// runs-as: deploying user (pure logic: resolves the extension seam and reads describe, no DML or SOQL)
 @IsTest
 private class GivingDataProtectionExtensionTest {
     @IsTest
