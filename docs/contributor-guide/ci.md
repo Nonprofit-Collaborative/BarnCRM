@@ -732,6 +732,10 @@ Recorded 2026-09-26, when development moved from one maintainer session to share
 Code users. Everything below is pushed to GitHub; nothing lives only on a local machine.
 Remove each item from this list in the PR that finishes it.
 
+Last checked 2026-10-12: nothing below has changed since 2026-09-26. `main` is at PR #178, the
+C-29 stack is still open with a `failure` status on its top head, and two Dependabot PRs (#179,
+#180) are open. The plan's Section 0 carries the same build-state summary.
+
 ### Waiting to merge: C-29 neutral Core (PRs #163 to #174)
 
 - Branches `feature/c-29-neutral-core-1` to `-12`, stacked; top head
@@ -837,7 +841,9 @@ each with the default that shipped and a recommendation.
 
 - **Test orgs:** `oi-test` and `oi-pa` are on the maintainer's Dev Hub. A contributor who
   cannot reach them needs their own Dev Hub and org, and the maintainer's approval for any
-  new org, as described earlier on this page.
+  new org, as described earlier on this page. Both expire soon: `oi-test` on 2026-10-23 and
+  `oi-pa` on 2026-10-24. Recreating `oi-pa` from `person-accounts.json` is pre-approved;
+  replacing `oi-test` also means updating the `SF_TEST_ORG_AUTH_URL` secret.
 - **The gate:** run it from a clean, detached worktree at the pushed head. The script checks
   for a clean tree only when it starts.
 - **Staging:** stage by explicit path. A synced checkout can create untracked copies named
