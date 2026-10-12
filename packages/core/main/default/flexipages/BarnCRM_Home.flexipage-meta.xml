@@ -2,7 +2,8 @@
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     The BarnCRM home page. Each tile is its own component so an administrator can move, remove
-    or add tiles in the Lightning App Builder. What's new since the last upgrade shows first, for everyone. The checklist, Health Check, Modules and status tiles
+    or add tiles in the Lightning App Builder. What's new since the last upgrade shows first, for
+    everyone. The checklist, Health Check, Modules and status tiles
     are
     shown only with the Manage BarnCRM Settings permission.
   </description>

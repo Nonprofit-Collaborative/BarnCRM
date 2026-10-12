@@ -899,6 +899,25 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
 
+### v0.7 keys
+
+Added by Find (C-34, Section 29D) and bulk update (C-35, Section 29E). Shown in the console's
+Import section.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
+| `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
+
+### v0.8 keys
+
+Added by the suite choice (C-30) and the Module Manager (C-24).
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). |
+| `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
+
 ### Field utilization keys
 
 Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-0086
@@ -5552,6 +5571,17 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
 
 ---
 
+# Part F: Connect additions for v0.6
+
+The Connect package is the only place a standard Salesforce object such as Campaign or
+Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
+Connect installs on an org where the object is absent and its feature says it is unavailable.
+The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
+sync (X-02) adds one attribute to Appeal and Connect's own settings object. The Opportunity
+mirror (X-01) adds one attribute to Gift and two keys to that settings object.
+
+---
+
 ## 29B. Campaign Sync
 
 ### Definition
@@ -6187,15 +6217,6 @@ than 13 months old.
 
 ---
 
-# Part F: Connect additions for v0.6
-
-The Connect package is the only place a standard Salesforce object such as Campaign or
-Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
-Connect installs on an org where the object is absent and its feature says it is unavailable.
-The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
-sync (X-02) adds one attribute to Appeal and Connect's own settings object. The Opportunity
-mirror (X-01) adds one attribute to Gift and two keys to that settings object.
-
 ---
 
 ## 29G. Interaction Note
@@ -6471,6 +6492,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| Saved Query | Core | v0.7 | 29D |
 | Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29F, 12 |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
