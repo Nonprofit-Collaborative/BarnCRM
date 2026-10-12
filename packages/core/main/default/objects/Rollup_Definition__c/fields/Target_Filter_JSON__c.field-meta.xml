@@ -3,11 +3,11 @@
     <fullName>Target_Filter_JSON__c</fullName>
     <description>Which target records this rollup maintains, in the same format. Empty means all of them.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Which target records this rollup writes to, as JSON, left empty to write to all of them. There is no filter builder yet, so editing the record directly is the only way to change it. Get the shape right by copying a shipped rollup that already filters the way you want.</inlineHelpText>
+    <inlineHelpText>Which target records this rollup writes to, as JSON, left empty to write to all of them. Change it in the Rollup Builder, step 4, under Only for some records.</inlineHelpText>
     <label>Target Filter</label>
     <length>32768</length>
     <required>false</required>
-    <trackHistory>false</trackHistory>
+    <trackHistory>true</trackHistory>
     <type>LongTextArea</type>
     <visibleLines>6</visibleLines>
 </CustomField>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorNameNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: the rollup has no name.</shortDescription>
+        <value>Give the rollup a name, so you can find it in the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorTargetNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: no record or field chosen to show the total.</shortDescription>
+        <value>Choose the kind of record and the field that show the total, in step 1.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorSourceNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: no records chosen to count.</shortDescription>
+        <value>Choose the records to count and how they link to the record that shows the total, in step 2.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorPathInvalid</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: the link from counted records to the target is not valid.</shortDescription>
+        <value>BarnCRM cannot follow that link from the records you count to the record that shows the total. Choose it again in step 2.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorFieldUnknown</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: a chosen field is not on the records.</shortDescription>
+        <value>One of the fields you chose is not on those records any more. Choose it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorSumNeedsNumber</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: Sum or Average of something that is not a number.</shortDescription>
+        <value>Sum and Average need a number, an amount or a percent to work on. Choose another field, or use Count.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorMinMaxType</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: Minimum or Maximum of a field that is not a number or date.</shortDescription>
+        <value>Minimum and Maximum need a number, an amount, a percent or a date. Choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorOrderByNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: First or Last without an order field.</shortDescription>
+        <value>First and Last need the field that decides which record comes first, usually a date. Choose one in step 3.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorWindowInvalid</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: the time window is not one BarnCRM offers.</shortDescription>
+        <value>Choose all time, this fiscal year, last fiscal year or two fiscal years ago.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorWindowNeedsDate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: a fiscal year window without a date field.</shortDescription>
+        <value>A fiscal year window needs the date that decides which year a record falls in. Choose a date field in step 3.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorOverlap</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: another active rollup fills the same field. {0} is its name.</shortDescription>
+        <value>{0} already fills this field for some of the same records, so the two would overwrite each other. Choose another field, or add conditions under Only for some records so they never pick the same record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_SourceBy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 2 option: records and the field that links them. {0} object, {1} field.</shortDescription>
+        <value>{0}, by {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_SourceByHousehold</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 2 option: through the person's household. {0} object, {1} field.</shortDescription>
+        <value>{0}, by {1} (their household)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Saved</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after a rollup is saved.</shortDescription>
+        <value>Rollup saved. It is calculated in its next run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_SavedAndCalculating</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after a rollup is saved and its recalculation started.</shortDescription>
+        <value>Rollup saved, and its recalculation has started.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_SavedNotCalculated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice when a rollup is saved while a full recalculation runs.</shortDescription>
+        <value>Rollup saved. A full recalculation is already running, so click Recalculate on its row after that finishes.</value>
+    </labels>
+</CustomLabels>

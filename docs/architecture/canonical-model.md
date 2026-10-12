@@ -1062,9 +1062,9 @@ One calculated number: which records are counted, how they reach the record that
 the number, what is aggregated, and when it is recalculated. This is the whole
 configuration surface of the rollup engine (plan Section 4.10, feature C-13). An
 administrator creates and edits these with a filter builder, and never types SOQL (plan
-Section 2.3): today on the Rollups page of the settings console, and once it ships in the
-Rollup Builder, a tab of its own where every rollup, shipped or admin-made, is created and
-edited (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`).
+Section 2.3), in the Rollup Builder, a tab of its own where every rollup, shipped or
+admin-made, is created and edited (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`). The
+Rollups page of the settings console lists them with the same switches and links to it.
 
 ### Attributes
 
@@ -1196,7 +1196,12 @@ direction forbids (ADR-0014).
 the same Target Entity only when their Target Filters make their target record sets
 disjoint. This is what lets one total giving attribute on Account serve households
 through one definition and organizations and person Accounts through another. The
-settings console refuses a save that would overlap.
+Rollup Builder refuses a save of an active definition that would overlap another active one on
+the same attribute: when either has no Target Filter, when the two Target Filters are the same
+document, or when a record in the org meets both (one query per such pair, as the saving user).
+Disjointness by construction cannot be decided from two arbitrary filters, so two filters no
+current record meets together are allowed; the engine then writes each record from the
+definition whose filter admits it.
 
 **R-R9 Idempotency and negative amounts.** Recalculating any set of records produces the
 same result as calculating it the first time, and every aggregate is correct in the
@@ -1209,11 +1214,23 @@ packaged defaults of Section 26.
 **R-R10 Validation on save.** The target attribute must exist and be writable, the
 aggregate must suit the source attribute type, and FIRST and LAST must have an Order By
 Attribute. A definition that fails validation is not saved, and the message names the
-problem in plain language. Today the save refuses a target attribute whose type does not suit
-the aggregate (R-R15) and a COUNT_DISTINCT or text list with no Source Attribute; the other
-checks are made by the engine when it plans the definition, which leaves a definition that
-fails them out of the run and records why in the Error Log (R-R10 is completed with the Rollup
-Builder).
+problem in plain language. The checks sit in two places:
+
+- **Every save** (the "Check rollups before saving" automation) refuses a target attribute
+  whose type does not suit the aggregate (R-R15) and a COUNT_DISTINCT or text list with no
+  Source Attribute. It leaves an entity or attribute the org does not have to the planner, so
+  a definition for a module that is not installed can still be saved.
+- **The Rollup Builder's save** (`RollupBuilderController`) also refuses: a blank name; a
+  target entity or attribute the org does not have, or cannot write; a source entity the org
+  does not have, or a path whose first segment on any alternative is not a reference
+  attribute of the source; a Source Attribute the source does not have; SUM and AVG of
+  anything but a number, currency or percent, and MIN and MAX of anything but those or a
+  date; FIRST and LAST with no Order By Attribute; a fiscal window whose offset is not 0, -1 or
+  -2 or whose date attribute is not a date; a filter document that cannot be read or names an
+  attribute the entity does not have; and an overlap under R-R8.
+
+A definition written another way (an import, the API) that fails a Builder check is left out of
+the run by the planner, which records why in the Error Log.
 
 **R-R11 Recompute, and what marks a target.** Every calculation, instant, queued, nightly
 or on demand, recomputes each affected target record from all its source records; nothing
@@ -1333,8 +1350,15 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
 - **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
   Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed
   how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
-  set when the Rollup Builder ships). Long text attributes record that they changed, not the
-  values.
+  completed with the Rollup Builder, which set Filter and Target Filter). Long text attributes
+  record that they changed, not the values.
+- **Rollup Builder:** the `Rollup_Builder` tab and app page, `rollupBuilder` (which nests the
+  Rollups list, `rollupDefinitions`, with New, Edit and Copy), `rollupWizard` (the five steps)
+  and `rollupFilterBuilder` (R-R2 documents, built once and shared with Find, plan Section
+  4.9). `RollupBuilderController` describes the org for the steps, in the running user's
+  describe, and saves a definition in user mode after the checks of R-R10 and R-R8. A new
+  definition gets the Definition Key `Custom_` followed by 16 random hexadecimal characters,
+  and Is Package Default false; an edited one keeps its key.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`;
   apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the

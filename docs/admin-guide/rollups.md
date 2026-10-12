@@ -229,30 +229,98 @@ What to know about them:
   or a value changed back is reflected the next time the total is calculated, whatever its
   mode.
 
-## The Rollup Builder (coming)
+## The Rollup Builder
 
-The Rollup Builder is coming. It will be a tab of its own,
-**Rollup Builder**, where you create a new total and edit any existing one, shipped or your
-own, without typing a query. It walks you through five steps:
+The **Rollup Builder** tab in the **BarnCRM** app is where you create a new total and edit any
+existing one, shipped or your own, without typing a query. It lists every rollup with the same
+controls as the Rollups page (mode, active, **Recalculate**, the nightly schedule and
+**Recalculate all**), and adds **New rollup**, and **Edit** and **Copy** on each row. The tab
+comes with the **BarnCRM Admin** permission set, and saving needs the **Manage BarnCRM
+Settings** permission. The Rollups page in BarnCRM Settings links to it.
 
-1. **Where should the number appear?** The record and the field that show the total. If
-   the field does not exist yet, it links you to Setup to create it.
-2. **What should be counted?** The records that feed the total, and, for a person's
-   records, whether the total lands on the person or on their household.
+**Copy** is the quickest way to make a total like one you already have: it opens the Builder
+with everything filled in from that rollup, under a new name, for you to change. Editing a
+shipped rollup is fine: an upgrade never overwrites a rollup you have changed.
+
+The Builder walks you through five steps. **Next** checks the step you are on, and says what
+to change, before it lets you go on.
+
+1. **Where should the number appear?** The kind of record and the field that show the total.
+   Only fields BarnCRM can write are offered: numbers, amounts, percents, dates, checkboxes
+   and text. A field another active rollup already fills is marked with that rollup's name. If
+   the field does not exist yet, create it in Setup (a Number or Currency field is right for
+   most totals) and come back.
+2. **What should be counted?** The records that feed the total and the field that links them
+   to the record from step 1, in plain words: "Gift, by Donor". When the total lands on an
+   account and the records point at a person, you can also choose that person's household,
+   for example "Gift, by Donor (their household)".
 3. **How should it be calculated?** Any calculation in
-   [What a rollup can calculate](#what-a-rollup-can-calculate), offered only when the field
-   from step 1 can hold it, and the time window: all time, this fiscal year, last fiscal
-   year, or two years ago.
-4. **Which records count?** Conditions you pick from lists, read back as a sentence
-   ("Gifts whose Status is Received, Refunded or Written off").
-5. **Check and save.** Pick a real record and see what the total would be next to what the
-   record shows now, and how many records the rollup will maintain. Then choose its mode
-   and save.
+   [What a rollup can calculate](#what-a-rollup-can-calculate) that the field from step 1 can
+   hold, the field it reads, for First and Last the field that decides which record comes
+   first, and the time window: all time, this fiscal year, last fiscal year, or two fiscal
+   years ago, with the date that decides which year a record falls in.
+4. **Which records count?** Conditions you pick from lists (a field, a comparison and a
+   value), read back as a sentence: "Gifts whose Status is Received, Refunded or Written off".
+   Add a condition for each thing that must be true; to mix "and" and "or", type the
+   condition numbers in **Combine conditions**, for example `1 AND (2 OR 3)`. **Only for
+   some records** holds the same kind of conditions on the record that shows the total, for
+   two rollups that fill one field for different records.
+5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
+   what the total would be next to what the record shows now, and how many records the
+   rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
+   and calculate now** to start its recalculation straight away.
 
-The Builder also has a **Needs attention** list: records waiting in the queue, records whose
-totals could not be saved and why, and **Retry**. Before **Recalculate all** it tells you how
-long the run is likely to take and, during working hours, offers to run it tonight instead.
-Until the Builder ships, use the Rollups page described above.
+### What the Builder will not save
+
+It says what to change instead of saving:
+
+- A rollup with no name, or no field to show it.
+- A field BarnCRM cannot write, such as a formula.
+- A calculation the field cannot hold, for example a sum into a checkbox. The message says
+  which kind of field to choose.
+- A sum or average of something that is not a number or an amount, and a minimum or maximum
+  of something that is not a number, an amount or a date.
+- First or Last without the field that decides which record comes first.
+- A fiscal year window without a date to measure it on.
+- Conditions that name a field the records do not have.
+- A field another active rollup already fills for some of the same records. Two rollups may
+  fill one field only when their **Only for some records** conditions never pick the same
+  record, as the household and the organization giving totals do. The Builder checks your
+  records, and says which rollup it overlaps.
+
+### When your org uses more than one currency
+
+The Builder warns you on step 3:
+
+- On a total of amounts into a currency field: "This org uses more than one currency. Totals
+  are converted to each record's currency at today's rates, not the rate on the gift date."
+- On a total of amounts into a number field: "This field is a number, not a currency, so the
+  total is shown in the corporate currency."
+
+After changing exchange rates, recalculate your money totals to bring them up to date.
+
+### Needs attention
+
+Under the list, **Needs attention** shows what the engine has not finished:
+
+- **Records waiting**, for example "1,204 records waiting, oldest 3 minutes ago". These are
+  totals from bulk changes, queued and calculated within minutes. Nothing to do unless the
+  oldest is more than an hour old.
+- **Could not be saved**: each record whose totals failed five times, with a link to it,
+  what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
+  rule or a record someone was editing), then click **Retry** for the ones you selected, or
+  **Retry all**. They go back in the queue and are tried within minutes. The next nightly run
+  that saves a record also takes it off the list.
+- A warning when the nightly run is not scheduled, and how the last full run ended.
+
+### Recalculate all, now or tonight
+
+Before **Recalculate all** starts, the Builder says how many records it will go through and
+roughly how long that takes, for example "About 41,200 records, roughly 25 minutes." During
+working hours (8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it
+tonight instead, because a long run competes with people saving records. **Run tonight**
+does nothing extra when the nightly run is scheduled, since it already recalculates every
+total at 2:00 AM; otherwise it sets up a single run for 2:00 AM tonight.
 
 ## Instant totals on your own objects
 
@@ -317,15 +385,14 @@ Fund totals and soft credit totals, including a household's soft credit totals, 
 instantly like every other giving total: saving a gift allocation or a soft credit moves them,
 and so does changing a gift's status or deleting a gift. What is not here yet:
 
-- **The Rollup Builder and its Needs attention list** are coming. Until then, the Error Log
-  says how many records' totals could not be saved. BarnCRM tries them again automatically,
-  and the nightly run puts right any that still could not be saved.
-- **One-click instant totals on your own objects** are coming with the Builder. Until then,
-  use the [Flow template](#with-the-flow-template); without it, a rollup that counts records
-  from an object your organization created is calculated every night and when you click
+- **One-click instant totals on your own objects** are coming. Until then, use the
+  [Flow template](#with-the-flow-template); without it, a rollup that counts records from an
+  object your organization created is calculated every night and when you click
   **Recalculate**.
-- **Before the Builder ships, BarnCRM is checked against its previous rollup engine.** A
-  developer runs that comparison on a test org; it changes nothing in your data.
+- **The Builder cannot create a field.** Create it in Setup first, then pick it in step 1.
+- **BarnCRM is checked against its previous rollup engine** before that engine is removed
+  from the package. A developer runs the comparison on a test org; it changes nothing in your
+  data.
 
 ## A five-minute walkthrough
 
@@ -381,8 +448,8 @@ needs to be right the moment a record is saved, set it to **Instantly** or **Bot
 
 **Expecting an import's totals the moment it finishes.** Totals from a bulk change are
 queued and catch up within minutes, not in the same instant. Give it a few minutes before
-checking. If a number still has not moved, look in the Error Log for a rollup summary (the
-**Needs attention** list in the Rollup Builder will show this once the Builder ships).
+checking. If a number still has not moved, look at **Needs attention** in the Rollup Builder,
+which shows how many records are still waiting and which could not be saved.
 
 **Switching off a rollup automation and forgetting it (with Giving).** Instantly and Both
 work because Giving runs an automation each time a gift, a commitment, a gift allocation or

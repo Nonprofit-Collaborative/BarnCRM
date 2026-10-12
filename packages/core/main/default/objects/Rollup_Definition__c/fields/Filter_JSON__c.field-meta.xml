@@ -3,11 +3,11 @@
     <fullName>Filter_JSON__c</fullName>
     <description>Which source records count, held as a filter document. Empty means all of them.</description>
     <externalId>false</externalId>
-    <inlineHelpText>Which source records this rollup counts, as JSON. There is no filter builder yet, so editing the record directly is the only way to change it. Get the shape right by copying a shipped rollup that already filters the way you want.</inlineHelpText>
+    <inlineHelpText>Which source records this rollup counts, as JSON. Change it in the Rollup Builder, step 4, which writes this for you.</inlineHelpText>
     <label>Filter</label>
     <length>32768</length>
     <required>false</required>
-    <trackHistory>false</trackHistory>
+    <trackHistory>true</trackHistory>
     <type>LongTextArea</type>
     <visibleLines>6</visibleLines>
 </CustomField>
