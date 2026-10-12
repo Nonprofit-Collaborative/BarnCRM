@@ -22,6 +22,7 @@
     "check:components-reachable": "python3 scripts/ci/check-components-reachable.py",
     "check:record-pages-assigned": "python3 scripts/ci/check-record-pages-assigned.py",
     "check:canonical-model": "python3 scripts/ci/check-canonical-model.py",
+    "check:openapi": "node scripts/ci/check-openapi.js",
     "check:setting-defaults": "python3 scripts/ci/check-setting-defaults.py",
     "check:setting-object-explicit": "python3 scripts/ci/check-setting-object-explicit.py",
     "precommit": "lint-staged",
@@ -40,6 +41,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "prettier": "3.9.9",
-    "prettier-plugin-apex": "2.3.0"
+    "prettier-plugin-apex": "2.3.0",
+    "yaml": "2.9.1"
   }
 }

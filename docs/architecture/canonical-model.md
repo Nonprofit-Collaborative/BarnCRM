@@ -953,12 +953,12 @@ Automation Setting records (Section 10) on install and on upgrade.
 |---|---|---|
 | DeveloperName | text | The stable identifier of the automation, matched to Automation Setting. |
 | Label | text | The automation's name as the admin sees it. |
-| Description__c | long text | What the automation does, in nonprofit language. |
-| Enabled_By_Default__c | boolean | Whether the automation is on when it is first materialized. |
+| `Description__c` | long text | What the automation does, in nonprofit language. |
+| `Enabled_By_Default__c` | boolean | Whether the automation is on when it is first materialized. |
 | `Always_Runs__c` | boolean, default false | Whether this automation enforces a rule rather than providing a convenience, so it cannot be switched off from the console or suppressed by a pause (ADR-0024). Copied to `Automation_Setting__c.Always_Runs__c` when the record is materialized. |
-| Handler_Class__c | text | The Apex handler the trigger dispatcher invokes. |
-| Object_Name__c | text | The object whose trigger this automation runs on. |
-| Execution_Order__c | integer | The order in which handlers run for that object. |
+| `Handler_Class__c` | text | The Apex handler the trigger dispatcher invokes. |
+| `Object_Name__c` | text | The object whose trigger this automation runs on. |
+| `Execution_Order__c` | integer | The order in which handlers run for that object. |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized
@@ -973,27 +973,27 @@ materialized into `Rollup_Definition__c` records (Section 14) on install and on 
 defaults", matched by Definition Key. Both Core and Giving ship rows; the metadata type
 itself belongs to Core.
 
-| Field | Type | Definition |
-|---|---|---|
-| DeveloperName | text | The stable identifier of the shipped definition. |
-| Label | text | The rollup's name as the admin sees it. |
-| Description | long text | What this number means, in nonprofit language. |
-| Definition Key | text | The key written to the materialized record and matched on upgrade. |
-| Source Object | text | The entity whose records are aggregated. |
-| Target Object | text | The entity that carries the number. |
-| Relationship Path | text | The path from source to target, in the notation in R-R1. |
-| Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG) | The calculation applied. |
-| Source Field | text | The attribute aggregated, empty for COUNT. |
-| Order By Field | text | The attribute that decides first and last. |
-| Target Field | text | The attribute that receives the result. |
-| Filter JSON | long text | The source filter document (R-R2). |
-| Target Filter JSON | long text | The target filter document (R-R8). |
-| Fiscal Year Aware | boolean | Whether the calculation is limited to a fiscal year window. |
-| Fiscal Year Offset | integer | Which window: 0, -1, or -2. |
-| Fiscal Date Field | text | The date attribute the window is measured on, written to the materialized definition. |
-| Mode | picklist(Real-time, Scheduled, Both) | The mode the materialized definition starts in. |
-| Default Active | boolean | Whether the definition is active when it is first materialized. |
-| Package | text | The package that ships this row, so Giving's rows are materialized only when Giving is installed. |
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the shipped definition. |
+| Label | `MasterLabel` | text | The rollup's name as the admin sees it. |
+| Description | `Description__c` | long text | What this number means, in nonprofit language. |
+| Definition Key | `Definition_Key__c` | text | The key written to the materialized record and matched on upgrade. |
+| Source Object | `Source_Object__c` | text | The entity whose records are aggregated. |
+| Target Object | `Target_Object__c` | text | The entity that carries the number. |
+| Relationship Path | `Relationship_Path__c` | text | The path from source to target, in the notation in R-R1. |
+| Aggregate | `Aggregate__c` | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG) | The calculation applied. |
+| Source Field | `Source_Field__c` | text | The attribute aggregated, empty for COUNT. |
+| Order By Field | `Order_By_Field__c` | text | The attribute that decides first and last. |
+| Target Field | `Target_Field__c` | text | The attribute that receives the result. |
+| Filter JSON | `Filter_JSON__c` | long text | The source filter document (R-R2). |
+| Target Filter JSON | `Target_Filter_JSON__c` | long text | The target filter document (R-R8). |
+| Fiscal Year Aware | `Fiscal_Year_Aware__c` | boolean | Whether the calculation is limited to a fiscal year window. |
+| Fiscal Year Offset | `Fiscal_Year_Offset__c` | integer | Which window: 0, -1, or -2. |
+| Fiscal Date Field | `Fiscal_Date_Field__c` | text | The date attribute the window is measured on, written to the materialized definition. |
+| Mode | `Mode__c` | picklist(Real-time, Scheduled, Both) | The mode the materialized definition starts in. |
+| Default Active | `Default_Active__c` | boolean | Whether the definition is active when it is first materialized. |
+| Package | `Package__c` | text | The package that ships this row, so Giving's rows are materialized only when Giving is installed. |
 
 ### Import Template Default
 
@@ -1001,17 +1001,17 @@ itself belongs to Core.
 materialized into `Import_Template__c` records (Section 15) the same way. Its fields
 mirror the template's own attributes.
 
-| Field | Type | Definition |
-|---|---|---|
-| DeveloperName | text | The stable identifier of the shipped template. |
-| Label | text | The template's name as the admin sees it. |
-| Description | long text | What kind of file this template reads. |
-| Template Key | text | The key written to the materialized record and matched on upgrade. |
-| Column Mapping JSON | long text | The mapping document (R-IT1). |
-| Default Values JSON | long text | The defaults document (R-IT1). |
-| Matching Rule | picklist(Email exact, Name plus postal code, External ID) | The matching rule the template starts with. |
-| Person Mode | picklist(Contacts, Person Accounts) | Whether the template creates Contacts or person Accounts, overridden from the detected org shape on materialization. |
-| Default Active | boolean | Whether the template is offered when it is first materialized. |
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the shipped template. |
+| Label | `MasterLabel` | text | The template's name as the admin sees it. |
+| Description | `Description__c` | long text | What kind of file this template reads. |
+| Template Key | `Template_Key__c` | text | The key written to the materialized record and matched on upgrade. |
+| Column Mapping JSON | `Column_Mapping_JSON__c` | long text | The mapping document (R-IT1). |
+| Default Values JSON | `Default_Values_JSON__c` | long text | The defaults document (R-IT1). |
+| Matching Rule | `Matching_Rule__c` | picklist(Email exact, Name plus postal code, External ID) | The matching rule the template starts with. |
+| Person Mode | `Person_Mode__c` | picklist(Contacts, Person Accounts) | Whether the template creates Contacts or person Accounts, overridden from the detected org shape on materialization. |
+| Default Active | `Default_Active__c` | boolean | Whether the template is offered when it is first materialized. |
 
 ### Relationship Type
 
