@@ -372,6 +372,7 @@
     <connector>
       <targetReference>Get_Type_Mapping</targetReference>
     </connector>
+    <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.Contact__c}), ISCHANGED({!$Record.Person_Account__c}), ISCHANGED({!$Record.Related_Contact__c}), ISCHANGED({!$Record.Related_Person_Account__c}), ISCHANGED({!$Record.Type__c}), ISCHANGED({!$Record.Status__c}), ISCHANGED({!$Record.End_Date__c}))</filterFormula>
     <object>Relationship__c</object>
     <recordTriggerType>CreateAndUpdate</recordTriggerType>
     <triggerType>RecordBeforeSave</triggerType>
