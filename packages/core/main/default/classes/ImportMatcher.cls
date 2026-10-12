@@ -95,9 +95,18 @@ public with sharing class ImportMatcher {
         if (key == null) {
             return null;
         }
-        return key +
-            FIRST_NAME_SEPARATOR +
-            (String.isBlank(firstName) ? '' : firstName.trim().toLowerCase());
+        String first = comparableFirstName(firstName);
+        return key + FIRST_NAME_SEPARATOR + (first == null ? '' : first);
+    }
+
+    /**
+     * A first name as it is compared, or null when there is none: case and spacing are
+     * ignored ("JANE", " Jane " and "jane" are one name, as are "Mary Ann" and "Mary  Ann"),
+     * but nothing else is, so an accent, an initial or a short form is a different name.
+     */
+    @NamespaceAccessible
+    public static String comparableFirstName(String name) {
+        return String.isBlank(name) ? null : name.trim().replaceAll('\\s+', ' ').toLowerCase();
     }
 
     /** The shared key a first-name key narrows, or the key itself when it narrows none. */
@@ -108,8 +117,8 @@ public with sharing class ImportMatcher {
 
     /**
      * The shared keys the last lookup found on more than one record, such as a couple at one
-     * address or with one email. A person is matched on such a key only by their first name,
-     * or when the row gives no first name (R-IB12).
+     * address or with one email. Only a row giving no first name is matched on a shared key
+     * alone, to its earliest holder; this tells the processor how many hold it (R-IB12).
      */
     private static Set<String> heldByMany = new Set<String>();
 
