@@ -1,0 +1,221 @@
+/**
+ * The fields of one object as the running user sees them, for the filter builder and Find.
+ *
+ * Everything here comes from describe calls made as the running user: an object the user cannot
+ * query is refused, and a field the user cannot read is left out. That is what lets the filter
+ * builder promise it never offers a field the user cannot see, and what lets a query compiler
+ * take object and field names only from describe results (plan Section 4.9, ADR-0047). Core
+ * names no object here: the object arrives as text, so the same catalog serves an org with or
+ * without the standard objects (ADR-0013).
+ */
+public with sharing class QueryFieldCatalog {
+    /** Raised when an object or field is not one the running user can see. */
+    public class QueryFieldCatalogException extends Exception {
+    }
+
+    /** How many lookups a field path may cross (canonical model R-R2, parent fields). */
+    public static final Integer MAX_PARENT_DEPTH = 2;
+
+    /** Compound and binary types no filter, sort or grid can use. */
+    private static final Set<Schema.DisplayType> NEVER_OFFERED = new Set<Schema.DisplayType>{
+        Schema.DisplayType.ADDRESS,
+        Schema.DisplayType.LOCATION,
+        Schema.DisplayType.BASE64,
+        Schema.DisplayType.COMPLEXVALUE,
+        Schema.DisplayType.ANYTYPE
+    };
+
+    private static final Pattern NAME = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*$');
+
+    /** One field, as the builder offers it. */
+    public class FieldInfo {
+        @AuraEnabled
+        public String apiName;
+        @AuraEnabled
+        public String label;
+        /** The describe type in lower case: string, picklist, double, currency, date, and so on. */
+        @AuraEnabled
+        public String dataType;
+        @AuraEnabled
+        public Boolean filterable;
+        @AuraEnabled
+        public Boolean sortable;
+        /** The parent object of a lookup with exactly one parent type; empty otherwise. */
+        @AuraEnabled
+        public String referenceTo;
+        /** The name a path uses to cross this lookup (`Household__r`), set with referenceTo. */
+        @AuraEnabled
+        public String relationshipName;
+        @AuraEnabled
+        public List<PicklistOption> picklistValues;
+    }
+
+    /** One active picklist value. */
+    public class PicklistOption {
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public String value;
+    }
+
+    /** One object and its fields, sorted by label. */
+    public class ObjectInfo {
+        @AuraEnabled
+        public String apiName;
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public String labelPlural;
+        @AuraEnabled
+        public List<FieldInfo> fields;
+    }
+
+    /** What the filter builder and Find read. Cached per object in the browser. */
+    @AuraEnabled(cacheable=true)
+    public static ObjectInfo getObjectInfo(String objectApiName) {
+        try {
+            return describe(objectApiName);
+        } catch (QueryFieldCatalogException refused) {
+            AuraHandledException reported = new AuraHandledException(refused.getMessage());
+            reported.setMessage(refused.getMessage());
+            throw reported;
+        }
+    }
+
+    /** The object and every field the running user can read on it. */
+    public static ObjectInfo describe(String objectApiName) {
+        Schema.DescribeSObjectResult objectDescribe = describeObject(objectApiName);
+        ObjectInfo info = new ObjectInfo();
+        info.apiName = objectDescribe.getName();
+        info.label = objectDescribe.getLabel();
+        info.labelPlural = objectDescribe.getLabelPlural();
+        info.fields = new List<FieldInfo>();
+        Map<String, FieldInfo> byLabel = new Map<String, FieldInfo>();
+        for (Schema.SObjectField field : objectDescribe.fields.getMap().values()) {
+            Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
+            if (!isOffered(fieldDescribe)) {
+                continue;
+            }
+            FieldInfo fieldInfo = toFieldInfo(fieldDescribe);
+            byLabel.put(fieldInfo.label.toLowerCase() + '\u0000' + fieldInfo.apiName, fieldInfo);
+        }
+        List<String> keys = new List<String>(byLabel.keySet());
+        keys.sort();
+        for (String key : keys) {
+            info.fields.add(byLabel.get(key));
+        }
+        return info;
+    }
+
+    /** The describe of an object the running user can query, or a refusal that says so. */
+    public static Schema.DescribeSObjectResult describeObject(String objectApiName) {
+        if (String.isBlank(objectApiName) || !NAME.matcher(objectApiName).matches()) {
+            throw unknownObject(objectApiName);
+        }
+        List<Schema.DescribeSObjectResult> found;
+        try {
+            found = Schema.describeSObjects(
+                new List<String>{ objectApiName },
+                SObjectDescribeOptions.DEFERRED
+            );
+        } catch (InvalidParameterValueException missing) {
+            throw unknownObject(objectApiName);
+        }
+        if (found.isEmpty() || !found[0].isAccessible() || !found[0].isQueryable()) {
+            throw unknownObject(objectApiName);
+        }
+        return found[0];
+    }
+
+    /**
+     * Follows a field path such as `Household__r.Name` from an object, checking each step against
+     * the running user's describe, and returns the field it ends on. A path may cross at most
+     * MAX_PARENT_DEPTH lookups, each with exactly one parent type.
+     */
+    public static Schema.DescribeFieldResult resolvePath(String objectApiName, String path) {
+        Schema.DescribeSObjectResult current = describeObject(objectApiName);
+        List<String> segments = String.isBlank(path) ? new List<String>() : path.split('\\.');
+        if (segments.isEmpty() || segments.size() > MAX_PARENT_DEPTH + 1) {
+            throw unknownField(path);
+        }
+        for (Integer index = 0; index < segments.size() - 1; index++) {
+            Schema.DescribeFieldResult lookup = lookupByRelationship(current, segments[index]);
+            if (lookup == null) {
+                throw unknownField(path);
+            }
+            current = describeObject(lookup.getReferenceTo()[0].getDescribe().getName());
+        }
+        String leafName = segments[segments.size() - 1];
+        Schema.SObjectField leaf = NAME.matcher(leafName).matches()
+            ? current.fields.getMap().get(leafName)
+            : null;
+        if (leaf == null || !isOffered(leaf.getDescribe())) {
+            throw unknownField(path);
+        }
+        return leaf.getDescribe();
+    }
+
+    private static Schema.DescribeFieldResult lookupByRelationship(
+        Schema.DescribeSObjectResult objectDescribe,
+        String relationshipName
+    ) {
+        for (Schema.SObjectField field : objectDescribe.fields.getMap().values()) {
+            Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
+            if (
+                fieldDescribe.getRelationshipName() != null &&
+                fieldDescribe.getRelationshipName().equalsIgnoreCase(relationshipName) &&
+                fieldDescribe.getReferenceTo().size() == 1 &&
+                fieldDescribe.isAccessible()
+            ) {
+                return fieldDescribe;
+            }
+        }
+        return null;
+    }
+
+    private static Boolean isOffered(Schema.DescribeFieldResult fieldDescribe) {
+        return fieldDescribe.isAccessible() && !NEVER_OFFERED.contains(fieldDescribe.getType());
+    }
+
+    private static FieldInfo toFieldInfo(Schema.DescribeFieldResult fieldDescribe) {
+        FieldInfo info = new FieldInfo();
+        info.apiName = fieldDescribe.getName();
+        info.label = fieldDescribe.getLabel();
+        info.dataType = String.valueOf(fieldDescribe.getType()).toLowerCase();
+        info.filterable = fieldDescribe.isFilterable();
+        info.sortable = fieldDescribe.isSortable();
+        List<Schema.SObjectType> parents = fieldDescribe.getReferenceTo();
+        if (parents.size() == 1 && fieldDescribe.getRelationshipName() != null) {
+            info.referenceTo = parents[0].getDescribe().getName();
+            info.relationshipName = fieldDescribe.getRelationshipName();
+        }
+        info.picklistValues = new List<PicklistOption>();
+        for (Schema.PicklistEntry entry : fieldDescribe.getPicklistValues()) {
+            if (entry.isActive()) {
+                PicklistOption option = new PicklistOption();
+                option.label = entry.getLabel();
+                option.value = entry.getValue();
+                info.picklistValues.add(option);
+            }
+        }
+        return info;
+    }
+
+    private static QueryFieldCatalogException unknownObject(String objectApiName) {
+        return new QueryFieldCatalogException(
+            String.format(
+                System.Label.Core_Filter_ErrorUnknownObject,
+                new List<Object>{ String.valueOf(objectApiName) }
+            )
+        );
+    }
+
+    private static QueryFieldCatalogException unknownField(String path) {
+        return new QueryFieldCatalogException(
+            String.format(
+                System.Label.Core_Filter_ErrorUnknownField,
+                new List<Object>{ String.valueOf(path) }
+            )
+        );
+    }
+}

@@ -37,6 +37,17 @@ public with sharing class RollupFilterParser {
         'is not null'
     };
     private static final Set<String> LIST_OPERATORS = new Set<String>{ 'in', 'not in' };
+
+    /**
+     * Relative date operators (R-R2 extensions). They render as the platform's date literals, and
+     * the only value any of them takes is a whole number of days, written back from an Integer.
+     */
+    private static final Map<String, String> DATE_LITERAL_BY_OPERATOR = new Map<String, String>{
+        'this year' => 'THIS_YEAR',
+        'last year' => 'LAST_YEAR'
+    };
+    private static final String LAST_N_DAYS = 'last n days';
+    private static final Integer MAX_DAYS = 3650;
     private static final Pattern DATE_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}$');
     private static final Pattern DATETIME_VALUE = Pattern.compile(
         '^\\d{4}-\\d{2}-\\d{2}T[0-9:.]+Z$'
@@ -99,6 +110,12 @@ public with sharing class RollupFilterParser {
         if (String.isBlank(fieldName) || FIELD_NAME.matcher(fieldName).matches() == false) {
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
         }
+        if (DATE_LITERAL_BY_OPERATOR.containsKey(operator)) {
+            return fieldName + ' = ' + DATE_LITERAL_BY_OPERATOR.get(operator);
+        }
+        if (operator == LAST_N_DAYS) {
+            return fieldName + ' = LAST_N_DAYS:' + dayCount(condition.get('value'));
+        }
         if (COMPARISON_BY_OPERATOR.containsKey(operator) == false) {
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidOperator);
         }
@@ -128,6 +145,20 @@ public with sharing class RollupFilterParser {
             return fieldName + ' ' + comparison + ' ' + renderValue(String.valueOf(rawValue) + '%');
         }
         return fieldName + ' ' + comparison + ' ' + renderValue(rawValue);
+    }
+
+    /** The day count of `last n days`: a whole number from 1 to MAX_DAYS, or a refusal. */
+    private static Integer dayCount(Object rawValue) {
+        Decimal days;
+        try {
+            days = rawValue == null ? null : Decimal.valueOf(String.valueOf(rawValue).trim());
+        } catch (TypeException notANumber) {
+            days = null;
+        }
+        if (days == null || days.stripTrailingZeros().scale() > 0 || days < 1 || days > MAX_DAYS) {
+            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+        }
+        return days.intValue();
     }
 
     /**

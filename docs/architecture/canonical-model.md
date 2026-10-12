@@ -1142,6 +1142,36 @@ Operators: equals, not equals, less than, less or equal, greater than, greater o
 contains, does not contain, starts with, is null, is not null, in, not in. The `logic`
 key is optional and defaults to every condition joined by AND.
 
+*Extensions added with Find (C-34), still version 1.* Every addition is new syntax a
+version 1 reader refuses rather than misreads, so the version number does not change.
+
+- **Relative dates.** Three more operators, for date and date/time fields only: `this
+  year` and `last year` (no value; calendar years in the running user's time zone) and
+  `last n days` (value: a whole number from 1 to 3650; today and the n days before it).
+  They render as the platform's date literals (`THIS_YEAR`, `LAST_YEAR`,
+  `LAST_N_DAYS:n`), never as typed text: the number is read as an integer and written
+  back from that integer.
+- **Parent fields.** `field` may be a path through lookups, written with relationship
+  names (`Household__r.Name`), at most two lookups deep. Each segment is checked against
+  the running user's describe of the object it is on.
+- **Typed values.** The filter builder writes a number as a JSON number, a checkbox as
+  `true` or `false`, a date as `YYYY-MM-DD`, a date/time as `YYYY-MM-DDThh:mm:ssZ`, and
+  `in` and `not in` as a list. A reader that knows the object coerces each value to the
+  field's type and refuses one that does not fit.
+- **Operators by field type.** The builder offers only what suits the field: text, email,
+  phone and URL get equals, not equals, contains, does not contain, starts with, in, not
+  in and the two null tests; picklists get equals, not equals, in, not in and the null
+  tests; numbers, currency and percent get the six comparisons and the null tests; dates
+  and date/times get those plus the three relative operators; checkboxes get equals only;
+  lookups and Ids get equals, not equals, in, not in and the null tests. Fields the
+  platform cannot filter on (long text, compound address and location fields) are not
+  offered.
+
+The filter builder (`filterBuilder`, one Core component) is the only writer of the
+document, for both the Rollups page and Find, and it reads field lists from the running
+user's describe through `QueryFieldCatalog`, so it never offers a field the user cannot
+see.
+
 *Why a document and not child rows.* Nothing the plan requires breaks without child rows.
 A filter is never managed as a list in its own right: it is built, saved, and shipped as
 part of one definition, so child rows would add parent-child DML ordering, orphan
@@ -5358,6 +5388,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-09-24 | Cancelled gift status, by the owner's decision (ADR-0054, amending G-04, ADR-0022, ADR-0023 and ADR-0031). No object added. `Gift__c.Status__c` gains Cancelled. New R-G16: a Pending gift that will never be paid is cancelled, with no negative gift, outside every total, the export and receipts, and allowed in a closed period; it moves only between Pending and Cancelled and unlinks its installment. R-G3: only a Received gift is refunded or written off. R-G14, R-AK8, R-RC8 and Section 26 name Cancelled. |
 | v0.6 | 2026-09-24 | C-23 automation pause with automatic resume, and the error digest (ADR-0055). No object added. `Nonprofit_Settings__c` gains five keys (Section 12, v0.6 keys): `Error_Digest_Recipients__c`, `Error_Digest_Frequency__c`, `Error_Digest_Covered_Until__c`, `Error_Digest_Last_Run__c` and `Error_Digest_Last_Run_Summary__c`. New rules R-A5 (a pause ends by itself through a one-time job that records the resume) and R-E5 (the digest counts and links, never quotes, and goes only to active users); R-E3 reworded to point at R-E5. |
 | v0.6 | 2026-09-25 | G-20 follow-up: Health Check finding for unposted gifts in a closed period (ADR-0053's recorded follow-up, ADR-0057). No object, field or rule added: the finding reports what R-G14 already locks, a gift with a counting status (ADR-0022) and a type other than In-kind, dated on or before Books Closed Through, whose `Accounting_Posted_At__c` is still empty, capped and linked the way C-21's orphan findings already are. Because Core may not name a gift or a closed period (C-29), Core gains a small extension seam instead of a new Core check: `HealthCheckExtension`, an interface, and `HealthCheckExtensions`, a resolver that finds an implementation by name with `Type.forName`, the same shape `ImportEntityProcessor` already uses for the opposite direction (R-IR6). `HealthCheckService.run()` folds a found extension's findings into the one report, isolated the way one failing check already is. Giving ships the one implementation, `GivingHealthCheckExtension`, delegating to `HealthCheckGivingChecks`, grouped the way ADR-0039 groups Core's own checks. |
+| v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
 
 ---
 ## 32. Entity ownership by package
