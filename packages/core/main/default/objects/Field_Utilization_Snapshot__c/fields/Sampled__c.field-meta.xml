@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Sampled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>
+    Checked when the field could not be counted across every record (long text, rich text,
+    encrypted), so it was counted on the 200 most recently modified records instead.
+  </description>
+  <externalId>false</externalId>
+  <label>Sampled</label>
+  <type>Checkbox</type>
+</CustomField>

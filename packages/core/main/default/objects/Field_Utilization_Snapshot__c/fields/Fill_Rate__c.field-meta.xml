@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Fill_Rate__c</fullName>
+  <description>Filled Count as a share of Record Count. Blank when no records were looked at.</description>
+  <externalId>false</externalId>
+  <formula>IF(Record_Count__c &gt; 0, Filled_Count__c / Record_Count__c, NULL)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <label>Fill Rate</label>
+  <precision>18</precision>
+  <required>false</required>
+  <scale>1</scale>
+  <type>Percent</type>
+  <unique>false</unique>
+</CustomField>

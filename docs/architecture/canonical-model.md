@@ -884,6 +884,18 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
 
+### Field utilization keys
+
+Added by field utilization (plan Section 6.1 item 10, Section 29D, ADR-NEXT
+`NEXT-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
+scheduling its job from the console (ADR-0038), so it has no on and off key.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Field_Utilization_Objects__c` | text (255) | empty | The API names of the objects the field utilization count covers, separated by commas, each checked against describe when saved and again when counted. Empty counts nothing. Written from the Field Utilization page only, with Manage BarnCRM Settings, and audited. |
+| `Field_Utilization_Last_Run__c` | datetime | empty | When the last field utilization count finished. Written by the job. |
+| `Field_Utilization_Last_Run_Summary__c` | text (255) | empty | What the last count did, in one sentence: fields and objects counted, fields that could not be counted, objects skipped as too large. Written by the job. |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -4918,6 +4930,77 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
   `DuplicateController`. The review page is the `duplicateReview` panel on the Households page
   of BarnCRM Settings.
 
+## 29D. Field Utilization Snapshot
+
+### Definition
+
+One count of how many records hold a value in one field, for one object and one record type,
+taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-NEXT
+`NEXT-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
+a run is the set of rows sharing it, and a trend is the same object, field and record type
+across runs. Neutral: it names no nonprofit concept and is in Core.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The snapshot's identifier, assigned automatically. |
+| Object Name | text | yes | The API name of the object counted, as describe gives it. |
+| Field Name | text | yes | The API name of the field counted, as describe gives it. |
+| Field Label | text | yes | The field's label when it was counted, for reports. |
+| Record Type | text | no | The developer name of the record type the count is for. Empty when the object has no record types, or for its records with none. |
+| Filled Count | number | yes | Records in this group with a value in the field. |
+| Record Count | number | yes | Records in this group that were looked at. |
+| Fill Rate | percent | computed | Filled Count divided by Record Count. |
+| Sampled | boolean | yes | True when the count covers a sample of recent records rather than all of them. |
+| Taken At | datetime | yes | When the run started. |
+
+### Rules
+
+**R-FU1 Describe only.** Objects come from the saved list `Field_Utilization_Objects__c`,
+each kept only when the global describe has it and it is queryable and accessible; fields come
+from that object's describe. No typed text reaches a query.
+**R-FU2 What is counted.** A field is counted when the runner can read it and either create or
+edit it, and it is not a formula, roll-up, auto number, checkbox, compound (address or
+location) or non-nillable field.
+**R-FU3 User mode.** Every count, read and write is in user mode, so a run counts the records
+its runner can see. Written into the page and the admin guide.
+**R-FU4 Count, else sample.** A filterable field is counted with one `COUNT(field)` query
+grouped by record type, one query row per group. A field that is not filterable, or whose
+count is refused, is counted on the 200 most recently modified records and its rows are
+Sampled.
+**R-FU5 Size limit.** An object holding more than 1,000,000 records is skipped and named in the
+run summary.
+**R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
+**R-FU7 Retention.** Rows are never edited. Each run's finish deletes rows whose Taken At is more
+than 13 months old.
+**R-FU8 Visible last run.** Each run records when it finished and a one sentence summary on
+`BarnCRM_Settings__c`, including a run that counted nothing.
+
+### Salesforce implementation
+
+- **Object** `Field_Utilization_Snapshot__c`, auto number Name `FUS-{000000}`, public read only
+  sharing, reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it:
+  Read, Create, Delete, View All and Modify All (the last so a user-mode retention delete
+  reaches another administrator's rows).
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Object Name | `Object_Name__c` | Text(80) | |
+| Field Name | `Field_Name__c` | Text(80) | |
+| Field Label | `Field_Label__c` | Text(255) | |
+| Record Type | `Record_Type__c` | Text(80) | Developer name. |
+| Filled Count | `Filled_Count__c` | Number(18, 0) | |
+| Record Count | `Record_Count__c` | Number(18, 0) | |
+| Fill Rate | `Fill_Rate__c` | Formula (Percent) | Blank when Record Count is 0. |
+| Sampled | `Sampled__c` | Checkbox | Default false. |
+| Taken At | `Taken_At__c` | DateTime | |
+
+- **Service:** `FieldUtilizationService` (plan and count), `FieldUtilizationBatch` (25 fields
+  per chunk), `FieldUtilizationScheduler` (weekly, Sundays 04:00), `FieldUtilizationSelector`,
+  `FieldUtilizationController`. The page is the `fieldUtilization` panel on the Field
+  Utilization page of BarnCRM Settings.
+
 ---
 
 # Part F: Connect additions for v0.6
@@ -5398,6 +5481,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29D, 12 |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
@@ -5471,3 +5555,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | API name pass (ADR-NEXT, `NEXT-barncrm-api-names.md`). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
 | v0.6 | 2026-10-12 | API name pass, access and navigation (`NEXT-barncrm-api-names.md`). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
 | v0.6 | 2026-10-12 | API name pass, stored values and the import field (`NEXT-barncrm-api-names.md`). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-NEXT `NEXT-field-utilization-ships-in-core.md`). New Section 29D, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
