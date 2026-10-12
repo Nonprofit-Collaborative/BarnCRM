@@ -3,7 +3,7 @@
   <fullName>Rollups_Last_Calculated__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>
-    When Open Impact last worked out the giving numbers on this record.
+    When BarnCRM last worked out the giving numbers on this record.
   </inlineHelpText>
   <label>Rollups Last Calculated</label>
   <required>false</required>

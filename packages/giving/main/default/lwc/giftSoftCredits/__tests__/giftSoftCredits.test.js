@@ -97,7 +97,7 @@ describe('c-gift-soft-credits', () => {
     expect(items[0].textContent).toContain('Household Member');
   });
 
-  it('badges the credit Open Impact created and offers no remove button for it', async () => {
+  it('badges the credit BarnCRM created and offers no remove button for it', async () => {
     const element = createComponent();
     getCredits.emit(PANEL);
     await flush();
@@ -177,7 +177,7 @@ describe('c-gift-soft-credits', () => {
 
   it('shows the message the server sends when an action is refused', async () => {
     removeCredit.mockRejectedValue({
-      body: { message: 'Open Impact created this credit and keeps it up to date.' }
+      body: { message: 'BarnCRM created this credit and keeps it up to date.' }
     });
     const element = createComponent();
     getCredits.emit(PANEL);
@@ -187,7 +187,7 @@ describe('c-gift-soft-credits', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent.trim()).toBe(
-      'Open Impact created this credit and keeps it up to date.'
+      'BarnCRM created this credit and keeps it up to date.'
     );
   });
 

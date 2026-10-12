@@ -6,8 +6,8 @@
 # WHY IN STAGES. The first deploy this project ever attempted sent all 982 components in one
 # request and came back with UNKNOWN_EXCEPTION, zero components deployed, zero component
 # errors, and a Salesforce ErrorId. A failure with no component attached tells you nothing
-# about which of 982 things caused it. Deploying the vendored tree separately from Open
-# Impact's own source, and Core before Giving, means the next such failure names a stage.
+# about which of 982 things caused it. Deploying the vendored tree separately from
+# BarnCRM's own source, and Core before Giving, means the next such failure names a stage.
 #
 # It also matches how the packages actually depend on each other: the vendored engine is
 # self contained, Core does not call it yet, and Giving depends on Core.

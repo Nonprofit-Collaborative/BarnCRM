@@ -130,7 +130,7 @@ public class ReceiptTestDataFactory {
         };
 
         ReceiptService.issuePermission = true;
-        // Maria configures Open Impact, so the tests that edit a letter run as somebody who may.
+        // Maria configures BarnCRM, so the tests that edit a letter run as somebody who may.
         // A custom permission cannot be granted to the user a test runs as without assigning a
         // permission set, which would make every receipting test a test of that assignment.
         ReceiptTemplateService.managePermission = true;

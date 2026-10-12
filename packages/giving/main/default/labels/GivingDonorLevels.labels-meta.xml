@@ -142,7 +142,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: recalculation refused</shortDescription>
-    <value>You need the Manage Nonprofit Settings permission to place every donor on the ladder. Ask whoever set up Open Impact for it.</value>
+    <value>You need the Manage Nonprofit Settings permission to place every donor on the ladder. Ask whoever set up BarnCRM for it.</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_TurnOnFirst</fullName>
@@ -158,6 +158,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Donor levels page: something went wrong</shortDescription>
-    <value>Open Impact could not read your donor levels. The details are in the Error Log.</value>
+    <value>BarnCRM could not read your donor levels. The details are in the Error Log.</value>
   </labels>
 </CustomLabels>

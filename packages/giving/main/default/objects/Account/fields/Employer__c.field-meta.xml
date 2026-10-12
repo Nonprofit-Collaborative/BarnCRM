@@ -4,7 +4,7 @@
   <deleteConstraint>SetNull</deleteConstraint>
   <description>
     The organization this person works for, used to recognize the employer when a matching gift
-    arrives. Open Impact checks a matching gift link against it where it is set, and links
+    arrives. BarnCRM checks a matching gift link against it where it is set, and links
     without complaint where it is blank (R-G11).
   </description>
   <externalId>false</externalId>

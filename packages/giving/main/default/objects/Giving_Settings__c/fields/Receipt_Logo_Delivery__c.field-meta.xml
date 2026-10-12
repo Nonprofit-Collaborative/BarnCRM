@@ -3,7 +3,7 @@
   <fullName>Receipt_Logo_Delivery__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>
-    How the logo image reaches the PDF. Leave it empty unless Open Impact support asks you to
+    How the logo image reaches the PDF. Leave it empty unless BarnCRM support asks you to
     change it: empty means the route the product ships with.
   </inlineHelpText>
   <label>Receipt Logo Delivery</label>

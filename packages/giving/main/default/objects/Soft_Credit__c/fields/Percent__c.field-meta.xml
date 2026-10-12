@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Percent__c</fullName>
   <description>
-    The credited amount as a share of the gift, maintained by Open Impact from the amount so that
+    The credited amount as a share of the gift, maintained by BarnCRM from the amount so that
     staff can enter and check a credit either way.
   </description>
   <externalId>false</externalId>

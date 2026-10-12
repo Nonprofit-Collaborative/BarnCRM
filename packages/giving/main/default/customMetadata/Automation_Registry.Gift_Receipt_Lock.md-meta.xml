@@ -26,6 +26,6 @@
         <field>Description__c</field>
         <value
       xsi:type="xsd:string"
-    >Protects the receipt a donor is holding: once a gift has a receipt number, its amount, date, donor and receipt number cannot change and the gift cannot be deleted. A receipt number is issued by Open Impact when it creates the receipt and is never typed onto a gift by hand. Correct a receipted gift by voiding the receipt and reissuing it, or record a refund. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Receipt Lock permission, which an administrator grants in Setup and every use of which is written to the Error Log.</value>
+    >Protects the receipt a donor is holding: once a gift has a receipt number, its amount, date, donor and receipt number cannot change and the gift cannot be deleted. A receipt number is issued by BarnCRM when it creates the receipt and is never typed onto a gift by hand. Correct a receipted gift by voiding the receipt and reissuing it, or record a refund. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Receipt Lock permission, which an administrator grants in Setup and every use of which is written to the Error Log.</value>
     </values>
 </CustomMetadata>

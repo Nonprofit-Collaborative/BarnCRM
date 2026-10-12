@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import row rejected: amount not a number</shortDescription>
-        <value>The amount {0} is not a number Open Impact can read.</value>
+        <value>The amount {0} is not a number BarnCRM can read.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorAmountNotPositive</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import row rejected: payment method unknown</shortDescription>
-        <value>The payment method {0} is not one Open Impact knows. Use one of: {1}.</value>
+        <value>The payment method {0} is not one BarnCRM knows. Use one of: {1}.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorValueUnreadable</fullName>
@@ -390,7 +390,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import row rejected: soft credit role unknown</shortDescription>
-        <value>The soft credit role {0} is not one Open Impact knows. Use one of: {1}.</value>
+        <value>The soft credit role {0} is not one BarnCRM knows. Use one of: {1}.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorCustomRoleMissing</fullName>
@@ -422,7 +422,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Gift import row rejected: tribute type unknown</shortDescription>
-        <value>The tribute type {0} is not one Open Impact knows. Use one of: {1}.</value>
+        <value>The tribute type {0} is not one BarnCRM knows. Use one of: {1}.</value>
     </labels>
     <labels>
         <fullName>Giving_Import_ErrorTributeHonoreeMissing</fullName>

@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Write the letter donors read, and generate this year's statements. The tax wording is added by Open Impact and is not editable here.</value>
+    <value xsi:type="xsd:string">Write the letter donors read, and generate this year's statements. The tax wording is added by BarnCRM and is not editable here.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

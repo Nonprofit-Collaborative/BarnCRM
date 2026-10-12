@@ -3,11 +3,11 @@
   <fullName>Is_Automatic__c</fullName>
   <defaultValue>false</defaultValue>
   <description>
-    Marks a credit Open Impact created and maintains, as opposed to one a person entered. The
+    Marks a credit BarnCRM created and maintains, as opposed to one a person entered. The
     package recomputes and removes its own credits and never touches a manual one (R-SC6).
   </description>
   <externalId>false</externalId>
-  <inlineHelpText>Open Impact created this credit and keeps it up to date.</inlineHelpText>
+  <inlineHelpText>BarnCRM created this credit and keeps it up to date.</inlineHelpText>
   <label>Is Automatic</label>
   <trackTrending>false</trackTrending>
   <type>Checkbox</type>

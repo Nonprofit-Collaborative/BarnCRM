@@ -4,7 +4,7 @@
   <deleteConstraint>SetNull</deleteConstraint>
   <externalId>false</externalId>
   <inlineHelpText>
-    The household credited with this gift. Open Impact fills this in from the donor, so you do not.
+    The household credited with this gift. BarnCRM fills this in from the donor, so you do not.
   </inlineHelpText>
   <label>Household</label>
   <referenceTo>Account</referenceTo>

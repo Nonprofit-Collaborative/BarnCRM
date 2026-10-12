@@ -129,7 +129,7 @@ const PAGE = {
       name: 'Everything else',
       order: 100,
       channel: 'Email',
-      template: 'Open_Impact_Thank_You',
+      template: 'BarnCRM_Thank_You',
       templateFound: false,
       minimumAmount: null,
       maximumAmount: null,
@@ -139,9 +139,7 @@ const PAGE = {
       active: false
     }
   ],
-  templates: [
-    { label: 'Open Impact: thank you for your gift', developerName: 'Open_Impact_Thank_You' }
-  ],
+  templates: [{ label: 'BarnCRM: thank you for your gift', developerName: 'BarnCRM_Thank_You' }],
   runs: [
     {
       id: 'a07000000000001AAA',

@@ -12,9 +12,9 @@
  */
 public with sharing class GivingScheduler {
     /** The names the scheduled jobs carry, so the settings page can find them again. */
-    public static final String TOP_UP_JOB_NAME = 'Open Impact Giving: installment top up';
-    public static final String OVERDUE_JOB_NAME = 'Open Impact Giving: installments overdue';
-    public static final String LEVELS_JOB_NAME = 'Open Impact Giving: donor levels';
+    public static final String TOP_UP_JOB_NAME = 'BarnCRM Giving: installment top up';
+    public static final String OVERDUE_JOB_NAME = 'BarnCRM Giving: installments overdue';
+    public static final String LEVELS_JOB_NAME = 'BarnCRM Giving: donor levels';
 
     /**
      * The times, and why they are these times. The top up runs first so the overdue pass sees

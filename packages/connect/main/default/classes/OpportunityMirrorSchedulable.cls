@@ -7,7 +7,7 @@
  * and the rollups at 02:00, which then count the gifts it made.
  */
 public with sharing class OpportunityMirrorSchedulable implements Schedulable {
-    public static final String JOB_NAME = 'Open Impact Connect: Opportunity mirror';
+    public static final String JOB_NAME = 'BarnCRM Connect: Opportunity mirror';
     private static final String CRON = '0 30 1 * * ?';
     /** The scheduled Apex job type, which is what CronJobDetail calls a scheduled class. */
     private static final String SCHEDULED_APEX = '7';

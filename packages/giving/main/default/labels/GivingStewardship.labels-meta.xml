@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the plans and their templates did not line up</shortDescription>
-    <value>Open Impact could not start one or more stewardship plans because the plans and the templates they came from did not line up. No tasks were created. This is a fault in Open Impact rather than something to correct in your data.</value>
+    <value>BarnCRM could not start one or more stewardship plans because the plans and the templates they came from did not line up. No tasks were created. This is a fault in BarnCRM rather than something to correct in your data.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_Title</fullName>
@@ -46,7 +46,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: what the page is for</shortDescription>
-    <value>The follow-up your organization repeats. Write a plan down once here, and Open Impact lays its tasks out every time the plan applies.</value>
+    <value>The follow-up your organization repeats. Write a plan down once here, and BarnCRM lays its tasks out every time the plan applies.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_RunningNotice</fullName>
@@ -182,7 +182,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: help, what the plan key is for</shortDescription>
-    <value>A short unchanging code, for example first_gift_welcome. It is how Open Impact recognizes this plan across upgrades even after you rename it.</value>
+    <value>A short unchanging code, for example first_gift_welcome. It is how BarnCRM recognizes this plan across upgrades even after you rename it.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_FieldEvent</fullName>
@@ -358,7 +358,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: this user may not change plans</shortDescription>
-    <value>Changing stewardship plans needs the Manage Nonprofit Settings permission. Ask whoever administers Open Impact for your organization.</value>
+    <value>Changing stewardship plans needs the Manage Nonprofit Settings permission. Ask whoever administers BarnCRM for your organization.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ErrorNameRequired</fullName>
@@ -382,6 +382,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the page could not do what was asked</shortDescription>
-    <value>Open Impact could not do that. The details are in the Error Log.</value>
+    <value>BarnCRM could not do that. The details are in the Error Log.</value>
   </labels>
 </CustomLabels>

@@ -9,7 +9,7 @@ global with sharing class InboundGiftAction {
     @InvocableMethod(
         label='Record Inbound Gift'
         description='Records a gift sent by another system, once, however many times it is sent.'
-        category='Open Impact'
+        category='BarnCRM'
     )
     global static List<InboundGiftResult> record(List<InboundGift> gifts) {
         return InboundGiftService.record(gifts);

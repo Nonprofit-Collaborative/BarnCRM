@@ -5,8 +5,8 @@
  * G-10 read gifts without reaching into another feature's class, and so that every query they make
  * is in one file (plan Section 9.3).
  *
- * Two access levels, deliberately. Automation reads in system mode, because the credits Open
- * Impact maintains must be right whatever the saving user can see; anything a person asked for
+ * Two access levels, deliberately. Automation reads in system mode, because the credits BarnCRM
+ * maintains must be right whatever the saving user can see; anything a person asked for
  * reads in user mode, so the screen shows them only their own access.
  */
 public with sharing class GiftLookupSelector {

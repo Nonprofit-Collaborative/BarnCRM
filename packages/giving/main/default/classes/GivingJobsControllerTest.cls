@@ -64,7 +64,7 @@ private class GivingJobsControllerTest {
         );
         Assert.areEqual(
             3,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'Choosing Schedule from the console schedules all three jobs, which is the whole fix.'
         );
         for (GivingJobsController.JobView job : view.jobs) {
@@ -81,7 +81,7 @@ private class GivingJobsControllerTest {
 
         Assert.areEqual(
             3,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'Pressing Schedule twice does not schedule a second copy of each job.'
         );
         Assert.isTrue(view.scheduled, 'The page still reports the jobs as scheduled.');
@@ -97,7 +97,7 @@ private class GivingJobsControllerTest {
         Assert.isFalse(view.scheduled, 'The page reports the jobs as stopped.');
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'Stopping leaves nothing scheduled.'
         );
     }
@@ -213,7 +213,7 @@ private class GivingJobsControllerTest {
         );
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'The refusal is a refusal: nothing was scheduled.'
         );
     }
@@ -255,14 +255,14 @@ private class GivingJobsControllerTest {
         Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
         User reader = new User(
             Alias = 'oijobs',
-            Email = 'nightly.jobs.reader@openimpact.invalid',
+            Email = 'nightly.jobs.reader@barncrm.invalid',
             EmailEncodingKey = 'UTF-8',
             LastName = 'Reader',
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
             ProfileId = standard.Id,
             TimeZoneSidKey = 'America/Chicago',
-            UserName = 'nightly.jobs.reader.' + Datetime.now().getTime() + '@openimpact.invalid'
+            UserName = 'nightly.jobs.reader.' + Datetime.now().getTime() + '@barncrm.invalid'
         );
         System.runAs(new User(Id = UserInfo.getUserId())) {
             insert reader;

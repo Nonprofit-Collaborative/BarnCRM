@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Template body is empty</shortDescription>
-    <value>A receipt letter cannot be empty. Type the letter you want donors to read, or restore the one Open Impact ships.</value>
+    <value>A receipt letter cannot be empty. Type the letter you want donors to read, or restore the one BarnCRM ships.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_GiftAlreadyReceipted</fullName>
@@ -94,7 +94,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Configured renderer is not installed in this org</shortDescription>
-    <value>The receipt renderer chosen in settings ({0}) is not available in this org. Clear the setting to use the one Open Impact ships.</value>
+    <value>The receipt renderer chosen in settings ({0}) is not available in this org. Clear the setting to use the one BarnCRM ships.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_SeriesIncomplete</fullName>
@@ -125,8 +125,8 @@
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Configured renderer is not one Open Impact offers</shortDescription>
-    <value>The receipt renderer chosen in settings ({0}) is not one Open Impact offers. Clear the setting to use the one Open Impact ships.</value>
+    <shortDescription>Configured renderer is not one BarnCRM offers</shortDescription>
+    <value>The receipt renderer chosen in settings ({0}) is not one BarnCRM offers. Clear the setting to use the one BarnCRM ships.</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_VoidNeedsReason</fullName>

@@ -46,7 +46,7 @@ private class ReceiptTemplateAccessTest {
         Assert.areEqual(
             2,
             restored.size(),
-            'The org gets the two letters Open Impact ships, per gift and consolidated statement.'
+            'The org gets the two letters BarnCRM ships, per gift and consolidated statement.'
         );
         Assert.areEqual(
             restored.size(),

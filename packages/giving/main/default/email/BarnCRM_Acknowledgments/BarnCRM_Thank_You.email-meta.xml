@@ -2,12 +2,12 @@
 <EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
   <available>true</available>
   <description>
-    The thank you Open Impact ships to start from. Edit it, or write your own and name it in your
+    The thank you BarnCRM ships to start from. Edit it, or write your own and name it in your
     acknowledgment rules. The donor is the contact it is addressed to; the gift is the record it is
     about.
   </description>
   <encodingKey>UTF-8</encodingKey>
-  <name>Open Impact: thank you for your gift</name>
+  <name>BarnCRM: thank you for your gift</name>
   <style>none</style>
   <subject>Thank you for your gift</subject>
   <type>text</type>

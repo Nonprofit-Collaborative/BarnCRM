@@ -12,7 +12,7 @@ private class GivingSchedulerTest {
 
         Assert.areEqual(
             3,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'Switching the jobs on schedules the top up, the overdue pass and the donor levels pass.'
         );
         Assert.isTrue(
@@ -35,7 +35,7 @@ private class GivingSchedulerTest {
 
         Assert.areEqual(
             3,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'An administrator pressing Schedule twice gets three jobs, not six.'
         );
         Assert.areEqual(
@@ -59,7 +59,7 @@ private class GivingSchedulerTest {
 
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'Stopping the nightly jobs leaves none of the three scheduled.'
         );
         Assert.isFalse(
@@ -91,7 +91,7 @@ private class GivingSchedulerTest {
         );
         Assert.areEqual(
             3,
-            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'Open Impact Giving%'],
+            [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'],
             'Scheduling fills in the two jobs that were missing and leaves the one already there alone.'
         );
     }

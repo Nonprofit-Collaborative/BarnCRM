@@ -3,7 +3,7 @@
  *
  * ADR-0006 puts structured configuration an administrator manages as a list in a packaged custom
  * object, and package shipped defaults in custom metadata materialized into that object. So the
- * two letters Open Impact ships live in `Receipt_Template_Default__mdt` and are copied into
+ * two letters BarnCRM ships live in `Receipt_Template_Default__mdt` and are copied into
  * `Receipt_Template__c` records. An upgrade updates the metadata and never touches what Maria
  * wrote.
  *

@@ -1,5 +1,5 @@
 /**
- * What Open Impact Giving does for itself at install and at every upgrade.
+ * What BarnCRM Giving does for itself at install and at every upgrade.
  *
  * Three things, all of them shipped defaults that an org is supposed to arrive with.
  *

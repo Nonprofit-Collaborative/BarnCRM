@@ -31,7 +31,7 @@ const TOKENS = [
  * The Receipts panel in the Nonprofit Settings console: the letters, and the year end run.
  *
  * The panel deliberately does not offer a way to edit the tax sentences. They are not on this
- * screen because they are not editable: whatever the letter says, Open Impact adds what IRS
+ * screen because they are not editable: whatever the letter says, BarnCRM adds what IRS
  * Publication 1771 requires (ADR-0016, R-RC7). The note under the editor says so, so that an
  * administrator looking for them stops looking rather than typing them in twice.
  */
@@ -144,7 +144,7 @@ export default class ReceiptSettings extends LightningElement {
     this.working = true;
     try {
       await restoreDefaultTemplates();
-      this.toast('Restored', 'The letters Open Impact ships are back.', 'success');
+      this.toast('Restored', 'The letters BarnCRM ships are back.', 'success');
       await refreshApex(this.wiredTemplates);
     } catch (error) {
       this.toast('Not restored', this.messageOf(error), 'error');
@@ -170,7 +170,7 @@ export default class ReceiptSettings extends LightningElement {
     this.working = true;
     try {
       await activateTemplate({ templateId: this.selectedTemplateId });
-      this.toast('Switched on', 'This letter is now the one Open Impact uses.', 'success');
+      this.toast('Switched on', 'This letter is now the one BarnCRM uses.', 'success');
       await refreshApex(this.wiredTemplates);
     } catch (error) {
       this.toast('Not switched on', this.messageOf(error), 'error');

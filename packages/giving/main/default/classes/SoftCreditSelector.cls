@@ -1,7 +1,7 @@
 /**
  * Every query against Soft Credit (plan Section 9.3).
  *
- * Maintenance reads run in system mode on purpose: the credits Open Impact created are the
+ * Maintenance reads run in system mode on purpose: the credits BarnCRM created are the
  * package's own records, and it has to see all of them to keep them right, whatever the person
  * saving the gift can see. Everything a person asked for on a screen reads in user mode.
  */
@@ -9,7 +9,7 @@ public with sharing class SoftCreditSelector {
     private static final Integer MAX_ROWS = 10000;
 
     /**
-     * The credits Open Impact created for these gifts in one role, for recomputation.
+     * The credits BarnCRM created for these gifts in one role, for recomputation.
      */
     public static List<Soft_Credit__c> selectAutomaticForGifts(Set<Id> giftIds, String role) {
         if (giftIds == null || giftIds.isEmpty() || String.isBlank(role)) {
@@ -26,7 +26,7 @@ public with sharing class SoftCreditSelector {
     }
 
     /**
-     * Every credit Open Impact created for these gifts, whatever the role, for removal.
+     * Every credit BarnCRM created for these gifts, whatever the role, for removal.
      */
     public static List<Soft_Credit__c> selectAutomaticForGifts(Set<Id> giftIds) {
         if (giftIds == null || giftIds.isEmpty()) {

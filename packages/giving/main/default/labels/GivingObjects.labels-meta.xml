@@ -30,7 +30,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Two funds marked default in one save</shortDescription>
-        <value>Only one fund can be the default. Save one default fund at a time, and Open Impact will clear the flag on the previous one.</value>
+        <value>Only one fund can be the default. Save one default fund at a time, and BarnCRM will clear the flag on the previous one.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_AllocationUpdateFailed</fullName>
@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Receipt number is issued, not typed</shortDescription>
-        <value>A receipt number is issued by Open Impact when it creates the receipt, and cannot be filled in by hand. Use Issue Receipt on the gift instead. A number typed in here belongs to no receipt, locks the gift, and can end up on a year end statement as well.</value>
+        <value>A receipt number is issued by BarnCRM when it creates the receipt, and cannot be filled in by hand. Use Issue Receipt on the gift instead. A number typed in here belongs to no receipt, locks the gift, and can end up on a year end statement as well.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_ReceiptedGiftNotDeletable</fullName>
@@ -142,7 +142,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Refund amount missing or not positive</shortDescription>
-        <value>Enter how much is going back to the donor. A refund amount is always more than zero: Open Impact records it as a negative gift for you.</value>
+        <value>Enter how much is going back to the donor. A refund amount is always more than zero: BarnCRM records it as a negative gift for you.</value>
     </labels>
     <labels>
         <fullName>Giving_Gift_RefundExceedsRemaining</fullName>

@@ -20,7 +20,7 @@
       <indicatorHighColor>#54C254</indicatorHighColor>
       <indicatorLowColor>#C25454</indicatorLowColor>
       <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
-      <report>Open_Impact_Giving/Gifts_This_Month_by_Day</report>
+      <report>BarnCRM_Giving/Gifts_This_Month_by_Day</report>
     </components>
     <components>
       <chartAxisRange>Auto</chartAxisRange>
@@ -28,7 +28,7 @@
       <drillEnabled>true</drillEnabled>
       <header>This month, day by day</header>
       <legendPosition>Bottom</legendPosition>
-      <report>Open_Impact_Giving/Gifts_This_Month_by_Day</report>
+      <report>BarnCRM_Giving/Gifts_This_Month_by_Day</report>
       <sortBy>RowLabelAscending</sortBy>
     </components>
   </leftSection>
@@ -41,7 +41,7 @@
       <footer>The last twelve months, this month at the right</footer>
       <header>Giving by month</header>
       <legendPosition>Bottom</legendPosition>
-      <report>Open_Impact_Giving/Giving_by_Month</report>
+      <report>BarnCRM_Giving/Giving_by_Month</report>
       <sortBy>RowLabelAscending</sortBy>
     </components>
     <components>
@@ -50,7 +50,7 @@
       <drillEnabled>true</drillEnabled>
       <header>Giving by fund, this year</header>
       <legendPosition>Bottom</legendPosition>
-      <report>Open_Impact_Giving/Giving_by_Fund_This_Year</report>
+      <report>BarnCRM_Giving/Giving_by_Fund_This_Year</report>
       <sortBy>RowValueDescending</sortBy>
     </components>
   </middleSection>
@@ -62,7 +62,7 @@
       <drillEnabled>true</drillEnabled>
       <header>Giving by appeal, this year</header>
       <legendPosition>Bottom</legendPosition>
-      <report>Open_Impact_Giving/Giving_by_Appeal_This_Year</report>
+      <report>BarnCRM_Giving/Giving_by_Appeal_This_Year</report>
       <sortBy>RowValueDescending</sortBy>
     </components>
     <components>
@@ -74,7 +74,7 @@
       <indicatorLowColor>#C25454</indicatorLowColor>
       <indicatorMiddleColor>#C2C254</indicatorMiddleColor>
       <maxValuesDisplayed>10</maxValuesDisplayed>
-      <report>Open_Impact_Giving/Top_Donors_This_Year</report>
+      <report>BarnCRM_Giving/Top_Donors_This_Year</report>
       <sortBy>RowValueDescending</sortBy>
     </components>
   </rightSection>

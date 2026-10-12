@@ -736,7 +736,7 @@ private class MigrationTemplatesTest {
     /**
      * Sample file npsp-payments.csv: paid payments from a donor already loaded, one with the
      * opportunity's campaign, one with a tribute, and one whose tribute type is still NPSP's own
-     * word, which the dry run refuses naming the words Open Impact uses.
+     * word, which the dry run refuses naming the words BarnCRM uses.
      */
     @IsTest
     static void npspPaymentsBecomeGiftsWithTheirTributes() {

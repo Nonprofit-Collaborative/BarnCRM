@@ -1,5 +1,5 @@
 /**
- * What Open Impact Connect does for itself at install and at every upgrade: create the
+ * What BarnCRM Connect does for itself at install and at every upgrade: create the
  * Automation page's switch rows for the automations Connect registers, starting with
  * Campaign sync (ADR-0056 on Campaign sync). Core's and Giving's scripts run before Connect's
  * registry rows exist, so they cannot create them, and Health Check would otherwise report the

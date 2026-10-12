@@ -4,11 +4,11 @@
   <active>true</active>
   <description>
     A soft credit says how much someone is recognized for, as an amount or as a share of the
-    gift. Open Impact fills in whichever one was not entered.
+    gift. BarnCRM fills in whichever one was not entered.
   </description>
   <errorConditionFormula>AND( ISBLANK(Amount__c), ISBLANK(Percent__c) )</errorConditionFormula>
   <errorMessage>
-    Enter an amount or a percent for this recognition. Open Impact works out the other one from
+    Enter an amount or a percent for this recognition. BarnCRM works out the other one from
     the gift.
   </errorMessage>
 </ValidationRule>
