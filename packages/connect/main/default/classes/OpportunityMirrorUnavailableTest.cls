@@ -31,7 +31,7 @@ private class OpportunityMirrorUnavailableTest {
     private static User maria() {
         return TestDataFactory.createUserOnTheRunningUsersProfile(
             'Maria',
-            new List<String>{ 'Nonprofit_Admin', 'Giving_Admin', 'Opportunity_Mirror' }
+            new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Opportunity_Mirror' }
         );
     }
 
