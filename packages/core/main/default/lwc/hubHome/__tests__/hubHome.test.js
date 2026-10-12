@@ -15,21 +15,20 @@ jest.mock('@salesforce/apex/CorePostInstall.countInstallProblems', () => ({ defa
 });
 
 const mockNavigate = jest.fn();
-jest.mock(
-  'lightning/navigation',
-  () => {
-    const Navigate = Symbol('Navigate');
-    const NavigationMixin = (Base) =>
-      class extends Base {
-        [Navigate](...args) {
-          mockNavigate(...args);
-        }
-      };
-    NavigationMixin.Navigate = Navigate;
-    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
-  },
-  { virtual: true }
-);
+// Not virtual: sfdx-lwc-jest resolves this module to a stub file, and a virtual mock of a
+// resolvable module is matched to the component's import unreliably in a parallel run, so the
+// component sometimes got the stub instead of the mock.
+jest.mock('lightning/navigation', () => {
+  const Navigate = Symbol('Navigate');
+  const NavigationMixin = (Base) =>
+    class extends Base {
+      [Navigate](...args) {
+        mockNavigate(...args);
+      }
+    };
+  NavigationMixin.Navigate = Navigate;
+  return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+});
 
 const mockEncodeDefaultFieldValues = jest.fn(
   (fields) =>
@@ -37,13 +36,12 @@ const mockEncodeDefaultFieldValues = jest.fn(
       .map((key) => `${key}=${fields[key]}`)
       .join(',')}`
 );
-jest.mock(
-  'lightning/pageReferenceUtils',
-  () => ({
-    encodeDefaultFieldValues: (...args) => mockEncodeDefaultFieldValues(...args)
-  }),
-  { virtual: true }
-);
+// Not virtual: sfdx-lwc-jest resolves this module to a stub file, and a virtual mock of a
+// resolvable module is matched to the component's import unreliably in a parallel run, so the
+// component sometimes got the stub instead of the mock.
+jest.mock('lightning/pageReferenceUtils', () => ({
+  encodeDefaultFieldValues: (...args) => mockEncodeDefaultFieldValues(...args)
+}));
 
 const HOUSEHOLD_RECORD_TYPE_ID = '012000000000001AAA';
 

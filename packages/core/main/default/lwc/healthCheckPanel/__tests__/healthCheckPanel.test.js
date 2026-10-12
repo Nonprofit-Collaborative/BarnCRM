@@ -29,26 +29,25 @@ jest.mock('@salesforce/apex/HealthCheckController.applyFix', () => ({ default: j
 });
 
 const mockNavigate = jest.fn();
-jest.mock(
-  'lightning/navigation',
-  () => {
-    const Navigate = Symbol('Navigate');
-    const GenerateUrl = Symbol('GenerateUrl');
-    const NavigationMixin = (Base) =>
-      class extends Base {
-        [Navigate](...args) {
-          mockNavigate(...args);
-        }
-        [GenerateUrl]() {
-          return Promise.resolve('https://example.com');
-        }
-      };
-    NavigationMixin.Navigate = Navigate;
-    NavigationMixin.GenerateUrl = GenerateUrl;
-    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
-  },
-  { virtual: true }
-);
+// Not virtual: sfdx-lwc-jest resolves this module to a stub file, and a virtual mock of a
+// resolvable module is matched to the component's import unreliably in a parallel run, so the
+// component sometimes got the stub instead of the mock.
+jest.mock('lightning/navigation', () => {
+  const Navigate = Symbol('Navigate');
+  const GenerateUrl = Symbol('GenerateUrl');
+  const NavigationMixin = (Base) =>
+    class extends Base {
+      [Navigate](...args) {
+        mockNavigate(...args);
+      }
+      [GenerateUrl]() {
+        return Promise.resolve('https://example.com');
+      }
+    };
+  NavigationMixin.Navigate = Navigate;
+  NavigationMixin.GenerateUrl = GenerateUrl;
+  return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+});
 
 /** Maria's org: Person Accounts on, Nonprofit Cloud objects present, no mode confirmed. */
 function agentforceReport(overrides = {}) {
