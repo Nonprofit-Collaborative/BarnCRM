@@ -1448,11 +1448,11 @@ column's value before it is matched or written (ADR-NEXT, `NEXT-data-transform-d
 |---|---|---|
 | `trim` | none | Removes leading and trailing white space and turns each run of white space into one space. |
 | `upper`, `lower` | none | Every letter as a capital, or as a small letter. |
-| `proper` | none | A capital for each letter that follows anything but a letter, every other letter small. |
-| `replace` | `find` (required, at most 255 characters), `with` (at most 255), `matchCase` (default false), `whole` (default false) | Replaces each occurrence of `find`, read as literal text, with `with`; under `whole`, replaces the value only when the whole value equals `find`. |
+| `proper` | none | A capital for each letter that starts a word (a run of letters, digits and apostrophes), every other letter small. |
+| `replace` | `text` (required, at most 255 characters), `replaceWith` (at most 255), `matchCase` (default false), `wholeValue` (default false) | Replaces each occurrence of `text`, read as literal text, with `replaceWith`; under `wholeValue`, replaces the value only when the whole value equals `text`. |
 | `ifBlank` | `value` (required, at most 255) | The value, when the value so far is blank. |
 | `append` | `columns` (1 to 5 source column names of the same row), `separator` (at most 10, default one space) | Adds the named columns' values after the value so far, leaving blank ones out, joined by the separator. |
-| `date` | `order`: `MDY`, `DMY` or `YMD` | Reads three numbers separated by any characters that are not digits in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
+| `date` | `dateOrder`: `MDY`, `DMY` or `YMD` | Reads the first three numbers, separated by any characters that are not digits, in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
 
 Steps run in order, before values for every row (R-IB14): a step's output that is blank is
 filled by a file or template value like any blank cell. A document is checked when it is saved
