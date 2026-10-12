@@ -40,6 +40,10 @@
         </div>
       </template>
 
+      <template lwc:if={isPhone}>
+        <p class="slds-text-body_small slds-m-bottom_small" data-id="use-computer">{labels.useComputer}</p>
+      </template>
+
       <template lwc:if={hasLines}>
         <div class="slds-scrollable_x">
           <table class="slds-table slds-table_bordered slds-table_cell-buffer" aria-label={labels.title}>
@@ -68,7 +72,7 @@
                   <td>
                     <template lwc:if={showKind}>
                       <lightning-combobox
-                        label={labels.columnDonor}
+                        label={row.cellLabels.kind}
                         variant="label-hidden"
                         options={kindOptions}
                         value={row.kind}
@@ -80,7 +84,7 @@
                     </template>
                     <template lwc:if={row.isPerson}>
                       <lightning-record-picker
-                        label={labels.columnDonor}
+                        label={row.cellLabels.donor}
                         variant="label-hidden"
                         placeholder={labels.donorPlaceholder}
                         object-api-name={row.donorObject}
@@ -93,7 +97,7 @@
                     </template>
                     <template lwc:else>
                       <lightning-record-picker
-                        label={labels.columnDonor}
+                        label={row.cellLabels.donor}
                         variant="label-hidden"
                         placeholder={labels.donorPlaceholder}
                         object-api-name="Account"
@@ -110,7 +114,7 @@
                       type="number"
                       formatter="currency"
                       step="0.01"
-                      label={labels.columnAmount}
+                      label={row.cellLabels.amount}
                       variant="label-hidden"
                       value={row.amount}
                       disabled={locked}
@@ -121,7 +125,7 @@
                   </td>
                   <td>
                     <lightning-input
-                      label={labels.columnReference}
+                      label={row.cellLabels.reference}
                       variant="label-hidden"
                       max-length="255"
                       value={row.paymentReference}
@@ -134,7 +138,7 @@
                   <td>
                     <lightning-input
                       type="date"
-                      label={labels.columnDate}
+                      label={row.cellLabels.date}
                       variant="label-hidden"
                       value={row.giftDate}
                       disabled={locked}
@@ -145,7 +149,7 @@
                   </td>
                   <td>
                     <lightning-combobox
-                      label={labels.columnMethod}
+                      label={row.cellLabels.method}
                       variant="label-hidden"
                       options={methodOptions}
                       value={row.methodValue}
@@ -157,7 +161,7 @@
                   </td>
                   <td>
                     <lightning-record-picker
-                      label={labels.columnFund}
+                      label={row.cellLabels.fund}
                       variant="label-hidden"
                       object-api-name={fundObject}
                       value={row.fundId}
@@ -169,7 +173,7 @@
                   </td>
                   <td>
                     <lightning-record-picker
-                      label={labels.columnAppeal}
+                      label={row.cellLabels.appeal}
                       variant="label-hidden"
                       object-api-name={appealObject}
                       value={row.appealId}
@@ -186,8 +190,8 @@
                     <template lwc:elseif={editable}>
                       <lightning-button-icon
                         icon-name="utility:delete"
-                        alternative-text={labels.removeLine}
-                        title={labels.removeLine}
+                        alternative-text={row.cellLabels.remove}
+                        title={row.cellLabels.remove}
                         data-key={row.key}
                         data-id="remove"
                         onclick={handleRemove}

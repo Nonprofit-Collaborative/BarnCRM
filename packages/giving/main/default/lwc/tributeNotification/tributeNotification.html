@@ -1,37 +1,37 @@
 <template>
   <lightning-card title={labels.title} icon-name="custom:custom25">
     <div class="slds-var-p-horizontal_medium">
-      <template if:true={hasError}>
+      <template lwc:if={hasError}>
         <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
 
-      <template if:true={isEmpty}>
+      <template lwc:if={isEmpty}>
         <p data-id="empty-state" class="slds-text-body_regular">{labels.none}</p>
       </template>
 
-      <template if:true={hasTribute}>
+      <template lwc:if={hasTribute}>
         <p data-id="summary" class="slds-text-body_regular">{summary}</p>
         <p data-id="status" class="slds-text-body_small slds-var-m-top_xx-small">
           {statusText}
-          <template if:true={tribute.notificationSentDate}>
+          <template lwc:if={tribute.notificationSentDate}>
             <lightning-formatted-date-time
               value={tribute.notificationSentDate}
             ></lightning-formatted-date-time>
           </template>
         </p>
-        <template if:true={tribute.message}>
+        <template lwc:if={tribute.message}>
           <p data-id="message" class="slds-text-body_small slds-var-m-top_x-small">
             {tribute.message}
           </p>
         </template>
-        <template if:true={showBlockedReason}>
+        <template lwc:if={showBlockedReason}>
           <p data-id="blocked-reason" class="slds-text-body_small slds-var-m-top_x-small">
             {blockedReason}
           </p>
         </template>
-        <template if:true={showMarkSent}>
+        <template lwc:if={showMarkSent}>
           <lightning-button
             data-id="mark-sent"
             class="slds-var-m-top_small"

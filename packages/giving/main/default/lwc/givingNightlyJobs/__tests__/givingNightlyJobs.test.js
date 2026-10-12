@@ -42,13 +42,13 @@ jest.mock(
 
 jest.mock(
   '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton',
-  () => ({ default: 'Schedule the nightly jobs' }),
+  () => ({ default: 'Schedule nightly run' }),
   { virtual: true }
 );
 
 jest.mock(
   '@salesforce/label/c.Giving_NightlyJobs_StopButton',
-  () => ({ default: 'Stop the nightly jobs' }),
+  () => ({ default: 'Stop nightly run' }),
   { virtual: true }
 );
 
@@ -169,7 +169,7 @@ describe('c-giving-nightly-jobs', () => {
       'The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own.'
     );
     expect(element.shadowRoot.querySelector('[data-id="schedule-button"]').label).toBe(
-      'Schedule the nightly jobs'
+      'Schedule nightly run'
     );
     expect(element.shadowRoot.querySelector('[data-id="next-run"]')).toBeNull();
     expect(element.shadowRoot.querySelectorAll('[data-id="job-never-run"]')).toHaveLength(3);
@@ -195,7 +195,7 @@ describe('c-giving-nightly-jobs', () => {
     await flush();
 
     const button = element.shadowRoot.querySelector('[data-id="schedule-button"]');
-    expect(button.label).toBe('Stop the nightly jobs');
+    expect(button.label).toBe('Stop nightly run');
     button.click();
     await flush();
 

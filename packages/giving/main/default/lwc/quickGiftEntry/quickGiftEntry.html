@@ -54,6 +54,12 @@
                         onchange={handleDonorChange}
                         data-id="donor-person"
                     ></lightning-record-picker>
+                    <lightning-button
+                        variant="base"
+                        label={labels.newPerson}
+                        onclick={handleNewPerson}
+                        data-id="new-person"
+                    ></lightning-button>
                 </template>
                 <template lwc:else>
                     <lightning-record-picker
@@ -65,15 +71,6 @@
                         onchange={handleDonorChange}
                         data-id="donor-organization"
                     ></lightning-record-picker>
-                </template>
-                <template lwc:if={errorDonor}>
-                    <p
-                        class="slds-form-element__help slds-text-color_error"
-                        role="alert"
-                        data-id="error-donor"
-                    >
-                        {errorDonor}
-                    </p>
                 </template>
             </div>
 
@@ -90,15 +87,6 @@
                         onchange={handleAmountChange}
                         data-id="amount"
                     ></lightning-input>
-                    <template lwc:if={errorAmount}>
-                        <p
-                            class="slds-form-element__help slds-text-color_error"
-                            role="alert"
-                            data-id="error-amount"
-                        >
-                            {errorAmount}
-                        </p>
-                    </template>
                 </div>
             </template>
 
@@ -111,15 +99,6 @@
                     onchange={handleDateChange}
                     data-id="gift-date"
                 ></lightning-input>
-                <template lwc:if={errorDate}>
-                    <p
-                        class="slds-form-element__help slds-text-color_error"
-                        role="alert"
-                        data-id="error-date"
-                    >
-                        {errorDate}
-                    </p>
-                </template>
             </div>
 
             <div class="slds-var-m-top_small">
@@ -132,15 +111,6 @@
                     onchange={handleTypeChange}
                     data-id="gift-type"
                 ></lightning-combobox>
-                <template lwc:if={errorType}>
-                    <p
-                        class="slds-form-element__help slds-text-color_error"
-                        role="alert"
-                        data-id="error-type"
-                    >
-                        {errorType}
-                    </p>
-                </template>
             </div>
 
             <template lwc:if={isInKindGift}>
@@ -154,15 +124,6 @@
                         onchange={handleInKindDescriptionChange}
                         data-id="in-kind-description"
                     ></lightning-textarea>
-                    <template lwc:if={errorInKindDescription}>
-                        <p
-                            class="slds-form-element__help slds-text-color_error"
-                            role="alert"
-                            data-id="error-in-kind-description"
-                        >
-                            {errorInKindDescription}
-                        </p>
-                    </template>
                 </div>
 
                 <div class="slds-var-m-top_small">
@@ -179,15 +140,6 @@
                     <p class="slds-form-element__help" data-id="fair-market-value-help">
                         {labels.fairMarketValueHelp}
                     </p>
-                    <template lwc:if={errorFairMarketValue}>
-                        <p
-                            class="slds-form-element__help slds-text-color_error"
-                            role="alert"
-                            data-id="error-fair-market-value"
-                        >
-                            {errorFairMarketValue}
-                        </p>
-                    </template>
                 </div>
             </template>
 
@@ -211,15 +163,6 @@
                     onchange={handleAppealChange}
                     data-id="appeal"
                 ></lightning-record-picker>
-                <template lwc:if={errorAppeal}>
-                    <p
-                        class="slds-form-element__help slds-text-color_error"
-                        role="alert"
-                        data-id="error-appeal"
-                    >
-                        {errorAppeal}
-                    </p>
-                </template>
             </div>
 
             <div class="slds-var-m-top_small">
@@ -231,15 +174,6 @@
                     onchange={handleFundChange}
                     data-id="fund"
                 ></lightning-record-picker>
-                <template lwc:if={errorFund}>
-                    <p
-                        class="slds-form-element__help slds-text-color_error"
-                        role="alert"
-                        data-id="error-fund"
-                    >
-                        {errorFund}
-                    </p>
-                </template>
             </div>
 
             <div class="slds-var-m-top_medium slds-grid slds-grid_vertical-align-center slds-wrap">

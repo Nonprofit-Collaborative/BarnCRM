@@ -93,6 +93,10 @@ attempt. A batch's **Posted** status is not the same as a gift posted to account
 to be designated. Set the default fund in BarnCRM Settings and post again; nothing was
 created by the failed attempt.
 
+**Typing a batch on a phone.** The grid has nine columns, so on a phone it scrolls sideways
+and the screen says **Batches are easier on a computer.** It still works. For one gift on a
+phone, Quick Gift Entry is quicker.
+
 **Two people typing the same batch.** Each save sends the whole grid. Type a batch on one
 screen at a time, or split the stack into two batches.
 
