@@ -257,6 +257,92 @@ public with sharing class RollupBuilderController {
         }
     }
 
+    // -------------------------------------------------------------------------------- preview
+
+    /** What step 5 shows before a save: the total on one record, and how many it maintains. */
+    public class PreviewResult {
+        @AuraEnabled
+        public String result { get; set; }
+        @AuraEnabled
+        public String maintains { get; set; }
+    }
+
+    /**
+     * Calculates the unsaved rollup for one record, writing nothing, and counts the records it
+     * would maintain (slice S12). Runs the save's checks first, apart from the name and the
+     * overlap with other rollups, which only a save needs.
+     *
+     * @param draft the rollup as the Builder holds it
+     * @param recordId a record of the target entity to calculate, or null for the count only
+     */
+    @AuraEnabled
+    public static PreviewResult preview(Draft draft, Id recordId) {
+        try {
+            if (draft != null) {
+                draft.name = String.isBlank(draft.name) ? draft.targetField : draft.name;
+                draft.active = false;
+            }
+            String problem = problemWith(draft);
+            if (problem != null) {
+                throw new RollupService.RollupServiceException(problem);
+            }
+            Schema.SObjectType targetType = SettingsService.typeByName(draft.targetObject);
+            String condition = RollupFilterParser.toWhereClause(draft.targetFilterJson);
+            Integer count = Database.countQueryWithBinds(
+                'SELECT COUNT() FROM ' +
+                    String.valueOf(targetType) +
+                    (String.isBlank(condition) ? '' : ' WHERE ' + condition),
+                new Map<String, Object>(),
+                AccessLevel.USER_MODE
+            );
+            PreviewResult preview = new PreviewResult();
+            preview.maintains = String.format(
+                Label.Core_RollupBuilder_Maintains,
+                new List<String>{ count.format() }
+            );
+            if (recordId != null) {
+                preview.result = describe(RollupEngine.preview(toRecord(draft), recordId));
+            }
+            return preview;
+        } catch (Exception caught) {
+            throw asUserError(caught);
+        }
+    }
+
+    private static String describe(RollupEngine.Preview preview) {
+        if (!preview.planned) {
+            return Label.Core_RollupBuilder_PreviewFailed;
+        }
+        if (!preview.admitted) {
+            return Label.Core_RollupBuilder_PreviewNotFilled;
+        }
+        return String.format(
+            Label.Core_RollupBuilder_PreviewResult,
+            new List<String>{ display(preview.calculated), display(preview.current) }
+        );
+    }
+
+    /** A value as the administrator reads it, in her locale. */
+    @TestVisible
+    private static String display(Object value) {
+        if (value == null || value == '') {
+            return Label.Core_RollupBuilder_PreviewEmpty;
+        }
+        if (value instanceof Integer) {
+            return ((Integer) value).format();
+        }
+        if (value instanceof Decimal) {
+            return ((Decimal) value).format();
+        }
+        if (value instanceof Date) {
+            return ((Date) value).format();
+        }
+        if (value instanceof Datetime) {
+            return ((Datetime) value).format();
+        }
+        return String.valueOf(value);
+    }
+
     // ---------------------------------------------------------------------------------- saving
 
     /** What a save did: the record, and what to tell the administrator. */

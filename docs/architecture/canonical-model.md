@@ -1358,7 +1358,12 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   4.9). `RollupBuilderController` describes the org for the steps, in the running user's
   describe, and saves a definition in user mode after the checks of R-R10 and R-R8. A new
   definition gets the Definition Key `Custom_` followed by 16 random hexadecimal characters,
-  and Is Package Default false; an edited one keeps its key.
+  and Is Package Default false; an edited one keeps its key. Its preview (S12) calculates the
+  unsaved definition for one record through `RollupEngine.preview`, which writes nothing, and
+  counts the target records it would maintain in user mode. `RollupController.estimateFullRun`
+  counts the records Recalculate all goes through at a fixed rough rate (1,650 records a
+  minute, to be measured on an org), and `runTonight` sets up one 2:00 AM run through
+  `RollupScheduler.scheduleTonight` only when the nightly run is not scheduled.
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`;
   apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the

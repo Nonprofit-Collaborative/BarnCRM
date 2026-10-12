@@ -672,4 +672,100 @@
         <shortDescription>Link from the Rollups settings page to the Builder.</shortDescription>
         <value>Open the Rollup Builder</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_PreviewRecord</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5: record to preview the total on</shortDescription>
+        <value>See it on a record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_PreviewResult</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preview: calculated value and the value on the record now</shortDescription>
+        <value>Calculated: {0}. On the record now: {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_PreviewNotFilled</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preview: the record is outside the rollup target filter</shortDescription>
+        <value>This rollup does not fill this record, because of the conditions in Only for some records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_PreviewFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preview: the rollup could not be calculated</shortDescription>
+        <value>BarnCRM could not calculate this rollup. Check the conditions in step 4.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_PreviewEmpty</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Preview: a value that is empty</shortDescription>
+        <value>(empty)</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Maintains</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Step 5: how many records the rollup maintains</shortDescription>
+        <value>This rollup will maintain about {0} records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Estimate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recalculate all: records and rough minutes</shortDescription>
+        <value>About {0} records, roughly {1} minutes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_EstimateWorkingHours</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recalculate all: warning during working hours</shortDescription>
+        <value>People are working now. A long run competes with them saving records, so consider running it tonight.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_StartNow</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recalculate all: button that starts the run now</shortDescription>
+        <value>Start now</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_RunTonight</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recalculate all: button that runs it tonight</shortDescription>
+        <value>Run tonight</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TonightAlreadyScheduled</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run tonight: the nightly run already covers it</shortDescription>
+        <value>The nightly run already recalculates every total at 2:00 AM, so there is nothing more to do.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_TonightScheduled</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run tonight: one run set for 2:00 AM</shortDescription>
+        <value>One recalculation of every total is set for 2:00 AM tonight.</value>
+    </labels>
 </CustomLabels>

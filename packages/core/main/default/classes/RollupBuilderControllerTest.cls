@@ -359,4 +359,104 @@ private class RollupBuilderControllerTest {
         System.Assert.isNull(problem, 'None of them fills the same field');
         System.Assert.isTrue(queries < 5, 'Rollups on other fields cost no query each');
     }
+
+    // --------------------------------------------------------------------- preview (slice S12)
+
+    /** A parent organization holding a stale count, with this many child organizations. */
+    private static Account parentWith(Integer children) {
+        Account parent = new Account(Name = 'Parent Org', Member_Count__c = 5);
+        insert parent;
+        List<Account> kids = new List<Account>();
+        for (Integer i = 0; i < children; i++) {
+            kids.add(new Account(Name = 'Child ' + i, ParentId = parent.Id));
+        }
+        insert kids;
+        return parent;
+    }
+
+    @IsTest
+    static void thePreviewShowsTheTotalNextToWhatTheRecordHoldsAndSavesNothing() {
+        User admin = maria();
+        RollupBuilderController.PreviewResult preview;
+        Account parent;
+
+        Test.startTest();
+        System.runAs(admin) {
+            parent = parentWith(200);
+            RollupBuilderController.Draft draft = childCount();
+            draft.name = null;
+            preview = RollupBuilderController.preview(draft, parent.Id);
+        }
+        Test.stopTest();
+
+        System.Assert.areEqual(
+            String.format(
+                Label.Core_RollupBuilder_PreviewResult,
+                new List<String>{ (200).format(), (5).format() }
+            ),
+            preview.result,
+            'Two hundred children counted, next to the five the record holds'
+        );
+        System.Assert.areEqual(
+            String.format(Label.Core_RollupBuilder_Maintains, new List<String>{ (201).format() }),
+            preview.maintains,
+            'Every account she can see is one the rollup maintains'
+        );
+        System.Assert.areEqual(
+            5,
+            [SELECT Member_Count__c FROM Account WHERE Id = :parent.Id].Member_Count__c,
+            'A preview writes nothing'
+        );
+        System.Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c], 'Nor saves it');
+    }
+
+    @IsTest
+    static void thePreviewSaysWhenTheRecordIsNotOneTheRollupFills() {
+        RollupBuilderController.PreviewResult preview;
+        System.runAs(maria()) {
+            Account parent = parentWith(2);
+            RollupBuilderController.Draft draft = childCount();
+            draft.targetFilterJson = nameFilter('starts with', 'Beta');
+            preview = RollupBuilderController.preview(draft, parent.Id);
+        }
+
+        System.Assert.areEqual(Label.Core_RollupBuilder_PreviewNotFilled, preview.result);
+        System.Assert.areEqual(
+            String.format(Label.Core_RollupBuilder_Maintains, new List<String>{ (0).format() }),
+            preview.maintains,
+            'No account starts with Beta'
+        );
+    }
+
+    @IsTest
+    static void thePreviewWithoutARecordCountsOnlyAndAnUnfinishedDraftIsRefused() {
+        RollupBuilderController.PreviewResult preview;
+        String refusal;
+        System.runAs(maria()) {
+            preview = RollupBuilderController.preview(childCount(), null);
+            RollupBuilderController.Draft unfinished = childCount();
+            unfinished.targetField = null;
+            try {
+                RollupBuilderController.preview(unfinished, null);
+            } catch (AuraHandledException refused) {
+                refusal = refused.getMessage();
+            }
+        }
+
+        System.Assert.isNull(preview.result, 'No record picked, no total');
+        System.Assert.isNotNull(preview.maintains);
+        System.Assert.areEqual(Label.Core_RollupBuilder_ErrorTargetNeeded, refusal);
+    }
+
+    @IsTest
+    static void emptyValuesReadAsEmpty() {
+        System.Assert.areEqual(
+            Label.Core_RollupBuilder_PreviewEmpty,
+            RollupBuilderController.display(null)
+        );
+        System.Assert.areEqual(
+            Date.newInstance(2026, 10, 12).format(),
+            RollupBuilderController.display(Date.newInstance(2026, 10, 12))
+        );
+    }
 }

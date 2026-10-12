@@ -118,11 +118,81 @@ public with sharing class RollupEngine {
         return plans;
     }
 
+    /** What a draft rollup would write on one record, without saving anything (slice S12). */
+    @NamespaceAccessible
+    public class Preview {
+        /** False when the definition cannot be planned or queried. */
+        @NamespaceAccessible
+        public Boolean planned = false;
+        /** False when the record is not one the definition writes (its target filter). */
+        @NamespaceAccessible
+        public Boolean admitted = false;
+        /** The value the definition would write. */
+        @NamespaceAccessible
+        public Object calculated;
+        /** The value the record holds now. */
+        @NamespaceAccessible
+        public Object current;
+    }
+
+    /**
+     * Calculates one definition, saved or not, for one record of its target entity and writes
+     * nothing. The Builder shows it next to what the record holds now.
+     *
+     * @param definition the definition, which need not be saved
+     * @param targetId a record of the definition's target entity
+     */
+    @NamespaceAccessible
+    public static Preview preview(Rollup_Definition__c definition, Id targetId) {
+        Preview preview = new Preview();
+        Result result = new Result();
+        List<RollupPlanner.Plan> plans = plansFor(
+            new List<Rollup_Definition__c>{ definition },
+            result
+        );
+        if (plans.isEmpty() || targetId == null) {
+            return preview;
+        }
+        RollupPlanner.Plan plan = plans[0];
+        if (targetId.getSObjectType() != plan.targetType) {
+            return preview;
+        }
+        Computation computation = compute(plan, new Set<Id>{ targetId }, result);
+        preview.planned = result.refused.isEmpty();
+        Map<Schema.SObjectField, Object> values = computation.computed.get(targetId);
+        if (preview.planned && values != null) {
+            preview.admitted = true;
+            preview.calculated = values.get(plan.targetFields[0]);
+            preview.current = computation.stored.get(targetId).get(plan.targetFields[0]);
+        }
+        return preview;
+    }
+
+    /** The records read and the values calculated for them, before anything is written. */
+    private class Computation {
+        Map<Id, SObject> stored = new Map<Id, SObject>();
+        Map<Id, Map<Schema.SObjectField, Object>> computed = new Map<Id, Map<Schema.SObjectField, Object>>();
+    }
+
     /** Calculates and writes one plan for one set of records of its target entity. */
     private static void runPass(RollupPlanner.Plan plan, Set<Id> targetIds, Result result) {
         if (targetIds.isEmpty()) {
             return;
         }
+        Computation computation = compute(plan, targetIds, result);
+        RollupWriter.TotalsWrite write = RollupWriter.writeTotals(
+            plan.targetType,
+            computation.stored,
+            computation.computed,
+            Datetime.now()
+        );
+        result.written.addAll(write.written);
+        result.failed.putAll(write.failed);
+    }
+
+    /** Calculates one plan for records of its target entity; ran and refused go on `result`. */
+    private static Computation compute(RollupPlanner.Plan plan, Set<Id> targetIds, Result result) {
+        Computation computation = new Computation();
         List<Set<Id>> admittedByDefinition = admitted(plan, targetIds);
         Set<Id> anyAdmitted = new Set<Id>();
         for (Set<Id> admittedIds : admittedByDefinition) {
@@ -139,8 +209,8 @@ public with sharing class RollupEngine {
             columns.add(RollupCurrency.ISO_FIELD);
         }
         Map<Id, SObject> stored = RollupAggregator.stored(plan.targetType, columns, anyAdmitted);
-
-        Map<Id, Map<Schema.SObjectField, Object>> computed = new Map<Id, Map<Schema.SObjectField, Object>>();
+        computation.stored = stored;
+        Map<Id, Map<Schema.SObjectField, Object>> computed = computation.computed;
         for (Integer i = 0; i < plan.definitions.size(); i++) {
             Rollup_Definition__c definition = plan.definitions[i];
             if (answer.failed.contains(i)) {
@@ -184,14 +254,7 @@ public with sharing class RollupEngine {
                 computed.get(targetId).put(field, value);
             }
         }
-        RollupWriter.TotalsWrite write = RollupWriter.writeTotals(
-            plan.targetType,
-            stored,
-            computed,
-            Datetime.now()
-        );
-        result.written.addAll(write.written);
-        result.failed.putAll(write.failed);
+        return computation;
     }
 
     /**

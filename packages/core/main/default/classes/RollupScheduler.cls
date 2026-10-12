@@ -50,6 +50,24 @@ public with sharing class RollupScheduler implements Schedulable {
         return RollupService.startNightlyRun();
     }
 
+    /**
+     * Sets up one run for the coming 2:00 AM in the running user's time zone, for Recalculate
+     * all when the nightly run is not scheduled (slice S12). The job carries the night's date
+     * in its name, so asking twice sets up one run.
+     */
+    public static Id scheduleTonight() {
+        Date night = Integer.valueOf(Datetime.now().format('H')) < 2
+            ? Date.today()
+            : Date.today().addDays(1);
+        String name = jobNameInUse + ' ' + String.valueOf(night);
+        Id existing = jobIdNamed(name);
+        if (existing != null) {
+            return existing;
+        }
+        String cron = '0 0 2 ' + night.day() + ' ' + night.month() + ' ? ' + night.year();
+        return System.schedule(name, cron, new RollupScheduler());
+    }
+
     /** True when the nightly run is scheduled. */
     public static Boolean isScheduled() {
         return scheduledJobId() != null;
@@ -72,10 +90,14 @@ public with sharing class RollupScheduler implements Schedulable {
     }
 
     private static Id scheduledJobId() {
+        return jobIdNamed(jobNameInUse);
+    }
+
+    private static Id jobIdNamed(String name) {
         List<CronJobDetail> details = [
             SELECT Id
             FROM CronJobDetail
-            WHERE Name = :jobNameInUse AND JobType = '7'
+            WHERE Name = :name AND JobType = '7'
             WITH SYSTEM_MODE
             LIMIT 1
         ];
