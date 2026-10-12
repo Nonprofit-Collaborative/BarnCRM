@@ -1844,6 +1844,10 @@ public with sharing class HouseholdService {
      * the master of that group, so deleting it would destroy the group rather than orphan it.
      * Such a household is left alone and the skip is reported, because a tidy-up that quietly
      * deletes somebody else's data is worse than a tidy-up left undone.
+     *
+     * A household that an installed package still credits records to is kept as well, asked
+     * through `HouseholdDependentsExtensions` because Core may not know what those records
+     * are (ADR-NEXT `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`).
      */
     @NamespaceAccessible
     public static void deleteEmptyHouseholds(Set<Id> householdIds) {
@@ -1868,12 +1872,18 @@ public with sharing class HouseholdService {
             return;
         }
         // One probe for the whole batch, so a split of fifty households still asks once.
-        Set<Id> dependent = HouseholdSelector.getAccountsWithNativeDependents(
-            new Map<Id, Account>(empties).keySet()
-        );
+        Set<Id> emptyIds = new Map<Id, Account>(empties).keySet();
+        Set<Id> dependent = HouseholdSelector.getAccountsWithNativeDependents(emptyIds);
+        // Records another BarnCRM package still credits to the household, such as the gifts
+        // given from it, which keep that household when the donor moves (R-G2). Kept quietly:
+        // it is the ordinary outcome of a move, not something to act on.
+        Set<Id> credited = HouseholdDependentsExtensions.householdsWithDependents(emptyIds);
         List<Account> deletable = new List<Account>();
         List<String> skipped = new List<String>();
         for (Account household : empties) {
+            if (credited.contains(household.Id) && !dependent.contains(household.Id)) {
+                continue;
+            }
             if (dependent.contains(household.Id)) {
                 if (!REPORTED_KEPT_HOUSEHOLDS.add(household.Id)) {
                     continue;

@@ -257,7 +257,15 @@ names is deleted.
 **R-H12 Reparenting and empty households.** Moving a contact to a different household
 recalculates both households' member counts and, once Giving is installed, their giving
 rollups. The vacated household is deleted when it is empty, `Delete_Empty_Households__c`
-is on, and nothing outside BarnCRM depends on the account (ADR-0036). "Empty" is
+is on, nothing outside BarnCRM depends on the account (ADR-0036), and no installed module
+still credits records to it (ADR-NEXT,
+`NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`). A module reports its
+credited records through the Core extension point `HouseholdDependentsExtension`, found by
+class name the way Health Check finds its extensions; Giving reports every household that
+a Gift or a Commitment names in its Household field, because those lookups clear on delete
+and a gift keeps the household it was given to (R-G2). Such a household is kept without an
+Error Log entry: keeping a donor's past household is the ordinary outcome of a move, not
+something an administrator has to act on. "Empty" is
 measured in BarnCRM's own membership, which is the only membership BarnCRM can
 see, so a household that also carries a Salesforce Nonprofit Cloud household group or its
 membership rows reads as empty here while being anything but. The account is the master of
@@ -5478,6 +5486,7 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
 | v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
 | v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-NEXT, `NEXT-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
+| v0.6 | 2026-10-12 | The empty household tidy-up keeps a household with gifts (ADR-NEXT, `NEXT-empty-household-tidy-up-keeps-households-with-gifts.md`; resolves the open follow-up of `NEXT-a-gift-keeps-the-household-it-was-given-to.md`). No object or field added. R-H12: an emptied household is also kept when an installed module still credits records to it, reported through the new Core extension point `HouseholdDependentsExtension`; Giving reports households named by a Gift's or a Commitment's Household field. Such a household is kept without an Error Log entry. |
 
 ---
 ## 32. Entity ownership by package
