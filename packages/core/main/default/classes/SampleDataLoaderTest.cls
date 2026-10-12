@@ -185,450 +185,506 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testStagesInsertHouseholdsOrganizationsAndContacts() {
-        loadEverything(buildJson(3, 2, true));
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(3, 2, true));
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(3, status.householdCount, 'three households should be inserted');
-        System.assertEquals(1, status.organizationCount, 'one organization should be inserted');
-        System.assertEquals(6, status.contactCount, 'three households of two members each');
-        System.assertEquals(
-            true,
-            status.loaded,
-            'status should report loaded once both stages run'
-        );
-        System.assertEquals(false, status.loading, 'no load job should still be queued');
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(3, status.householdCount, 'three households should be inserted');
+            System.assertEquals(1, status.organizationCount, 'one organization should be inserted');
+            System.assertEquals(6, status.contactCount, 'three households of two members each');
+            System.assertEquals(
+                true,
+                status.loaded,
+                'status should report loaded once both stages run'
+            );
+            System.assertEquals(false, status.loading, 'no load job should still be queued');
+        }
     }
 
     @IsTest
     static void testFirstQueueableRunsTheHouseholdStage() {
-        // The only chaining-dependent assertion the platform allows: a test context runs
-        // the first enqueued job and nothing it enqueues, so only stage one's effects
-        // exist afterwards.
-        SampleDataLoader.jsonOverride = buildJson(2, 2, false);
+        System.runAs(TestUsers.admin()) {
+            // The only chaining-dependent assertion the platform allows: a test context runs
+            // the first enqueued job and nothing it enqueues, so only stage one's effects
+            // exist afterwards.
+            SampleDataLoader.jsonOverride = buildJson(2, 2, false);
 
-        Test.startTest();
-        SampleDataLoader.load();
-        Test.stopTest();
+            Test.startTest();
+            SampleDataLoader.load();
+            Test.stopTest();
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(2, status.householdCount, 'stage one should insert the households');
-        System.assertEquals(
-            1,
-            status.organizationCount,
-            'stage one should insert the organization'
-        );
-        System.assertEquals(
-            0,
-            status.contactCount,
-            'the contact stage is a second queueable, which a test context does not run'
-        );
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(2, status.householdCount, 'stage one should insert the households');
+            System.assertEquals(
+                1,
+                status.organizationCount,
+                'stage one should insert the organization'
+            );
+            System.assertEquals(
+                0,
+                status.contactCount,
+                'the contact stage is a second queueable, which a test context does not run'
+            );
+        }
     }
 
     @IsTest
     static void testContactChunksAtOneHundred() {
-        // Five households of fifty members each: 250 contacts, three chunks of 100, 100
-        // and 50, matching the governor-limit rule in plan Section 7.2.
-        SampleDataSet data = SampleDataSet.parse(buildJson(5, 50, false));
-        System.assertEquals(250, data.members.size(), 'the payload should hold 250 members');
-        System.assertEquals(3, data.chunkCount(), '250 contacts should need three chunks');
+        System.runAs(TestUsers.admin()) {
+            // Five households of fifty members each: 250 contacts, three chunks of 100, 100
+            // and 50, matching the governor-limit rule in plan Section 7.2.
+            SampleDataSet data = SampleDataSet.parse(buildJson(5, 50, false));
+            System.assertEquals(250, data.members.size(), 'the payload should hold 250 members');
+            System.assertEquals(3, data.chunkCount(), '250 contacts should need three chunks');
 
-        SampleDataLoadQueueable.loadHouseholdsAndOrganizations(data);
+            SampleDataLoadQueueable.loadHouseholdsAndOrganizations(data);
 
-        System.assertEquals(
-            100,
-            SampleDataLoadQueueable.loadContactChunk(data, 0),
-            'the first chunk should insert a full 100 contacts'
-        );
-        System.assertEquals(
-            100,
-            SampleDataLoadQueueable.loadContactChunk(data, 1),
-            'the second chunk should insert a full 100 contacts'
-        );
-        System.assertEquals(
-            50,
-            SampleDataLoadQueueable.loadContactChunk(data, 2),
-            'the last chunk should insert the remaining 50 contacts'
-        );
-        System.assertEquals(
-            0,
-            SampleDataLoadQueueable.loadContactChunk(data, 3),
-            'a chunk past the end should insert nothing'
-        );
+            System.assertEquals(
+                100,
+                SampleDataLoadQueueable.loadContactChunk(data, 0),
+                'the first chunk should insert a full 100 contacts'
+            );
+            System.assertEquals(
+                100,
+                SampleDataLoadQueueable.loadContactChunk(data, 1),
+                'the second chunk should insert a full 100 contacts'
+            );
+            System.assertEquals(
+                50,
+                SampleDataLoadQueueable.loadContactChunk(data, 2),
+                'the last chunk should insert the remaining 50 contacts'
+            );
+            System.assertEquals(
+                0,
+                SampleDataLoadQueueable.loadContactChunk(data, 3),
+                'a chunk past the end should insert nothing'
+            );
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(5, status.householdCount);
-        System.assertEquals(250, status.contactCount, 'all 250 contacts should be inserted');
-        System.assertEquals(true, status.loaded);
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(5, status.householdCount);
+            System.assertEquals(250, status.contactCount, 'all 250 contacts should be inserted');
+            System.assertEquals(true, status.loaded);
+        }
     }
 
     @IsTest
     static void testLoadThrowsWhenAlreadyLoaded() {
-        loadEverything(buildJson(1, 1, false));
-        SampleDataLoader.jsonOverride = buildJson(1, 1, false);
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(1, 1, false));
+            SampleDataLoader.jsonOverride = buildJson(1, 1, false);
 
-        Boolean threw = false;
-        try {
-            SampleDataLoader.load();
-        } catch (SampleDataException e) {
-            threw = true;
-            System.assertEquals(
-                Label.Core_SampleData_AlreadyLoaded,
-                e.getMessage(),
-                'the already-loaded error should use the packaged label'
-            );
+            Boolean threw = false;
+            try {
+                SampleDataLoader.load();
+            } catch (SampleDataException e) {
+                threw = true;
+                System.assertEquals(
+                    Label.Core_SampleData_AlreadyLoaded,
+                    e.getMessage(),
+                    'the already-loaded error should use the packaged label'
+                );
+            }
+            System.assertEquals(true, threw, 'loading twice should throw SampleDataException');
         }
-        System.assertEquals(true, threw, 'loading twice should throw SampleDataException');
     }
 
     @IsTest
     static void testJunctionModeJoinsEveryPersonWithAMembershipRow() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-        SettingsService.clearCaches();
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            SettingsService.clearCaches();
 
-        loadEverything(buildJson(2, 2, false));
+            loadEverything(buildJson(2, 2, false));
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(2, status.householdCount, 'both households should be inserted');
-        System.assertEquals(4, status.contactCount, 'both households of two people should load');
-        System.assertEquals(
-            4,
-            [SELECT COUNT() FROM Household_Member__c WHERE End_Date__c = NULL],
-            'every sample person should be joined by a household member record'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE AND AccountId != NULL],
-            'in junction mode the membership row is the join, not the contact household field'
-        );
-        for (Account household : [
-            SELECT Member_Count__c
-            FROM Account
-            WHERE Sample_Data__c = TRUE AND RecordType.DeveloperName = 'Household'
-        ]) {
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(2, status.householdCount, 'both households should be inserted');
             System.assertEquals(
-                2,
-                household.Member_Count__c,
-                'the household counts the people the membership rows joined to it'
+                4,
+                status.contactCount,
+                'both households of two people should load'
             );
+            System.assertEquals(
+                4,
+                [SELECT COUNT() FROM Household_Member__c WHERE End_Date__c = NULL],
+                'every sample person should be joined by a household member record'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE AND AccountId != NULL],
+                'in junction mode the membership row is the join, not the contact household field'
+            );
+            for (Account household : [
+                SELECT Member_Count__c
+                FROM Account
+                WHERE Sample_Data__c = TRUE AND RecordType.DeveloperName = 'Household'
+            ]) {
+                System.assertEquals(
+                    2,
+                    household.Member_Count__c,
+                    'the household counts the people the membership rows joined to it'
+                );
+            }
         }
     }
 
     @IsTest
     static void testJunctionModeIsReportedToTheCard() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-        SettingsService.clearCaches();
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            SettingsService.clearCaches();
 
-        System.assertEquals(
-            true,
-            SampleDataLoader.status().junctionMembership,
-            'the card is told the org keeps membership in household member records'
-        );
+            System.assertEquals(
+                true,
+                SampleDataLoader.status().junctionMembership,
+                'the card is told the org keeps membership in household member records'
+            );
+        }
     }
 
     @IsTest
     static void testContactModeIsStillJoinedThroughTheContactHousehold() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        SettingsService.clearCaches();
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            SettingsService.clearCaches();
 
-        loadEverything(buildJson(2, 2, false));
+            loadEverything(buildJson(2, 2, false));
 
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Household_Member__c],
-            'contact membership writes no membership rows (R-M1)'
-        );
-        System.assertEquals(
-            4,
-            [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE AND AccountId != NULL],
-            'every sample person is on their household'
-        );
-        System.assertEquals(
-            false,
-            SampleDataLoader.status().junctionMembership,
-            'the card is told this org keeps membership on the contact'
-        );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Household_Member__c],
+                'contact membership writes no membership rows (R-M1)'
+            );
+            System.assertEquals(
+                4,
+                [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE AND AccountId != NULL],
+                'every sample person is on their household'
+            );
+            System.assertEquals(
+                false,
+                SampleDataLoader.status().junctionMembership,
+                'the card is told this org keeps membership on the contact'
+            );
+        }
     }
 
     @IsTest
     static void testRemoveInJunctionModeTakesTheMembershipRowsWithIt() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-        SettingsService.clearCaches();
-        loadEverything(buildJson(2, 2, false));
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            SettingsService.clearCaches();
+            loadEverything(buildJson(2, 2, false));
 
-        SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            SampleDataLoader.Counts removed = SampleDataLoader.remove();
 
-        System.assertEquals(2, removed.householdCount, 'both sample households are removed');
-        System.assertEquals(4, removed.contactCount, 'every sample person is removed');
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Household_Member__c],
-            'the membership rows go with the households they belonged to'
-        );
-        SampleDataLoader.Counts afterStatus = SampleDataLoader.status();
-        System.assertEquals(0, afterStatus.householdCount);
-        System.assertEquals(0, afterStatus.contactCount);
-        System.assertEquals(false, afterStatus.loaded);
+            System.assertEquals(2, removed.householdCount, 'both sample households are removed');
+            System.assertEquals(4, removed.contactCount, 'every sample person is removed');
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Household_Member__c],
+                'the membership rows go with the households they belonged to'
+            );
+            SampleDataLoader.Counts afterStatus = SampleDataLoader.status();
+            System.assertEquals(0, afterStatus.householdCount);
+            System.assertEquals(0, afterStatus.contactCount);
+            System.assertEquals(false, afterStatus.loaded);
+        }
     }
 
     @IsTest
     static void testLoadRefusesWhileALoadIsRunning() {
-        SampleDataLoader.jsonOverride = buildJson(1, 1, false);
-        SampleDataLoader.runningJobOverride = true;
+        System.runAs(TestUsers.admin()) {
+            SampleDataLoader.jsonOverride = buildJson(1, 1, false);
+            SampleDataLoader.runningJobOverride = true;
 
-        Boolean threw = false;
-        try {
-            SampleDataLoader.load();
-        } catch (SampleDataException e) {
-            threw = true;
-            System.assertEquals(
-                Label.Core_SampleData_LoadInProgress,
-                e.getMessage(),
-                'a second load should be refused with the load-in-progress label'
-            );
+            Boolean threw = false;
+            try {
+                SampleDataLoader.load();
+            } catch (SampleDataException e) {
+                threw = true;
+                System.assertEquals(
+                    Label.Core_SampleData_LoadInProgress,
+                    e.getMessage(),
+                    'a second load should be refused with the load-in-progress label'
+                );
+            }
+            System.assertEquals(true, threw, 'loading during a running load should throw');
         }
-        System.assertEquals(true, threw, 'loading during a running load should throw');
     }
 
     @IsTest
     static void testRemoveRefusesWhileALoadIsRunning() {
-        loadEverything(buildJson(1, 1, false));
-        SampleDataLoader.runningJobOverride = true;
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(1, 1, false));
+            SampleDataLoader.runningJobOverride = true;
 
-        Boolean threw = false;
-        try {
-            SampleDataLoader.remove();
-        } catch (SampleDataException e) {
-            threw = true;
+            Boolean threw = false;
+            try {
+                SampleDataLoader.remove();
+            } catch (SampleDataException e) {
+                threw = true;
+                System.assertEquals(
+                    Label.Core_SampleData_LoadInProgress,
+                    e.getMessage(),
+                    'removing during a load should be refused with the load-in-progress label'
+                );
+            }
+            System.assertEquals(true, threw, 'removing during a running load should throw');
+
+            SampleDataLoader.runningJobOverride = false;
+            SampleDataLoader.Counts status = SampleDataLoader.status();
             System.assertEquals(
-                Label.Core_SampleData_LoadInProgress,
-                e.getMessage(),
-                'removing during a load should be refused with the load-in-progress label'
+                1,
+                status.householdCount,
+                'the refused remove should delete nothing'
             );
         }
-        System.assertEquals(true, threw, 'removing during a running load should throw');
-
-        SampleDataLoader.runningJobOverride = false;
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(1, status.householdCount, 'the refused remove should delete nothing');
     }
 
     @IsTest
     static void testStatusReportsLoadingWhileAJobRuns() {
-        loadEverything(buildJson(1, 1, false));
-        SampleDataLoader.runningJobOverride = true;
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(1, 1, false));
+            SampleDataLoader.runningJobOverride = true;
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(true, status.loading, 'status should report a running load');
-        System.assertEquals(false, status.loaded, 'a running load is not a finished load');
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(true, status.loading, 'status should report a running load');
+            System.assertEquals(false, status.loaded, 'a running load is not a finished load');
+        }
     }
 
     @IsTest
     static void testRemoveDeletesEverythingFlagged() {
-        loadEverything(buildJson(2, 2, false));
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(2, 2, false));
 
-        SampleDataLoader.Counts removed = SampleDataLoader.remove();
-        System.assertEquals(2, removed.householdCount);
-        System.assertEquals(1, removed.organizationCount);
-        System.assertEquals(4, removed.contactCount);
+            SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            System.assertEquals(2, removed.householdCount);
+            System.assertEquals(1, removed.organizationCount);
+            System.assertEquals(4, removed.contactCount);
 
-        SampleDataLoader.Counts afterStatus = SampleDataLoader.status();
-        System.assertEquals(
-            0,
-            afterStatus.householdCount,
-            'households should be gone after remove'
-        );
-        System.assertEquals(
-            0,
-            afterStatus.organizationCount,
-            'organizations should be gone after remove'
-        );
-        System.assertEquals(0, afterStatus.contactCount, 'contacts should be gone after remove');
-        System.assertEquals(false, afterStatus.loaded);
+            SampleDataLoader.Counts afterStatus = SampleDataLoader.status();
+            System.assertEquals(
+                0,
+                afterStatus.householdCount,
+                'households should be gone after remove'
+            );
+            System.assertEquals(
+                0,
+                afterStatus.organizationCount,
+                'organizations should be gone after remove'
+            );
+            System.assertEquals(
+                0,
+                afterStatus.contactCount,
+                'contacts should be gone after remove'
+            );
+            System.assertEquals(false, afterStatus.loaded);
+        }
     }
 
     @IsTest
     static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
-        loadEverythingIncludingConnections(buildJsonWithConnections());
-        Account ownRecord = new Account(Name = 'A real household');
-        insert ownRecord;
-        Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownRecord.Id);
-        insert ownPerson;
-        Contact ownOtherPerson = new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id);
-        insert ownOtherPerson;
-        Relationship__c ownRelationship = new Relationship__c(
-            Contact__c = ownPerson.Id,
-            Related_Contact__c = ownOtherPerson.Id,
-            Type__c = 'Friend',
-            Status__c = 'Current'
-        );
-        insert ownRelationship;
-        Affiliation__c ownAffiliation = new Affiliation__c(
-            Contact__c = ownPerson.Id,
-            Organization__c = ownRecord.Id,
-            Role__c = 'Board Member',
-            Status__c = 'Current'
-        );
-        insert ownAffiliation;
+        System.runAs(TestUsers.admin()) {
+            loadEverythingIncludingConnections(buildJsonWithConnections());
+            Account ownRecord = new Account(Name = 'A real household');
+            insert ownRecord;
+            Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownRecord.Id);
+            insert ownPerson;
+            Contact ownOtherPerson = new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id);
+            insert ownOtherPerson;
+            Relationship__c ownRelationship = new Relationship__c(
+                Contact__c = ownPerson.Id,
+                Related_Contact__c = ownOtherPerson.Id,
+                Type__c = 'Friend',
+                Status__c = 'Current'
+            );
+            insert ownRelationship;
+            Affiliation__c ownAffiliation = new Affiliation__c(
+                Contact__c = ownPerson.Id,
+                Organization__c = ownRecord.Id,
+                Role__c = 'Board Member',
+                Status__c = 'Current'
+            );
+            insert ownAffiliation;
 
-        SampleDataLoader.remove();
+            SampleDataLoader.remove();
 
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Account WHERE Id = :ownRecord.Id],
-            'a household the admin entered is not touched'
-        );
-        System.assertEquals(
-            2,
-            [SELECT COUNT() FROM Contact WHERE Id IN (:ownPerson.Id, :ownOtherPerson.Id)],
-            'people the admin entered are not touched'
-        );
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Relationship__c WHERE Id = :ownRelationship.Id],
-            'a connection the admin entered is not touched'
-        );
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Affiliation__c WHERE Id = :ownAffiliation.Id],
-            'an affiliation the admin entered is not touched'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Relationship__c WHERE Sample_Data__c = TRUE],
-            'every connection the loader created is gone'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Affiliation__c WHERE Sample_Data__c = TRUE],
-            'every affiliation the loader created is gone'
-        );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :ownRecord.Id],
+                'a household the admin entered is not touched'
+            );
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Contact WHERE Id IN (:ownPerson.Id, :ownOtherPerson.Id)],
+                'people the admin entered are not touched'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Relationship__c WHERE Id = :ownRelationship.Id],
+                'a connection the admin entered is not touched'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Affiliation__c WHERE Id = :ownAffiliation.Id],
+                'an affiliation the admin entered is not touched'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Relationship__c WHERE Sample_Data__c = TRUE],
+                'every connection the loader created is gone'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Affiliation__c WHERE Sample_Data__c = TRUE],
+                'every affiliation the loader created is gone'
+            );
+        }
     }
 
     @IsTest
     static void testConnectionStageLoadsRelationshipsAndAffiliations() {
-        loadEverythingIncludingConnections(buildJsonWithConnections());
+        System.runAs(TestUsers.admin()) {
+            loadEverythingIncludingConnections(buildJsonWithConnections());
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(
-            1,
-            status.relationshipCount,
-            'the payload names one connection between two households'
-        );
-        System.assertEquals(1, status.affiliationCount, 'the payload names one affiliation');
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(
+                1,
+                status.relationshipCount,
+                'the payload names one connection between two households'
+            );
+            System.assertEquals(1, status.affiliationCount, 'the payload names one affiliation');
 
-        Relationship__c saved = [
-            SELECT Contact__c, Related_Contact__c, Type__c, Sample_Data__c
-            FROM Relationship__c
-            WHERE Sample_Data__c = TRUE
-            LIMIT 1
-        ];
-        System.assertEquals('Friend', saved.Type__c, 'the connection keeps the type it was given');
-        System.assertNotEquals(
-            saved.Contact__c,
-            saved.Related_Contact__c,
-            'a connection joins two different people'
-        );
+            Relationship__c saved = [
+                SELECT Contact__c, Related_Contact__c, Type__c, Sample_Data__c
+                FROM Relationship__c
+                WHERE Sample_Data__c = TRUE
+                LIMIT 1
+            ];
+            System.assertEquals(
+                'Friend',
+                saved.Type__c,
+                'the connection keeps the type it was given'
+            );
+            System.assertNotEquals(
+                saved.Contact__c,
+                saved.Related_Contact__c,
+                'a connection joins two different people'
+            );
 
-        Affiliation__c affiliation = [
-            SELECT Contact__c, Organization__c, Role__c
-            FROM Affiliation__c
-            WHERE Sample_Data__c = TRUE
-            LIMIT 1
-        ];
-        System.assertEquals(
-            'Board Member',
-            affiliation.Role__c,
-            'the affiliation keeps the role it was given'
-        );
-        System.assertNotEquals(
-            null,
-            affiliation.Organization__c,
-            'the affiliation found the sample organization by its key'
-        );
+            Affiliation__c affiliation = [
+                SELECT Contact__c, Organization__c, Role__c
+                FROM Affiliation__c
+                WHERE Sample_Data__c = TRUE
+                LIMIT 1
+            ];
+            System.assertEquals(
+                'Board Member',
+                affiliation.Role__c,
+                'the affiliation keeps the role it was given'
+            );
+            System.assertNotEquals(
+                null,
+                affiliation.Organization__c,
+                'the affiliation found the sample organization by its key'
+            );
+        }
     }
 
     @IsTest
     static void testEveryPersonAndHouseholdKeepsItsGeneratorKey() {
-        loadEverything(buildJson(2, 2, false));
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(2, 2, false));
 
-        System.assertEquals(
-            2,
-            [
-                SELECT COUNT()
-                FROM Account
-                WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c LIKE 'H%'
-            ],
-            'each household carries the key the generator gave it'
-        );
-        System.assertEquals(
-            4,
-            [
-                SELECT COUNT()
-                FROM Contact
-                WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c != NULL
-            ],
-            'each person carries the key a module sample set finds them by'
-        );
-        System.assertEquals(
-            1,
-            [
-                SELECT COUNT()
-                FROM Account
-                WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c = 'O1'
-            ],
-            'the organization carries its own key'
-        );
+            System.assertEquals(
+                2,
+                [
+                    SELECT COUNT()
+                    FROM Account
+                    WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c LIKE 'H%'
+                ],
+                'each household carries the key the generator gave it'
+            );
+            System.assertEquals(
+                4,
+                [
+                    SELECT COUNT()
+                    FROM Contact
+                    WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c != NULL
+                ],
+                'each person carries the key a module sample set finds them by'
+            );
+            System.assertEquals(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Account
+                    WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c = 'O1'
+                ],
+                'the organization carries its own key'
+            );
+        }
     }
 
     @IsTest
     static void testRemoveAsksEveryModuleToRemoveItsOwnRecords() {
-        loadEverything(buildJson(1, 1, false));
-        StubModule module = new StubModule(12);
-        SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
+        System.runAs(TestUsers.admin()) {
+            loadEverything(buildJson(1, 1, false));
+            StubModule module = new StubModule(12);
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
 
-        SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            SampleDataLoader.Counts removed = SampleDataLoader.remove();
 
-        System.assertEquals(1, module.removeCalls, 'the module is asked once to remove its own');
-        System.assertEquals(
-            1,
-            removed.moduleCounts.size(),
-            'the counts returned name the module that was removed'
-        );
-        System.assertEquals(
-            12,
-            removed.moduleCounts[0].recordCount,
-            'the count reported is what the module held before it was emptied'
-        );
-        System.assertEquals(
-            0,
-            SampleDataLoader.status().moduleCounts[0].recordCount,
-            'the module has nothing left after the remove'
-        );
+            System.assertEquals(
+                1,
+                module.removeCalls,
+                'the module is asked once to remove its own'
+            );
+            System.assertEquals(
+                1,
+                removed.moduleCounts.size(),
+                'the counts returned name the module that was removed'
+            );
+            System.assertEquals(
+                12,
+                removed.moduleCounts[0].recordCount,
+                'the count reported is what the module held before it was emptied'
+            );
+            System.assertEquals(
+                0,
+                SampleDataLoader.status().moduleCounts[0].recordCount,
+                'the module has nothing left after the remove'
+            );
+        }
     }
 
     @IsTest
     static void testStatusReportsEachModuleCountWithItsOwnLabel() {
-        SampleDataModules.moduleOverride = new List<SampleDataModule>{ new StubModule(709) };
+        System.runAs(TestUsers.admin()) {
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ new StubModule(709) };
 
-        SampleDataLoader.Counts status = SampleDataLoader.status();
+            SampleDataLoader.Counts status = SampleDataLoader.status();
 
-        System.assertEquals(1, status.moduleCounts.size(), 'one installed module is reported');
-        System.assertEquals('Stub', status.moduleCounts[0].name);
-        System.assertEquals(
-            'Stub records',
-            status.moduleCounts[0].label,
-            'the card is given the module its own wording for the number'
-        );
-        System.assertEquals(709, status.moduleCounts[0].recordCount);
+            System.assertEquals(1, status.moduleCounts.size(), 'one installed module is reported');
+            System.assertEquals('Stub', status.moduleCounts[0].name);
+            System.assertEquals(
+                'Stub records',
+                status.moduleCounts[0].label,
+                'the card is given the module its own wording for the number'
+            );
+            System.assertEquals(709, status.moduleCounts[0].recordCount);
+        }
     }
 
     @IsTest
     static void testStatusReportsNotLoadedBeforeAnyLoad() {
-        SampleDataLoader.Counts status = SampleDataLoader.status();
-        System.assertEquals(0, status.householdCount);
-        System.assertEquals(0, status.organizationCount);
-        System.assertEquals(0, status.contactCount);
-        System.assertEquals(false, status.loaded);
-        System.assertEquals(false, status.loading);
+        System.runAs(TestUsers.admin()) {
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(0, status.householdCount);
+            System.assertEquals(0, status.organizationCount);
+            System.assertEquals(0, status.contactCount);
+            System.assertEquals(false, status.loaded);
+            System.assertEquals(false, status.loading);
+        }
     }
 }

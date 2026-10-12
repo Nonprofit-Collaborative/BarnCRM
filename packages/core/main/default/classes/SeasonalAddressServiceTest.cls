@@ -18,98 +18,104 @@ private class SeasonalAddressServiceTest {
 
     @IsTest
     static void seasonStartsOnItsFirstDayAndNotTheDayBefore() {
-        Fixture garcia = winterInArizona(1, 1, 3, 31);
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(1, 1, 3, 31);
 
-        SeasonalAddressService.Plan dayBefore = SeasonalAddressService.planFor(
-            garcia.addresses(),
-            Date.newInstance(2026, 12, 31)
-        );
-        SeasonalAddressService.Plan firstDay = SeasonalAddressService.planFor(
-            garcia.addresses(),
-            Date.newInstance(2027, 1, 1)
-        );
+            SeasonalAddressService.Plan dayBefore = SeasonalAddressService.planFor(
+                garcia.addresses(),
+                Date.newInstance(2026, 12, 31)
+            );
+            SeasonalAddressService.Plan firstDay = SeasonalAddressService.planFor(
+                garcia.addresses(),
+                Date.newInstance(2027, 1, 1)
+            );
 
-        Assert.isFalse(
-            dayBefore.movedIn,
-            'December 31 is outside January 1 to March 31, so nothing should move.'
-        );
-        Assert.areEqual(
-            0,
-            dayBefore.updates.size(),
-            'A day outside the season should produce no updates at all.'
-        );
-        Assert.isTrue(
-            firstDay.movedIn,
-            'January 1 is the first day of the season, so the winter address takes over.'
-        );
-        Assert.areEqual(
-            garcia.winterId,
-            defaultIdIn(firstDay),
-            'The address made default on the first day should be the winter address.'
-        );
-        Assert.areEqual(
-            garcia.homeId,
-            markedIdIn(firstDay),
-            'The home address should be marked so the job knows what to put back in April.'
-        );
+            Assert.isFalse(
+                dayBefore.movedIn,
+                'December 31 is outside January 1 to March 31, so nothing should move.'
+            );
+            Assert.areEqual(
+                0,
+                dayBefore.updates.size(),
+                'A day outside the season should produce no updates at all.'
+            );
+            Assert.isTrue(
+                firstDay.movedIn,
+                'January 1 is the first day of the season, so the winter address takes over.'
+            );
+            Assert.areEqual(
+                garcia.winterId,
+                defaultIdIn(firstDay),
+                'The address made default on the first day should be the winter address.'
+            );
+            Assert.areEqual(
+                garcia.homeId,
+                markedIdIn(firstDay),
+                'The home address should be marked so the job knows what to put back in April.'
+            );
+        }
     }
 
     @IsTest
     static void seasonEndsOnItsLastDayAndTheAddressComesBackTheDayAfter() {
-        Fixture garcia = winterInArizona(1, 1, 3, 31);
-        garcia.makeWinterCurrent();
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(1, 1, 3, 31);
+            garcia.makeWinterCurrent();
 
-        SeasonalAddressService.Plan lastDay = SeasonalAddressService.planFor(
-            garcia.addresses(),
-            Date.newInstance(2027, 3, 31)
-        );
-        SeasonalAddressService.Plan dayAfter = SeasonalAddressService.planFor(
-            garcia.addresses(),
-            Date.newInstance(2027, 4, 1)
-        );
+            SeasonalAddressService.Plan lastDay = SeasonalAddressService.planFor(
+                garcia.addresses(),
+                Date.newInstance(2027, 3, 31)
+            );
+            SeasonalAddressService.Plan dayAfter = SeasonalAddressService.planFor(
+                garcia.addresses(),
+                Date.newInstance(2027, 4, 1)
+            );
 
-        Assert.areEqual(
-            0,
-            lastDay.updates.size(),
-            'March 31 is still inside the season, so the winter address stays in use.'
-        );
-        Assert.isTrue(
-            dayAfter.movedBack,
-            'April 1 is the day after the season, so the home address comes back.'
-        );
-        Assert.areEqual(
-            garcia.homeId,
-            defaultIdIn(dayAfter),
-            'The address put back on April 1 should be the one the season displaced.'
-        );
+            Assert.areEqual(
+                0,
+                lastDay.updates.size(),
+                'March 31 is still inside the season, so the winter address stays in use.'
+            );
+            Assert.isTrue(
+                dayAfter.movedBack,
+                'April 1 is the day after the season, so the home address comes back.'
+            );
+            Assert.areEqual(
+                garcia.homeId,
+                defaultIdIn(dayAfter),
+                'The address put back on April 1 should be the one the season displaced.'
+            );
+        }
     }
 
     @IsTest
     static void aSeasonThatWrapsTheEndOfTheYearIsOneSeason() {
-        Fixture garcia = winterInArizona(11, 1, 3, 31);
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(11, 1, 3, 31);
 
-        Map<Date, Boolean> expected = new Map<Date, Boolean>{
-            Date.newInstance(2026, 10, 31) => false,
-            Date.newInstance(2026, 11, 1) => true,
-            Date.newInstance(2026, 12, 25) => true,
-            Date.newInstance(2027, 1, 1) => true,
-            Date.newInstance(2027, 3, 31) => true,
-            Date.newInstance(2027, 4, 1) => false
-        };
+            Map<Date, Boolean> expected = new Map<Date, Boolean>{
+                Date.newInstance(2026, 10, 31) => false,
+                Date.newInstance(2026, 11, 1) => true,
+                Date.newInstance(2026, 12, 25) => true,
+                Date.newInstance(2027, 1, 1) => true,
+                Date.newInstance(2027, 3, 31) => true,
+                Date.newInstance(2027, 4, 1) => false
+            };
 
-        for (Date day : expected.keySet()) {
-            SeasonalAddressService.Plan plan = SeasonalAddressService.planFor(
-                garcia.addresses(),
-                day
-            );
-            Assert.areEqual(
-                expected.get(day),
-                plan.movedIn,
-                'November 1 to March 31 is one season, so ' +
-                    day.format() +
-                    ' should be inside it: ' +
-                    expected.get(day)
-            );
+            for (Date day : expected.keySet()) {
+                SeasonalAddressService.Plan plan = SeasonalAddressService.planFor(
+                    garcia.addresses(),
+                    day
+                );
+                Assert.areEqual(
+                    expected.get(day),
+                    plan.movedIn,
+                    'November 1 to March 31 is one season, so ' +
+                        day.format() +
+                        ' should be inside it: ' +
+                        expected.get(day)
+                );
+            }
         }
     }
 
@@ -117,283 +123,314 @@ private class SeasonalAddressServiceTest {
 
     @IsTest
     static void aRunMovesTheHouseholdToItsWinterAddressAndTheStandardFieldsFollow() {
-        Fixture garcia = winterInArizona(11, 1, 3, 31);
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(11, 1, 3, 31);
 
-        Test.startTest();
-        SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
-            new Set<Id>{ garcia.householdId },
-            Date.newInstance(2027, 1, 15)
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.householdId },
+                Date.newInstance(2027, 1, 15)
+            );
+            Test.stopTest();
 
-        Assert.areEqual(1, summary.movedIn, 'One household moved to its seasonal address.');
-        Assert.areEqual(0, summary.failed, 'Nothing should have failed.');
-        Map<Id, Address__c> saved = addressesById(garcia.householdId);
-        Assert.isTrue(
-            saved.get(garcia.winterId).Is_Default__c,
-            'The winter address should be the one in use in January.'
-        );
-        Assert.isFalse(
-            saved.get(garcia.homeId).Is_Default__c,
-            'The home address should no longer be the one in use.'
-        );
-        Assert.isTrue(
-            saved.get(garcia.homeId).Replaced_By_Seasonal__c,
-            'The home address should be marked as the one waiting to come back.'
-        );
-        Account moved = [SELECT BillingCity FROM Account WHERE Id = :garcia.householdId];
-        Assert.areEqual(
-            WINTER_CITY,
-            moved.BillingCity,
-            'The address automation should copy the new default into the standard fields.'
-        );
+            Assert.areEqual(1, summary.movedIn, 'One household moved to its seasonal address.');
+            Assert.areEqual(0, summary.failed, 'Nothing should have failed.');
+            Map<Id, Address__c> saved = addressesById(garcia.householdId);
+            Assert.isTrue(
+                saved.get(garcia.winterId).Is_Default__c,
+                'The winter address should be the one in use in January.'
+            );
+            Assert.isFalse(
+                saved.get(garcia.homeId).Is_Default__c,
+                'The home address should no longer be the one in use.'
+            );
+            Assert.isTrue(
+                saved.get(garcia.homeId).Replaced_By_Seasonal__c,
+                'The home address should be marked as the one waiting to come back.'
+            );
+            Account moved = [SELECT BillingCity FROM Account WHERE Id = :garcia.householdId];
+            Assert.areEqual(
+                WINTER_CITY,
+                moved.BillingCity,
+                'The address automation should copy the new default into the standard fields.'
+            );
+        }
     }
 
     @IsTest
     static void aRunPutsTheHomeAddressBackWhenTheSeasonEnds() {
-        Fixture garcia = winterInArizona(11, 1, 3, 31);
-        SeasonalAddressService.swapOwners(
-            new Set<Id>{ garcia.householdId },
-            Date.newInstance(2027, 1, 15)
-        );
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(11, 1, 3, 31);
+            SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.householdId },
+                Date.newInstance(2027, 1, 15)
+            );
 
-        Test.startTest();
-        SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
-            new Set<Id>{ garcia.householdId },
-            Date.newInstance(2027, 4, 1)
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.householdId },
+                Date.newInstance(2027, 4, 1)
+            );
+            Test.stopTest();
 
-        Assert.areEqual(1, summary.movedBack, 'One household came back from its winter address.');
-        Map<Id, Address__c> saved = addressesById(garcia.householdId);
-        Assert.isTrue(
-            saved.get(garcia.homeId).Is_Default__c,
-            'The home address should be the one in use again on April 1.'
-        );
-        Assert.isFalse(
-            saved.get(garcia.homeId).Replaced_By_Seasonal__c,
-            'The mark should be cleared once the address is back in use.'
-        );
-        Account moved = [SELECT BillingCity FROM Account WHERE Id = :garcia.householdId];
-        Assert.areEqual(
-            HOME_CITY,
-            moved.BillingCity,
-            'The standard fields should follow the address back home.'
-        );
+            Assert.areEqual(
+                1,
+                summary.movedBack,
+                'One household came back from its winter address.'
+            );
+            Map<Id, Address__c> saved = addressesById(garcia.householdId);
+            Assert.isTrue(
+                saved.get(garcia.homeId).Is_Default__c,
+                'The home address should be the one in use again on April 1.'
+            );
+            Assert.isFalse(
+                saved.get(garcia.homeId).Replaced_By_Seasonal__c,
+                'The mark should be cleared once the address is back in use.'
+            );
+            Account moved = [SELECT BillingCity FROM Account WHERE Id = :garcia.householdId];
+            Assert.areEqual(
+                HOME_CITY,
+                moved.BillingCity,
+                'The standard fields should follow the address back home.'
+            );
+        }
     }
 
     @IsTest
     static void runningTwiceOnTheSameDayChangesNothingTheSecondTime() {
-        Fixture garcia = winterInArizona(11, 1, 3, 31);
-        Date january = Date.newInstance(2027, 1, 15);
-        SeasonalAddressService.swapOwners(new Set<Id>{ garcia.householdId }, january);
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(11, 1, 3, 31);
+            Date january = Date.newInstance(2027, 1, 15);
+            SeasonalAddressService.swapOwners(new Set<Id>{ garcia.householdId }, january);
 
-        Test.startTest();
-        SeasonalAddressService.RunSummary second = SeasonalAddressService.swapOwners(
-            new Set<Id>{ garcia.householdId },
-            january
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.RunSummary second = SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.householdId },
+                january
+            );
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            second.movedIn,
-            'The right address is already in use, so a second run should move nothing.'
-        );
-        Assert.isTrue(
-            addressesById(garcia.householdId).get(garcia.winterId).Is_Default__c,
-            'The winter address should still be the one in use.'
-        );
+            Assert.areEqual(
+                0,
+                second.movedIn,
+                'The right address is already in use, so a second run should move nothing.'
+            );
+            Assert.isTrue(
+                addressesById(garcia.householdId).get(garcia.winterId).Is_Default__c,
+                'The winter address should still be the one in use.'
+            );
+        }
     }
 
     @IsTest
     static void anOwnerWhoseOnlyAddressIsSeasonalKeepsIt() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        insert garcia;
-        Address__c winter = seasonalAddress(garcia.Id, 11, 1, 3, 31);
-        winter.Is_Default__c = true;
-        insert winter;
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c winter = seasonalAddress(garcia.Id, 11, 1, 3, 31);
+            winter.Is_Default__c = true;
+            insert winter;
 
-        Test.startTest();
-        SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
-            new Set<Id>{ garcia.Id },
-            Date.newInstance(2027, 6, 1)
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.Id },
+                Date.newInstance(2027, 6, 1)
+            );
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            summary.movedBack,
-            'There is no other address to put back, so nothing moves.'
-        );
-        Assert.isTrue(
-            addressesById(garcia.Id).get(winter.Id).Is_Default__c,
-            'An out of date address is worth more than no address at all, so it stays in use.'
-        );
+            Assert.areEqual(
+                0,
+                summary.movedBack,
+                'There is no other address to put back, so nothing moves.'
+            );
+            Assert.isTrue(
+                addressesById(garcia.Id).get(winter.Id).Is_Default__c,
+                'An out of date address is worth more than no address at all, so it stays in use.'
+            );
+        }
     }
 
     @IsTest
     static void twoSeasonalAddressesOnTheSameDayPickTheOlderOneAndAreReported() {
-        Fixture garcia = winterInArizona(11, 1, 3, 31);
-        Address__c second = seasonalAddress(garcia.householdId, 12, 1, 2, 28);
-        second.City__c = 'Tucson';
-        insert second;
+        System.runAs(TestUsers.admin()) {
+            Fixture garcia = winterInArizona(11, 1, 3, 31);
+            Address__c second = seasonalAddress(garcia.householdId, 12, 1, 2, 28);
+            second.City__c = 'Tucson';
+            insert second;
 
-        Test.startTest();
-        SeasonalAddressService.swapOwners(
-            new Set<Id>{ garcia.householdId },
-            Date.newInstance(2027, 1, 15)
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.swapOwners(
+                new Set<Id>{ garcia.householdId },
+                Date.newInstance(2027, 1, 15)
+            );
+            Test.stopTest();
 
-        Assert.isTrue(
-            addressesById(garcia.householdId).get(garcia.winterId).Is_Default__c,
-            'The seasonal address added first should win, so the answer is the same every night.'
-        );
-        List<Error_Log__c> logged = [
-            SELECT Id, Severity__c, Message__c
-            FROM Error_Log__c
-            WHERE Record_Reference__c = :String.valueOf(garcia.winterId)
-        ];
-        Assert.areEqual(
-            1,
-            logged.size(),
-            'Two seasonal addresses covering one day is a data entry mistake worth reporting.'
-        );
-        Assert.areEqual(
-            ErrorLogger.SEVERITY_WARNING,
-            logged[0].Severity__c,
-            'A collision is a warning: the job still did something sensible.'
-        );
+            Assert.isTrue(
+                addressesById(garcia.householdId).get(garcia.winterId).Is_Default__c,
+                'The seasonal address added first should win, so the answer is the same every night.'
+            );
+            List<Error_Log__c> logged = [
+                SELECT Id, Severity__c, Message__c
+                FROM Error_Log__c
+                WHERE Record_Reference__c = :String.valueOf(garcia.winterId)
+            ];
+            Assert.areEqual(
+                1,
+                logged.size(),
+                'Two seasonal addresses covering one day is a data entry mistake worth reporting.'
+            );
+            Assert.areEqual(
+                ErrorLogger.SEVERITY_WARNING,
+                logged[0].Severity__c,
+                'A collision is a warning: the job still did something sensible.'
+            );
+        }
     }
 
     @IsTest
     static void aPersonalSeasonalAddressMovesWithoutMovingTheHousehold() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        insert garcia;
-        Contact harper = AddressTestDataFactory.newContact('Harper', 'Garcia', garcia.Id);
-        harper.MailingStreet = HOME_STREET;
-        harper.MailingCity = HOME_CITY;
-        insert harper;
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Contact harper = AddressTestDataFactory.newContact('Harper', 'Garcia', garcia.Id);
+            harper.MailingStreet = HOME_STREET;
+            harper.MailingCity = HOME_CITY;
+            insert harper;
 
-        Address__c campus = seasonalAddress(null, 9, 1, 5, 31);
-        campus.Contact__c = harper.Id;
-        campus.Street__c = '1 University Drive';
-        campus.City__c = 'Urbana';
-        insert campus;
+            Address__c campus = seasonalAddress(null, 9, 1, 5, 31);
+            campus.Contact__c = harper.Id;
+            campus.Street__c = '1 University Drive';
+            campus.City__c = 'Urbana';
+            insert campus;
 
-        Test.startTest();
-        SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
-            new Set<Id>{ harper.Id },
-            Date.newInstance(2027, 10, 1)
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                new Set<Id>{ harper.Id },
+                Date.newInstance(2027, 10, 1)
+            );
+            Test.stopTest();
 
-        Assert.areEqual(1, summary.movedIn, 'The student address should take over in October.');
-        Contact moved = [SELECT MailingCity FROM Contact WHERE Id = :harper.Id];
-        Assert.areEqual(
-            'Urbana',
-            moved.MailingCity,
-            'A personal address writes that person mailing fields.'
-        );
+            Assert.areEqual(1, summary.movedIn, 'The student address should take over in October.');
+            Contact moved = [SELECT MailingCity FROM Contact WHERE Id = :harper.Id];
+            Assert.areEqual(
+                'Urbana',
+                moved.MailingCity,
+                'A personal address writes that person mailing fields.'
+            );
+        }
     }
 
     @IsTest
     static void aWholeChunkOfHouseholdsSwapsInOneTransaction() {
-        // A whole chunk rather than two hundred households, because a chunk is the largest
-        // number of owners the job ever handles in one transaction on purpose: each owner is
-        // saved on its own so that half a swap can never leave a household with no address in
-        // use (see SeasonalAddressWriter.save). This is the governor-limit proof for the shape
-        // the job actually runs in.
-        Integer chunk = SeasonalAddressBatch.CHUNK_SIZE;
-        List<Account> households = new List<Account>();
-        for (Integer i = 0; i < chunk; i++) {
-            Account household = AddressTestDataFactory.newHousehold('Snowbird ' + i);
-            household.BillingStreet = HOME_STREET;
-            household.BillingCity = HOME_CITY;
-            households.add(household);
-        }
-        insert households;
-        List<Address__c> winters = new List<Address__c>();
-        Set<Id> ownerIds = new Set<Id>();
-        for (Account household : households) {
-            winters.add(seasonalAddress(household.Id, 11, 1, 3, 31));
-            ownerIds.add(household.Id);
-        }
-        insert winters;
+        System.runAs(TestUsers.admin()) {
+            // A whole chunk rather than two hundred households, because a chunk is the largest
+            // number of owners the job ever handles in one transaction on purpose: each owner is
+            // saved on its own so that half a swap can never leave a household with no address in
+            // use (see SeasonalAddressWriter.save). This is the governor-limit proof for the shape
+            // the job actually runs in.
+            Integer chunk = SeasonalAddressBatch.CHUNK_SIZE;
+            List<Account> households = new List<Account>();
+            for (Integer i = 0; i < chunk; i++) {
+                Account household = AddressTestDataFactory.newHousehold('Snowbird ' + i);
+                household.BillingStreet = HOME_STREET;
+                household.BillingCity = HOME_CITY;
+                households.add(household);
+            }
+            insert households;
+            List<Address__c> winters = new List<Address__c>();
+            Set<Id> ownerIds = new Set<Id>();
+            for (Account household : households) {
+                winters.add(seasonalAddress(household.Id, 11, 1, 3, 31));
+                ownerIds.add(household.Id);
+            }
+            insert winters;
 
-        Test.startTest();
-        SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
-            ownerIds,
-            Date.newInstance(2027, 1, 15)
-        );
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.RunSummary summary = SeasonalAddressService.swapOwners(
+                ownerIds,
+                Date.newInstance(2027, 1, 15)
+            );
+            Test.stopTest();
 
-        Assert.areEqual(chunk, summary.movedIn, 'Every household in the chunk should have moved.');
-        Assert.areEqual(0, summary.failed, 'A full chunk should stay inside the limits.');
-        Assert.areEqual(
-            chunk,
-            [
-                SELECT COUNT()
-                FROM Address__c
-                WHERE Account__c IN :ownerIds AND Is_Default__c = TRUE AND Type__c = 'Seasonal'
-            ],
-            'Every household should have its seasonal address in use.'
-        );
+            Assert.areEqual(
+                chunk,
+                summary.movedIn,
+                'Every household in the chunk should have moved.'
+            );
+            Assert.areEqual(0, summary.failed, 'A full chunk should stay inside the limits.');
+            Assert.areEqual(
+                chunk,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE Account__c IN :ownerIds AND Is_Default__c = TRUE AND Type__c = 'Seasonal'
+                ],
+                'Every household should have its seasonal address in use.'
+            );
+        }
     }
 
     // ------------------------------------------------------------------ the visible last run
 
     @IsTest
     static void recordingARunStoresWhenItFinishedAndWhatItDid() {
-        SeasonalAddressService.RunSummary summary = new SeasonalAddressService.RunSummary();
-        summary.movedIn = 3;
-        summary.movedBack = 2;
-        summary.failed = 1;
-        Datetime finishedAt = Datetime.newInstance(2027, 1, 15, 0, 30, 0);
+        System.runAs(TestUsers.admin()) {
+            SeasonalAddressService.RunSummary summary = new SeasonalAddressService.RunSummary();
+            summary.movedIn = 3;
+            summary.movedBack = 2;
+            summary.failed = 1;
+            Datetime finishedAt = Datetime.newInstance(2027, 1, 15, 0, 30, 0);
 
-        Test.startTest();
-        SeasonalAddressService.recordRun(summary, finishedAt);
-        Test.stopTest();
+            Test.startTest();
+            SeasonalAddressService.recordRun(summary, finishedAt);
+            Test.stopTest();
 
-        Assert.areEqual(
-            finishedAt,
-            SeasonalAddressService.lastRun(),
-            'The Hub reads the time the run finished from the settings record.'
-        );
-        String text = SeasonalAddressService.lastRunSummary();
-        Assert.isTrue(
-            text.contains('3') && text.contains('2') && text.contains('1'),
-            'The summary should carry all three counts, and read: ' + text
-        );
+            Assert.areEqual(
+                finishedAt,
+                SeasonalAddressService.lastRun(),
+                'The Hub reads the time the run finished from the settings record.'
+            );
+            String text = SeasonalAddressService.lastRunSummary();
+            Assert.isTrue(
+                text.contains('3') && text.contains('2') && text.contains('1'),
+                'The summary should carry all three counts, and read: ' + text
+            );
+        }
     }
 
     @IsTest
     static void aRunThatDidNothingIsStillRecorded() {
-        Test.startTest();
-        SeasonalAddressService.recordRun(new SeasonalAddressService.RunSummary(), Datetime.now());
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SeasonalAddressService.recordRun(
+                new SeasonalAddressService.RunSummary(),
+                Datetime.now()
+            );
+            Test.stopTest();
 
-        Assert.isNotNull(
-            SeasonalAddressService.lastRun(),
-            'The job ran and had nothing to do, which is a different fact from the job not running.'
-        );
-        Assert.isTrue(
-            SeasonalAddressService.lastRunSummary().contains('0'),
-            'A run that moved nothing should say so rather than say nothing.'
-        );
+            Assert.isNotNull(
+                SeasonalAddressService.lastRun(),
+                'The job ran and had nothing to do, which is a different fact from the job not running.'
+            );
+            Assert.isTrue(
+                SeasonalAddressService.lastRunSummary().contains('0'),
+                'A run that moved nothing should say so rather than say nothing.'
+            );
+        }
     }
 
     @IsTest
     static void anOrgThatHasNotScheduledTheJobIsNeverStale() {
-        Test.startTest();
-        Boolean stale = SeasonalAddressService.isStale();
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Boolean stale = SeasonalAddressService.isStale();
+            Test.stopTest();
 
-        Assert.isFalse(
-            stale,
-            'An org that has not switched the job on has not missed a run, so it is not warned.'
-        );
+            Assert.isFalse(
+                stale,
+                'An org that has not switched the job on has not missed a run, so it is not warned.'
+            );
+        }
     }
 
     // ------------------------------------------------------------------ fixtures
