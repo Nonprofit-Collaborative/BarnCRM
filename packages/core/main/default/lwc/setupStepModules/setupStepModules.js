@@ -3,18 +3,23 @@ import PRESENT from '@salesforce/label/c.Core_SetupAssistant_ModulePresent';
 import ABSENT from '@salesforce/label/c.Core_SetupAssistant_ModuleAbsent';
 import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore';
 import MANAGER_NOTICE from '@salesforce/label/c.Core_SetupAssistant_ModuleManagerNotice';
+import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
+import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
 
 /**
- * Step six: the six BarnCRM packages, which of them are in this org, and where to read
- * what each one does. Turning a module on and off with one click is the Module Manager, in
- * version 0.7, and the notice says so rather than pretending otherwise.
+ * The modules step: the BarnCRM packages this org is offered, which of them are here, where to
+ * read what each one does, and Salesforce's installer for a published one that is not here
+ * (C-30). Turning a module on and off with one click is the Module Manager, and the notice
+ * says so rather than pretending otherwise.
  */
 export default class SetupStepModules extends LightningElement {
   @api modules = [];
 
   labels = {
     learnMore: LEARN_MORE,
-    managerNotice: MANAGER_NOTICE
+    managerNotice: MANAGER_NOTICE,
+    install: INSTALL,
+    newTab: NEW_TAB
   };
 
   get rows() {

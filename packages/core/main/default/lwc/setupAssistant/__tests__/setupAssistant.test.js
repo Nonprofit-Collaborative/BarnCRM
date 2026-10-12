@@ -3,6 +3,7 @@ import SetupAssistant from 'c/setupAssistant';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
+import applySuite from '@salesforce/apex/SetupAssistantController.applySuite';
 import applyCoexistence from '@salesforce/apex/SetupAssistantController.applyCoexistence';
 import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepValues';
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
@@ -20,6 +21,9 @@ jest.mock('@salesforce/apex/SetupAssistantController.skipStep', () => ({ default
   virtual: true
 });
 jest.mock('@salesforce/apex/SetupAssistantController.reset', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/SetupAssistantController.applySuite', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -111,6 +115,25 @@ function state(overrides = {}) {
     ],
     importAvailable: false,
     ...overrides
+  };
+}
+
+// Core's first step since C-30: the edition, ahead of the steps above.
+function withSuiteStep(suite, completed = false) {
+  const base = state();
+  const suiteStep = {
+    ...base.steps[0],
+    key: 'suite',
+    position: 1,
+    label: 'Choose your edition',
+    completed
+  };
+  return {
+    ...base,
+    steps: [suiteStep, ...base.steps.map((step) => ({ ...step, position: step.position + 1 }))],
+    stepsTotal: 9,
+    stepsCompleted: completed ? 1 : 0,
+    suite
   };
 }
 
@@ -497,5 +520,65 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(element.shadowRoot.textContent).toContain('No luck today.');
+  });
+
+  it('saves the Community Suite through Apex and moves on', async () => {
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
+    applySuite.mockResolvedValue(
+      withSuiteStep({ currentSuite: 'Community', giving: { present: false } }, true)
+    );
+    const element = build();
+    await settle();
+
+    element.shadowRoot
+      .querySelector('c-setup-step-suite')
+      .dispatchEvent(new CustomEvent('confirm', { detail: { suite: 'Community' } }));
+    await settle();
+
+    expect(applySuite).toHaveBeenCalledWith({ suite: 'Community' });
+    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+      'Confirm how BarnCRM fits your existing org'
+    );
+  });
+
+  it('stays on the step when the Nonprofit Edition still needs Giving installed', async () => {
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
+    applySuite.mockResolvedValue(
+      withSuiteStep({ currentSuite: 'Impact', giving: { present: false } }, true)
+    );
+    const element = build();
+    await settle();
+
+    element.shadowRoot
+      .querySelector('c-setup-step-suite')
+      .dispatchEvent(new CustomEvent('confirm', { detail: { suite: 'Impact' } }));
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+      'Choose your edition'
+    );
+    expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.currentSuite).toBe(
+      'Impact'
+    );
+  });
+
+  it('checks again for Giving without leaving the step', async () => {
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: 'Impact', giving: {} }));
+    const element = build();
+    await settle();
+    getState.mockResolvedValue(
+      withSuiteStep({ currentSuite: 'Impact', giving: { present: true } }, true)
+    );
+
+    element.shadowRoot
+      .querySelector('c-setup-step-suite')
+      .dispatchEvent(new CustomEvent('checkagain'));
+    await settle();
+
+    expect(getState).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+      'Choose your edition'
+    );
+    expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.giving.present).toBe(true);
   });
 });

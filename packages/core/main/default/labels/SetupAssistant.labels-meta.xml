@@ -206,7 +206,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice that one click module control arrives later</shortDescription>
-        <value>Turning a module on and off with one click arrives with the Module Manager in version 0.7. Until then this list tells you what is here, and the links tell you what each module does.</value>
+        <value>Turning a module on and off with one click arrives with the Module Manager. Until then this list tells you what is here, and the links tell you what each module does and open its installer.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_ModulePresent</fullName>

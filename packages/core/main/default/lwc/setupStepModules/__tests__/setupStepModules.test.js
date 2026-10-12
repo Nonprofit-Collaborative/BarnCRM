@@ -6,6 +6,8 @@ const MODULES = [
   { name: 'Giving', present: false, docsUrl: 'https://example.invalid/giving' }
 ];
 
+const PUBLISHED = '/packaging/installPackage.apexp?p0=04t000000000001AAA';
+
 function build() {
   const element = createElement('c-setup-step-modules', { is: SetupStepModules });
   element.modules = MODULES;
@@ -41,5 +43,22 @@ describe('c-setup-step-modules', () => {
     const element = build();
 
     expect(element.shadowRoot.textContent).toContain('Core_SetupAssistant_ModuleManagerNotice');
+  });
+
+  it('links a published module that is not here to its installer in a new tab', () => {
+    const element = createElement('c-setup-step-modules', { is: SetupStepModules });
+    element.modules = [MODULES[0], { ...MODULES[1], installUrl: PUBLISHED }];
+    document.body.appendChild(element);
+
+    const install = element.shadowRoot.querySelectorAll('[data-id="install-link"]');
+    expect(install).toHaveLength(1);
+    expect(install[0].getAttribute('href')).toBe(PUBLISHED);
+    expect(install[0].target).toBe('_blank');
+  });
+
+  it('offers no installer for a module with no published version', () => {
+    const element = build();
+
+    expect(element.shadowRoot.querySelectorAll('[data-id="install-link"]')).toHaveLength(0);
   });
 });

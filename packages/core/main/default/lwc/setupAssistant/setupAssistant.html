@@ -68,6 +68,15 @@
                     {activeStep.description}
                 </p>
 
+                <template lwc:if={isSuiteStep}>
+                    <c-setup-step-suite
+                        suite={suite}
+                        can-edit={canEdit}
+                        onconfirm={handleSuiteConfirm}
+                        oncheckagain={handleCheckAgain}
+                    ></c-setup-step-suite>
+                </template>
+
                 <template lwc:if={isCoexistenceStep}>
                     <c-setup-step-coexistence
                         coexistence={coexistence}
