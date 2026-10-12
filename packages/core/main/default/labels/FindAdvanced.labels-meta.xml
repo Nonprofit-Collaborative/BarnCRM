@@ -280,4 +280,116 @@
         <shortDescription>Typed query refusal: the text box is empty.</shortDescription>
         <value>Type a query first.</value>
     </labels>
+    <labels>
+        <fullName>Core_Find_RelatedRecords</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading: related records conditions.</shortDescription>
+        <value>Related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedHelp</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help under the related records heading.</shortDescription>
+        <value>Keep only the records that have, or have no, related records matching conditions of their own.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_AddRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: add a related records condition.</shortDescription>
+        <value>Add related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Has</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Choice: keep records that have matching related records.</shortDescription>
+        <value>Has related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_HasNo</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Choice: keep records with no matching related records.</shortDescription>
+        <value>Has no related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Which</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: has or has no related records.</shortDescription>
+        <value>Which records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedKind</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the kind of related record.</shortDescription>
+        <value>Kind of related record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChooseRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Placeholder: choose a kind of related record.</shortDescription>
+        <value>Choose a kind of related record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedConditions</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label above the related records' own conditions.</shortDescription>
+        <value>Conditions on the related records (none means any related record)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedColumns</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading: related record columns.</shortDescription>
+        <value>Related record columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_AddRelatedColumn</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: add a related record column.</shortDescription>
+        <value>Add a related record column</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedFields</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the related record fields a column shows.</shortDescription>
+        <value>Fields to show (up to 5)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedRows</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: how many related records a column shows.</shortDescription>
+        <value>Records per row (newest first)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Remove</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: remove a related records condition or column.</shortDescription>
+        <value>Remove</value>
+    </labels>
 </CustomLabels>
