@@ -14,6 +14,7 @@ import getBatch from '@salesforce/apex/ImportController.getBatch';
 import getRows from '@salesforce/apex/ImportController.getRows';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
+import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
 
 import cardTitle from '@salesforce/label/c.Core_Import_CardTitle';
 import stepTemplate from '@salesforce/label/c.Core_Import_StepTemplate';
@@ -61,6 +62,35 @@ import paymentMatchOnly from '@salesforce/label/c.Core_Import_PaymentMatchingMat
 import paymentNeverMatch from '@salesforce/label/c.Core_Import_PaymentMatchingNeverMatch';
 import matchWindowLabel from '@salesforce/label/c.Core_Import_MatchWindowLabel';
 import matchToleranceLabel from '@salesforce/label/c.Core_Import_MatchToleranceLabel';
+import personMatchFieldLabel from '@salesforce/label/c.Core_Import_PersonMatchFieldLabel';
+import organizationRuleLabel from '@salesforce/label/c.Core_Import_OrganizationRuleLabel';
+import organizationNameHelp from '@salesforce/label/c.Core_Import_OrganizationNameHelp';
+import organizationExternalIdHelp from '@salesforce/label/c.Core_Import_OrganizationExternalIdHelp';
+import organizationMatchFieldLabel from '@salesforce/label/c.Core_Import_OrganizationMatchFieldLabel';
+import noMatchFields from '@salesforce/label/c.Core_Import_NoMatchFields';
+import matchFieldNotMapped from '@salesforce/label/c.Core_Import_MatchFieldNotMapped';
+import severalMatchesLabel from '@salesforce/label/c.Core_Import_SeveralMatchesLabel';
+import severalRejectOption from '@salesforce/label/c.Core_Import_SeveralRejectOption';
+import severalRecentOption from '@salesforce/label/c.Core_Import_SeveralRecentOption';
+import severalRejectHelp from '@salesforce/label/c.Core_Import_SeveralRejectHelp';
+import severalRecentHelp from '@salesforce/label/c.Core_Import_SeveralRecentHelp';
+import fileValuesHeading from '@salesforce/label/c.Core_Import_FileValuesHeading';
+import fileValuesHelp from '@salesforce/label/c.Core_Import_FileValuesHelp';
+import addFileValueButton from '@salesforce/label/c.Core_Import_AddFileValueButton';
+import removeFileValueLabel from '@salesforce/label/c.Core_Import_RemoveFileValueLabel';
+import fileValueTargetLabel from '@salesforce/label/c.Core_Import_FileValueTargetLabel';
+import fileValueLabel from '@salesforce/label/c.Core_Import_FileValueLabel';
+import targetFirstPersonField from '@salesforce/label/c.Core_Import_TargetFirstPersonField';
+import targetSecondPersonField from '@salesforce/label/c.Core_Import_TargetSecondPersonField';
+import targetOrganizationField from '@salesforce/label/c.Core_Import_TargetOrganizationField';
+import recordIdFieldName from '@salesforce/label/c.Core_Import_RecordIdFieldName';
+import matchOnlyLabel from '@salesforce/label/c.Core_Import_MatchOnlyLabel';
+import matchOnlyHelp from '@salesforce/label/c.Core_Import_MatchOnlyHelp';
+
+/** Fills a label's {0} with a value. */
+function format(label, value) {
+  return label.replace('{0}', value);
+}
 
 /** A number as an input shows it, or empty. */
 function numberText(value) {
@@ -125,6 +155,31 @@ const RULES = [
   { value: 'External ID', help: matchingExternalIdHelp }
 ];
 
+const EXTERNAL_ID = 'External ID';
+
+/** How organizations are matched (R-IT2); each says what it risks. */
+const ORGANIZATION_RULES = [
+  { value: 'Name exact', help: organizationNameHelp },
+  { value: EXTERNAL_ID, help: organizationExternalIdHelp }
+];
+
+/** What happens when several records match a row (R-IT9); rejecting is the default. */
+const SEVERAL_REJECT = 'Reject the row';
+const SEVERAL_CHOICES = [
+  { value: SEVERAL_REJECT, label: severalRejectOption, help: severalRejectHelp },
+  { value: 'Use the most recently changed', label: severalRecentOption, help: severalRecentHelp }
+];
+
+/** A person's attributes a value for every row may not set: every row would be one person. */
+const PERSON_ATTRIBUTES_NOT_FOR_EVERY_ROW = ['FirstName', 'LastName', 'FullName', 'Email', 'Id'];
+
+/** A column holding a Salesforce record ID matches that record (R-IT10). */
+const RECORD_ID_TARGETS = [
+  { value: 'Contact1.Id', label: format(targetFirstPersonField, recordIdFieldName) },
+  { value: 'Contact2.Id', label: format(targetSecondPersonField, recordIdFieldName) },
+  { value: 'Organization.Id', label: format(targetOrganizationField, recordIdFieldName) }
+];
+
 /**
  * The import wizard (C-14): choose a mapping, upload a file, check the columns, choose how
  * rows are matched, dry run, commit, and see the result.
@@ -163,6 +218,21 @@ export default class ImportWizard extends LightningElement {
   paymentMatching = 'Match or create';
   matchDateWindowDays = '';
   matchAmountTolerance = '';
+  /** How the chosen mapping matches people and organizations (R-IT2, R-IT8, R-IT9). */
+  personMatchField = '';
+  organizationRule = 'Name exact';
+  organizationMatchField = '';
+  severalMatches = SEVERAL_REJECT;
+  /**
+   * The fields matching accepts, per object (R-IT8), and the fields of people and
+   * organizations a column can be mapped to besides the fixed list (R-IT11).
+   */
+  matchFields = { contact: [], account: [], personFields: [], organizationFields: [] };
+  /** Whether this file only matches and creates nobody (R-IB15). */
+  matchOnly = false;
+  /** Values for every row of this file (R-IB14), as typed: { key, target, value }. */
+  fileValues = [];
+  fileValueCounter = 0;
 
   labels = {
     cardTitle,
@@ -198,7 +268,20 @@ export default class ImportWizard extends LightningElement {
     paymentMatchingHelp,
     paymentMatchingLabel,
     matchWindowLabel,
-    matchToleranceLabel
+    matchToleranceLabel,
+    personMatchFieldLabel,
+    organizationRuleLabel,
+    organizationMatchFieldLabel,
+    noMatchFields,
+    severalMatchesLabel,
+    fileValuesHeading,
+    fileValuesHelp,
+    addFileValueButton,
+    removeFileValueLabel,
+    fileValueTargetLabel,
+    fileValueLabel,
+    matchOnlyLabel,
+    matchOnlyHelp
   };
 
   async connectedCallback() {
@@ -207,6 +290,13 @@ export default class ImportWizard extends LightningElement {
       if (this.permitted) {
         this.templates = await getTemplates();
         this.entityTargets = (await getEntityTargets()) || [];
+        const fields = await getMatchFields();
+        this.matchFields = {
+          contact: (fields && fields.contact) || [],
+          account: (fields && fields.account) || [],
+          personFields: (fields && fields.personFields) || [],
+          organizationFields: (fields && fields.organizationFields) || []
+        };
         if (this.templates.length > 0) {
           this.selectTemplate(this.templates[0].id);
         }
@@ -253,6 +343,14 @@ export default class ImportWizard extends LightningElement {
     this.paymentMatching = (template && template.paymentMatching) || 'Match or create';
     this.matchDateWindowDays = numberText(template && template.matchDateWindowDays);
     this.matchAmountTolerance = numberText(template && template.matchAmountTolerance);
+    this.personMatchField = (template && template.personMatchField) || '';
+    this.organizationRule = (template && template.organizationRule) || 'Name exact';
+    this.organizationMatchField = (template && template.organizationMatchField) || '';
+    this.severalMatches = (template && template.severalMatches) || SEVERAL_REJECT;
+    // A mapping saved before a field could be chosen starts with the first one offered.
+    if (this.isPersonExternalId && !this.personMatchField && this.personFields.length > 0) {
+      this.personMatchField = this.personFields[0].value;
+    }
   }
 
   handleRecurringChange(event) {
@@ -389,9 +487,60 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get targetOptions() {
-    return [{ label: doNotLoad, value: IGNORE }]
+    const all = [{ label: doNotLoad, value: IGNORE }]
       .concat(TARGETS)
+      .concat(RECORD_ID_TARGETS)
+      .concat(this.matchFieldTargets)
+      .concat(this.ownFieldTargets)
       .concat(this.entityTargets.map((target) => ({ value: target.value, label: target.label })));
+    // A field offered twice (a fixed column, or an ID field that is also writable) is listed
+    // once, under its first name.
+    const seen = new Set();
+    return all.filter((option) => {
+      const key = option.value.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+  }
+
+  /** The org's own fields of people and organizations the user may write (R-IT11). */
+  get ownFieldTargets() {
+    const people = this.matchFields.personFields.flatMap((field) => [
+      { value: `Contact1.${field.value}`, label: format(targetFirstPersonField, field.label) },
+      { value: `Contact2.${field.value}`, label: format(targetSecondPersonField, field.label) }
+    ]);
+    const organizations = this.matchFields.organizationFields.map((field) => ({
+      value: `Organization.${field.value}`,
+      label: format(targetOrganizationField, field.label)
+    }));
+    return people.concat(organizations);
+  }
+
+  /** The fields people are matched on, from the object this mapping stores them on (R-IT3). */
+  get personFields() {
+    const template = this.selectedTemplate;
+    return template && template.personMode === 'Person Accounts'
+      ? this.matchFields.account
+      : this.matchFields.contact;
+  }
+
+  /**
+   * A column can hold an ID a row is matched on (R-IT8): each field matching accepts is
+   * offered for either person and for the organization.
+   */
+  get matchFieldTargets() {
+    const people = this.personFields.flatMap((field) => [
+      { value: `Contact1.${field.value}`, label: format(targetFirstPersonField, field.label) },
+      { value: `Contact2.${field.value}`, label: format(targetSecondPersonField, field.label) }
+    ]);
+    const organizations = this.matchFields.account.map((field) => ({
+      value: `Organization.${field.value}`,
+      label: format(targetOrganizationField, field.label)
+    }));
+    return people.concat(organizations);
   }
 
   /**
@@ -450,8 +599,23 @@ export default class ImportWizard extends LightningElement {
     const amount = this.showExpectedAmount ? String(this.expectedAmount || '').trim() : '';
     const options = {
       expectedCount: count === '' ? null : Number(count),
-      expectedAmount: amount === '' ? null : Number(amount)
+      expectedAmount: amount === '' ? null : Number(amount),
+      matching: {
+        personMatchField: this.isPersonExternalId ? this.personMatchField : null,
+        organizationRule: this.organizationRule,
+        organizationMatchField: this.isOrganizationExternalId ? this.organizationMatchField : null,
+        severalMatches: this.severalMatches
+      }
     };
+    const fileValues = this.fileValues
+      .filter((each) => each.target && String(each.value || '').trim() !== '')
+      .map((each) => ({ target: each.target, value: String(each.value).trim() }));
+    if (fileValues.length > 0) {
+      options.fileValues = fileValues;
+    }
+    if (this.matchOnly) {
+      options.matchOnly = true;
+    }
     if (this.showExpectedAmount) {
       // Shown only where a module loads gifts, and saved on the template only then (R-IT7).
       const days = String(this.matchDateWindowDays || '').trim();
@@ -511,6 +675,154 @@ export default class ImportWizard extends LightningElement {
 
   handleRuleChange(event) {
     this.matchingRule = event.detail.value;
+    if (this.isPersonExternalId && !this.personMatchField && this.personFields.length > 0) {
+      this.personMatchField = this.personFields[0].value;
+    }
+  }
+
+  get isPersonExternalId() {
+    return this.matchingRule === EXTERNAL_ID;
+  }
+
+  get personFieldOptions() {
+    return this.personFields.map((field) => ({ label: field.label, value: field.value }));
+  }
+
+  get hasPersonFields() {
+    return this.personFields.length > 0;
+  }
+
+  handlePersonFieldChange(event) {
+    this.personMatchField = event.detail.value;
+  }
+
+  /** A warning when the chosen ID field is not a column, so nobody would be matched (R-IT8). */
+  get personFieldWarning() {
+    return this.unmappedWarning(this.isPersonExternalId, this.personMatchField, [
+      'Contact1',
+      'Contact2'
+    ]);
+  }
+
+  /** The organization rule is offered only where the mapping names an organization. */
+  get mapsOrganization() {
+    return this.columns.some((column) => (column.target || '').startsWith('Organization.'));
+  }
+
+  get organizationRuleOptions() {
+    return ORGANIZATION_RULES.map((rule) => ({ label: rule.value, value: rule.value }));
+  }
+
+  get organizationRuleHelp() {
+    const found = ORGANIZATION_RULES.find((rule) => rule.value === this.organizationRule);
+    return found ? found.help : '';
+  }
+
+  handleOrganizationRuleChange(event) {
+    this.organizationRule = event.detail.value;
+    const fields = this.matchFields.account;
+    if (this.isOrganizationExternalId && !this.organizationMatchField && fields.length > 0) {
+      this.organizationMatchField = fields[0].value;
+    }
+  }
+
+  get isOrganizationExternalId() {
+    return this.mapsOrganization && this.organizationRule === EXTERNAL_ID;
+  }
+
+  get organizationFieldOptions() {
+    return this.matchFields.account.map((field) => ({ label: field.label, value: field.value }));
+  }
+
+  get hasOrganizationFields() {
+    return this.matchFields.account.length > 0;
+  }
+
+  handleOrganizationFieldChange(event) {
+    this.organizationMatchField = event.detail.value;
+  }
+
+  get organizationFieldWarning() {
+    return this.unmappedWarning(this.isOrganizationExternalId, this.organizationMatchField, [
+      'Organization'
+    ]);
+  }
+
+  unmappedWarning(applies, field, entities) {
+    if (!applies || !field) {
+      return '';
+    }
+    const targets = entities.map((entity) => `${entity}.${field}`);
+    const mapped = this.columns.some((column) => targets.includes(column.target));
+    return mapped ? '' : matchFieldNotMapped;
+  }
+
+  get severalOptions() {
+    return SEVERAL_CHOICES.map((choice) => ({ label: choice.label, value: choice.value }));
+  }
+
+  get severalHelp() {
+    const found = SEVERAL_CHOICES.find((choice) => choice.value === this.severalMatches);
+    return found ? found.help : '';
+  }
+
+  handleSeveralChange(event) {
+    this.severalMatches = event.detail.value;
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Values for every row of the file (R-IB14)
+  // ---------------------------------------------------------------------------------------
+
+  /**
+   * What a value for every row can be for: what a column can, except what names or finds a
+   * person, since every row would then be one person.
+   */
+  get fileValueTargetOptions() {
+    const personField = this.isPersonExternalId ? this.personMatchField : null;
+    return this.targetOptions.filter((option) => {
+      if (option.value === IGNORE) {
+        return false;
+      }
+      const [entity, attribute] = option.value.split('.');
+      if (entity !== 'Contact1' && entity !== 'Contact2') {
+        return true;
+      }
+      return !PERSON_ATTRIBUTES_NOT_FOR_EVERY_ROW.includes(attribute) && attribute !== personField;
+    });
+  }
+
+  /** Whether this file only matches and creates nobody (R-IB15); for this file only. */
+  handleMatchOnlyChange(event) {
+    this.matchOnly = event.target.checked;
+  }
+
+  handleAddFileValue() {
+    this.fileValueCounter += 1;
+    this.fileValues = this.fileValues.concat({
+      key: `value-${this.fileValueCounter}`,
+      target: '',
+      value: ''
+    });
+  }
+
+  handleRemoveFileValue(event) {
+    const key = event.target.dataset.key;
+    this.fileValues = this.fileValues.filter((each) => each.key !== key);
+  }
+
+  handleFileValueTargetChange(event) {
+    this.updateFileValue(event.target.dataset.key, { target: event.detail.value });
+  }
+
+  handleFileValueChange(event) {
+    this.updateFileValue(event.target.dataset.key, { value: event.target.value });
+  }
+
+  updateFileValue(key, change) {
+    this.fileValues = this.fileValues.map((each) => {
+      return each.key === key ? { ...each, ...change } : each;
+    });
   }
 
   // ---------------------------------------------------------------------------------------
@@ -649,6 +961,8 @@ export default class ImportWizard extends LightningElement {
     this.message = undefined;
     this.expectedCount = '';
     this.expectedAmount = '';
+    this.fileValues = [];
+    this.matchOnly = false;
   }
 
   // ---------------------------------------------------------------------------------------
@@ -715,8 +1029,14 @@ export default class ImportWizard extends LightningElement {
     return !this.loading && !this.permitted;
   }
 
+  /** An External ID rule needs a field to match on before anything can be matched (R-IT8). */
   get cannotDryRun() {
-    return !this.mapsSomebody || this.records.length === 0;
+    return (
+      !this.mapsSomebody ||
+      this.records.length === 0 ||
+      (this.isPersonExternalId && !this.personMatchField) ||
+      (this.isOrganizationExternalId && !this.organizationMatchField)
+    );
   }
 
   get cannotCommit() {

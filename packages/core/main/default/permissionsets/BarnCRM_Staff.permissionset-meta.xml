@@ -684,6 +684,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Import_Batch__c.File_Values_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Match_Only__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Import_Batch__c.Row_Count__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -785,6 +795,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Row__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Several_Matches__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

@@ -164,6 +164,73 @@ public with sharing class ImportMapping {
         return result;
     }
 
+    /**
+     * Puts a file's values (R-IB14) before this mapping's defaults, in place, and returns
+     * this mapping. A file value replaces the template's default for the same target, and
+     * the row's own value still wins over both, because defaults only fill blanks. A blank or
+     * unreadable document changes nothing.
+     */
+    @NamespaceAccessible
+    public ImportMapping withFileValues(String fileValuesDocument) {
+        ImportMapping file = parse(fileValuesDocument);
+        if (file.defaults.isEmpty()) {
+            return this;
+        }
+        List<Assignment> merged = new List<Assignment>();
+        Set<String> given = new Set<String>();
+        for (Assignment assignment : file.defaults) {
+            if (assignment != null && !isIgnored(assignment.target)) {
+                merged.add(assignment);
+                given.add(assignment.target.trim().toLowerCase());
+            }
+        }
+        for (Assignment assignment : defaults) {
+            if (
+                assignment != null &&
+                assignment.target != null &&
+                !given.contains(assignment.target.trim().toLowerCase())
+            ) {
+                merged.add(assignment);
+            }
+        }
+        defaults = merged;
+        return this;
+    }
+
+    /**
+     * True when a target names or finds a person: either person's first, last or full name,
+     * their email, their record ID (R-IT10), or the field people are matched on (null when the
+     * rule uses none). A value
+     * for every row of a file may not be one of these, since every row would then be one
+     * person (R-IB14).
+     */
+    @NamespaceAccessible
+    public static Boolean namesAPerson(String target, String personMatchField) {
+        String entity = entityOf(target);
+        String attribute = attributeOf(target);
+        if (
+            attribute == null ||
+            !(ENTITY_CONTACT_1.equalsIgnoreCase(entity) ||
+            ENTITY_CONTACT_2.equalsIgnoreCase(entity))
+        ) {
+            return false;
+        }
+        for (
+            String identifying : new List<String>{
+                'FirstName',
+                'LastName',
+                'Email',
+                'Id',
+                ATTRIBUTE_FULL_NAME
+            }
+        ) {
+            if (identifying.equalsIgnoreCase(attribute)) {
+                return true;
+            }
+        }
+        return personMatchField != null && personMatchField.equalsIgnoreCase(attribute);
+    }
+
     /** The document, as it is stored on the template. */
     @NamespaceAccessible
     public String serialize() {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Match_Only__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>When ticked, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15).</description>
+  <inlineHelpText>Ticked when the file was loaded to update existing records only. Rows that matched nobody were rejected.</inlineHelpText>
+  <label>Match Only</label>
+  <type>Checkbox</type>
+</CustomField>

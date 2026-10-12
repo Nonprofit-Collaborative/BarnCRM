@@ -68,6 +68,48 @@ public with sharing class ImportBatchService {
         Integer expectedCount,
         Decimal expectedAmount
     ) {
+        return create(templateId, fileId, fileName, expectedCount, expectedAmount, null);
+    }
+
+    /**
+     * Creates the batch for one upload with its control totals and the values every row of
+     * the file takes where it has none of its own (R-IB14). A value that would make every row
+     * one person is refused, saying which.
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c create(
+        Id templateId,
+        String fileId,
+        String fileName,
+        Integer expectedCount,
+        Decimal expectedAmount,
+        List<ImportMapping.Assignment> fileValues
+    ) {
+        return create(
+            templateId,
+            fileId,
+            fileName,
+            expectedCount,
+            expectedAmount,
+            fileValues,
+            false
+        );
+    }
+
+    /**
+     * Creates the batch for one upload as above, marked Match only when the file is to update
+     * records the org already has and create none (R-IB15).
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c create(
+        Id templateId,
+        String fileId,
+        String fileName,
+        Integer expectedCount,
+        Decimal expectedAmount,
+        List<ImportMapping.Assignment> fileValues,
+        Boolean matchOnly
+    ) {
         if (expectedCount != null && expectedCount < 0) {
             throw new ImportException(Label.Core_Import_ErrorControlCountNegative);
         }
@@ -75,6 +117,7 @@ public with sharing class ImportBatchService {
         if (template == null) {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
+        String fileValuesDocument = fileValuesDocument(template, fileValues);
         Import_Batch__c batch = new Import_Batch__c(
             Import_Template__c = template.Id,
             File_Id__c = String.isBlank(fileId) ? null : fileId.left(18),
@@ -88,10 +131,56 @@ public with sharing class ImportBatchService {
             Rows_Rejected__c = 0,
             Chunk_Size__c = chunkSize(),
             Expected_Count__c = expectedCount,
-            Expected_Amount__c = expectedAmount == null ? null : expectedAmount.setScale(2)
+            Expected_Amount__c = expectedAmount == null ? null : expectedAmount.setScale(2),
+            File_Values_JSON__c = fileValuesDocument,
+            Match_Only__c = matchOnly == true
         );
         Database.insert(batch, AccessLevel.USER_MODE);
         return batch;
+    }
+
+    /**
+     * The file's values as the defaults half of a mapping document, or null when there are
+     * none (R-IB14). Blank targets and values are dropped. A value for a person's name parts,
+     * full name or email, or for the field people are matched on, is refused: every row would
+     * then be one person.
+     */
+    private static String fileValuesDocument(
+        Import_Template__c template,
+        List<ImportMapping.Assignment> fileValues
+    ) {
+        if (fileValues == null || fileValues.isEmpty()) {
+            return null;
+        }
+        String personField = ImportTemplateService.RULE_EXTERNAL_ID.equals(
+                ImportTemplateService.normalizedRule(template.Matching_Rule__c)
+            )
+            ? ImportMatcher.matchField(
+                  ImportTemplateService.personType(template),
+                  template.Person_Match_Field__c
+              )
+            : null;
+        ImportMapping document = new ImportMapping();
+        for (ImportMapping.Assignment given : fileValues) {
+            if (
+                given == null ||
+                ImportMapping.isIgnored(given.target) ||
+                String.isBlank(given.value)
+            ) {
+                continue;
+            }
+            String target = given.target.trim();
+            if (ImportMapping.namesAPerson(target, personField)) {
+                throw new ImportException(
+                    String.format(
+                        Label.Core_Import_ErrorFileValueNotAllowed,
+                        new List<String>{ target.left(80) }
+                    )
+                );
+            }
+            document.defaults.add(new ImportMapping.Assignment(target, given.value.trim()));
+        }
+        return document.defaults.isEmpty() ? null : document.serialize();
     }
 
     /**
@@ -259,9 +348,10 @@ public with sharing class ImportBatchService {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
         ImportMapping mapping = ImportMapping.parse(
-            template.Column_Mapping_JSON__c,
-            template.Default_Values_JSON__c
-        );
+                template.Column_Mapping_JSON__c,
+                template.Default_Values_JSON__c
+            )
+            .withFileValues(batch.File_Values_JSON__c);
         if (!mapping.identifiesSomebody()) {
             throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
         }

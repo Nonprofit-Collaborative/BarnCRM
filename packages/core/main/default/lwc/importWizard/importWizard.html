@@ -118,6 +118,122 @@
                     <p class="slds-text-body_small slds-var-m-top_x-small" data-id="rule-help">
                         {ruleHelp}
                     </p>
+                    <template lwc:if={isPersonExternalId}>
+                        <template lwc:if={hasPersonFields}>
+                            <lightning-combobox
+                                data-id="person-field"
+                                label={labels.personMatchFieldLabel}
+                                value={personMatchField}
+                                options={personFieldOptions}
+                                onchange={handlePersonFieldChange}
+                            ></lightning-combobox>
+                            <p class="slds-text-color_error slds-text-body_small" data-id="person-field-warning">
+                                {personFieldWarning}
+                            </p>
+                        </template>
+                        <template lwc:else>
+                            <p class="slds-text-color_error slds-text-body_small" data-id="no-person-fields">
+                                {labels.noMatchFields}
+                            </p>
+                        </template>
+                    </template>
+                    <template lwc:if={mapsOrganization}>
+                        <lightning-combobox
+                            class="slds-var-m-top_medium"
+                            data-id="organization-rule"
+                            label={labels.organizationRuleLabel}
+                            value={organizationRule}
+                            options={organizationRuleOptions}
+                            onchange={handleOrganizationRuleChange}
+                        ></lightning-combobox>
+                        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="organization-rule-help">
+                            {organizationRuleHelp}
+                        </p>
+                        <template lwc:if={isOrganizationExternalId}>
+                            <template lwc:if={hasOrganizationFields}>
+                                <lightning-combobox
+                                    data-id="organization-field"
+                                    label={labels.organizationMatchFieldLabel}
+                                    value={organizationMatchField}
+                                    options={organizationFieldOptions}
+                                    onchange={handleOrganizationFieldChange}
+                                ></lightning-combobox>
+                                <p
+                                    class="slds-text-color_error slds-text-body_small"
+                                    data-id="organization-field-warning"
+                                >
+                                    {organizationFieldWarning}
+                                </p>
+                            </template>
+                            <template lwc:else>
+                                <p class="slds-text-color_error slds-text-body_small" data-id="no-organization-fields">
+                                    {labels.noMatchFields}
+                                </p>
+                            </template>
+                        </template>
+                    </template>
+                    <lightning-combobox
+                        class="slds-var-m-top_medium"
+                        data-id="several-matches"
+                        label={labels.severalMatchesLabel}
+                        value={severalMatches}
+                        options={severalOptions}
+                        onchange={handleSeveralChange}
+                    ></lightning-combobox>
+                    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="several-help">
+                        {severalHelp}
+                    </p>
+                    <lightning-input
+                        class="slds-var-m-top_medium"
+                        type="checkbox"
+                        data-id="match-only"
+                        label={labels.matchOnlyLabel}
+                        field-level-help={labels.matchOnlyHelp}
+                        checked={matchOnly}
+                        onchange={handleMatchOnlyChange}
+                    ></lightning-input>
+                    <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
+                        {labels.fileValuesHeading}
+                    </h3>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.fileValuesHelp}</p>
+                    <template for:each={fileValues} for:item="fileValue">
+                        <div key={fileValue.key} class="slds-grid slds-gutters_x-small slds-wrap" data-id="file-value-row">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+                                <lightning-combobox
+                                    data-key={fileValue.key}
+                                    label={labels.fileValueTargetLabel}
+                                    value={fileValue.target}
+                                    options={fileValueTargetOptions}
+                                    onchange={handleFileValueTargetChange}
+                                ></lightning-combobox>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+                                <lightning-input
+                                    data-key={fileValue.key}
+                                    label={labels.fileValueLabel}
+                                    value={fileValue.value}
+                                    max-length="255"
+                                    onchange={handleFileValueChange}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-align-bottom">
+                                <lightning-button-icon
+                                    data-key={fileValue.key}
+                                    icon-name="utility:delete"
+                                    alternative-text={labels.removeFileValueLabel}
+                                    title={labels.removeFileValueLabel}
+                                    onclick={handleRemoveFileValue}
+                                ></lightning-button-icon>
+                            </div>
+                        </div>
+                    </template>
+                    <lightning-button
+                        class="slds-var-m-top_x-small"
+                        data-id="add-file-value"
+                        label={labels.addFileValueButton}
+                        icon-name="utility:add"
+                        onclick={handleAddFileValue}
+                    ></lightning-button>
                     <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
                         {labels.controlTotalsHeading}
                     </h3>
