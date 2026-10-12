@@ -23,6 +23,7 @@
     "check:record-pages-assigned": "python3 scripts/ci/check-record-pages-assigned.py",
     "check:canonical-model": "python3 scripts/ci/check-canonical-model.py",
     "check:setting-defaults": "python3 scripts/ci/check-setting-defaults.py",
+    "check:setting-object-explicit": "python3 scripts/ci/check-setting-object-explicit.py",
     "precommit": "lint-staged",
     "check:apex": "bash scripts/ci/check-apex-offline.sh",
     "check:analyzer": "sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2"
@@ -37,7 +38,7 @@
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jest": "29.16.6",
     "husky": "9.1.7",
-    "lint-staged": "17.5.1",
+    "lint-staged": "17.6.0",
     "prettier": "3.9.9",
     "prettier-plugin-apex": "2.3.0"
   }
