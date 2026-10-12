@@ -1,7 +1,7 @@
-# ADR-NEXT: Typed Find queries are parsed into the query document in the browser
+# ADR-0078: Typed Find queries are parsed into the query document in the browser
 
-**Status:** Proposed (awaits owner confirmation: the first exception to plan Section 4.10's
-rule against SOQL typed by admins)
+**Status:** Accepted (owner standing instruction to proceed as recommended, 2026-10-12; the
+first exception to plan Section 4.10's rule against SOQL typed by admins)
 **Date:** 2026-10-12
 **Source:** plan Section 4.9 (Find, "If C-36 allows it later, it is parsed into the same
 document in the browser and the server checks it exactly as before, so there is no second

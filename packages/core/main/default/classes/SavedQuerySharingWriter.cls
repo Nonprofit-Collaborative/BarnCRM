@@ -1,7 +1,7 @@
 /**
  * Keeps the Apex managed share of each saved Find query in step with its Shared flag.
  *
- * System mode, `without sharing`, under ADR-NEXT (saved queries are private and shared by Apex
+ * System mode, `without sharing`, under ADR-0076 (saved queries are private and shared by Apex
  * managed sharing) and in the manner of ADR-0021: a user cannot create a share with an Apex
  * sharing reason, so this one write runs as the system. It is reached only from FindController,
  * after the caller has checked the Find and Export Records permission and that the running user

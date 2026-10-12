@@ -1,6 +1,6 @@
 /**
  * What data management may never write (plan Section 4.9, "Fields that can never be bulk updated
- * or imported over"; canonical model R-IT14; ADR-NEXT `NEXT-import-load-one-object.md`): the
+ * or imported over"; canonical model R-IT14; ADR-0080 `0080-import-load-one-object.md`): the
  * objects a load may not touch, decided by an allow-list rule over describe, and the fields the
  * package or the platform keeps.
  *

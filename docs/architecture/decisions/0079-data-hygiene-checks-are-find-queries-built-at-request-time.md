@@ -1,11 +1,11 @@
-# ADR-NEXT: Data hygiene checks are Find queries built at request time
+# ADR-0079: Data hygiene checks are Find queries built at request time
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12
 **Source:** plan Section 6 row C-28 ("Data hygiene console (orphans, missing households, bad
 addresses)", "Uses C-34 saved queries"); plan Section 4.8 (Health Check, orphaned records);
 builds on ADR-0021, ADR-0047, ADR-0048 and
-`NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`
+`0076-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`
 
 ## Context
 

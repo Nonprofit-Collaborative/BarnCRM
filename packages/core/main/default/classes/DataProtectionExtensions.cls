@@ -1,6 +1,6 @@
 /**
  * Finds the data protection extensions dependent packages installed, and gathers the objects
- * they protect (canonical model R-IT14; ADR-NEXT `NEXT-import-load-one-object.md`). An org
+ * they protect (canonical model R-IT14; ADR-0080 `0080-import-load-one-object.md`). An org
  * without Giving has none, and nothing is missing: Core's own bookkeeping is listed in
  * `DataProtectedFields`.
  *

@@ -1,11 +1,11 @@
-# ADR-NEXT: Column changes as a declarative transform document, and import matching through the org's duplicate rules
+# ADR-0081: Column changes as a declarative transform document, and import matching through the org's duplicate rules
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12
 **Source:** plan Section 4.9 ("Matching", "Bulk update", "Queries are built from a document,
 never from text") and feature C-37 (part 1: transforms and dedupe on import; bulk delete is
-out of scope). Builds on ADR-0047 (D-13), `NEXT-import-matching-per-entity-and-per-file-values.md`
-and `NEXT-import-load-one-object.md`. Adds canonical model R-IT15 and R-IT16 and amends R-IT1.
+out of scope). Builds on ADR-0047 (D-13), `0068-import-matching-per-entity-and-per-file-values.md`
+and `0080-import-load-one-object.md`. Adds canonical model R-IT15 and R-IT16 and amends R-IT1.
 
 ## Context
 

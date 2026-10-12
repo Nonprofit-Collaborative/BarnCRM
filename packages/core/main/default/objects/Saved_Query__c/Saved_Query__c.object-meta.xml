@@ -4,7 +4,7 @@
   <description>
     A named Find query: which object, columns, conditions, sort and row count (canonical model
     Section 29D). Private to the person who saved it; Shared gives everyone Read through an Apex
-    managed share (ADR-NEXT, saved queries). Holds no records and grants access to none.
+    managed share (ADR-0076, saved queries). Holds no records and grants access to none.
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

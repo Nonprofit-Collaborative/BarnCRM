@@ -1,10 +1,10 @@
-# ADR-NEXT: Import loads one object: insert, update by record ID, upsert, with an allow-list
+# ADR-0080: Import loads one object: insert, update by record ID, upsert, with an allow-list
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12
 **Source:** plan Section 4.9 ("Load one object", "Fields that can never be bulk updated or
 imported over", "Architecture decisions") and feature C-33. Builds on ADR-0047, ADR-0021 and
-`NEXT-import-record-id-matching-and-match-only.md`. Adds canonical model R-IT12 to R-IT14 and
+`0069-import-record-id-matching-and-match-only.md`. Adds canonical model R-IT12 to R-IT14 and
 amends R-IT1, R-IB8, R-IB9, R-IJ3 and Section 17A (a journal phase for created records).
 
 ## Context

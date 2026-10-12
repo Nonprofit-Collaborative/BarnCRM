@@ -1,6 +1,6 @@
 /**
- * Loads one chunk of a one-object template (canonical model R-IT12 to R-IT14; ADR-NEXT
- * `NEXT-import-load-one-object.md`): Insert, Update by record Id, or Upsert by external ID, for
+ * Loads one chunk of a one-object template (canonical model R-IT12 to R-IT14; ADR-0080
+ * `0080-import-load-one-object.md`): Insert, Update by record Id, or Upsert by external ID, for
  * any object `ImportObjectSchema` admits, custom ones included.
  *
  * Every read and save of the target object and of lookup parents is in the running user's own

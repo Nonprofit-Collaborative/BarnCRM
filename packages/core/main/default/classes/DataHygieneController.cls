@@ -1,6 +1,6 @@
 /**
  * What the Data Hygiene tab reads and does (C-28, admin guide data-hygiene.md, canonical model
- * R-SQ6, ADR-NEXT `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+ * R-SQ6, ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
  *
  * Both methods require the Find and Export Records custom permission (R-SQ5): the console is a
  * way into Find and grants nothing of its own. Counts run in user mode (DataHygieneService).

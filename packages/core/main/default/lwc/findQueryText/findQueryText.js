@@ -1,6 +1,6 @@
 /**
- * Reads a typed Find query into the query document (C-36, canonical model R-SQ7, ADR-NEXT
- * `NEXT-typed-find-queries-are-parsed-into-the-query-document.md`).
+ * Reads a typed Find query into the query document (C-36, canonical model R-SQ7, ADR-0078
+ * `0078-typed-find-queries-are-parsed-into-the-query-document.md`).
  *
  * The text is a subset of SOQL: exactly what the document can hold, and nothing else. The
  * result is a document like the one the builder writes, which Find loads into the builder and

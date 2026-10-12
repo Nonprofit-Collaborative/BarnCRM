@@ -1,6 +1,6 @@
 /**
  * Which objects and fields a bulk update may write, which fields may be copied into which, and
- * how a value to set is typed (C-35, canonical model R-BU4, ADR-NEXT bulk update).
+ * how a value to set is typed (C-35, canonical model R-BU4, ADR-0077 bulk update).
  *
  * Everything is asked of the running user's describe: a target is a field of the query's own
  * object that the user may edit, of a type a value can be written to, and not one the package

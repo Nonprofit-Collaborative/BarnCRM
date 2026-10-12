@@ -1,6 +1,6 @@
 /**
  * The checks on the Data Hygiene tab (C-28, admin guide data-hygiene.md, canonical model R-SQ6,
- * ADR-NEXT `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+ * ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
  *
  * Each check is a Find query document (R-SQ1) built here when it is counted or opened: names
  * come from schema tokens, so a namespace added later is carried, and the household record type

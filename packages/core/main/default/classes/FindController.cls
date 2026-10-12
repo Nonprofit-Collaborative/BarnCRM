@@ -5,7 +5,7 @@
  * tool and grants no record access. Queries are compiled from the query document by
  * QueryCompiler and run in user mode; no SOQL text is accepted. Saved queries are read and
  * written as the user, and only the owner may change, share or delete one; the one system-mode
- * write, the share row, is SavedQuerySharingWriter's (ADR-NEXT, saved queries).
+ * write, the share row, is SavedQuerySharingWriter's (ADR-0076, saved queries).
  */
 public with sharing class FindController {
     /** Raised for anything the person can fix; the message is shown as it is. */

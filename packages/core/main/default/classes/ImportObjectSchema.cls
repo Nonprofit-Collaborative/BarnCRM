@@ -1,6 +1,6 @@
 /**
  * What a template that loads one object may name, read from the running user's describe at run
- * time (canonical model R-IT12 to R-IT14; ADR-NEXT `NEXT-import-load-one-object.md`): the
+ * time (canonical model R-IT12 to R-IT14; ADR-0080 `0080-import-load-one-object.md`): the
  * objects a file may load, the fields a column may fill, the fields an upsert may match on, the
  * fields a lookup may name its parent by, and how a cell is read as its field's type.
  *

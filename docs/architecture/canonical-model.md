@@ -1423,7 +1423,7 @@ as the other attributes are (R-IB12): converted to the field's type, never clear
 value with a blank, and a field the user may not write is skipped and named in the run log.
 
 **R-IT12 A template that loads one object.** A template with a Target Object loads each row
-as one record of that object (ADR-NEXT, `NEXT-import-load-one-object.md`), through the same
+as one record of that object (ADR-0080, `0080-import-load-one-object.md`), through the same
 batch, dry run, results, journal and undo as any import, in the running user's own access. The
 object and every field come from the running user's describe, when the template is saved and
 in every chunk. Load Operation decides what a row does:
@@ -1496,7 +1496,7 @@ describe for each row according to whether it creates or updates.
 
 **R-IT15 Changing a column's values (the transform document).** A column of the mapping
 document may carry `"transforms"`, an ordered list of at most 10 steps that change the
-column's value before it is matched or written (ADR-NEXT, `NEXT-data-transform-document.md`):
+column's value before it is matched or written (ADR-0081, `0081-data-transform-document.md`):
 
 ```
 { "source": "Last", "target": "Contact1.LastName",
@@ -1523,8 +1523,8 @@ record or uses a pattern the administrator typed: `replace` quotes its text. The
 of the row by name, so bulk update (C-35) can apply the same steps to a record's fields.
 
 **R-IT16 Matching through the org's duplicate rules.** A people template with Use Duplicate
-Rules ticked also asks the org's active duplicate rules (ADR-NEXT,
-`NEXT-data-transform-document.md`) about each person and organization of a chunk that its rule
+Rules ticked also asks the org's active duplicate rules (ADR-0081,
+`0081-data-transform-document.md`) about each person and organization of a chunk that its rule
 (R-IT2, R-IT8) found nobody for, that no record ID names (R-IT10), that no earlier row of the
 pass is creating (R-IB12) and whose row is not already rejected. The row's values for the
 entity, as stored names (R-IT11), are set on an unsaved record of the entity's object (Contact,
@@ -5644,8 +5644,8 @@ browser.
 **R-SQ4 Sharing.** Saved Query is Private. Sharing is an Apex managed share with the reason
 Shared With Find Users, to the org's All Internal Users group, granting Read. Only the owner
 can set or clear Shared, and the share row follows the flag. The share row is the one
-system-mode write here, recorded in ADR-NEXT
-(`NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`); every other read
+system-mode write here, recorded in ADR-0076
+(`0076-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`); every other read
 and write runs as the user.
 
 **R-SQ5 Permission.** Every Find action requires the `Find_And_Export_Records` custom
@@ -5657,14 +5657,14 @@ check is stored in the package. Its count is `SELECT COUNT()` over that same doc
 and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved Query owned by
 the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
 own saved query of that name if there is one. Nothing else about Saved Query changes
-(ADR-NEXT, `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+(ADR-0079, `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
 
 **R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
 in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists
 what each accepts). The browser parses it into a query document and loads that document into
 the builder; the server never receives the text. Every check of R-SQ2 then applies to the
-document as to one built by hand, so there is one enforcement path (ADR-NEXT,
-`NEXT-typed-find-queries-are-parsed-into-the-query-document.md`). Text the parser cannot map
+document as to one built by hand, so there is one enforcement path (ADR-0078,
+`0078-typed-find-queries-are-parsed-into-the-query-document.md`). Text the parser cannot map
 onto the document, including anything R-R2 has no operator for, is refused before anything is
 sent.
 
@@ -5733,7 +5733,7 @@ Up to five changes to every record a Find query returns (plan Section 4.9, featu
 a field to a value, clear it, or copy another field of the same record into it. A bulk update
 adds no object of its own: it is a data job (Section 16) with Operation Update, journaled in
 the import journal (Section 17A) and undone as an import is (ADR-0047; builder decisions in
-ADR-NEXT, `NEXT-bulk-update-runs-as-the-user-from-a-find-query.md`).
+ADR-0077, `0077-bulk-update-runs-as-the-user-from-a-find-query.md`).
 
 ### Rules
 
@@ -5977,12 +5977,12 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.6 | 2026-10-12 | The empty household tidy-up keeps a household with gifts (ADR-0070, `0070-empty-household-tidy-up-keeps-households-with-gifts.md`; resolves the open follow-up of `0071-a-gift-keeps-the-household-it-was-given-to.md`). No object or field added. R-H12: an emptied household is also kept when an installed module still credits records to it, reported through the new Core extension point `HouseholdDependentsExtension`; Giving reports households named by a Gift's or a Commitment's Household field. Such a household is kept without an Error Log entry. |
 | v0.6 | 2026-10-12 | A gift keeps the household it was given to (ADR-0071, `0071-a-gift-keeps-the-household-it-was-given-to.md`; plan decision D-20). No object or field added. R-G2 amended: a gift's Household is derived when the gift is saved and again when its donor changes, and is not recomputed when the donor's household membership changes, so a donor who moves households leaves their past gifts with the household they were given to. A household merge still carries the merged household's gifts to the survivor (R-H13). Household rollups reached through current membership, such as automatic household soft credits, follow current membership. The Gift Household attribute says so. This matches what the Giving trigger already did. |
 | v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
-| v0.7 | 2026-10-12 | C-35 bulk update (ADR-NEXT, `NEXT-bulk-update-runs-as-the-user-from-a-find-query.md`). New Section 29E, rules R-BU1 to R-BU6; no new object. `Import_Batch__c` gains `Operation__c` (Import, Update) and `Operation_JSON__c`, and Section 16's definition covers both kinds of data job. R-IJ2 and R-IJ3: the journal gains the Failed entry. BarnCRM Settings gains `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Update_Records` and permission set `BarnCRM_Bulk_Update`. |
-| v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-NEXT `NEXT-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
-| 1.x | 2026-10-12 | C-36 Advanced Find (ADR-NEXT, `NEXT-typed-find-queries-are-parsed-into-the-query-document.md`). No object, field or settings key added. R-SQ1 gains three optional keys at version 1 (`related`, `children`, `aggregate`). New rules R-SQ7 (typed queries parsed in the browser into the document), R-SQ8 (related-records conditions as semi-joins and anti-joins, related record columns as subqueries), R-SQ9 (summaries), R-SQ10 (editing results, journaled as an Update data job) and R-SQ11 (Excel export). New service `FindInlineEditService`. |
-| v0.7 | 2026-10-12 | C-28 Data hygiene console. No object or field added. New rule R-SQ6: the Data Hygiene tab builds each check's query document in code, counts it in user mode over the same document, and opens it in Find by saving an unshared Saved Query owned by the person. The checks read rules already defined: R-C1 and R-M2 (no household), R-H11 (Member Count), R-M4 (a membership naming nobody), R-AD1 (an address with no owner), R-AD3 (the default address) and R-AD6 (Verification Status). ADR-NEXT `NEXT-data-hygiene-checks-are-find-queries-built-at-request-time.md`. |
-| v0.7 | 2026-10-12 | C-33 load one object (ADR-NEXT, `NEXT-import-load-one-object.md`). `Import_Template__c` gains `Target_Object__c`, `Load_Operation__c`, `Load_Match_Field__c` and `Lookup_Not_Found__c`; `Import_Journal__c.Phase__c` gains Created. R-IT12 (a template that loads one object: insert, update by record Id, upsert by external ID), R-IT13 (lookup columns by ID, name or a unique field) and R-IT14 (the allow-list of objects and the fields never written) added. R-IT1 gains the `Record` entity and `lookupField`; R-IR1, R-IB8, R-IB9 and R-IJ3 say how a one-object import's creations are journaled and undone; Import Row's Resulting Record and Processor Key serve one-object rows. |
-| 1.x | 2026-10-12 | C-37 data transforms and dedupe on import (ADR-NEXT, `NEXT-data-transform-document.md`). R-IT1 columns gain `transforms`; R-IT15 (the transform document and the `DataTransform` engine shared with bulk update) and R-IT16 (matching through the org's active duplicate rules) added. `Import_Template__c` gains `Use_Duplicate_Rules__c`; `Import_Row__c` gains `Duplicate_Rule_Match__c`. |
+| v0.7 | 2026-10-12 | C-35 bulk update (ADR-0077, `0077-bulk-update-runs-as-the-user-from-a-find-query.md`). New Section 29E, rules R-BU1 to R-BU6; no new object. `Import_Batch__c` gains `Operation__c` (Import, Update) and `Operation_JSON__c`, and Section 16's definition covers both kinds of data job. R-IJ2 and R-IJ3: the journal gains the Failed entry. BarnCRM Settings gains `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Update_Records` and permission set `BarnCRM_Bulk_Update`. |
+| v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-0076 `0076-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
+| 1.x | 2026-10-12 | C-36 Advanced Find (ADR-0078, `0078-typed-find-queries-are-parsed-into-the-query-document.md`). No object, field or settings key added. R-SQ1 gains three optional keys at version 1 (`related`, `children`, `aggregate`). New rules R-SQ7 (typed queries parsed in the browser into the document), R-SQ8 (related-records conditions as semi-joins and anti-joins, related record columns as subqueries), R-SQ9 (summaries), R-SQ10 (editing results, journaled as an Update data job) and R-SQ11 (Excel export). New service `FindInlineEditService`. |
+| v0.7 | 2026-10-12 | C-28 Data hygiene console. No object or field added. New rule R-SQ6: the Data Hygiene tab builds each check's query document in code, counts it in user mode over the same document, and opens it in Find by saving an unshared Saved Query owned by the person. The checks read rules already defined: R-C1 and R-M2 (no household), R-H11 (Member Count), R-M4 (a membership naming nobody), R-AD1 (an address with no owner), R-AD3 (the default address) and R-AD6 (Verification Status). ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`. |
+| v0.7 | 2026-10-12 | C-33 load one object (ADR-0080, `0080-import-load-one-object.md`). `Import_Template__c` gains `Target_Object__c`, `Load_Operation__c`, `Load_Match_Field__c` and `Lookup_Not_Found__c`; `Import_Journal__c.Phase__c` gains Created. R-IT12 (a template that loads one object: insert, update by record Id, upsert by external ID), R-IT13 (lookup columns by ID, name or a unique field) and R-IT14 (the allow-list of objects and the fields never written) added. R-IT1 gains the `Record` entity and `lookupField`; R-IR1, R-IB8, R-IB9 and R-IJ3 say how a one-object import's creations are journaled and undone; Import Row's Resulting Record and Processor Key serve one-object rows. |
+| 1.x | 2026-10-12 | C-37 data transforms and dedupe on import (ADR-0081, `0081-data-transform-document.md`). R-IT1 columns gain `transforms`; R-IT15 (the transform document and the `DataTransform` engine shared with bulk update) and R-IT16 (matching through the org's active duplicate rules) added. `Import_Template__c` gains `Use_Duplicate_Rules__c`; `Import_Row__c` gains `Duplicate_Rule_Match__c`. |
 
 ---
 ## 32. Entity ownership by package

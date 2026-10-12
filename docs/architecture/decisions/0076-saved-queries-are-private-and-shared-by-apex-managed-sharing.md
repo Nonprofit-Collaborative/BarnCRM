@@ -1,4 +1,4 @@
-# ADR-NEXT: Saved queries are private and shared by Apex managed sharing
+# ADR-0076: Saved queries are private and shared by Apex managed sharing
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12

@@ -1,4 +1,4 @@
-# ADR-NEXT: Bulk update runs as the user, from a Find query, and is undone by the import undo
+# ADR-0077: Bulk update runs as the user, from a Find query, and is undone by the import undo
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-12

@@ -1,7 +1,7 @@
 /**
  * Asks the org's own active duplicate rules about the people and organizations of an import
- * chunk that the template's rule found nobody for (canonical model R-IT16, ADR-NEXT
- * `NEXT-data-transform-document.md`).
+ * chunk that the template's rule found nobody for (canonical model R-IT16, ADR-0081
+ * `0081-data-transform-document.md`).
  *
  * Nothing here decides what a row is. The platform's matcher compares an unsaved record built
  * from the row with the records already there, as the org's rules say; this class keeps only

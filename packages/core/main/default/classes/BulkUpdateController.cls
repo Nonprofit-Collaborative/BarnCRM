@@ -1,6 +1,6 @@
 /**
  * What the bulk update panel and the Bulk Update tab read and write (C-35, canonical model
- * Section 29E, ADR-NEXT bulk update).
+ * Section 29E, ADR-0077 bulk update).
  *
  * Every method requires the Bulk Update Records custom permission and, because every bulk update
  * starts from a Find query, Find and Export Records (R-BU6). Neither grants record access: the
