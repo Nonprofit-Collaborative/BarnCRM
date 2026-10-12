@@ -68,6 +68,7 @@ Start with [docs/contributor-guide/environment.md](docs/contributor-guide/enviro
 - [docs/contributor-guide/](docs/contributor-guide/): environment setup, scratch orgs, CI, and the [dynamic Apex conventions](docs/contributor-guide/dynamic-apex.md) for reaching objects and classes an org may not have.
 - [docs/release-notes/](docs/release-notes/): what shipped in each iteration.
 - [docs/barncrm-features.md](docs/barncrm-features.md): the feature catalog, every feature by module with its status (shipped, built on a branch, or planned).
+- Project docs at the repository root: [architecture.md](architecture.md) (environments, orgs, layout and gotchas), [roadmap.md](roadmap.md) (planned work with status), [changelog.md](changelog.md) (every change made, newest first) and [memory.md](memory.md) (decisions, open questions and working agreements).
 
 ## Governance and license
 
