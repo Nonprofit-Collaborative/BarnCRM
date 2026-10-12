@@ -109,6 +109,77 @@ private class StewardshipPlanControllerTest {
         Assert.isFalse(saved.Active__c, 'And off until she says otherwise.');
     }
 
+    private static String keyOf(Id templateId) {
+        return [SELECT Plan_Key__c FROM Stewardship_Plan_Template__c WHERE Id = :templateId]
+        .Plan_Key__c;
+    }
+
+    @IsTest
+    static void aNewPlanGetsAKeyMadeFromItsName() {
+        Test.startTest();
+        Id created = StewardshipPlanController.saveTemplate(
+            model(null, '  First gift: welcome!  ', null)
+        );
+        Test.stopTest();
+
+        Assert.areEqual(
+            'first_gift_welcome',
+            keyOf(created),
+            'The administrator is never asked for a code; one is made from the name.'
+        );
+    }
+
+    /** The bulk case: two hundred plans already share the name, and the next one still saves. */
+    @IsTest
+    static void aPlanNamedLikeTwoHundredOthersGetsTheNextFreeKey() {
+        List<Stewardship_Plan_Template__c> existing = new List<Stewardship_Plan_Template__c>();
+        for (Integer i = 1; i <= 200; i++) {
+            existing.add(
+                new Stewardship_Plan_Template__c(
+                    Name = 'Welcome',
+                    Plan_Key__c = i == 1 ? 'Welcome' : 'welcome_' + i,
+                    Active__c = false,
+                    Trigger_Event__c = StewardshipService.EVENT_MANUAL
+                )
+            );
+        }
+        insert existing;
+
+        Test.startTest();
+        Id created = StewardshipPlanController.saveTemplate(model(null, 'Welcome', null));
+        Test.stopTest();
+
+        Assert.areEqual(
+            'welcome_201',
+            keyOf(created),
+            'Keys are compared without case, as the unique field compares them.'
+        );
+    }
+
+    @IsTest
+    static void editingAPlanNeverChangesItsKey() {
+        Stewardship_Plan_Template__c plan = template('Old name', 'old_key', false);
+
+        Test.startTest();
+        StewardshipPlanController.saveTemplate(model(plan.Id, 'A new name', null));
+        Test.stopTest();
+
+        Assert.areEqual(
+            'old_key',
+            keyOf(plan.Id),
+            'The key is what keeps a renamed plan recognizable, so a rename leaves it alone.'
+        );
+    }
+
+    @IsTest
+    static void aNameWithNoLettersOrDigitsStillGetsAKey() {
+        Assert.areEqual(
+            'plan',
+            StewardshipPlanController.uniquePlanKeyFor('???'),
+            'A name in another script still produces a usable key.'
+        );
+    }
+
     @IsTest
     static void aPlanWithNoNameIsRefusedWithSomethingToActOn() {
         String message;

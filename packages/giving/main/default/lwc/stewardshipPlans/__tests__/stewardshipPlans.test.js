@@ -227,8 +227,7 @@ describe('c-stewardship-plans', () => {
     await flush();
     const name = element.shadowRoot.querySelector('[data-id="plan-name"]');
     name.dispatchEvent(new CustomEvent('change', { detail: { value: 'Pledge welcome' } }));
-    const key = element.shadowRoot.querySelector('[data-id="plan-key"]');
-    key.dispatchEvent(new CustomEvent('change', { detail: { value: 'pledge_welcome' } }));
+    expect(element.shadowRoot.querySelector('[data-id="plan-key"]')).toBeNull();
     const event = element.shadowRoot.querySelector('[data-id="plan-event-input"]');
     event.dispatchEvent(new CustomEvent('change', { detail: { value: 'Commitment started' } }));
     element.shadowRoot.querySelector('[data-id="save-plan"]').click();
@@ -238,7 +237,6 @@ describe('c-stewardship-plans', () => {
       template: {
         recordId: null,
         name: 'Pledge welcome',
-        planKey: 'pledge_welcome',
         triggerEvent: 'Commitment started',
         minimumAmount: null,
         description: '',

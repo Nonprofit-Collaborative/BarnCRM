@@ -31,10 +31,9 @@ The page lists every plan you have written down, how many steps each one lays ou
 copies of it are running right now, and whether it is switched on.
 
 1. Choose **New plan** and fill in:
-   - a **plan name**, the one your team will recognize, for example "First gift welcome";
-   - a **plan key**, a short unchanging code such as `first_gift_welcome`. You will not
-     see it again. It is how BarnCRM recognizes the plan across upgrades even if you
-     rename it;
+   - a **plan name**, the one your team will recognize, for example "First gift welcome".
+     You can rename the plan later: BarnCRM also gives it a hidden key made from this first
+     name, which never changes, so it still recognizes the plan after a rename;
    - **what starts it**:
      - **Manual**: nothing starts it automatically. Somebody starts it on a donor.
      - **First gift**: starts when a donor's first gift arrives.
@@ -68,7 +67,7 @@ laid out, and none of them changes when you edit it.
 ## A five-minute walkthrough
 
 1. Open **BarnCRM Settings**, **Giving**, **Stewardship plans**, and choose **New plan**.
-   Call it "First gift welcome", key `first_gift_welcome`, started by **First gift**, no
+   Call it "First gift welcome", started by **First gift**, no
    smallest gift. Leave **On** unchecked and save.
 2. Choose the plan in the list, then add three steps:
    - "Call to say thank you", 1 day after start, Record owner, High;

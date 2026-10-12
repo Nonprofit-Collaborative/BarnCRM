@@ -103,6 +103,17 @@
                     onclick={handleOpenRule}
                   ></lightning-button>
                   <span data-id="rule-active" class="slds-text-body_small">{rule.activeText}</span>
+                  <template lwc:if={canManage}>
+                    <lightning-button
+                      data-id="rule-edit"
+                      data-record-id={rule.id}
+                      class="slds-var-m-left_x-small"
+                      variant="base"
+                      label={labels.editRule}
+                      title={rule.editTitle}
+                      onclick={handleEditRule}
+                    ></lightning-button>
+                  </template>
                 </td>
                 <td>{rule.channel}</td>
                 <td>
@@ -122,13 +133,69 @@
         </table>
       </template>
 
-      <div class="slds-var-m-top_small slds-var-m-bottom_medium">
-        <lightning-button
-          data-id="new-rule"
-          label={labels.newRule}
-          onclick={handleNewRule}
-        ></lightning-button>
-      </div>
+      <template lwc:if={showRuleForm}>
+        <div data-id="rule-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
+          <h3 class="slds-text-heading_small slds-var-m-bottom_small">{ruleFormHeading}</h3>
+          <lightning-record-edit-form
+            object-api-name="Acknowledgment_Rule__c"
+            record-id={editingRuleId}
+            onsubmit={handleRuleSubmit}
+            onsuccess={handleRuleSaved}
+          >
+            <lightning-messages></lightning-messages>
+            <lightning-input-field field-name="Name"></lightning-input-field>
+            <lightning-input-field field-name="Order__c"></lightning-input-field>
+            <lightning-input-field field-name="Active__c"></lightning-input-field>
+            <lightning-input-field
+              data-id="rule-channel"
+              field-name="Channel__c"
+              onchange={handleChannelChange}
+            ></lightning-input-field>
+            <template lwc:if={ruleIsEmail}>
+              <lightning-combobox
+                data-id="rule-template"
+                label={labels.templateField}
+                field-level-help={labels.templateFieldHelp}
+                placeholder={labels.templatePlaceholder}
+                options={templateOptions}
+                value={ruleTemplate}
+                message-when-value-missing={labels.templateRequired}
+                required
+                onchange={handleRuleTemplateChange}
+              ></lightning-combobox>
+            </template>
+            <lightning-input-field field-name="Minimum_Amount__c"></lightning-input-field>
+            <lightning-input-field field-name="Maximum_Amount__c"></lightning-input-field>
+            <lightning-input-field field-name="Gift_Type__c"></lightning-input-field>
+            <lightning-input-field field-name="Appeal__c"></lightning-input-field>
+            <lightning-input-field field-name="First_Gift_Only__c"></lightning-input-field>
+            <lightning-input-field field-name="Description__c"></lightning-input-field>
+            <div class="slds-var-m-top_small">
+              <lightning-button
+                data-id="rule-cancel"
+                label={labels.cancelRule}
+                onclick={handleCancelRule}
+              ></lightning-button>
+              <lightning-button
+                data-id="rule-save"
+                class="slds-var-m-left_x-small"
+                variant="brand"
+                type="submit"
+                label={labels.saveRule}
+              ></lightning-button>
+            </div>
+          </lightning-record-edit-form>
+        </div>
+      </template>
+      <template lwc:elseif={canManage}>
+        <div class="slds-var-m-top_small slds-var-m-bottom_medium">
+          <lightning-button
+            data-id="new-rule"
+            label={labels.newRule}
+            onclick={handleNewRule}
+          ></lightning-button>
+        </div>
+      </template>
 
       <h3 class="slds-text-heading_small">{labels.runsHeading}</h3>
       <template if:true={showNoRuns}>
@@ -169,27 +236,6 @@
                     ></lightning-button>
                   </template>
                 </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </template>
-
-      <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.templatesHeading}</h3>
-      <p class="slds-text-body_small slds-var-m-bottom_small">{labels.templatesIntro}</p>
-      <template if:true={hasTemplates}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">{labels.columnLabel}</th>
-              <th scope="col">{labels.columnDeveloperName}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={page.templates} for:item="template">
-              <tr key={template.developerName} data-id="template">
-                <td>{template.label}</td>
-                <td data-id="template-developer-name">{template.developerName}</td>
               </tr>
             </template>
           </tbody>

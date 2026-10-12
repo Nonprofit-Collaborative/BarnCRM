@@ -7,7 +7,7 @@
     on a name the administrator may have changed.
   </description>
   <externalId>true</externalId>
-  <inlineHelpText>A short unchanging code for this plan, for example first_gift_welcome.</inlineHelpText>
+  <inlineHelpText>Made from the plan name when the plan is created, and never changed, so BarnCRM recognizes the plan after a rename. You do not need to set it.</inlineHelpText>
   <label>Plan Key</label>
   <length>80</length>
   <required>true</required>
