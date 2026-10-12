@@ -8,7 +8,9 @@
 private class ImportFirstNameMatchTest {
     @TestSetup
     static void setUp() {
-        TestDataFactory.defaultSettings();
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+        }
     }
 
     private static final List<String> COLUMNS = new List<String>{
@@ -119,80 +121,104 @@ private class ImportFirstNameMatchTest {
 
     @IsTest
     static void aRowNamingJaneAloneFindsJaneNotHerHusband() {
-        insert new List<Contact>{ smith('John'), smith('Jane') };
+        System.runAs(TestUsers.admin()) {
+            insert new List<Contact>{ smith('John'), smith('Jane') };
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'Jane' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ 'Jane' } }),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Jane, found by first name.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Nobody renamed or added.');
+            Assert.areEqual(
+                'Jane',
+                firstNameOf(rows[0].Contact_1__c),
+                'Jane, found by first name.'
+            );
+            Assert.areEqual(
+                new List<String>{ 'John', 'Jane' },
+                smiths(),
+                'Nobody renamed or added.'
+            );
+        }
     }
 
     @IsTest
     static void aRowNamingJohnAloneFindsJohnWhenJaneIsTheOlderRecord() {
-        insert smith('Jane');
-        insert smith('John');
+        System.runAs(TestUsers.admin()) {
+            insert smith('Jane');
+            insert smith('John');
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'John' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ 'John' } }),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual('John', firstNameOf(rows[0].Contact_1__c), 'John, not the older Jane.');
-        Assert.areEqual(new List<String>{ 'Jane', 'John' }, smiths(), 'Nobody renamed or added.');
+            Assert.areEqual('John', firstNameOf(rows[0].Contact_1__c), 'John, not the older Jane.');
+            Assert.areEqual(
+                new List<String>{ 'Jane', 'John' },
+                smiths(),
+                'Nobody renamed or added.'
+            );
+        }
     }
 
     @IsTest
     static void aRowAfterACoupleInTheSameChunkFindsTheRightPartner() {
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(
-                new List<List<String>>{
-                    new List<String>{ 'John', 'Jane' },
-                    new List<String>{ 'Jane' },
-                    new List<String>{ 'Mary' }
-                }
-            ),
-            200
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{
+                        new List<String>{ 'John', 'Jane' },
+                        new List<String>{ 'Jane' },
+                        new List<String>{ 'Mary' }
+                    }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual(rows[0].Contact_2__c, rows[1].Contact_1__c, 'The Jane row is that Jane.');
-        Assert.areEqual('Mary', firstNameOf(rows[2].Contact_1__c), 'Mary is nobody else.');
-        // Jane is saved with the second people, after Mary, so the order says nothing here.
-        Assert.areEqual(
-            sorted(new List<String>{ 'John', 'Jane', 'Mary' }),
-            sorted(smiths()),
-            'Three people.'
-        );
-        assertOneHousehold(rows[0].Contact_1__c, rows[0].Contact_2__c);
-        Assert.areEqual(rows[0].Household__c, rows[1].Household__c, 'Her row names it too.');
+            Assert.areEqual(
+                rows[0].Contact_2__c,
+                rows[1].Contact_1__c,
+                'The Jane row is that Jane.'
+            );
+            Assert.areEqual('Mary', firstNameOf(rows[2].Contact_1__c), 'Mary is nobody else.');
+            // Jane is saved with the second people, after Mary, so the order says nothing here.
+            Assert.areEqual(
+                sorted(new List<String>{ 'John', 'Jane', 'Mary' }),
+                sorted(smiths()),
+                'Three people.'
+            );
+            assertOneHousehold(rows[0].Contact_1__c, rows[0].Contact_2__c);
+            Assert.areEqual(rows[0].Household__c, rows[1].Household__c, 'Her row names it too.');
+        }
     }
 
     @IsTest
     static void aRowNamingJaneBeforeHerCoupleRowIsInTheCouplesHousehold() {
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(
-                new List<List<String>>{
-                    new List<String>{ 'Jane' },
-                    new List<String>{ 'John', 'Jane' }
-                }
-            ),
-            200
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{
+                        new List<String>{ 'Jane' },
+                        new List<String>{ 'John', 'Jane' }
+                    }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual(rows[1].Contact_2__c, rows[0].Contact_1__c, 'One Jane, not two.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Two people.');
-        assertOneHousehold(rows[1].Contact_1__c, rows[1].Contact_2__c);
-        Assert.areEqual(rows[1].Household__c, rows[0].Household__c, 'Her row names it too.');
+            Assert.areEqual(rows[1].Contact_2__c, rows[0].Contact_1__c, 'One Jane, not two.');
+            Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Two people.');
+            assertOneHousehold(rows[1].Contact_1__c, rows[1].Contact_2__c);
+            Assert.areEqual(rows[1].Household__c, rows[0].Household__c, 'Her row names it too.');
+        }
     }
 
     private static void assertOneHousehold(Id john, Id jane) {
@@ -218,110 +244,143 @@ private class ImportFirstNameMatchTest {
 
     @IsTest
     static void aMatchIsFoundHoweverManyPeopleShareTheSurnameElsewhere() {
-        List<Contact> elsewhere = new List<Contact>();
-        for (Integer i = 0; i < 3; i++) {
-            elsewhere.add(
-                new Contact(FirstName = 'Al' + i, LastName = 'Smith', MailingPostalCode = '99999')
+        System.runAs(TestUsers.admin()) {
+            List<Contact> elsewhere = new List<Contact>();
+            for (Integer i = 0; i < 3; i++) {
+                elsewhere.add(
+                    new Contact(
+                        FirstName = 'Al' + i,
+                        LastName = 'Smith',
+                        MailingPostalCode = '99999'
+                    )
+                );
+            }
+            insert elsewhere;
+            insert smith('John');
+            // Smiths elsewhere once filled the lookup before John was reached.
+            ImportMatcher.rowCap = 3;
+
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ 'John' } }),
+                200
             );
+            Test.stopTest();
+
+            Assert.areEqual(ImportRowProcessor.STATUS_MATCHED, rows[0].Status__c, 'John is found.');
+            Assert.areEqual(4, [SELECT COUNT() FROM Contact], 'Nobody added.');
         }
-        insert elsewhere;
-        insert smith('John');
-        // Smiths elsewhere once filled the lookup before John was reached.
-        ImportMatcher.rowCap = 3;
-
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'John' } }),
-            200
-        );
-        Test.stopTest();
-
-        Assert.areEqual(ImportRowProcessor.STATUS_MATCHED, rows[0].Status__c, 'John is found.');
-        Assert.areEqual(4, [SELECT COUNT() FROM Contact], 'Nobody added.');
     }
 
     @IsTest
     static void aLookupStoppedAtTheCapNeverRenamesAnybody() {
-        insert smith('John');
-        // The lookup reads as many records as it may, so another holder may be unseen.
-        ImportMatcher.rowCap = 1;
+        System.runAs(TestUsers.admin()) {
+            insert smith('John');
+            // The lookup reads as many records as it may, so another holder may be unseen.
+            ImportMatcher.rowCap = 1;
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'Jane' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ 'Jane' } }),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Jane is created.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'John is not renamed.');
-        Assert.isTrue(
-            [SELECT COUNT() FROM Error_Log__c WHERE Severity__c = :ErrorLogger.SEVERITY_WARNING] >
-            0,
-            'And the stop is logged.'
-        );
+            Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Jane is created.');
+            Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'John is not renamed.');
+            Assert.isTrue(
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Severity__c = :ErrorLogger.SEVERITY_WARNING
+                ] > 0,
+                'And the stop is logged.'
+            );
+        }
     }
 
     @IsTest
     static void twoCouplesAtOneAddressAreToldApartByFirstName() {
-        insert new List<Contact>{ smith('John'), smith('Jane'), smith('Bob'), smith('Mary') };
+        System.runAs(TestUsers.admin()) {
+            insert new List<Contact>{ smith('John'), smith('Jane'), smith('Bob'), smith('Mary') };
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'Mary' }, new List<String>{ 'Ann' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{ new List<String>{ 'Mary' }, new List<String>{ 'Ann' } }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual('Mary', firstNameOf(rows[0].Contact_1__c), 'Mary, not the first Smith.');
-        Assert.areEqual('Ann', firstNameOf(rows[1].Contact_1__c), 'Ann is new, not a guess.');
-        Assert.areEqual(
-            new List<String>{ 'John', 'Jane', 'Bob', 'Mary', 'Ann' },
-            smiths(),
-            'Nobody renamed.'
-        );
+            Assert.areEqual(
+                'Mary',
+                firstNameOf(rows[0].Contact_1__c),
+                'Mary, not the first Smith.'
+            );
+            Assert.areEqual('Ann', firstNameOf(rows[1].Contact_1__c), 'Ann is new, not a guess.');
+            Assert.areEqual(
+                new List<String>{ 'John', 'Jane', 'Bob', 'Mary', 'Ann' },
+                smiths(),
+                'Nobody renamed.'
+            );
+        }
     }
 
     @IsTest
     static void aDryRunInOneRowChunksCountsWhatTheCommitDoes() {
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(
-                new List<List<String>>{
-                    new List<String>{ 'John' },
-                    new List<String>{ 'John', 'Jane' },
-                    new List<String>{ 'Jane' },
-                    new List<String>{ 'Mary' }
-                }
-            ),
-            1
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{
+                        new List<String>{ 'John' },
+                        new List<String>{ 'John', 'Jane' },
+                        new List<String>{ 'Jane' },
+                        new List<String>{ 'Mary' }
+                    }
+                ),
+                1
+            );
+            Test.stopTest();
 
-        Assert.areEqual(rows[0].Contact_1__c, rows[1].Contact_1__c, 'The couple row finds John.');
-        Assert.areEqual(rows[1].Contact_2__c, rows[2].Contact_1__c, 'And the Jane row, Jane.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane', 'Mary' }, smiths(), 'Three people.');
+            Assert.areEqual(
+                rows[0].Contact_1__c,
+                rows[1].Contact_1__c,
+                'The couple row finds John.'
+            );
+            Assert.areEqual(rows[1].Contact_2__c, rows[2].Contact_1__c, 'And the Jane row, Jane.');
+            Assert.areEqual(new List<String>{ 'John', 'Jane', 'Mary' }, smiths(), 'Three people.');
+        }
     }
 
     @IsTest
     static void firstNamesAreComparedIgnoringCaseButNotAccents() {
-        insert new List<Contact>{ smith('John'), smith('Jane') };
+        System.runAs(TestUsers.admin()) {
+            insert new List<Contact>{ smith('John'), smith('Jane') };
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'JANE' }, new List<String>{ 'Jáne' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{ new List<String>{ 'JANE' }, new List<String>{ 'Jáne' } }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Whatever the case.');
-        Assert.areEqual(
-            'Jáne',
-            firstNameOf(rows[1].Contact_1__c),
-            'An accent is a different name: created, not guessed.'
-        );
-        // A row with no first name at this couple matches both: ImportMatchingRulesTest (R-IT9).
-        Assert.areEqual(new List<String>{ 'John', 'Jane', 'Jáne' }, smiths(), 'Nobody renamed.');
+            Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Whatever the case.');
+            Assert.areEqual(
+                'Jáne',
+                firstNameOf(rows[1].Contact_1__c),
+                'An accent is a different name: created, not guessed.'
+            );
+            // A row with no first name at this couple matches both: ImportMatchingRulesTest (R-IT9).
+            Assert.areEqual(
+                new List<String>{ 'John', 'Jane', 'Jáne' },
+                smiths(),
+                'Nobody renamed.'
+            );
+        }
     }
 
     /** One person per row under the given rule, each row's values as given. */
@@ -354,209 +413,241 @@ private class ImportFirstNameMatchTest {
 
     @IsTest
     static void aRowWithAnotherFirstNameIsCreatedNotTheSoleHolderRenamed() {
-        Contact john = smith('John');
-        insert john;
-        Import_Batch__c batch = file(new List<List<String>>{ new List<String>{ 'Jane' } });
+        System.runAs(TestUsers.admin()) {
+            Contact john = smith('John');
+            insert john;
+            Import_Batch__c batch = file(new List<List<String>>{ new List<String>{ 'Jane' } });
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(batch, 200);
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(batch, 200);
+            Test.stopTest();
 
-        Assert.areEqual(ImportRowProcessor.STATUS_CREATED, rows[0].Status__c, 'Jane is new.');
-        Assert.areNotEqual(john.Id, rows[0].Contact_1__c, 'Not John.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'John is not renamed.');
-        Contact jane = [
-            SELECT Created_By_Import_Batch__c
-            FROM Contact
-            WHERE Id = :rows[0].Contact_1__c
-        ];
-        Assert.areEqual(batch.Id, jane.Created_By_Import_Batch__c, 'Undo would remove Jane.');
-        Assert.isNull(
-            [SELECT Created_By_Import_Batch__c FROM Contact WHERE Id = :john.Id]
-            .Created_By_Import_Batch__c,
-            'And leave John, whom the import never touched.'
-        );
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Import_Journal__c WHERE Import_Batch__c = :batch.Id],
-            'Nothing of John was changed, so there is nothing for undo to put back.'
-        );
+            Assert.areEqual(ImportRowProcessor.STATUS_CREATED, rows[0].Status__c, 'Jane is new.');
+            Assert.areNotEqual(john.Id, rows[0].Contact_1__c, 'Not John.');
+            Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'John is not renamed.');
+            Contact jane = [
+                SELECT Created_By_Import_Batch__c
+                FROM Contact
+                WHERE Id = :rows[0].Contact_1__c
+            ];
+            Assert.areEqual(batch.Id, jane.Created_By_Import_Batch__c, 'Undo would remove Jane.');
+            Assert.isNull(
+                [SELECT Created_By_Import_Batch__c FROM Contact WHERE Id = :john.Id]
+                .Created_By_Import_Batch__c,
+                'And leave John, whom the import never touched.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Import_Journal__c WHERE Import_Batch__c = :batch.Id],
+                'Nothing of John was changed, so there is nothing for undo to put back.'
+            );
+        }
     }
 
     @IsTest
     static void aRowWithNoFirstNameMatchesTheHolderAndRenamesNobody() {
-        Contact john = smith('John');
-        insert john;
+        System.runAs(TestUsers.admin()) {
+            Contact john = smith('John');
+            insert john;
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ '' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ '' } }),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual(john.Id, rows[0].Contact_1__c, 'No first name: found on the rest.');
-        Assert.areEqual(new List<String>{ 'John' }, smiths(), 'Still John, nobody added.');
+            Assert.areEqual(john.Id, rows[0].Contact_1__c, 'No first name: found on the rest.');
+            Assert.areEqual(new List<String>{ 'John' }, smiths(), 'Still John, nobody added.');
+        }
     }
 
     @IsTest
     static void aHolderWithNoFirstNameIsNotTakenByARowWithOne() {
-        Contact unnamed = new Contact(LastName = 'Smith', MailingPostalCode = '12345');
-        insert unnamed;
+        System.runAs(TestUsers.admin()) {
+            Contact unnamed = new Contact(LastName = 'Smith', MailingPostalCode = '12345');
+            insert unnamed;
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'Jane' } }),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ 'Jane' } }),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areNotEqual(unnamed.Id, rows[0].Contact_1__c, 'Jane is somebody else.');
-        Assert.isNull(firstNameOf(unnamed.Id), 'The record with no first name is not renamed.');
-        Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Jane is created.');
+            Assert.areNotEqual(unnamed.Id, rows[0].Contact_1__c, 'Jane is somebody else.');
+            Assert.isNull(firstNameOf(unnamed.Id), 'The record with no first name is not renamed.');
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Jane is created.');
+        }
     }
 
     @IsTest
     static void spacingAndCaseAreIgnoredButInitialsAreNot() {
-        Contact john = smith('John');
-        Contact maryAnn = smith('Mary Ann');
-        insert new List<Contact>{ john, maryAnn };
+        System.runAs(TestUsers.admin()) {
+            Contact john = smith('John');
+            Contact maryAnn = smith('Mary Ann');
+            insert new List<Contact>{ john, maryAnn };
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(
-                new List<List<String>>{
-                    new List<String>{ ' JOHN ' },
-                    new List<String>{ 'mary   ann' },
-                    new List<String>{ 'J.' }
-                }
-            ),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{
+                        new List<String>{ ' JOHN ' },
+                        new List<String>{ 'mary   ann' },
+                        new List<String>{ 'J.' }
+                    }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areEqual(john.Id, rows[0].Contact_1__c, 'Capitals and outer spaces: John.');
-        Assert.areEqual(maryAnn.Id, rows[1].Contact_1__c, 'Inner spaces: Mary Ann.');
-        Assert.areEqual('J.', firstNameOf(rows[2].Contact_1__c), 'An initial is created.');
-        Assert.areEqual(3, [SELECT COUNT() FROM Contact], 'Only J. is added.');
-        Assert.isTrue(
-            'John'.equalsIgnoreCase(firstNameOf(john.Id).trim()),
-            'John is not renamed to J.'
-        );
+            Assert.areEqual(john.Id, rows[0].Contact_1__c, 'Capitals and outer spaces: John.');
+            Assert.areEqual(maryAnn.Id, rows[1].Contact_1__c, 'Inner spaces: Mary Ann.');
+            Assert.areEqual('J.', firstNameOf(rows[2].Contact_1__c), 'An initial is created.');
+            Assert.areEqual(3, [SELECT COUNT() FROM Contact], 'Only J. is added.');
+            Assert.isTrue(
+                'John'.equalsIgnoreCase(firstNameOf(john.Id).trim()),
+                'John is not renamed to J.'
+            );
+        }
     }
 
     @IsTest
     static void johnThenJaneInOneFileAreTwoPeopleInOneChunkOrTwo() {
-        Test.startTest();
-        List<Import_Row__c> together = load(
-            file(new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }),
-            200
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Import_Row__c> together = load(
+                file(
+                    new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areNotEqual(together[0].Contact_1__c, together[1].Contact_1__c, 'Two people.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Neither renamed.');
+            Assert.areNotEqual(together[0].Contact_1__c, together[1].Contact_1__c, 'Two people.');
+            Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Neither renamed.');
 
-        // Loaded again in one-row chunks: each row now finds its own person by first name.
-        List<Import_Row__c> again = load(
-            file(new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }),
-            1
-        );
-        Assert.areEqual(together[0].Contact_1__c, again[0].Contact_1__c, 'John again.');
-        Assert.areEqual(together[1].Contact_1__c, again[1].Contact_1__c, 'Jane again.');
-        Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
+            // Loaded again in one-row chunks: each row now finds its own person by first name.
+            List<Import_Row__c> again = load(
+                file(
+                    new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }
+                ),
+                1
+            );
+            Assert.areEqual(together[0].Contact_1__c, again[0].Contact_1__c, 'John again.');
+            Assert.areEqual(together[1].Contact_1__c, again[1].Contact_1__c, 'Jane again.');
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
+        }
     }
 
     @IsTest
     static void aNewJohnThenJaneAcrossOneRowChunksAreTwoPeople() {
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }),
-            1
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(
+                    new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }
+                ),
+                1
+            );
+            Test.stopTest();
 
-        Assert.areNotEqual(rows[0].Contact_1__c, rows[1].Contact_1__c, 'Two people.');
-        Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Neither renamed.');
+            Assert.areNotEqual(rows[0].Contact_1__c, rows[1].Contact_1__c, 'Two people.');
+            Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Neither renamed.');
+        }
     }
 
     @IsTest
     static void aRowWithNoFirstNameThenJaneInOneChunkAreTwoPeople() {
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            file(new List<List<String>>{ new List<String>{ '' }, new List<String>{ 'Jane' } }),
-            200
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                file(new List<List<String>>{ new List<String>{ '' }, new List<String>{ 'Jane' } }),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areNotEqual(rows[0].Contact_1__c, rows[1].Contact_1__c, 'Jane is not taken.');
-        Assert.isNull(firstNameOf(rows[0].Contact_1__c), 'The unnamed person is not renamed.');
-        Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Two people.');
+            Assert.areNotEqual(rows[0].Contact_1__c, rows[1].Contact_1__c, 'Jane is not taken.');
+            Assert.isNull(firstNameOf(rows[0].Contact_1__c), 'The unnamed person is not renamed.');
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Two people.');
+        }
     }
 
     @IsTest
     static void theEmailRuleCreatesAnotherFirstNameAtASharedEmail() {
-        Contact john = new Contact(
-            FirstName = 'John',
-            LastName = 'Smith',
-            Email = 'smiths@example.org'
-        );
-        insert john;
-        Map<String, String> jane = row('Jane', 'Smith');
-        jane.put('Contact1.Email', 'smiths@example.org');
-        Map<String, String> unnamed = row('', 'Smith');
-        unnamed.put('Contact1.Email', 'SMITHS@example.org');
+        System.runAs(TestUsers.admin()) {
+            Contact john = new Contact(
+                FirstName = 'John',
+                LastName = 'Smith',
+                Email = 'smiths@example.org'
+            );
+            insert john;
+            Map<String, String> jane = row('Jane', 'Smith');
+            jane.put('Contact1.Email', 'smiths@example.org');
+            Map<String, String> unnamed = row('', 'Smith');
+            unnamed.put('Contact1.Email', 'SMITHS@example.org');
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(
-            fileOf(
-                ImportTemplateService.RULE_EMAIL,
-                new List<Map<String, String>>{ jane, unnamed }
-            ),
-            200
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(
+                fileOf(
+                    ImportTemplateService.RULE_EMAIL,
+                    new List<Map<String, String>>{ jane, unnamed }
+                ),
+                200
+            );
+            Test.stopTest();
 
-        Assert.areNotEqual(john.Id, rows[0].Contact_1__c, 'Jane is not John.');
-        Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'She is created.');
-        Assert.areEqual(john.Id, rows[1].Contact_1__c, 'No first name: the earliest holder.');
-        Assert.areEqual('John', firstNameOf(john.Id), 'John is not renamed.');
+            Assert.areNotEqual(john.Id, rows[0].Contact_1__c, 'Jane is not John.');
+            Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'She is created.');
+            Assert.areEqual(john.Id, rows[1].Contact_1__c, 'No first name: the earliest holder.');
+            Assert.areEqual('John', firstNameOf(john.Id), 'John is not renamed.');
+        }
     }
 
     @IsTest
     static void twoHundredRowsMatchOrCreateByFirstNameInOneChunk() {
-        List<Contact> holders = new List<Contact>();
-        List<Map<String, String>> values = new List<Map<String, String>>();
-        for (Integer i = 0; i < 200; i++) {
-            holders.add(
-                new Contact(FirstName = 'John', LastName = 'Smith' + i, MailingPostalCode = '12345')
-            );
-            values.add(row(Math.mod(i, 2) == 0 ? 'John' : 'Jane', 'Smith' + i));
-        }
-        insert holders;
-        Import_Batch__c batch = fileOf(ImportTemplateService.RULE_NAME_POSTAL, values);
+        System.runAs(TestUsers.admin()) {
+            List<Contact> holders = new List<Contact>();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                holders.add(
+                    new Contact(
+                        FirstName = 'John',
+                        LastName = 'Smith' + i,
+                        MailingPostalCode = '12345'
+                    )
+                );
+                values.add(row(Math.mod(i, 2) == 0 ? 'John' : 'Jane', 'Smith' + i));
+            }
+            insert holders;
+            Import_Batch__c batch = fileOf(ImportTemplateService.RULE_NAME_POSTAL, values);
 
-        Test.startTest();
-        List<Import_Row__c> rows = load(batch, 200);
-        Test.stopTest();
+            Test.startTest();
+            List<Import_Row__c> rows = load(batch, 200);
+            Test.stopTest();
 
-        Set<Id> holderIds = new Map<Id, Contact>(holders).keySet();
-        for (Integer i = 0; i < 200; i++) {
-            Boolean john = Math.mod(i, 2) == 0;
+            Set<Id> holderIds = new Map<Id, Contact>(holders).keySet();
+            for (Integer i = 0; i < 200; i++) {
+                Boolean john = Math.mod(i, 2) == 0;
+                Assert.areEqual(
+                    john,
+                    holderIds.contains(rows[i].Contact_1__c),
+                    'Row ' + i + ': John finds John, Jane is created.'
+                );
+            }
+            Import_Batch__c committed = ImportBatchSelector.selectById(batch.Id);
+            Assert.areEqual(100, committed.Rows_Created__c, 'One Jane per address.');
+            Assert.areEqual(100, committed.Rows_Matched__c, 'Each John found and unchanged.');
             Assert.areEqual(
-                john,
-                holderIds.contains(rows[i].Contact_1__c),
-                'Row ' + i + ': John finds John, Jane is created.'
+                200,
+                [SELECT COUNT() FROM Contact WHERE FirstName = 'John'],
+                'No John renamed.'
+            );
+            Assert.areEqual(
+                100,
+                [SELECT COUNT() FROM Contact WHERE FirstName = 'Jane'],
+                'Jane x100.'
             );
         }
-        Import_Batch__c committed = ImportBatchSelector.selectById(batch.Id);
-        Assert.areEqual(100, committed.Rows_Created__c, 'One Jane per address.');
-        Assert.areEqual(100, committed.Rows_Matched__c, 'Each John found and unchanged.');
-        Assert.areEqual(
-            200,
-            [SELECT COUNT() FROM Contact WHERE FirstName = 'John'],
-            'No John renamed.'
-        );
-        Assert.areEqual(100, [SELECT COUNT() FROM Contact WHERE FirstName = 'Jane'], 'Jane x100.');
     }
 }

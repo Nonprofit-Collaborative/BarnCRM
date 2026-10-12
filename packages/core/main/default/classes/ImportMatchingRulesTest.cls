@@ -8,7 +8,9 @@
 private class ImportMatchingRulesTest {
     @TestSetup
     static void setUp() {
-        TestDataFactory.defaultSettings();
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+        }
     }
 
     private static final List<String> PERSON_COLUMNS = new List<String>{
@@ -101,155 +103,180 @@ private class ImportMatchingRulesTest {
 
     @IsTest
     static void aRowWithNoFirstNameAtACoupleIsRejectedByDefault() {
-        insert new List<Contact>{ smith('John'), smith('Jane') };
-        Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
-        ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('') });
+        System.runAs(TestUsers.admin()) {
+            insert new List<Contact>{ smith('John'), smith('Jane') };
+            Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
+            ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('') });
 
-        Test.startTest();
-        load(batch);
-        Test.stopTest();
+            Test.startTest();
+            load(batch);
+            Test.stopTest();
 
-        Import_Row__c row = rowsOf(batch.Id)[0];
-        Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Not guessed at.');
-        Assert.areEqual(
-            Label.Core_Import_ErrorSeveralPeopleMatch,
-            row.Error_Message__c,
-            'Says why.'
-        );
-        Assert.isTrue(row.Several_Matches__c, 'And is ticked so it can be listed.');
-        Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
+            Import_Row__c row = rowsOf(batch.Id)[0];
+            Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Not guessed at.');
+            Assert.areEqual(
+                Label.Core_Import_ErrorSeveralPeopleMatch,
+                row.Error_Message__c,
+                'Says why.'
+            );
+            Assert.isTrue(row.Several_Matches__c, 'And is ticked so it can be listed.');
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
+        }
     }
 
     @IsTest
     static void twoRecordsWithOneFirstNameAreSeveralMatchesToo() {
-        insert new List<Contact>{ smith('Jane'), smith('Jane') };
-        Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
-        ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('Jane') });
+        System.runAs(TestUsers.admin()) {
+            insert new List<Contact>{ smith('Jane'), smith('Jane') };
+            Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
+            ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('Jane') });
 
-        Test.startTest();
-        load(batch);
-        Test.stopTest();
+            Test.startTest();
+            load(batch);
+            Test.stopTest();
 
-        Import_Row__c row = rowsOf(batch.Id)[0];
-        Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Two Janes: rejected.');
-        Assert.isTrue(row.Several_Matches__c, 'Ticked.');
+            Import_Row__c row = rowsOf(batch.Id)[0];
+            Assert.areEqual(
+                ImportRowProcessor.STATUS_REJECTED,
+                row.Status__c,
+                'Two Janes: rejected.'
+            );
+            Assert.isTrue(row.Several_Matches__c, 'Ticked.');
+        }
     }
 
     @IsTest
     static void theMostRecentlyChangedIsUsedWhenTheTemplateSaysSo() {
-        Contact john = smith('John');
-        insert john;
-        Contact jane = smith('Jane');
-        insert jane;
-        Import_Batch__c batch = ImportTestDataFactory.batch(
-            template(ImportTemplateService.SEVERAL_MOST_RECENT)
-        );
-        ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('') });
+        System.runAs(TestUsers.admin()) {
+            Contact john = smith('John');
+            insert john;
+            Contact jane = smith('Jane');
+            insert jane;
+            Import_Batch__c batch = ImportTestDataFactory.batch(
+                template(ImportTemplateService.SEVERAL_MOST_RECENT)
+            );
+            ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ smithRow('') });
 
-        Test.startTest();
-        Import_Batch__c committed = load(batch);
-        Test.stopTest();
+            Test.startTest();
+            Import_Batch__c committed = load(batch);
+            Test.stopTest();
 
-        Import_Row__c row = rowsOf(batch.Id)[0];
-        Assert.areNotEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Loaded.');
-        // Saved in one test second, the two tie on Last Modified Date: the later created wins.
-        Assert.areEqual(jane.Id, row.Contact_1__c, 'The most recently changed, Jane.');
-        Assert.isTrue(row.Several_Matches__c, 'Still ticked, so it can be checked.');
-        Assert.isTrue(
-            committed.Run_Log__c.contains(Label.Core_Import_LogSeveralMatchesUsedRecent),
-            'The run log says so.'
-        );
-        Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
+            Import_Row__c row = rowsOf(batch.Id)[0];
+            Assert.areNotEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Loaded.');
+            // Saved in one test second, the two tie on Last Modified Date: the later created wins.
+            Assert.areEqual(jane.Id, row.Contact_1__c, 'The most recently changed, Jane.');
+            Assert.isTrue(row.Several_Matches__c, 'Still ticked, so it can be checked.');
+            Assert.isTrue(
+                committed.Run_Log__c.contains(Label.Core_Import_LogSeveralMatchesUsedRecent),
+                'The run log says so.'
+            );
+            Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nobody added.');
+        }
     }
 
     @IsTest
     static void twoOrganizationsWithOneNameRejectTheRow() {
-        Id organizationType = organizationRecordTypeId();
-        insert new List<Account>{
-            new Account(Name = 'First Baptist', RecordTypeId = organizationType),
-            new Account(Name = 'First Baptist', RecordTypeId = organizationType)
-        };
-        Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
-        Map<String, String> values = smithRow('Ana');
-        values.put('Organization.Name', 'first baptist');
-        ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ values });
+        System.runAs(TestUsers.admin()) {
+            Id organizationType = organizationRecordTypeId();
+            insert new List<Account>{
+                new Account(Name = 'First Baptist', RecordTypeId = organizationType),
+                new Account(Name = 'First Baptist', RecordTypeId = organizationType)
+            };
+            Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
+            Map<String, String> values = smithRow('Ana');
+            values.put('Organization.Name', 'first baptist');
+            ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ values });
 
-        Test.startTest();
-        load(batch);
-        Test.stopTest();
+            Test.startTest();
+            load(batch);
+            Test.stopTest();
 
-        Import_Row__c row = rowsOf(batch.Id)[0];
-        Assert.areEqual(
-            Label.Core_Import_ErrorSeveralOrganizationsMatch,
-            row.Error_Message__c,
-            'Two organizations by that name: rejected.'
-        );
-        Assert.isTrue(row.Several_Matches__c, 'Ticked.');
-        Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Nothing of the row was written.');
+            Import_Row__c row = rowsOf(batch.Id)[0];
+            Assert.areEqual(
+                Label.Core_Import_ErrorSeveralOrganizationsMatch,
+                row.Error_Message__c,
+                'Two organizations by that name: rejected.'
+            );
+            Assert.isTrue(row.Several_Matches__c, 'Ticked.');
+            Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Nothing of the row was written.');
+        }
     }
 
     @IsTest
     static void anOrganizationIsMatchedByNameOnlyAmongOrganizations() {
-        Id organizationType = organizationRecordTypeId();
-        Account organization = new Account(Name = 'Harbor Trust', RecordTypeId = organizationType);
-        insert organization;
-        Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
-        Map<String, String> values = smithRow('Ana');
-        values.put('Organization.Name', 'Harbor Trust');
-        ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ values });
+        System.runAs(TestUsers.admin()) {
+            Id organizationType = organizationRecordTypeId();
+            Account organization = new Account(
+                Name = 'Harbor Trust',
+                RecordTypeId = organizationType
+            );
+            insert organization;
+            Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
+            Map<String, String> values = smithRow('Ana');
+            values.put('Organization.Name', 'Harbor Trust');
+            ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ values });
 
-        Test.startTest();
-        load(batch);
-        Test.stopTest();
+            Test.startTest();
+            load(batch);
+            Test.stopTest();
 
-        Import_Row__c row = rowsOf(batch.Id)[0];
-        Assert.areEqual(organization.Id, row.Organization__c, 'Found by its name.');
-        Assert.isFalse(row.Several_Matches__c, 'One organization holds it.');
+            Import_Row__c row = rowsOf(batch.Id)[0];
+            Assert.areEqual(organization.Id, row.Organization__c, 'Found by its name.');
+            Assert.isFalse(row.Several_Matches__c, 'One organization holds it.');
+        }
     }
 
     @IsTest
     static void aMatchingFieldDescribeDoesNotOfferIsRefused() {
-        Import_Template__c template = template(null);
-        ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
-        choices.personRule = ImportTemplateService.RULE_EXTERNAL_ID;
-        choices.personMatchField = 'Email';
-        Boolean refused = false;
-        Test.startTest();
-        try {
-            ImportTemplateService.saveMatching(template.Id, choices);
-        } catch (ImportException e) {
-            refused = e.getMessage().contains('Email');
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = template(null);
+            ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
+            choices.personRule = ImportTemplateService.RULE_EXTERNAL_ID;
+            choices.personMatchField = 'Email';
+            Boolean refused = false;
+            Test.startTest();
+            try {
+                ImportTemplateService.saveMatching(template.Id, choices);
+            } catch (ImportException e) {
+                refused = e.getMessage().contains('Email');
+            }
+            Test.stopTest();
+            Assert.isTrue(refused, 'Email is neither External ID nor Unique, so it is refused.');
         }
-        Test.stopTest();
-        Assert.isTrue(refused, 'Email is neither External ID nor Unique, so it is refused.');
     }
 
     @IsTest
     static void matchingChoicesAreSavedNormalized() {
-        Import_Template__c template = template(null);
-        ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
-        choices.personRule = 'email EXACT';
-        choices.personMatchField = 'Ignored_Without_The_Rule__c';
-        choices.organizationRule = 'something else';
-        choices.severalMatches = 'use the most recently changed';
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = template(null);
+            ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
+            choices.personRule = 'email EXACT';
+            choices.personMatchField = 'Ignored_Without_The_Rule__c';
+            choices.organizationRule = 'something else';
+            choices.severalMatches = 'use the most recently changed';
 
-        Test.startTest();
-        ImportTemplateService.saveMatching(template.Id, choices);
-        Test.stopTest();
+            Test.startTest();
+            ImportTemplateService.saveMatching(template.Id, choices);
+            Test.stopTest();
 
-        Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
-        Assert.areEqual(ImportTemplateService.RULE_EMAIL, saved.Matching_Rule__c, 'Person rule.');
-        Assert.isNull(saved.Person_Match_Field__c, 'No field without the External ID rule.');
-        Assert.areEqual(
-            ImportTemplateService.ORGANIZATION_RULE_NAME,
-            saved.Organization_Matching_Rule__c,
-            'An unknown organization rule is Name exact.'
-        );
-        Assert.areEqual(
-            ImportTemplateService.SEVERAL_MOST_RECENT,
-            saved.Several_Matches__c,
-            'The several-matches choice.'
-        );
+            Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
+            Assert.areEqual(
+                ImportTemplateService.RULE_EMAIL,
+                saved.Matching_Rule__c,
+                'Person rule.'
+            );
+            Assert.isNull(saved.Person_Match_Field__c, 'No field without the External ID rule.');
+            Assert.areEqual(
+                ImportTemplateService.ORGANIZATION_RULE_NAME,
+                saved.Organization_Matching_Rule__c,
+                'An unknown organization rule is Name exact.'
+            );
+            Assert.areEqual(
+                ImportTemplateService.SEVERAL_MOST_RECENT,
+                saved.Several_Matches__c,
+                'The several-matches choice.'
+            );
+        }
     }
 
     /**
@@ -259,103 +286,125 @@ private class ImportMatchingRulesTest {
      */
     @IsTest
     static void aChosenFieldFindsByValueAndNeverByBlank() {
-        Import_Template__c template = template(null);
-        Assert.areEqual(
-            'Template_Key__c',
-            ImportMatcher.matchField(Import_Template__c.SObjectType, 'template_key__c'),
-            'Offered, and named as describe names it.'
-        );
-        Assert.isNull(
-            ImportMatcher.matchField(Import_Template__c.SObjectType, 'Name'),
-            'A field neither External ID nor Unique is not offered.'
-        );
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = template(null);
+            Assert.areEqual(
+                'Template_Key__c',
+                ImportMatcher.matchField(Import_Template__c.SObjectType, 'template_key__c'),
+                'Offered, and named as describe names it.'
+            );
+            Assert.isNull(
+                ImportMatcher.matchField(Import_Template__c.SObjectType, 'Name'),
+                'A field neither External ID nor Unique is not offered.'
+            );
 
-        Test.startTest();
-        Map<String, Id> found = ImportMatcher.byMatchField(
-            Import_Template__c.SObjectType,
-            'Template_Key__c',
-            new Set<String>{ template.Template_Key__c.toUpperCase(), '', null },
-            null
-        );
-        Test.stopTest();
+            Test.startTest();
+            Map<String, Id> found = ImportMatcher.byMatchField(
+                Import_Template__c.SObjectType,
+                'Template_Key__c',
+                new Set<String>{ template.Template_Key__c.toUpperCase(), '', null },
+                null
+            );
+            Test.stopTest();
 
-        Assert.areEqual(1, found.size(), 'Only the real value was looked up.');
-        Assert.areEqual(
-            template.Id,
-            found.get(template.Template_Key__c.toLowerCase()),
-            'Found by its value.'
-        );
+            Assert.areEqual(1, found.size(), 'Only the real value was looked up.');
+            Assert.areEqual(
+                template.Id,
+                found.get(template.Template_Key__c.toLowerCase()),
+                'Found by its value.'
+            );
+        }
     }
 
     @IsTest
     static void twoHundredRowsAtCouplesAreRejectedInOneChunk() {
-        List<Contact> couples = new List<Contact>();
-        List<Map<String, String>> values = new List<Map<String, String>>();
-        for (Integer i = 0; i < 200; i++) {
-            couples.add(
-                new Contact(FirstName = 'John', LastName = 'Smith' + i, MailingPostalCode = '12345')
+        System.runAs(TestUsers.admin()) {
+            List<Contact> couples = new List<Contact>();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                couples.add(
+                    new Contact(
+                        FirstName = 'John',
+                        LastName = 'Smith' + i,
+                        MailingPostalCode = '12345'
+                    )
+                );
+                couples.add(
+                    new Contact(
+                        FirstName = 'Jane',
+                        LastName = 'Smith' + i,
+                        MailingPostalCode = '12345'
+                    )
+                );
+                values.add(
+                    new Map<String, String>{
+                        'Contact1.LastName' => 'Smith' + i,
+                        'Contact1.MailingPostalCode' => '12345'
+                    }
+                );
+            }
+            insert couples;
+            Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            Import_Batch__c committed = load(batch);
+            Test.stopTest();
+
+            Assert.areEqual(200, committed.Rows_Rejected__c, 'Every row matches a couple.');
+            Assert.areEqual(
+                200,
+                [
+                    SELECT COUNT()
+                    FROM Import_Row__c
+                    WHERE Import_Batch__c = :batch.Id AND Several_Matches__c = TRUE
+                ],
+                'Every row is ticked.'
             );
-            couples.add(
-                new Contact(FirstName = 'Jane', LastName = 'Smith' + i, MailingPostalCode = '12345')
-            );
-            values.add(
-                new Map<String, String>{
-                    'Contact1.LastName' => 'Smith' + i,
-                    'Contact1.MailingPostalCode' => '12345'
-                }
-            );
+            Assert.areEqual(400, [SELECT COUNT() FROM Contact], 'Nobody added, nobody renamed.');
         }
-        insert couples;
-        Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
-        ImportTestDataFactory.rows(batch, values);
-
-        Test.startTest();
-        Import_Batch__c committed = load(batch);
-        Test.stopTest();
-
-        Assert.areEqual(200, committed.Rows_Rejected__c, 'Every row matches a couple.');
-        Assert.areEqual(
-            200,
-            [
-                SELECT COUNT()
-                FROM Import_Row__c
-                WHERE Import_Batch__c = :batch.Id AND Several_Matches__c = TRUE
-            ],
-            'Every row is ticked.'
-        );
-        Assert.areEqual(400, [SELECT COUNT() FROM Contact], 'Nobody added, nobody renamed.');
     }
 
     @IsTest
     static void twoHundredRowsTakeTheMostRecentWhenChosen() {
-        List<Contact> couples = new List<Contact>();
-        List<Map<String, String>> values = new List<Map<String, String>>();
-        for (Integer i = 0; i < 200; i++) {
-            couples.add(
-                new Contact(FirstName = 'John', LastName = 'Smith' + i, MailingPostalCode = '12345')
+        System.runAs(TestUsers.admin()) {
+            List<Contact> couples = new List<Contact>();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                couples.add(
+                    new Contact(
+                        FirstName = 'John',
+                        LastName = 'Smith' + i,
+                        MailingPostalCode = '12345'
+                    )
+                );
+                couples.add(
+                    new Contact(
+                        FirstName = 'Jane',
+                        LastName = 'Smith' + i,
+                        MailingPostalCode = '12345'
+                    )
+                );
+                values.add(
+                    new Map<String, String>{
+                        'Contact1.LastName' => 'Smith' + i,
+                        'Contact1.MailingPostalCode' => '12345'
+                    }
+                );
+            }
+            insert couples;
+            Import_Batch__c batch = ImportTestDataFactory.batch(
+                template(ImportTemplateService.SEVERAL_MOST_RECENT)
             );
-            couples.add(
-                new Contact(FirstName = 'Jane', LastName = 'Smith' + i, MailingPostalCode = '12345')
-            );
-            values.add(
-                new Map<String, String>{
-                    'Contact1.LastName' => 'Smith' + i,
-                    'Contact1.MailingPostalCode' => '12345'
-                }
-            );
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            Import_Batch__c committed = load(batch);
+            Test.stopTest();
+
+            Assert.areEqual(0, committed.Rows_Rejected__c, 'Every row is loaded.');
+            Assert.areEqual(200, committed.Rows_Matched__c, 'Into a record already there.');
+            Assert.areEqual(400, [SELECT COUNT() FROM Contact], 'Nobody added.');
         }
-        insert couples;
-        Import_Batch__c batch = ImportTestDataFactory.batch(
-            template(ImportTemplateService.SEVERAL_MOST_RECENT)
-        );
-        ImportTestDataFactory.rows(batch, values);
-
-        Test.startTest();
-        Import_Batch__c committed = load(batch);
-        Test.stopTest();
-
-        Assert.areEqual(0, committed.Rows_Rejected__c, 'Every row is loaded.');
-        Assert.areEqual(200, committed.Rows_Matched__c, 'Into a record already there.');
-        Assert.areEqual(400, [SELECT COUNT() FROM Contact], 'Nobody added.');
     }
 }

@@ -9,303 +9,361 @@ private class HouseholdNamingServiceTest {
 
     @IsTest
     static void sharedSurnameGivesTheFamilyName() {
-        String name = HouseholdNamingService.computeName(
-            HouseholdTestDataFactory.smithCouple(),
-            NAME_PATTERN,
-            false
-        );
-        Assert.areEqual('The Smith Family', name, 'Two people called Smith are the Smith family');
+        System.runAs(TestUsers.admin()) {
+            String name = HouseholdNamingService.computeName(
+                HouseholdTestDataFactory.smithCouple(),
+                NAME_PATTERN,
+                false
+            );
+            Assert.areEqual(
+                'The Smith Family',
+                name,
+                'Two people called Smith are the Smith family'
+            );
+        }
     }
 
     @IsTest
     static void oneMemberGivesTheFamilyName() {
-        List<HouseholdService.Person> members = new List<HouseholdService.Person>{
-            HouseholdTestDataFactory.person('Ms.', 'Maria', 'Garcia', 'Head')
-        };
-        Assert.areEqual(
-            'The Garcia Family',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, false),
-            'Maria on her own is still a family'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Ms.', 'Maria', 'Garcia', 'Head')
+            };
+            Assert.areEqual(
+                'The Garcia Family',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, false),
+                'Maria on her own is still a family'
+            );
+        }
     }
 
     @IsTest
     static void differingSurnamesAreListed() {
-        String name = HouseholdNamingService.computeName(
-            HouseholdTestDataFactory.garciaAndLee(),
-            NAME_PATTERN,
-            false
-        );
-        Assert.areEqual('Garcia and Lee Household', name, 'Two surnames are listed, not patterned');
+        System.runAs(TestUsers.admin()) {
+            String name = HouseholdNamingService.computeName(
+                HouseholdTestDataFactory.garciaAndLee(),
+                NAME_PATTERN,
+                false
+            );
+            Assert.areEqual(
+                'Garcia and Lee Household',
+                name,
+                'Two surnames are listed, not patterned'
+            );
+        }
     }
 
     @IsTest
     static void threeSurnamesUseCommasAndAnAnd() {
-        List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
-        members.add(HouseholdTestDataFactory.person('Mr.', 'Tom', 'Smith', 'Other'));
-        Assert.areEqual(
-            'Garcia, Lee, and Smith Household',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, false),
-            'Three surnames read as a list'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
+            members.add(HouseholdTestDataFactory.person('Mr.', 'Tom', 'Smith', 'Other'));
+            Assert.areEqual(
+                'Garcia, Lee, and Smith Household',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, false),
+                'Three surnames read as a list'
+            );
+        }
     }
 
     @IsTest
     static void hyphenatedSurnameIsNeverSplit() {
-        List<HouseholdService.Person> members = new List<HouseholdService.Person>{
-            HouseholdTestDataFactory.person('Ms.', 'Priya', 'Garcia-Lee', 'Head'),
-            HouseholdTestDataFactory.person('Mr.', 'Wei', 'Garcia-Lee', 'Spouse or Partner')
-        };
-        Assert.areEqual(
-            'The Garcia-Lee Family',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, false),
-            'A hyphenated surname is one surname'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Ms.', 'Priya', 'Garcia-Lee', 'Head'),
+                HouseholdTestDataFactory.person('Mr.', 'Wei', 'Garcia-Lee', 'Spouse or Partner')
+            };
+            Assert.areEqual(
+                'The Garcia-Lee Family',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, false),
+                'A hyphenated surname is one surname'
+            );
+        }
     }
 
     @IsTest
     static void preferredNameReplacesFirstName() {
-        List<HouseholdService.Person> members = new List<HouseholdService.Person>{
-            HouseholdTestDataFactory.person('Dr.', 'David', 'Okonkwo', 'Head')
-        };
-        members[0].preferredName = 'Dave';
-        Assert.areEqual(
-            'Dave',
-            HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
-            'David prefers Dave'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Dr.', 'David', 'Okonkwo', 'Head')
+            };
+            members[0].preferredName = 'Dave';
+            Assert.areEqual(
+                'Dave',
+                HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
+                'David prefers Dave'
+            );
+        }
     }
 
     @IsTest
     static void informalGreetingListsLivingMembers() {
-        Assert.areEqual(
-            'John and Jane',
-            HouseholdNamingService.computeInformalGreeting(
-                HouseholdTestDataFactory.smithCouple(),
-                INFORMAL_PATTERN
-            ),
-            'Both first names appear'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'John and Jane',
+                HouseholdNamingService.computeInformalGreeting(
+                    HouseholdTestDataFactory.smithCouple(),
+                    INFORMAL_PATTERN
+                ),
+                'Both first names appear'
+            );
+        }
     }
 
     @IsTest
     static void deceasedMemberIsLeftOutOfGreetings() {
-        List<HouseholdService.Person> members = HouseholdTestDataFactory.smithCouple();
-        members[1].isDeceased = true;
-        Assert.areEqual(
-            'John',
-            HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
-            'Jane has died and is not greeted'
-        );
-        Assert.areEqual(
-            'Mr. John Smith',
-            HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
-            'The formal greeting names John alone'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.smithCouple();
+            members[1].isDeceased = true;
+            Assert.areEqual(
+                'John',
+                HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
+                'Jane has died and is not greeted'
+            );
+            Assert.areEqual(
+                'Mr. John Smith',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, false),
+                'The formal greeting names John alone'
+            );
+        }
     }
 
     @IsTest
     static void deceasedMemberLeavesTheNameWhenTheSettingIsOff() {
-        List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
-        members[1].isDeceased = true;
-        Assert.areEqual(
-            'The Garcia Family',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, false),
-            'Wei has died and is not in the name'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
+            members[1].isDeceased = true;
+            Assert.areEqual(
+                'The Garcia Family',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, false),
+                'Wei has died and is not in the name'
+            );
+        }
     }
 
     @IsTest
     static void deceasedMemberStaysInTheNameWhenTheSettingIsOn() {
-        List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
-        members[1].isDeceased = true;
-        Assert.areEqual(
-            'Garcia and Lee Household',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, true),
-            'Wei stays in the name when the org asks for that'
-        );
-        Assert.areEqual(
-            'Ms. Maria Garcia and the late Mr. Wei Lee',
-            HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, true),
-            'The formal greeting says the late'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
+            members[1].isDeceased = true;
+            Assert.areEqual(
+                'Garcia and Lee Household',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, true),
+                'Wei stays in the name when the org asks for that'
+            );
+            Assert.areEqual(
+                'Ms. Maria Garcia and the late Mr. Wei Lee',
+                HouseholdNamingService.computeFormalGreeting(members, FORMAL_PATTERN, true),
+                'The formal greeting says the late'
+            );
+        }
     }
 
     @IsTest
     static void excludeFromHouseholdNameLeavesTheGreetingsAlone() {
-        List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
-        members[1].excludeFromName = true;
-        Assert.areEqual(
-            'The Garcia Family',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, false),
-            'Wei is out of the name'
-        );
-        Assert.areEqual(
-            'Maria and Wei',
-            HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
-            'Wei is still greeted'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
+            members[1].excludeFromName = true;
+            Assert.areEqual(
+                'The Garcia Family',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, false),
+                'Wei is out of the name'
+            );
+            Assert.areEqual(
+                'Maria and Wei',
+                HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
+                'Wei is still greeted'
+            );
+        }
     }
 
     @IsTest
     static void excludeFromGreetingsLeavesTheNameAlone() {
-        List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
-        members[1].excludeFromGreetings = true;
-        Assert.areEqual(
-            'Garcia and Lee Household',
-            HouseholdNamingService.computeName(members, NAME_PATTERN, false),
-            'Wei is still in the name'
-        );
-        Assert.areEqual(
-            'Maria',
-            HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
-            'Wei is not greeted'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = HouseholdTestDataFactory.garciaAndLee();
+            members[1].excludeFromGreetings = true;
+            Assert.areEqual(
+                'Garcia and Lee Household',
+                HouseholdNamingService.computeName(members, NAME_PATTERN, false),
+                'Wei is still in the name'
+            );
+            Assert.areEqual(
+                'Maria',
+                HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
+                'Wei is not greeted'
+            );
+        }
     }
 
     @IsTest
     static void formalGreetingCombinesTitlesForACouple() {
-        Assert.areEqual(
-            'Mr. and Mrs. John Smith',
-            HouseholdNamingService.computeFormalGreeting(
-                HouseholdTestDataFactory.smithCouple(),
-                FORMAL_PATTERN,
-                false
-            ),
-            'One surname and two titles read as one greeting'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'Mr. and Mrs. John Smith',
+                HouseholdNamingService.computeFormalGreeting(
+                    HouseholdTestDataFactory.smithCouple(),
+                    FORMAL_PATTERN,
+                    false
+                ),
+                'One surname and two titles read as one greeting'
+            );
+        }
     }
 
     @IsTest
     static void formalGreetingNamesBothWhenSurnamesDiffer() {
-        Assert.areEqual(
-            'Ms. Maria Garcia and Mr. Wei Lee',
-            HouseholdNamingService.computeFormalGreeting(
-                HouseholdTestDataFactory.garciaAndLee(),
-                FORMAL_PATTERN,
-                false
-            ),
-            'Different surnames are greeted one by one'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'Ms. Maria Garcia and Mr. Wei Lee',
+                HouseholdNamingService.computeFormalGreeting(
+                    HouseholdTestDataFactory.garciaAndLee(),
+                    FORMAL_PATTERN,
+                    false
+                ),
+                'Different surnames are greeted one by one'
+            );
+        }
     }
 
     @IsTest
     static void membersAreOrderedByRole() {
-        List<HouseholdService.Person> members = new List<HouseholdService.Person>{
-            HouseholdTestDataFactory.person('Ms.', 'Chidi', 'Okonkwo', 'Child'),
-            HouseholdTestDataFactory.person('Dr.', 'David', 'Okonkwo', 'Head')
-        };
-        Assert.areEqual(
-            'David and Chidi',
-            HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
-            'The head of the household is greeted first'
-        );
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person('Ms.', 'Chidi', 'Okonkwo', 'Child'),
+                HouseholdTestDataFactory.person('Dr.', 'David', 'Okonkwo', 'Head')
+            };
+            Assert.areEqual(
+                'David and Chidi',
+                HouseholdNamingService.computeInformalGreeting(members, INFORMAL_PATTERN),
+                'The head of the household is greeted first'
+            );
+        }
     }
 
     @IsTest
     static void bangTokenSpellingIsAccepted() {
-        Assert.areEqual(
-            'The Smith Family',
-            HouseholdNamingService.computeName(
-                HouseholdTestDataFactory.smithCouple(),
-                'The {!LastName} Family',
-                false
-            ),
-            'A pattern copied from a formula still works'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'The Smith Family',
+                HouseholdNamingService.computeName(
+                    HouseholdTestDataFactory.smithCouple(),
+                    'The {!LastName} Family',
+                    false
+                ),
+                'A pattern copied from a formula still works'
+            );
+        }
     }
 
     @IsTest
     static void aBlankPatternFallsBackToTheShippedOne() {
-        Assert.areEqual(
-            'The Smith Family',
-            HouseholdNamingService.computeName(HouseholdTestDataFactory.smithCouple(), null, false),
-            'A missing pattern does not produce a blank name'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'The Smith Family',
+                HouseholdNamingService.computeName(
+                    HouseholdTestDataFactory.smithCouple(),
+                    null,
+                    false
+                ),
+                'A missing pattern does not produce a blank name'
+            );
+        }
     }
 
     @IsTest
     static void aHouseholdWithNoOneLeftHasNoName() {
-        Assert.areEqual(
-            null,
-            HouseholdNamingService.computeName(
-                new List<HouseholdService.Person>(),
-                NAME_PATTERN,
-                false
-            ),
-            'No members means no computed name'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                null,
+                HouseholdNamingService.computeName(
+                    new List<HouseholdService.Person>(),
+                    NAME_PATTERN,
+                    false
+                ),
+                'No members means no computed name'
+            );
+        }
     }
 
     @IsTest
     static void applyNamingWritesTheNameAndGreetings() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
-        insert household;
-        // Household Role is what decides the order members are named in, so the couple are
-        // given theirs: without a role these two are ordered by the tie breaks that follow
-        // it, and the greeting would name whichever of them those happen to put first.
-        insert new List<Contact>{
-            new Contact(
-                Salutation = 'Mr.',
-                FirstName = 'John',
-                LastName = 'Smith',
-                Household_Role__c = 'Head',
-                AccountId = household.Id
-            ),
-            new Contact(
-                Salutation = 'Mrs.',
-                FirstName = 'Jane',
-                LastName = 'Smith',
-                Household_Role__c = 'Spouse or Partner',
-                AccountId = household.Id
-            )
-        };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
+            insert household;
+            // Household Role is what decides the order members are named in, so the couple are
+            // given theirs: without a role these two are ordered by the tie breaks that follow
+            // it, and the greeting would name whichever of them those happen to put first.
+            insert new List<Contact>{
+                new Contact(
+                    Salutation = 'Mr.',
+                    FirstName = 'John',
+                    LastName = 'Smith',
+                    Household_Role__c = 'Head',
+                    AccountId = household.Id
+                ),
+                new Contact(
+                    Salutation = 'Mrs.',
+                    FirstName = 'Jane',
+                    LastName = 'Smith',
+                    Household_Role__c = 'Spouse or Partner',
+                    AccountId = household.Id
+                )
+            };
 
-        Test.startTest();
-        HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
-        Test.stopTest();
+            Test.startTest();
+            HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
+            Test.stopTest();
 
-        Account saved = [
-            SELECT Name, Household_Formal_Greeting__c, Household_Informal_Greeting__c
-            FROM Account
-            WHERE Id = :household.Id
-        ];
-        Assert.areEqual(
-            'The Smith Family',
-            saved.Name,
-            'The household is renamed from its members'
-        );
-        Assert.areEqual(
-            'Mr. and Mrs. John Smith',
-            saved.Household_Formal_Greeting__c,
-            'Formal greeting'
-        );
-        Assert.areEqual('John and Jane', saved.Household_Informal_Greeting__c, 'Informal greeting');
+            Account saved = [
+                SELECT Name, Household_Formal_Greeting__c, Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :household.Id
+            ];
+            Assert.areEqual(
+                'The Smith Family',
+                saved.Name,
+                'The household is renamed from its members'
+            );
+            Assert.areEqual(
+                'Mr. and Mrs. John Smith',
+                saved.Household_Formal_Greeting__c,
+                'Formal greeting'
+            );
+            Assert.areEqual(
+                'John and Jane',
+                saved.Household_Informal_Greeting__c,
+                'Informal greeting'
+            );
+        }
     }
 
     @IsTest
     static void customNameStopsEveryRecomputation() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        Account household = HouseholdTestDataFactory.newHousehold('The Reverend and Mrs. Smith');
-        household.Custom_Name__c = true;
-        insert household;
-        insert new Contact(
-            Salutation = 'Mr.',
-            FirstName = 'John',
-            LastName = 'Smith',
-            AccountId = household.Id
-        );
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account household = HouseholdTestDataFactory.newHousehold(
+                'The Reverend and Mrs. Smith'
+            );
+            household.Custom_Name__c = true;
+            insert household;
+            insert new Contact(
+                Salutation = 'Mr.',
+                FirstName = 'John',
+                LastName = 'Smith',
+                AccountId = household.Id
+            );
 
-        Test.startTest();
-        HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
-        Test.stopTest();
+            Test.startTest();
+            HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
+            Test.stopTest();
 
-        Account saved = [SELECT Name FROM Account WHERE Id = :household.Id];
-        Assert.areEqual(
-            'The Reverend and Mrs. Smith',
-            saved.Name,
-            'A household David worded himself is never rewritten'
-        );
+            Account saved = [SELECT Name FROM Account WHERE Id = :household.Id];
+            Assert.areEqual(
+                'The Reverend and Mrs. Smith',
+                saved.Name,
+                'A household David worded himself is never rewritten'
+            );
+        }
     }
 }

@@ -47,104 +47,116 @@ private class HouseholdDependentsExtensionsTest {
 
     @IsTest
     static void aHouseholdAPackageStillCreditsIsKeptWhenItsLastMemberMoves() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-        Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-        insert new List<Contact>{ maria, wei };
-        Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
-        Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
-        onlyThisExtension(new StubExtension(new Set<Id>{ fromHousehold }));
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ maria, wei };
+            Id fromHousehold = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
+            onlyThisExtension(new StubExtension(new Set<Id>{ fromHousehold }));
 
-        Test.startTest();
-        HouseholdService.moveContact(maria.Id, toHousehold);
-        Test.stopTest();
+            Test.startTest();
+            HouseholdService.moveContact(maria.Id, toHousehold);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
-            'The household still has records credited to it, so it is kept'
-        );
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Error_Log__c WHERE Severity__c = :ErrorLogger.SEVERITY_INFO],
-            'Keeping a household with credited records is ordinary, so nothing is logged'
-        );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Account WHERE Id = :fromHousehold],
+                'The household still has records credited to it, so it is kept'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Error_Log__c WHERE Severity__c = :ErrorLogger.SEVERITY_INFO],
+                'Keeping a household with credited records is ordinary, so nothing is logged'
+            );
+        }
     }
 
     @IsTest
     static void twoHundredEmptyHouseholdsKeepOnlyThoseAPackageCredits() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        List<Account> households = emptyHouseholds(200);
-        Set<Id> credited = new Set<Id>();
-        for (Integer i = 0; i < households.size(); i += 2) {
-            credited.add(households[i].Id);
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Account> households = emptyHouseholds(200);
+            Set<Id> credited = new Set<Id>();
+            for (Integer i = 0; i < households.size(); i += 2) {
+                credited.add(households[i].Id);
+            }
+            onlyThisExtension(new StubExtension(credited));
+
+            Test.startTest();
+            HouseholdService.deleteEmptyHouseholds(new Map<Id, Account>(households).keySet());
+            Test.stopTest();
+
+            Set<Id> remaining = new Map<Id, Account>(
+                    [SELECT Id FROM Account WHERE Id IN :households]
+                )
+                .keySet();
+            Assert.areEqual(credited, remaining, 'Exactly the credited households are kept');
         }
-        onlyThisExtension(new StubExtension(credited));
-
-        Test.startTest();
-        HouseholdService.deleteEmptyHouseholds(new Map<Id, Account>(households).keySet());
-        Test.stopTest();
-
-        Set<Id> remaining = new Map<Id, Account>([SELECT Id FROM Account WHERE Id IN :households])
-            .keySet();
-        Assert.areEqual(credited, remaining, 'Exactly the credited households are kept');
     }
 
     @IsTest
     static void withNoExtensionInstalledAnEmptyHouseholdIsDeleted() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        List<Account> households = emptyHouseholds(1);
-        onlyThisExtension(null);
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Account> households = emptyHouseholds(1);
+            onlyThisExtension(null);
 
-        Test.startTest();
-        HouseholdService.deleteEmptyHouseholds(new Set<Id>{ households[0].Id });
-        Test.stopTest();
+            Test.startTest();
+            HouseholdService.deleteEmptyHouseholds(new Set<Id>{ households[0].Id });
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Account WHERE Id = :households[0].Id],
-            'Nothing is credited to the household, so the tidy-up deletes it'
-        );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :households[0].Id],
+                'Nothing is credited to the household, so the tidy-up deletes it'
+            );
+        }
     }
 
     @IsTest
     static void anExtensionThatFailsKeepsEveryHouseholdAndIsLogged() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        List<Account> households = emptyHouseholds(3);
-        onlyThisExtension(new FailingExtension());
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Account> households = emptyHouseholds(3);
+            onlyThisExtension(new FailingExtension());
 
-        Test.startTest();
-        HouseholdService.deleteEmptyHouseholds(new Map<Id, Account>(households).keySet());
-        Test.stopTest();
+            Test.startTest();
+            HouseholdService.deleteEmptyHouseholds(new Map<Id, Account>(households).keySet());
+            Test.stopTest();
 
-        Assert.areEqual(
-            3,
-            [SELECT COUNT() FROM Account WHERE Id IN :households],
-            'An extension that could not answer has not said the households are safe to delete'
-        );
-        Assert.areEqual(
-            1,
-            [
-                SELECT COUNT()
-                FROM Error_Log__c
-                WHERE Context__c = 'HouseholdDependentsExtensions.householdsWithDependents'
-            ],
-            'The failure is logged once'
-        );
+            Assert.areEqual(
+                3,
+                [SELECT COUNT() FROM Account WHERE Id IN :households],
+                'An extension that could not answer has not said the households are safe to delete'
+            );
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'HouseholdDependentsExtensions.householdsWithDependents'
+                ],
+                'The failure is logged once'
+            );
+        }
     }
 
     @IsTest
     static void anUnusableExtensionKeepsEveryHousehold() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        Set<Id> asked = new Map<Id, Account>(emptyHouseholds(2)).keySet();
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Set<Id> asked = new Map<Id, Account>(emptyHouseholds(2)).keySet();
 
-        Test.startTest();
-        Set<Id> answer = new HouseholdDependentsExtensions.EveryHouseholdDependent()
-            .householdsWithDependents(asked);
-        Set<Id> none = HouseholdDependentsExtensions.householdsWithDependents(new Set<Id>());
-        Test.stopTest();
+            Test.startTest();
+            Set<Id> answer = new HouseholdDependentsExtensions.EveryHouseholdDependent()
+                .householdsWithDependents(asked);
+            Set<Id> none = HouseholdDependentsExtensions.householdsWithDependents(new Set<Id>());
+            Test.stopTest();
 
-        Assert.areEqual(asked, answer, 'An extension that cannot be built keeps everything');
-        Assert.isTrue(none.isEmpty(), 'Asking about no households asks nothing');
+            Assert.areEqual(asked, answer, 'An extension that cannot be built keeps everything');
+            Assert.isTrue(none.isEmpty(), 'Asking about no households asks nothing');
+        }
     }
 }

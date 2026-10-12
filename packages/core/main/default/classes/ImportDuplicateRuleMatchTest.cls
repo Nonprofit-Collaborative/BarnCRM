@@ -15,7 +15,9 @@ private class ImportDuplicateRuleMatchTest {
 
     @TestSetup
     static void setUp() {
-        TestDataFactory.defaultSettings();
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+        }
     }
 
     private static User admin() {
@@ -78,218 +80,257 @@ private class ImportDuplicateRuleMatchTest {
 
     @IsTest
     static void twoHundredPeopleTheRuleMissedAreMatchedByTheDuplicateRules() {
-        System.runAs(admin()) {
-            List<Contact> existing = new List<Contact>();
-            for (Integer i = 0; i < MANY; i++) {
-                existing.add(new Contact(LastName = 'Dup' + i, Email = 'old' + i + '@example.org'));
-            }
-            insert existing;
-            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
-            List<Map<String, String>> values = new List<Map<String, String>>();
-            for (Integer i = 0; i < MANY; i++) {
-                ImportDuplicateRuleMatcher.stubMatches.put(
-                    'dup' + i,
-                    new List<Id>{ existing[i].Id }
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                List<Contact> existing = new List<Contact>();
+                for (Integer i = 0; i < MANY; i++) {
+                    existing.add(
+                        new Contact(LastName = 'Dup' + i, Email = 'old' + i + '@example.org')
+                    );
+                }
+                insert existing;
+                ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
+                List<Map<String, String>> values = new List<Map<String, String>>();
+                for (Integer i = 0; i < MANY; i++) {
+                    ImportDuplicateRuleMatcher.stubMatches.put(
+                        'dup' + i,
+                        new List<Id>{ existing[i].Id }
+                    );
+                    values.add(row('Dup' + i, 'new' + i + '@example.org'));
+                }
+                given(values, true);
+
+                Test.startTest();
+                ImportRowProcessor.Outcome preview = run(true);
+                ImportRowProcessor.Outcome committed = run(false);
+                Test.stopTest();
+
+                Assert.areEqual(0, preview.created, 'Nobody would be created.');
+                Assert.areEqual(0, committed.created, 'Nobody was: ' + committed.notes);
+                Assert.areEqual(MANY, [SELECT COUNT() FROM Contact], 'Still two hundred people.');
+                Assert.isTrue(committed.notes.contains(Label.Core_Import_LogDuplicateRuleMatches));
+                List<Import_Row__c> loaded = rows();
+                Assert.areEqual(existing[0].Id, loaded[0].Contact_1__c, 'Loaded into the match.');
+                for (Import_Row__c each : loaded) {
+                    Assert.isTrue(each.Duplicate_Rule_Match__c, 'Every such row is ticked.');
+                }
+                Assert.areEqual(
+                    'new0@example.org',
+                    [SELECT Email FROM Contact WHERE Id = :existing[0].Id].Email,
+                    'The row was loaded into the matched person.'
                 );
-                values.add(row('Dup' + i, 'new' + i + '@example.org'));
             }
-            given(values, true);
 
-            Test.startTest();
-            ImportRowProcessor.Outcome preview = run(true);
-            ImportRowProcessor.Outcome committed = run(false);
-            Test.stopTest();
-
-            Assert.areEqual(0, preview.created, 'Nobody would be created.');
-            Assert.areEqual(0, committed.created, 'Nobody was: ' + committed.notes);
-            Assert.areEqual(MANY, [SELECT COUNT() FROM Contact], 'Still two hundred people.');
-            Assert.isTrue(committed.notes.contains(Label.Core_Import_LogDuplicateRuleMatches));
-            List<Import_Row__c> loaded = rows();
-            Assert.areEqual(existing[0].Id, loaded[0].Contact_1__c, 'Loaded into the match.');
-            for (Import_Row__c each : loaded) {
-                Assert.isTrue(each.Duplicate_Rule_Match__c, 'Every such row is ticked.');
-            }
-            Assert.areEqual(
-                'new0@example.org',
-                [SELECT Email FROM Contact WHERE Id = :existing[0].Id].Email,
-                'The row was loaded into the matched person.'
-            );
         }
     }
 
     @IsTest
     static void aPersonTheRuleFindsIsNeverAskedAbout() {
-        Contact byEmail = new Contact(LastName = 'Exact', Email = 'exact@example.org');
-        Contact other = new Contact(LastName = 'Other');
-        insert new List<Contact>{ byEmail, other };
-        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
-            'exact' => new List<Id>{ other.Id }
-        };
-        given(new List<Map<String, String>>{ row('Exact', 'exact@example.org') }, true);
+        System.runAs(TestUsers.admin()) {
+            Contact byEmail = new Contact(LastName = 'Exact', Email = 'exact@example.org');
+            Contact other = new Contact(LastName = 'Other');
+            insert new List<Contact>{ byEmail, other };
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                'exact' => new List<Id>{ other.Id }
+            };
+            given(new List<Map<String, String>>{ row('Exact', 'exact@example.org') }, true);
 
-        run(false);
+            run(false);
 
-        Import_Row__c loaded = rows()[0];
-        Assert.areEqual(byEmail.Id, loaded.Contact_1__c, 'The exact rule wins.');
-        Assert.isFalse(loaded.Duplicate_Rule_Match__c);
+            Import_Row__c loaded = rows()[0];
+            Assert.areEqual(byEmail.Id, loaded.Contact_1__c, 'The exact rule wins.');
+            Assert.isFalse(loaded.Duplicate_Rule_Match__c);
+        }
     }
 
     @IsTest
     static void severalMatchesAreRejectedByDefault() {
-        Contact one = new Contact(LastName = 'Twin');
-        Contact two = new Contact(LastName = 'Twin');
-        insert new List<Contact>{ one, two };
-        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
-            'twin' => new List<Id>{ one.Id, two.Id }
-        };
-        given(new List<Map<String, String>>{ row('Twin', 'twin@example.org') }, true);
+        System.runAs(TestUsers.admin()) {
+            Contact one = new Contact(LastName = 'Twin');
+            Contact two = new Contact(LastName = 'Twin');
+            insert new List<Contact>{ one, two };
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                'twin' => new List<Id>{ one.Id, two.Id }
+            };
+            given(new List<Map<String, String>>{ row('Twin', 'twin@example.org') }, true);
 
-        ImportRowProcessor.Outcome preview = run(true);
+            ImportRowProcessor.Outcome preview = run(true);
 
-        Import_Row__c rejected = rows()[0];
-        Assert.areEqual(1, preview.rejected);
-        Assert.areEqual(Label.Core_Import_ErrorSeveralPeopleMatch, rejected.Error_Message__c);
-        Assert.isTrue(rejected.Several_Matches__c, 'Listed as a several-matches row.');
-        Assert.isFalse(rejected.Duplicate_Rule_Match__c, 'Not loaded into either.');
+            Import_Row__c rejected = rows()[0];
+            Assert.areEqual(1, preview.rejected);
+            Assert.areEqual(Label.Core_Import_ErrorSeveralPeopleMatch, rejected.Error_Message__c);
+            Assert.isTrue(rejected.Several_Matches__c, 'Listed as a several-matches row.');
+            Assert.isFalse(rejected.Duplicate_Rule_Match__c, 'Not loaded into either.');
+        }
     }
 
     @IsTest
     static void severalMatchesCanTakeTheMostRecentlyChanged() {
-        Contact older = new Contact(LastName = 'Twin');
-        Contact newer = new Contact(LastName = 'Twin');
-        insert new List<Contact>{ older, newer };
-        Test.setCreatedDate(older.Id, Datetime.now().addDays(-10));
-        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
-            'twin' => new List<Id>{ older.Id, newer.Id }
-        };
-        given(new List<Map<String, String>>{ row('Twin', 'twin@example.org') }, true);
-        template.Several_Matches__c = ImportTemplateService.SEVERAL_MOST_RECENT;
-        update template;
-        template = ImportTemplateSelector.selectById(template.Id);
+        System.runAs(TestUsers.admin()) {
+            Contact older = new Contact(LastName = 'Twin');
+            Contact newer = new Contact(LastName = 'Twin');
+            insert new List<Contact>{ older, newer };
+            Test.setCreatedDate(older.Id, Datetime.now().addDays(-10));
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                'twin' => new List<Id>{ older.Id, newer.Id }
+            };
+            given(new List<Map<String, String>>{ row('Twin', 'twin@example.org') }, true);
+            template.Several_Matches__c = ImportTemplateService.SEVERAL_MOST_RECENT;
+            update template;
+            template = ImportTemplateSelector.selectById(template.Id);
 
-        run(false);
+            run(false);
 
-        Import_Row__c loaded = rows()[0];
-        Assert.areEqual(newer.Id, loaded.Contact_1__c, 'The later of two equally changed.');
-        Assert.isTrue(loaded.Several_Matches__c);
-        Assert.isTrue(loaded.Duplicate_Rule_Match__c);
+            Import_Row__c loaded = rows()[0];
+            Assert.areEqual(newer.Id, loaded.Contact_1__c, 'The later of two equally changed.');
+            Assert.isTrue(loaded.Several_Matches__c);
+            Assert.isTrue(loaded.Duplicate_Rule_Match__c);
+        }
     }
 
     @IsTest
     static void bothPeopleMatchedToOneRecordRejectTheRow() {
-        Contact shared = new Contact(LastName = 'Rivera');
-        insert shared;
-        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
-            'rivera' => new List<Id>{ shared.Id }
-        };
-        Map<String, String> couple = row('Rivera', null);
-        couple.put('Partner', 'Rivera');
-        given(new List<Map<String, String>>{ couple }, true);
+        System.runAs(TestUsers.admin()) {
+            Contact shared = new Contact(LastName = 'Rivera');
+            insert shared;
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                'rivera' => new List<Id>{ shared.Id }
+            };
+            Map<String, String> couple = row('Rivera', null);
+            couple.put('Partner', 'Rivera');
+            given(new List<Map<String, String>>{ couple }, true);
 
-        run(true);
+            run(true);
 
-        Assert.areEqual(Label.Core_Import_ErrorDuplicateRuleOnePerson, rows()[0].Error_Message__c);
+            Assert.areEqual(
+                Label.Core_Import_ErrorDuplicateRuleOnePerson,
+                rows()[0].Error_Message__c
+            );
+        }
     }
 
     @IsTest
     static void anOrganizationTheRulesMatchIsUsedAndAHouseholdNeverIs() {
-        Account church = new Account(
-            Name = 'First Baptist Church',
-            RecordTypeId = organizationType()
-        );
-        insert church;
-        Contact member = new Contact(LastName = 'Okafor');
-        insert member;
-        Id household = [SELECT AccountId FROM Contact WHERE Id = :member.Id].AccountId;
-        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
-            'first baptist' => new List<Id>{ church.Id },
-            'okafor charity' => new List<Id>{ household }
-        };
-        Map<String, String> first = row('Ruiz', 'ruiz@example.org');
-        first.put('Organization', 'First Baptist');
-        Map<String, String> second = row('Lee', 'lee@example.org');
-        second.put('Organization', 'Okafor Charity');
-        given(new List<Map<String, String>>{ first, second }, true);
+        System.runAs(TestUsers.admin()) {
+            Account church = new Account(
+                Name = 'First Baptist Church',
+                RecordTypeId = organizationType()
+            );
+            insert church;
+            Contact member = new Contact(LastName = 'Okafor');
+            insert member;
+            Id household = [SELECT AccountId FROM Contact WHERE Id = :member.Id].AccountId;
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                'first baptist' => new List<Id>{ church.Id },
+                'okafor charity' => new List<Id>{ household }
+            };
+            Map<String, String> first = row('Ruiz', 'ruiz@example.org');
+            first.put('Organization', 'First Baptist');
+            Map<String, String> second = row('Lee', 'lee@example.org');
+            second.put('Organization', 'Okafor Charity');
+            given(new List<Map<String, String>>{ first, second }, true);
 
-        run(false);
+            run(false);
 
-        List<Import_Row__c> loaded = rows();
-        Assert.areEqual(church.Id, loaded[0].Organization__c, 'Matched by the rules.');
-        Assert.isTrue(loaded[0].Duplicate_Rule_Match__c);
-        Assert.areNotEqual(household, loaded[1].Organization__c, 'A household is no organization.');
-        Assert.isNotNull(loaded[1].Organization__c, 'The organization was created instead.');
-        Assert.isFalse(loaded[1].Duplicate_Rule_Match__c);
+            List<Import_Row__c> loaded = rows();
+            Assert.areEqual(church.Id, loaded[0].Organization__c, 'Matched by the rules.');
+            Assert.isTrue(loaded[0].Duplicate_Rule_Match__c);
+            Assert.areNotEqual(
+                household,
+                loaded[1].Organization__c,
+                'A household is no organization.'
+            );
+            Assert.isNotNull(loaded[1].Organization__c, 'The organization was created instead.');
+            Assert.isFalse(loaded[1].Duplicate_Rule_Match__c);
+        }
     }
 
     @IsTest
     static void withNoRuleToAskTheRuleAloneDecidesAndTheRunLogSaysSo() {
-        ImportDuplicateRuleMatcher.stubUnavailable = true;
-        Map<String, String> one = row('Nobody', 'nobody@example.org');
-        one.put('Organization', 'New Org');
-        given(new List<Map<String, String>>{ one }, true);
+        System.runAs(TestUsers.admin()) {
+            ImportDuplicateRuleMatcher.stubUnavailable = true;
+            Map<String, String> one = row('Nobody', 'nobody@example.org');
+            one.put('Organization', 'New Org');
+            given(new List<Map<String, String>>{ one }, true);
 
-        ImportRowProcessor.Outcome committed = run(false);
+            ImportRowProcessor.Outcome committed = run(false);
 
-        Assert.areEqual(1, committed.created, 'Nothing is rejected for want of a rule.');
-        Assert.isTrue(committed.notes.contains(Label.Core_Import_LogNoDuplicateRulePeople));
-        Assert.isTrue(committed.notes.contains(Label.Core_Import_LogNoDuplicateRuleOrganizations));
+            Assert.areEqual(1, committed.created, 'Nothing is rejected for want of a rule.');
+            Assert.isTrue(committed.notes.contains(Label.Core_Import_LogNoDuplicateRulePeople));
+            Assert.isTrue(
+                committed.notes.contains(Label.Core_Import_LogNoDuplicateRuleOrganizations)
+            );
+        }
     }
 
     @IsTest
     static void aTemplateNotUsingTheRulesNeverAsksThem() {
-        Contact other = new Contact(LastName = 'Asked');
-        insert other;
-        ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
-            'asked' => new List<Id>{ other.Id }
-        };
-        given(new List<Map<String, String>>{ row('Asked', 'asked@example.org') }, false);
+        System.runAs(TestUsers.admin()) {
+            Contact other = new Contact(LastName = 'Asked');
+            insert other;
+            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                'asked' => new List<Id>{ other.Id }
+            };
+            given(new List<Map<String, String>>{ row('Asked', 'asked@example.org') }, false);
 
-        ImportRowProcessor.Outcome committed = run(false);
+            ImportRowProcessor.Outcome committed = run(false);
 
-        Assert.areEqual(1, committed.created);
-        Assert.areNotEqual(other.Id, rows()[0].Contact_1__c);
+            Assert.areEqual(1, committed.created);
+            Assert.areNotEqual(other.Id, rows()[0].Contact_1__c);
+        }
     }
 
     @IsTest
     static void theChoiceIsSavedWithTheMatchingChoices() {
-        System.runAs(admin()) {
-            given(new List<Map<String, String>>(), false);
-            ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
-            choices.useDuplicateRules = true;
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                given(new List<Map<String, String>>(), false);
+                ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
+                choices.useDuplicateRules = true;
 
-            ImportTemplateService.saveMatching(template.Id, choices);
+                ImportTemplateService.saveMatching(template.Id, choices);
 
-            Assert.isTrue(ImportTemplateSelector.selectById(template.Id).Use_Duplicate_Rules__c);
-            choices.useDuplicateRules = null;
-            ImportTemplateService.saveMatching(template.Id, choices);
-            Assert.isFalse(ImportTemplateSelector.selectById(template.Id).Use_Duplicate_Rules__c);
+                Assert.isTrue(
+                    ImportTemplateSelector.selectById(template.Id).Use_Duplicate_Rules__c
+                );
+                choices.useDuplicateRules = null;
+                ImportTemplateService.saveMatching(template.Id, choices);
+                Assert.isFalse(
+                    ImportTemplateSelector.selectById(template.Id).Use_Duplicate_Rules__c
+                );
+            }
+
         }
     }
 
     @IsTest
     static void thePlatformIsAskedWhenNothingIsStubbed() {
-        Contact probe = (Contact) ImportDuplicateRuleMatcher.probe(
-            Contact.SObjectType,
-            new Map<String, String>{
-                'LastName' => 'Probe',
-                'Email' => 'probe@example.org',
-                'Birthdate' => '2000-01-01'
-            },
-            null
-        );
-        Assert.areEqual('Probe', probe.LastName);
-        Assert.isNull(probe.Birthdate, 'Only text a rule compares is copied.');
+        System.runAs(TestUsers.admin()) {
+            Contact probe = (Contact) ImportDuplicateRuleMatcher.probe(
+                Contact.SObjectType,
+                new Map<String, String>{
+                    'LastName' => 'Probe',
+                    'Email' => 'probe@example.org',
+                    'Birthdate' => '2000-01-01'
+                },
+                null
+            );
+            Assert.areEqual('Probe', probe.LastName);
+            Assert.isNull(probe.Birthdate, 'Only text a rule compares is copied.');
 
-        Test.startTest();
-        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
-            new List<SObject>{ probe },
-            null
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
+                new List<SObject>{ probe },
+                null
+            );
+            Test.stopTest();
 
-        // Whether this org has an active rule for contacts is the org's business: either the
-        // rules were asked and found nobody, or there was none to ask.
-        Assert.isTrue(found == null || (found.size() == 1 && found[0].isEmpty()));
-        Assert.isTrue(ImportDuplicateRuleMatcher.matchesFor(new List<SObject>(), null).isEmpty());
+            // Whether this org has an active rule for contacts is the org's business: either the
+            // rules were asked and found nobody, or there was none to ask.
+            Assert.isTrue(found == null || (found.size() == 1 && found[0].isEmpty()));
+            Assert.isTrue(
+                ImportDuplicateRuleMatcher.matchesFor(new List<SObject>(), null).isEmpty()
+            );
+        }
     }
 }

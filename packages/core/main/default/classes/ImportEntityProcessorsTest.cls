@@ -16,22 +16,28 @@ private class ImportEntityProcessorsTest {
 
     @IsTest
     static void aClassThatIsNotInTheOrgIsNoProcessorAndNoError() {
-        Test.startTest();
-        ImportEntityProcessor found = ImportEntityProcessors.resolve('NoSuchImportProcessorFu3');
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            ImportEntityProcessor found = ImportEntityProcessors.resolve(
+                'NoSuchImportProcessorFu3'
+            );
+            Test.stopTest();
 
-        Assert.isNull(found, 'A package that is not installed contributes nothing');
-        Assert.areEqual(0, logged(), 'An org without the package is not an error');
+            Assert.isNull(found, 'A package that is not installed contributes nothing');
+            Assert.areEqual(0, logged(), 'An org without the package is not an error');
+        }
     }
 
     @IsTest
     static void aClassOfTheWrongShapeIsLeftOutAndLogged() {
-        Test.startTest();
-        // A real class with a no-argument constructor that does not implement the interface.
-        ImportEntityProcessor found = ImportEntityProcessors.resolve('ImportEntityProcessors');
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            // A real class with a no-argument constructor that does not implement the interface.
+            ImportEntityProcessor found = ImportEntityProcessors.resolve('ImportEntityProcessors');
+            Test.stopTest();
 
-        Assert.isNull(found, 'Only a class that implements the interface is used');
-        Assert.areEqual(1, logged(), 'The wrong shape is written to the Error Log');
+            Assert.isNull(found, 'Only a class that implements the interface is used');
+            Assert.areEqual(1, logged(), 'The wrong shape is written to the Error Log');
+        }
     }
 }

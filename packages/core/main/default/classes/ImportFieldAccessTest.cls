@@ -102,74 +102,78 @@ private class ImportFieldAccessTest {
 
     @IsTest
     static void aFieldTheImporterCannotWriteIsNamedOnceInTheRunLog() {
-        given();
-        User person = importer();
-        ImportRowProcessor.Outcome preview;
-        ImportRowProcessor.Outcome committed;
-        Test.startTest();
-        System.runAs(person) {
-            Assert.isFalse(
-                Contact.AssistantName.getDescribe().isUpdateable(),
-                'Precondition: the importer may not write the field this test maps.'
-            );
-            preview = run(true);
-            committed = run(false);
-        }
-        Test.stopTest();
-
-        String note = noAccessNote(Contact.AssistantName);
-        Assert.isTrue(
-            preview.notes.contains(note),
-            'The dry run says the column will not load, before anything is committed: ' +
-            preview.notes
-        );
-        Assert.isTrue(committed.notes.contains(note), 'So does the commit: ' + committed.notes);
-        Integer mentions = 0;
-        for (String line : committed.notes) {
-            if (line.contains(Contact.AssistantName.getDescribe().getLabel())) {
-                mentions++;
+        System.runAs(TestUsers.admin()) {
+            given();
+            User person = importer();
+            ImportRowProcessor.Outcome preview;
+            ImportRowProcessor.Outcome committed;
+            Test.startTest();
+            System.runAs(person) {
+                Assert.isFalse(
+                    Contact.AssistantName.getDescribe().isUpdateable(),
+                    'Precondition: the importer may not write the field this test maps.'
+                );
+                preview = run(true);
+                committed = run(false);
             }
+            Test.stopTest();
+
+            String note = noAccessNote(Contact.AssistantName);
+            Assert.isTrue(
+                preview.notes.contains(note),
+                'The dry run says the column will not load, before anything is committed: ' +
+                preview.notes
+            );
+            Assert.isTrue(committed.notes.contains(note), 'So does the commit: ' + committed.notes);
+            Integer mentions = 0;
+            for (String line : committed.notes) {
+                if (line.contains(Contact.AssistantName.getDescribe().getLabel())) {
+                    mentions++;
+                }
+            }
+            Assert.areEqual(1, mentions, 'Once for the field, not once for each of the two rows.');
+            Assert.areEqual(
+                2,
+                committed.created,
+                'The rest of each row still loads: ' + rowErrors() + ' ' + committed.notes
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE AssistantName != NULL],
+                'And the skipped column wrote nothing.'
+            );
         }
-        Assert.areEqual(1, mentions, 'Once for the field, not once for each of the two rows.');
-        Assert.areEqual(
-            2,
-            committed.created,
-            'The rest of each row still loads: ' + rowErrors() + ' ' + committed.notes
-        );
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Contact WHERE AssistantName != NULL],
-            'And the skipped column wrote nothing.'
-        );
     }
 
     @IsTest
     static void aBarnCrmAdminLoadsTheOptOuts() {
-        given();
-        User person = importer();
-        ImportRowProcessor.Outcome committed;
-        Test.startTest();
-        System.runAs(person) {
-            committed = run(false);
-        }
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            given();
+            User person = importer();
+            ImportRowProcessor.Outcome committed;
+            Test.startTest();
+            System.runAs(person) {
+                committed = run(false);
+            }
+            Test.stopTest();
 
-        Assert.areEqual(
-            2,
-            committed.created,
-            'Both people were created: ' + rowErrors() + ' ' + committed.notes
-        );
-        for (Contact created : [SELECT HasOptedOutOfEmail, DoNotCall FROM Contact]) {
-            Assert.isTrue(created.HasOptedOutOfEmail, 'The email opt-out from the file stuck.');
-            Assert.isTrue(created.DoNotCall, 'So did Do Not Call.');
+            Assert.areEqual(
+                2,
+                committed.created,
+                'Both people were created: ' + rowErrors() + ' ' + committed.notes
+            );
+            for (Contact created : [SELECT HasOptedOutOfEmail, DoNotCall FROM Contact]) {
+                Assert.isTrue(created.HasOptedOutOfEmail, 'The email opt-out from the file stuck.');
+                Assert.isTrue(created.DoNotCall, 'So did Do Not Call.');
+            }
+            Assert.isFalse(
+                committed.notes.contains(noAccessNote(Contact.HasOptedOutOfEmail)),
+                'BarnCRM Admin may write the opt-outs, so none is reported skipped.'
+            );
+            Assert.isFalse(
+                committed.notes.contains(noAccessNote(Contact.DoNotCall)),
+                'Nor Do Not Call.'
+            );
         }
-        Assert.isFalse(
-            committed.notes.contains(noAccessNote(Contact.HasOptedOutOfEmail)),
-            'BarnCRM Admin may write the opt-outs, so none is reported skipped.'
-        );
-        Assert.isFalse(
-            committed.notes.contains(noAccessNote(Contact.DoNotCall)),
-            'Nor Do Not Call.'
-        );
     }
 }
