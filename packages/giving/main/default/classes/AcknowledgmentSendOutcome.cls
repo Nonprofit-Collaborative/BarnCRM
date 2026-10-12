@@ -5,7 +5,7 @@
  * It exists as its own class because `Messaging.SendEmailResult` cannot be constructed, so a test
  * could not stand in for the platform without one (ADR-0032).
  */
-public class AcknowledgmentSendOutcome {
+public with sharing class AcknowledgmentSendOutcome {
     public Boolean sent { get; private set; }
     public String failureReason { get; private set; }
 

@@ -22,11 +22,16 @@ public with sharing class RollupBatch implements Database.Batchable<SObject>, Da
     private Integer failed = 0;
 
     public Database.QueryLocator start(Database.BatchableContext context) {
+        // System mode, stated because API 67.0 would otherwise read in user mode: this is the
+        // engine's read of its definitions (as RollupSelector.selectAll is), and the job runs
+        // as whoever scheduled it, whose access must not decide which totals are reconciled
+        // (ADR-0021).
         return Database.getQueryLocator(
             [
                 SELECT Id
                 FROM Rollup_Definition__c
                 WHERE Active__c = TRUE AND Mode__c IN ('Scheduled', 'Both')
+                WITH SYSTEM_MODE
                 ORDER BY Target_Object__c, Name
             ]
         );

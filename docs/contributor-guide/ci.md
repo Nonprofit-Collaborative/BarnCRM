@@ -151,6 +151,17 @@ Salesforce org is needed for this job. Steps:
    keeps the value it first stored. The rename of the default to `BarnCRM_Settings__c` left
    such orgs pointed at the old object and every save refused with "That setting does not
    exist in this org".
+   `scripts/ci/check-apex-access-modes.py` fails the build if packaged Apex (tests and
+   `vendor/` excepted) leaves its sharing or access mode to the platform default: a class
+   with no `with`, `without` or `inherited sharing` keyword (an inner class only when it
+   touches the database), an inline query with no `WITH USER_MODE` or `WITH SYSTEM_MODE`, a
+   DML statement with no `as user` or `as system`, or a `Database` or `Search` method with no
+   `AccessLevel`. A query string that carries its own `WITH` clause is marked with an
+   `// Access mode:` comment on the call's line or the line above. From API version 67.0 a
+   query or DML statement with no mode runs in user mode and a class with no keyword runs
+   with sharing (Apex Developer Guide, Versioned Behavior Changes), so an elevated read that
+   relied on the old system-mode default fails for a user without access, and only an org
+   run as that user shows it.
 17. A grep check that fails the build if any tracked file contains an em dash character.
 18. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.

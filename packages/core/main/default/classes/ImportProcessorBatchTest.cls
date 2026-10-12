@@ -834,4 +834,27 @@ private class ImportProcessorBatchTest {
         );
         Assert.areEqual(0, after.Rows_Created__c, 'And it created nothing.');
     }
+
+    @IsTest
+    static void theRunReadsEveryStagedRowWhoeverStartsIt() {
+        Import_Batch__c batch = staged(200);
+        // No packaged permission set, so no access to the staged rows at all: API 67.0 reads in
+        // user mode unless told otherwise, and the rows are bookkeeping read in system mode.
+        User limited = TestDataFactory.createUser('Nolimport', new List<String>());
+
+        Integer read = 0;
+        Test.startTest();
+        System.runAs(limited) {
+            Database.QueryLocatorIterator rows = new ImportProcessorBatch(batch.Id, true)
+                .start(null)
+                .iterator();
+            while (rows.hasNext()) {
+                rows.next();
+                read++;
+            }
+        }
+        Test.stopTest();
+
+        Assert.areEqual(200, read, 'Every staged row is read, not only those the user may see.');
+    }
 }

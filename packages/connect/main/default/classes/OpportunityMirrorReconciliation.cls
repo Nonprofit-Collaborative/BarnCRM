@@ -127,6 +127,7 @@ public with sharing class OpportunityMirrorReconciliation {
         // A gift in the range may name an Opportunity closed outside it, or one not won.
         List<Gift__c> elsewhere = new List<Gift__c>();
         Set<Id> elsewhereIds = new Set<Id>();
+        // Access mode: user mode, stated as WITH USER_MODE in the selector's query text.
         for (List<Gift__c> chunk : Database.query(OpportunityMirrorSelector.GIFTS_IN_RANGE_QUERY)) {
             if (result.giftCount + chunk.size() > maxRecords) {
                 throw new ReconciliationException(Label.Connect_OpportunityMirror_ErrorTooMany);
