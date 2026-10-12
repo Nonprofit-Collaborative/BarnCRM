@@ -68,6 +68,28 @@ public with sharing class GivingScheduler {
         return jobIds;
     }
 
+    /** True when the job with this name is scheduled; for Health Check's nightly job list. */
+    public static Boolean isJobScheduled(String jobName) {
+        JobStatus status = statuses().get(jobName);
+        return status != null && status.scheduled == true;
+    }
+
+    /**
+     * Schedules just the one job with this name at its usual time, leaving it alone when it is
+     * already scheduled and doing nothing for a name that is not one of the three. The other two
+     * jobs are untouched, so Health Check can name and schedule each on its own.
+     */
+    public static void scheduleJobNamed(String jobName) {
+        Map<String, JobStatus> current = statuses();
+        if (jobName == TOP_UP_JOB_NAME) {
+            scheduleJob(current, jobName, TOP_UP_CRON, new InstallmentTopUpSchedulable());
+        } else if (jobName == OVERDUE_JOB_NAME) {
+            scheduleJob(current, jobName, OVERDUE_CRON, new InstallmentSchedulable());
+        } else if (jobName == LEVELS_JOB_NAME) {
+            scheduleJob(current, jobName, LEVELS_CRON, new DonorLevelSchedulable());
+        }
+    }
+
     /**
      * Stops all three nightly jobs. Nothing already generated, marked Overdue or placed on a
      * level is changed: the schedules simply stop being extended and nothing new is marked.
