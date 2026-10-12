@@ -42,4 +42,8 @@
     <object>Saved_Query__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Find</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>

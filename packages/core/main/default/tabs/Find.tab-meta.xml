@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Find exactly the records you need on any object you can see, save and share the query, and
+    export the results to CSV.
+  </description>
+  <flexiPage>Find</flexiPage>
+  <label>Find</label>
+  <motif>Custom57: Binoculars</motif>
+</CustomTab>

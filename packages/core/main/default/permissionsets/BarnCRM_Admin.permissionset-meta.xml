@@ -1417,6 +1417,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Find</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
