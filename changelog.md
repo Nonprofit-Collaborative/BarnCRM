@@ -18,6 +18,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 - Feature catalog moved into `docs/barncrm-features.md` (branch `docs/barncrm-features`).
 - Telemetry (C-26) deferred indefinitely by owner decision (no AppExchange for now); recorded in BMemory as D-24.
 - Focus view turned on in VS Code settings (claudeCode.focusView) at the owner's request.
+- `mwdbdevsb` sandbox connected (Midwest Dreamin' sandbox `brandondev`, instance API 68.0); `oi-test` stays the default org. Nothing deployed.
 - Four root project docs created (`architecture.md`, `roadmap.md`, `changelog.md`, `memory.md`; branch `docs/project-docs`).
 - BMemory plan: 7 stale lines fixed (test orgs now include `barn-core` in Sections 0 and 9.6 and item 26; item 2 license marked resolved by D-08; Section 11.3 item 6 and follow-ups 1 to 5 status; salvage branch `claude/openimpact-barncrm-status-ft0c1x` recorded as the source for C-33, C-35 and X-07).
 - Branch audit: 62 stale remote branches with no PR, whose work is in main or superseded, deleted with owner approval, plus local `feature/g-17-gift-batch-entry-v2`. Kept: the salvage branch above, `feature/v-01-v-02-v-03-volunteers` (parked work), `experiment/cmdt-by-type`. The 3 unclear household branches (`fix/household-apex-correctness`, `feature/c-01-members-panel-primary`, `fix/household-lwc-polish`) were checked line by line, found fully covered or obsolete in main, and deleted. `experiment/cmdt-by-type` deleted with owner approval.

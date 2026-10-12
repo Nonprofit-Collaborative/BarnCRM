@@ -29,7 +29,7 @@ Last verified 2026-10-12.
 | `oi-test` | Default scratch test org, Person Accounts shape | Named by the `SF_TEST_ORG_AUTH_URL` secret |
 | `oi-pa` | Person Account scratch org (D-15) | Expires 2026-10-24; recreation pre-approved |
 | `barn-core` | Third scratch test org, Sales Cloud shape, for Core-only runs | Approved 2026-10-12 (alias was `bc-core`) |
-| `mwdbdevsb` | Sandbox of a real, built-out org, for Community Suite (Core without Giving) tests; alias was `mwdsb` until 2026-10-12 | Never the default; check-only first; ask the owner before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only |
+| `mwdbdevsb` | Sandbox of a real, built-out org, for Community Suite (Core without Giving) tests; alias was `mwdsb` until 2026-10-12; Midwest Dreamin' sandbox `brandondev`, connected 2026-10-12, instance API 68.0 | Never the default; check-only first; ask the owner before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only |
 
 Any other org (including other mwd sandboxes) needs owner approval. Agents share each scratch org one deploy or test run at a time, through a lock in the session scratchpad. Scratch org definitions: `config/scratch-defs/` (`person-accounts.json`, `sales-cloud.json`, `platform-only.json`, `npsp.json`, `nonprofit-cloud.json`).
 
