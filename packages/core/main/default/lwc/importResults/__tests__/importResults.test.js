@@ -76,6 +76,22 @@ describe('the import results view', () => {
     expect(element.shadowRoot.querySelector('[data-id="running"]')).not.toBeNull();
   });
 
+  it('lists values a change rewrote, before and after, and nothing when none did', () => {
+    const element = render({
+      batch: DRY_RUN,
+      rejectedRows: [],
+      changedValues: [
+        { rowNumber: 2, column: 'Email', before: 'ana at example.org', after: 'ana@example.org' }
+      ]
+    });
+    const rows = element.shadowRoot.querySelectorAll('[data-id="changed-value"]');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain('ana at example.org');
+    expect(rows[0].textContent).toContain('ana@example.org');
+    const none = render({ batch: DRY_RUN, rejectedRows: [] });
+    expect(none.shadowRoot.querySelectorAll('[data-id="changed-value"]')).toHaveLength(0);
+  });
+
   it('renders with no batch at all', () => {
     const element = render({ batch: undefined, rejectedRows: [] });
     expect(element.shadowRoot.querySelector('[data-id="created"]').textContent).toContain('0');

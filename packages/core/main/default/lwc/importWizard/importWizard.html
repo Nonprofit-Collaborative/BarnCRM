@@ -48,6 +48,40 @@
                             onchange={handleSourceNameChange}
                         ></lightning-input>
                     </template>
+                    <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
+                        {labels.loadObjectHeading}
+                    </h3>
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.loadObjectHelp}</p>
+                    <template lwc:if={choosingObject}>
+                        <lightning-combobox
+                            data-id="new-object"
+                            label={labels.loadObjectLabel}
+                            value={newObjectName}
+                            options={objectOptions}
+                            onchange={handleNewObjectChange}
+                        ></lightning-combobox>
+                        <lightning-input
+                            data-id="new-template-name"
+                            label={labels.loadObjectNameLabel}
+                            value={newTemplateName}
+                            max-length="80"
+                            onchange={handleNewTemplateNameChange}
+                        ></lightning-input>
+                        <lightning-button
+                            class="slds-var-m-top_x-small"
+                            label={labels.loadObjectCreateButton}
+                            data-id="create-object-template"
+                            disabled={cannotCreateObjectTemplate}
+                            onclick={handleCreateObjectTemplate}
+                        ></lightning-button>
+                    </template>
+                    <template lwc:else>
+                        <lightning-button
+                            label={labels.loadObjectHeading}
+                            data-id="choose-object"
+                            onclick={handleChooseObject}
+                        ></lightning-button>
+                    </template>
                 </template>
 
                 <template lwc:if={isStepUpload}>
@@ -83,7 +117,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <template for:each={columns} for:item="column">
+                                <template for:each={columnRows} for:item="column">
                                     <tr key={column.key} data-id="column-row">
                                         <td>{column.source}</td>
                                         <td>
@@ -95,6 +129,24 @@
                                                 options={targetOptions}
                                                 onchange={handleTargetChange}
                                             ></lightning-combobox>
+                                            <template lwc:if={column.isLookup}>
+                                                <lightning-combobox
+                                                    class="slds-var-m-top_xx-small"
+                                                    label={labels.lookupFieldLabel}
+                                                    data-id="lookup-field"
+                                                    data-source={column.source}
+                                                    value={column.lookupField}
+                                                    options={column.lookupOptions}
+                                                    onchange={handleLookupFieldChange}
+                                                ></lightning-combobox>
+                                            </template>
+                                            <lightning-button
+                                                variant="base"
+                                                label={column.changesLabel}
+                                                data-id="edit-changes"
+                                                data-source={column.source}
+                                                onclick={handleEditChanges}
+                                            ></lightning-button>
                                         </td>
                                         <td class="slds-text-body_small">{column.samples}</td>
                                     </tr>
@@ -102,12 +154,35 @@
                             </tbody>
                         </table>
                     </div>
+                    <template lwc:if={editingColumn}>
+                        <c-import-column-transforms
+                            data-id="column-changes"
+                            source={editingColumn.source}
+                            transforms={editingColumn.transforms}
+                            column-names={headers}
+                            sample-rows={changeSampleRows}
+                            onchange={handleChangesChange}
+                            ondone={handleChangesDone}
+                        ></c-import-column-transforms>
+                    </template>
                 </template>
 
                 <template lwc:if={isStepMatching}>
                     <h2 class="slds-text-heading_small slds-var-m-bottom_small">
                         {labels.stepMatching}
                     </h2>
+                    <template lwc:if={loadsOneObject}>
+                        <c-import-load-options
+                            data-id="load-options"
+                            operation={loadOperation}
+                            operations={loadOperations}
+                            match-field={loadMatchField}
+                            lookup-not-found={lookupNotFound}
+                            key-fields={keyFields}
+                            onchange={handleLoadOptionsChange}
+                        ></c-import-load-options>
+                    </template>
+                    <template lwc:if={loadsPeople}>
                     <lightning-combobox
                         data-id="rule"
                         label={labels.matchingRuleLabel}
@@ -172,6 +247,7 @@
                             </template>
                         </template>
                     </template>
+                    </template>
                     <lightning-combobox
                         class="slds-var-m-top_medium"
                         data-id="several-matches"
@@ -192,6 +268,22 @@
                         checked={matchOnly}
                         onchange={handleMatchOnlyChange}
                     ></lightning-input>
+                    <template lwc:if={loadsPeople}>
+                        <lightning-input
+                            class="slds-var-m-top_small"
+                            type="checkbox"
+                            data-id="duplicate-rules"
+                            label={labels.duplicateRulesLabel}
+                            field-level-help={labels.duplicateRulesHelp}
+                            checked={useDuplicateRules}
+                            onchange={handleDuplicateRulesChange}
+                        ></lightning-input>
+                        <template lwc:if={duplicateRulesMissing}>
+                            <p class="slds-text-color_error slds-text-body_small" data-id="duplicate-rules-none">
+                                {labels.duplicateRulesNone}
+                            </p>
+                        </template>
+                    </template>
                     <h3 class="slds-text-heading_x-small slds-var-m-top_medium">
                         {labels.fileValuesHeading}
                     </h3>
@@ -300,6 +392,7 @@
                     <c-import-results
                         batch={batch}
                         rejected-rows={rejectedRows}
+                        changed-values={changedValues}
                         data-id="results"
                     ></c-import-results>
                 </template>

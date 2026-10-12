@@ -165,9 +165,25 @@ public with sharing class ImportUndoService {
         Integer restored,
         Boolean failed
     ) {
+        finish(batchId, countedAtStart, restored, failed, 0);
+    }
+
+    /**
+     * The same, for an undo that also deleted journaled creations (R-IJ3): `createdGone` is how
+     * many of them are no longer there, so the ones left are the ones kept.
+     */
+    @NamespaceAccessible
+    public static void finish(
+        Id batchId,
+        Integer countedAtStart,
+        Integer restored,
+        Boolean failed,
+        Integer createdGone
+    ) {
         try {
             Preview left = new Preview();
             countTagged(batchId, left);
+            left.total = Math.max(left.total - (createdGone == null ? 0 : createdGone), 0);
             Integer counted = countedAtStart == null ? 0 : countedAtStart;
             Import_Batch__c batch = [
                 SELECT Id, Run_Log__c
@@ -341,6 +357,49 @@ public with sharing class ImportUndoService {
             otherTotal += counted.count;
             view.others.add(counted);
         }
+        TaggedCount created = createdCount(batchId);
+        if (created != null) {
+            otherTotal += created.count;
+            view.others.add(created);
+        }
         view.total = view.people + view.households + view.organizations + otherTotal;
+    }
+
+    /**
+     * The records a one-object import journaled as created (R-IJ3), under their object's plural
+     * label, or null when it created none. A one-object import loads one object, so the first
+     * Created page names it. Read in system mode, as the tagged counts are.
+     */
+    private static TaggedCount createdCount(Id batchId) {
+        Integer count = ImportJournalService.entryCount(
+            batchId,
+            ImportJournalService.PHASE_CREATED
+        );
+        if (count == 0) {
+            return null;
+        }
+        String phase = ImportJournalService.PHASE_CREATED;
+        List<Import_Journal__c> first = [
+            SELECT Entries_JSON__c
+            FROM Import_Journal__c
+            WHERE Import_Batch__c = :batchId AND Phase__c = :phase
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate ASC, Id ASC
+            LIMIT 1
+        ];
+        List<Map<String, Object>> entries = first.isEmpty()
+            ? new List<Map<String, Object>>()
+            : ImportJournalService.entries(first[0]);
+        String objectName = entries.isEmpty() ? null : (String) entries[0].get('object');
+        Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
+        TaggedCount counted = new TaggedCount();
+        counted.objectName = type == null
+            ? objectName
+            : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        counted.label = type == null
+            ? objectName
+            : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+        counted.count = count;
+        return counted;
     }
 }

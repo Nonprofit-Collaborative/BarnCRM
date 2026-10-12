@@ -129,4 +129,29 @@ private class ImportMappingTest {
             'A mapping saved and read again is the same mapping.'
         );
     }
+
+    @IsTest
+    static void aOneObjectMappingKeepsItsLookupFieldsAndRecordAttributes() {
+        ImportMapping mapping = ImportMapping.parse(
+            '{"columns":[' +
+                '{"source":"Program","target":"Record.Program__c","lookupField":"Code__c"},' +
+                '{"source":"Person","target":"Record.Contact__c","lookupField":"Id"},' +
+                '{"source":"Hours","target":"Record.Hours__c"},' +
+                '{"source":"Email","target":"Contact1.Email","lookupField":"Name"}],' +
+                '"defaults":[{"target":"Record.Status__c","value":"Done"}]}'
+        );
+
+        ImportMapping again = ImportMapping.parse(mapping.serialize());
+
+        Assert.areEqual(
+            new Map<String, String>{ 'program__c' => 'Code__c' },
+            again.lookupFieldsByAttribute(),
+            'Only a Record lookup named by a field other than the ID.'
+        );
+        Assert.areEqual(
+            new Set<String>{ 'program__c', 'contact__c', 'hours__c', 'status__c' },
+            again.recordAttributes(),
+            'Columns and values for every row, folded to lower case.'
+        );
+    }
 }

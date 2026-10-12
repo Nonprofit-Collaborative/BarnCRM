@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Data_ObjectUnknown</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the object is not in this org</shortDescription>
+        <value>That object is not in this org, or you cannot see it. Choose another object, or ask your Salesforce administrator for access.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Data_ObjectBookkeeping</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the object is the package's own records</shortDescription>
+        <value>{0} are kept by BarnCRM itself and cannot be loaded from a file.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Data_ObjectSetup</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the object is a setup or security object</shortDescription>
+        <value>{0} are managed in Setup and cannot be loaded from a file here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Data_ObjectMembership</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: household members are managed by households</shortDescription>
+        <value>{0} are kept by the households they belong to and cannot be loaded from a file. Load people with a people mapping instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Data_ObjectNotLoadable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the object is not a record a file can load</shortDescription>
+        <value>{0} are not records a file can load: settings, metadata, events, history and similar records are kept by Salesforce.</value>
+    </labels>
+</CustomLabels>

@@ -9,6 +9,8 @@ you say how a row should be matched against records you already have, and then y
 **preview** that tells you exactly what would be created, updated, matched, or rejected
 before anything is written. When the preview looks right you import it, and the results
 screen tells you what happened, row by row, including every row that failed and why.
+A file that describes one kind of record, such as program sessions or one of your own custom
+objects, loads through **Load one object** (section 9).
 
 Every record an import creates is tagged with the import it came from, so six months
 later you can still answer "where did these 400 households come from".
@@ -59,7 +61,8 @@ or six rows.
    **Do not load** stays that way even when BarnCRM recognizes its heading. Besides the
    usual columns, the picker lists your org's own fields on people and organizations that
    you may edit (for example "Person: Member Since"), and each one's Salesforce record ID
-   (section 8).
+   (section 8). **Change values** beside a column tidies its values as they load, for
+   example names in capitals or dates written day first (section 10).
 4. Choose how rows are matched. **Email exact** is the safe default for people. Read the
    sentence under each rule before you change it: **Name plus postal code** will treat two
    different people who share a name at one address as the same person. If the file has
@@ -68,7 +71,8 @@ or six rows.
    unless you have a reason to change it). On the same step, **Values for every row** lets
    you give a value the whole file shares, for example a city missing from every row; a row
    with its own value keeps it. Tick **Match only** when the file should update records you
-   already have and never add new ones. Section 8 explains every choice.
+   already have and never add new ones, and **Also match with my duplicate rules** to let your
+   org's duplicate rules find people the rule missed. Section 8 explains every choice.
 5. Optionally, under **Control totals**, type how many rows the file should have (and, with
    Giving, for a gift file, what its amounts should add up to). The preview checks them and the import is
    refused while they do not match.
@@ -144,7 +148,9 @@ Three things are worth knowing about it.
 
 An import you regret can be undone for 30 days after you import it. Undo removes the
 people, households and organizations that import created (and, with Giving, its gifts), and
-puts back the values it changed on records you already had. It does not touch anything else.
+puts back the values it changed on records you already had. An import that loaded one object
+(section 9) has the records it created removed the same way, counted under that object's name.
+It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).
 
@@ -305,6 +311,19 @@ organization's. Map the column to the right one, or fix the ID.
 so a row whose person or organization is not already in Salesforce is rejected instead of
 creating them. If those rows are new people, untick **Match only** and load them again.
 
+**Load one object: "No record ... was found for" a lookup.** The value in a lookup column did
+not find a record by the field that column names its parent by (section 9, step 4). Check the
+value, or choose a different field in the column's second picker, or choose **Leave it empty**
+to load the row without the lookup.
+
+**Load one object: the object you want is not listed.** It is a setup or security object, one
+of BarnCRM's own, or one you may not create or edit records of (section 9, "Which objects are
+listed"). Ask your Salesforce administrator for access, or use Setup for setup objects.
+
+**Load one object: "This row names the same record as an earlier row".** Two rows of the file
+have the same record ID, or the same value in the upsert ID field. Only the first is loaded;
+merge the two rows in the spreadsheet and load the second again if it held something new.
+
 ## 8. How rows are matched, and values for every row
 
 The matching step of the wizard holds the choices below. How people and organizations are
@@ -368,12 +387,129 @@ you already have and add none, for example a list of updated phone numbers. A ro
 or organization matches no record is rejected with the reason, and the preview shows you those
 rows first. The choice is for this file only: the next file starts with it unticked.
 
+**Your duplicate rules.** Tick **Also match with my duplicate rules** to let the duplicate rules
+your org already uses (the ones that warn people as they type, see [Duplicates](duplicates.md))
+find people and organizations the rule above does not. They are asked only about a person or
+organization the rule found nobody for: a file of work emails, for example, can still find Ana
+Ramirez by her name and phone if your rule for people compares those. What it risks: your
+duplicate rules are usually looser than **Email exact**, so a row can be loaded into somebody who
+is only similar. Every row matched this way has **Matched By Duplicate Rule** ticked and the run
+log says there are such rows, so read them in the dry run before you commit (report on Import
+Rows, or open the import's rows). A row whose two people the rules match to one record is
+rejected. When a rule finds more than one
+record, **When more than one record matches** decides, as for any match. Only organizations are
+taken for organizations, and only people for people, whatever the rule compares. The choice is
+saved with the mapping.
+
+If no duplicate rule is switched on for people (or for organizations), the box changes nothing for
+them, the matching step says so, and the run log says the rule above was used alone. Turn a rule
+on as [Duplicates](duplicates.md) describes. A dry run matches only records that are already
+there: a person an earlier row of the same file creates is found by the rule above, never by a
+duplicate rule, so the commit can match a few more rows than the dry run did.
+
 **Your own fields.** The column list includes the fields your org added to people (contacts)
 and organizations (accounts), and the standard ones not already listed, wherever you may edit
 them. Fields Salesforce calculates (formulas, roll-ups, auto numbers), lookups to other records
 and the fields BarnCRM keeps for itself are not listed. A value is converted to the field's
 type (a checkbox takes Yes, True or 1; a date is written 2026-10-12), and a value the field
 cannot take is skipped and named in the run log.
+
+## 9. Loading one object
+
+Not every file is people. A spreadsheet of program sessions, a corrected export of one of your
+own objects, or volunteer hours from a sign-in sheet each describe one kind of record. **Load
+one object** loads a file into a single object, including your org's own custom objects, with
+the same dry run, results, journal and undo as any import.
+
+1. Open the **Import** tab and select **Load one object**.
+2. Choose the object from the list, give the mapping a name (for example "Program sessions"),
+   and select **Create**. The new mapping is chosen for you. Select **Next**.
+3. Upload the file. Each column is matched to the field whose label or API name is its heading;
+   anything else is **Do not load**. Change any column from the picker, which lists the fields
+   of that object you may create or edit.
+4. For a column that fills a lookup (a field that points at another record), a second picker
+   says how the file names that record: **Salesforce record ID** (the default), the record's
+   name, or one of its ID fields marked External ID or Unique.
+5. On the next step choose what each row does:
+
+| Choice | What it does | What it risks |
+|---|---|---|
+| **Insert** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
+| **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
+| **Upsert by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
+
+   Also choose what happens when a lookup finds no record: **Reject the row** (the default) or
+   **Leave it empty** and load the rest of the row. When a lookup or an upsert finds more than
+   one record, the **When more than one record matches** choice applies, as in section 8.
+6. Select **Dry run**, read the results, and commit.
+
+**Which objects are listed.** Your org's own custom objects, and the standard objects
+Salesforce treats as business records (ones you can find in global search), where you
+may create or edit records. Never listed, whatever your access:
+
+- Salesforce setup and security: users, groups, queues, profiles, roles, permission sets and
+  their assignments, record types, licenses and the organization itself. Manage those in Setup.
+- Custom settings, custom metadata, platform events, and history, sharing and feed records.
+- BarnCRM's own bookkeeping (import mappings, imports, import rows and journals, the error log,
+  setting changes, automation settings, rollup definitions) and household membership rows,
+  which households manage themselves. With Giving, receipts, receipt runs, receipt number
+  series and acknowledgments are never listed either.
+
+**People and organizations load by Update only.** Contacts and accounts can be updated by record
+ID, for example to load back an export you corrected in Excel, but not inserted or upserted
+here: new people, households and organizations come in through a people mapping, which builds
+their households.
+
+**Fields that are never written**, even when listed in your file: fields Salesforce fills in
+(created and modified dates, IDs), formulas, roll-ups and auto numbers, every field a BarnCRM
+rollup writes, the fields BarnCRM keeps on households and people, and a household's name. A
+column mapped to one of them is named in the run log and skipped. A field you may not edit is
+skipped and named the same way.
+
+**A row is one record.** A value its field cannot take (a date Salesforce cannot read, letters
+in a number, text longer than the field) rejects the whole row with the field and the value,
+rather than loading the rest of it. A row naming the same record as an earlier row of the file
+(the same ID, or the same external ID) is rejected too: fix the duplicate and load it again.
+Under **Match only**, a row that would create a record is rejected. A value for every row
+cannot be the record ID or the upsert ID field.
+
+**Undo** works as in section 5. It deletes the records the import created (keeping any that
+someone has edited or added a record to since) and puts back the values it changed.
+
+## 10. Changing values as they load
+
+A file from another system rarely says things the way your database does: names in capitals,
+"St." where you write "Street", dates written day first, a first and a last name in two columns
+you want as one. You can fix these in the mapping instead of in the spreadsheet, so the next
+file of the same kind is fixed too.
+
+1. On the columns step, select **Change values** beside a column.
+2. Select **Add a change** and pick one. Changes run in the order listed, and you can add up
+   to ten to one column:
+
+| Change | What it does | Example |
+|---|---|---|
+| **Remove extra spaces** | Removes spaces at the start and end, and turns several spaces in a row into one. | `  Ana   Ramirez ` becomes `Ana Ramirez` |
+| **All capitals** | Writes every letter as a capital. | `ca` becomes `CA` |
+| **All lower case** | Writes every letter small. | `ANA@EXAMPLE.ORG` becomes `ana@example.org` |
+| **Capitalize each word** | A capital at the start of each word, the rest small. | `RAMIREZ-LOPEZ` becomes `Ramirez-Lopez` |
+| **Find and replace** | Replaces text you type with other text. Tick **Whole value only** to replace only a value that is exactly that text, and **Match capitals** to tell `ca` from `CA`. | `St.` becomes `Street`; with Whole value only, `CA` becomes `California` |
+| **Value when empty** | Gives the cell a value when it is empty. | an empty cell becomes `Unknown` |
+| **Add other columns** | Adds the values of other columns of the same row after this one, with a separator you choose (a space unless you type another). An empty one is left out. | `Ana` with Middle and Last becomes `Ana M Ramirez` |
+| **Read as a date** | Reads a date written month first, day first or year first, with any separator, and writes it the way Salesforce reads it. A two-digit year below 50 is in the 2000s. | day first: `31/12/2025` becomes `2025-12-31` |
+
+3. The panel shows the first values of the column before and after your changes. Select
+   **Done**. The column shows how many changes it has.
+4. Select **Dry run**. The results show, for the first rows of the file, each changed value
+   before and after, under **Changed values**. Matching uses the changed values, so a person's
+   email made lower case is matched as lower case.
+
+The changes are saved with the mapping, like the columns, so the next file starts with them.
+They run before **Values for every row**: a column a change leaves empty is then filled by the
+file's value for every row, if you gave one. A change never runs code and never reads a record:
+it only rearranges the text of the row. A date that cannot be read the way you chose is left as
+it was, and the field then refuses it as it would any value it cannot take (a one-object load
+rejects the row; a people load skips the value and names it in the run log).
 
 ## Fields the BarnCRM Admin role can import
 
@@ -406,7 +542,9 @@ For building a report on your imports.
 | Why an import failed as a whole | Import Batch | Run Log |
 | One row of the file | Import Row | Row Number, Status, Error Message |
 | Rows that matched more than one record | Import Row | Several Matches |
-| How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches |
+| How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches, Use Duplicate Rules |
+| Rows your duplicate rules matched | Import Row | Matched By Duplicate Rule |
+| How a mapping changes values as they load | Import Template | Column Mapping (each column's changes) |
 | The values given to every row of a file | Import Batch | File Values |
 | Whether a file only matched existing records | Import Batch | Match Only |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
@@ -415,3 +553,5 @@ For building a report on your imports.
 | Which mappings are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
 | When an import can be undone until | Import Batch | Undo Deadline |
 | What an import changed on existing records, and what an undo kept | Import Journal | Phase, Entry Count, Entries |
+| The records an import that loaded one object created | Import Journal (Phase Created), Import Row | Entries; Resulting Record |
+| What a mapping that loads one object loads, and how | Import Template | Target Object, Load Operation, Load Match Field, Lookup Not Found |

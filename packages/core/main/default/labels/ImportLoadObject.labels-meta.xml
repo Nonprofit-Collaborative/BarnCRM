@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_ErrorObjectTemplateName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the new mapping has no name</shortDescription>
+        <value>Give the mapping a name.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RecordIdOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the record ID choice for a column or lookup</shortDescription>
+        <value>Salesforce record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorObjectNoAccess</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the user lacks the object access the load needs</shortDescription>
+        <value>You cannot read, create or edit {0} as this mapping needs. Ask your Salesforce administrator for access, or choose another action for each row.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorPeopleUpdateOnly</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: accounts and contacts load by update only</shortDescription>
+        <value>{0} can only be updated by record ID here. Add new people and organizations with a people mapping, which also builds their households.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorNothingMapped</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no column is mapped to a field of the object</shortDescription>
+        <value>No column is mapped to a field of the object. Map at least one column in the columns step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorIdColumnMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: update by record ID has no record ID column</shortDescription>
+        <value>Update by record ID needs a column mapped to Salesforce record ID.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyFieldRequired</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: upsert has no external ID field chosen</shortDescription>
+        <value>Upsert by external ID needs the external ID field rows are matched on. Choose it in the matching step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyFieldUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the chosen upsert field cannot be used</shortDescription>
+        <value>Rows cannot be matched on {0}: it is not an external ID text field of this object that you can read. Choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyColumnMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no column is mapped to the upsert field</shortDescription>
+        <value>Upsert by external ID needs a column mapped to {0}, the field rows are matched on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyForEveryRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a value for every row names the record</shortDescription>
+        <value>A value for every row cannot be {0}: every row would then name the same record. Map {0} to a column of the file instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorValueTooLong</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a value is longer than its field holds</shortDescription>
+        <value>The value for {0} is longer than the {1} characters it holds. Shorten it and load the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorValueUnreadable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a value cannot be read as its field type</shortDescription>
+        <value>"{1}" is not a value {0} accepts. Fix the cell and load the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRowEmpty</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the row has no value in any mapped column</shortDescription>
+        <value>This row has no value in any mapped column, so there is nothing to load.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordIdWrongObject</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the record ID is of another object</shortDescription>
+        <value>"{0}" is the ID of another kind of record, not of {1}. Check the Salesforce record ID column.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordNotFound</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no record the user can see has the ID</shortDescription>
+        <value>No record you can see has this ID. Check the ID, or ask your Salesforce administrator for access to the record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRecordRepeated</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: an earlier row names the same record</shortDescription>
+        <value>An earlier row of this file names the same record. Keep one of the rows, or load the other in a file of its own.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorKeyMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the row has no value in the upsert field</shortDescription>
+        <value>This row has no {0}, which the upsert matches rows on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralRecords</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: several records hold the row's external ID</shortDescription>
+        <value>More than one record has this row's external ID, and the mapping says to reject such a row. Fix the duplicates, or choose Use the most recently changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorLookupNotFound</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a lookup value finds no record</shortDescription>
+        <value>No record you can see matches "{1}" for {0}. Check the value or the field it is found by, or choose Leave it empty to load the rest of the row.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorLookupSeveral</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: a lookup value finds several records</shortDescription>
+        <value>More than one record matches "{1}" for {0}, and the mapping says to reject such a row. Find it by a unique field, or choose Use the most recently changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchOnlyWouldCreate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: match only, and the row would create a record</shortDescription>
+        <value>No record matches this row, and this file only matches, so nothing was created. To create it, untick Match only and load the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogFieldProtected</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: a mapped field is never written</shortDescription>
+        <value>Not loaded: {0} is kept by BarnCRM or by Salesforce and is never imported over.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupLeftEmpty</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: some lookups were left empty</shortDescription>
+        <value>Some rows name no record you can see for {0}. They were loaded with it left empty, as the mapping says.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupPolymorphic</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: a lookup to several objects is read by ID</shortDescription>
+        <value>{0} can point at more than one kind of record, so it is read by Salesforce record ID only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogLookupFieldUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object run log: a lookup's chosen field cannot be searched</shortDescription>
+        <value>{0} is found by {1}, which you cannot search by, so no record was found for it. Choose another field in the columns step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_UndoKeptNotCreatedByImport</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Undo: a journaled record was not created by this import's commit</shortDescription>
+        <value>Kept: this record was not created by the person who ran this import while it ran, so the undo left it in place.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: heading and button of the one-object mapping section</shortDescription>
+        <value>Load one object</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a one-object mapping is for</shortDescription>
+        <value>For a file that is not a list of people: program sessions, volunteer hours, or a corrected export of one of your objects.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for the object a new mapping loads</shortDescription>
+        <value>Object</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectNameLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: name of a new one-object mapping</shortDescription>
+        <value>Mapping name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadObjectCreateButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: button that creates a one-object mapping</shortDescription>
+        <value>Create</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for the field a lookup column names its record by</shortDescription>
+        <value>Find it by</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadOperationLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for what each row does to the object</shortDescription>
+        <value>What each row does</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationInsert</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Insert load operation</shortDescription>
+        <value>Insert</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationUpdate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Update by record ID load operation</shortDescription>
+        <value>Update by record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OperationUpsert</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Upsert by external ID load operation</shortDescription>
+        <value>Upsert by external ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadInsertHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Insert does and risks</shortDescription>
+        <value>Creates a new record for every row. Risk: loading the same file twice creates every record twice.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadUpdateHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Update by record ID does and risks</shortDescription>
+        <value>Changes the record whose Salesforce record ID is in the row; map that column to Salesforce record ID. Nothing is created. Risk: a wrong ID changes the wrong record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadUpsertHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Upsert by external ID does and risks</shortDescription>
+        <value>Finds the record by the ID field you choose and changes it, or creates one when no record has that value. Risk: a value typed into the wrong row changes the wrong record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadMatchFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: picker for the external ID field an upsert matches on</shortDescription>
+        <value>Match rows on</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadNoKeyFields</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the object has no external ID field to upsert on</shortDescription>
+        <value>This object has no field marked External ID that you can read, so rows cannot be upserted. Choose another action.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupNotFoundLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a row does when a lookup finds no record</shortDescription>
+        <value>When a lookup finds no record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupRejectOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: option to reject a row whose lookup finds nothing</shortDescription>
+        <value>Reject the row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupLeaveEmptyOption</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: option to load a row with the lookup left empty</shortDescription>
+        <value>Leave it empty</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupRejectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what rejecting a row with a missing lookup risks</shortDescription>
+        <value>The row is rejected and listed with the reason. Risk: you fix those rows and load them again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LookupLeaveEmptyHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what leaving a missing lookup empty risks</shortDescription>
+        <value>The row loads without that lookup, and the run log says so. Risk: records arrive without the link you meant them to have.</value>
+    </labels>
+</CustomLabels>

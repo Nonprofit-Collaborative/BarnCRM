@@ -1019,6 +1019,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Duplicate_Rule_Match__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Import_Template__c.Active__c</field>
     <readable>true</readable>
@@ -1101,6 +1106,31 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Import_Template__c.Several_Matches__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Target_Object__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Load_Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Load_Match_Field__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Lookup_Not_Found__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Use_Duplicate_Rules__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
