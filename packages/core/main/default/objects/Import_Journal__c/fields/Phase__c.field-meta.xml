@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Phase__c</fullName>
-  <description>Whether this page records the import or the undoing of it.</description>
+  <description>Whether this page records the changes an import made, the records an import that loads one object created, or the undoing of it.</description>
   <label>Phase</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
@@ -14,6 +14,11 @@
         <fullName>Commit</fullName>
         <default>true</default>
         <label>Commit</label>
+      </value>
+      <value>
+        <fullName>Created</fullName>
+        <default>false</default>
+        <label>Created</label>
       </value>
       <value>
         <fullName>Undo</fullName>

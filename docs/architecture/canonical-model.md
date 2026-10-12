@@ -1267,6 +1267,10 @@ Maria load the same payment processor export every month without rebuilding the 
 | Payment Matching | picklist(Always create, Match or create, Match only, Never match) | no | Whether an imported record pays a scheduled payment it matches (used by modules that load payments; with Giving, a gift matched to a payment the donor already owes); empty means Match or create (R-IT7, R-DM5). |
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
+| Target Object | text | no | The API name of the one object this template loads, as describe gives it; empty for a template that loads people and organizations (R-IT12). |
+| Load Operation | picklist(Insert, Update by record Id, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
+| Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; required then (R-IT12). |
+| Lookup Not Found | picklist(Reject the row, Leave it empty) | no | What a row of a one-object template does when a lookup column finds no record; empty means Reject the row (R-IT13). |
 
 ### Relationships
 
@@ -1296,7 +1300,13 @@ processor-specific templates (plan Section 4.9).
 ```
 
 Targets are written as `Entity.Attribute` using the row entity names in R-IR1, so a
-template can be read without knowing the object model.
+template can be read without knowing the object model. A one-object template (R-IT12) uses
+the one entity `Record`, whose attributes are the target object's field API names, and a
+lookup column may carry `"lookupField"`, the parent field it names its parent by (R-IT13):
+
+```
+{ "source": "Program", "target": "Record.Program__c", "lookupField": "Program_Code__c" }
+```
 
 **R-IT2 Matching rules in plain language.** The wizard states what each matching rule
 does and what it risks, for example that "Name plus postal code" merges two people who
@@ -1348,6 +1358,77 @@ it lists Contact fields in contact terms, which R-IT3 translates in Person Accou
 organizations it lists Account fields that are not person account fields. Values are written
 as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
 value with a blank, and a field the user may not write is skipped and named in the run log.
+
+**R-IT12 A template that loads one object.** A template with a Target Object loads each row
+as one record of that object (ADR-NEXT, `NEXT-import-load-one-object.md`), through the same
+batch, dry run, results, journal and undo as any import, in the running user's own access. The
+object and every field come from the running user's describe, when the template is saved and
+in every chunk. Load Operation decides what a row does:
+
+- **Insert** creates one record per row.
+- **Update by record Id** changes the record named by the row's `Record.Id`. An ID that is not
+  a valid ID of the target object, or names no record the user can see, rejects the row, and
+  nothing is created for it.
+- **Upsert by external ID** finds the record whose Load Match Field (a field the object marks
+  External ID, holding text or an email, that the user may read) holds the row's value,
+  compared ignoring case; it changes that record, or creates one when none holds the value. A
+  row with no value in the field is rejected. A value several records hold follows Several
+  Matches (R-IT9).
+
+The loader reads the existing records itself, in user mode, and never calls the platform's
+upsert, so the dry run decides exactly as the commit will and the journal holds each value
+before. An update writes only the values that differ from the record's, and a row that changes
+nothing is Matched. A value its field cannot take (a date or number that cannot be read, a
+checkbox value that is neither yes nor no, text longer than the field) rejects the row, naming
+the field and the value, because a row is one record. A row naming the same record as an
+earlier row of the file (the same ID or upsert value) is rejected wherever the file's chunks
+fall, through a digest in its Processor Key (Section 17). Under Match only (R-IB15) a row that
+would create a record is rejected. A value for every row of the file (R-IB14) may not be the
+record ID or the Load Match Field. Each row's resulting record is written to its Resulting
+Record. A row a save refuses carries the platform's words. Account and Contact load by Update
+by record Id only (R-IT14).
+
+**R-IT13 Lookup columns.** A column mapped to a lookup field of the target object names its
+parent by the column's `lookupField` (R-IT1): the record ID when it is empty or `Id`, or else
+the parent's name field or one of the parent's External ID or Unique fields that holds text or
+an email and that the user may read. A lookup that can point at more than one object is read by
+record ID only. Parents are found in user mode, one query per column and chunk, and a parent the
+user cannot see is not found. When none is found, Lookup Not Found decides: Reject the row (the
+default), naming the column and the value, or Leave it empty, loading the rest of the row and
+saying once in the run log that lookups were left empty. A value that finds several parents
+follows Several Matches (R-IT9) and ticks the row's Several Matches.
+
+**R-IT14 What a load may write.** An object may be loaded only when all of these hold, decided
+from describe at run time, so a new object is judged without a code change:
+
+1. It is a custom object, not a custom setting, custom metadata, platform event, big object or
+   external object; or a standard object that describe calls layoutable, searchable and
+   queryable.
+2. Its name does not end in Share, History, Feed or ChangeEvent.
+3. It is not a Salesforce setup or security object: User, Group, GroupMember, QueueSobject,
+   Profile, UserRole, PermissionSet, PermissionSetAssignment, PermissionSetGroup,
+   PermissionSetGroupComponent, PermissionSetLicenseAssign, SetupEntityAccess,
+   ObjectPermissions, FieldPermissions, RecordType, Organization, UserLicense,
+   UserPackageLicense, NetworkMember.
+4. It is not the package's own bookkeeping (`Import_Template__c`, `Import_Batch__c`,
+   `Import_Row__c`, `Import_Journal__c`, `Error_Log__c`, `Setting_Change__c`,
+   `Automation_Setting__c`, `Rollup_Definition__c`), not `Household_Member__c` (membership is
+   written only through the household service, R-M5), and not an object a dependent package
+   names through the data protection seam (`DataProtectionExtension`; Giving names receipts,
+   receipt runs, receipt number sequences, acknowledgments and acknowledgment runs).
+5. The user can read it and query it, and can create records of it for Insert, edit them for
+   Update, or both for Upsert.
+
+Account and Contact may be loaded only by Update by record Id: people, households and
+organizations are created by a people template, which builds households (R-IR1a).
+
+These fields are never written, whatever the file holds: the fields the platform keeps (Id,
+created and modified stamps, system mod stamp, last activity, viewed and referenced dates),
+formula and auto number fields, every Rollup Definition target on the object, the batch tag
+(R-IB3), any package field whose name ends in Last Calculated, the household fields the household
+automation keeps on accounts and contacts, and a household's Name. A column mapped to one is
+named once in the run log and skipped; so is a field the user may not create or edit, asked of
+describe for each row according to whether it creates or updates.
 
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
@@ -1435,12 +1516,20 @@ from Nonprofit Cloud", section 5).
 | Payment Matching (labelled Donation Matching, API name `Donation_Matching__c`, before v0.6) | `Payment_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
+| Target Object | `Target_Object__c` | Text (255) |
+| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Upsert by external ID |
+| Load Match Field | `Load_Match_Field__c` | Text (255) |
+| Lookup Not Found | `Lookup_Not_Found__c` | Picklist: Reject the row, Leave it empty |
 
 - **Shipped defaults:** `Import_Template_Default__mdt` (Section 13).
 - **Service:** `ImportTemplateService` (materialization and save), `ImportTemplateSelector`,
   `ImportMapping` (the mapping document in R-IT1), `ImportColumnLibrary` (the known column
   names automatic mapping suggests from), LWC `importWizard` (where a template is marked
   recurring), `HubController` and LWC `hubHome` (the recurring sources list, R-IT6).
+  One-object templates (R-IT12 to R-IT14): `ImportObjectSchema` (the objects, fields, keys and
+  parents describe offers, and reading a value as its field's type), `ImportObjectLoader` (one
+  chunk), `DataProtectedFields` with the `DataProtectionExtension` seam and
+  `DataProtectionExtensions` (what a load never writes), LWC `importLoadOptions`.
 
 ---
 
@@ -1537,8 +1626,9 @@ after the deadline is refused, in a sentence naming the date it passed.
    a status, a name or a user to decide what to delete, and there is no undo of more than one
    batch. A flag can be true of records nobody meant to include; a batch identifier cannot.
 2. **Counted, shown, then confirmed.** The first step counts what carries the tag, by kind
-   (people, households, organizations, and each object an entity processor tags, R-IB9), and
-   shows those numbers with the batch's name and file name. The undo starts only when the number the person confirms is still the number
+   (people, households, organizations, and each object an entity processor tags, R-IB9), adds
+   the records a one-object load journaled as created (R-IT12, Section 17A) under that object's
+   plural label, and shows those numbers with the batch's name and file name. The undo starts only when the number the person confirms is still the number
    counted, so it can only delete a set somebody has seen the size of.
 3. **Once.** The batch's status moves from Complete to Undoing inside a locked read of the
    batch, so a second request, while the first runs or after it has finished, is refused
@@ -1560,7 +1650,12 @@ after the deadline is refused, in a sentence naming the date it passed.
   them, and the organizations it created. The tag is written when the record is created and
   never afterwards, so a record the batch matched or updated cannot be in scope. People are
   deleted first, then accounts, so a household can be judged after its imported members are
-  gone.
+  gone. A one-object load (R-IT12) tags nothing, because its object has no tag: the records it
+  created are named on the batch's Created journal pages (Section 17A) and deleted in a pass of
+  their own, after the values are put back and before any module's pass. A journaled record is
+  deleted only when it was created by the committer between the commit's start and its
+  completion; any other is kept and journaled, so a journal entry can never delete somebody
+  else's record. The checks below apply to these records as to tagged ones.
 - **It keeps a tagged record that has gained something since.** A tagged record is kept,
   counted and journaled with the reason, when:
   - any record points at it through any reference the org can filter on (a gift, a soft
@@ -1820,7 +1915,7 @@ processor resolves those in dependency order.
 | Contact 2 | reference(Contact) | computed | The second person, where people are Contacts. |
 | Person 2 Account | reference(Organization) | computed | The second person, where people are person Accounts. |
 | Organization | reference(Organization) | computed | The organization this row resolved to. |
-| Gift | text | computed | The gift this row resolved to, held as a record identifier (R-IR2). |
+| Gift | text | computed | The gift this row resolved to, held as a record identifier (R-IR2); for a one-object template, the record the row created, updated or matched (R-IT12). Labelled Resulting Record. |
 | Soft Credit | text | computed | The soft credit this row resolved to, held as a record identifier (R-IR2). |
 | Person 1 Key | text | computed | In a dry run only, a digest of the matching key of the first person this row would create, so later chunks count that person once (R-IB12). Cleared when the row is processed again. |
 | Person 2 Key | text | computed | The same for the second person. |
@@ -1829,7 +1924,7 @@ processor resolves those in dependency order.
 | Organization Key | text | computed | The same for the organization this row would create. |
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
 | Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
-| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. |
+| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12). |
 
 ### Relationships
 
@@ -1843,7 +1938,9 @@ processor resolves those in dependency order.
 `Household`, `Contact1`, `Contact2`, `Organization`, `Affiliation`, `Gift`, `Allocation`,
 `SoftCredit` and `Tribute` in the template's mapping document, and they are resolved in
 dependency order: organization, household, people, membership and affiliation, gift,
-allocations, soft credit, tribute. Resolution is idempotent per row (R-IB4).
+allocations, soft credit, tribute. Resolution is idempotent per row (R-IB4). A row of a
+one-object template (R-IT12) is read as the one entity `Record` instead, and none of the
+others.
 
 **R-IR1a What a row means for households.** A row is one household. The row's first
 person is saved first and is given a household by the ordinary creation path (R-H1 in
@@ -1978,7 +2075,7 @@ undo left in place and why (feature C-19).
 |---|---|---|---|
 | Name | text | computed | The journal page's identifier, assigned automatically. |
 | Import Batch | reference(Import Batch) | yes | The import this page belongs to. |
-| Phase | picklist(Commit, Undo) | yes | Whether this page records the import or the undoing of it. |
+| Phase | picklist(Commit, Created, Undo) | yes | Whether this page records the changes an import made, the records a one-object import created (R-IJ3), or the undoing of it. |
 | Entry Count | integer | yes | How many entries this page holds, so a total is a sum rather than a parse. |
 | Entries | long text | yes | The entries themselves, held as one document per page (R-IJ2). |
 
@@ -2010,15 +2107,20 @@ a date as `YYYY-MM-DD`), so a value put back is the value that was there.
     { "action": "Kept", "object": "Account", "id": "001...", "label": "The Smith Family",
       "reason": "A person this import did not create is in this household." },
     { "action": "NotRestored", "object": "Contact", "id": "003...", "field": "Email",
-      "reason": "Changed since the import." }
+      "reason": "Changed since the import." },
+    { "action": "Created", "object": "Program_Session__c", "id": "a01...", "row": 14 }
   ]
 }
 ```
 
-**R-IJ3 What is journaled.** A commit journals updates only: the attributes a row changed on
+**R-IJ3 What is journaled.** A commit journals updates: the attributes a row changed on
 a record the import did not create, with the value before and the value written, in full. A
-created record needs no entry because it carries the tag (R-IB3), and a matched or rejected
-row changed nothing and is recorded on its staged row (Section 17). An undo journals the
+record a people import created needs no entry because it carries the tag (R-IB3), and a
+matched or rejected row changed nothing and is recorded on its staged row (Section 17). A
+one-object import (R-IT12) creates records of an object with no tag, so each record it
+creates is journaled as a Created entry (object, ID, file row) on pages of their own, Phase
+Created, at most 100 to a page so an undo deletes one page inside one transaction's limits;
+the undo reads them as R-IB9 says. An undo journals the
 records it kept and the values it did not put back, each with its reason; the records it
 deleted are counted in the Run Log rather than listed, because the recycle bin lists them.
 
@@ -2039,12 +2141,13 @@ By, Started At and Completed At.
 | Attribute | API name | Type |
 |---|---|---|
 | Import Batch | `Import_Batch__c` | Master-Detail to `Import_Batch__c` |
-| Phase | `Phase__c` | Picklist: Commit, Undo |
+| Phase | `Phase__c` | Picklist: Commit, Created, Undo |
 | Entry Count | `Entry_Count__c` | Number |
 | Entries | `Entries_JSON__c` | Long Text Area |
 
 - **Service:** `ImportJournalService` (writes and reads pages), `ImportRowProcessor` (writes
-  the commit phase), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
+  the commit phase), `ImportObjectLoader` (writes the commit and created phases of a one-object
+  import), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
 
 ---
 
@@ -5560,3 +5663,4 @@ is the place that reprioritization is recorded permanently; this table follows i
 | v0.6 | 2026-10-12 | Import first names (ADR-NEXT, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
 | v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-NEXT, `NEXT-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
 | v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-NEXT, `NEXT-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
+| v0.7 | 2026-10-12 | C-33 load one object (ADR-NEXT, `NEXT-import-load-one-object.md`). `Import_Template__c` gains `Target_Object__c`, `Load_Operation__c`, `Load_Match_Field__c` and `Lookup_Not_Found__c`; `Import_Journal__c.Phase__c` gains Created. R-IT12 (a template that loads one object: insert, update by record Id, upsert by external ID), R-IT13 (lookup columns by ID, name or a unique field) and R-IT14 (the allow-list of objects and the fields never written) added. R-IT1 gains the `Record` entity and `lookupField`; R-IR1, R-IB8, R-IB9 and R-IJ3 say how a one-object import's creations are journaled and undone; Import Row's Resulting Record and Processor Key serve one-object rows. |

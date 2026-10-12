@@ -9,6 +9,8 @@ you say how a row should be matched against records you already have, and then y
 **dry run** that tells you exactly what would be created, updated, matched, or rejected
 before anything is written. When the preview looks right you commit it, and the results
 screen tells you what happened, row by row, including every row that failed and why.
+A file that describes one kind of record, such as program sessions or one of your own custom
+objects, loads through **Load one object** (section 9).
 
 Every record an import creates is tagged with the import it came from, so six months
 later you can still answer "where did these 400 households come from".
@@ -144,7 +146,9 @@ Three things are worth knowing about it.
 
 An import you regret can be undone for 30 days after you commit it. Undo removes the
 people, households and organizations that import created (and, with Giving, its gifts), and
-puts back the values it changed on records you already had. It does not touch anything else.
+puts back the values it changed on records you already had. An import that loaded one object
+(section 9) has the records it created removed the same way, counted under that object's name.
+It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).
 
@@ -302,6 +306,19 @@ organization's. Map the column to the right one, or fix the ID.
 so a row whose person or organization is not already in Salesforce is rejected instead of
 creating them. If those rows are new people, untick **Match only** and load them again.
 
+**Load one object: "No record ... was found for" a lookup.** The value in a lookup column did
+not find a record by the field that column names its parent by (section 9, step 4). Check the
+value, or choose a different field in the column's second picker, or choose **Leave it empty**
+to load the row without the lookup.
+
+**Load one object: the object you want is not listed.** It is a setup or security object, one
+of BarnCRM's own, or one you may not create or edit records of (section 9, "Which objects are
+listed"). Ask your Salesforce administrator for access, or use Setup for setup objects.
+
+**Load one object: "This row names the same record as an earlier row".** Two rows of the file
+have the same record ID, or the same value in the upsert ID field. Only the first is loaded;
+merge the two rows in the spreadsheet and load the second again if it held something new.
+
 ## 8. How rows are matched, and values for every row
 
 The matching step of the wizard holds the choices below. How people and organizations are
@@ -372,6 +389,68 @@ and the fields BarnCRM keeps for itself are not listed. A value is converted to 
 type (a checkbox takes Yes, True or 1; a date is written 2026-10-12), and a value the field
 cannot take is skipped and named in the run log.
 
+## 9. Loading one object
+
+Not every file is people. A spreadsheet of program sessions, a corrected export of one of your
+own objects, or volunteer hours from a sign-in sheet each describe one kind of record. **Load
+one object** loads a file into a single object, including your org's own custom objects, with
+the same dry run, results, journal and undo as any import.
+
+1. Open the **Import** tab and select **Load one object**.
+2. Choose the object from the list, give the mapping a name (for example "Program sessions"),
+   and select **Create**. The new mapping is chosen for you. Select **Next**.
+3. Upload the file. Each column is matched to the field whose label or API name is its heading;
+   anything else is **Do not load**. Change any column from the picker, which lists the fields
+   of that object you may create or edit.
+4. For a column that fills a lookup (a field that points at another record), a second picker
+   says how the file names that record: **Salesforce record ID** (the default), the record's
+   name, or one of its ID fields marked External ID or Unique.
+5. On the next step choose what each row does:
+
+| Choice | What it does | What it risks |
+|---|---|---|
+| **Insert** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
+| **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
+| **Upsert by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
+
+   Also choose what happens when a lookup finds no record: **Reject the row** (the default) or
+   **Leave it empty** and load the rest of the row. When a lookup or an upsert finds more than
+   one record, the **When more than one record matches** choice applies, as in section 8.
+6. Select **Dry run**, read the results, and commit.
+
+**Which objects are listed.** Your org's own custom objects, and the standard objects
+Salesforce treats as business records (ones with page layouts that you can search), where you
+may create or edit records. Never listed, whatever your access:
+
+- Salesforce setup and security: users, groups, queues, profiles, roles, permission sets and
+  their assignments, record types, licenses and the organization itself. Manage those in Setup.
+- Custom settings, custom metadata, platform events, and history, sharing and feed records.
+- BarnCRM's own bookkeeping (import mappings, imports, import rows and journals, the error log,
+  setting changes, automation settings, rollup definitions) and household membership rows,
+  which households manage themselves. With Giving, receipts, receipt runs, receipt number
+  series and acknowledgments are never listed either.
+
+**People and organizations load by Update only.** Contacts and accounts can be updated by record
+ID, for example to load back an export you corrected in Excel, but not inserted or upserted
+here: new people, households and organizations come in through a people mapping, which builds
+their households.
+
+**Fields that are never written**, even when listed in your file: fields Salesforce fills in
+(created and modified dates, IDs), formulas, roll-ups and auto numbers, every field a BarnCRM
+rollup writes, the fields BarnCRM keeps on households and people, and a household's name. A
+column mapped to one of them is named in the run log and skipped. A field you may not edit is
+skipped and named the same way.
+
+**A row is one record.** A value its field cannot take (a date Salesforce cannot read, letters
+in a number, text longer than the field) rejects the whole row with the field and the value,
+rather than loading the rest of it. A row naming the same record as an earlier row of the file
+(the same ID, or the same external ID) is rejected too: fix the duplicate and load it again.
+Under **Match only**, a row that would create a record is rejected. A value for every row
+cannot be the record ID or the upsert ID field.
+
+**Undo** works as in section 5. It deletes the records the import created (keeping any that
+someone has edited or added a record to since) and puts back the values it changed.
+
 ## Fields the BarnCRM Admin role can import
 
 Salesforce controls standard fields one by one, and a person with only a minimal profile
@@ -412,3 +491,5 @@ For building a report on your imports.
 | Which mappings are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
 | When an import can be undone until | Import Batch | Undo Deadline |
 | What an import changed on existing records, and what an undo kept | Import Journal | Phase, Entry Count, Entries |
+| The records an import that loaded one object created | Import Journal (Phase Created), Import Row | Entries; Resulting Record |
+| What a mapping that loads one object loads, and how | Import Template | Target Object, Load Operation, Load Match Field, Lookup Not Found |

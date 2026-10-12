@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Lookup_Not_Found__c</fullName>
+  <description>What a row of a template that loads one object does when a lookup column finds no record. Empty means Reject the row (canonical model R-IT13).</description>
+  <inlineHelpText>What happens when a lookup column finds no record.</inlineHelpText>
+  <label>Lookup Not Found</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Reject the row</fullName>
+        <default>true</default>
+        <label>Reject the row</label>
+      </value>
+      <value>
+        <fullName>Leave it empty</fullName>
+        <default>false</default>
+        <label>Leave it empty</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>
