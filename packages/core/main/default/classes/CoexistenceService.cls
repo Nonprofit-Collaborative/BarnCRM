@@ -260,8 +260,8 @@ public with sharing class CoexistenceService {
      * great many person accounts does not count every one of them against the query row limit.
      */
     public static Integer countPeopleStoredAsAccounts(Integer cap) {
-        Set<Id> personTypes = OrgShapeDetector.personAccountRecordTypeIds();
-        if (personTypes == null || personTypes.isEmpty()) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        if (personTypes.isEmpty()) {
             return 0;
         }
         if (cap != null) {

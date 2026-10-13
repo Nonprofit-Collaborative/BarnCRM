@@ -504,4 +504,22 @@ private class OrgShapeDetectorTest {
         shape.hasIndustriesNonprofit = hasIndustriesNonprofit;
         return shape;
     }
+
+    @IsTest
+    static void personRecordTypeIdsReadsTheDetectedShape() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.OrgShape shape = shapeWith(false, true, false);
+            Id typeId = Id.valueOf('012000000000999');
+            shape.personAccountRecordTypeIds = new Set<Id>{ typeId };
+            OrgShapeDetector.overrideShape = shape;
+
+            Assert.isTrue(OrgShapeDetector.personRecordTypeIds().contains(typeId));
+
+            OrgShapeDetector.overrideShape = shapeWith(false, false, false);
+            Assert.isTrue(
+                OrgShapeDetector.personRecordTypeIds().isEmpty(),
+                'Never null, empty without person types.'
+            );
+        }
+    }
 }

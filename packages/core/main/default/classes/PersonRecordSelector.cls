@@ -6,16 +6,11 @@
  * read with SObject.get. It is the only class in Core that does this, and it runs only
  * when HouseholdService.isPersonAccountOrg() is true.
  *
- * How a person is told apart from an organization, and what that costs: the sound test is
- * the platform's own person flag, which the CI check on standard object references
- * forbids Core to name at all, with no exemption. So this class infers it: an account
- * holds a person when the surname field both exists on the object and carries a value on
- * the record. That is right for every ordinary case, because an organization never
- * carries a surname. It is wrong in two ways worth knowing: a record read with a query
- * that did not select the surname reads as an organization, and an org that puts a value
- * in that field on a business account would be misread. Both are visible only inside this
- * class. If the check ever grows an exemption for a describe-only read of the person flag,
- * that is the one line to change.
+ * How a person is told apart from an organization: the record's record type is one the org
+ * describes as a person type (OrgShapeDetector.personRecordTypeIds). The platform's own
+ * person flag is not used, because the CI check on standard object references forbids Core
+ * to name it. A record read with a query that did not select RecordTypeId reads as an
+ * organization, which is visible only inside this class.
  *
  * There are two kinds of read here, and they are not interchangeable, exactly as in
  * HouseholdSelector. The upkeep read (getPersons) feeds the member count, the household
@@ -43,7 +38,7 @@ public with sharing class PersonRecordSelector {
 
     // detection-only: an account holds a person rather than an organization when this
     // field both exists on the object and carries a value on the record.
-    private static final String PERSON_MARKER_FIELD = 'LastName';
+    private static final String RECORD_TYPE_FIELD = 'RecordTypeId';
 
     // detection-only: the contact the platform keeps behind an account that holds a person
     // exists as a field only where the org stores people as accounts.
@@ -83,9 +78,8 @@ public with sharing class PersonRecordSelector {
     private static Map<String, HouseholdService.Person> personOverridesByName;
 
     /**
-     * True when this account record holds a person. Nothing that exists only in some orgs
-     * is named at compile time: the field is looked up by name and read from the values
-     * the record actually carries.
+     * True when this account record holds a person: its record type is a person type. The
+     * record type is read from the values the record actually carries.
      */
     public static Boolean isPersonRecord(SObject record) {
         if (record == null) {
@@ -94,22 +88,9 @@ public with sharing class PersonRecordSelector {
         if (personRecordOverride != null) {
             return personRecordOverride;
         }
-        if (!accountHasPersonMarker()) {
-            return false;
-        }
-        Object value = record.getPopulatedFieldsAsMap().get(PERSON_MARKER_FIELD);
-        return value != null && String.isNotBlank(String.valueOf(value));
-    }
-
-    private static Boolean cachedAccountHasPersonMarker;
-
-    /** One field describe per transaction, not one per record asked about (PEOPLE-40). */
-    private static Boolean accountHasPersonMarker() {
-        if (cachedAccountHasPersonMarker == null) {
-            cachedAccountHasPersonMarker = Schema.SObjectType.Account.fields.getMap()
-                .containsKey(PERSON_MARKER_FIELD);
-        }
-        return cachedAccountHasPersonMarker;
+        Object recordTypeId = record.getPopulatedFieldsAsMap().get(RECORD_TYPE_FIELD);
+        return recordTypeId != null &&
+            OrgShapeDetector.personRecordTypeIds().contains((Id) recordTypeId);
     }
 
     /**

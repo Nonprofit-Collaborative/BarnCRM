@@ -81,6 +81,13 @@ public with sharing class OrgShapeDetector {
         }
     }
 
+    /** Account record types that are person types. Empty unless Person Accounts are enabled. */
+    public static Set<Id> personRecordTypeIds() {
+        // The cheap read: no full detect(), and never null.
+        Set<Id> personTypes = personAccountRecordTypeIds();
+        return personTypes == null ? new Set<Id>() : personTypes;
+    }
+
     /**
      * What this org looks like, computed once per transaction.
      */
