@@ -55,6 +55,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>CreatePersonAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>CustomPermissionSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -75,7 +79,19 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FindPeopleAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FiscalYearSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetDataJobStatusAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GetHouseholdSummaryAction</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>

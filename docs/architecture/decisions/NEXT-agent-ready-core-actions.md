@@ -66,9 +66,15 @@ Two platform facts bear on the shape:
    directory in `sfdx-project.json`, for an administrator to deploy to their own Agentforce
    org or to copy in Agent Builder. If a packaged agent is wanted later, it is a separate
    optional extension package that depends on Core and requires Agentforce, with its own ADR.
-6. **No packaged permission set grants the four classes,** as for Record Inbound Gift: an
-   administrator grants Apex Class Access in a permission set of their own to the users and
-   agent users who may use them. A Flow calls them without it.
+6. **The packaged permission sets grant the four classes,** so no one adds Apex Class Access
+   by hand (owner decision, 2026-10-13). BarnCRM Staff and BarnCRM Admin grant all four;
+   BarnCRM Read Only grants Find People and Get Household Summary, because it reads people and
+   households but not data jobs and creates nothing. The role groups (Program Staff,
+   Volunteer Coordinator, Read Only, BarnCRM Admin Group) carry the grants through their
+   sets. The actions run in user mode, so object and field access still decides what each user
+   can do: the class grant lets an assistant call the action, never see or change more than
+   the user could by hand. Record Inbound Gift is unchanged and still needs a grant by the
+   administrator. A Flow calls the four without a grant.
 
 ## Alternatives considered
 
@@ -85,9 +91,10 @@ Two platform facts bear on the shape:
   assistant should not make.
 - **One action per object with an "operation" input.** Rejected: an assistant chooses tools
   by their descriptions, and one tool that does four things is chosen and filled badly.
-- **Grant the classes in BarnCRM Staff.** Rejected for now, as for X-03: giving an assistant
-  write access should be a decision the administrator makes. Reversible: a later release can
-  add the grant.
+- **Leave the grant to each administrator.** Rejected by the owner (2026-10-13): a manual
+  Setup step is easy to miss, and user-mode access already limits what any user can do
+  through an action. An administrator who wants an assistant limited to looking things up
+  assigns it a user with BarnCRM Read Only.
 
 ## Consequences
 
