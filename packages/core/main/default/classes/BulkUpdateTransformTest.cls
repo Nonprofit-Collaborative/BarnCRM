@@ -300,9 +300,14 @@ private class BulkUpdateTransformTest {
             );
             System.Assert.areEqual(true, BulkUpdateFields.fromText(optOut, 'Yes'));
             System.Assert.areEqual(false, BulkUpdateFields.fromText(optOut, ''));
+            System.Assert.areEqual(false, BulkUpdateFields.fromText(optOut, 'false'));
+            System.Assert.areEqual(false, BulkUpdateFields.fromText(optOut, ' No '));
+            System.Assert.areEqual(false, BulkUpdateFields.fromText(optOut, '0'));
             System.Assert.isNull(BulkUpdateFields.fromText(birthdate, ' '), 'Blank clears');
             for (
                 List<Object> refused : new List<List<Object>>{
+                    new List<Object>{ optOut, 'Y' },
+                    new List<Object>{ optOut, 'tru' },
                     new List<Object>{ birthdate, '31/12/2025' },
                     new List<Object>{ employees, 'many' },
                     new List<Object>{ employees, '12.5' },

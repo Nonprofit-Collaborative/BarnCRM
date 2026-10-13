@@ -72,6 +72,12 @@ public with sharing class DataTransform {
     private static final Integer CENTURY_PIVOT = 50;
 
     /**
+     * A letter that starts a word: one not following a letter, a digit or an apostrophe.
+     * Found by the pattern engine, so a long text costs one pass per word, not per character.
+     */
+    private static final Pattern WORD_START = Pattern.compile('(?<![\\p{L}\\p{Nd}\'])\\p{L}');
+
+    /**
      * One step. Only the parameters its operation reads are set; the field names are the keys
      * of the stored document.
      */
@@ -284,14 +290,14 @@ public with sharing class DataTransform {
         }
         String lowered = value.toLowerCase();
         List<String> result = new List<String>();
-        Boolean inWord = false;
-        for (Integer i = 0; i < lowered.length(); i++) {
-            String character = lowered.substring(i, i + 1);
-            Boolean isLetter = character.isAlpha();
-            Boolean isWordCharacter = isLetter || character.isNumeric() || character == '\'';
-            result.add(isLetter && !inWord ? character.toUpperCase() : character);
-            inWord = isWordCharacter;
+        Matcher starts = WORD_START.matcher(lowered);
+        Integer copied = 0;
+        while (starts.find()) {
+            result.add(lowered.substring(copied, starts.start()));
+            result.add(starts.group().toUpperCase());
+            copied = starts.end();
         }
+        result.add(lowered.substring(copied));
         return String.join(result, '');
     }
 

@@ -61,6 +61,28 @@ private class DataTransformTest {
         }
     }
 
+    /**
+     * Capitalize each word over long texts of 32,000 characters: the words are found by the
+     * pattern engine, not character by character. Twenty texts here, a tenth of a chunk: under
+     * 4 seconds for them is under 40 of a chunk's 60 asynchronous seconds. The message records
+     * the time, for the org run.
+     */
+    @IsTest
+    static void capitalizesLongTextsWithinAChunksTime() {
+        System.runAs(TestUsers.admin()) {
+            String longText = 'the QUICK brown fox. '.repeat(1524).left(32000);
+            Integer cpuBefore = Limits.getCpuTime();
+            String last;
+            for (Integer index = 0; index < 20; index++) {
+                last = one(step('proper'), longText);
+            }
+            Integer used = Limits.getCpuTime() - cpuBefore;
+            Assert.isTrue(last.startsWith('The Quick Brown Fox. The Quick'), last.left(40));
+            Assert.areEqual(32000, last.length(), 'Nothing lost or added.');
+            Assert.isTrue(used < 4000, 'CPU ms for 20 long texts: ' + used);
+        }
+    }
+
     @IsTest
     static void findsAndReplacesLiteralText() {
         System.runAs(TestUsers.admin()) {
