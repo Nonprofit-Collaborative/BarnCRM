@@ -909,6 +909,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
+| `Import_Row_Retention_Days__c` | integer | 90 | How many days after an import finished its staged rows are kept before the nightly Import row cleanup removes them (R-IR5, D-40). From 1 to 3650; 0 keeps them for ever; empty reads as 90, over 3650 as 3650. |
 
 ### v0.8 keys
 
@@ -2474,9 +2475,13 @@ according to the template's Person Mode, never to both (Section 4 "Person refere
 correction is made by fixing the file and re-running, not by editing the staged row, so
 the batch remains an accurate record of what was loaded.
 
-**R-IR5 Retention.** Rows are kept for the undo window and are deletable in bulk from the
-batch record, so a large import does not sit in storage forever. Undo does not read them: it
-reads the tag on the records and the journal (R-IB9, Section 17A).
+**R-IR5 Retention.** Rows are kept for `Import_Row_Retention_Days__c` days (90 unless the
+admin changes it, 0 for ever) after their batch's last pass completed (`Completed_At__c`), then
+deleted by the nightly Import row cleanup job (`ImportRowPurgeScheduler`, listed in Health
+Check's nightly jobs), so a large import does not sit in storage forever (D-40). The batch
+keeps its counts and run log. Undo does not read the rows: it reads the tag on the records and
+the journal (R-IB9, Section 17A). A batch whose rows were removed cannot be run again; a pass is
+refused, saying so.
 
 **R-IR6 Entities Core cannot resolve.** Core resolves `Organization`, `Household`,
 `Contact1`, `Contact2` and `Affiliation` (R-AF5). `Gift`, `Allocation`, `SoftCredit` and `Tribute`
@@ -6626,6 +6631,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-10, owner decision). No object or field added. R-AF5 states how a people import creates or matches the first person's affiliation with the row's organization, journaled as Created for undo; R-IR6: Core resolves the `Affiliation` entity. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-22, IMPORT-23). No object or field added. The wizard's fixed columns are served by the server with labels, adding Affiliation: role; File Reference is empty for a file over 2.5 MB. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-19, D-41). No object or field added. R-IT4: shipped import templates are added on install and on every upgrade by each package's post-install script. |
+| v0.6 | 2026-10-13 | Core quality pass, import (D-40). No object added. `BarnCRM_Settings__c` gains `Import_Row_Retention_Days__c` (v0.7 keys table, Import section). R-IR5: staged rows are deleted nightly once their batch finished more than that many days ago, and a batch without its rows cannot run again. |
 
 ---
 ## 32. Entity ownership by package

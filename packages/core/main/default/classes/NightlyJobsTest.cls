@@ -67,6 +67,7 @@ private class NightlyJobsTest {
             Assert.isTrue(jobs[0] instanceof NightlyJobs.RollupJob, 'Rollups first.');
             Assert.isTrue(jobs[1] instanceof NightlyJobs.SeasonalAddressJob, 'Then addresses.');
             Assert.isTrue(jobs[2] instanceof NightlyJobs.ErrorDigestJob, 'Then the digest.');
+            Assert.isTrue(jobs[3] instanceof NightlyJobs.ImportRowPurgeJob, 'Then the rows.');
             Assert.areEqual(moduleJob, jobs[jobs.size() - 1], 'A registered job is counted last.');
             Assert.areEqual(
                 System.Label.Core_HealthCheck_JobSeasonalAddresses,
@@ -92,7 +93,7 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.areEqual(4, jobs.size(), 'Core three, plus the module that answered.');
+            Assert.areEqual(5, jobs.size(), 'Core four, plus the module that answered.');
         }
     }
 
@@ -118,10 +119,10 @@ private class NightlyJobsTest {
             List<NightlyJob> withObjects = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.areEqual(3, withoutObjects, 'With nothing chosen, Core lists its three jobs.');
-            Assert.areEqual(4, withObjects.size(), 'Choosing an object adds the weekly count.');
+            Assert.areEqual(4, withoutObjects, 'With nothing chosen, Core lists its four jobs.');
+            Assert.areEqual(5, withObjects.size(), 'Choosing an object adds the weekly count.');
             Assert.isTrue(
-                withObjects[3] instanceof NightlyJobs.FieldUtilizationJob,
+                withObjects[4] instanceof NightlyJobs.FieldUtilizationJob,
                 'The weekly count comes after Core\'s nightly jobs.'
             );
         }

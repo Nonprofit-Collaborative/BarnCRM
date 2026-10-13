@@ -32,9 +32,11 @@ A few things are worth knowing before your first large file:
    fires on save.
 3. **Days an import can be undone** is 30 unless you change it, and can be anything from 1
    to 365. Each import keeps the window it was imported with.
-4. **Import** on the same page has an **Open the import wizard** link, which is the same
+4. **Days the rows of an import are kept** is 90 unless you change it, from 1 to 3650, or 0
+   to keep them for ever. See [How long the rows are kept](#how-long-the-rows-are-kept).
+5. **Import** on the same page has an **Open the import wizard** link, which is the same
    place the **Import** tab takes you.
-5. With the Giving module installed, the same page has the two payment matching settings
+6. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
 BarnCRM Core ships one ready-made mapping, the **Generic contact list**. You can edit it,
@@ -197,6 +199,19 @@ Select **Undo** again: it finishes the job without repeating what it already did
 **Days an import can be undone** in **BarnCRM Settings**, **Import**, sets the window, from
 1 to 365 days. The window is fixed when an import runs, so changing the setting only
 affects imports you run afterwards.
+
+### How long the rows are kept
+
+Every row of every file is kept as an Import Row so you can see what happened to it, download
+the rejected rows and check what a re-import changed. Rows take storage, so a nightly job
+removes the rows of an import once it finished more than **Days the rows of an import are
+kept** ago (90 days unless you change it in **BarnCRM Settings**, **Import**; 0 keeps them for
+ever). The import itself stays: its counts, run log and file name, and its undo, which never
+reads the rows. A preview whose rows were removed cannot be committed: upload the file again.
+
+The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
+its **Schedule all nightly jobs** fix schedules it. It runs at a quarter past one in the
+morning.
 
 ## 6. Files that arrive every month
 
