@@ -90,6 +90,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Not a duplicate" dismissals | Minor | A dismissed pair, with a reason, is not suggested again. | Shipped | C-20 |
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
+| Relationships and affiliations with no person | Minor | Health Check counts and links relationships with no person on one side and affiliations with no person (left by a person delete), changing nothing. | Built, not merged (fix/people-19) | PEOPLE-19 |
 | Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Shipped | C-28 |
 
 ### 1.5 Import and Data Management
