@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import getAttention from '@salesforce/apex/RollupAttentionController.getAttention';
 import retry from '@salesforce/apex/RollupAttentionController.retry';
+import processNow from '@salesforce/apex/RollupAttentionController.processNow';
 
 import TITLE from '@salesforce/label/c.Core_RollupBuilder_AttentionTitle';
 import FAILED_TITLE from '@salesforce/label/c.Core_RollupBuilder_FailedTitle';
@@ -13,13 +14,15 @@ import RETRY from '@salesforce/label/c.Core_RollupBuilder_Retry';
 import RETRY_ALL from '@salesforce/label/c.Core_RollupBuilder_RetryAll';
 import RETRIED from '@salesforce/label/c.Core_RollupBuilder_Retried';
 import NIGHTLY_OFF from '@salesforce/label/c.Core_RollupBuilder_NightlyOff';
+import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
+import STARTED from '@salesforce/label/c.Core_RollupBuilder_Started';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 
 /**
  * Needs attention in the Rollup Builder (rollup proposal slice S13, canonical model Section 14A):
- * how many records wait in the queue, each record whose totals could not be saved with what went
- * wrong, Retry for the selected ones or all, a warning when the nightly run is off, and how the
- * last full run ended.
+ * how many records wait in the queue with Start now, each record whose totals could not be saved
+ * with what went wrong, Retry for the selected ones or all, a warning when the nightly run is
+ * off, and how the last full run ended.
  */
 export default class RollupNeedsAttention extends LightningElement {
   labels = {
@@ -28,7 +31,8 @@ export default class RollupNeedsAttention extends LightningElement {
     nothingFailed: NOTHING_FAILED,
     retry: RETRY,
     retryAll: RETRY_ALL,
-    nightlyOff: NIGHTLY_OFF
+    nightlyOff: NIGHTLY_OFF,
+    startNow: START_NOW
   };
 
   columns = [
@@ -81,6 +85,27 @@ export default class RollupNeedsAttention extends LightningElement {
 
   get canRetry() {
     return !!this.attention && this.attention.canManage === true && this.hasFailed;
+  }
+
+  get canStart() {
+    return (
+      !!this.attention && this.attention.canManage === true && this.attention.hasWaiting === true
+    );
+  }
+
+  handleStartNow() {
+    this.busy = true;
+    this.notice = undefined;
+    processNow()
+      .then((attention) => {
+        this.attention = attention;
+        this.notice = STARTED;
+        this.error = undefined;
+      })
+      .catch((error) => this.fail(error))
+      .finally(() => {
+        this.busy = false;
+      });
   }
 
   get hideCheckboxes() {

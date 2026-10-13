@@ -304,8 +304,9 @@ After changing exchange rates, recalculate your money totals to bring them up to
 Under the list, **Needs attention** shows what the engine has not finished:
 
 - **Records waiting**, for example "1,204 records waiting, oldest 3 minutes ago". These are
-  totals from bulk changes, queued and calculated within minutes. Nothing to do unless the
-  oldest is more than an hour old.
+  totals from recent saves and bulk changes, queued and calculated within a minute or a few.
+  Nothing to do unless the oldest is more than an hour old, which Health Check also reports.
+  Then click **Start now** to recalculate them now; the nightly run also picks them up.
 - **Could not be saved**: each record whose totals failed five times, with a link to it,
   what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
   rule or a record someone was editing), then click **Retry** for the ones you selected, or

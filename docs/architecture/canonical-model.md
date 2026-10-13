@@ -1607,16 +1607,20 @@ merges and sorts their identifiers, recalculates a slice (R-R11), and deletes th
 finished. Target records that failed are written back as a new entry with Attempts increased
 and Next Attempt set later each time; after the fifth attempt the entry is Failed. The
 processor runs again while Pending entries remain. A second processor started by accident is
-harmless, because recalculation recomputes (R-R11). A save inside a Queueable job never starts
-the processor: the platform lets a Queueable queue one job, and that job belongs to the running
-job's own next step (the sample data load, the household soft credit recompute, a subscriber's
-integration). Its entries wait for the next processor a later save starts, the one the job
-starts itself when its chain ends (`RollupService.startQueuedRecalculation`), or the nightly run.
+harmless, because recalculation recomputes (R-R11). A writer starts a processor only when none
+is queued; when it cannot (its job allowance used, or automation paused), the nightly run, the
+end of a pause, Retry and Start now on the Needs attention list start one for the Pending
+entries. A save inside a Queueable job never starts the processor: the platform lets a
+Queueable queue one job, and that job belongs to the running job's own next step (the sample
+data load, the household soft credit recompute, a subscriber's integration). Its entries wait
+for the next processor a later save starts, the one the job starts itself when its chain ends
+(`RollupService.startQueuedRecalculation`), or the nightly run.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
 (which deletes it). Each processor and nightly run writes one summary entry to the Error Log
-(Section 9) when anything failed, so the Hub's error tile sees it.
+(Section 9) when anything failed, so the Hub's error tile sees it. Health Check reports Failed
+entries, and Pending entries older than an hour.
 
 **R-RQ5 Written in system mode.** Entries are the engine's own bookkeeping and are written
 under ADR-0021, so a gift saved by a user who cannot see the queue still queues its totals.

@@ -506,6 +506,9 @@ public with sharing class HealthCheckService {
                     new HealthCheckSettingsChecks.NightlyRollupsCheck()
                 )
             );
+            steps.add(
+                new CheckStep('rollup_queue', new HealthCheckSettingsChecks.RollupQueueCheck())
+            );
         }
 
         return steps;

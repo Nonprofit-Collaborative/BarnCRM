@@ -187,6 +187,19 @@ public with sharing class AutomationControl {
         } catch (Exception failed) {
             ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
         }
+        startWaitingRollups();
+    }
+
+    /**
+     * Totals queued during the pause wait for a processor that the pause stopped from starting
+     * (ROLLUPS-7). Resuming starts it; a failure is logged, never in the way of the resume.
+     */
+    private static void startWaitingRollups() {
+        try {
+            RollupQueue.processPending();
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
+        }
     }
 
     /**
@@ -221,6 +234,7 @@ public with sharing class AutomationControl {
         AutomationSettingsWriter.savePausedUntil(locked, null);
         SettingsService.clearCache();
         SettingsService.logChange(PAUSE_SETTING_NAME, String.valueOf(stored), '');
+        startWaitingRollups();
         return true;
     }
 
