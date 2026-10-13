@@ -38,4 +38,12 @@
     <field>Settings_Object__c</field>
     <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
   </values>
+  <values>
+    <field>Min_Value__c</field>
+    <value xsi:type="xsd:double">30</value>
+  </values>
+  <values>
+    <field>Max_Value__c</field>
+    <value xsi:type="xsd:double">365</value>
+  </values>
 </CustomMetadata>
