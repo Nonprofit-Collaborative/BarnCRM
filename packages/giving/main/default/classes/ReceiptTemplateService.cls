@@ -22,9 +22,6 @@
  * write the settings console makes, and the DML stays in user mode on top of that.
  */
 public with sharing class ReceiptTemplateService {
-    /** Configuring the app. The same permission every other console write checks. */
-    public static final String MANAGE_PERMISSION = 'Manage_BarnCRM_Settings';
-
     private static final String INSTALL_CONTEXT = 'ReceiptTemplateService.installDefaults';
 
     public class ReceiptTemplateException extends Exception {
@@ -80,7 +77,7 @@ public with sharing class ReceiptTemplateService {
     /** Whether the running user may write to the letters, for a screen deciding what to offer. */
     public static Boolean canManageTemplates() {
         if (managePermission == null) {
-            managePermission = FeatureManagement.checkPermission(MANAGE_PERMISSION);
+            managePermission = BarnCRMPermissions.canManageSettings();
         }
         return managePermission;
     }

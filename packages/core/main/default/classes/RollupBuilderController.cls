@@ -166,7 +166,7 @@ public with sharing class RollupBuilderController {
     public static BuilderModel getModel() {
         try {
             BuilderModel model = new BuilderModel();
-            model.canManage = FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+            model.canManage = BarnCRMPermissions.canManageSettings();
             model.multiCurrency = RollupCurrency.isMultiCurrency();
             model.defaultMode = RollupService.defaultMode();
             model.targets = targetEntities();
@@ -363,7 +363,7 @@ public with sharing class RollupBuilderController {
     @AuraEnabled
     public static SaveResult save(Draft draft, Boolean calculateNow) {
         try {
-            if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
+            if (!BarnCRMPermissions.canManageSettings()) {
                 throw new RollupService.RollupServiceException(
                     Label.Core_Rollups_ErrorNoPermission
                 );

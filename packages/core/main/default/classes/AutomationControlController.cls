@@ -121,7 +121,7 @@ public with sharing class AutomationControlController {
     private static Boolean canManage() {
         // Bare, and correctly so: a custom permission defined in the same package resolves without
         // a namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
-        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+        return BarnCRMPermissions.canManageSettings();
     }
 
     private static void requirePermission() {

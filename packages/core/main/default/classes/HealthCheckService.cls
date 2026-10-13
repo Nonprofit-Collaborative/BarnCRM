@@ -151,11 +151,8 @@ public with sharing class HealthCheckService {
     @NamespaceAccessible
     public static final String FIX_CUSTOM_PERMISSIONS_URL = '/lightning/setup/CustomPermissions/home';
 
-    /**
-     * The custom permission that gates changing settings and reading who else is in the org.
-     * Declared once, next to the setting it protects.
-     */
-    public static final String MANAGE_SETTINGS = CoexistenceService.MANAGE_SETTINGS;
+    /** The custom permission that gates changing settings and reading who else is in the org. */
+    public static final String MANAGE_SETTINGS = BarnCRMPermissions.MANAGE_SETTINGS;
 
     /**
      * Test injection points, null in every real transaction: a check that always throws, and
@@ -520,7 +517,7 @@ public with sharing class HealthCheckService {
      */
     @NamespaceAccessible
     public static Boolean canManageSettings() {
-        return FeatureManagement.checkPermission(MANAGE_SETTINGS);
+        return BarnCRMPermissions.canManageSettings();
     }
 
     /**

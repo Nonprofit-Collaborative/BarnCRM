@@ -6,8 +6,6 @@
  * so the component always has a message it can put in front of a person.
  */
 public with sharing class AccessController {
-    private static final String MANAGE_SETTINGS_PERMISSION = 'Manage_BarnCRM_Settings';
-
     /** Error codes the component can branch on without reading the message text. */
     public static final String ERROR_NO_PERMISSION = 'NO_PERMISSION';
     public static final String ERROR_INVALID_INPUT = 'INVALID_INPUT';
@@ -190,6 +188,6 @@ public with sharing class AccessController {
      * @return true when they hold the Manage BarnCRM Settings custom permission
      */
     private static Boolean canManageAccess() {
-        return FeatureManagement.checkPermission(MANAGE_SETTINGS_PERMISSION);
+        return BarnCRMPermissions.canManageSettings();
     }
 }

@@ -372,7 +372,7 @@ public with sharing class RollupController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+        return BarnCRMPermissions.canManageSettings();
     }
 
     private static void requirePermission() {

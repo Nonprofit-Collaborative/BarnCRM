@@ -8,7 +8,6 @@
  * permission first, logs what went wrong, and returns a message Maria can act on.
  */
 public with sharing class SetupAssistantController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'Setup Assistant';
 
     /** Everything the assistant needs to draw itself. */
@@ -231,7 +230,7 @@ public with sharing class SetupAssistantController {
 
     private static SetupState buildState() {
         SetupState state = new SetupState();
-        state.canEdit = FeatureManagement.checkPermission(EDIT_PERMISSION);
+        state.canEdit = BarnCRMPermissions.canManageSettings();
         state.steps = SetupAssistantService.getSteps();
         state.stepsTotal = state.steps.size();
         state.stepsCompleted = SetupAssistantService.countCompleted(state.steps);
@@ -345,7 +344,7 @@ public with sharing class SetupAssistantController {
     }
 
     private static void requireEdit() {
-        if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw asAuraException(System.Label.Core_Settings_PermissionRequiredError);
         }
     }

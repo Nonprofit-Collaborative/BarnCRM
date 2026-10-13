@@ -7,8 +7,6 @@
  * render.
  */
 public with sharing class AcknowledgmentController {
-    private static final String MANAGE_PERMISSION = 'Manage_BarnCRM_Settings';
-
     /** One rule, flattened, with the template resolved to the label an administrator recognizes. */
     public class RuleView {
         @AuraEnabled
@@ -171,7 +169,7 @@ public with sharing class AcknowledgmentController {
     private static PageView currentView() {
         PageView view = new PageView();
         view.enabled = AcknowledgmentService.isEnabled();
-        view.canManage = FeatureManagement.checkPermission(MANAGE_PERMISSION);
+        view.canManage = BarnCRMPermissions.canManageSettings();
         view.canSend = AcknowledgmentService.canSend();
         view.scheduled = AcknowledgmentScheduler.isScheduled();
         view.nextRunAt = AcknowledgmentScheduler.nextRunAt();
@@ -298,7 +296,7 @@ public with sharing class AcknowledgmentController {
     }
 
     private static void requireManagePermission() {
-        if (!FeatureManagement.checkPermission(MANAGE_PERMISSION)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw new AcknowledgmentService.AcknowledgmentException(
                 Label.Giving_Acknowledgment_NoPermission
             );
