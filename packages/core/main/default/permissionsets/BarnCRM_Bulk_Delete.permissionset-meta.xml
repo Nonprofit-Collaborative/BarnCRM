@@ -7,6 +7,14 @@
     Assign with BarnCRM Find and Export. In no role. Grants read on data jobs and their journal,
     and no record access.
   </description>
+  <classAccesses>
+    <apexClass>BulkDeleteController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>BulkUpdateController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
     <name>Bulk_Delete_Records</name>

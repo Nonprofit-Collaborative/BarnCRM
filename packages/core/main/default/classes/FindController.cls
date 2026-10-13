@@ -66,6 +66,9 @@ public with sharing class FindController {
         /** Whether the person may also bulk update the results (C-35, R-BU6). */
         @AuraEnabled
         public Boolean canBulkUpdate;
+        /** Whether the person may also bulk delete the results (C-37, R-BD6). */
+        @AuraEnabled
+        public Boolean canBulkDelete;
     }
 
     /** The rows a query returned and the SOQL it ran, for display only. */
@@ -281,6 +284,7 @@ public with sharing class FindController {
         page.maxRows = QueryCompiler.MAX_ROWS;
         page.exportPageSize = QueryCompiler.EXPORT_PAGE_SIZE;
         page.canBulkUpdate = BulkUpdateController.hasPermission();
+        page.canBulkDelete = BulkDeleteController.hasPermission();
         List<SavedQueryView> mine = new List<SavedQueryView>();
         List<SavedQueryView> others = new List<SavedQueryView>();
         Id me = UserInfo.getUserId();

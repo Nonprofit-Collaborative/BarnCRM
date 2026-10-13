@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_BulkDelete_ErrorNoPermission</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the person lacks the bulk delete permissions.</shortDescription>
+        <value>Bulk delete needs the Bulk Delete Records and Find and Export Records permissions. Ask your administrator.</value>
+    </labels>
+    <labels>
         <fullName>Core_BulkDelete_ErrorObject</fullName>
         <categories>BulkDelete</categories>
         <language>en_US</language>

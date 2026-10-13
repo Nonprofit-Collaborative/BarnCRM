@@ -8,6 +8,10 @@
     access.
   </description>
   <classAccesses>
+    <apexClass>BulkDeleteController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>BulkUpdateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
