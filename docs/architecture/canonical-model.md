@@ -5520,8 +5520,10 @@ be explained.
   `MailingState`, `MailingPostalCode`, `MailingCountry`.
 - **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
   `Seasonal_Address_Last_Run_Summary__c` (Section 12).
-- **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector`,
-  `AddressController`; and for the seasonal swap `SeasonalAddressService`,
+- **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
+  Addresses card reads and saves through Lightning Data Service, with no controller,
+  ADR-NEXT record reads through Lightning Data Service); and for the seasonal swap
+  `SeasonalAddressService`,
   `SeasonalAddressSelector`, `SeasonalAddressWriter`, `SeasonalAddressBatch`,
   `SeasonalAddressScheduler`, `SeasonalAddressController`.
 

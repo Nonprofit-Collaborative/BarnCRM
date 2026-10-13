@@ -76,6 +76,11 @@ Addresses appear in two places once you are set up: an **Addresses** card on eve
 household, organization, and person record, and an **Addresses** tab in the BarnCRM
 app for reporting and list views.
 
+The card reads and saves addresses as the person using it, through Salesforce's own record
+service, so it shows exactly what their object and field access allows and nothing more. An
+address edited elsewhere on the page shows on the card without a reload, and after **Set as
+default** the record's own address boxes refresh too.
+
 ## A five-minute walkthrough
 
 You are Maria. The Garcia household spends January to March in Arizona and the rest of the

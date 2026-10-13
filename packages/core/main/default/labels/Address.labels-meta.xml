@@ -46,23 +46,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: message shown when the addresses cannot be read</shortDescription>
-        <value>We could not load the addresses for this record. Refresh the page, and if it happens again ask your administrator to check the Error Log.</value>
+        <value>We could not load the addresses for this record. Refresh the page, and if it happens again ask your administrator to check that you can read addresses.</value>
     </labels>
     <labels>
-        <fullName>Core_Address_NotFound</fullName>
+        <fullName>Core_Address_Loading</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Address service: the requested address no longer exists</shortDescription>
-        <value>That address no longer exists. Refresh the page to see the addresses on file now.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_OwnerRequired</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address service: no owner record was supplied</shortDescription>
-        <value>Choose a household, an organization, or a person before asking for their addresses.</value>
+        <shortDescription>Address panel: what a screen reader hears while the card loads</shortDescription>
+        <value>Loading addresses</value>
     </labels>
     <labels>
         <fullName>Core_Address_PanelTitle</fullName>

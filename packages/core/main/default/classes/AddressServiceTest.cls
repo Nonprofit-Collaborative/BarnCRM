@@ -552,4 +552,27 @@ private class AddressServiceTest {
             );
         }
     }
+
+    @IsTest
+    static void selectorReturnsNothingWhenAskedForNothing() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Assert.areEqual(
+                0,
+                AddressSelector.selectByOwnerIds(null).size(),
+                'No owners, no addresses.'
+            );
+            Assert.areEqual(
+                0,
+                AddressSelector.selectByOwnerIds(new Set<Id>()).size(),
+                'No owners, no addresses.'
+            );
+            Assert.areEqual(
+                0,
+                AddressSelector.selectDefaultsByOwnerIds(null, null).size(),
+                'No owners, no defaults.'
+            );
+            Test.stopTest();
+        }
+    }
 }
