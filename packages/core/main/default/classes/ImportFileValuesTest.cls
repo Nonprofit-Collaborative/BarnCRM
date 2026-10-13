@@ -99,7 +99,8 @@ private class ImportFileValuesTest {
                 new List<ImportMapping.Assignment>{
                     new ImportMapping.Assignment('Contact1.MailingCity', 'Portland'),
                     new ImportMapping.Assignment('Contact1.Phone', '  ')
-                }
+                },
+                false
             );
             List<Map<String, String>> values = new List<Map<String, String>>();
             for (Integer i = 0; i < 200; i++) {
@@ -159,7 +160,8 @@ private class ImportFileValuesTest {
                         null,
                         new List<ImportMapping.Assignment>{
                             new ImportMapping.Assignment(target, 'x')
-                        }
+                        },
+                        false
                     );
                 } catch (ImportException e) {
                     refused = e.getMessage().contains(target);

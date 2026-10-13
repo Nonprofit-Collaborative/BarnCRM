@@ -209,6 +209,158 @@
         <value>Chunk {0} failed and its rows were rejected: {1}</value>
     </labels>
     <labels>
+        <fullName>Core_Import_TargetHouseholdField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, a household field; {0} is the field</shortDescription>
+        <value>Household: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAffiliationField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target, an affiliation field; {0} is the field</shortDescription>
+        <value>Affiliation: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, a person&apos;s title, such as Ms.</shortDescription>
+        <value>title</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeFirstName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, first name</shortDescription>
+        <value>first name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeLastName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, last name</shortDescription>
+        <value>last name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeFullName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, a whole name in one column</shortDescription>
+        <value>full name in one column</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeEmail</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, email</shortDescription>
+        <value>email</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributePhone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, phone</shortDescription>
+        <value>phone</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeJobTitle</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, job title</shortDescription>
+        <value>job title</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeStreet</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, street</shortDescription>
+        <value>street</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeCity</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, city</shortDescription>
+        <value>city</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeState</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, state or province</shortDescription>
+        <value>state or province</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributePostalCode</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, postal code</shortDescription>
+        <value>postal code</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeCountry</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, country</shortDescription>
+        <value>country</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeName</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, name</shortDescription>
+        <value>name</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeWebsite</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, website</shortDescription>
+        <value>website</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TargetAttributeRole</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: column target attribute, an affiliation&apos;s role</shortDescription>
+        <value>role</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OriginalTooLargeToKeep</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the original file is too large to keep with the import</shortDescription>
+        <value>This file is larger than 2.5 MB, so it imports without a copy of the original kept with the import.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_OriginalNotKept</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the original file could not be kept, with the reason</shortDescription>
+        <value>The original file was not kept with the import: {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_LogRowsNotSaved</fullName>
         <categories>Import</categories>
         <language>en_US</language>

@@ -393,6 +393,11 @@
                         <template lwc:if={isStepPreview}>{labels.stepPreview}</template>
                         <template lwc:else>{labels.stepResults}</template>
                     </h2>
+                    <template lwc:if={storeFileError}>
+                        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="original-not-kept">
+                            {storeFileError}
+                        </p>
+                    </template>
                     <c-import-results
                         batch={batch}
                         rejected-rows={rejectedRows}

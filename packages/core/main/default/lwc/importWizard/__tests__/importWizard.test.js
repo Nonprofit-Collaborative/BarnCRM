@@ -36,12 +36,6 @@ jest.mock(
   () => ({ default: 'Organization: {0}' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_Import_FieldEmail', () => ({ default: 'email' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_Import_FieldName', () => ({ default: 'name' }), {
-  virtual: true
-});
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -131,6 +125,18 @@ const EMPTY_PAGE = { cursor: null, rows: [], nextIndex: 0, total: 0, hasMore: fa
 
 const FILE_TEXT = 'Last Name,Email,Notes\nRamirez,ana@example.org,vip\nOkafor,ben@example.org,';
 
+/** The fixed columns of a people file, as the server lists them (ImportFieldCatalog). */
+const FIXED_TARGETS = [
+  { value: 'Contact1.FirstName', label: 'Person: first name' },
+  { value: 'Contact1.LastName', label: 'Person: last name' },
+  { value: 'Contact1.Email', label: 'Person: email' },
+  { value: 'Contact1.Phone', label: 'Person: phone' },
+  { value: 'Contact1.MailingCity', label: 'Person: city' },
+  { value: 'Contact2.Email', label: 'Second person: email' },
+  { value: 'Organization.Name', label: 'Organization: name' },
+  { value: 'Affiliation.Role__c', label: 'Affiliation: role' }
+];
+
 /**
  * Lets every pending promise and rerender settle. Several turns, because reading a file goes
  * through FileReader, which resolves on its own task.
@@ -148,9 +154,12 @@ function render() {
 }
 
 /** Feeds the wizard a file the way the browser's file input does. */
-async function chooseFile(element, text = FILE_TEXT, name = 'donors.csv') {
+async function chooseFile(element, text = FILE_TEXT, name = 'donors.csv', size = undefined) {
   const input = element.shadowRoot.querySelector('[data-id="file"]');
   const file = new File([text], name, { type: 'text/csv' });
+  if (size !== undefined) {
+    Object.defineProperty(file, 'size', { value: size });
+  }
   Object.defineProperty(input, 'files', { value: [file], configurable: true });
   input.dispatchEvent(new CustomEvent('change'));
   await flush();
@@ -182,7 +191,7 @@ describe('the import wizard', () => {
     getBatch.mockResolvedValue(DRY_RUN_BATCH);
     getRowPage.mockResolvedValue(EMPTY_PAGE);
     getEntityTargets.mockResolvedValue([]);
-    getMatchFields.mockResolvedValue({ contact: [], account: [] });
+    getMatchFields.mockResolvedValue({ fixedTargets: FIXED_TARGETS, contact: [], account: [] });
     getChangedValues.mockResolvedValue([]);
     previewChanges.mockResolvedValue({ problems: [], samples: [] });
   });
@@ -312,22 +321,6 @@ describe('the import wizard', () => {
     await chooseFile(element);
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(rows[0].textContent).toContain('Ramirez, Okafor');
-  });
-
-  it('names each column target from custom labels, so the picker can be translated', async () => {
-    const element = render();
-    await flush();
-    click(element, 'next');
-    await flush();
-    await chooseFile(element);
-    const options = element.shadowRoot.querySelector(
-      '[data-id="column-row"] lightning-combobox'
-    ).options;
-    expect(options).toContainEqual({ value: 'Contact2.Email', label: 'Second person: email' });
-    expect(options).toContainEqual({
-      value: 'Household.Name',
-      label: 'c.Core_Import_TargetHouseholdField'
-    });
   });
 
   it('refuses a file with no rows under its heading', async () => {
@@ -495,6 +488,50 @@ describe('the import wizard', () => {
     input.dispatchEvent(new CustomEvent('change'));
   }
 
+  it('offers the fixed columns the server lists, with its labels', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    expect(picker.options).toEqual(
+      expect.arrayContaining([
+        { value: 'Contact1.LastName', label: 'Person: last name' },
+        { value: 'Affiliation.Role__c', label: 'Affiliation: role' }
+      ])
+    );
+  });
+
+  it('imports a file too large to keep without its original, and says so', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, FILE_TEXT, 'donors.csv', 3000000);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    expect(saveFile).not.toHaveBeenCalled();
+    expect(createBatch.mock.calls[0][0].fileId).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="original-not-kept"]').textContent).toContain(
+      'c.Core_Import_OriginalTooLargeToKeep'
+    );
+  });
+
+  it('says when the original could not be kept, and imports anyway', async () => {
+    saveFile.mockRejectedValue({ body: { message: 'Heap too large' } });
+    const element = await toMatchingStep();
+    click(element, 'dry-run');
+    await flush();
+    expect(createBatch).toHaveBeenCalled();
+    // The label mock has no {0} to fill; the real label carries the reason.
+    expect(element.shadowRoot.querySelector('[data-id="original-not-kept"]').textContent).toContain(
+      'c.Core_Import_OriginalNotKept'
+    );
+  });
+
   it('sends the control totals with the batch, and none when the boxes are empty', async () => {
     let element = await toMatchingStep();
     // No module reads gift amounts here, so only the row count is offered.
@@ -653,6 +690,7 @@ describe('the import wizard', () => {
 
   it('asks for the ID field under External ID, and warns when no column holds it', async () => {
     getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: []
     });
@@ -675,6 +713,7 @@ describe('the import wizard', () => {
 
   it('offers each ID field as a column for either person and the organization', async () => {
     getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: [{ value: 'Charity_Number__c', label: 'Charity Number' }]
     });
@@ -696,6 +735,7 @@ describe('the import wizard', () => {
 
   it('offers record ID columns and the org own fields, each once', async () => {
     getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
       contact: [{ value: 'Member_Number__c', label: 'Member Number' }],
       account: [],
       personFields: [
@@ -912,7 +952,12 @@ describe('the import wizard', () => {
   });
 
   it('sends the duplicate rules choice, and warns when no rule is switched on', async () => {
-    getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: false });
+    getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
+      contact: [],
+      account: [],
+      contactRules: false
+    });
     const element = await toMatchingStep();
     const box = element.shadowRoot.querySelector('[data-id="duplicate-rules"]');
     expect(box.checked).toBe(false);
@@ -930,7 +975,12 @@ describe('the import wizard', () => {
 
   it('starts with the duplicate rules choice the mapping holds', async () => {
     getTemplates.mockResolvedValue([{ ...TEMPLATE, useDuplicateRules: true }]);
-    getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: true });
+    getMatchFields.mockResolvedValue({
+      fixedTargets: FIXED_TARGETS,
+      contact: [],
+      account: [],
+      contactRules: true
+    });
     const element = await toMatchingStep();
     expect(element.shadowRoot.querySelector('[data-id="duplicate-rules"]').checked).toBe(true);
     expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).toBeNull();
@@ -1102,7 +1152,7 @@ describe('the import wizard loading one object', () => {
     canImport.mockResolvedValue(true);
     getTemplates.mockResolvedValue([OBJECT_TEMPLATE]);
     getEntityTargets.mockResolvedValue([]);
-    getMatchFields.mockResolvedValue({ contact: [], account: [] });
+    getMatchFields.mockResolvedValue({ fixedTargets: FIXED_TARGETS, contact: [], account: [] });
     getObjectFields.mockResolvedValue([
       { value: 'Record.Id', label: 'Salesforce record ID', isLookup: false, lookupFields: [] },
       { value: 'Record.Session_Key__c', label: 'Session Key', isLookup: false, lookupFields: [] },

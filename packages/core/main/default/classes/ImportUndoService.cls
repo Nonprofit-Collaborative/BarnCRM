@@ -148,21 +148,8 @@ public with sharing class ImportUndoService {
     /**
      * Closes an undo: its status, and one line added to the run log saying who ran it, when,
      * and what it deleted, kept and put back. Called from the job's last finish, in system
-     * mode over fields the package owns (ADR-0021).
-     */
-    @NamespaceAccessible
-    public static void finish(
-        Id batchId,
-        Integer countedAtStart,
-        Integer restored,
-        Boolean failed
-    ) {
-        finish(batchId, countedAtStart, restored, failed, 0);
-    }
-
-    /**
-     * The same, for an undo that also deleted journaled creations (R-IJ3): `createdGone` is how
-     * many of them are no longer there, so the ones left are the ones kept.
+     * mode over fields the package owns (ADR-0021). `createdGone` is how many journaled
+     * creations the undo deleted (R-IJ3), so the ones left are the ones kept.
      */
     @NamespaceAccessible
     public static void finish(
@@ -231,13 +218,22 @@ public with sharing class ImportUndoService {
      */
     @NamespaceAccessible
     public static String refusal(Import_Batch__c batch) {
+        return refusal(batch, null);
+    }
+
+    /**
+     * As above, for a batch whose effective status the caller has already worked out, so the
+     * job is not asked about twice; a null status is worked out here.
+     */
+    @NamespaceAccessible
+    public static String refusal(Import_Batch__c batch, String knownStatus) {
         if (batch == null) {
             return Label.Core_Import_ErrorBatchGone;
         }
         if (batch.Is_Dry_Run__c == true) {
             return Label.Core_Import_UndoErrorDryRun;
         }
-        String status = effectiveStatus(batch);
+        String status = knownStatus == null ? effectiveStatus(batch) : knownStatus;
         if (
             ImportBatchService.STATUS_UNDOING.equals(status) ||
             ImportBatchService.STATUS_UNDONE.equals(status)

@@ -165,6 +165,9 @@ public with sharing class ImportController {
         /** Account fields, for organizations and for people stored as person accounts. */
         @AuraEnabled
         public List<MatchFieldView> account = new List<MatchFieldView>();
+        /** The fixed columns of a people file, with their labels (ImportFieldCatalog). */
+        @AuraEnabled
+        public List<ImportMapping.Target> fixedTargets = new List<ImportMapping.Target>();
         /** The fields a person's column can be mapped to besides the fixed list (R-IT11). */
         @AuraEnabled
         public List<ImportMapping.Target> personFields = new List<ImportMapping.Target>();
@@ -320,6 +323,7 @@ public with sharing class ImportController {
             MatchFieldsView view = new MatchFieldsView();
             view.contact = fieldViews(Contact.SObjectType);
             view.account = fieldViews(Account.SObjectType);
+            view.fixedTargets = ImportFieldCatalog.fixedTargets();
             view.personFields = ImportFieldCatalog.personFields();
             view.organizationFields = ImportFieldCatalog.organizationFields();
             view.contactRules = ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType);
@@ -519,23 +523,17 @@ public with sharing class ImportController {
         try {
             enforcePermission();
             BatchOptions options = parseOptions(optionsJson);
-            ImportTemplateService.saveMapping(templateId, mappingDocument, matchingRule);
-            if (options.savePaymentMatching == true) {
-                ImportTemplateService.savePaymentMatching(
-                    templateId,
-                    options.paymentMatching,
-                    options.matchDateWindowDays,
-                    options.matchAmountTolerance
-                );
-            }
-            if (options.load != null) {
-                ImportTemplateService.saveLoad(templateId, options.load);
-            }
-            if (options.matching != null) {
-                // The wizard's rule for people is the one passed above; the rest is saved here.
-                options.matching.personRule = matchingRule;
-                ImportTemplateService.saveMatching(templateId, options.matching);
-            }
+            // One read and one write of the template for everything the wizard settled on.
+            ImportTemplateService.UploadChoices choices = new ImportTemplateService.UploadChoices();
+            choices.mappingDocument = mappingDocument;
+            choices.matchingRule = matchingRule;
+            choices.savePaymentMatching = options.savePaymentMatching;
+            choices.paymentMatching = options.paymentMatching;
+            choices.matchDateWindowDays = options.matchDateWindowDays;
+            choices.matchAmountTolerance = options.matchAmountTolerance;
+            choices.load = options.load;
+            choices.matching = options.matching;
+            ImportTemplateService.saveUpload(templateId, choices);
             return toView(
                 ImportBatchService.create(
                     templateId,
@@ -557,9 +555,9 @@ public with sharing class ImportController {
      * (canonical model Section 16, File Reference), and returns its document identifier.
      *
      * The component sends the file only when it is small enough to pass through a request
-     * without risking the heap. A larger file still imports: the batch keeps its name and the
-     * run log says the original was not kept, which is the honest answer rather than a
-     * failure the administrator cannot act on.
+     * without risking the heap (2.5 MB, sent as base64 and decoded here). A larger file still
+     * imports: the batch keeps its name and the wizard says the original was not kept, which
+     * is the honest answer rather than a failure the administrator cannot act on.
      */
     @AuraEnabled
     public static String saveFile(String fileName, String base64Content) {
@@ -851,7 +849,7 @@ public with sharing class ImportController {
         view.runLog = batch.Run_Log__c;
         view.startedAt = batch.Started_At__c;
         view.undoDeadline = batch.Undo_Deadline__c;
-        view.canUndo = String.isBlank(ImportUndoService.refusal(batch));
+        view.canUndo = String.isBlank(ImportUndoService.refusal(batch, view.status));
         view.controlTotalsAgree = ImportBatchService.controlTotalsAgree(batch);
         return view;
     }

@@ -334,6 +334,12 @@ them (the Giving module loads gifts), so without one BarnCRM offers nowhere to p
 suggests **Do not load**. Nothing is lost: the staged row still keeps the whole original
 line. With Giving installed, see [Importing gifts](gift-import.md).
 
+**"This file is larger than 2.5 MB, so it imports without a copy of the original".** BarnCRM
+keeps a copy of each file you import as a Salesforce File, so the original can be downloaded
+again, but only up to 2.5 MB: a larger one is too big to send safely. The import itself goes
+ahead and loads every row. Keep your own copy of the file. "The original file was not kept"
+with a reason means the copy could not be saved; again, the import goes ahead.
+
 **"The control totals do not match."** The preview counted a different number of rows (or,
 with Giving, a different total of gift amounts) from the control totals you typed. The run log gives both
 numbers. Fix the file or the totals and preview again; the import is refused until they agree.
@@ -426,7 +432,9 @@ affiliation with it, nothing new is made, and two rows of one file linking the s
 organization make one affiliation. A new affiliation follows the usual rules, so it becomes the person's primary one only when they
 have no other. The preview counts a row that would add an affiliation as one that creates
 something, and undoing the import deletes the affiliations it made. The row's second person is
-not linked: put them on a row of their own to link them too.
+not linked: put them on a row of their own to link them too. Map a column to **Affiliation: role**
+to give a new affiliation its role, for example Board chair; an affiliation that already exists
+keeps its own.
 
 **Salesforce record IDs.** If your file came out of Salesforce (a report export, for example),
 map its ID column to **Person: Salesforce record ID**, **Second person: Salesforce record ID**

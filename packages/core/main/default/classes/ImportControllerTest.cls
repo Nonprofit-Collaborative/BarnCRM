@@ -208,6 +208,78 @@ private class ImportControllerTest {
         }
     }
 
+    /**
+     * Everything the wizard settles on is saved in one read and one write of the template, so
+     * a preview is the template's write and the batch's insert, whatever the wizard sent.
+     */
+    @IsTest
+    static void aPreviewSavesTheTemplateOnce() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = permittedTemplate();
+            String optionsJson =
+                '{"savePaymentMatching": true, "paymentMatching": "Match only", ' +
+                '"matchDateWindowDays": 5, "matching": {"organizationRule": "Name exact", ' +
+                '"severalMatches": "Use the most recently changed"}}';
+
+            Test.startTest();
+            Integer queriesBefore = Limits.getQueries();
+            Integer dmlBefore = Limits.getDmlStatements();
+            ImportController.createBatch(
+                template.Id,
+                null,
+                'donors.csv',
+                ImportTestDataFactory.donorMapping(),
+                ImportTemplateService.RULE_NAME_POSTAL,
+                optionsJson
+            );
+            Integer queries = Limits.getQueries() - queriesBefore;
+            Integer dml = Limits.getDmlStatements() - dmlBefore;
+            Test.stopTest();
+
+            Assert.areEqual(2, dml, 'One template write and the batch insert.');
+            Assert.isTrue(queries <= 3, 'One template read here, one in create: ' + queries);
+            Import_Template__c stored = ImportTemplateSelector.selectById(template.Id);
+            Assert.areEqual(ImportTemplateService.RULE_NAME_POSTAL, stored.Matching_Rule__c);
+            Assert.areEqual('Match only', stored.Payment_Matching__c);
+            Assert.areEqual(5, stored.Match_Date_Window_Days__c);
+            Assert.areEqual(
+                ImportTemplateService.SEVERAL_MOST_RECENT,
+                stored.Several_Matches__c,
+                'Every choice was saved.'
+            );
+        }
+    }
+
+    /** A commit's job is asked about once per batch shown, not once for its status and again. */
+    @IsTest
+    static void aRunningCommitIsAskedAboutOnce() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = permittedTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            update new Import_Batch__c(
+                Id = batch.Id,
+                Status__c = ImportBatchService.STATUS_COMMITTING,
+                Is_Dry_Run__c = false,
+                Job_Id__c = '707000000000000',
+                Undo_Deadline__c = Datetime.now().addDays(30)
+            );
+
+            Test.startTest();
+            Integer queriesBefore = Limits.getQueries();
+            ImportController.BatchView view = ImportController.getBatch(batch.Id);
+            Integer queries = Limits.getQueries() - queriesBefore;
+            Test.stopTest();
+
+            Assert.areEqual(
+                ImportBatchService.STATUS_FAILED,
+                view.status,
+                'A commit with no job running reads as failed.'
+            );
+            Assert.isTrue(view.canUndo, 'And can be undone.');
+            Assert.isTrue(queries <= 2, 'The batch, and its job once: ' + queries);
+        }
+    }
+
     @IsTest
     static void stagesRowsFromTheBrowserPage() {
         System.runAs(TestUsers.admin()) {
