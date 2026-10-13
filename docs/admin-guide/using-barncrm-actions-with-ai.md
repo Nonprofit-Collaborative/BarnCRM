@@ -62,9 +62,11 @@ to Salesforce, not to BarnCRM.
      Job Status.
    - **BarnCRM Read Only** (and so the Read Only group) gives Find People and Get Household
      Summary. For an assistant that should only look things up, use a user with Read Only.
-   - Record Inbound Gift needs **Giving Staff** and an Apex Class Access grant to
-     `InboundGiftAction` in a permission set of your own, assigned only to the users who may
-     use it through an assistant.
+   - Record Inbound Gift needs **Giving Staff**, which covers the records involved, and
+     Connect's **Record Inbound Gift Action** permission set (Setup, Users, choose the person,
+     Permission Set Assignments), which runs that one action and grants nothing else. Assign it
+     only to the users who may record gifts through an assistant; no BarnCRM role includes it,
+     so no one gets the action without your decision.
    The actions run with the user's own access, so what each user can find or change is still
    decided by their object and field access.
 3. **Add the actions to your assistant.**
@@ -179,7 +181,7 @@ twice records the gift once.
 
 **The assistant does not offer the action.** Its user has none of the BarnCRM permission sets
 that include the action (see step 2; Read Only has no Create Person or Get Data Job Status),
-or, for Record Inbound Gift, lacks **Apex Class Access** to `InboundGiftAction`, or the action
+or, for Record Inbound Gift, is missing the **Record Inbound Gift Action** permission set, or the action
 was not added to the agent's topic or the MCP server. Check step 2 and step 3 above.
 
 **"You do not have access to the records this action reads or changes."** The assistant's user

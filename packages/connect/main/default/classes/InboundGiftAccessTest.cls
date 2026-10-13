@@ -195,4 +195,26 @@ private class InboundGiftAccessTest {
             );
         }
     }
+
+    @IsTest
+    static void theActionSetOpensOnlyTheFlowAction() {
+        System.runAs(TestUsers.admin()) {
+            List<SetupEntityAccess> grants = [
+                SELECT SetupEntityId
+                FROM SetupEntityAccess
+                WHERE Parent.Name = 'Record_Inbound_Gift_Action' AND SetupEntityType = 'ApexClass'
+                WITH SYSTEM_MODE
+            ];
+            List<ApexClass> action = [
+                SELECT Id
+                FROM ApexClass
+                WHERE Name = 'InboundGiftAction'
+                WITH SYSTEM_MODE
+            ];
+
+            Assert.areEqual(1, action.size(), 'The action class is in the org');
+            Assert.areEqual(1, grants.size(), 'The set opens one class and nothing else');
+            Assert.areEqual(action[0].Id, grants[0].SetupEntityId, 'That class is the action');
+        }
+    }
 }

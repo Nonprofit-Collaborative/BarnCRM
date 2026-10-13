@@ -125,6 +125,7 @@ ALLOWED = {
     "ObjectPermissions": "read back by the access checks in C-06.",
     "FieldPermissions": "same.",
     "SetupEntityAccess": "class and custom permission grants inside a permission set.",
+    "ApexClass": "the class a SetupEntityAccess grant names, asserted in tests. Every org with Apex.",
     "CustomPermission": "the packaged custom permissions.",
     "RecordType": "the Household record type, ADR-0005.",
     "UserRecordAccess": "sharing checks in user mode paths.",
