@@ -768,4 +768,132 @@
         <shortDescription>Run tonight: one run set for 2:00 AM</shortDescription>
         <value>One recalculation of every total is set for 2:00 AM tonight.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_AttentionTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: section title</shortDescription>
+        <value>Needs attention</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Waiting</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: records waiting and the age of the oldest</shortDescription>
+        <value>{0} records waiting, oldest {1} minutes ago.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NothingWaiting</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: nothing waiting in the queue</shortDescription>
+        <value>No records waiting.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_FailedTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: list of records that could not be saved</shortDescription>
+        <value>Could not be saved</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NothingFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: no failed records</shortDescription>
+        <value>Every total was saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ColumnRecord</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: record column</shortDescription>
+        <value>Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ColumnError</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: what went wrong column</shortDescription>
+        <value>What went wrong</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ColumnWhen</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: when it failed column</shortDescription>
+        <value>When</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ColumnTries</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: number of tries column</shortDescription>
+        <value>Tries</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Retry</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: retry the selected records</shortDescription>
+        <value>Retry</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_RetryAll</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: retry every failed record</shortDescription>
+        <value>Retry all</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Retried</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: notice after a retry</shortDescription>
+        <value>Back in the queue. They are tried within minutes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NightlyOff</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: the nightly run is not scheduled</shortDescription>
+        <value>The nightly run is not scheduled, so totals a bulk change missed are not put right overnight.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_LastRun</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: how the last full run ended</shortDescription>
+        <value>Last full run: {0}, finished {1}, {2} parts stopped.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_LastRunGoing</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: a full run is going</shortDescription>
+        <value>A full run is going: {0} of {1} parts done.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_LastRunNever</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: no full run yet</shortDescription>
+        <value>No full run yet.</value>
+    </labels>
 </CustomLabels>

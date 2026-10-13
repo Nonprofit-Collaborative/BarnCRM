@@ -164,6 +164,40 @@ public without sharing class RollupQueue implements Queueable {
         return Datetime.now().addMinutes(minutes);
     }
 
+    /**
+     * Retry from the Rollup Builder's Needs attention list (R-RQ4, slice S13): Failed entries
+     * go back to Pending with no attempts and are tried within minutes.
+     *
+     * @param entryIds the entries to retry, or null for every Failed entry
+     * @return how many entries went back in the queue
+     */
+    public static Integer retry(Set<Id> entryIds) {
+        List<Rollup_Queue__c> failed = entryIds == null
+            ? [
+                  SELECT Id
+                  FROM Rollup_Queue__c
+                  WHERE Status__c = :STATUS_FAILED
+                  WITH SYSTEM_MODE
+                  LIMIT 10000
+              ]
+            : [
+                  SELECT Id
+                  FROM Rollup_Queue__c
+                  WHERE Status__c = :STATUS_FAILED AND Id IN :entryIds
+                  WITH SYSTEM_MODE
+              ];
+        for (Rollup_Queue__c entry : failed) {
+            entry.Status__c = STATUS_PENDING;
+            entry.Attempts__c = 0;
+            entry.Next_Attempt__c = null;
+        }
+        if (!failed.isEmpty()) {
+            Database.update(failed, AccessLevel.SYSTEM_MODE);
+            requestProcessor();
+        }
+        return failed.size();
+    }
+
     private static void insertEntries(List<Rollup_Queue__c> entries) {
         if (entries.isEmpty()) {
             return;

@@ -1363,7 +1363,13 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   counts the target records it would maintain in user mode. `RollupController.estimateFullRun`
   counts the records Recalculate all goes through at a fixed rough rate (1,650 records a
   minute, to be measured on an org), and `runTonight` sets up one 2:00 AM run through
-  `RollupScheduler.scheduleTonight` only when the nightly run is not scheduled.
+  `RollupScheduler.scheduleTonight` only when the nightly run is not scheduled. Needs
+  attention (S13), `rollupNeedsAttention` under the list, reads the Rollup Queue in user mode
+  through `RollupAttentionController` (records waiting and the oldest's age, one row per record
+  of each Failed entry named by describe, at most 200, whether the nightly run is scheduled and
+  how the last full run ended); its Retry, for the selected records' entries or all, goes
+  through `RollupQueue.retry`, which sets them Pending with Attempts 0 and no Next Attempt in
+  system mode (R-RQ4, R-RQ5).
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/NEXT-barncrm-owns-its-rollup-engine.md`;
   apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the
