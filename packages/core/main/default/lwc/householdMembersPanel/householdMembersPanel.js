@@ -387,7 +387,11 @@ export default class HouseholdMembersPanel extends LightningElement {
     const personId = this.movingPersonId;
     const targetId = this.targetHouseholdId;
     this.busy = true;
-    return moveContact({ contactId: personId, targetHouseholdId: targetId })
+    return moveContact({
+      contactId: personId,
+      targetHouseholdId: targetId,
+      sourceHouseholdId: this.recordId
+    })
       .then(() => {
         this.movingPersonId = undefined;
         this.targetHouseholdId = undefined;

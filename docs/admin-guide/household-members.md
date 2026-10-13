@@ -41,7 +41,8 @@ Two actions sit on each row:
 - **Make primary** turns that person into the household's primary contact. It is hidden on
   the person who already is.
 - **Move to another household** takes that person out of this household and into one you
-  choose. It only appears where a move can actually be carried out: a person your org
+  choose. In the flexible way of belonging only their membership in this household ends:
+  a child who also belongs to another parent's household stays in that one. It only appears where a move can actually be carried out: a person your org
   stores as an account can only be moved in the flexible way of belonging, so in the simple
   way the button is not offered on them.
 

@@ -168,7 +168,20 @@ public with sharing class HouseholdOfPersonController {
                 FirstName = firstName,
                 LastName = lastName
             );
-            Database.insert(person, AccessLevel.USER_MODE);
+            if (!HouseholdService.isJunctionMode()) {
+                // In contact mode the household is the contact's own account, so the person
+                // is created straight into it.
+                person.AccountId = householdId;
+            }
+            // The person is joining this household, so automatic creation must not give
+            // them one of their own first: that would leave an empty household behind in
+            // contact mode, and two households in junction mode.
+            HouseholdService.suspendAutomaticCreation();
+            try {
+                Database.insert(person, AccessLevel.USER_MODE);
+            } finally {
+                HouseholdService.resumeAutomaticCreation();
+            }
             HouseholdService.addMembers(
                 new Map<Id, Set<Id>>{ householdId => new Set<Id>{ person.Id } }
             );
