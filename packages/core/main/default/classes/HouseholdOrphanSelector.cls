@@ -17,6 +17,33 @@
  * account field is referenced here and Core still compiles on a Platform-only org (ADR-0013).
  */
 public with sharing class HouseholdOrphanSelector {
+    /**
+     * Junction mode: the people in no household, contacts and person accounts together, as
+     * Health Check and the data hygiene console both count them. Stops at `cap`: the person
+     * accounts are not counted once the contacts alone reach it.
+     */
+    public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {
+        Set<Id> personTypes = personRecordTypeIds();
+        Set<Id> excluded = new Set<Id>(personTypes);
+        if (householdRecordTypeId != null) {
+            excluded.add(householdRecordTypeId);
+        }
+        Integer found = countContactsWithoutMembership(excluded, cap);
+        if (!personTypes.isEmpty() && found < cap) {
+            found += countPersonAccountsWithoutMembership(personTypes, cap);
+        }
+        return found;
+    }
+
+    /** The record types the org describes as person types; empty without Person Accounts. */
+    public static Set<Id> personRecordTypeIds() {
+        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
+        return shape == null ||
+            shape.personAccountRecordTypeIds == null
+            ? new Set<Id>()
+            : shape.personAccountRecordTypeIds;
+    }
+
     /** Contact mode: contacts with no account at all. */
     public static Integer countContactsWithoutAccount(Integer cap) {
         return [SELECT COUNT() FROM Contact WHERE AccountId = NULL WITH USER_MODE LIMIT :cap];

@@ -244,6 +244,37 @@ private class DuplicateControllerTest {
         }
     }
 
+    /**
+     * Organization pairs the standard Account rule writes on save do not hide the households
+     * behind them: the panel reads on past a window it can use none of.
+     */
+    @IsTest
+    static void organizationPairsDoNotHideAHouseholdPairBehindThem() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> households = twoHouseholds();
+            if (!suggest(households[0].Id, households[1].Id)) {
+                return;
+            }
+            for (Integer index = 0; index < 3; index++) {
+                List<Account> bakeries = (List<Account>) insertAllowingDuplicates(
+                    new List<Account>{
+                        new Account(Name = 'Dupview Bakery ' + index),
+                        new Account(Name = 'Dupview Bakery ' + index)
+                    }
+                );
+                suggest(bakeries[0].Id, bakeries[1].Id);
+            }
+            DuplicateController.maxRead = 2;
+
+            Test.startTest();
+            DuplicateController.DuplicateView view = DuplicateController.getView();
+            Test.stopTest();
+
+            Assert.areEqual(1, view.suggestions.size(), 'The households, found past the bakeries.');
+            Assert.isTrue(view.suggestions[0].canMerge, 'And offered for merge.');
+        }
+    }
+
     @IsTest
     static void aPairWithAnOrganizationIsNotShown() {
         System.runAs(TestUsers.admin()) {

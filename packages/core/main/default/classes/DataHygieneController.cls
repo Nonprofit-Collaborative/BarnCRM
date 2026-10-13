@@ -53,22 +53,15 @@ public with sharing class DataHygieneController {
             }
             String name = DataHygieneService.savedQueryName(checkKey);
             Id existing = ownSavedQueryNamed(name);
-            FindController.FindPage page = FindController.saveQuery(
-                existing,
-                name,
-                document,
-                false
-            );
+            FindController.saveQuery(existing, name, document, false);
             OpenInFind target = new OpenInFind();
-            target.savedQueryId = existing;
+            // The query just updated, or, when there was none, the one just created: read
+            // back by owner and name, not picked from Find's list, which is cut at 500 and
+            // can hold two of a name.
+            target.savedQueryId = existing != null ? existing : ownSavedQueryNamed(name);
             target.savedQueryName = name;
             target.findTabApiName = NamespaceUtil.qualify(FIND_TAB);
             target.stateKey = NamespaceUtil.stateKey(SAVED_QUERY_STATE);
-            for (FindController.SavedQueryView view : page.savedQueries) {
-                if (view.mine == true && view.name == name) {
-                    target.savedQueryId = view.recordId;
-                }
-            }
             return target;
         } catch (AuraHandledException alreadyForThePerson) {
             throw alreadyForThePerson;

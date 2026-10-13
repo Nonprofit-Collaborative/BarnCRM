@@ -109,7 +109,7 @@ public with sharing class ImportDuplicateRuleMatcher {
             return result;
         }
         Schema.SObjectType type = probes[0].getSObjectType();
-        Boolean active = hasActiveRule(type);
+        Boolean active = hasActiveRule(type, arePersonAccounts(probes[0]));
         if (active == false) {
             return null;
         }
@@ -168,16 +168,39 @@ public with sharing class ImportDuplicateRuleMatcher {
      */
     @NamespaceAccessible
     public static Boolean hasActiveRule(Schema.SObjectType type) {
+        return hasActiveRule(type, false);
+    }
+
+    /**
+     * As `hasActiveRule`, for person accounts or for every other record of the object. On
+     * Account a person account rule (the person account subtype) compares them only, so
+     * it is no answer for an organization or a household, and asking the matcher about one
+     * with only that rule switched on fails and logs an error for every chunk.
+     */
+    @NamespaceAccessible
+    public static Boolean hasActiveRule(Schema.SObjectType type, Boolean personAccounts) {
         if (stubMatches != null || stubUnavailable == true) {
             return stubUnavailable != true;
         }
         String objectName = type.getDescribe().getName();
         try {
-            return DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName })
-                .contains(objectName);
+            return DuplicateSelector.hasActiveRuleFor(
+                objectName,
+                type == Account.SObjectType && personAccounts == true
+            );
         } catch (Exception cannotReadRules) {
             return null;
         }
+    }
+
+    /** Whether the probes are person accounts: of a person account record type. */
+    private static Boolean arePersonAccounts(SObject probe) {
+        if (probe.getSObjectType() != Account.SObjectType) {
+            return false;
+        }
+        Id recordTypeId = (Id) probe.getPopulatedFieldsAsMap().get('RecordTypeId');
+        return recordTypeId != null &&
+            OrgShapeDetector.detect().personAccountRecordTypeIds.contains(recordTypeId);
     }
 
     /**

@@ -35,13 +35,6 @@ public with sharing class DuplicateService {
     private static Boolean stubFails = false;
 
     /**
-     * In a test, the check for pairs already dismissed is skipped, which is what a dismissal
-     * racing another person's sees: the other dismissal lands between the check and the write.
-     */
-    @TestVisible
-    private static Boolean skipDismissedCheck = false;
-
-    /**
      * How many matcher calls and suggestion writes have failed in this transaction. A failure
      * is logged and answered with nothing so the scan carries on; the scan reads this to say
      * how many chunks it could not check, so a failed chunk never reads as a clean one.
@@ -242,17 +235,23 @@ public with sharing class DuplicateService {
         if (pairs == null || pairs.isEmpty()) {
             return 0;
         }
+        // The stand-in rules are read only when some pair's own rule is not known, which in a
+        // scan (pairs named by the matcher, rules read once per object) is seldom.
         Set<String> objectNames = new Set<String>();
         for (Pair pair : pairs) {
-            objectNames.add(pair.left.getSObjectType().getDescribe().getName());
+            if (ruleIdsByName == null || !ruleIdsByName.containsKey(pair.ruleName)) {
+                objectNames.add(String.valueOf(pair.left.getSObjectType()));
+            }
         }
-        Map<String, Id> fallbackByObject = DuplicateSelector.activeRuleIdByObject(objectNames);
+        Map<String, Id> fallbackByObject = objectNames.isEmpty()
+            ? new Map<String, Id>()
+            : DuplicateSelector.activeRuleIdByObject(objectNames);
         List<Pair> writable = new List<Pair>();
         List<DuplicateRecordSet> sets = new List<DuplicateRecordSet>();
         for (Pair pair : pairs) {
             Id ruleId = ruleIdsByName == null ? null : ruleIdsByName.get(pair.ruleName);
             if (ruleId == null) {
-                ruleId = fallbackByObject.get(pair.left.getSObjectType().getDescribe().getName());
+                ruleId = fallbackByObject.get(String.valueOf(pair.left.getSObjectType()));
             }
             if (ruleId == null) {
                 continue;
@@ -348,10 +347,9 @@ public with sharing class DuplicateService {
         for (DuplicateRecordItem item : found.DuplicateRecordItems) {
             records.add(item.RecordId);
         }
+        // A pair already dismissed (by anyone, at any moment) fails the unique pair key and is
+        // counted as done below, so nothing is read first.
         Set<String> keys = pairKeysAmong(records);
-        if (!skipDismissedCheck) {
-            keys.removeAll(DuplicateSelector.dismissedKeys(keys));
-        }
         List<Duplicate_Dismissal__c> dismissals = new List<Duplicate_Dismissal__c>();
         String cleanReason = String.isBlank(reason) ? null : reason.trim().left(255);
         for (String key : keys) {

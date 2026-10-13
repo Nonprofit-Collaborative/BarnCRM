@@ -23,7 +23,14 @@ public with sharing class DuplicateController {
      * How many suggestions are read before the ones the panel cannot show (organizations,
      * records this person cannot see) are filtered out, so that fifty shown are fifty usable.
      */
-    private static final Integer MAX_READ = 500;
+    @TestVisible
+    private static Integer maxRead = 500;
+    /**
+     * How many such windows are read at most while fewer than fifty usable suggestions have
+     * been found: organization pairs the standard Account rule reports on save would otherwise
+     * fill the first window and hide the households and people behind it.
+     */
+    private static final Integer MAX_WINDOWS = 4;
 
     /** One record in a suggestion, as the panel shows it. */
     public class RecordView {
@@ -219,10 +226,21 @@ public with sharing class DuplicateController {
         if (!view.canReviewSuggestions) {
             return view;
         }
-        List<DuplicateRecordSet> sets = DuplicateSelector.openSets(MAX_READ);
-        List<SuggestionView> usable = suggestions(sets);
+        List<SuggestionView> usable = new List<SuggestionView>();
+        List<DuplicateRecordSet> window = DuplicateSelector.openSetsAfter(maxRead, null);
+        Integer windows = 1;
+        usable.addAll(suggestions(window));
+        while (
+            window.size() >= maxRead &&
+            usable.size() < MAX_SUGGESTIONS &&
+            windows < MAX_WINDOWS
+        ) {
+            window = DuplicateSelector.openSetsAfter(maxRead, window[window.size() - 1]);
+            windows++;
+            usable.addAll(suggestions(window));
+        }
         view.totalSuggestions = usable.size();
-        view.moreNotCounted = sets.size() >= MAX_READ;
+        view.moreNotCounted = window.size() >= maxRead;
         for (Integer index = 0; index < usable.size() && index < MAX_SUGGESTIONS; index++) {
             view.suggestions.add(usable[index]);
         }

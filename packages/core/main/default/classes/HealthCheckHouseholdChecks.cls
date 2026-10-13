@@ -47,16 +47,16 @@ public with sharing class HealthCheckHouseholdChecks {
         List<SObject> first = new List<SObject>();
         String detail;
         if (HouseholdService.isJunctionMode()) {
-            Set<Id> personTypes = personRecordTypeIds();
+            Set<Id> personTypes = HouseholdOrphanSelector.personRecordTypeIds();
             Set<Id> excluded = new Set<Id>(personTypes);
             excluded.add(householdType);
-            count = HouseholdOrphanSelector.countContactsWithoutMembership(excluded, countCap + 1);
+            // Counted as the data hygiene console counts them, one rule for both.
+            count = HouseholdOrphanSelector.countPeopleWithoutMembership(
+                householdType,
+                countCap + 1
+            );
             first.addAll(HouseholdOrphanSelector.contactsWithoutMembership(excluded, LINKS_SHOWN));
             if (!personTypes.isEmpty()) {
-                count += HouseholdOrphanSelector.countPersonAccountsWithoutMembership(
-                    personTypes,
-                    countCap + 1
-                );
                 if (first.size() < LINKS_SHOWN) {
                     first.addAll(
                         HouseholdOrphanSelector.personAccountsWithoutMembership(
@@ -150,14 +150,6 @@ public with sharing class HealthCheckHouseholdChecks {
                 HealthCheckService.CATEGORY_SETTINGS
             )
             .withLinks(links);
-    }
-
-    private static Set<Id> personRecordTypeIds() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        return shape == null ||
-            shape.personAccountRecordTypeIds == null
-            ? new Set<Id>()
-            : shape.personAccountRecordTypeIds;
     }
 
     private static Boolean hasNativeHouseholds() {
