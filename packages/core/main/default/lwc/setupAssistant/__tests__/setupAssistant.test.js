@@ -619,7 +619,7 @@ describe('c-setup-assistant', () => {
     });
   });
 
-  it('opens the Import tab by page reference from the data step', async () => {
+  it('opens the Data Jobs tab (API name Import) by page reference from the data step', async () => {
     getState.mockResolvedValue(
       state({
         importAvailable: true,

@@ -20,7 +20,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Import</masterLabel>
+  <masterLabel>Data Jobs</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

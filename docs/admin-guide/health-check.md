@@ -104,7 +104,7 @@ Nothing is broken today.
 | Settings | With Giving: whether receipts have been voided with the reason "Generation failed", which is a receipt run that did not finish. |
 | Settings | Whether any of the totals BarnCRM ships are missing from the Rollups page. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
-| Settings | Whether any import template BarnCRM ships is missing from the Import page. |
+| Settings | Whether any import template BarnCRM ships is missing from the **Data Jobs** tab. |
 | Settings | Whether any BarnCRM nightly job is not scheduled: the rollup recalculation, the seasonal address swap and the error digest, the weekly field utilization count once you have chosen what it counts, plus the nightly jobs of any module that registers them. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Connect it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
 | Settings | Whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
@@ -156,7 +156,7 @@ pressing it once. Most can be undone on their own page:
 |---|---|---|
 | **Shipped totals are missing** | Creates the missing totals exactly as shipped. Each one starts calculating straight away, as it would have from install. Your own totals are not touched, and a shipped total whose field one of your own active totals already writes is skipped and named, so the two never overwrite each other. | Switch a total off on the Rollups page. Do not delete it: a deleted shipped total comes back the next time totals are restored or the package is upgraded (see Rollups). |
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
-| **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
+| **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the **Data Jobs** tab cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
 | **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollups page, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Connect. |
 | **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Load a spreadsheet of people, households and organizations, preview exactly what it would do,
-    and then commit it.
+    Data jobs (ADR-0047): load a spreadsheet of people, households and organizations, preview
+    exactly what it would do, commit it, and see recent imports with their undo.
   </description>
   <flexiPage>Import</flexiPage>
-  <label>Import</label>
+  <label>Data Jobs</label>
   <motif>Custom25: Box</motif>
 </CustomTab>

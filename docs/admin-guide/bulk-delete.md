@@ -96,9 +96,9 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 
 | Where | Field | What it holds |
 |---|---|---|
-| Import (data job) | Operation | Delete for a bulk delete. |
-| Import (data job) | Bulk Update Definition | The query and the confirmed count a bulk delete ran with. |
-| Import (data job) | Row Count | How many records matched when the bulk delete started. |
-| Import (data job) | Rows Deleted | How many records the bulk delete deleted. |
-| Import (data job) | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
+| Data Job | Operation | Delete for a bulk delete. |
+| Data Job | Bulk Update Definition | The query and the confirmed count a bulk delete ran with. |
+| Data Job | Row Count | How many records matched when the bulk delete started. |
+| Data Job | Rows Deleted | How many records the bulk delete deleted. |
+| Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk delete run limit | The most records one bulk delete may delete. Default 10,000, at most 48,000. |

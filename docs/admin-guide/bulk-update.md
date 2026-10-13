@@ -61,7 +61,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 5. Type `37` into **Type the number of records to confirm**, then press **Update 37 records**.
 6. The progress bar shows the chunks done. When it finishes, the panel says how many records
    were updated, how many already held the new value and how many failed, with the reason for
-   each failure. The job's run log, on the Import record, also says how many no longer matched
+   each failure. The job's run log, on the Data Job record, also says how many no longer matched
    the query.
 7. To undo it, open the **Bulk Update** tab. Find the job under **Recent bulk updates**, press
    **Undo**, check the number, and confirm.
@@ -150,10 +150,10 @@ Deleting the records a query returns is a separate tool with its own permission:
 
 | Where | Field | What it holds |
 |---|---|---|
-| Import (data job) | Operation | Import for a file import, Update for a bulk update, Delete for a bulk delete. |
-| Import (data job) | Bulk Update Definition | The query, the changes (with any steps) and the confirmed count a bulk update ran with; for a bulk delete, the query and the confirmed count. Written only by bulk update and bulk delete. |
-| Import (data job) | Row Count | How many records matched when the bulk update started. |
-| Import (data job) | Rows Updated | How many records the bulk update saved. |
-| Import (data job) | Rows Matched | How many records already held the new values and were not saved. |
-| Import (data job) | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
+| Data Job | Operation | Import for a file import, Update for a bulk update, Delete for a bulk delete. |
+| Data Job | Bulk Update Definition | The query, the changes (with any steps) and the confirmed count a bulk update ran with; for a bulk delete, the query and the confirmed count. Written only by bulk update and bulk delete. |
+| Data Job | Row Count | How many records matched when the bulk update started. |
+| Data Job | Rows Updated | How many records the bulk update saved. |
+| Data Job | Rows Matched | How many records already held the new values and were not saved. |
+| Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk update run limit | The most records one bulk update may change. Default 48,000, at most 48,000. |

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Import_Batch__c</fullName>
-  <description>The import this journal page belongs to.</description>
+  <description>The data job (import, bulk update or bulk delete) this journal page belongs to.</description>
   <externalId>false</externalId>
-  <label>Import</label>
+  <label>Data Job</label>
   <referenceTo>Import_Batch__c</referenceTo>
   <relationshipLabel>Import Journal</relationshipLabel>
   <relationshipName>Import_Journals</relationshipName>

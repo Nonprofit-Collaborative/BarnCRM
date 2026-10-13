@@ -2001,6 +2001,11 @@ changes, and what happened). An import is the unit an administrator dry-runs, co
 v0.5 undoes; a bulk update is committed when it starts and is undone the same way
 (plan Section 4.9, ADR-0047).
 
+Labels (ADR-0047): the object reads **Data Job** (plural **Data Jobs**, record name **Job
+Number**), the tab **Data Jobs**, and the lookups to it from Import Row and Import Journal
+**Data Job**. The API names (`Import_Batch__c`, the `Import` tab and flexipage, the lookup
+fields) are unchanged.
+
 ### Attributes
 
 | Attribute | Type | Required | Definition |

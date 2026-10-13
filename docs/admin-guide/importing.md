@@ -19,9 +19,14 @@ removed and the values it changed are put back (section 5).
 
 ## 2. How to turn it on
 
-Nothing to turn on. The **Import** tab is in the BarnCRM app for anyone with the
+Nothing to turn on. The **Data Jobs** tab is in the BarnCRM app for anyone with the
 **Manage BarnCRM Settings** permission. If you do not see the tab, ask whoever set up
 your org to give you the BarnCRM Admin role on the **Access** page.
+
+The tab used to be called **Import**. It is **Data Jobs** because every import, bulk update
+([Bulk update](bulk-update.md)) and bulk delete ([Bulk delete](bulk-delete.md)) is saved as one
+**Data Job** record, with its counts, run log and undo deadline. In reports and list views look
+for **Data Jobs**; the object's API name, `Import_Batch__c`, has not changed.
 
 A few things are worth knowing before your first large file:
 
@@ -33,7 +38,7 @@ A few things are worth knowing before your first large file:
 3. **Days an import can be undone** is 30 unless you change it, and can be anything from 1
    to 365. Each import keeps the window it was imported with.
 4. **Import** on the same page has an **Open the import wizard** link, which is the same
-   place the **Import** tab takes you.
+   place the **Data Jobs** tab takes you.
 5. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
@@ -48,7 +53,7 @@ Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-fr
 You need a CSV file or an Excel workbook (.xlsx). A small one is best for the first run: five
 or six rows.
 
-1. Open the **Import** tab. Select **Generic contact list**, then **Next**.
+1. Open the **Data Jobs** tab. Select **Generic contact list**, then **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
    you every column it found, with the first few values from the file underneath each one.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
@@ -161,7 +166,7 @@ It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).
 
-1. Open the **Import** tab. **Recent imports** lists your last imports, newest first, with
+1. Open the **Data Jobs** tab. **Recent imports** lists your last imports, newest first, with
    the date each one can be undone until.
 2. Select **Undo** beside the import. BarnCRM counts what it would remove (people,
    households and organizations, and gifts with Giving) and how many changed values it would put back, and shows
@@ -202,7 +207,7 @@ Some files come back on a schedule: a monthly export from your payment processor
 quarterly list from a partner. Mark the mapping you use for one as recurring and the Hub
 keeps track of it for you.
 
-1. Open the **Import** tab and choose the mapping.
+1. Open the **Data Jobs** tab and choose the mapping.
 2. Select **This file arrives regularly**, and give the source a name you will recognize,
    for example "Monthly processor export". The name is required while the box is ticked.
 3. Select **Next** and import the file as usual.
@@ -428,7 +433,7 @@ own objects, or volunteer hours from a sign-in sheet each describe one kind of r
 one object** loads a file into a single object, including your org's own custom objects, with
 the same dry run, results, journal and undo as any import.
 
-1. Open the **Import** tab and select **Load one object**.
+1. Open the **Data Jobs** tab and select **Load one object**.
 2. Choose the object from the list, give the mapping a name (for example "Program sessions"),
    and select **Create**. The new mapping is chosen for you. Select **Next**.
 3. Upload the file. Each column is matched to the field whose label or API name is its heading;
@@ -545,20 +550,20 @@ For building a report on your imports.
 
 | What you want | Object | Field |
 |---|---|---|
-| One upload and its counts | Import Batch | Row Count, Rows Created, Rows Updated, Rows Matched, Rows Rejected |
-| Why an import failed as a whole | Import Batch | Run Log |
+| One upload and its counts | Data Job | Row Count, Rows Created, Rows Updated, Rows Matched, Rows Rejected |
+| Why an import failed as a whole | Data Job | Run Log |
 | One row of the file | Import Row | Row Number, Status, Error Message |
 | Rows that matched more than one record | Import Row | Several Matches |
 | How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches, Use Duplicate Rules |
 | Rows your duplicate rules matched | Import Row | Matched By Duplicate Rule |
 | How a mapping changes values as they load | Import Template | Column Mapping (each column's changes) |
-| The values given to every row of a file | Import Batch | File Values |
-| Whether a file only matched existing records | Import Batch | Match Only |
+| The values given to every row of a file | Data Job | File Values |
+| Whether a file only matched existing records | Data Job | Match Only |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
-| The control totals of a file | Import Batch | Expected Count (and, with Giving, Expected Amount, File Amount) |
+| The control totals of a file | Data Job | Expected Count (and, with Giving, Expected Amount, File Amount) |
 | The import a record came from | Account, Contact (and Gift, with Giving) | Created By Import Batch |
 | Which mappings are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
-| When an import can be undone until | Import Batch | Undo Deadline |
+| When an import can be undone until | Data Job | Undo Deadline |
 | What an import changed on existing records, and what an undo kept | Import Journal | Phase, Entry Count, Entries |
 | The records an import that loaded one object created | Import Journal (Phase Created), Import Row | Entries; Resulting Record |
 | What a mapping that loads one object loads, and how | Import Template | Target Object, Load Operation, Load Match Field, Lookup Not Found |

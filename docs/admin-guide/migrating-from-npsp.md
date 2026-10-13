@@ -7,7 +7,7 @@
 If your donors and gifts are in the Nonprofit Success Pack (NPSP), BarnCRM ships three
 ready-made import mappings that read NPSP's own exports: your contacts, and the payments your
 donors made, from people and from organizations. You export each file with Data Loader or
-Workbench, without renaming a column, and load it through the **Import** tab like any other
+Workbench, without renaming a column, and load it through the **Data Jobs** tab like any other
 file, with a preview first and an undo afterwards.
 
 The mappings only name columns. Nothing in BarnCRM depends on NPSP being installed.
@@ -15,7 +15,7 @@ The mappings only name columns. Nothing in BarnCRM depends on NPSP being install
 ## 2. How to turn it on
 
 BarnCRM brings the contacts mapping, and the Giving module brings the two payment mappings.
-In an org that has never opened the **Import** tab they appear the first time it opens. In an
+In an org that has never opened the **Data Jobs** tab they appear the first time it opens. In an
 org that already had the generic mappings, add them once from Health Check:
 
 1. Open the **BarnCRM** app, click **BarnCRM Settings** and choose **Health**.
@@ -24,7 +24,7 @@ org that already had the generic mappings, add them once from Health Check:
    and names them.
 3. Select **Restore import templates**. Your own mappings, and any shipped mapping you have
    edited, are not touched.
-4. Open the **Import** tab. The list now has **NPSP: contacts**, **NPSP: opportunities and
+4. Open the **Data Jobs** tab. The list now has **NPSP: contacts**, **NPSP: opportunities and
    payments** and **NPSP: organization payments**.
 
 Before loading gifts, create in BarnCRM every appeal the gifts name, with the same names
@@ -37,7 +37,7 @@ The three sample files in [samples](samples/) are small exports in exactly the s
 in section 4 produce. Create a default fund called **General Fund** and an appeal called
 **Year End 2024** first.
 
-1. Open the **Import** tab, select **NPSP: contacts**, then **Next**, and upload
+1. Open the **Data Jobs** tab, select **NPSP: contacts**, then **Next**, and upload
    `npsp-contacts.csv`. Every column is already mapped: the home email to the personal email,
    the work email to the work email, the preferred email to the preferred email, and so on.
 2. Preview, then import. Ana Okafor and Robert Hale are created, each with a household of their

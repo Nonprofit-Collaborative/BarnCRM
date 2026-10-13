@@ -3,7 +3,7 @@
 ## 1. What it does
 
 Importing gifts loads a spreadsheet of gifts, with the donor on each row, through the same
-**Import** tab you use for people. Each row becomes an ordinary gift: the donor is found or
+**Data Jobs** tab you use for people. Each row becomes an ordinary gift: the donor is found or
 created, the gift is allocated to the fund you name (or split across several), and a soft
 credit and an in honor or in memory tribute can come with it. Nothing is written until you
 have seen a preview, and a gift import can be undone like any other import.
@@ -41,7 +41,7 @@ instead.
 Start with a small file: five gifts, each with a donor name, an email, an amount, a date
 (for example `2026-03-15`) and a fund name you already have.
 
-1. Open the **Import** tab, select **Generic gift list**, then **Next**, and upload the file.
+1. Open the **Data Jobs** tab, select **Generic gift list**, then **Next**, and upload the file.
 2. Check the columns. The gift columns now read **Gift: amount**, **Gift: date**, **Gift:
    fund** and so on. Map a column of processor transaction numbers to **Gift: external ID**:
    it is what stops the same file loading twice.
