@@ -124,6 +124,7 @@ public class TestUsers {
     private static User create(String usernameStart, List<String> names) {
         User person = newUser('Test User', UserInfo.getProfileId(), usernameStart);
         person.Alias = 'barntest';
+        person.Email = 'barn-test' + DOMAIN;
         person.FirstName = 'BarnCRM';
         return insertWith(person, names);
     }
@@ -172,7 +173,8 @@ public class TestUsers {
 
     /**
      * A user on the least privileged standard profile, not yet inserted, with a username no
-     * other call can produce: for a test that sets more fields before inserting it.
+     * other call can produce: for a test that sets more fields before inserting it. Its email is
+     * the last name at barncrm.example.invalid.
      *
      * @param lastName the user's last name, also the start of the alias and username
      * @return the unsaved user
@@ -227,7 +229,9 @@ public class TestUsers {
     private static User newUser(String lastName, Id profileId, String usernameStart) {
         return new User(
             Alias = lastName.deleteWhitespace().left(8),
-            Email = 'barn-test' + DOMAIN,
+            // The last name at the test domain, so a test can name the person by address
+            // (the error digest recipients are listed by email).
+            Email = lastName.replaceAll('[^A-Za-z0-9]', '') + DOMAIN,
             EmailEncodingKey = 'UTF-8',
             LastName = lastName,
             LanguageLocaleKey = 'en_US',
