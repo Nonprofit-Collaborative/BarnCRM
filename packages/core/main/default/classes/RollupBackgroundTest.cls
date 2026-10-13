@@ -180,11 +180,18 @@ private class RollupBackgroundTest {
             byHousehold.Definition_Key__c = 'Test_Background_Household';
             byHousehold.Relationship_Path__c = '{Household}';
             byHousehold.Target_Field__c = 'AnnualRevenue';
-            insert new List<Rollup_Definition__c>{ staffCount(), byHousehold };
+            List<Rollup_Definition__c> both = new List<Rollup_Definition__c>{
+                staffCount(),
+                byHousehold
+            };
+            insert both;
+            Map<String, List<Rollup_Definition__c>> marked = new Map<String, List<Rollup_Definition__c>>{
+                'Account' => both
+            };
 
             Test.startTest();
-            Integer planned = RollupService.plannedQueries(new Set<String>{ 'Account' });
-            Boolean fits = RollupService.canRecalculateNow(1, new Set<String>{ 'Account' });
+            Integer planned = RollupService.plannedQueries(marked);
+            Boolean fits = RollupService.canRecalculateNow(1, marked);
             Test.stopTest();
 
             Assert.areEqual(4 + 1 + 2, planned, 'Fixed cost, one plain, one through a token');

@@ -153,6 +153,10 @@ other BarnCRM records. For a total that counts records from one of your own obje
 [Instant totals on your own objects](#instant-totals-on-your-own-objects) below;
 without that, such a total is calculated every night and on demand only.
 
+A save recalculates only the totals its change can move. Saving a soft credit recalculates the
+soft credit totals on that person and household, not their gift or pledge totals, and an
+**Every night** total waits for the nightly run even when a record it counts is saved.
+
 ### Just after the save, or during it
 
 **When instant totals are calculated** has two choices:

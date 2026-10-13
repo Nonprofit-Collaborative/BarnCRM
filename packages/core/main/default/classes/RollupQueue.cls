@@ -34,6 +34,7 @@ public without sharing class RollupQueue implements Queueable {
     private static final String CLASS_NAME = 'RollupQueue';
     private static final String SEPARATOR = ',';
     private static final Integer LAST_ERROR_LENGTH = 32768;
+    private static final Integer DEFINITION_IDS_LENGTH = 32768;
 
     /** The longest delay the platform accepts for a queued job, in minutes. */
     private static final Integer LONGEST_DELAY_MINUTES = 10;
@@ -77,9 +78,32 @@ public without sharing class RollupQueue implements Queueable {
      * @param idsByTarget the target records, by target entity API name
      */
     public static void add(Map<String, Set<Id>> idsByTarget) {
+        add(idsByTarget, null);
+    }
+
+    /**
+     * As above, naming the definitions to recalculate for each target entity's records, so the
+     * processor runs only those (ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`).
+     *
+     * @param idsByTarget the target records, by target entity API name
+     * @param definitionIdsByTarget the definitions, by the same names; a missing or empty set
+     *        means every active definition on the entity
+     */
+    public static void add(
+        Map<String, Set<Id>> idsByTarget,
+        Map<String, Set<Id>> definitionIdsByTarget
+    ) {
         List<Rollup_Queue__c> entries = new List<Rollup_Queue__c>();
         for (String target : idsByTarget == null ? new Set<String>() : idsByTarget.keySet()) {
-            entries.addAll(entriesFor(target, idsByTarget.get(target), 0, null));
+            entries.addAll(
+                entriesFor(
+                    target,
+                    idsByTarget.get(target),
+                    0,
+                    null,
+                    definitionIdsByTarget == null ? null : definitionIdsByTarget.get(target)
+                )
+            );
         }
         insertEntries(entries);
     }
@@ -97,6 +121,18 @@ public without sharing class RollupQueue implements Queueable {
         Map<Id, String> messageById,
         Integer attemptsSoFar
     ) {
+        retryLater(targetObject, messageById, attemptsSoFar, null);
+    }
+
+    /**
+     * As above, for these definitions only; null means every active definition on the entity.
+     */
+    public static void retryLater(
+        String targetObject,
+        Map<Id, String> messageById,
+        Integer attemptsSoFar,
+        Set<Id> definitionIds
+    ) {
         if (messageById == null || messageById.isEmpty()) {
             return;
         }
@@ -109,7 +145,8 @@ public without sharing class RollupQueue implements Queueable {
                 targetObject,
                 messageById.keySet(),
                 (attemptsSoFar == null ? 0 : attemptsSoFar) + 1,
-                message
+                message,
+                definitionIds
             )
         );
     }
@@ -118,7 +155,8 @@ public without sharing class RollupQueue implements Queueable {
         String targetObject,
         Set<Id> ids,
         Integer attempts,
-        String lastError
+        String lastError,
+        Set<Id> definitionIds
     ) {
         List<Rollup_Queue__c> entries = new List<Rollup_Queue__c>();
         if (String.isBlank(targetObject) || ids == null) {
@@ -131,25 +169,45 @@ public without sharing class RollupQueue implements Queueable {
             }
         }
         sorted.sort();
+        String definitions = joinedDefinitionIds(definitionIds);
         for (Integer start = 0; start < sorted.size(); start += IDS_PER_ENTRY) {
             List<String> chunk = new List<String>();
             for (Integer i = start; i < Math.min(start + IDS_PER_ENTRY, sorted.size()); i++) {
                 chunk.add(sorted[i]);
             }
-            entries.add(entry(targetObject, chunk, attempts, lastError));
+            entries.add(entry(targetObject, chunk, attempts, lastError, definitions));
         }
         return entries;
+    }
+
+    /**
+     * The definitions as an entry holds them, or null for every definition: none named, or
+     * more than the attribute holds.
+     */
+    private static String joinedDefinitionIds(Set<Id> definitionIds) {
+        if (definitionIds == null || definitionIds.isEmpty() || definitionIds.contains(null)) {
+            return null;
+        }
+        List<String> sorted = new List<String>();
+        for (Id definitionId : definitionIds) {
+            sorted.add(String.valueOf(definitionId));
+        }
+        sorted.sort();
+        String joined = String.join(sorted, SEPARATOR);
+        return joined.length() > DEFINITION_IDS_LENGTH ? null : joined;
     }
 
     private static Rollup_Queue__c entry(
         String targetObject,
         List<String> ids,
         Integer attempts,
-        String lastError
+        String lastError,
+        String definitionIds
     ) {
         return new Rollup_Queue__c(
             Target_Object__c = targetObject,
             Record_Ids__c = String.join(ids, SEPARATOR),
+            Definition_Ids__c = definitionIds,
             Record_Count__c = ids.size(),
             Attempts__c = attempts,
             Status__c = attempts >= MAX_ATTEMPTS ? STATUS_FAILED : STATUS_PENDING,
@@ -276,12 +334,23 @@ public without sharing class RollupQueue implements Queueable {
         drain.held.addAll(slice.entries);
         Integer failed = 0;
         for (String target : slice.idsByTarget.keySet()) {
-            RollupEngine.Result result = RollupEngine.recalculate(
-                slice.idsByTarget.get(target),
-                SettingsService.typeByName(target)
-            );
+            Set<Id> definitionIds = slice.definitionIdsFor(target);
+            RollupEngine.Result result = definitionIds == null
+                ? RollupEngine.recalculate(
+                      slice.idsByTarget.get(target),
+                      SettingsService.typeByName(target)
+                  )
+                : RollupEngine.recalculate(
+                      slice.idsByTarget.get(target),
+                      RollupSelector.selectActiveByIds(definitionIds)
+                  );
             if (!result.failed.isEmpty()) {
-                retryLater(target, result.failed, slice.attemptsByTarget.get(target));
+                retryLater(
+                    target,
+                    result.failed,
+                    slice.attemptsByTarget.get(target),
+                    definitionIds
+                );
                 failed += result.failed.size();
             }
         }
@@ -315,6 +384,29 @@ public without sharing class RollupQueue implements Queueable {
         public List<Rollup_Queue__c> finished = new List<Rollup_Queue__c>();
         /** Entries larger than the slice: rewritten with the identifiers left over. */
         public List<Rollup_Queue__c> remainders = new List<Rollup_Queue__c>();
+        /** The definitions the entries taken name, by target entity. */
+        public Map<String, Set<Id>> definitionIdsByTarget = new Map<String, Set<Id>>();
+        /** Target entities with an entry that names none, so every definition runs. */
+        public Set<String> everyDefinition = new Set<String>();
+
+        /** The definitions to run for this target entity, or null for every one. */
+        public Set<Id> definitionIdsFor(String target) {
+            return this.everyDefinition.contains(target)
+                ? null
+                : this.definitionIdsByTarget.get(target);
+        }
+
+        public void addDefinitions(String target, Rollup_Queue__c entry) {
+            List<Id> named = idsIn(entry.Definition_Ids__c);
+            if (named.isEmpty()) {
+                this.everyDefinition.add(target);
+                return;
+            }
+            if (!this.definitionIdsByTarget.containsKey(target)) {
+                this.definitionIdsByTarget.put(target, new Set<Id>());
+            }
+            this.definitionIdsByTarget.get(target).addAll(named);
+        }
     }
 
     /**
@@ -358,6 +450,7 @@ public without sharing class RollupQueue implements Queueable {
             }
             slice.entries.add(entry);
             slice.idsByTarget.put(target, merged);
+            slice.addDefinitions(target, entry);
             Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
             Integer highest = slice.attemptsByTarget.get(target);
             slice.attemptsByTarget.put(
@@ -370,11 +463,15 @@ public without sharing class RollupQueue implements Queueable {
 
     /** The identifiers an entry holds; anything that is not one is dropped. */
     public static List<Id> idsOf(Rollup_Queue__c entry) {
+        return idsIn(entry.Record_Ids__c);
+    }
+
+    private static List<Id> idsIn(String joined) {
         List<Id> ids = new List<Id>();
-        if (String.isBlank(entry.Record_Ids__c)) {
+        if (String.isBlank(joined)) {
             return ids;
         }
-        for (String part : entry.Record_Ids__c.split(SEPARATOR)) {
+        for (String part : joined.split(SEPARATOR)) {
             try {
                 ids.add(Id.valueOf(part.trim()));
             } catch (Exception notAnId) {
@@ -387,7 +484,7 @@ public without sharing class RollupQueue implements Queueable {
     private static List<Rollup_Queue__c> selectDue(Integer maxEntries) {
         Datetime now = Datetime.now();
         return [
-            SELECT Id, Target_Object__c, Record_Ids__c, Attempts__c
+            SELECT Id, Target_Object__c, Record_Ids__c, Definition_Ids__c, Attempts__c
             FROM Rollup_Queue__c
             WHERE
                 Status__c = :STATUS_PENDING

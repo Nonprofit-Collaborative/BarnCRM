@@ -1418,9 +1418,12 @@ as `Gift__r.Status__c`). A changed path marks both the old and the new target; a
 marks the old target, including when a parent record is deleted and its source records go
 with it, which fires no trigger on them (deleting a gift removes its allocations, so the
 gift's delete marks their funds); an undelete marks the target again. A person who changes
-household marks both households, in both membership modes. All active definitions on one
-target entity are calculated together, one write per target record, and a value that did
-not change is not written.
+household marks both households, in both membership modes. A save recalculates only the
+definitions that marked a target, never every definition on its entity (ADR-NEXT
+`NEXT-rollups-recalculate-only-what-a-save-changed.md`); a full run calculates every
+definition it covers. The definitions one calculation runs on one target entity are
+calculated together, one write per target record, and a value that did not change is not
+written.
 
 **R-R12 Where real time comes from.** Each package ships the trigger registration for its
 own source entities (Automation Registry, Section 13). An administrator's own entity has no
@@ -1583,6 +1586,7 @@ failure list and retry.
 | Target Entity | text | yes | The entity whose records are listed, for example Account or Fund. |
 | Record Ids | long text | yes | The identifiers of the target records to recalculate, at most 200, held as text (R-RQ2). |
 | Record Count | integer | yes | How many identifiers Record Ids holds, so "records waiting" is a sum rather than a parse. |
+| Definition Ids | long text | no | The identifiers of the Rollup Definitions whose change queued the entry, held as text. Empty means every active definition on the target entity (R-R11). |
 | Status | picklist(Pending, Failed) | yes (defaults Pending) | Pending: waiting for the processor. Failed: tried five times without success; waits for Retry. |
 | Attempts | integer | yes (defaults 0) | How many times the processor has tried these records. |
 | Next Attempt | datetime | no | The earliest time the processor tries these records again after a failure; empty means now. |
@@ -1590,9 +1594,10 @@ failure list and retry.
 
 ### Relationships
 
-- None. Record Ids and Target Entity are text, never references (R-RQ2), and an entry is not
-  tied to a Rollup Definition: it lists records, and every active definition on their target
-  entity is recalculated for them (R-R11).
+- None. Record Ids, Definition Ids and Target Entity are text, never references (R-RQ2). An
+  entry names the definitions that queued it, and only those active ones are recalculated for
+  its records; an entry with no Definition Ids (a full run's hand-off, an entry written before
+  the attribute existed) recalculates every active definition on its target entity (R-R11).
 
 ### Rules
 
@@ -1606,7 +1611,8 @@ Identifiers held as text lock nothing. The cost is that an entry is not reportab
 the Needs attention list resolves the names.
 
 **R-RQ3 How the processor works.** It reads Pending entries whose Next Attempt has passed,
-merges and sorts their identifiers, recalculates a slice (R-R11), and deletes the entries it
+merges and sorts their identifiers, recalculates a slice for the union of the entries'
+definitions (R-R11), and deletes the entries it
 finished. Target records that failed are written back as a new entry with Attempts increased
 and Next Attempt set later each time; after the fifth attempt the entry is Failed. The
 processor runs again while Pending entries remain. A second processor started by accident is
@@ -1636,6 +1642,7 @@ and processed; the nightly run puts the totals right afterwards in Both mode.
 | Target Entity | `Target_Object__c` | Text (80) |
 | Record Ids | `Record_Ids__c` | Long Text Area |
 | Record Count | `Record_Count__c` | Number (0 decimals) |
+| Definition Ids | `Definition_Ids__c` | Long Text Area |
 | Status | `Status__c` | Picklist: Pending, Failed |
 | Attempts | `Attempts__c` | Number (0 decimals) |
 | Next Attempt | `Next_Attempt__c` | DateTime |

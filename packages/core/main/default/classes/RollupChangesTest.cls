@@ -68,6 +68,49 @@ private class RollupChangesTest {
         return ids == null ? new Set<Id>() : ids;
     }
 
+    /**
+     * ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`: a save names the
+     * definitions that marked each target, so only those are recalculated.
+     */
+    @IsTest
+    static void aSaveNamesOnlyTheDefinitionsThatMarkedATarget() {
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c children = definition('Account', 'ParentId', null);
+            children.Id = FakeIds.of(Rollup_Definition__c.SObjectType, 1);
+            Rollup_Definition__c staff = definition('Contact', 'AccountId', null);
+            staff.Id = FakeIds.of(Rollup_Definition__c.SObjectType, 2);
+            Account child = organization('Child');
+            child.Id = fakeId(Account.SObjectType);
+            child.ParentId = FakeIds.of(Account.SObjectType, 2);
+
+            RollupChanges.Marked marked = RollupChanges.forSave(
+                'Account',
+                new List<SObject>{ child },
+                null,
+                false,
+                new List<Rollup_Definition__c>{ children, staff }
+            );
+            Rollup_Definition__c unsaved = definition('Account', 'ParentId', null);
+            RollupChanges.Marked byUnsaved = RollupChanges.forSave(
+                'Account',
+                new List<SObject>{ child },
+                null,
+                false,
+                new List<Rollup_Definition__c>{ unsaved }
+            );
+
+            Assert.areEqual(
+                new List<Rollup_Definition__c>{ children },
+                marked.definitionsFor('Account'),
+                'An account save marks the parent for the child count, never the staff count'
+            );
+            Assert.isNull(
+                byUnsaved.definitionsFor('Account'),
+                'A definition with no id cannot be named, so every definition runs'
+            );
+        }
+    }
+
     @IsTest
     static void aRecordMovedToAnotherParentMarksBothParents() {
         System.runAs(TestUsers.admin()) {
