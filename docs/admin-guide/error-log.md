@@ -93,7 +93,7 @@ their status, every morning when the daily Error Log run starts (the same 7:00 A
 sends the digest).
 
 1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
-2. In **Days to keep Error Log entries**, type how many days to keep them, from 30 to
+2. In **Days to keep Error Log entries**, type how many days to keep them, from 1 to
    3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
    anything older; nothing is deleted when you save.
 3. Make sure the daily run is scheduled: the **Error digest** panel says so, and Health
