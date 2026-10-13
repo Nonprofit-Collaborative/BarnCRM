@@ -73,6 +73,22 @@
         <value>One of the values is not in the format this setting expects, so nothing was saved. Check the value and save again.</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_NumberOutOfRange</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings: a number outside its range. {0} setting, {1} lowest, {2} highest.</shortDescription>
+        <value>{0} takes a number from {1} to {2}, so nothing was saved. Change it and save again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Settings_NumberOutOfRangeOnPage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: a marked number is outside its range.</shortDescription>
+        <value>A number is outside the range its setting takes, so nothing was saved. Correct the marked value and save again.</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_LearnMoreLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>

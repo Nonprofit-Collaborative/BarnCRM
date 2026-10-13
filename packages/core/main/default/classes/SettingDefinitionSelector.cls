@@ -42,7 +42,9 @@ public with sharing class SettingDefinitionSelector {
                 Description__c,
                 Help_Path__c,
                 Required_Permission__c,
-                Sort_Order__c
+                Sort_Order__c,
+                Min_Value__c,
+                Max_Value__c
             FROM Setting_Definition__mdt
             WITH SYSTEM_MODE
             ORDER BY Section__c, Sort_Order__c, MasterLabel

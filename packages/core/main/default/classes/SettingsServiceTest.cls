@@ -817,6 +817,66 @@ private class SettingsServiceTest {
     }
 
     @IsTest
+    static void aNumberOutsideItsRangeIsRefusedNamingTheSettingAndTheRange() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Import_Chunk_Size',
+                    MasterLabel = 'Rows per import chunk',
+                    Setting_Key__c = 'Import_Chunk_Size__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = 'Number',
+                    Min_Value__c = 1,
+                    Max_Value__c = 2000,
+                    Sort_Order__c = 1
+                )
+            };
+
+            Test.startTest();
+            String tooLow = refusalOf('Import_Chunk_Size__c', '0');
+            String tooHigh = refusalOf('Import_Chunk_Size__c', '2001');
+            String notANumber = refusalOf('Import_Chunk_Size__c', 'lots');
+            String highest = refusalOf('Import_Chunk_Size__c', '2000');
+            Test.stopTest();
+
+            String expected = String.format(
+                System.Label.Core_Settings_NumberOutOfRange,
+                new List<Object>{ 'Rows per import chunk', '1', '2000' }
+            );
+            Assert.areEqual(expected, tooLow, 'Below the range is refused, naming both ends');
+            Assert.areEqual(expected, tooHigh, 'and so is above it');
+            Assert.isNotNull(notANumber, 'Something that is not a number is refused');
+            Assert.isNull(highest, 'The ends of the range are accepted');
+            Assert.areEqual(
+                2000,
+                Integer.valueOf(SettingsService.getValue('Import_Chunk_Size__c')),
+                'and saved'
+            );
+        }
+    }
+
+    @IsTest
+    static void everyShippedNumberSettingHasARange() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Setting_Definition__mdt> rows = SettingDefinitionSelector.getAll();
+            Test.stopTest();
+
+            Integer numbers = 0;
+            for (Setting_Definition__mdt row : rows) {
+                if (row.Data_Type__c == 'Number') {
+                    numbers++;
+                    Assert.isNotNull(row.Min_Value__c, row.DeveloperName + ' has a lowest value');
+                    Assert.isNotNull(row.Max_Value__c, row.DeveloperName + ' has a highest value');
+                    Assert.isTrue(row.Min_Value__c <= row.Max_Value__c, 'in the right order');
+                }
+            }
+            Assert.isTrue(numbers > 0, 'Core ships number settings');
+        }
+    }
+
+    @IsTest
     static void aRecordSettingTakesOnlyARecordOfItsObject() {
         System.runAs(TestUsers.admin()) {
             stubPickerDefinitions();

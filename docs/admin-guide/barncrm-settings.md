@@ -101,6 +101,10 @@ so every setting is explained the same way however you use the page.
 - **Typing a value in the wrong format.** A date and time setting expects a date and time,
   and a number setting expects a number. If a value cannot be read, nothing on the page is
   saved and a message says which value to fix. Correct it and save again.
+- **Typing a number outside its range.** Every number setting has a lowest and a highest
+  value. Type a number outside them and the box says so, and Save saves nothing until you
+  correct it. The server refuses such a value too, with a message naming the setting and
+  its range, so the page never shows a value as saved that BarnCRM would not use.
 - **Not finding a record in a picker.** The search box finds records you can see, by name.
   If the fund or appeal you want is missing, check that it exists and that you have access
   to it, then search again.
