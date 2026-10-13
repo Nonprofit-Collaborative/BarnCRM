@@ -638,8 +638,8 @@ private class ImportRowProcessorTest {
                 OrgShapeDetector.overrideShape = shape;
             } else if (PersonAccountTestShape.skipReason() != null) {
                 // Person accounts, but none of their record types is given to the running
-                // user, so the import creates nobody (ImportPersonAccountTest proves that).
-                // The reason is checked and logged.
+                // user: skipReason fails the test there, naming the script that fixes the
+                // org (PEOPLE-29), so this return is never reached in a person account org.
                 return;
             }
             givenACoupleOnOneRow(ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS);

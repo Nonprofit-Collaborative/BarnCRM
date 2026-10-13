@@ -7,19 +7,20 @@
  * nothing true to assert there. An org that does store people as accounts but gives the
  * running user none of its person record types (a Nonprofit Cloud trial ships its Person
  * Account record type without giving it to the System Administrator profile) is a gap in
- * the org's setup, and every test that returns there is coverage that did not run
- * (PEOPLE-29). Each reason is checked against the schema rather than taken from the
- * detector on trust, and written to the debug log, so a run that skipped says so and says
- * which.
+ * the org's setup, not a shape to skip: the test fails, naming the script that closes the
+ * gap (scripts/org/grant-person-record-type.sh), so person account coverage can never
+ * quietly not run (PEOPLE-29). Each reason is checked against the schema rather than taken
+ * from the detector on trust, and a skip is written to the debug log.
  */
 @IsTest
 public class PersonAccountTestShape {
     public static final String NO_PERSON_ACCOUNTS = 'Skipped: this org does not store people as accounts (the Platform-only shape, ADR-0013).';
-    public static final String NO_PERSON_TYPE_FOR_USER = 'Skipped: this org stores people as accounts but gives the running user none of its person record types. Give the System Administrator profile one so this test runs.';
+    public static final String NO_PERSON_TYPE_FOR_USER = 'This org stores people as accounts but gives the running user none of its person record types, so person account coverage cannot run. Run scripts/org/grant-person-record-type.sh <alias> to give the System Administrator profile one.';
 
     /**
-     * Null when the running user can create real person accounts here; otherwise the reason
-     * the test cannot, after checking that reason against the org's own describe.
+     * Null when the running user can create real person accounts here, and NO_PERSON_ACCOUNTS
+     * in an org that has none. Fails the calling test, with NO_PERSON_TYPE_FOR_USER, in an org
+     * that has person accounts but gives the running user no person record type.
      */
     public static String skipReason() {
         Schema.DescribeSObjectResult account = Account.SObjectType.getDescribe(
@@ -41,7 +42,7 @@ public class PersonAccountTestShape {
                     'No person record type is available to the running user, so none can be created'
                 );
             }
-            return logged(NO_PERSON_TYPE_FOR_USER);
+            Assert.fail(NO_PERSON_TYPE_FOR_USER);
         }
         return null;
     }
