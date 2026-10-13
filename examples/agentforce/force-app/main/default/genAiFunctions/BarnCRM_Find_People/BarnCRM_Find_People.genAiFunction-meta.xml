@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Finds people by part of their name or by their exact email address, and gives each one's household. Only people the running user can see are returned. Never creates or changes anything.</description>
+  <invocationTarget>FindPeopleAction</invocationTarget>
+  <invocationTargetType>apex</invocationTargetType>
+  <isConfirmationRequired>false</isConfirmationRequired>
+  <masterLabel>Find People</masterLabel>
+</GenAiFunction>

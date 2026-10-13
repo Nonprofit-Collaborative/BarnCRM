@@ -1,0 +1,14 @@
+{
+  "required": ["recordId"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "recordId": {
+      "title": "Household or Person Id",
+      "description": "Required. The record id of a household, or of a person (for example a Person Id from Find People), in which case the household that person belongs to is summarized.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

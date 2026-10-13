@@ -29,6 +29,19 @@ public with sharing class ImportBatchSelector {
         return found.isEmpty() ? null : found[0];
     }
 
+    /** These batches, those the running user can see, in one query. */
+    @NamespaceAccessible
+    public static List<Import_Batch__c> selectByIds(Set<Id> batchIds) {
+        if (batchIds == null || batchIds.isEmpty()) {
+            return new List<Import_Batch__c>();
+        }
+        return Database.queryWithBinds(
+            'SELECT ' + FIELDS + ' FROM Import_Batch__c WHERE Id IN :batchIds LIMIT 2000',
+            new Map<String, Object>{ 'batchIds' => batchIds },
+            AccessLevel.USER_MODE
+        );
+    }
+
     /**
      * The most recent imports, newest first, for the results screen's history list. Bulk
      * updates and bulk deletes are listed on their own page (canonical model Section 29E); a

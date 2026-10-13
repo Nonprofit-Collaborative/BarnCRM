@@ -1,0 +1,82 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "householdId": {
+      "title": "Household Id",
+      "description": "The household's record id.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": false,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "name": {
+      "title": "Household Name",
+      "description": "The household's name, for example The Garcia Family.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "formalGreeting": {
+      "title": "Formal Greeting",
+      "description": "How a letter to the household is addressed, for example Ms. Maria Garcia and Mr. Wei Lee.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "informalGreeting": {
+      "title": "Informal Greeting",
+      "description": "How the household is greeted informally, for example Maria and Wei.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "memberCount": {
+      "title": "Member Count",
+      "description": "How many people currently belong to the household.",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "primaryContactName": {
+      "title": "Primary Contact Name",
+      "description": "The name of the household's primary contact, the person mail and calls go to first. Empty when none is set.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "mailingAddress": {
+      "title": "Mailing Address",
+      "description": "The household's current mailing address on one line: street, city, state, postal code and country. Empty when none is recorded.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "members": {
+      "title": "Members",
+      "description": "The people who currently belong to the household, the primary member first.",
+      "maxItems": 200,
+      "items": {
+        "lightning:type": "@apexClassType/c__GetHouseholdSummaryAction$Member"
+      },
+      "lightning:type": "lightning__listType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "errorMessage": {
+      "title": "Error Message",
+      "description": "Empty when the household was found. Otherwise why not, in plain words to show the user.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}
