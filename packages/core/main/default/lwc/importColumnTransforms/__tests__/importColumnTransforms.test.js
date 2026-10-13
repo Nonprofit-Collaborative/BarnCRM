@@ -83,6 +83,9 @@ describe('the changes to one column', () => {
     const samples = element.shadowRoot.querySelectorAll('[data-id="sample"]');
     expect(samples).toHaveLength(1);
     expect(samples[0].textContent).toContain('Ana');
+    expect(element.shadowRoot.querySelector('table').getAttribute('aria-label')).toBe(
+      'c.Core_Import_ChangesPreviewHeading'
+    );
   });
 
   it('offers every kind of change, and the other columns to add', async () => {

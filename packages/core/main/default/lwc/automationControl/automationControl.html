@@ -54,8 +54,8 @@
                 </div>
             </template>
 
-            <div class="slds-grid slds-gutters slds-grid_vertical-align-end slds-var-m-bottom_medium">
-                <div class="slds-col slds-size_1-of-3">
+            <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end slds-var-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
                     <lightning-combobox
                         data-id="pause-hours"
                         label={labels.pauseLength}
@@ -65,7 +65,7 @@
                         onchange={handleHoursChange}
                     ></lightning-combobox>
                 </div>
-                <div class="slds-col">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-var-m-top_x-small">
                     <lightning-button
                         data-id="pause-button"
                         label={labels.pauseButton}

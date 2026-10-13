@@ -12,7 +12,7 @@
             </p>
         </template>
 
-        <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_medium">
+        <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_medium" aria-live="polite" data-id="counts">
             <template for:each={counts} for:item="count">
                 <div
                     key={count.key}
@@ -41,7 +41,11 @@
                 {labels.changedValuesHeading}
             </h3>
             <div class="slds-scrollable_x slds-var-m-bottom_medium">
-                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <table
+                    class="slds-table slds-table_bordered slds-table_cell-buffer"
+                    aria-label={labels.changedValuesHeading}
+                    data-id="changed-values-table"
+                >
                     <thead>
                         <tr class="slds-line-height_reset">
                             <th scope="col">{labels.rowNumberHeader}</th>
@@ -69,7 +73,11 @@
         </h3>
         <template lwc:if={hasRejectedRows}>
             <div class="slds-scrollable_x">
-                <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <table
+                    class="slds-table slds-table_bordered slds-table_cell-buffer"
+                    aria-label={labels.rejectedHeading}
+                    data-id="rejected-table"
+                >
                     <thead>
                         <tr class="slds-line-height_reset">
                             <th scope="col">{labels.rowNumberHeader}</th>

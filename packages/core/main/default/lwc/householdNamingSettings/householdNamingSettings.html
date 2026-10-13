@@ -38,7 +38,7 @@
 
             <h2 class="slds-text-heading_small slds-var-m-top_medium">{label.previewHeading}</h2>
             <template if:true={hasSamples}>
-                <table class="slds-table slds-table_bordered slds-var-m-top_x-small">
+                <table class="slds-table slds-table_bordered slds-var-m-top_x-small" aria-label={label.previewHeading}>
                     <thead>
                         <tr class="slds-line-height_reset">
                             <th scope="col">{label.columnMembers}</th>
