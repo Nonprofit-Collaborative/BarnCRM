@@ -4,9 +4,9 @@
  */
 @IsTest
 private class DataProtectionExtensionsTest {
-    private class ProtectsDismissals implements DataProtectionExtension {
+    private class ProtectsRelationships implements DataProtectionExtension {
         public Set<Schema.SObjectType> protectedObjects() {
-            return new Set<Schema.SObjectType>{ Duplicate_Dismissal__c.SObjectType };
+            return new Set<Schema.SObjectType>{ Relationship__c.SObjectType };
         }
     }
 
@@ -26,22 +26,22 @@ private class DataProtectionExtensionsTest {
     static void anObjectAnExtensionProtectsIsRefusedLikeCoresOwnBookkeeping() {
         DataProtectionExtensions.noneForTest = true;
         Assert.isNull(
-            DataProtectedFields.objectRefusal(Duplicate_Dismissal__c.SObjectType),
-            'Without the extension a dismissal may be loaded.'
+            DataProtectedFields.objectRefusal(Relationship__c.SObjectType),
+            'Without the extension a relationship may be loaded.'
         );
 
-        DataProtectionExtensions.overrides.add(new ProtectsDismissals());
+        DataProtectionExtensions.overrides.add(new ProtectsRelationships());
         DataProtectionExtensions.reset();
 
         Assert.areEqual(
             String.format(
                 Label.Core_Data_ObjectBookkeeping,
                 new List<String>{
-                    Duplicate_Dismissal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                    Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                         .getLabelPlural()
                 }
             ),
-            DataProtectedFields.objectRefusal(Duplicate_Dismissal__c.SObjectType),
+            DataProtectedFields.objectRefusal(Relationship__c.SObjectType),
             'With it, the object is refused.'
         );
     }
@@ -51,12 +51,12 @@ private class DataProtectionExtensionsTest {
         DataProtectionExtensions.noneForTest = true;
         DataProtectionExtensions.overrides.add(new Throws());
         DataProtectionExtensions.overrides.add(new ReturnsNull());
-        DataProtectionExtensions.overrides.add(new ProtectsDismissals());
+        DataProtectionExtensions.overrides.add(new ProtectsRelationships());
 
         Set<Schema.SObjectType> objects = DataProtectionExtensions.protectedObjects();
 
         Assert.areEqual(
-            new Set<Schema.SObjectType>{ Duplicate_Dismissal__c.SObjectType },
+            new Set<Schema.SObjectType>{ Relationship__c.SObjectType },
             objects,
             'Only what a working extension named.'
         );

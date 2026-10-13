@@ -260,7 +260,8 @@ private class BulkUpdateBatchTest {
         Test.startTest();
         System.runAs(maria) {
             ImportUndoService.Preview preview = ImportUndoService.preview(created.Id);
-            System.Assert.isTrue(preview.allowed, preview.reason);
+            // The reason is null when the undo is allowed, and an assertion message may not be.
+            System.Assert.isTrue(preview.allowed, 'Undo is allowed: ' + preview.reason);
             System.Assert.areEqual(200, preview.updates, 'The records the bulk update saved');
             ImportUndoService.start(created.Id, preview.total);
         }

@@ -8,6 +8,12 @@
  */
 @IsTest
 private class ImportControllerLoadTest {
+    static {
+        // Dismissals are the package's bookkeeping, which an import refuses; here they stand in
+        // for an org's own object with an External ID, which Core does not otherwise have.
+        DataProtectedFields.ordinaryForTest.add('duplicate_dismissal__c');
+    }
+
     @TestSetup
     static void setUp() {
         TestDataFactory.defaultSettings();

@@ -118,6 +118,14 @@ public with sharing class DataProtectedFields {
     @TestVisible
     private static List<Rollup_Definition__c> definitionsOverride;
 
+    /**
+     * Set only by tests: bookkeeping objects (lower-case local names) to treat as the org's own
+     * records. Core's only custom object with an External ID is Duplicate_Dismissal__c, so the
+     * one-object import tests load it as a stand-in for an org's own object.
+     */
+    @TestVisible
+    private static Set<String> ordinaryForTest = new Set<String>();
+
     /** The protected field names of each object, worked out once per transaction. */
     private static final Map<Schema.SObjectType, Set<String>> PROTECTED_BY_TYPE = new Map<Schema.SObjectType, Set<String>>();
 
@@ -144,10 +152,7 @@ public with sharing class DataProtectedFields {
         if (!described.isCustom() && SETUP.contains(name)) {
             return String.format(Label.Core_Data_ObjectSetup, plural);
         }
-        if (
-            (own != null && BOOKKEEPING.contains(own)) ||
-            DataProtectionExtensions.protectedObjects().contains(type)
-        ) {
+        if (isOwnBookkeeping(own) || DataProtectionExtensions.protectedObjects().contains(type)) {
             return String.format(Label.Core_Data_ObjectBookkeeping, plural);
         }
         if (own == MEMBERSHIP) {
@@ -175,8 +180,13 @@ public with sharing class DataProtectedFields {
         }
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         String own = described.isCustom() ? ownLocalName(described.getName().toLowerCase()) : null;
-        return (own != null && BOOKKEEPING.contains(own)) ||
-            DataProtectionExtensions.protectedObjects().contains(type);
+        return isOwnBookkeeping(own) || DataProtectionExtensions.protectedObjects().contains(type);
+    }
+
+    private static Boolean isOwnBookkeeping(String ownLocalName) {
+        return ownLocalName != null &&
+            BOOKKEEPING.contains(ownLocalName) &&
+            !ordinaryForTest.contains(ownLocalName);
     }
 
     /** Whether this object is a Salesforce setup or security object, which Setup manages. */

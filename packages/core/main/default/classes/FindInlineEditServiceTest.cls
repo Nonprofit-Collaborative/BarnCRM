@@ -100,7 +100,8 @@ private class FindInlineEditServiceTest {
 
         System.runAs(maria()) {
             cleared = FindInlineEditService.save('Contact', edits(people, '', 1));
-            nothing = FindInlineEditService.save('Contact', edits(people, 'Volunteer', 0));
+            // The same values again: the first is still Volunteer, the second already empty.
+            nothing = FindInlineEditService.save('Contact', edits(people, '', 1));
         }
 
         System.Assert.areEqual(1, cleared.saved, 'The empty value cleared the field');

@@ -106,16 +106,32 @@ private class ImportUndoTest {
      */
     private static void undo(Import_Batch__c batch, Datetime undoStartedAt) {
         Integer total = ImportUndoService.preview(batch.Id).total;
-        // Latched and queued only: a test runs a queued job at Test.stopTest, and there is
-        // none here, so the passes below are the only ones that run, each with this start.
-        ImportUndoService.start(batch.Id, total);
-        runDeletePasses(batch, total, undoStartedAt);
+        // Latched only: a job still queued when the test method ends runs then, and would
+        // repeat these passes with its own start, so it is aborted. The passes below are the
+        // only ones that run, each with this start.
+        System.abortJob(ImportUndoService.start(batch.Id, total));
+        runDeletePasses(batch, total, undoStartedAt, true);
     }
 
     private static void runDeletePasses(
         Import_Batch__c batch,
         Integer total,
         Datetime undoStartedAt
+    ) {
+        runDeletePasses(batch, total, undoStartedAt, false);
+    }
+
+    /**
+     * Runs every delete pass in this one test transaction. `accountsPassAlone` gives the last
+     * pass its own governor limits, as the platform does for every chunk: its checks keep
+     * what they cannot afford to ask about, so a budget the earlier passes spent here would
+     * keep records the job itself deletes. Only for a caller that has not used Test.startTest.
+     */
+    private static void runDeletePasses(
+        Import_Batch__c batch,
+        Integer total,
+        Datetime undoStartedAt,
+        Boolean accountsPassAlone
     ) {
         List<String> passes = ImportUndoBatch.passes();
         passes.remove(passes.indexOf(ImportUndoBatch.PASS_RESTORE));
@@ -128,6 +144,10 @@ private class ImportUndoTest {
                 false,
                 undoStartedAt
             );
+            Boolean alone = accountsPassAlone && pass == ImportUndoBatch.PASS_ACCOUNTS;
+            if (alone) {
+                Test.startTest();
+            }
             Database.QueryLocatorIterator records = job.start(null).iterator();
             List<SObject> scope = new List<SObject>();
             while (records.hasNext()) {
@@ -143,6 +163,9 @@ private class ImportUndoTest {
             }
             if (pass == ImportUndoBatch.PASS_ACCOUNTS) {
                 job.finish(null);
+            }
+            if (alone) {
+                Test.stopTest();
             }
         }
     }

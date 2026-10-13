@@ -1976,19 +1976,22 @@ public with sharing class ImportRowProcessor {
         if (stored == null || held == null || held.isEmpty()) {
             return result;
         }
-        Map<String, Object> populated = new Map<String, Object>();
-        for (String name : stored.getPopulatedFieldsAsMap().keySet()) {
-            populated.put(name.toLowerCase(), stored.getPopulatedFieldsAsMap().get(name));
-        }
         for (String attributeName : held.keySet()) {
             String incoming = held.get(attributeName);
             String lookupKey = attributeName.toLowerCase();
-            // A field that was not selected cannot be compared, so it is not claimed as a
-            // change: saying "would update" about something unread would be a lie.
-            if (String.isBlank(incoming) || !populated.containsKey(lookupKey)) {
+            if (String.isBlank(incoming)) {
                 continue;
             }
-            Object current = populated.get(lookupKey);
+            // A field that was not selected cannot be compared, so it is not claimed as a
+            // change: saying "would update" about something unread would be a lie. Read with
+            // get, not getPopulatedFieldsAsMap, which leaves out a selected field that is
+            // blank, and a blank field is exactly the one an import fills in.
+            Object current;
+            try {
+                current = stored.get(attributeName);
+            } catch (SObjectException notSelected) {
+                continue;
+            }
             if (isCheckbox(stored, lookupKey)) {
                 // A checkbox is compared as the value the save would write: "Yes" in the file
                 // is the true already stored, not a change to journal on every re-import.
