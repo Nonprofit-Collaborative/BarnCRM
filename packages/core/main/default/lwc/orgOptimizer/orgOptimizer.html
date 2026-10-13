@@ -62,6 +62,16 @@
                             ></lightning-button>
                         </template>
                     </lightning-tab>
+                    <lightning-tab label={labels.errors} value="errors" onactive={handleActive} data-id="tab-errors">
+                        <template lwc:if={errorsOpened}>
+                            <c-error-log-tile></c-error-log-tile>
+                        </template>
+                    </lightning-tab>
+                    <lightning-tab label={labels.storage} value="storage" onactive={handleActive} data-id="tab-storage">
+                        <template lwc:if={storageOpened}>
+                            <c-optimizer-storage></c-optimizer-storage>
+                        </template>
+                    </lightning-tab>
                 </template>
             </lightning-tabset>
         </div>

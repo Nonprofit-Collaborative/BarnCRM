@@ -18,6 +18,8 @@ opens quickly however large your database is.
 | **Duplicates** | Which people and households are in your database twice. Scan, review each pair, merge two households, or say a pair is not the same. See [Duplicates](duplicates.md). | Administrators |
 | **Field utilization** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field utilization](field-utilization.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
+| **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
+| **Storage and limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. A section you cannot use is not shown.
@@ -54,7 +56,9 @@ Start from the sample data (see [Sample data](sample-data.md)).
    come back in a minute to see any pairs.
 5. Choose **Health Check** and press **Run Health Check**. The findings appear, most serious
    first, each with what to do.
-6. Go back to **Data quality** and press **Recount**: the counts are fresh each time you ask.
+6. Choose **Storage and limits**. **Data storage (MB)** shows how much of your allowance is
+   used, and **What BarnCRM stores** lists the sample data's import and error records.
+7. Go back to **Data quality** and press **Recount**: the counts are fresh each time you ask.
 
 ## 4. Why sections load only when opened
 

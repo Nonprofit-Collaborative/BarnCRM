@@ -112,4 +112,156 @@
         <shortDescription>Org Optimizer: why Health Check waits for the button</shortDescription>
         <value>Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.</value>
     </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_ErrorNoPermission</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: refusal without Manage BarnCRM Settings</shortDescription>
+        <value>This section needs the Manage BarnCRM Settings permission. Ask your administrator.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Errors</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Errors section name</shortDescription>
+        <value>Errors</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_ErrorsText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Errors section answers</shortDescription>
+        <value>What went wrong recently, and which entries nobody has read.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Storage</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Storage and limits section name</shortDescription>
+        <value>Storage and limits</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_StorageText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Storage and limits section answers</shortDescription>
+        <value>How much storage and how many daily limits are used, and what BarnCRM adds.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitsHeading</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: heading of the org limits list</shortDescription>
+        <value>Your org's limits</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitUsage</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: one limit's use; {0} used, {1} allowed, {2} percent</shortDescription>
+        <value>{0} of {1} ({2}%)</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitDataStorage</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: name of the data storage limit, in MB</shortDescription>
+        <value>Data storage (MB)</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitFileStorage</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: name of the file storage limit, in MB</shortDescription>
+        <value>File storage (MB)</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitApiRequests</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: name of the daily API request limit</shortDescription>
+        <value>API requests in the last 24 hours</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitAsyncApex</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: name of the daily background job limit</shortDescription>
+        <value>Background jobs (asynchronous Apex) in the last 24 hours</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_LimitSingleEmail</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: name of the daily single email limit</shortDescription>
+        <value>Single emails sent today</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_OwnHeading</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: heading of BarnCRM's own storage list</shortDescription>
+        <value>What BarnCRM stores</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_OwnIntro</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: explains the BarnCRM storage list</shortDescription>
+        <value>Records BarnCRM keeps for imports, undo and errors. Salesforce counts most records as 2 KB.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_ColumnObject</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: storage column, the kind of record</shortDescription>
+        <value>Kind of record</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_ColumnRecords</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: storage column, how many records</shortDescription>
+        <value>Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_ColumnMB</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: storage column, estimated megabytes</shortDescription>
+        <value>About (MB)</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_MoreThan</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: a count that stopped at its cap; {0} is the cap</shortDescription>
+        <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Refresh</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: button that reads the section again</shortDescription>
+        <value>Refresh</value>
+    </labels>
 </CustomLabels>

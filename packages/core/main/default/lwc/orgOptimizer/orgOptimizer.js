@@ -13,6 +13,10 @@ import FIELD_UTILIZATION from '@salesforce/label/c.Core_OrgOptimizer_FieldUtiliz
 import FIELD_UTILIZATION_TEXT from '@salesforce/label/c.Core_OrgOptimizer_FieldUtilizationText';
 import HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_HealthCheck';
 import HEALTH_CHECK_TEXT from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckText';
+import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
+import ERRORS_TEXT from '@salesforce/label/c.Core_OrgOptimizer_ErrorsText';
+import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
+import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
 import OPEN from '@salesforce/label/c.Core_OrgOptimizer_Open';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
@@ -35,6 +39,8 @@ export default class OrgOptimizer extends LightningElement {
     duplicates: DUPLICATES,
     fieldUtilization: FIELD_UTILIZATION,
     healthCheck: HEALTH_CHECK,
+    errors: ERRORS,
+    storage: STORAGE,
     open: OPEN,
     runHealthCheck: RUN_HEALTH_CHECK,
     healthCheckIntro: HEALTH_CHECK_INTRO
@@ -63,7 +69,9 @@ export default class OrgOptimizer extends LightningElement {
       sections.push(
         { name: 'duplicates', title: DUPLICATES, text: DUPLICATES_TEXT },
         { name: 'fieldUtilization', title: FIELD_UTILIZATION, text: FIELD_UTILIZATION_TEXT },
-        { name: 'healthCheck', title: HEALTH_CHECK, text: HEALTH_CHECK_TEXT }
+        { name: 'healthCheck', title: HEALTH_CHECK, text: HEALTH_CHECK_TEXT },
+        { name: 'errors', title: ERRORS, text: ERRORS_TEXT },
+        { name: 'storage', title: STORAGE, text: STORAGE_TEXT }
       );
     }
     return sections;
@@ -79,6 +87,14 @@ export default class OrgOptimizer extends LightningElement {
 
   get fieldUtilizationOpened() {
     return Boolean(this.opened.fieldUtilization);
+  }
+
+  get errorsOpened() {
+    return Boolean(this.opened.errors);
+  }
+
+  get storageOpened() {
+    return Boolean(this.opened.storage);
   }
 
   get showHealthCheck() {

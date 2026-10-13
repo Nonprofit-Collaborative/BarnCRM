@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import OrgOptimizer from 'c/orgOptimizer';
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
+import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
 
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
@@ -12,6 +13,11 @@ jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ defau
 jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/OrgOptimizerStorageController.getStorage',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/DataHygieneController.getChecks', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -61,7 +67,14 @@ describe('c-org-optimizer as an administrator', () => {
     const names = Array.from(
       element.shadowRoot.querySelectorAll('lightning-button[data-section]')
     ).map((button) => button.dataset.section);
-    expect(names).toEqual(['quality', 'duplicates', 'fieldUtilization', 'healthCheck']);
+    expect(names).toEqual([
+      'quality',
+      'duplicates',
+      'fieldUtilization',
+      'healthCheck',
+      'errors',
+      'storage'
+    ]);
   });
 
   it('creates a section the first time its tab is opened, and keeps it', async () => {
@@ -84,6 +97,20 @@ describe('c-org-optimizer as an administrator', () => {
 
     expect(one(element, 'lightning-tabset').activeTabValue).toBe('duplicates');
     expect(one(element, 'c-duplicate-review')).not.toBeNull();
+  });
+
+  it('reads storage and errors only when their sections are opened', async () => {
+    getStorage.mockResolvedValue({ countCap: 10000, limits: [], ownObjects: [] });
+    const element = await render();
+    expect(getStorage).not.toHaveBeenCalled();
+    expect(one(element, 'c-error-log-tile')).toBeNull();
+
+    await activate(element, 'storage');
+    expect(one(element, 'c-optimizer-storage')).not.toBeNull();
+    expect(getStorage).toHaveBeenCalledTimes(1);
+
+    await activate(element, 'errors');
+    expect(one(element, 'c-error-log-tile')).not.toBeNull();
   });
 
   it('runs Health Check only when asked', async () => {
