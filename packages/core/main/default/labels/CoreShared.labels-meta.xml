@@ -101,7 +101,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Console tab name: a page, then what it shows</shortDescription>
+        <shortDescription>Console tab name; {0} the page, {1} what it shows</shortDescription>
         <value>{0}: {1}</value>
     </labels>
     <labels>

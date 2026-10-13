@@ -5,9 +5,17 @@
  * ships no Platform Cache partition (ADR-0094). These tests read with
  * no test override, so they see the shipped rows and measure the real cost.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:AutomationRegistrySelector, ApexClass:SettingDefinitionSelector, ApexClass:SettingsService'
+)
 private class ConfigReadBudgetTest {
     private static final String STAFF = 'BarnCRM_Staff';
+
+    @TestSetup
+    static void createTestUsers() {
+        TestUsers.withPermissionSets(new List<String>{ STAFF });
+        TestUsers.admin();
+    }
 
     @IsTest
     static void dispatcherRegistryReadCostsNoQuery() {
