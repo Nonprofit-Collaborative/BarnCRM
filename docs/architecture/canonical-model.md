@@ -5426,7 +5426,12 @@ owned by an account is the household's or the organization's; an address owned b
 is theirs alone and does not affect their household.
 
 **R-AD2 One default per owner.** At most one address per owner has Is Default true.
-Setting it on a second clears the first.
+Setting it on a second clears the first. Within one save that marks several addresses of
+one owner as default, the last of them keeps the flag. Clearing the flag on an owner's only
+default, with no other put in use in the same save, is refused (label
+`Core_Address_CannotUntickOnlyDefault`). When the default is deleted, the newest remaining
+address that is not Seasonal is promoted, and a Seasonal one only when nothing else is left.
+The first address added from the address card to an owner with none is saved as default.
 
 **R-AD3 Default propagation.** The default address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
@@ -6589,6 +6594,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
 
 ---
 ## 32. Entity ownership by package

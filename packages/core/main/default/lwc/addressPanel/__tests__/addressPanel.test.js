@@ -189,6 +189,41 @@ describe('c-address-panel', () => {
     expect(owner.fieldName).toBe('Contact__c');
   });
 
+  it('saves the first address as the one in use', async () => {
+    const element = build('Account');
+    getAddresses.emit([]);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-address"]').click();
+    await flush();
+
+    const flag = element.shadowRoot.querySelector('[data-id="first-address-default"]');
+    expect(flag.fieldName).toBe('Is_Default__c');
+    expect(flag.value).toBe(true);
+  });
+
+  it('leaves the default alone when the record already has addresses', async () => {
+    const element = build('Account');
+    getAddresses.emit([HOME]);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-address"]').click();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="first-address-default"]')).toBeNull();
+  });
+
+  it('does not guess the first address when the list could not be read', async () => {
+    const element = build('Account');
+    getAddresses.error({ body: { message: 'boom' } });
+    await flush();
+    const add = element.shadowRoot.querySelector('[data-id="add-address"]');
+    if (add) {
+      add.click();
+      await flush();
+    }
+
+    expect(element.shadowRoot.querySelector('[data-id="first-address-default"]')).toBeNull();
+  });
+
   it('closes the form and refreshes after a new address is saved', async () => {
     const element = build();
     getAddresses.emit([HOME]);

@@ -161,13 +161,25 @@ on the address card instead, or mark a new address as the default. This is also 
 verification apps should be pointed at the address records.
 
 **Marking two addresses as default.** You cannot end up with two. Marking a second address
-as the default clears the first one automatically. If you expected both to stay marked, you
-wanted two addresses with different types (for example Home and Work), not two defaults.
+as the default clears the first one automatically, and when one save (an import, say) marks
+two addresses of the same household or person as default, the last of them is kept and the
+others are saved unmarked. If you expected both to stay marked, you wanted two addresses
+with different types (for example Home and Work), not two defaults.
+
+**Unticking Default on the address in use.** Refused, with "This is the address in use. To
+change that, make another address the default, or delete this one." A household or person
+is never left with no address in use while their standard address boxes still show the old
+one. Choose **Set as default** on the address you want instead.
+
+**The first address on a record.** The first address you add from the address card to a
+household, organization or person with none is saved as the default, so it is in use straight
+away. After that, a new address is added unmarked until you choose **Set as default**.
 
 **Filling in a seasonal address with no dates.** A Seasonal address needs all four date
 boxes: start month, start day, end month, end day. Saving without them gives you
 "A seasonal address needs a start month, a start day, an end month, and an end day so we
-know when to use it." Fill in the four boxes, or change the type to Other if the address is
+know when to use it." The day must be one its month has (April 31 is refused; February 29
+is accepted). Fill in the four boxes, or change the type to Other if the address is
 not really seasonal. A range that crosses New Year, such as November 1 to March 31, is one
 range: enter it exactly that way, do not split it into two addresses.
 
@@ -186,8 +198,10 @@ address inside a household, put the person on it and leave the household blank.
 
 **Deleting the default address.** You can delete it, and BarnCRM promotes the most
 recently created remaining address to default so the household is never left with no
-address in its standard boxes. If the household has only one address, deleting it leaves
-the standard address boxes as they were and nothing is promoted. Prefer adding a new
+address in its standard boxes. An address that is not seasonal is preferred: a seasonal one
+is promoted only when nothing else is left, so mail does not go to a winter home in July. If
+the household has only one address, deleting it leaves the standard address boxes as they
+were and nothing is promoted. Prefer adding a new
 address and marking it default over deleting the old one: the old address is the record of
 where a mailing actually went.
 

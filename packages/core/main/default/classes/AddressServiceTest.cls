@@ -732,4 +732,221 @@ private class AddressServiceTest {
             Assert.isNull(saved.Account__c, 'Not the account lookup');
         }
     }
+
+    /** PEOPLE-24: with no household to move, the person keeps the address as their own. */
+    @IsTest
+    static void aPersonWithNoHouseholdKeepsTheirAddressAsTheirOwn() {
+        System.runAs(TestUsers.admin()) {
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', null);
+            ana.MailingStreet = HOME_STREET;
+            ana.MailingCity = HOME_CITY;
+
+            Test.startTest();
+            HouseholdService.suspendAutomaticCreation();
+            insert ana;
+            HouseholdService.resumeAutomaticCreation();
+            Test.stopTest();
+
+            List<Address__c> addresses = [
+                SELECT Contact__c, Account__c, Street__c, Is_Default__c
+                FROM Address__c
+            ];
+            Assert.areEqual(1, addresses.size(), 'The address was kept');
+            Assert.areEqual(ana.Id, addresses[0].Contact__c, 'As her own');
+            Assert.isTrue(addresses[0].Is_Default__c, 'And in use');
+        }
+    }
+
+    // ------------------------------------------------ one address in use (PEOPLE-22, 49)
+
+    @IsTest
+    static void twoDefaultsForOneOwnerInOneSaveLeaveTheLastInUse() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c first = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                City__c = HOME_CITY,
+                Is_Default__c = true
+            );
+            Address__c second = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Other',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Is_Default__c = true
+            );
+
+            Test.startTest();
+            insert new List<Address__c>{ first, second };
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
+                ],
+                'One address in use (R-AD2)'
+            );
+            Assert.isTrue(
+                [SELECT Is_Default__c FROM Address__c WHERE Id = :second.Id].Is_Default__c,
+                'The last in the save'
+            );
+            Assert.areEqual(
+                WINTER_CITY,
+                [SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
+                'The standard fields show the one in use'
+            );
+        }
+    }
+
+    @IsTest
+    static void untickingTheOnlyAddressInUseIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c home = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                City__c = HOME_CITY,
+                Is_Default__c = true
+            );
+            insert home;
+
+            Test.startTest();
+            Database.SaveResult result = Database.update(
+                new Address__c(Id = home.Id, Is_Default__c = false),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'The household would have no address in use');
+            Assert.areEqual(
+                Label.Core_Address_CannotUntickOnlyDefault,
+                result.getErrors()[0].getMessage(),
+                'The person is told what to do instead'
+            );
+        }
+    }
+
+    @IsTest
+    static void movingTheDefaultInOneSaveIsAllowed() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c home = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                City__c = HOME_CITY,
+                Is_Default__c = true
+            );
+            Address__c other = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Other',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY
+            );
+            insert new List<Address__c>{ home, other };
+
+            Test.startTest();
+            update new List<Address__c>{
+                new Address__c(Id = home.Id, Is_Default__c = false),
+                new Address__c(Id = other.Id, Is_Default__c = true)
+            };
+            Test.stopTest();
+
+            Assert.isTrue(
+                [SELECT Is_Default__c FROM Address__c WHERE Id = :other.Id].Is_Default__c,
+                'The other address is in use'
+            );
+        }
+    }
+
+    @IsTest
+    static void deletingTheDefaultPrefersAnAddressThatIsNotSeasonal() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c home = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                City__c = HOME_CITY
+            );
+            insert home;
+            Address__c winter = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Seasonal',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Seasonal_Start_Month__c = 1,
+                Seasonal_Start_Day__c = 1,
+                Seasonal_End_Month__c = 3,
+                Seasonal_End_Day__c = 31
+            );
+            insert winter;
+            Address__c work = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Other',
+                City__c = 'Chicago',
+                Is_Default__c = true
+            );
+            insert work;
+
+            Test.startTest();
+            delete work;
+            Test.stopTest();
+
+            Assert.isTrue(
+                [SELECT Is_Default__c FROM Address__c WHERE Id = :home.Id].Is_Default__c,
+                'The home address is put in use, not the newer seasonal one'
+            );
+            Assert.isFalse(
+                [SELECT Is_Default__c FROM Address__c WHERE Id = :winter.Id].Is_Default__c,
+                'The seasonal address waits for its season'
+            );
+        }
+    }
+
+    @IsTest
+    static void aDayItsMonthDoesNotHaveIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c aprilThirtyFirst = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Seasonal',
+                City__c = WINTER_CITY,
+                Seasonal_Start_Month__c = 4,
+                Seasonal_Start_Day__c = 31,
+                Seasonal_End_Month__c = 5,
+                Seasonal_End_Day__c = 31
+            );
+            Address__c februaryTwentyNinth = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Seasonal',
+                City__c = WINTER_CITY,
+                Seasonal_Start_Month__c = 1,
+                Seasonal_Start_Day__c = 1,
+                Seasonal_End_Month__c = 2,
+                Seasonal_End_Day__c = 29
+            );
+
+            Test.startTest();
+            List<Database.SaveResult> results = Database.insert(
+                new List<Address__c>{ aprilThirtyFirst, februaryTwentyNinth },
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(results[0].isSuccess(), 'April has 30 days');
+            Assert.isTrue(results[1].isSuccess(), 'February 29 is a day in a leap year');
+        }
+    }
 }
