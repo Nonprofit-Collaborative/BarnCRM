@@ -147,7 +147,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Connect | v0.6 |
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Connect | v0.6 |
 | X-03 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Connect | v0.6 |
-| X-03 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Connect | v0.7 |
+| X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Connect | v0.7 |
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Connect | v0.6 |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving | v0.6 |
 | UX review item 2 | [A donor's giving on their record](donor-records.md) | Giving | v0.6 |
