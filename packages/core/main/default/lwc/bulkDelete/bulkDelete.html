@@ -59,6 +59,16 @@
                             day="numeric"
                         ></lightning-formatted-date-time>
                     </p>
+                    <div class="slds-var-m-bottom_small">
+                        <lightning-button
+                            data-id="backup"
+                            icon-name="utility:download"
+                            label={labels.backup}
+                            disabled={busy}
+                            onclick={handleBackup}
+                        ></lightning-button>
+                        <p class="slds-text-body_small slds-var-m-top_xx-small">{labels.backupHelp}</p>
+                    </div>
                     <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
                         <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                             <lightning-input

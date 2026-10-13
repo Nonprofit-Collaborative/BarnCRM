@@ -131,6 +131,28 @@ public with sharing class BulkDeleteController {
         }
     }
 
+    /**
+     * One page of the records a delete would delete, with every field the person may read, so
+     * they can be downloaded first (R-BD8): from a query, or from a delete by file's batch.
+     */
+    @AuraEnabled
+    public static BulkDeleteService.BackupPage backupPage(
+        String queryJson,
+        String batchId,
+        String afterId
+    ) {
+        try {
+            if (String.isBlank(batchId)) {
+                requirePermission();
+                return BulkDeleteService.backupPage(queryJson, null, afterId);
+            }
+            requireDeletePermission();
+            return BulkDeleteService.backupPage(null, Id.valueOf(batchId), afterId);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Download records before a bulk delete');
+        }
+    }
+
     /** Starts deleting the records a delete by file's dry run Matched, once confirmed (R-BD7). */
     @AuraEnabled
     public static JobView startFile(String batchId, Integer confirmedCount) {
