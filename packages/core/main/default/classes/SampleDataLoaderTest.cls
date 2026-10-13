@@ -3,10 +3,11 @@
  * injected through the @TestVisible jsonOverride hook, so the tests never depend on the
  * real SampleData static resource or its size.
  *
- * The stages are called directly (SampleDataLoadQueueable.loadHouseholdsAndOrganizations
- * and loadContactChunk) rather than through the queueable chain, because an Apex test
- * context runs only the first enqueued job. One test still enqueues the first queueable
- * inside Test.startTest and Test.stopTest and asserts stage one's effects only.
+ * The stages are called directly (SampleDataLoadStages.loadHouseholdsAndOrganizations
+ * and loadContactChunk) rather than through the stage batch, because an Apex test context
+ * runs only one execute of a batch. One test still starts the batch inside Test.startTest
+ * and Test.stopTest and asserts stage one's effects only. SampleDataStageBatchTest covers
+ * the stage sequence and the hand-offs.
  */
 @IsTest(testFor='ApexClass:SampleDataLoader')
 private class SampleDataLoaderTest {
@@ -133,20 +134,20 @@ private class SampleDataLoaderTest {
         return JSON.serialize(root);
     }
 
-    /** Runs both stages in order, the way the queueable chain does in an org. */
+    /** Runs both stages in order, the way the stage batch does in an org. */
     private static SampleDataSet loadEverything(String jsonBody) {
         SampleDataSet data = SampleDataSet.parse(jsonBody);
-        SampleDataLoadQueueable.loadHouseholdsAndOrganizations(data);
+        SampleDataLoadStages.loadHouseholdsAndOrganizations(data);
         for (Integer chunk = 0; chunk < data.chunkCount(); chunk++) {
-            SampleDataLoadQueueable.loadContactChunk(data, chunk);
+            SampleDataLoadStages.loadContactChunk(data, chunk);
         }
         return data;
     }
 
-    /** Runs all three stages, the way the whole chain does in an org. */
+    /** Runs all three stages, the way the whole stage batch does in an org. */
     private static SampleDataSet loadEverythingIncludingConnections(String jsonBody) {
         SampleDataSet data = loadEverything(jsonBody);
-        SampleDataConnectionQueueable.loadConnections(data);
+        SampleDataConnections.loadConnections(data);
         return data;
     }
 
@@ -207,11 +208,10 @@ private class SampleDataLoaderTest {
     }
 
     @IsTest
-    static void testFirstQueueableRunsTheHouseholdStage() {
+    static void testLoadBatchRunsTheHouseholdStage() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
-            // The only chaining-dependent assertion the platform allows: a test context runs
-            // the first enqueued job and nothing it enqueues, so only stage one's effects
-            // exist afterwards.
+            // The only batch-dependent assertion the platform allows: a test context runs one
+            // execute of a batch, so only stage one's effects exist afterwards.
             SampleDataLoader.jsonOverride = buildJson(2, 2, false);
 
             Test.startTest();
@@ -228,7 +228,7 @@ private class SampleDataLoaderTest {
             System.assertEquals(
                 0,
                 status.contactCount,
-                'the contact stage is a second queueable, which a test context does not run'
+                'the contact stage is a second batch execute, which a test context does not run'
             );
         }
     }
@@ -242,26 +242,26 @@ private class SampleDataLoaderTest {
             System.assertEquals(250, data.members.size(), 'the payload should hold 250 members');
             System.assertEquals(3, data.chunkCount(), '250 contacts should need three chunks');
 
-            SampleDataLoadQueueable.loadHouseholdsAndOrganizations(data);
+            SampleDataLoadStages.loadHouseholdsAndOrganizations(data);
 
             System.assertEquals(
                 100,
-                SampleDataLoadQueueable.loadContactChunk(data, 0),
+                SampleDataLoadStages.loadContactChunk(data, 0),
                 'the first chunk should insert a full 100 contacts'
             );
             System.assertEquals(
                 100,
-                SampleDataLoadQueueable.loadContactChunk(data, 1),
+                SampleDataLoadStages.loadContactChunk(data, 1),
                 'the second chunk should insert a full 100 contacts'
             );
             System.assertEquals(
                 50,
-                SampleDataLoadQueueable.loadContactChunk(data, 2),
+                SampleDataLoadStages.loadContactChunk(data, 2),
                 'the last chunk should insert the remaining 50 contacts'
             );
             System.assertEquals(
                 0,
-                SampleDataLoadQueueable.loadContactChunk(data, 3),
+                SampleDataLoadStages.loadContactChunk(data, 3),
                 'a chunk past the end should insert nothing'
             );
 

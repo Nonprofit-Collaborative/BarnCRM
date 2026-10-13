@@ -1,8 +1,7 @@
 /**
- * Stage three of the C-10 sample data load: the connections between the people the contact
- * stage inserted, and the affiliations joining them to the sample organizations. It is also
- * where a module sample data set (Giving, today) is started, because by the time this stage
- * runs every household, person and organization a module's records point at exists.
+ * The last stage of Core's C-10 sample data load (SampleDataLoadStages): the connections
+ * between the people the contact stages inserted, and the affiliations joining them to the
+ * sample organizations.
  *
  * People are found by the key the generator gave them, read back from `Sample_Data_Key__c`,
  * rather than carried from one job to the next. Sixty relationships and eighty affiliations
@@ -13,27 +12,11 @@
  * as sample data, inside a bypass of both relationship automations, so that the remove
  * action takes them away with the side the loader inserted.
  */
-public with sharing class SampleDataConnectionQueueable implements Queueable {
-    public void execute(QueueableContext context) {
-        // A stage that throws rolls back everything it did, a notification included, so the
-        // person who loaded the data is told by the finalizer, which runs afterwards (Q-04).
-        System.attachFinalizer(new SampleDataLoadFinalizer());
-        try {
-            SampleDataSet data = SampleDataSet.parse(SampleDataLoader.getSampleDataJson());
-            loadConnections(data);
-            SampleDataModules.startFirst();
-        } catch (Exception e) {
-            // Logged here because nothing else sees an async failure; the synchronous
-            // entry points leave logging to SampleDataController.
-            ErrorLogger.log(e, 'SampleDataConnectionQueueable');
-            throw e;
-        }
-    }
-
+public with sharing class SampleDataConnections {
     /**
      * Inserts the payload's relationships and affiliations and returns how many rows the
      * loader itself created, mirrors included. Static and taking a parsed set, so a test
-     * runs it without the queueable chain.
+     * runs it without the batch.
      */
     public static Integer loadConnections(SampleDataSet data) {
         SampleDataSelector selector = new SampleDataSelector();

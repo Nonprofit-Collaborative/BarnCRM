@@ -89,7 +89,7 @@ private class SampleDataModulesTest {
             System.assertEquals(
                 false,
                 second.loadStarted,
-                'the second waits: a queueable may only enqueue one job, so each module starts the next'
+                'the second waits: modules load one at a time, so each module starts the next'
             );
         }
     }

@@ -8,12 +8,45 @@
  * executed: no org in this environment.
  */
 @IsTest(
-    testFor='ApexClass:JobNotifier, ApexClass:ImportBatchService, ApexClass:ImportUndoService, ApexClass:BulkUpdateBatch, ApexClass:BulkDeleteUndoBatch, ApexClass:SeasonalAddressBatch, ApexClass:HouseholdNamingBatch, ApexClass:RollupFullRecalcBatch'
+    testFor='ApexClass:JobNotifier, ApexClass:ImportBatchService, ApexClass:ImportUndoService, ApexClass:BulkUpdateBatch, ApexClass:BulkDeleteUndoBatch, ApexClass:SeasonalAddressBatch, ApexClass:HouseholdNamingBatch, ApexClass:RollupFullRecalcBatch, ApexClass:SampleDataStageBatch'
 )
 private class JobNotificationPathsTest {
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
+    }
+
+    /** A sample data load of one stage that throws, or one that works. */
+    private class OneStage implements SampleDataStages {
+        private final Boolean fails;
+
+        OneStage(Boolean fails) {
+            this.fails = fails;
+        }
+
+        public String name() {
+            return 'OneStage';
+        }
+
+        public Integer stageCount() {
+            return 1;
+        }
+
+        public void runStage(Integer stage) {
+            if (fails) {
+                throw new IllegalArgumentException('stage stopped');
+            }
+        }
+
+        public void finish() {
+        }
+    }
+
+    /** Runs the one stage the way the stage batch does. */
+    private static void runOneStage(Boolean fails) {
+        SampleDataStageBatch batch = new SampleDataStageBatch(new OneStage(fails));
+        batch.start(null);
+        batch.runStage(0);
     }
 
     private static void notifications(Boolean turnedOn) {
@@ -165,9 +198,9 @@ private class JobNotificationPathsTest {
             );
 
             JobNotifier.sent.clear();
-            SampleDataLoadFinalizer.handle(ParentJobResult.SUCCESS);
+            runOneStage(false);
             Assert.areEqual(0, JobNotifier.sent.size(), 'A stage that worked says nothing');
-            SampleDataLoadFinalizer.handle(ParentJobResult.UNHANDLED_EXCEPTION);
+            runOneStage(true);
             assertOneAboutSection(
                 JobNotifier.SECTION_GENERAL,
                 title(System.Label.Core_JobNotice_Stopped, System.Label.Core_JobNotice_SampleData)
@@ -288,7 +321,7 @@ private class JobNotificationPathsTest {
             ImportUndoService.finish(updated.Id, 0, 0, false);
             new HouseholdNamingBatch().finish(null);
             new SeasonalAddressBatch().finish(null);
-            SampleDataLoadFinalizer.handle(ParentJobResult.UNHANDLED_EXCEPTION);
+            runOneStage(true);
 
             Assert.areEqual(0, JobNotifier.sent.size(), 'Turned off, no job sends');
             Assert.areEqual(

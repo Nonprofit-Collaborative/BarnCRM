@@ -50,12 +50,12 @@ private class SampleDataControllerTest {
         return JSON.serialize(root);
     }
 
-    /** Inserts stage one and every contact chunk without relying on queueable chaining. */
+    /** Inserts stage one and every contact chunk without relying on the stage batch. */
     private static void loadEverything(String jsonBody) {
         SampleDataSet data = SampleDataSet.parse(jsonBody);
-        SampleDataLoadQueueable.loadHouseholdsAndOrganizations(data);
+        SampleDataLoadStages.loadHouseholdsAndOrganizations(data);
         for (Integer chunk = 0; chunk < data.chunkCount(); chunk++) {
-            SampleDataLoadQueueable.loadContactChunk(data, chunk);
+            SampleDataLoadStages.loadContactChunk(data, chunk);
         }
     }
 

@@ -1,9 +1,9 @@
 /**
  * The Giving sample data module as Core's loader sees it (its name, label, count, load and remove
- * entry points and the payload it reads), and the queueable that loads it stage by stage. The
- * stages are called directly where a platform test would refuse a job that queues another.
+ * entry points and the payload it reads), and the stages that load it. The stages are called
+ * directly, since an Apex test runs only one execute of the stage batch.
  */
-@IsTest(testFor='ApexClass:GivingSampleData, ApexClass:GivingSampleDataQueueable')
+@IsTest(testFor='ApexClass:GivingSampleData, ApexClass:GivingSampleDataStages')
 private class GivingSampleDataCoverageTest {
     @TestSetup
     static void createTestUser() {
@@ -156,26 +156,23 @@ private class GivingSampleDataCoverageTest {
         }
     }
 
-    // --------------------------------------------------------------------------- the queueable
+    // ------------------------------------------------------------------------------ the stages
 
     @IsTest
-    static void theWholeChainLoadsTheReferenceDataThenTheGiftsThenFinishes() {
+    static void everyStageLoadsTheReferenceDataThenTheGifts() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePerson();
             GivingSampleData.jsonOverride = payload(5);
+            GivingSampleDataStages stages = new GivingSampleDataStages();
 
-            Test.startTest();
-            new GivingSampleDataQueueable(
-                    GivingSampleDataQueueable.STAGE_REFERENCE_DATA,
-                    new Map<String, Id>()
-                )
-                .execute(null);
-            Test.stopTest();
+            for (Integer stage = 0; stage < stages.stageCount(); stage++) {
+                stages.runStage(stage);
+            }
 
             Assert.areEqual(
                 5,
                 [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
-                'The second job, started by the first, loads all five gifts'
+                'The gift stage after the reference data stage loads all five gifts'
             );
             Assert.areEqual(5, new GivingSampleData().countLoaded(), 'And the card counts them');
             Assert.isTrue(
@@ -191,40 +188,36 @@ private class GivingSampleDataCoverageTest {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePerson();
             GivingSampleData.jsonOverride = payload(200);
-            Map<String, Id> reference = GivingSampleDataLoader.loadReferenceData(
-                GivingSampleDataSet.parse(GivingSampleData.getSampleDataJson())
-            );
+            GivingSampleDataStages stages = new GivingSampleDataStages();
+            Assert.areEqual(3, stages.stageCount(), 'Reference data, then two gift chunks');
 
-            new GivingSampleDataQueueable(0, reference).execute(null);
+            stages.runStage(0);
+            stages.runStage(1);
             Integer afterFirst = new GivingSampleData().countLoaded();
-            new GivingSampleDataQueueable(1, reference).execute(null);
+            stages.runStage(2);
 
             Assert.areEqual(
                 GivingSampleData.GIFT_CHUNK_SIZE,
                 afterFirst,
-                'The first job loads one chunk of gifts'
+                'The first gift stage loads one chunk of gifts'
             );
             Assert.areEqual(200, new GivingSampleData().countLoaded(), 'The second loads the rest');
         }
     }
 
     @IsTest
-    static void aPayloadThatCannotBeReadFailsTheJobSoThePlatformRecordsIt() {
+    static void aPayloadThatCannotBeReadFailsTheStage() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             GivingSampleData.jsonOverride = 'this is not json';
             Boolean failed = false;
 
             try {
-                new GivingSampleDataQueueable(
-                        GivingSampleDataQueueable.STAGE_REFERENCE_DATA,
-                        new Map<String, Id>()
-                    )
-                    .execute(null);
+                new GivingSampleDataStages().runStage(0);
             } catch (Exception expected) {
                 failed = true;
             }
 
-            Assert.isTrue(failed, 'The failure is passed on after it is logged');
+            Assert.isTrue(failed, 'The failure is passed on to the stage batch, which logs it');
             Assert.areEqual(
                 0,
                 [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],

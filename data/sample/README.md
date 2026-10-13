@@ -181,13 +181,15 @@ unexpectedly is caught at generation time, not in review.
 
 ## Loading and removing
 
-`SampleDataLoader.load()` (Apex) reads the Core static resource and starts a queueable
-chain: households and organizations first (record types by DeveloperName, `Sample_Data__c`
-true, `Sample_Data_Key__c` set), then contacts in chunks of 100, then the connections and
-affiliations, and finally any module sample set. Giving is one: `GivingSampleData`
-implements the Core `SampleDataModule` interface, Core finds it by name at runtime
-(ADR-0017), and its own chain inserts the funds, appeals and commitments and then the gifts
-in chunks of 100.
+`SampleDataLoader.load()` (Apex) reads the Core static resource and starts
+`SampleDataStageBatch`, which runs one stage per execute: households and organizations
+first (record types by DeveloperName, `Sample_Data__c` true, `Sample_Data_Key__c` set),
+then contacts in chunks of 100, then the connections and affiliations. Its finish starts
+any module sample set. Giving is one: `GivingSampleData` implements the Core
+`SampleDataModule` interface, Core finds it by name at runtime (ADR-0017), and its own
+stages (`GivingSampleDataStages`, run by the same batch class) insert the funds, appeals
+and commitments and then the gifts in chunks of 100. Batch Apex rather than a queueable
+chain, because Developer Edition, trial and scratch orgs stop a chain after five jobs.
 
 `SampleDataLoader.remove()` deletes every record carrying the flag: each module's records
 first, because a gift points at a person and a household, then connections, affiliations,
