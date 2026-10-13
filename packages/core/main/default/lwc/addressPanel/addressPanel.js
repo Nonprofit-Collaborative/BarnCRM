@@ -202,6 +202,14 @@ export default class AddressPanel extends LightningElement {
     return this.loaded && !this.hasAddresses && !this.errorMessage;
   }
 
+  /**
+   * The first address the record gets is the one in use (PEOPLE-49), so the form saves it as
+   * the default. Only when the list was read and is empty: a failed read proves nothing.
+   */
+  get isFirstAddress() {
+    return this.loaded && !this.errorMessage && !this.hasAddresses;
+  }
+
   /** The lookup that ties a new address to the record the panel is sitting on. */
   get ownerFieldName() {
     return this.objectApiName === 'Contact' ? 'Contact__c' : 'Account__c';

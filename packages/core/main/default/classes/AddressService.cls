@@ -83,8 +83,10 @@ public with sharing class AddressService {
 
     /**
      * After a default address is deleted, promotes the most recently created remaining
-     * address for that owner. Deleting a default is allowed: refusing it would leave a
-     * household stuck with an address it no longer uses.
+     * address for that owner, preferring one that is not seasonal: a seasonal address put in
+     * use outside its season would send the mail to the wrong home (PEOPLE-49). A seasonal one
+     * is promoted only when nothing else is left. Deleting a default is allowed: refusing it
+     * would leave a household stuck with an address it no longer uses.
      */
     public static void promoteDefaultAfterDelete(List<Address__c> deletedAddresses) {
         if (deletedAddresses == null || deletedAddresses.isEmpty() || isPropagating) {
@@ -107,8 +109,7 @@ public with sharing class AddressService {
             if (deletedIds.contains(address.Id) || ownerId == null) {
                 continue;
             }
-            Address__c held = newestByOwner.get(ownerId);
-            if (held == null || address.CreatedDate > held.CreatedDate) {
+            if (betterReplacement(address, newestByOwner.get(ownerId))) {
                 newestByOwner.put(ownerId, address);
             }
         }
@@ -129,6 +130,102 @@ public with sharing class AddressService {
             applyToStandardFields(new List<Address__c>(newestByOwner.values()));
         } finally {
             isPropagating = false;
+        }
+    }
+
+    /** Whether `candidate` is a better address to put in use than `held`, the best so far. */
+    private static Boolean betterReplacement(Address__c candidate, Address__c held) {
+        if (held == null) {
+            return true;
+        }
+        Boolean candidateSeasonal = candidate.Type__c == TYPE_SEASONAL;
+        Boolean heldSeasonal = held.Type__c == TYPE_SEASONAL;
+        if (candidateSeasonal != heldSeasonal) {
+            return !candidateSeasonal;
+        }
+        return candidate.CreatedDate > held.CreatedDate;
+    }
+
+    // ---------------------------------------------------------------- before the save
+
+    /**
+     * One default per owner within a single save (R-AD2, PEOPLE-22). When one insert or
+     * update marks two or more addresses of the same owner as default (an import can), the
+     * last of them in the save keeps the flag and the others are saved without it; the
+     * defaults already on file are cleared after the save, as for any new default.
+     */
+    public static void keepOneDefaultPerOwnerInSave(List<Address__c> records) {
+        if (records == null || records.isEmpty()) {
+            return;
+        }
+        Map<Id, Address__c> lastDefaultByOwner = new Map<Id, Address__c>();
+        for (Address__c address : records) {
+            Id ownerId = ownerIdOf(address);
+            if (address.Is_Default__c != true || ownerId == null) {
+                continue;
+            }
+            Address__c earlier = lastDefaultByOwner.put(ownerId, address);
+            if (earlier != null) {
+                earlier.Is_Default__c = false;
+            }
+        }
+    }
+
+    /**
+     * Refuses unticking the address an owner has in use when nothing else in the same save
+     * puts another in use and the owner has no other default on file (PEOPLE-49). Without
+     * it the owner would have no address in use and standard fields still showing this one.
+     * Choosing another address as the default, or deleting this one, is how it is changed.
+     * The package's own writes (a new default clearing the old one, the seasonal swap, a
+     * promotion after a delete) always put another in use in the same save, or run while
+     * propagation is under way, so they are never refused.
+     */
+    public static void refuseLeavingAnOwnerWithoutADefault(
+        List<Address__c> records,
+        Map<Id, SObject> previousById
+    ) {
+        if (records == null || previousById == null || isPropagating) {
+            return;
+        }
+        Map<Id, List<Address__c>> untickedByOwner = new Map<Id, List<Address__c>>();
+        Set<Id> ownersWithADefaultInSave = new Set<Id>();
+        for (Address__c address : records) {
+            Id ownerId = ownerIdOf(address);
+            if (ownerId == null) {
+                continue;
+            }
+            if (address.Is_Default__c == true) {
+                ownersWithADefaultInSave.add(ownerId);
+                continue;
+            }
+            Address__c previous = (Address__c) previousById.get(address.Id);
+            if (previous != null && previous.Is_Default__c == true) {
+                if (!untickedByOwner.containsKey(ownerId)) {
+                    untickedByOwner.put(ownerId, new List<Address__c>());
+                }
+                untickedByOwner.get(ownerId).add(address);
+            }
+        }
+        untickedByOwner.keySet().removeAll(ownersWithADefaultInSave);
+        if (untickedByOwner.isEmpty()) {
+            return;
+        }
+        Set<Id> ownersWithAnotherDefault = new Set<Id>();
+        for (
+            Address__c other : AddressSelector.selectDefaultsByOwnerIds(
+                untickedByOwner.keySet(),
+                previousById.keySet()
+            )
+        ) {
+            ownersWithAnotherDefault.add(ownerIdOf(other));
+        }
+        for (Id ownerId : untickedByOwner.keySet()) {
+            if (ownersWithAnotherDefault.contains(ownerId)) {
+                continue;
+            }
+            for (Address__c address : untickedByOwner.get(ownerId)) {
+                address.addError(Label.Core_Address_CannotUntickOnlyDefault);
+            }
         }
     }
 
@@ -612,16 +709,23 @@ public with sharing class AddressService {
     ) {
         Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
         Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(contactIds);
-        if (householdByPerson == null || householdByPerson.isEmpty()) {
-            return;
+        if (householdByPerson == null) {
+            householdByPerson = new Map<Id, Id>();
         }
         Map<Id, Contact> sourceByHousehold = new Map<Id, Contact>();
+        List<Contact> withoutAHousehold = new List<Contact>();
         for (Contact contact : contacts) {
             Id householdId = householdByPerson.get(contact.Id);
             if (householdId == null) {
+                withoutAHousehold.add(contact);
                 continue;
             }
             sourceByHousehold.put(householdId, contact);
+        }
+        // A person with no household to move still keeps the address they were given, as
+        // their own (PEOPLE-24, R-AD5).
+        if (!withoutAHousehold.isEmpty()) {
+            capturePersonalAddresses(withoutAHousehold, toInsert);
         }
         if (sourceByHousehold.isEmpty()) {
             return;

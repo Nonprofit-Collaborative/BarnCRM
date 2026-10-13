@@ -239,6 +239,41 @@ describe('c-address-panel', () => {
     expect(owner.fieldName).toBe('Contact__c');
   });
 
+  it('saves the first address as the one in use', async () => {
+    const element = build('Account');
+    graphql.emit(response([]));
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-address"]').click();
+    await flush();
+
+    const flag = element.shadowRoot.querySelector('[data-id="first-address-default"]');
+    expect(flag.fieldName).toBe('Is_Default__c');
+    expect(flag.value).toBe(true);
+  });
+
+  it('leaves the default alone when the record already has addresses', async () => {
+    const element = build('Account');
+    graphql.emit(response([HOME]));
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-address"]').click();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="first-address-default"]')).toBeNull();
+  });
+
+  it('does not guess the first address when the list could not be read', async () => {
+    const element = build('Account');
+    graphql.emitErrors([{ message: 'boom' }]);
+    await flush();
+    const add = element.shadowRoot.querySelector('[data-id="add-address"]');
+    if (add) {
+      add.click();
+      await flush();
+    }
+
+    expect(element.shadowRoot.querySelector('[data-id="first-address-default"]')).toBeNull();
+  });
+
   it('closes the form and reads the card and the record again after a new address is saved', async () => {
     const refresh = jest.fn().mockResolvedValue();
     const element = build();

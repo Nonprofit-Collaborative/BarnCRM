@@ -2,8 +2,9 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Seasonal_Day_In_Range</fullName>
   <active>true</active>
-  <description>A seasonal day is a day of the month.</description>
-  <errorConditionFormula>OR(AND(NOT(ISBLANK(Seasonal_Start_Day__c)), OR(Seasonal_Start_Day__c &lt; 1, Seasonal_Start_Day__c &gt; 31)), AND(NOT(ISBLANK(Seasonal_End_Day__c)), OR(Seasonal_End_Day__c &lt; 1, Seasonal_End_Day__c &gt; 31)))</errorConditionFormula>
+  <description>A seasonal day is a day its month has: 1 to 31, 1 to 30 in April, June, September and November, 1 to 29 in February.</description>
+  <errorConditionFormula
+  >OR(AND(NOT(ISBLANK(Seasonal_Start_Day__c)), OR(Seasonal_Start_Day__c &lt; 1, Seasonal_Start_Day__c &gt; IF(ISBLANK(Seasonal_Start_Month__c), 31, CASE(Seasonal_Start_Month__c, 2, 29, 4, 30, 6, 30, 9, 30, 11, 30, 31)))), AND(NOT(ISBLANK(Seasonal_End_Day__c)), OR(Seasonal_End_Day__c &lt; 1, Seasonal_End_Day__c &gt; IF(ISBLANK(Seasonal_End_Month__c), 31, CASE(Seasonal_End_Month__c, 2, 29, 4, 30, 6, 30, 9, 30, 11, 30, 31)))))</errorConditionFormula>
   <errorDisplayField>Seasonal_Start_Day__c</errorDisplayField>
-  <errorMessage>A seasonal day is a number from 1 to 31.</errorMessage>
+  <errorMessage>A seasonal day is a day its month has: 1 to 31, or 1 to 30 in April, June, September and November, or 1 to 29 in February.</errorMessage>
 </ValidationRule>

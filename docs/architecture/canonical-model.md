@@ -5515,7 +5515,12 @@ owned by an account is the household's or the organization's; an address owned b
 is theirs alone and does not affect their household.
 
 **R-AD2 One default per owner.** At most one address per owner has Is Default true.
-Setting it on a second clears the first.
+Setting it on a second clears the first. Within one save that marks several addresses of
+one owner as default, the last of them keeps the flag. Clearing the flag on an owner's only
+default, with no other put in use in the same save, is refused (label
+`Core_Address_CannotUntickOnlyDefault`). When the default is deleted, the newest remaining
+address that is not Seasonal is promoted, and a Seasonal one only when nothing else is left.
+The first address added from the address card to an owner with none is saved as default.
 
 **R-AD3 Default propagation.** The default address is copied to the standard address
 fields, so every standard feature, report, and third-party app keeps working: to the
@@ -6700,6 +6705,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Error Log retention (owner decision 2026-10-13, ADMIN-26). `BarnCRM_Settings__c` gains `Error_Log_Retention_Days__c` (default 180; Section 12, v0.6 keys). New rule R-E6: the daily Error Log job deletes entries older than that, whatever their status. No object added. |
 | v0.6 | 2026-10-13 | A range on every number setting (owner decision 2026-10-13, ADMIN-27). `Setting_Definition__mdt` gains `Min_Value__c` and `Max_Value__c` (Section 13); every shipped Number row sets both, and the console and `SettingsService` refuse a value outside them. No object added. |
 | v0.11 | 2026-10-13 | Household Member integrity (PEOPLE-25). No object or field added. R-M4 is now enforced by the validation rule `Membership_Names_One_Person` on a save that creates a row or changes who it names. New R-M6: one current membership per person per household, refused before the save by the Household Member trigger (label `Core_Households_ErrorAlreadyCurrentMember`). R-M3's tolerance of two primaries from a data load is unchanged. |
+| v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
 
 ---
 ## 32. Entity ownership by package

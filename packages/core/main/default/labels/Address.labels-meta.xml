@@ -25,6 +25,14 @@
         <value>Cancel</value>
     </labels>
     <labels>
+        <fullName>Core_Address_CannotUntickOnlyDefault</fullName>
+        <categories>Addresses</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Address: refusal to untick the only address in use</shortDescription>
+        <value>This is the address in use. To change that, make another address the default, or delete this one.</value>
+    </labels>
+    <labels>
         <fullName>Core_Address_DefaultBadge</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>

@@ -24,6 +24,20 @@ public with sharing class AddressTriggerHandler extends TriggerHandler {
             return;
         }
         AddressService.ownPersonAccountsAsPeople(records);
+        AddressService.keepOneDefaultPerOwnerInSave(records);
+    }
+
+    /**
+     * One default per owner within the save, and the address in use is not unticked unless
+     * another is put in use (R-AD2).
+     */
+    public override void beforeUpdate() {
+        List<Address__c> records = (List<Address__c>) newRecords();
+        if (records == null || records.isEmpty()) {
+            return;
+        }
+        AddressService.keepOneDefaultPerOwnerInSave(records);
+        AddressService.refuseLeavingAnOwnerWithoutADefault(records, oldRecordsById());
     }
 
     public override void afterInsert() {

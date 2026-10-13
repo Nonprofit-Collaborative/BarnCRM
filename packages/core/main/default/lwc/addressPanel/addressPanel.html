@@ -67,6 +67,14 @@
               value={recordId}
               variant="label-hidden"
             ></lightning-input-field>
+            <template lwc:if={isFirstAddress}>
+              <lightning-input-field
+                field-name="Is_Default__c"
+                value={isFirstAddress}
+                class="slds-hide"
+                data-id="first-address-default"
+              ></lightning-input-field>
+            </template>
             <template for:each={formFields} for:item="fieldName">
               <lightning-input-field key={fieldName} field-name={fieldName}></lightning-input-field>
             </template>
