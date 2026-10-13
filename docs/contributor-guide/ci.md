@@ -102,7 +102,8 @@ Salesforce org is needed for this job. Steps:
    description over 1000, a custom label value over 1000; two layout actions with the same
    sort order or name; a record page visibility rule that tests a lookup field itself (the
    platform refuses EQUAL and NE there, so test a field across it, such as
-   `{!Record.Donor_Account__r.Name}`); and an Apex class, interface or enum named after a reserved Apex type
+   `{!Record.Donor_Account__r.Name}`); a dynamic related list column value that names
+   several fields instead of one per `valueListItems`; and an Apex class, interface or enum named after a reserved Apex type
    (Page, Package, Type, Object, Limit, Group, Case, Sort, Select, Trigger, System, Schema,
    Database). Lengths are counted with leading and trailing whitespace trimmed but the line
    breaks and indentation inside counted, as the platform does, so a description that

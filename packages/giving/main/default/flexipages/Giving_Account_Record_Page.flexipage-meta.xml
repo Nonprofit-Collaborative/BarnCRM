@@ -447,7 +447,19 @@
           <name>relatedListFieldAliases</name>
           <valueList>
             <valueListItems>
-              <value>NAME Gift_Date__c Amount__c Type__c Status__c</value>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift_Date__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Type__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Status__c</value>
             </valueListItems>
           </valueList>
         </componentInstanceProperties>
@@ -503,7 +515,19 @@
           <name>relatedListFieldAliases</name>
           <valueList>
             <valueListItems>
-              <value>NAME Gift_Date__c Amount__c Type__c Status__c</value>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift_Date__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Type__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Status__c</value>
             </valueListItems>
           </valueList>
         </componentInstanceProperties>
@@ -559,7 +583,22 @@
           <name>relatedListFieldAliases</name>
           <valueList>
             <valueListItems>
-              <value>NAME Type__c Amount__c Frequency__c Status__c Balance__c</value>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Type__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Frequency__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Status__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Balance__c</value>
             </valueListItems>
           </valueList>
         </componentInstanceProperties>
@@ -615,7 +654,22 @@
           <name>relatedListFieldAliases</name>
           <valueList>
             <valueListItems>
-              <value>NAME Type__c Amount__c Frequency__c Status__c Balance__c</value>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Type__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Frequency__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Status__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Balance__c</value>
             </valueListItems>
           </valueList>
         </componentInstanceProperties>
@@ -671,7 +725,16 @@
           <name>relatedListFieldAliases</name>
           <valueList>
             <valueListItems>
-              <value>NAME Gift__c Role__c Amount__c</value>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Role__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
             </valueListItems>
           </valueList>
         </componentInstanceProperties>
