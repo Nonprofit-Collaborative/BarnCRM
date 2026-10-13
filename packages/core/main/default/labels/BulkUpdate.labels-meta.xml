@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_BulkUpdate_LogNotReached</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log line: confirmed records a stopped job never reached.</shortDescription>
+        <value>Up to {0} of the confirmed records were not reached, because Salesforce stopped part of the job (often a limit reached by automation on many records at once). They were left as they were; run a new job over them.</value>
+    </labels>
+    <labels>
         <fullName>Core_BulkUpdate_ErrorObject</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>

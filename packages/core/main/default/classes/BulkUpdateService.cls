@@ -221,6 +221,18 @@ public with sharing class BulkUpdateService {
         );
     }
 
+    /**
+     * How many of the confirmed records a job stopped by the platform never reached: the
+     * confirmed count less every record it counted an outcome for. An upper bound, since a
+     * record deleted after the confirmation was never there to reach. Used by bulk delete too.
+     */
+    public static Integer notReached(Decimal confirmed, Integer counted) {
+        if (confirmed == null) {
+            return 0;
+        }
+        return Math.max(0, confirmed.intValue() - (counted == null ? 0 : counted));
+    }
+
     /** The confirmed count a job's definition holds. */
     public static Integer confirmedCountOf(String definitionJson) {
         Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(

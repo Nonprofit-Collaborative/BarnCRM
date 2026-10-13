@@ -36,6 +36,9 @@ public with sharing class BulkUpdateFields {
         Schema.DisplayType.CURRENCY,
         Schema.DisplayType.PERCENT
     };
+    /** The words a step result may be for a ticked and an unticked checkbox. */
+    private static final Set<String> CHECKED_WORDS = new Set<String>{ 'true', 'yes', '1' };
+    private static final Set<String> UNCHECKED_WORDS = new Set<String>{ 'false', 'no', '0' };
     /** Types a bulk update can write a value of. The undo puts each of them back typed. */
     private static final Set<Schema.DisplayType> WRITABLE = new Set<Schema.DisplayType>{
         Schema.DisplayType.STRING,
@@ -332,17 +335,27 @@ public with sharing class BulkUpdateFields {
     /**
      * The text a transform produced, as the field's own type, read as an import reads a cell
      * (R-BU7): blank clears the field (a checkbox reads it as false), a checkbox takes true, yes
-     * or 1, a number keeps only its digits, point and minus sign. Unlike an import, a result the
-     * field cannot take is never shortened or guessed: it is refused, naming the field and the
-     * value, so the record is journaled as Failed rather than saved wrong.
+     * or 1 and false, no or 0, a number keeps only its digits, point and minus sign. Unlike an
+     * import, a result the field cannot take is never shortened or guessed: it is refused,
+     * naming the field and the value, so the record is journaled as Failed rather than saved
+     * wrong. That includes a checkbox result that is none of those words.
      */
     public static Object fromText(Schema.DescribeFieldResult field, String text) {
         Schema.DisplayType kind = field.getType();
         if (kind == Schema.DisplayType.BOOLEAN) {
-            String flag = text == null ? '' : text.trim();
-            return 'true'.equalsIgnoreCase(flag) ||
-                'yes'.equalsIgnoreCase(flag) ||
-                '1'.equals(flag);
+            String flag = text == null ? '' : text.trim().toLowerCase();
+            if (CHECKED_WORDS.contains(flag)) {
+                return true;
+            }
+            if (String.isBlank(flag) || UNCHECKED_WORDS.contains(flag)) {
+                return false;
+            }
+            throw new BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorStepResult,
+                    new List<Object>{ field.getLabel(), text.abbreviate(80) }
+                )
+            );
         }
         if (String.isBlank(text)) {
             if (!field.isNillable()) {

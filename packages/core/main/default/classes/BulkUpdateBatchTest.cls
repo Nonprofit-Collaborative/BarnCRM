@@ -341,6 +341,43 @@ private class BulkUpdateBatchTest {
     }
 
     /**
+     * A chunk the platform stopped (a governor limit, which a test cannot cause) leaves records
+     * nobody reached, and the run log says how many rather than four numbers that do not add up.
+     */
+    @IsTest
+    static void aStoppedChunkSaysHowManyRecordsWereNotReached() {
+        System.runAs(TestUsers.admin()) {
+            makePeople(200, 0);
+            Import_Batch__c created;
+            System.runAs(maria()) {
+                created = createJob(SET_COORDINATOR, 200);
+                BulkUpdateBatch job = new BulkUpdateBatch(created.Id);
+                List<SObject> scope = startQuery(job);
+                List<SObject> firstHalf = new List<SObject>();
+                for (Integer i = 0; i < 100; i++) {
+                    firstHalf.add(scope[i]);
+                }
+                // The second chunk rolled back whole: only the first is counted.
+                BulkUpdateBatch.jobErrorsForTest = 1;
+                runNow(job, firstHalf);
+            }
+
+            Import_Batch__c done = reread(created.Id);
+            System.Assert.areEqual(ImportBatchService.STATUS_FAILED, done.Status__c);
+            System.Assert.areEqual(100, done.Rows_Updated__c, done.Run_Log__c);
+            System.Assert.isTrue(
+                done.Run_Log__c.contains(
+                    String.format(
+                        System.Label.Core_BulkUpdate_LogNotReached,
+                        new List<Object>{ (100).format() }
+                    )
+                ),
+                done.Run_Log__c
+            );
+        }
+    }
+
+    /**
      * A record whose old and new values are too long for a journal page is refused, never saved
      * without an undo, and the reason is journaled.
      */

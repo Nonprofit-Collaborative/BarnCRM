@@ -116,7 +116,9 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** asks you to
   confirm the number of values those chunks saved, then puts them back. A job also stops when
   your access to the object or a field is taken away while it runs; the run log says why, and
-  the records it had not reached are left as they were.
+  the records it had not reached are left as they were. When Salesforce stopped part of the
+  job, the run log also says how many of the confirmed records were not reached; run a new
+  bulk update over them, in smaller parts if automation on them is heavy.
 - **"The old and new values of this record are too long to keep for an undo."** A very long
   text value (tens of thousands of characters) cannot be kept for an undo, so that record is
   left as it was rather than changed without one. Change it on the record itself.
@@ -140,7 +142,8 @@ in the order listed:
 
 The steps work on the value as text, and the result is then saved as the field's type: a
 number field takes `1,250.00` as 1250 (a whole-number field refuses `12.5` rather than drop the
-point), a checkbox takes `true`, `yes` or `1` as ticked, and a date field takes `2025-12-31`. A
+point), a checkbox takes `true`, `yes` or `1` as ticked and `false`, `no`, `0` or nothing as
+unticked (any other word is refused for that record), and a date field takes `2025-12-31`. A
 step reads a date as `2025-12-31` and a date and time as `2025-12-31 09:30:00` in your own time
 zone, so a step that changes nothing leaves the value as it was. A step never runs code and
 never reads another record.

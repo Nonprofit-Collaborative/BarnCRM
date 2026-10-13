@@ -210,12 +210,13 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
     }
 
     public void finish(Database.BatchableContext context) {
-        if (chunkStopped(context)) {
+        Boolean platformStopped = chunkStopped(context);
+        if (platformStopped) {
             failed = true;
         }
         try {
             Import_Batch__c job = [
-                SELECT Id, Run_Log__c
+                SELECT Id, Run_Log__c, Row_Count__c
                 FROM Import_Batch__c
                 WHERE Id = :jobId
                 WITH SYSTEM_MODE
@@ -244,6 +245,20 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                     }
                 )
             );
+            if (platformStopped) {
+                Integer notReached = BulkUpdateService.notReached(
+                    job.Row_Count__c,
+                    updated + unchanged + noLongerMatching + failedRecords
+                );
+                if (notReached > 0) {
+                    lines.add(
+                        String.format(
+                            System.Label.Core_BulkUpdate_LogNotReached,
+                            new List<Object>{ notReached.format() }
+                        )
+                    );
+                }
+            }
             if (journalIncomplete) {
                 lines.add(System.Label.Core_BulkUpdate_LogJournalIncomplete);
             }
