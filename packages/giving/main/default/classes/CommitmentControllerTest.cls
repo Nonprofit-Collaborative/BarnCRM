@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:CommitmentController')
 private class CommitmentControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Contact donor() {
         Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
         insert person;

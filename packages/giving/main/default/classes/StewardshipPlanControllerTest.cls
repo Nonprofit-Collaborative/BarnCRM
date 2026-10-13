@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:StewardshipPlanController')
 private class StewardshipPlanControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Stewardship_Plan_Template__c template(String name, String key, Boolean active) {
         Stewardship_Plan_Template__c created = new Stewardship_Plan_Template__c(
             Name = name,

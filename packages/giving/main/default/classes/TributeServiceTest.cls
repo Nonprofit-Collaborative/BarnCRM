@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:TributeService')
 private class TributeServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void savesAMemorialWithATypedHonoreeName() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

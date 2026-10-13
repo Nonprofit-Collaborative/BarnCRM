@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:MatchingGiftService')
 private class MatchingGiftServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void linksBothSidesAndCreditsTheEmployee() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

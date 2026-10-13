@@ -214,8 +214,10 @@ Salesforce org is needed for this job. Steps:
    run as that user shows it.
    `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
    in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
-   carries no `// runs-as: deploying user (reason)` comment. See "Tests run as a user they
-   create" below for why.
+   carries no `// runs-as: deploying user (reason)` comment (a `@TestSetup` that only calls
+   `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
+   is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
+   below for why.
    `scripts/ci/check-test-relevance.py` fails the build if a test class (the vendored engine
    excepted) has neither `@IsTest(testFor='...')` nor `@IsTest(critical=true)` and is not in
    `scripts/ci/test-relevance-cross-cutting.txt`, or if a `testFor` names a class or trigger
@@ -518,6 +520,12 @@ So every test is self-contained:
   name, preferring the ones in this package's namespace. `withPermissionSets(names)` takes any
   other list. It keeps one user per list of sets per transaction, and finds the user a
   `@TestSetup` made again in every test method, so setup data and the test share an owner.
+- Each test method is a transaction of its own, so a user made only inside test methods is
+  inserted again, with its permission set assignments, in every one (about 330 ms each,
+  roughly 7.5 minutes of a gate run before this was fixed). A class whose test methods use
+  a `TestUsers` user in more than one method creates it once in a `@TestSetup`; when there
+  is no other setup, that is a method whose body is just the call, such as
+  `TestUsers.admin();`, and it needs no `runAs`.
 - A Core test whose code calls into whichever modules are installed (the sample data loader
   counts and removes each module's records) runs as `TestUsers.adminWithInstalledModules()`:
   BarnCRM Admin plus the admin permission set of each module the org has, and `admin()` in

@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:AccountingPeriodController')
 private class AccountingPeriodControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static User maria() {
         return TestDataFactory.createUser(
             'Maria',

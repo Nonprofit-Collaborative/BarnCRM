@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:ReceiptService')
 private class ReceiptServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void issuingWithoutPermissionIsRefusedWithAMessageThatSaysWhatToAskFor() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

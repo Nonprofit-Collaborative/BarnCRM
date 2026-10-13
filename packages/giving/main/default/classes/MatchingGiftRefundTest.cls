@@ -13,6 +13,11 @@
  */
 @IsTest(testFor='ApexClass:MatchingGiftService, ApexClass:GiftService')
 private class MatchingGiftRefundTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String KEY_TOTAL = 'Contact_Total_Soft_Credits';
     private static final String KEY_COUNT = 'Contact_Soft_Credit_Count';
 

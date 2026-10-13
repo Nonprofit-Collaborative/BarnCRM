@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:CampaignSyncController')
 private class CampaignSyncControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static void switchOn(Boolean enabled) {
         Connect_Settings__c settings = Connect_Settings__c.getOrgDefaults();
         settings.Campaign_Sync_Enabled__c = enabled;

@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:InstallmentTopUpBatch')
 private class InstallmentTopUpBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void extendsEveryActiveRecurringCommitmentNotJustTheOldest() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

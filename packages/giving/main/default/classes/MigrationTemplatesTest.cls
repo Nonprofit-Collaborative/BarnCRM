@@ -15,6 +15,11 @@
  */
 @IsTest(testFor='ApexClass:ImportTemplateService, ApexClass:ImportRowProcessor')
 private class MigrationTemplatesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     /** The shipped migration templates: the people ones ship from Core, the gift ones from Giving. */
     private static final List<String> MIGRATION_KEYS = new List<String>{
         'npc_gift_transactions',

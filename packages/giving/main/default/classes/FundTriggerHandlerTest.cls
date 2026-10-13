@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:FundTriggerHandler')
 private class FundTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void markingANewDefaultClearsTheOldOne() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:GiftImportCredits')
 private class GiftImportCreditsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 

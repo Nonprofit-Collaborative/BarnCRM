@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:ReceiptStatementBatch')
 private class ReceiptStatementBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final Integer YEAR = 2026;
 
     /**

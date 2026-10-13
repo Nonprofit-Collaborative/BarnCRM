@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:AcknowledgmentRuleService')
 private class AcknowledgmentRuleMatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static List<Acknowledgment_Rule__c> ladder() {
         Acknowledgment_Rule__c major = AcknowledgmentTestData.buildRule(
             'Major gifts',

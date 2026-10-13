@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:StewardshipCommitmentHandler')
 private class StewardshipCommitmentHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String PLAN = 'Pledge welcome';
 
     private static Stewardship_Plan_Template__c activeTemplate() {

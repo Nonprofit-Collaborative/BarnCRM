@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:InboundGiftRequest')
 private class InboundGiftRequestTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static InboundGift gift(String externalId, Decimal amount) {
         InboundGift request = new InboundGift();
         request.externalId = externalId;

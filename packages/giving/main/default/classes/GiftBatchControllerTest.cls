@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:GiftBatchController')
 private class GiftBatchControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static User david() {
         return TestDataFactory.createUser(
             'David',

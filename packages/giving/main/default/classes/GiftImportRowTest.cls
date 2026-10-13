@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:GiftImportRow')
 private class GiftImportRowTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static GiftImportRow read(Map<String, Map<String, String>> entities) {
         return new GiftImportRow(new Import_Row__c(), entities);
     }

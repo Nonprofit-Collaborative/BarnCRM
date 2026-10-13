@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:QuickGiftEntryController')
 private class QuickGiftEntryControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Fund__c makeFund() {
         Fund__c fund = new Fund__c(Name = 'Annual Fund', Active__c = true, Is_Default__c = true);
         insert fund;
