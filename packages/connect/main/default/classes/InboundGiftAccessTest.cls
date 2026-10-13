@@ -195,4 +195,32 @@ private class InboundGiftAccessTest {
             );
         }
     }
+
+    @IsTest
+    static void thePermissionSetOpensTheFlowActionAndTheEndpoint() {
+        System.runAs(TestUsers.admin()) {
+            Set<String> granted = new Set<String>();
+            for (SetupEntityAccess access : [
+                SELECT SetupEntityId
+                FROM SetupEntityAccess
+                WHERE Parent.Name = 'Inbound_Gift_API' AND SetupEntityType = 'ApexClass'
+                WITH SYSTEM_MODE
+            ]) {
+                granted.add(access.SetupEntityId);
+            }
+            List<ApexClass> actions = [
+                SELECT Id, Name
+                FROM ApexClass
+                WHERE Name IN ('InboundGiftAction', 'InboundGiftResource')
+                WITH SYSTEM_MODE
+            ];
+            Assert.areEqual(2, actions.size(), 'Both entry points are in the org');
+            for (ApexClass action : actions) {
+                Assert.isTrue(
+                    granted.contains(action.Id),
+                    'Inbound Gift API gives access to ' + action.Name
+                );
+            }
+        }
+    }
 }
