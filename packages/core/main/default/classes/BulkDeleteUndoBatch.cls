@@ -240,7 +240,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
     }
 
     public void finish(Database.BatchableContext context) {
-        if (chunkStopped(context)) {
+        if (DataJobs.chunkStopped(context, jobErrorsForTest)) {
             failed = true;
         }
         try {
@@ -275,24 +275,5 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkDeleteUndoBatch.finish', jobId);
         }
-    }
-
-    /** Whether the platform stopped any chunk: the job's own error count is the one record. */
-    private Boolean chunkStopped(Database.BatchableContext context) {
-        if (jobErrorsForTest != null) {
-            return jobErrorsForTest > 0;
-        }
-        if (context == null || context.getJobId() == null) {
-            return false;
-        }
-        Id asyncJobId = context.getJobId();
-        List<AsyncApexJob> jobs = [
-            SELECT NumberOfErrors
-            FROM AsyncApexJob
-            WHERE Id = :asyncJobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return !jobs.isEmpty() && jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0;
     }
 }

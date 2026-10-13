@@ -129,22 +129,197 @@ public with sharing class DataJobs {
      * automation runs out of limits on 200 records at a time.
      */
     public static Integer chunkSize() {
-        Object configured = SettingsService.hasKey(CHUNK_SETTING)
-            ? SettingsService.getValue(CHUNK_SETTING)
-            : null;
+        return wholeNumberSetting(CHUNK_SETTING, MAX_CHUNK, MIN_CHUNK, MAX_CHUNK);
+    }
+
+    /**
+     * A whole-number setting from BarnCRM Settings, held between `lowest` and `highest`; the
+     * fallback when it is empty or unreadable.
+     */
+    public static Integer wholeNumberSetting(
+        String key,
+        Integer fallback,
+        Integer lowest,
+        Integer highest
+    ) {
+        Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
         if (configured == null) {
-            return MAX_CHUNK;
+            return fallback;
         }
         try {
-            Integer records = Decimal.valueOf(String.valueOf(configured)).intValue();
-            return Math.max(MIN_CHUNK, Math.min(records, MAX_CHUNK));
+            Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
+            return Math.max(lowest, Math.min(value, highest));
         } catch (Exception ignored) {
-            return MAX_CHUNK;
+            return fallback;
         }
     }
 
     public static Integer intOf(Decimal value) {
         return value == null ? 0 : value.intValue();
+    }
+
+    // -------------------------------------------------------------------------------------
+    // What the services and the batches share
+    // -------------------------------------------------------------------------------------
+
+    /** The confirmed count a job's definition holds. */
+    public static Integer confirmedCountOf(String definitionJson) {
+        Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
+            definitionJson
+        );
+        return Integer.valueOf(definition.get('confirmedCount'));
+    }
+
+    /** The object's name field, when the person may read it, for a sample. */
+    public static String nameField(Schema.DescribeSObjectResult described) {
+        for (Schema.SObjectField token : described.fields.getMap().values()) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            if (field.isNameField() && field.isAccessible()) {
+                return field.getName();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * How many records match, counting at most one past `ceiling`, or null when the request
+     * cannot read enough rows to tell. A count past the ceiling is returned, so the caller can
+     * say which limit it passed.
+     */
+    public static Integer countWithin(String queryJson, Integer ceiling, Integer margin) {
+        Integer headroom = Limits.getLimitQueryRows() - Limits.getQueryRows() - margin;
+        Integer cap = Math.min(ceiling + 1, headroom);
+        Integer count = QueryCompiler.count(queryJson, cap);
+        return count >= cap && cap <= ceiling ? null : count;
+    }
+
+    /** Starts the job's batch at the chunk size stamped on it, and records the batch's job. */
+    public static Import_Batch__c launch(Database.Batchable<SObject> work, Import_Batch__c job) {
+        Id asyncJobId = Database.executeBatch(work, job.Chunk_Size__c.intValue());
+        job.Job_Id__c = asyncJobId;
+        Database.update(
+            new Import_Batch__c(Id = job.Id, Job_Id__c = asyncJobId),
+            AccessLevel.SYSTEM_MODE
+        );
+        return job;
+    }
+
+    /** The definition a job stored when it started, read in system mode (ADR-0021). */
+    public static String definitionOf(Id jobId) {
+        return [
+            SELECT Operation_JSON__c
+            FROM Import_Batch__c
+            WHERE Id = :jobId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ]
+        .Operation_JSON__c;
+    }
+
+    /** The records a job reads: at most the confirmed number, in Id order, as the person. */
+    public static Database.QueryLocator locatorFor(String queryJson, Integer confirmed) {
+        QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
+            queryJson,
+            new Set<String>{ 'Id' },
+            null
+        );
+        selection.binds.put('confirmed', confirmed);
+        return Database.getQueryLocatorWithBinds(
+            selection.soql + ' ORDER BY Id LIMIT :confirmed',
+            selection.binds,
+            AccessLevel.USER_MODE
+        );
+    }
+
+    /** A locator that reads no record, so a job that could not start still finishes. */
+    public static Database.QueryLocator noRecords(Id jobId) {
+        return Database.getQueryLocatorWithBinds(
+            'SELECT Id FROM Import_Batch__c WHERE Id = :owner AND Id = NULL',
+            new Map<String, Object>{ 'owner' => jobId },
+            AccessLevel.SYSTEM_MODE
+        );
+    }
+
+    /**
+     * Whether the platform stopped any chunk of a batch. A governor limit cannot be caught, so
+     * the job's own error count is the one record of it (R-IB8). `errorsForTest`, when set,
+     * stands for that count, which a test cannot bring about for real.
+     */
+    public static Boolean chunkStopped(Database.BatchableContext context, Integer errorsForTest) {
+        if (errorsForTest != null) {
+            return errorsForTest > 0;
+        }
+        if (context == null || context.getJobId() == null) {
+            return false;
+        }
+        Id asyncJobId = context.getJobId();
+        List<AsyncApexJob> jobs = [
+            SELECT NumberOfErrors
+            FROM AsyncApexJob
+            WHERE Id = :asyncJobId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        return !jobs.isEmpty() && jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0;
+    }
+
+    /** The job as a finishing batch reads it: its run log so far and its count. */
+    public static Import_Batch__c forFinish(Id jobId) {
+        return [
+            SELECT Id, Run_Log__c, Row_Count__c
+            FROM Import_Batch__c
+            WHERE Id = :jobId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+    }
+
+    /**
+     * The run log a finishing bulk job writes: the lines before, why it stopped (`stoppedLine`,
+     * or null), what it did (`finishedLine`), how many confirmed records the platform stopped it
+     * reaching, and whether the journal missed anything. Cut to the field's size from the start.
+     */
+    public static String finalLog(
+        Import_Batch__c job,
+        String stoppedLine,
+        String finishedLine,
+        Boolean platformStopped,
+        Integer counted,
+        Boolean journalIncomplete
+    ) {
+        List<String> lines = new List<String>();
+        if (String.isNotBlank(job.Run_Log__c)) {
+            lines.add(job.Run_Log__c);
+        }
+        if (String.isNotBlank(stoppedLine)) {
+            lines.add(stoppedLine);
+        }
+        lines.add(finishedLine);
+        Integer missed = platformStopped == true ? notReached(job.Row_Count__c, counted) : 0;
+        if (missed > 0) {
+            lines.add(
+                String.format(
+                    System.Label.Core_BulkUpdate_LogNotReached,
+                    new List<Object>{ missed.format() }
+                )
+            );
+        }
+        if (journalIncomplete == true) {
+            lines.add(System.Label.Core_BulkUpdate_LogJournalIncomplete);
+        }
+        return String.join(lines, '\n').right(32768);
+    }
+
+    /**
+     * How many of the confirmed records a job stopped by the platform never reached: the
+     * confirmed count less every record it counted an outcome for. An upper bound, since a
+     * record deleted after the confirmation was never there to reach.
+     */
+    public static Integer notReached(Decimal confirmed, Integer counted) {
+        if (confirmed == null) {
+            return 0;
+        }
+        return Math.max(0, confirmed.intValue() - (counted == null ? 0 : counted));
     }
 
     /**

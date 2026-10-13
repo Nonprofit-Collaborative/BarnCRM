@@ -39,28 +39,10 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
-        Id owner = jobId;
-        definition = [
-            SELECT Operation_JSON__c
-            FROM Import_Batch__c
-            WHERE Id = :owner
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ]
-        .Operation_JSON__c;
+        definition = DataJobs.definitionOf(jobId);
         try {
             BulkDeleteService.Plan checked = BulkDeleteService.planFromDefinition(definition);
-            QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
-                checked.queryJson,
-                new Set<String>{ 'Id' },
-                null
-            );
-            selection.binds.put('confirmed', BulkDeleteService.confirmedCountOf(definition));
-            return Database.getQueryLocatorWithBinds(
-                selection.soql + ' ORDER BY Id LIMIT :confirmed',
-                selection.binds,
-                AccessLevel.USER_MODE
-            );
+            return DataJobs.locatorFor(checked.queryJson, DataJobs.confirmedCountOf(definition));
         } catch (Exception e) {
             failed = true;
             stoppedBecause = e.getMessage();
@@ -70,12 +52,7 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
             ) {
                 ErrorLogger.log(e, 'BulkDeleteBatch.start', jobId);
             }
-            // A locator that reads no record, so finish still closes the job.
-            return Database.getQueryLocatorWithBinds(
-                'SELECT Id FROM Import_Batch__c WHERE Id = :owner AND Id = NULL',
-                new Map<String, Object>{ 'owner' => owner },
-                AccessLevel.SYSTEM_MODE
-            );
+            return DataJobs.noRecords(jobId);
         }
     }
 
@@ -153,31 +130,20 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
     }
 
     public void finish(Database.BatchableContext context) {
-        Boolean platformStopped = chunkStopped(context);
+        Boolean platformStopped = DataJobs.chunkStopped(context, jobErrorsForTest);
         if (platformStopped) {
             failed = true;
         }
         try {
-            Import_Batch__c job = [
-                SELECT Id, Run_Log__c, Row_Count__c
-                FROM Import_Batch__c
-                WHERE Id = :jobId
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            List<String> lines = new List<String>();
-            if (String.isNotBlank(job.Run_Log__c)) {
-                lines.add(job.Run_Log__c);
-            }
-            if (String.isNotBlank(stoppedBecause)) {
-                lines.add(
-                    String.format(
-                        System.Label.Core_BulkDelete_LogStopped,
-                        new List<Object>{ stoppedBecause }
-                    )
-                );
-            }
-            lines.add(
+            Import_Batch__c job = DataJobs.forFinish(jobId);
+            job.Run_Log__c = DataJobs.finalLog(
+                job,
+                String.isBlank(stoppedBecause)
+                    ? null
+                    : String.format(
+                          System.Label.Core_BulkDelete_LogStopped,
+                          new List<Object>{ stoppedBecause }
+                      ),
                 String.format(
                     System.Label.Core_BulkDelete_LogFinished,
                     new List<Object>{
@@ -185,26 +151,11 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
                         noLongerMatching.format(),
                         failedRecords.format()
                     }
-                )
+                ),
+                platformStopped,
+                deletedRecords + noLongerMatching + failedRecords,
+                journalIncomplete
             );
-            if (platformStopped) {
-                Integer notReached = BulkUpdateService.notReached(
-                    job.Row_Count__c,
-                    deletedRecords + noLongerMatching + failedRecords
-                );
-                if (notReached > 0) {
-                    lines.add(
-                        String.format(
-                            System.Label.Core_BulkUpdate_LogNotReached,
-                            new List<Object>{ notReached.format() }
-                        )
-                    );
-                }
-            }
-            if (journalIncomplete) {
-                lines.add(System.Label.Core_BulkUpdate_LogJournalIncomplete);
-            }
-            job.Run_Log__c = String.join(lines, '\n').right(32768);
             job.Status__c = failed
                 ? ImportBatchService.STATUS_FAILED
                 : ImportBatchService.STATUS_COMPLETE;
@@ -215,28 +166,6 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkDeleteBatch.finish', jobId);
         }
-    }
-
-    /**
-     * Whether the platform stopped any chunk. A governor limit cannot be caught, so the job's
-     * own error count is the one record of it.
-     */
-    private Boolean chunkStopped(Database.BatchableContext context) {
-        if (jobErrorsForTest != null) {
-            return jobErrorsForTest > 0;
-        }
-        if (context == null || context.getJobId() == null) {
-            return false;
-        }
-        Id asyncJobId = context.getJobId();
-        List<AsyncApexJob> jobs = [
-            SELECT NumberOfErrors
-            FROM AsyncApexJob
-            WHERE Id = :asyncJobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return !jobs.isEmpty() && jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0;
     }
 
     private static String message(List<Database.Error> errors) {
