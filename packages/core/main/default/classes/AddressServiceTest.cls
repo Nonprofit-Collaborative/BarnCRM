@@ -163,6 +163,116 @@ private class AddressServiceTest {
         }
     }
 
+    /**
+     * The household already has a default address. A member's new mailing address becomes
+     * a new default, the old one is kept as history (R-AD7), and the move reaches the
+     * household's billing address and every other member, as the admin guide walks through.
+     */
+    @IsTest
+    static void aNewAddressReplacesAnExistingDefaultAndKeepsTheOldOne() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            garcia.BillingStreet = HOME_STREET;
+            garcia.BillingCity = HOME_CITY;
+            insert garcia;
+            List<Contact> members = new List<Contact>{
+                AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
+                AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
+            };
+            insert members;
+            Id oldDefaultId = [
+                SELECT Id
+                FROM Address__c
+                WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
+            ]
+            .Id;
+
+            Test.startTest();
+            update new Contact(
+                Id = members[0].Id,
+                MailingStreet = WINTER_STREET,
+                MailingCity = WINTER_CITY
+            );
+            Test.stopTest();
+
+            Address__c oldAddress = [
+                SELECT Street__c, Is_Default__c
+                FROM Address__c
+                WHERE Id = :oldDefaultId
+            ];
+            Assert.areEqual(
+                HOME_STREET,
+                oldAddress.Street__c,
+                'The old address is not overwritten'
+            );
+            Assert.isFalse(oldAddress.Is_Default__c, 'It is no longer the one in use');
+            Address__c inUse = [
+                SELECT Street__c, Type__c
+                FROM Address__c
+                WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
+            ];
+            Assert.areEqual(WINTER_STREET, inUse.Street__c, 'The new address is in use');
+            Assert.areEqual(
+                WINTER_STREET,
+                [SELECT BillingStreet FROM Account WHERE Id = :garcia.Id].BillingStreet,
+                'The household billing address followed'
+            );
+            Assert.areEqual(
+                WINTER_STREET,
+                [SELECT MailingStreet FROM Contact WHERE Id = :members[1].Id].MailingStreet,
+                'Luis moved with the household'
+            );
+        }
+    }
+
+    /**
+     * During a season the seasonal address is the default. A permanent address typed in
+     * then is a new record; the seasonal one is not overwritten, so the new permanent
+     * address is there to come back to in the spring.
+     */
+    @IsTest
+    static void anEditDuringASeasonDoesNotOverwriteTheSeasonalAddress() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            insert ana;
+            Address__c seasonal = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Seasonal',
+                Street__c = WINTER_STREET,
+                City__c = WINTER_CITY,
+                Seasonal_Start_Month__c = 1,
+                Seasonal_Start_Day__c = 1,
+                Seasonal_End_Month__c = 3,
+                Seasonal_End_Day__c = 31,
+                Is_Default__c = true
+            );
+            insert seasonal;
+
+            Test.startTest();
+            update new Contact(Id = ana.Id, MailingStreet = HOME_STREET, MailingCity = HOME_CITY);
+            Test.stopTest();
+
+            Address__c kept = [
+                SELECT Street__c, Type__c
+                FROM Address__c
+                WHERE Id = :seasonal.Id
+            ];
+            Assert.areEqual(WINTER_STREET, kept.Street__c, 'The seasonal address is unchanged');
+            Assert.areEqual('Seasonal', kept.Type__c, 'And still seasonal');
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE Account__c = :garcia.Id AND Type__c = 'Home' AND Street__c = :HOME_STREET
+                ],
+                'The permanent address is its own Home record'
+            );
+        }
+    }
+
     @IsTest
     static void creatingAPersonalAddressLeavesTheHouseholdWhereItIs() {
         System.runAs(TestUsers.admin()) {
@@ -550,6 +660,76 @@ private class AddressServiceTest {
                 ),
                 'A seasonal address with no full range cannot be judged.'
             );
+        }
+    }
+
+    /**
+     * An address added through the account lookup stays on it for a household or an
+     * organization, on every org shape.
+     */
+    @IsTest
+    static void anAddressOnAHouseholdStaysOnTheAccountLookup() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+
+            Test.startTest();
+            Address__c home = new Address__c(
+                Account__c = garcia.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                Is_Default__c = true
+            );
+            insert home;
+            Test.stopTest();
+
+            Address__c saved = [
+                SELECT Account__c, Person_Account__c
+                FROM Address__c
+                WHERE Id = :home.Id
+            ];
+            Assert.areEqual(garcia.Id, saved.Account__c, 'A household owns its address');
+            Assert.isNull(saved.Person_Account__c, 'And is not taken for a person');
+        }
+    }
+
+    /**
+     * The address panel on a person account page saves through the account lookup. The
+     * address is moved to the person lookup, so it reaches the person's mailing address
+     * (R-AD3). Needs real person accounts of a type the running user is given (oi-pa).
+     */
+    @IsTest
+    static void anAddressAddedOnAPersonAccountBelongsToThePerson() {
+        System.runAs(TestUsers.admin()) {
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (personType == null) {
+                // No person account type this user may create: a Platform-only org, or an
+                // org (a Nonprofit Cloud trial) that does not give the admin profile one.
+                return;
+            }
+            SObject person = Account.SObjectType.newSObject();
+            person.put('RecordTypeId', personType);
+            person.put('FirstName', 'Ana');
+            person.put('LastName', 'Okafor');
+            insert person;
+
+            Test.startTest();
+            Address__c home = new Address__c(
+                Account__c = person.Id,
+                Type__c = 'Home',
+                Street__c = HOME_STREET,
+                Is_Default__c = true
+            );
+            insert home;
+            Test.stopTest();
+
+            Address__c saved = [
+                SELECT Account__c, Person_Account__c
+                FROM Address__c
+                WHERE Id = :home.Id
+            ];
+            Assert.areEqual(person.Id, saved.Person_Account__c, 'The person owns the address');
+            Assert.isNull(saved.Account__c, 'Not the account lookup');
         }
     }
 }

@@ -109,7 +109,10 @@ year at home, and letters have been going to the wrong place. Start from the sam
 7. Go back to **The Garcia Family**. Because your setting says **Update household**, the
    household's default address now shows Harper's new street, and every other member of the
    household has the same new mailing address. One edit moved the whole household, which is
-   what a household moving actually means.
+   what a household moving actually means. The new street is a new Home address card marked
+   default; the address it replaced stays on the card as history and is not overwritten. If
+   the household is away for the season when you make the edit, the seasonal address card is
+   left as it is, and the new street is the one the household comes back to.
 
 If you had set **Create personal address** instead, step 7 would look different: Harper
 would have her own address card on her own record, marked default for her, and the rest of
