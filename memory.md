@@ -65,7 +65,7 @@ Last refreshed from BMemory 2026-10-13 (through D-77).
 | D-55 | 2026-10-13 | Shipped import templates added at install and on upgrade (closes Section 11.2 item 14) |
 | D-56 | 2026-10-13 | Org gates may batch several PRs into one combined org run and deploy only changed metadata; every test that would have run still runs |
 | D-57 | 2026-10-13 | Console app: on oi-test, oi-pa and barn-core Claude deletes and redeploys the app; on barn-npc and mwdbdevsb the owner switches Navigation Style to Console in App Manager |
-| D-58 | 2026-10-13 | Logo: barn icon approved, in blue (similar to the Blue Bottle Coffee logo blue; exact value set on feature/console-app-icon), replacing red #B3261E |
+| D-58 | 2026-10-13 | Logo: blue barn icon approved as is, replacing red #B3261E: walls #00A8D9 (the blue in the Blue Bottle Coffee logo file), roof and app header #007A9E (4.91:1 against white); set on feature/console-app-icon at 4047fc85 |
 | D-59 | 2026-10-13 | Console tab icons: keep the page icons set by Q-07 |
 | D-60 | 2026-10-13 | Q-11: no Platform Cache for now; revisit after security review |
 | D-61 | 2026-10-13 | Q-09: user access policies documented with samples, not packaged |
@@ -78,7 +78,7 @@ Last refreshed from BMemory 2026-10-13 (through D-77).
 | D-68 | 2026-10-13 | The four Q-14 agent-ready actions get access through packaged permission sets and/or groups, not a manual Setup step |
 | D-69 | 2026-10-13 | Q-14 scope: the four action classes are global (permanent once managed); no Update Person action (standard Update Record covers it); starting or committing imports from an assistant is out of scope |
 | D-70 | 2026-10-13 | Record cards (Addresses, Affiliations, Relationships) that refuse a change for lack of access show a friendly message and write no Error Log entry; real failures still logged (Q-06) |
-| D-71 | 2026-10-13 | Rollup totals recalculated just after the save by default (Background), with a "During the save" setting (Q-01, PR #256); modifies ADR-0082 decision 4 via an ADR-NEXT on that branch |
+| D-71 | 2026-10-13 | Rollup totals recalculated just after the save by default (Background), with a "During the save" setting (Q-01, PR #256); modifies ADR-0082 decision 4 via a new ADR written on that branch (number assigned at merge) |
 | D-72 | 2026-10-13 | RollupRecalcAction is global so subscriber Flow Builder can use it (permanent once managed) |
 | D-73 | 2026-10-13 | Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 |
 | D-74 | 2026-10-13 | Setup notes for Giving and Connect shown on each module's own page, using Core's note component (keeps ADR-0020) |
