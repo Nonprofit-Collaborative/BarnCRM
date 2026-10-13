@@ -2136,6 +2136,7 @@ unchanged.
 | Expected Amount | decimal | no | The total the administrator expects the file's gift amounts to add up to, a control total checked by the dry run (R-IB10). |
 | File Amount | decimal | computed | The total of the file's gift amounts as the last pass read them, written only when an entity processor reads amounts (R-IB10). |
 | Processor Settings | long text | computed | The settings the entity processor ran the last dry run under, as a document only that processor reads; the commit runs under them (R-IB11). |
+| Template Snapshot | long text | computed | The template as the last dry run started with it; that dry run and the commit run under it (R-IB1). |
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
@@ -2158,7 +2159,11 @@ commit will make. The preview counts and the downloadable exceptions file come f
 Import Row records the dry run wrote. A dry run is refused on a batch that has started a
 commit, or is in any undo status: a dry run over a committed batch would mark it a dry run
 (so it could never be undone), clear its completion time, and a second commit would move its
-undo window.
+undo window. "The same template" means the template as the dry run read it: when a dry run
+starts, the batch records the template (its mapping, values for every row, matching rules and
+person mode) as Template Snapshot, every chunk of that dry run and the commit after it run
+under the snapshot, and an edit to the template since changes the next dry run and not the
+commit. A batch with no snapshot (one previewed before this rule) runs under the template.
 
 **R-IB2 Chunked and asynchronous.** Rows are processed in chunks of Chunk Size in Batch
 Apex, with progress visible on the batch record, so a file of hundreds of thousands of
@@ -2446,6 +2451,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Expected Amount | `Expected_Amount__c` | Currency (16, 2) |
 | File Amount | `File_Amount__c` | Currency (16, 2) |
 | Processor Settings | `Processor_Settings_JSON__c` | Long Text Area (32768) |
+| Template Snapshot | `Template_Snapshot_JSON__c` | Long Text Area (131072) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
@@ -6822,6 +6828,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
 | v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
 | post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 
 ---
 ## 32. Entity ownership by package

@@ -91,4 +91,22 @@ public with sharing class ImportBatchSelector {
         }
         return result;
     }
+
+    /**
+     * The template a batch's last dry run started with (R-IB1), or null. Read on its own, not
+     * with the batch, because it can be long and the history list never needs it. System mode
+     * because the package writes and reads it as its own bookkeeping (ADR-0021).
+     */
+    @NamespaceAccessible
+    public static String selectTemplateSnapshot(Id batchId) {
+        if (batchId == null) {
+            return null;
+        }
+        List<Import_Batch__c> found = Database.queryWithBinds(
+            'SELECT Template_Snapshot_JSON__c FROM Import_Batch__c WHERE Id = :batchId LIMIT 1',
+            new Map<String, Object>{ 'batchId' => batchId },
+            AccessLevel.SYSTEM_MODE
+        );
+        return found.isEmpty() ? null : found[0].Template_Snapshot_JSON__c;
+    }
 }
