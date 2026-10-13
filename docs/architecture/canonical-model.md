@@ -6104,10 +6104,7 @@ third-party code (the same reasoning as ADR-0049).
   `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10).
 - **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`.
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
-  permission set `BarnCRM_Find_And_Export`, assignable alone. That set also carries the read on
-  `Import_Batch__c`, `Import_Template__c` and `Import_Journal__c` that bulk update and bulk
-  delete need, so `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` carry only their permission,
-  classes and tab.
+  permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
 - **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data Hygiene tab
   (app page `Data_Hygiene`, component `dataHygieneConsole`).

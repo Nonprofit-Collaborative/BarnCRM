@@ -27,8 +27,8 @@ refused is listed with the reason; the rest are still deleted.
    because every bulk delete starts from a Find query. **Bulk Delete Records is in no role, not
    even BarnCRM Admin**: assign the **BarnCRM Bulk Delete** permission set to the few people
    who should have it (Setup, Users, choose the person, Permission Set Assignments), with
-   **BarnCRM Find and Export** if they do not have it already. Neither grants access to any of
-   your records; BarnCRM Find and Export carries the read on data jobs that undo needs.
+   **BarnCRM Find and Export** if they do not have it already. Neither grants access to any
+   record.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk delete run limit**
    (default 10,000). A bulk delete that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just
