@@ -5,7 +5,7 @@
  * The engine's own arithmetic is `RollupEngineTest`'s; here it is which definitions run, for
  * which records, and what is stamped afterwards.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupService')
 private class RollupServiceTest {
     private static Rollup_Definition__c memberCount(String mode, Boolean active) {
         return new Rollup_Definition__c(

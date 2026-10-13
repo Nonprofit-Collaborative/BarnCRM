@@ -5,7 +5,7 @@
  * These tests have not been executed: no Salesforce org exists in this environment, so nothing
  * here has run. They assert the mapping the ADR names, attribute by attribute.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupAdapter')
 private class RollupAdapterTest {
     private static Rollup_Definition__c givingTotal() {
         return new Rollup_Definition__c(

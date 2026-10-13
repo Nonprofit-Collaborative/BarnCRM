@@ -3,7 +3,7 @@
  * imported gift pays, under each of the four behaviours. Run as Maria, who holds the admin
  * permission sets, because the payments are read in her own mode.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DonationMatcher')
 private class DonationMatcherTest {
     private static User maria() {
         return TestDataFactory.createUser(

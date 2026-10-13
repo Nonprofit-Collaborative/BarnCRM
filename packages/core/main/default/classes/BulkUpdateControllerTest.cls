@@ -5,7 +5,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkUpdateController')
 private class BulkUpdateControllerTest {
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{

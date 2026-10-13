@@ -1,7 +1,7 @@
 /**
  * The standard email being kept in step with the address a person chose (R-C6).
  */
-@IsTest
+@IsTest(testFor='ApexClass:PreferredEmailService')
 private class PreferredEmailServiceTest {
     private static final String PERSONAL = 'maria.garcia@example.org';
     private static final String WORK = 'mgarcia@springfieldfoodbank.example.org';

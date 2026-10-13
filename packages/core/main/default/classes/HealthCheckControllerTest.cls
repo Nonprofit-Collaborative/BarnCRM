@@ -9,7 +9,7 @@
  * administrator holding every packaged permission set, so a method that means "without the
  * permission" and does not run as Priya is asking the question of somebody who has it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckController')
 private class HealthCheckControllerTest {
     @IsTest
     static void anyoneCanReadTheReport() {

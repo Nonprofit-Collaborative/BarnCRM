@@ -2,7 +2,7 @@
  * The Record Inbound Gift Flow action (X-03): many gifts in, one answer each, in order, and a
  * refused gift is an answer rather than a failure of the flow.
  */
-@IsTest
+@IsTest(testFor='ApexClass:InboundGiftAction')
 private class InboundGiftActionTest {
     @IsTest
     static void eachGiftIsAnsweredInTheOrderSent() {

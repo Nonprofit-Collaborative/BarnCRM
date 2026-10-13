@@ -2,7 +2,7 @@
  * The REST endpoint (X-03): what goes over the wire, status code and body, for the outcomes
  * the API reference documents. The rules themselves are proved in InboundGiftServiceTest.
  */
-@IsTest
+@IsTest(testFor='ApexClass:InboundGiftResource')
 private class InboundGiftResourceTest {
     private static final String EMAIL = 'luis.garcia.rest@example.org';
 

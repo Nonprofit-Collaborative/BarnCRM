@@ -4,7 +4,7 @@
  * `0070-empty-household-tidy-up-keeps-households-with-gifts.md`). End to end: Core's tidy-up
  * finds `GivingHouseholdDependentsExtension` by name and keeps what it reports.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingHouseholdDependentsExtension')
 private class GivingHouseholdDependentsExtensionTest {
     @TestSetup
     static void makeData() {

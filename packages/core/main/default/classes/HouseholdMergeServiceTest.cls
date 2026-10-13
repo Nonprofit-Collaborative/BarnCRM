@@ -2,7 +2,7 @@
  * Combining and separating households, in both membership modes.
  * Canonical model R-H11, R-H12, R-H13.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMergeService')
 private class HouseholdMergeServiceTest {
     // ------------------------------------------------------------------ preview
 

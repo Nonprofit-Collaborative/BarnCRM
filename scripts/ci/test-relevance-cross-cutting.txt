@@ -1,0 +1,7 @@
+# Test classes with no @IsTest(testFor=...) and no critical=true, each with the reason.
+# Read by scripts/ci/check-test-relevance.py. One class per line: Name  # reason.
+# A class belongs here only when no Apex change should select it; anything that tests Apex
+# names that Apex in testFor instead. See docs/contributor-guide/ci.md, "Relevant tests".
+InKindGiftRulesTest  # validation rules on Gift__c only, asserted through DML: no Apex under test
+InteractionNoteTest  # the packaged Log_Interaction action and Task values: no Apex under test
+TestUsersTest  # tests the TestUsers test utility, which is not production code

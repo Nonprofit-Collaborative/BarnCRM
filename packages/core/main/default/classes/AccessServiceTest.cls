@@ -2,7 +2,7 @@
  * Tests for AccessService: Maria giving David a role, giving it twice, taking it away,
  * finding people, a person who is not allowed to change roles, and several at once.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AccessService')
 private class AccessServiceTest {
     private static final String PROGRAM_ROLE = 'Program_Staff';
 

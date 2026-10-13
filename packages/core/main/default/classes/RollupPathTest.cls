@@ -3,7 +3,7 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupPath')
 private class RollupPathTest {
     @IsTest
     static void oneReferenceAttributeIsOneHop() {

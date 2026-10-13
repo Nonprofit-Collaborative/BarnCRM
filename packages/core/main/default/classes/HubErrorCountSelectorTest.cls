@@ -3,7 +3,7 @@
  * is not part of this package build or the reader cannot see it. It stops counting at the
  * cap, so a flooded Error Log never costs the home page more than that.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HubErrorCountSelector')
 private class HubErrorCountSelectorTest {
     private static void insertNewErrors(Integer howMany) {
         List<Error_Log__c> errors = new List<Error_Log__c>();

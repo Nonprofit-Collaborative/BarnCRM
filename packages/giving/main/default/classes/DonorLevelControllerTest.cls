@@ -5,7 +5,7 @@
  * org, so it is not something a user without the settings permission may start, and it is not
  * something to start at all while levels are switched off.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DonorLevelController')
 private class DonorLevelControllerTest {
     private static final String PERMISSION_SET = 'DonorLevelsTestAccess';
 

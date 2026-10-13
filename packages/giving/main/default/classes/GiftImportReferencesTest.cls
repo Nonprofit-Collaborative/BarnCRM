@@ -1,7 +1,7 @@
 /**
  * Finding the funds and appeals an imported row names (R-GI3, R-GI4).
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftImportReferences')
 private class GiftImportReferencesTest {
     private static GiftImportRow row(Map<String, String> gift, Map<String, String> allocation) {
         Map<String, String> values = new Map<String, String>{

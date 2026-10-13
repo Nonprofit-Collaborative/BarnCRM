@@ -1,7 +1,7 @@
 /**
  * What the merge and split screen calls, including the picker and the read only check.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMergeController')
 private class HouseholdMergeControllerTest {
     @IsTest
     static void theSearchOffersHouseholdsAndNotOrganizations() {

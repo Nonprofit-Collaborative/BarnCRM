@@ -5,7 +5,7 @@
  * amount and the file are facts about the world. This class is the proof that the code treats them
  * that way: nothing here checks that a field can be written, it checks that it cannot.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptService')
 private class ReceiptVoidReissueTest {
     /**
      * An issued receipt's number, amount and stored file are all exactly as they were after the

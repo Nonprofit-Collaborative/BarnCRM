@@ -3,7 +3,7 @@
  * broken extension is left out without stopping anything (canonical model R-IT14).
  */
 // runs-as: deploying user (pure logic: resolves extension classes by name and reads describe, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:DataProtectionExtensions')
 private class DataProtectionExtensionsTest {
     private class ProtectsRelationships implements DataProtectionExtension {
         public Set<Schema.SObjectType> protectedObjects() {

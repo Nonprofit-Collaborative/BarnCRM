@@ -3,7 +3,7 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupController')
 private class RollupControllerTest {
     private static Rollup_Definition__c definition() {
         return new Rollup_Definition__c(

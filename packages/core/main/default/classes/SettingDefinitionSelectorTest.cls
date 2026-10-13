@@ -1,5 +1,5 @@
 /** The console reads what to show from the shipped Setting Definition rows. */
-@IsTest
+@IsTest(testFor='ApexClass:SettingDefinitionSelector')
 private class SettingDefinitionSelectorTest {
     @IsTest
     static void readsTheShippedRows() {

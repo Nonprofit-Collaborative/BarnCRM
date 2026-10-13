@@ -5,7 +5,7 @@
  * Matching is a pure function, so most of this needs no records at all: the gifts are built in
  * memory and the rules are a list. That is the point of keeping the matcher free of DML.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AcknowledgmentRuleService')
 private class AcknowledgmentRuleMatchTest {
     private static List<Acknowledgment_Rule__c> ladder() {
         Acknowledgment_Rule__c major = AcknowledgmentTestData.buildRule(

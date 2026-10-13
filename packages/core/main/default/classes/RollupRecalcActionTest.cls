@@ -4,7 +4,7 @@
  * an administrator's own entity: the action is called with the records a record-triggered Flow
  * would hand it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupRecalcAction')
 private class RollupRecalcActionTest {
     private static Rollup_Definition__c childCount() {
         return new Rollup_Definition__c(

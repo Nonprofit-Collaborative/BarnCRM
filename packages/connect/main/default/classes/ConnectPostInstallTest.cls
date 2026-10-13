@@ -2,7 +2,7 @@
  * Installing Connect creates the Automation page's switches for Campaign sync and the Opportunity
  * mirror, switched on, and an upgrade leaves an administrator's choice alone (ADR-0056).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ConnectPostInstall')
 private class ConnectPostInstallTest {
     private static List<Automation_Setting__c> campaignSyncSwitch() {
         return [

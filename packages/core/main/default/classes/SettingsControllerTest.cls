@@ -2,7 +2,7 @@
  * Maria opens the console and changes a setting. David opens the same page without the
  * Manage BarnCRM Settings permission and gets a read-only view that names the permission.
  */
-@IsTest
+@IsTest(critical=true)
 private class SettingsControllerTest {
     private static final String TEXT_KEY = 'Household_Name_Pattern__c';
     private static final String CHECKBOX_KEY = 'Auto_Create_Households__c';

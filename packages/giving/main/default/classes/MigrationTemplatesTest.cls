@@ -13,7 +13,7 @@
  * that stores people as accounts reads the same columns is Core's importer's business and is
  * tested there.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportTemplateService, ApexClass:ImportRowProcessor')
 private class MigrationTemplatesTest {
     /** The shipped migration templates: the people ones ship from Core, the gift ones from Giving. */
     private static final List<String> MIGRATION_KEYS = new List<String>{

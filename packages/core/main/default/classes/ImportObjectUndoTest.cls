@@ -8,7 +8,7 @@
  * `ImportUndoTest` drives them, and everything runs as a minimal-profile user holding only
  * BarnCRM Admin.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportUndoService, ApexClass:ImportUndoBatch')
 private class ImportObjectUndoTest {
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in

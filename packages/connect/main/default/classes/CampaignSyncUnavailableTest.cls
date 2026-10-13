@@ -5,7 +5,7 @@
  * that need Campaign: an appeal saves, nothing is linked, nothing is logged, and the page says
  * Campaign sync is unavailable.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CampaignSyncService, ApexClass:CampaignSyncController')
 private class CampaignSyncUnavailableTest {
     @TestSetup
     static void setup() {

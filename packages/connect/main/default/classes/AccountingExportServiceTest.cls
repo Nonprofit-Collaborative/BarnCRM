@@ -5,7 +5,7 @@
  * written here: a split gift, a refund, a gift with none at all, and the gifts the file must
  * leave out (Pending, In-kind, and one dated in September).
  */
-@IsTest
+@IsTest(testFor='ApexClass:AccountingExportService')
 private class AccountingExportServiceTest {
     private static final Date AUGUST_FIRST = Date.newInstance(2026, 8, 1);
     private static final Date AUGUST_LAST = Date.newInstance(2026, 8, 31);

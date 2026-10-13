@@ -2,7 +2,7 @@
  * ReceiptGenerationFailureSelector counts the void receipts a failed run left behind (R-RC3). The findings
  * built from the count are tested in HealthCheckGivingChecksTest.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptGenerationFailureSelector')
 private class ReceiptGenerationFailureSelectorTest {
     @IsTest
     static void anOrgWithNoFailedRunsCountsZero() {

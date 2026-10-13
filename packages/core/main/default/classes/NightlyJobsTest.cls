@@ -4,7 +4,7 @@
  * Every test supplies the jobs in memory, so none depends on what the org it runs in has
  * scheduled, and none schedules a real job.
  */
-@IsTest
+@IsTest(testFor='ApexClass:NightlyJobs')
 private class NightlyJobsTest {
     /** A job that only remembers whether it was scheduled. */
     private class FakeJob implements NightlyJob {

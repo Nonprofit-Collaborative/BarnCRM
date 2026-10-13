@@ -11,7 +11,7 @@
  * These tests have not been executed: no Salesforce org exists in this environment. What a
  * real install has still to confirm is named in ADR-0029.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingPostInstall')
 private class GivingPostInstallTest {
     @IsTest
     static void installingGivingCreatesTheGivingTotals() {

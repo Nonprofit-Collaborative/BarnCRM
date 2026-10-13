@@ -7,7 +7,7 @@
  * thing under test here is the placement, not the arithmetic of the total (which G-02 owns and
  * `GiftRollupRefundTest` already asserts).
  */
-@IsTest
+@IsTest(testFor='ApexClass:DonorLevelBatch, ApexClass:DonorLevelService')
 private class DonorLevelAssignmentTest {
     private static final String FRIEND = 'Friend';
     private static final String SUSTAINER = 'Sustainer';

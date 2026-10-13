@@ -2,7 +2,7 @@
  * How a custom metadata deployment's ending is recorded (canonical model R-S6): an audit row
  * on success, an Error Log entry on failure, each findable by the deployment Id.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CustomMetadataDeployCallback')
 private class CustomMetadataDeployCallbackTest {
     private static final Id JOB = FakeIds.ofPrefix('0Af', 2);
 

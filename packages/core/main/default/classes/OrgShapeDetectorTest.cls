@@ -6,7 +6,7 @@
  * detect() itself is tested against the real org, which is the only honest way to know that
  * the describe calls work where Core has to run.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OrgShapeDetector')
 private class OrgShapeDetectorTest {
     // Held as text here for the same reason it is held as text in OrgShapeSelector: these
     // tests have to pass on a Platform-only org, where the object does not exist, so they may

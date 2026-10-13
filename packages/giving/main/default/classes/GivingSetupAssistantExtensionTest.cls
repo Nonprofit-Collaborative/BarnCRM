@@ -8,7 +8,7 @@
  * `@NamespaceAccessible`, so under a future namespace prefix this package cannot read them
  * directly. A JSON round trip reaches them the way the Lightning wire path does.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingSetupAssistantExtension')
 private class GivingSetupAssistantExtensionTest {
     private static List<Object> asList(List<SetupAssistantService.Step> steps) {
         return (List<Object>) JSON.deserializeUntyped(JSON.serialize(steps));

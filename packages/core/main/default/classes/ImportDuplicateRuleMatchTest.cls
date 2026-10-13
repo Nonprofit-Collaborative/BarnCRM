@@ -6,7 +6,7 @@
  * the org's business, so the answer is stubbed; one test asks the platform itself. The 200-row
  * case runs as a minimal-profile user holding only BarnCRM Admin.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportDuplicateRuleMatcher')
 private class ImportDuplicateRuleMatchTest {
     private static final Integer MANY = 200;
 

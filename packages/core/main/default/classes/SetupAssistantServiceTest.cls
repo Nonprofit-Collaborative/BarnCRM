@@ -1,7 +1,7 @@
 /**
  * Maria works down the setup checklist, and the Hub remembers where she got to.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SetupAssistantService')
 private class SetupAssistantServiceTest {
     @TestSetup
     static void grantPermission() {

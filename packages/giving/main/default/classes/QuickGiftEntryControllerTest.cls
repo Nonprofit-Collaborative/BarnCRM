@@ -3,7 +3,7 @@
  * from a person, a gift from an organization or a person account, and the mistakes that
  * happen on a phone.
  */
-@IsTest
+@IsTest(testFor='ApexClass:QuickGiftEntryController')
 private class QuickGiftEntryControllerTest {
     private static Fund__c makeFund() {
         Fund__c fund = new Fund__c(Name = 'Annual Fund', Active__c = true, Is_Default__c = true);

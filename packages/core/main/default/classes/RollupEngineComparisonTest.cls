@@ -4,7 +4,7 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngineComparison')
 private class RollupEngineComparisonTest {
     private static final String KEY = 'Test_People_Per_Organization';
     private static final Integer STORED = 99;

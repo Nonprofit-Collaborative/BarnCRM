@@ -206,6 +206,10 @@ Salesforce org is needed for this job. Steps:
    in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
    carries no `// runs-as: deploying user (reason)` comment. See "Tests run as a user they
    create" below for why.
+   `scripts/ci/check-test-relevance.py` fails the build if a test class (the vendored engine
+   excepted) has neither `@IsTest(testFor='...')` nor `@IsTest(critical=true)` and is not in
+   `scripts/ci/test-relevance-cross-cutting.txt`, or if a `testFor` names a class or trigger
+   that is not in `packages/`. See "Relevant tests" below.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.
@@ -248,6 +252,7 @@ npm run check:openapi
 npm run check:setting-defaults
 npm run check:flow-templates
 npm run check:tests-run-as
+npm run check:test-relevance
 npm run check:apex
 npm run check:analyzer
 ```
@@ -474,6 +479,33 @@ So every test is self-contained:
 
 To prove a branch is self-contained, run its tests in an org as a user who holds none of the
 BarnCRM permission sets.
+
+### Relevant tests
+
+Spring '26 (API 66.0) added the `RunRelevantTests` test level (beta) to deployments: Salesforce
+runs the tests in the deployment, the tests that depend directly on the Apex being deployed, and
+any test class that asks to be included. It follows direct references only, so a test that
+reaches a class through a trigger, the automation registry or `Type.forName` is missed. Two
+class-level `@IsTest` parameters close that gap, and every test class carries one:
+
+- `@IsTest(testFor='ApexClass:HouseholdService, ApexClass:HouseholdMergeService')` runs the
+  class whenever one of the named classes (or `ApexTrigger:Name`) is in the deployment. It adds
+  to what the platform selects; it never narrows it. Name the classes the test exercises, not
+  every class it touches on the way.
+- `@IsTest(critical=true)` runs the class on every relevant-tests deployment, whatever changed.
+  Five classes carry it, one smoke test for each core path: `SettingsControllerTest` (settings
+  console save), `HouseholdServiceTest` (a new person gets a household), `GiftRealTimeRollupTest`
+  (a saved gift moves its totals), `ImportProcessorBatchTest` (an import commit) and
+  `FindControllerTest` (Find and export). Together they take about 110 seconds of the full run's
+  35 minutes. Add another only for a path that has to be proven on every change, since each one
+  runs every time.
+
+A test class with neither, because no Apex change should select it (a test of validation rules
+or of a test utility), is listed in `scripts/ci/test-relevance-cross-cutting.txt` with its reason.
+`scripts/ci/check-test-relevance.py` (static check 16) holds every new test class to this, and
+fails when a `testFor` names a class or trigger that is not in `packages/`, so a rename cannot
+leave a test pointing at nothing. Test utilities with no test method (`TestDataFactory`,
+`TestUsers`) are skipped. The vendored rollup engine is outside the check.
 
 ### `org-tests`
 

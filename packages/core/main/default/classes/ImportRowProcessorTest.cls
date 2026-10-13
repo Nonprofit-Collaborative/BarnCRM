@@ -5,7 +5,7 @@
  * The assertion that matters most here is the one in `dryRunWritesNothing`: the preview an
  * administrator decides on has to be free.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor')
 private class ImportRowProcessorTest {
     private static Import_Template__c template;
     private static Import_Batch__c batch;

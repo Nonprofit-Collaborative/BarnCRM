@@ -5,7 +5,7 @@
  * after her export, marks it again by mistake, and unposts one gift with a reason. David, on
  * Giving Staff, can do neither.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftPostingService')
 private class GiftPostingServiceTest {
     private static User jen() {
         return TestDataFactory.createUser(

@@ -2,7 +2,7 @@
  * FieldUtilizationController: the Field Utilization page of the settings console. Every change
  * needs Manage BarnCRM Settings, and the results compare the latest run with the one before.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FieldUtilizationController')
 private class FieldUtilizationControllerTest {
     private static final String DISMISSAL = Duplicate_Dismissal__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED

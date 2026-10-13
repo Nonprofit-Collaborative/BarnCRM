@@ -8,7 +8,7 @@
  * switch one on. A test that must write a suggestion therefore stops, with an assertion that
  * nothing was written, in an org with no active rule for its object.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DuplicateScanBatch')
 private class DuplicateScanBatchTest {
     private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
         Database.DMLOptions options = new Database.DMLOptions();

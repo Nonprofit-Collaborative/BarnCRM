@@ -6,7 +6,7 @@
  * Both are built on a minimal profile with only a packaged permission set, so these tests prove
  * what the package grants rather than what a system administrator profile already allows.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AutomationControlController')
 private class AutomationControlControllerTest {
     private static final String NAMING = 'Household_Naming';
 

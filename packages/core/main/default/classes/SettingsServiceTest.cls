@@ -2,7 +2,7 @@
  * Maria changes a setting in the console and expects three things: the value sticks, the
  * change is recorded, and a value that makes no sense is refused before anything is saved.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SettingsService')
 private class SettingsServiceTest {
     private static final String TEXT_KEY = 'Household_Name_Pattern__c';
     private static final String CHECKBOX_KEY = 'Auto_Create_Households__c';

@@ -14,7 +14,7 @@
  *
  * Merges are covered by `GivingContactMergeTest`; this class adds the totals beyond the sum.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupRegressionPathsTest {
     @TestSetup
     static void makeData() {

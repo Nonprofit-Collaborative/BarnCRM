@@ -6,7 +6,7 @@
  * literal prefix: they have to keep passing on the day the namespace is registered.
  */
 // runs-as: deploying user (pure logic: reads a class name, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:NamespaceUtil')
 private class NamespaceUtilTest {
     @IsTest
     static void prefixIsEmptyOrEndsInADoubleUnderscore() {

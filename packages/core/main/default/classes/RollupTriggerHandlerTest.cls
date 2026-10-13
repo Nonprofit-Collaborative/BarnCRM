@@ -5,7 +5,7 @@
  * as `RollupEngineTest` does. Account is not registered for real time, so the handler is called
  * directly with the records in front of it, as a registered trigger would.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupTriggerHandler')
 private class RollupTriggerHandlerTest {
     private static Rollup_Definition__c childCount() {
         return new Rollup_Definition__c(

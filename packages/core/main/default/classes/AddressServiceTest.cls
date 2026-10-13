@@ -5,7 +5,7 @@
  * The households belong to Maria's organization and the people are the Garcia family from
  * the admin guide, who spend January to March in Arizona.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AddressService')
 private class AddressServiceTest {
     private static final String HOME_STREET = '812 Willow Lane';
     private static final String HOME_CITY = 'Springfield';

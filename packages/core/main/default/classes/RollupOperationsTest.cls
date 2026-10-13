@@ -8,7 +8,7 @@
  * which is registered for instant totals by `Core_Rollups_Contact`. These tests have not been
  * executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupPlanner, ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupOperationsTest {
     private static final Integer ORGANIZATIONS = 10;
     private static final Integer PEOPLE_EACH = 20;

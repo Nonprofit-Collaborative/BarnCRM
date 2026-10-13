@@ -5,7 +5,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkDeleteService')
 private class BulkDeleteServiceTest {
     private static String query(String objectName, String field, String value) {
         Map<String, Object> document = new Map<String, Object>{

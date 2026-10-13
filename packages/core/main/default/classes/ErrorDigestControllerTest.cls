@@ -2,7 +2,7 @@
  * The error digest panel (C-23): the scheduling entry point, sending now, and that only an
  * administrator can do either.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ErrorDigestController')
 private class ErrorDigestControllerTest {
     private static List<CronTrigger> digestJobs() {
         return [

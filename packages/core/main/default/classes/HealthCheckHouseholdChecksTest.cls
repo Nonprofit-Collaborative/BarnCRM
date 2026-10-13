@@ -8,7 +8,7 @@
  * who holds the permission these checks are shown under. Every test states the org shape it
  * runs in, so none depends on whether the org has Person Accounts or Nonprofit Cloud.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckHouseholdChecks')
 private class HealthCheckHouseholdChecksTest {
     private static final String PEOPLE = 'people_without_household';
     private static final String HOUSEHOLDS = 'households_without_members';

@@ -5,7 +5,7 @@
  * These tests have not been executed against an org: none was reachable from the environment they
  * were written in.
  */
-@IsTest
+@IsTest(testFor='ApexClass:StewardshipTriggerHandler')
 private class StewardshipTriggerHandlerTest {
     private static final String PLAN = 'Every gift thanks';
 

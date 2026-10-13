@@ -8,7 +8,7 @@
  * through `{Household}`. These tests have not been executed: no Salesforce org exists in this
  * environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine, ApexClass:RollupPlanner')
 private class RollupTextListsTest {
     private static final Integer ORGANIZATIONS = 10;
     private static final Integer PEOPLE_EACH = 20;

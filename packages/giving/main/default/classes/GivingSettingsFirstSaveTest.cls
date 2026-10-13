@@ -7,7 +7,9 @@
  * gifts to installments, household soft credits, and the receipt logo. Every test here starts
  * with no record, makes one save, and asserts those three are still on (ADR-0035).
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:CommitmentService, ApexClass:AccountingPeriodWriter, ApexClass:AcknowledgmentService, ApexClass:DonorLevelWriter'
+)
 private class GivingSettingsFirstSaveTest {
     private static final String PERMISSION_SET = 'GivingFirstSaveTestAccess';
 

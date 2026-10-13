@@ -3,7 +3,7 @@
  * refused before anything is looked up or saved.
  */
 // runs-as: deploying user (pure logic: reads an import row in memory, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:GiftImportRow')
 private class GiftImportRowTest {
     private static GiftImportRow read(Map<String, Map<String, String>> entities) {
         return new GiftImportRow(new Import_Row__c(), entities);

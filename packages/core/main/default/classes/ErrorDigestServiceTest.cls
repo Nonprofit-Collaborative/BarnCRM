@@ -6,7 +6,7 @@
  * minimal profile holding only the packaged BarnCRM Admin set. Messages are captured rather
  * than sent, except in the one test that proves the real send path handles either outcome.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ErrorDigestService')
 private class ErrorDigestServiceTest {
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });

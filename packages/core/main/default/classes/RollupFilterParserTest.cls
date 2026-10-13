@@ -6,7 +6,7 @@
  * the class documents.
  */
 // runs-as: deploying user (pure logic: parses a filter document, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:RollupFilterParser')
 private class RollupFilterParserTest {
     @IsTest
     static void emptyDocumentMeansEveryRecord() {

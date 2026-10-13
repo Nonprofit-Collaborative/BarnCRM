@@ -2,7 +2,7 @@
  * The life of a batch: created, staged in pages, dry run before commit, and finished with
  * counts read back from the rows rather than carried in memory.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportBatchService')
 private class ImportBatchServiceTest {
     @TestSetup
     static void setUp() {

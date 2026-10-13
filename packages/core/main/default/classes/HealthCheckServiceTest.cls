@@ -6,7 +6,7 @@
  * so that a finding is asserted against numbers the test chose rather than against whoever
  * happens to hold a permission set in the org the tests run in.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckService')
 private class HealthCheckServiceTest {
     @IsTest
     static void npspOrgReportsNpspDetectedAndRecommendsIt() {

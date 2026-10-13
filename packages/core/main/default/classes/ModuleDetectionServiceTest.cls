@@ -2,7 +2,7 @@
  * Core has to run on an org where no other BarnCRM package is installed, so detection
  * answers honestly and nothing static ever names another package's schema.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ModuleDetectionService')
 private class ModuleDetectionServiceTest {
     @IsTest
     static void listsTheSixPackagesAndSaysWhichAreHere() {

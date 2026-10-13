@@ -8,7 +8,7 @@
  * The first tests set the person overrides, so they hold on every org shape; the last one
  * needs real person accounts and returns early on an org without them.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AccountTriggerHandler')
 private class PersonAccountMergeTest {
     @IsTest
     static void theSurvivorTakesTheMergedPersonsHouseholdAndItsPrimary() {

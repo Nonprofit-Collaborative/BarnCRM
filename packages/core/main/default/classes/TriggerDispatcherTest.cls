@@ -5,7 +5,7 @@
  * test-only handler with an explicit context, which is the same code path a real trigger takes
  * once the dispatcher has read `Trigger.operationType`.
  */
-@IsTest
+@IsTest(testFor='ApexClass:TriggerDispatcher')
 private class TriggerDispatcherTest {
     private static final String HANDLER_NAME = 'Test_Recording_Handler';
 

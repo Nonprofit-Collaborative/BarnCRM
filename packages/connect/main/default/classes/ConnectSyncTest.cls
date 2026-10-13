@@ -3,7 +3,7 @@
  * identifier is read, when a transaction is too spent to copy, and how refusals are grouped so a
  * rule that refuses a whole import writes a handful of Warnings (R-OM6).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ConnectSync')
 private class ConnectSyncTest {
     private static final String CONTEXT = 'Connect sync test';
     private static final String ONE = 'Could not copy "{0}": {1}';

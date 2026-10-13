@@ -3,7 +3,7 @@
  * health-check-schedules-every-nightly-job): the three jobs are listed, each is scheduled on its
  * own and only once, and the acknowledgment send, which emails donors, is never one of them.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingNightlyJobProvider')
 private class GivingNightlyJobProviderTest {
     private static Integer givingTriggerCount() {
         return [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'];

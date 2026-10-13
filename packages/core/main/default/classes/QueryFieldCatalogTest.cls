@@ -3,7 +3,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:QueryFieldCatalog')
 private class QueryFieldCatalogTest {
     @IsTest
     static void describesAnObjectWithItsFieldsSortedByLabel() {

@@ -22,7 +22,7 @@
  * The `Account__c > {Household}` alternative resolves a person stored as an account, which needs
  * a Person Account org; it is not covered here.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupRegressionHouseholdsTest {
     private static final Set<String> HOUSEHOLD_SOFT_KEYS = new Set<String>{
         GivingRollupTestData.HOUSEHOLD_SOFT_TOTAL,

@@ -3,7 +3,7 @@
  * Manage BarnCRM Settings permission, sees the same page and cannot change anything.
  * Finishing a step belongs to the Setup Assistant's own controller.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HubController')
 private class HubControllerTest {
     @TestSetup
     static void grantPermission() {

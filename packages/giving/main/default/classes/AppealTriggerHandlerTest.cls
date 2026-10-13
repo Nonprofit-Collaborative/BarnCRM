@@ -1,7 +1,7 @@
 /**
  * An appeal hierarchy is shallow and it never loops (R-AP2).
  */
-@IsTest
+@IsTest(testFor='ApexClass:AppealTriggerHandler')
 private class AppealTriggerHandlerTest {
     @IsTest
     static void anAppealCannotBeItsOwnParent() {

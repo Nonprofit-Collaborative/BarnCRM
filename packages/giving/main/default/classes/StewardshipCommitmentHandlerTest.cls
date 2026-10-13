@@ -4,7 +4,7 @@
  * These tests have not been executed against an org: none was reachable from the environment they
  * were written in. They are written to the rules in canonical model Sections 25I to 25K.
  */
-@IsTest
+@IsTest(testFor='ApexClass:StewardshipCommitmentHandler')
 private class StewardshipCommitmentHandlerTest {
     private static final String PLAN = 'Pledge welcome';
 

@@ -9,7 +9,7 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptController, ApexClass:ReceiptTemplateService')
 private class ReceiptLetterEditorTest {
     private static final String LEGACY_BODY =
         '<div class="letterhead">\n  <h1>{{OrganizationName}}</h1>\n  <p>{{OrganizationAddress}}</p>\n</div>\n' +

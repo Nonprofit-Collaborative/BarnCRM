@@ -4,7 +4,7 @@
  * Everything about receipt numbering exists to make one question answerable: what happened to
  * number N. These tests are that question asked three ways.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptNumberSequence')
 private class ReceiptNumberSequenceTest {
     private static final Integer YEAR = 2026;
 

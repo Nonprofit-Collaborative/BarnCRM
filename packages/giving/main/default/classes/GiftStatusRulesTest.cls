@@ -5,7 +5,7 @@
  * leaves her receipts and frees the installment it was meant to pay. Then the check turns up
  * after all, and he sets it back to Pending.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftStatusRules')
 private class GiftStatusRulesTest {
     @TestSetup
     static void makeData() {

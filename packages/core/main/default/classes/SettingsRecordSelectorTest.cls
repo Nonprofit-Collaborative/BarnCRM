@@ -2,7 +2,7 @@
  * A module ships its own settings object, so Core reads the org-level record of an object it
  * does not know at compile time.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SettingsRecordSelector')
 private class SettingsRecordSelectorTest {
     @IsTest
     static void readsNothingWhenTheOrgHasNeverSaved() {

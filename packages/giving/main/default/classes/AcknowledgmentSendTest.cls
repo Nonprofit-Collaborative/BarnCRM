@@ -5,7 +5,7 @@
  * however the test says, which is the only way to prove what the feature records after a partial
  * failure.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AcknowledgmentService, ApexClass:AcknowledgmentRuleService')
 private class AcknowledgmentSendTest {
     @TestSetup
     static void setUp() {

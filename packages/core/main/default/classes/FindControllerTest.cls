@@ -4,7 +4,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(critical=true)
 private class FindControllerTest {
     private static final String ERRORS_ONLY =
         '{"version": 1, "object": "Error_Log__c", "fields": ["Context__c", "Severity__c"], ' +

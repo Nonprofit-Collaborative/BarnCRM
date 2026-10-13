@@ -6,7 +6,7 @@
  * Runs as a minimal-profile user holding only BarnCRM Admin, since every answer is that user's
  * describe.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportController')
 private class ImportControllerLoadTest {
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in

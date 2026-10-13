@@ -3,7 +3,7 @@
  * where the org does not store people that way, the selector returns nothing rather than
  * failing, which is the behavior Core depends on.
  */
-@IsTest
+@IsTest(testFor='ApexClass:PersonRecordSelector')
 private class PersonRecordSelectorTest {
     @IsTest
     static void nothingIsReadWhenTheOrgDoesNotStorePeopleAsAccounts() {

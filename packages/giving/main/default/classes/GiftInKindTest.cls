@@ -9,7 +9,7 @@
  * The receipt content itself is asserted in `ReceiptContentRulesTest`, where the rest of the IRS
  * language lives.
  */
-@IsTest
+@IsTest(testFor='ApexClass:QuickGiftEntryController')
 private class GiftInKindTest {
     private static final String RECEIPT_NUMBER = 'R-2026-000318';
     private static final String DESCRIBED = 'A used upright piano, delivered to the community hall';

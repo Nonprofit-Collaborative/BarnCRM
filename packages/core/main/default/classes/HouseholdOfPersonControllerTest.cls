@@ -4,7 +4,7 @@
  * the primary contact being moved from one membership record to another, and a new or
  * existing person joining a household in the flexible way of belonging.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdOfPersonController')
 private class HouseholdOfPersonControllerTest {
     @IsTest
     static void aContactPointsAtItsHouseholdInTheSimpleWay() {

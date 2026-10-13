@@ -2,7 +2,7 @@
  * The changed-only write of BarnCRM's own rollup engine (rollup proposal S5, "Changed-only
  * writes"): a record is saved only when a total changed, and values are compared as stored.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupWriter')
 private class RollupWriterTest {
     @IsTest
     static void valuesAreComparedAsTheyWouldBeStored() {

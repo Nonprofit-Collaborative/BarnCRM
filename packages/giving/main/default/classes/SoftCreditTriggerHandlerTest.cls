@@ -1,7 +1,7 @@
 /**
  * The rules a soft credit is saved by (feature G-08).
  */
-@IsTest
+@IsTest(testFor='ApexClass:SoftCreditTriggerHandler')
 private class SoftCreditTriggerHandlerTest {
     @IsTest
     static void refusesACreditWithNobodyCredited() {

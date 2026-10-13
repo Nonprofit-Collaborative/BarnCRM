@@ -1,7 +1,7 @@
 /**
  * One rule from canonical model R-H4 to R-H9 per test method.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdNamingService')
 private class HouseholdNamingServiceTest {
     private static final String NAME_PATTERN = 'The {LastName} Family';
     private static final String FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';

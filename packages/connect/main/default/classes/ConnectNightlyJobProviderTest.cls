@@ -3,7 +3,7 @@
  * the Opportunity mirror's run is listed only while a direction is chosen, and scheduling it
  * twice leaves one job.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ConnectNightlyJobProvider')
 private class ConnectNightlyJobProviderTest {
     private static void choose(String direction) {
         Connect_Settings__c settings = Connect_Settings__c.getOrgDefaults();

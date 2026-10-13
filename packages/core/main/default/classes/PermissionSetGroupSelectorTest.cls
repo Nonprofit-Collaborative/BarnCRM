@@ -2,7 +2,7 @@
  * Tests for PermissionSetGroupSelector: the packaged roles are found by DeveloperName,
  * and nothing is queried when there is nothing to look for.
  */
-@IsTest
+@IsTest(testFor='ApexClass:PermissionSetGroupSelector')
 private class PermissionSetGroupSelectorTest {
     @IsTest
     static void selectByDeveloperNamesFindsThePackagedRoles() {

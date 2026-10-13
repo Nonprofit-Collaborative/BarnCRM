@@ -15,7 +15,7 @@
  * the recalculation it asserts on; a test of the real-time path installs them first and makes
  * every save between `Test.startTest` and `Test.stopTest`.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupRegressionAmountsTest {
     private static final String HOUSEHOLD_THIS_YEAR = 'Household_Giving_This_Year';
     private static final String FUND_THIS_YEAR = 'Fund_Total_Raised_This_Year';

@@ -5,7 +5,7 @@
  * No org has run these yet; they are written against the behaviour the class documents.
  */
 // runs-as: deploying user (pure logic: parses a filter document against describe, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:FilterValueBinder')
 private class FilterValueBinderTest {
     private static FilterValueBinder bind(String objectName, String conditions, String logic) {
         String document =

@@ -4,7 +4,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:QueryCompiler')
 private class QueryCompilerTest {
     private static String query(String filter, String orderBy, Object rowLimit) {
         Map<String, Object> document = new Map<String, Object>{

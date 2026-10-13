@@ -5,7 +5,7 @@
  * is covered here is the behavior a finding cannot show: that an empty or missing set of
  * names asks the database nothing and answers nothing, rather than counting the whole org.
  */
-@IsTest
+@IsTest(testFor='ApexClass:UserAccessSelector')
 private class UserAccessSelectorTest {
     @IsTest
     static void noGroupNamesMeansNobody() {

@@ -6,7 +6,7 @@
  * set given to the running user during the test run is not seen by FeatureManagement until a
  * new user context starts, and reads and saves are in her own mode from API version 67.0.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CustomMetadataManagerController')
 private class CustomMetadataManagerControllerTest {
     private static final String TYPE_NAME = 'Relationship_Type__mdt';
     private static final Id JOB = FakeIds.ofPrefix('0Af', 3);

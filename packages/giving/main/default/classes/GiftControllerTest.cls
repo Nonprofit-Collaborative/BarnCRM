@@ -2,7 +2,7 @@
  * The screen-facing surface: it returns what a panel needs, and it turns a rule into a message
  * a person can read rather than a stack trace.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftController')
 private class GiftControllerTest {
     @TestSetup
     static void makeData() {
