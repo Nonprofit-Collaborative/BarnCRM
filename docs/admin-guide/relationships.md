@@ -44,6 +44,12 @@ access levels (BarnCRM Admin, Program Staff, or Volunteer Coordinator, or Fundra
 with Giving) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them.
 
+Keeping the other side in step does not depend on what the person saving can see or edit.
+Someone who may save a relationship but cannot see or edit the other person's side of it (for
+example under private sharing, where that side belongs to another user) still gets a matching
+other side, and an edit or delete still reaches it: BarnCRM writes the other side itself. The
+relationship they save is still checked against their own access.
+
 Relationships appear in two places once you are set up: a **Relationships** card on every
 person's record, and a **Relationships** tab in the BarnCRM app for reporting and
 list views.
