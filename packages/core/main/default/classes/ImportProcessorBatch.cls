@@ -21,6 +21,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     private List<String> log = new List<String>();
     private Set<String> notes = new Set<String>();
     private Integer chunksRun = 0;
+    /** Values empty cells cleared, or would clear, over the chunks (R-IT18). */
+    private Integer cleared = 0;
     /** The gift amounts the entity processor read, added up over the chunks (R-IB10). */
     private Decimal fileAmount;
     /** The entity processor's own state, handed from chunk to chunk (R-IR6). */
@@ -37,6 +39,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
+        // A row skipped when it was staged (R-IT17) is never processed.
+        String skipped = ImportRowProcessor.STATUS_SKIPPED;
         // System mode, stated because API 67.0 would otherwise read in user mode: the staged
         // rows are the package's own bookkeeping, written in system mode for the reason
         // ADR-0021 gives, and this read only feeds that processing. The records a row makes
@@ -59,7 +63,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                     Gift_Id__c,
                     Soft_Credit_Id__c
                 FROM Import_Row__c
-                WHERE Import_Batch__c = :owner
+                WHERE Import_Batch__c = :owner AND Status__c != :skipped
                 WITH SYSTEM_MODE
                 ORDER BY Row_Number__c ASC
             ]
@@ -105,6 +109,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             // Kept only from a chunk that finished: a chunk that died saved nothing.
             processorState = ImportEntityProcessors.carriedState;
             notes.addAll(outcome.notes);
+            cleared += outcome.cleared;
             if (outcome.fileAmount != null) {
                 fileAmount = (fileAmount == null ? 0 : fileAmount) + outcome.fileAmount;
             }
@@ -134,6 +139,14 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 dryRun ? Label.Core_Import_LogDryRunHeader : Label.Core_Import_LogCommitHeader
             );
             lines.addAll(new List<String>(notes));
+            if (cleared > 0) {
+                lines.add(
+                    String.format(
+                        dryRun ? Label.Core_Import_LogWouldClear : Label.Core_Import_LogCleared,
+                        new List<String>{ String.valueOf(cleared) }
+                    )
+                );
+            }
             lines.addAll(log);
             ImportBatchService.finish(
                 batchId,

@@ -68,6 +68,12 @@ public with sharing class ImportMapping {
         /** The steps that change this column's values before they are used (R-IT15). */
         @AuraEnabled
         public List<DataTransform.Step> transforms;
+        /**
+         * For a `Record` column of an update or upsert, an empty cell clears the field rather
+         * than leaving it as it is (R-IT18). False when absent.
+         */
+        @AuraEnabled
+        public Boolean blankClears;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the
@@ -129,12 +135,38 @@ public with sharing class ImportMapping {
         }
     }
 
+    /**
+     * A rule that skips a row of the file (R-IT17): the row's cell in `column` equals `text`,
+     * contains it, or is blank (a test of `DataTransform.TESTS`), compared as uploaded,
+     * trimmed and ignoring capitals.
+     */
+    @NamespaceAccessible
+    public class SkipRule {
+        @AuraEnabled
+        public String column;
+        @AuraEnabled
+        public String test;
+        @AuraEnabled
+        public String text;
+
+        @NamespaceAccessible
+        public SkipRule() {
+            this.column = null;
+        }
+    }
+
     @AuraEnabled
     public Integer version;
     @AuraEnabled
     public List<Column> columns;
     @AuraEnabled
     public List<Assignment> defaults;
+    /** Rows any of these rules matches are skipped when the file is staged (R-IT17). */
+    @AuraEnabled
+    public List<SkipRule> skipRows;
+    /** Only the first row of each combination of these columns' values loads (R-IT17). */
+    @AuraEnabled
+    public List<String> uniqueBy;
 
     @NamespaceAccessible
     public ImportMapping() {
@@ -161,6 +193,8 @@ public with sharing class ImportMapping {
             result.version = parsed.version == null ? 1 : parsed.version;
             result.columns = parsed.columns == null ? new List<Column>() : parsed.columns;
             result.defaults = parsed.defaults == null ? new List<Assignment>() : parsed.defaults;
+            result.skipRows = parsed.skipRows;
+            result.uniqueBy = parsed.uniqueBy;
         } catch (Exception ignored) {
             // An unreadable document is an empty mapping. The caller reports the emptiness.
             return new ImportMapping();
@@ -461,6 +495,26 @@ public with sharing class ImportMapping {
         for (String target : targets) {
             if (ENTITY_RECORD.equalsIgnoreCase(entityOf(target))) {
                 result.add(attributeOf(target).toLowerCase());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The `Record` attributes whose column says an empty cell clears the field (R-IT18),
+     * folded to lower case. A column set to Do not load is left out.
+     */
+    @NamespaceAccessible
+    public Set<String> clearingAttributes() {
+        Set<String> result = new Set<String>();
+        for (Column column : columns) {
+            if (
+                column != null &&
+                column.blankClears == true &&
+                !isIgnored(column.target) &&
+                ENTITY_RECORD.equalsIgnoreCase(entityOf(column.target))
+            ) {
+                result.add(attributeOf(column.target).toLowerCase());
             }
         }
         return result;

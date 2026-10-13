@@ -341,6 +341,7 @@ public with sharing class ImportTemplateService {
         }
         // A broken step is skipped on read, so it is refused here, where the admin can fix it.
         List<String> changeProblems = mapping.transformProblems();
+        changeProblems.addAll(ImportRowFilter.problems(mapping));
         if (!changeProblems.isEmpty()) {
             throw new ImportException(String.join(changeProblems, ' '));
         }
