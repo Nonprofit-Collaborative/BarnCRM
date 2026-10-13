@@ -677,7 +677,7 @@ Because the first customers are Nonprofit Cloud / Agentforce Nonprofit orgs (Sec
 ### 7.4 Definition of done (per feature)
 
 - [ ] Canonical model updated first (Section 4.4).
-- [ ] Metadata, Apex, LWC complete with tests passing on all org shapes.
+- [ ] Metadata, Apex, LWC complete with tests passing on the test orgs (`oi-test` and `oi-pa`).
 - [ ] Settings for the feature exposed in the Settings console with descriptions; no Setup step required for normal use.
 - [ ] Permission sets updated; no new permission requires cloning.
 - [ ] Error paths logged to Error Log with human-readable messages.
@@ -690,7 +690,7 @@ Because the first customers are Nonprofit Cloud / Agentforce Nonprofit orgs (Sec
 
 1. Merge to `main` with CI green.
 2. Create a package version (`sf package version create`) for each changed package; beta versions for testing.
-3. Install beta into the internal test orgs (one per org shape) and the prerelease cohort.
+3. Install beta into the internal test orgs (`oi-test` and `oi-pa`) and the prerelease cohort.
 4. Run upgrade tests and the manual walkthrough.
 5. Promote (`sf package version promote`) and tag the repo `v0.N.0`.
 6. Push upgrade to opted-in orgs (from v0.6; before that, manual installs). Push schedule: never on a Friday, never in the last week of December (year-end giving) or the first two weeks of January (year-end receipting).
@@ -794,6 +794,7 @@ Standing owner instructions for the build session (recorded 2026-10-12 from the 
 - **Test orgs (Brandon, 2026-09-23, 2026-09-24 and 2026-10-12):** use only `oi-test`, `oi-pa` and `barn-core` (a temporary Sales Cloud scratch org for Core-only coverage, approved by Brandon 2026-10-12; Section 11.2 item 26); creating any other scratch org needs Brandon's approval first, and recreating `oi-pa` from `config/scratch-defs/person-accounts.json` when it expires is pre-approved. Agents share each org one deploy or test run at a time. Never read, print or store an org auth URL, and never dispatch the GitHub org-test workflow.
 - **Sandbox `mwdbdevsb` (Brandon, 2026-10-12):** approved for testing the Community Suite (Core without Giving). It is a sandbox of a real, built-out org, not a dummy org, so it is never the project's default target org; every deploy is a check-only deploy first and runs only with Brandon's go-ahead; no data change, destructive deploy or scheduled job without his approval; deploy Core only, unless he says otherwise.
 - **Gate from a clean checkout:** run `scripts/org/run-org-tests.sh` only from a dedicated worktree checked out detached at the pushed head, never from a worktree someone is editing; the script checks for a clean tree only when it starts, so mid-run edits get deployed half-finished.
+- **Core only until the modules start (Brandon, 2026-10-13; D-84):** "Going forward, please only present findings and decisions related to core (not the extra modules) until I start working on those modules. The feedback, decisions, etc, can be recorded in relation to those modules in the project plan or somewhere appropriately so they can be referenced when I'm working on those modules. Right now I want to get Core v1.0 completed." Module findings go to Section 11.5, grouped by module, not into reports to Brandon.
 - **Synced checkout:** the maintainer's checkout sits in a synced folder that creates untracked "name 2.ext" copies (including inside `.git/`). Stage by explicit path, never `git add -A`, and check `git show --stat` for ` 2.` files before pushing.
 
 ## 10. v0.1 in detail (the first build)
@@ -970,6 +971,19 @@ Adding any package dependency; adding a standard-object reference outside Connec
 
 ---
 
+### 11.5 Module notes recorded during Core v1.0
+
+Findings and decisions about the modules (Giving, Connect, Volunteers, Programs, Funders), recorded here so they can be referenced when work on each module starts. They are not presented to Brandon until then (D-84). Grouped by module.
+
+**Giving**
+- **Erase a person: receipt PDFs (from PR #284, D-52).** Receipt PDFs are kept as tax records and still show the donor's name and address. The Erase a person preview tells admins to delete them by hand when retention allows. Recommended default, taken as the default. Alternative: Giving deletes them.
+- **Label descriptions.** Giving (66 labels) and Connect (38 labels) label descriptions still need the placeholder sweep before `scripts/ci/check-labels.py` covers them.
+
+**Connect**
+- Label descriptions: see the note above (38 labels).
+
+---
+
 ## 12. Decision log (initial ADRs; copy each into `docs/architecture/decisions/`)
 
 | ID | Decision | Alternatives rejected | Why |
@@ -1046,15 +1060,18 @@ Adding any package dependency; adding a standard-object reference outside Connec
 | D-70 | Record cards (Addresses, Affiliations, Relationships) that refuse a change for lack of access show a friendly message and write no Error Log entry; real failures are still logged (owner decision, Brandon, 2026-10-13; Q-06) | Logging every refused change | A permission refusal is expected behavior, not an error; the Error Log keeps real failures visible |
 | D-71 | Rollup totals are recalculated just after the save by default (Background), with a "During the save" setting (Q-01, PR #256; owner decision, Brandon, 2026-10-13, as recommended); modifies ADR-0082 decision 4 through a new ADR written on that branch (number assigned at merge) | Recalculating during the save by default | The save is not slowed by recalculation; admins who need immediate totals can choose it |
 | D-72 | `RollupRecalcAction` is global so a subscriber's Flow Builder can use it (owner decision, Brandon, 2026-10-13, as recommended); permanent once managed | Keeping it public | A subscriber's flow cannot call a non-global action |
-| D-73 | Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 (owner decision, Brandon, 2026-10-13, as recommended) | A manual Setup step | Follows D-62 and D-68: access ships with the package |
+| D-73 | **Amended by D-83.** Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 (owner decision, Brandon, 2026-10-13, as recommended) | A manual Setup step | Follows D-62 and D-68: access ships with the package |
 | D-74 | Setup notes for Giving and Connect are shown on each module's own page, using Core's note component (owner decision, Brandon, 2026-10-13, as recommended); keeps ADR-0020 | Core showing notes for modules; a separate component per module | Core never references Giving or Connect; one component keeps the notes consistent |
-| D-75 | The Bulk Update and Bulk Delete permission sets' 31 shared grants move into BarnCRM Find and Export (PLATFORM-17; owner decision, Brandon, 2026-10-13, as recommended) | Repeating the grants in each set | One place for grants those tools share |
+| D-75 | **Reversed by D-82.** The Bulk Update and Bulk Delete permission sets' 31 shared grants move into BarnCRM Find and Export (PLATFORM-17; owner decision, Brandon, 2026-10-13, as recommended) | Repeating the grants in each set | One place for grants those tools share |
 | D-76 | All BarnCRM triggers declare all seven contexts, with a CI check, after PR #229 merges (PLATFORM-18; owner decision, Brandon, 2026-10-13, as recommended) | Declaring only the contexts used | Uniform trigger declarations, enforced |
 | D-77 | The unused label `Giving_SoftCredit_Duplicate` is deleted as a leftover (owner decision, Brandon, 2026-10-13, as recommended) | Keeping it | Nothing references it |
 | D-78 | `Error_Log__c` sharing stays Read/Write (owner decision, Brandon, 2026-10-13, as recommended): every permission set has View All, only Admin can edit | Read only sharing | Read would break Mark as seen on other people's entries |
 | D-79 | Stored household names use the org default language for joining words ("and", the list separator, "the late"), not the saving user's language (owner decision, Brandon, 2026-10-13, as recommended) | The saving user's language | A household name is stored data; it should not change with whoever saves it |
 | D-80 | Plan corrections applied (owner decision, Brandon, 2026-10-13, as recommended; closes Section 11.2 item 27): the v0.3 row no longer lists NPSP import templates (they ship in v0.5); CI runs on one test org, not four org shapes; `TestDataFactory` is exposed with `@NamespaceAccessible` (ADR-0017), not `@IsTest global`; X-07 is v0.6 in both places that said v0.10; D-14 cites ADR-0053 and ADR-0054; the C-25 note says built, in `main`; Section 11.3 item 6 (the advanced find release note) is done as `v0.7-draft-advanced-find.md`; the v0.11 row says accessibility, mobile and translation are built, not merged (PRs #273 to #276), with the device mobile run still open | Leaving the plan stale | The plan matches the code and the other decisions |
 | D-81 | Suites and packaging (owner decision, Brandon, 2026-09-23; numbered 2026-10-13): BarnCRM ships as two suites from the same packages, the Impact Suite (Core plus Giving, with Programs, Logic Models, Volunteers, Funders and Connect as modules) and the Community Suite (Core alone, with the fitting modules); one install to start, guided installs after; Core is neutral; unlocked packages now, managed at listing; minor features are feature-flagged inside a package. Full text in Section 4.1 | One product for all organizations; a base package that Core depends on | An unused module leaves nothing in the org (Principle 3) |
+| D-82 | D-75 is reversed (owner decision, Brandon, 2026-10-13): the Bulk Update and Bulk Delete permission sets keep their own data job read grants | Moving the shared grants into BarnCRM Find and Export | Find and Export holders would then read every data job and the undo journal, which holds old field values |
+| D-83 | Connect's Record Inbound Gift action gets its own small permission set granting only that action (owner decision, Brandon, 2026-10-13); amends D-73, which named Giving's sets | Granting it through a broader set | Least access: only the action, nothing else |
+| D-84 | Working agreement (Brandon, 2026-10-13): present only Core findings and decisions until he starts work on the modules; module feedback and decisions are recorded in Section 11.5 (grouped by module) so they can be referenced when those modules start; the goal now is Core v1.0 complete. Verbatim text in Section 9.6 | Presenting module findings alongside Core | Keeps attention on finishing Core v1.0 without losing module notes |
 
 ---
 
