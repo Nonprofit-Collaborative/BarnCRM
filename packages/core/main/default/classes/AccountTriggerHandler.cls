@@ -270,7 +270,10 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         for (Account record : records) {
             Boolean isHousehold = record.RecordTypeId == recordTypeId;
             if (isHousehold && record.Custom_Name__c != true && String.isBlank(record.Name)) {
-                record.Name = Label.Core_Households_NamePlaceholder;
+                record.Name = HouseholdNamingService.storedLabel(
+                    'Core_Households_NamePlaceholder',
+                    Label.Core_Households_NamePlaceholder
+                );
             }
         }
     }

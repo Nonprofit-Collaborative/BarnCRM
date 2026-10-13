@@ -366,4 +366,108 @@ private class HouseholdNamingServiceTest {
             );
         }
     }
+
+    /** A Smith couple in a new household, saved and named as the running user. */
+    private static Account namedSmithHousehold() {
+        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+        Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
+        insert household;
+        insert new List<Contact>{
+            new Contact(
+                Salutation = 'Mr.',
+                FirstName = 'John',
+                LastName = 'Smith',
+                Household_Role__c = 'Head',
+                AccountId = household.Id
+            ),
+            new Contact(
+                Salutation = 'Mrs.',
+                FirstName = 'Jane',
+                LastName = 'Smith',
+                Household_Role__c = 'Spouse or Partner',
+                AccountId = household.Id
+            )
+        };
+        Test.startTest();
+        HouseholdNamingService.applyNaming(new Set<Id>{ household.Id });
+        Test.stopTest();
+        return [
+            SELECT Household_Formal_Greeting__c, Household_Informal_Greeting__c
+            FROM Account
+            WHERE Id = :household.Id
+        ];
+    }
+
+    /** The admin test user, switched to French, so their own labels differ from the org's. */
+    private static User frenchSpeakingAdmin() {
+        User admin = TestUsers.admin();
+        admin.LanguageLocaleKey = 'fr';
+        update admin;
+        return admin;
+    }
+
+    @IsTest
+    static void storedWordsUseTheOrgLanguageNotTheSaver() {
+        OrgLanguageSelector.languageOverride = 'de';
+        HouseholdNamingService.translationsForTest = new Map<String, String>{
+            'de|Core_Households_Conjunction' => 'und'
+        };
+        System.runAs(frenchSpeakingAdmin()) {
+            Assert.areEqual('fr', UserInfo.getLanguage(), 'The person saving reads French.');
+
+            Account saved = namedSmithHousehold();
+
+            Assert.areEqual(
+                'Mr. und Mrs. John Smith',
+                saved.Household_Formal_Greeting__c,
+                'The greeting is worded in the org language, not the saver language.'
+            );
+            Assert.areEqual(
+                'John und Jane',
+                saved.Household_Informal_Greeting__c,
+                'So is the informal greeting.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aMissingTranslationFallsBackToTheOrdinaryLabel() {
+        OrgLanguageSelector.languageOverride = 'de';
+        HouseholdNamingService.translationsForTest = new Map<String, String>();
+        System.runAs(TestUsers.admin()) {
+            Account saved = namedSmithHousehold();
+
+            Assert.areEqual(
+                'John ' + Label.Core_Households_Conjunction + ' Jane',
+                saved.Household_Informal_Greeting__c,
+                'With no word in the org language, the ordinary label is used.'
+            );
+        }
+    }
+
+    @IsTest
+    static void anUnknownOrgLanguageFallsBackWithoutFailingTheSave() {
+        OrgLanguageSelector.languageOverride = 'not_a_language';
+        System.runAs(TestUsers.admin()) {
+            Account saved = namedSmithHousehold();
+
+            Assert.areEqual(
+                'John ' + Label.Core_Households_Conjunction + ' Jane',
+                saved.Household_Informal_Greeting__c,
+                'A language the platform does not know still names the household.'
+            );
+        }
+    }
+
+    @IsTest
+    static void theOrgLanguageLabelIsReadWithThePackageNamespace() {
+        System.runAs(TestUsers.admin()) {
+            Assert.isNotNull(OrgLanguageSelector.defaultLanguage(), 'Every org has a language.');
+            Assert.areNotEqual(
+                'fallback used',
+                HouseholdNamingService.storedLabel('Core_Households_Conjunction', 'fallback used'),
+                'The label is found by name in the org language, so the namespace is right.'
+            );
+        }
+    }
 }

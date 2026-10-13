@@ -122,6 +122,14 @@ lists the surnames instead, which is deliberate. Check also whether anyone is ma
 "exclude from household name": that person is left out of the name but still counted as a
 member.
 
+**"Which language are the added words in?"**
+The words BarnCRM adds to a name or greeting ("and", the comma between names, "the late",
+"Household", and the placeholder name a new household gets) are in your org's default
+language (Setup, Company Information), whoever saves the household. A colleague who uses
+Salesforce in another language does not rename households into theirs. Where BarnCRM has no
+translation for that language, the words stay in English. Your patterns are used exactly as
+you typed them.
+
 ## Field reference
 
 For report builders only.
