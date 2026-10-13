@@ -132,10 +132,9 @@ Most buttons open a page. A button that changes something in your org works like
 1. The finding says exactly what the fix will do, counted from your org: for example, with
    Giving, **3 shipped totals are missing**, followed by their names (Total Gifts, Largest
    Gift, Last Gift Date) and what the fix will create.
-2. Click the button. A box headed **Before this fix runs** opens at the top of the panel, the
-   page scrolls to it, and it shows that sentence again with **Confirm** and **Cancel**.
-   Nothing has changed yet. **Cancel** or the Escape key closes it and takes you back to the
-   button.
+2. Click the button. A dialog headed **Before this fix runs** opens over the page and shows
+   that sentence again with **Confirm** and **Cancel**. Nothing has changed yet. **Cancel**,
+   the close button, or the Escape key closes it and takes you back to the button.
 3. Click **Confirm**. The fix runs, the panel says what it did (for example **Done. Created:
    Total Gifts, Largest Gift, Last Gift Date.**), and Health Check re-runs underneath it. If it
    fails, nothing is changed, the panel says so in a sentence, and the details are in the Error

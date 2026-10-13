@@ -1,4 +1,6 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import SampleDataManager from 'c/sampleDataManager';
 import getStatus from '@salesforce/apex/SampleDataController.getStatus';
 import loadSampleData from '@salesforce/apex/SampleDataController.loadSampleData';
@@ -48,12 +50,10 @@ const LOADED_STATUS = {
   junctionMembership: false
 };
 
-// Outside the confirmation panel there are exactly two buttons, Load then Remove;
-// inside it there are exactly two, Cancel then Confirm (see sampleDataManager.html).
+// The card has exactly two buttons, Load then Remove (see sampleDataManager.html); each asks
+// for confirmation in c/barnConfirmModal, whose answer a test sets on BarnConfirmModal.open.
 const LOAD_BUTTON_INDEX = 0;
 const REMOVE_BUTTON_INDEX = 1;
-const CANCEL_BUTTON_INDEX = 0;
-const CONFIRM_BUTTON_INDEX = 1;
 
 function flushPromises() {
   return new Promise((resolve) => setTimeout(resolve, 0));
@@ -78,6 +78,11 @@ function buttons(element) {
 }
 
 describe('c-sample-data-manager', () => {
+  beforeEach(() => {
+    BarnConfirmModal.open.mockResolvedValue(true);
+    jest.spyOn(Toast, 'show');
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
     jest.useRealTimers();
@@ -217,17 +222,17 @@ describe('c-sample-data-manager', () => {
     buttons(element)[LOAD_BUTTON_INDEX].click();
     await flushPromises();
 
-    expect(loadSampleData).not.toHaveBeenCalled();
-    const confirmButtons = buttons(element);
-    expect(confirmButtons.length).toBe(2);
-
-    confirmButtons[CONFIRM_BUTTON_INDEX].click();
-    await flushPromises();
-
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: 'c.Core_SampleData_LoadConfirmTitle',
+        message: 'c.Core_SampleData_LoadConfirmBody'
+      })
+    );
     expect(loadSampleData).toHaveBeenCalledTimes(1);
   });
 
   it('cancelling the confirmation does not call Apex', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
     canManageSampleData.mockResolvedValue(true);
     getStatus.mockResolvedValue(NOT_LOADED_STATUS);
 
@@ -237,9 +242,7 @@ describe('c-sample-data-manager', () => {
     buttons(element)[LOAD_BUTTON_INDEX].click();
     await flushPromises();
 
-    buttons(element)[CANCEL_BUTTON_INDEX].click();
-    await flushPromises();
-
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
     expect(loadSampleData).not.toHaveBeenCalled();
     expect(buttons(element).length).toBe(2);
   });
@@ -310,9 +313,30 @@ describe('c-sample-data-manager', () => {
     buttons(element)[REMOVE_BUTTON_INDEX].click();
     await flushPromises();
 
-    buttons(element)[CONFIRM_BUTTON_INDEX].click();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ label: 'c.Core_SampleData_RemoveConfirmTitle' })
+    );
+    expect(removeSampleData).toHaveBeenCalledTimes(1);
+    expect(Toast.show).toHaveBeenCalledWith(
+      { label: 'c.Core_SampleData_RemoveSuccess', message: '', variant: 'success' },
+      expect.anything()
+    );
+  });
+
+  it('shows an error toast when removing fails', async () => {
+    canManageSampleData.mockResolvedValue(true);
+    getStatus.mockResolvedValue(LOADED_STATUS);
+    removeSampleData.mockRejectedValue({ body: { message: 'Locked row' } });
+
+    const element = createManager();
     await flushPromises();
 
-    expect(removeSampleData).toHaveBeenCalledTimes(1);
+    buttons(element)[REMOVE_BUTTON_INDEX].click();
+    await flushPromises();
+
+    expect(Toast.show).toHaveBeenCalledWith(
+      expect.objectContaining({ label: 'c.Core_SampleData_RemoveError', variant: 'error' }),
+      expect.anything()
+    );
   });
 });
