@@ -64,25 +64,12 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
         try {
             AffiliationService.refreshPrimaries(records, previous);
         } catch (Exception thrown) {
-            report(thrown, records == null || records.isEmpty() ? previous : records, context);
-        }
-    }
-
-    /**
-     * The affiliation specific message, rather than the dispatcher's general one, so a person
-     * reading the error knows which part of the save failed. The exception is recorded in the
-     * Error Log first (R-E1), and a record already carrying a message that tells the person
-     * what to change is left alone.
-     */
-    private void report(Exception thrown, List<Affiliation__c> records, String context) {
-        ErrorLogger.log(thrown, context);
-        if (records == null) {
-            return;
-        }
-        for (Affiliation__c record : records) {
-            if (!record.hasErrors()) {
-                record.addError(Label.Core_Affiliation_PrimaryFailed);
-            }
+            reportFailure(
+                thrown,
+                records == null || records.isEmpty() ? previous : records,
+                context,
+                Label.Core_Affiliation_PrimaryFailed
+            );
         }
     }
 }

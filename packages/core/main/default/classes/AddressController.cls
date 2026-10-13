@@ -42,13 +42,13 @@ public with sharing class AddressController {
     @AuraEnabled(cacheable=true)
     public static List<AddressView> getAddresses(Id ownerId) {
         if (ownerId == null) {
-            throw messageFor(Label.Core_Address_OwnerRequired);
+            throw ControllerErrors.messageFor(Label.Core_Address_OwnerRequired);
         }
         try {
             return toViews(AddressSelector.selectByOwnerIds(new Set<Id>{ ownerId }));
         } catch (Exception e) {
             ErrorLogger.log(e, 'AddressController.getAddresses');
-            throw messageFor(Label.Core_Address_LoadFailed);
+            throw ControllerErrors.messageFor(Label.Core_Address_LoadFailed);
         }
     }
 
@@ -60,16 +60,16 @@ public with sharing class AddressController {
     @AuraEnabled
     public static List<AddressView> setDefault(Id addressId) {
         if (addressId == null) {
-            throw messageFor(Label.Core_Address_NotFound);
+            throw ControllerErrors.messageFor(Label.Core_Address_NotFound);
         }
         List<Address__c> found = AddressSelector.selectByIds(new Set<Id>{ addressId });
         if (found.isEmpty()) {
-            throw messageFor(Label.Core_Address_NotFound);
+            throw ControllerErrors.messageFor(Label.Core_Address_NotFound);
         }
         Address__c address = found[0];
         Id ownerId = AddressService.ownerIdOf(address);
         if (ownerId == null) {
-            throw messageFor(Label.Core_Address_OwnerRequired);
+            throw ControllerErrors.messageFor(Label.Core_Address_OwnerRequired);
         }
         try {
             Database.update(
@@ -78,7 +78,7 @@ public with sharing class AddressController {
             );
         } catch (Exception e) {
             ErrorLogger.log(e, 'AddressController.setDefault');
-            throw messageFor(Label.Core_Address_SetDefaultFailed);
+            throw ControllerErrors.messageFor(Label.Core_Address_SetDefaultFailed);
         }
         return toViews(AddressSelector.selectByOwnerIds(new Set<Id>{ ownerId }));
     }
@@ -120,11 +120,5 @@ public with sharing class AddressController {
         Integer safeDay = Math.min(day.intValue(), 28);
         Datetime sample = Datetime.newInstance(2001, month.intValue(), safeDay, 12, 0, 0);
         return sample.format('MMMM') + ' ' + String.valueOf(day.intValue());
-    }
-
-    private static AuraHandledException messageFor(String message) {
-        AuraHandledException e = new AuraHandledException(message);
-        e.setMessage(message);
-        return e;
     }
 }

@@ -13,11 +13,6 @@
  * that maintenance off.
  */
 public with sharing class AffiliationDomain {
-    @TestVisible
-    private static final String STATUS_CURRENT = 'Current';
-    @TestVisible
-    private static final String STATUS_FORMER = 'Former';
-
     /**
      * Settles the status against the dates, and takes the primary flag off anything that has
      * ended (R-AF4). A former affiliation is never the primary one: a field that still names
@@ -28,20 +23,15 @@ public with sharing class AffiliationDomain {
             return;
         }
         for (Affiliation__c record : records) {
-            if (String.isBlank(record.Status__c)) {
-                record.Status__c = STATUS_CURRENT;
-            }
-            if (record.End_Date__c != null) {
-                record.Status__c = STATUS_FORMER;
-            } else {
-                Affiliation__c previous = previousById == null
-                    ? null
-                    : (Affiliation__c) previousById.get(record.Id);
-                if (previous != null && previous.End_Date__c != null) {
-                    record.Status__c = STATUS_CURRENT;
-                }
-            }
-            if (record.Status__c == STATUS_FORMER) {
+            Affiliation__c previous = previousById == null
+                ? null
+                : (Affiliation__c) previousById.get(record.Id);
+            record.Status__c = ConnectionStatus.settle(
+                record.Status__c,
+                record.End_Date__c,
+                previous?.End_Date__c
+            );
+            if (record.Status__c == ConnectionStatus.FORMER) {
                 record.Is_Primary__c = false;
             }
         }
@@ -191,21 +181,15 @@ public with sharing class AffiliationDomain {
         return String.format(
             Label.Core_Affiliation_Overlap,
             new List<String>{
-                personName(existing),
+                PersonReference.nameOf(
+                    existing.Contact__r,
+                    existing.Person_Account__r,
+                    Label.Core_Affiliation_UnnamedPerson
+                ),
                 existing.Organization__r == null ? '' : existing.Organization__r.Name,
                 String.isBlank(existing.Role__c) ? Label.Core_Affiliation_NoRole : existing.Role__c,
                 existing.Name
             }
         );
-    }
-
-    private static String personName(Affiliation__c record) {
-        if (record.Contact__r != null && String.isNotBlank(record.Contact__r.Name)) {
-            return record.Contact__r.Name;
-        }
-        if (record.Person_Account__r != null && String.isNotBlank(record.Person_Account__r.Name)) {
-            return record.Person_Account__r.Name;
-        }
-        return Label.Core_Affiliation_UnnamedPerson;
     }
 }

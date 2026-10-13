@@ -42,13 +42,13 @@ public with sharing class RelationshipController {
     @AuraEnabled(cacheable=true)
     public static List<RelationshipView> getRelationships(Id personId) {
         if (personId == null) {
-            throw messageFor(Label.Core_Relationship_PersonRequired);
+            throw ControllerErrors.messageFor(Label.Core_Relationship_PersonRequired);
         }
         try {
             return toViews(RelationshipSelector.selectByFromPersonIds(new Set<Id>{ personId }));
         } catch (Exception e) {
             ErrorLogger.log(e, 'RelationshipController.getRelationships');
-            throw messageFor(Label.Core_Relationship_LoadFailed);
+            throw ControllerErrors.messageFor(Label.Core_Relationship_LoadFailed);
         }
     }
 
@@ -60,7 +60,7 @@ public with sharing class RelationshipController {
     @AuraEnabled
     public static List<RelationshipView> removeRelationship(Id relationshipId, Id personId) {
         if (relationshipId == null || personId == null) {
-            throw messageFor(Label.Core_Relationship_RemoveFailed);
+            throw ControllerErrors.messageFor(Label.Core_Relationship_RemoveFailed);
         }
         try {
             Database.delete(
@@ -69,7 +69,7 @@ public with sharing class RelationshipController {
             );
         } catch (Exception e) {
             ErrorLogger.log(e, 'RelationshipController.removeRelationship');
-            throw messageFor(Label.Core_Relationship_RemoveFailed);
+            throw ControllerErrors.messageFor(Label.Core_Relationship_RemoveFailed);
         }
         return getRelationships(personId);
     }
@@ -88,7 +88,7 @@ public with sharing class RelationshipController {
             view.relationshipType = record.Type__c;
             view.reciprocalType = record.Reciprocal_Type__c;
             view.status = record.Status__c;
-            view.isFormer = record.Status__c != 'Current';
+            view.isFormer = record.Status__c != ConnectionStatus.CURRENT;
             view.startDate = record.Start_Date__c;
             view.endDate = record.End_Date__c;
             view.description = record.Description__c;
@@ -100,23 +100,10 @@ public with sharing class RelationshipController {
     }
 
     private static String relatedName(Relationship__c record) {
-        if (
-            record.Related_Contact__r != null && String.isNotBlank(record.Related_Contact__r.Name)
-        ) {
-            return record.Related_Contact__r.Name;
-        }
-        if (
-            record.Related_Person_Account__r != null &&
-            String.isNotBlank(record.Related_Person_Account__r.Name)
-        ) {
-            return record.Related_Person_Account__r.Name;
-        }
-        return Label.Core_Relationship_UnnamedPerson;
-    }
-
-    private static AuraHandledException messageFor(String message) {
-        AuraHandledException e = new AuraHandledException(message);
-        e.setMessage(message);
-        return e;
+        return PersonReference.nameOf(
+            record.Related_Contact__r,
+            record.Related_Person_Account__r,
+            Label.Core_Relationship_UnnamedPerson
+        );
     }
 }

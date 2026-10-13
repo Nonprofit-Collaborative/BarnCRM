@@ -41,25 +41,12 @@ public with sharing class RelationshipValidationHandler extends TriggerHandler {
             RelationshipDomain.applyDefaults(records, previousById);
             RelationshipDomain.validate(records, previousById);
         } catch (Exception thrown) {
-            report(thrown, records, 'RelationshipValidationHandler.applyAndValidate');
-        }
-    }
-
-    /**
-     * The relationship specific message, rather than the dispatcher's general one, so a person
-     * reading the error knows which part of the save failed. The exception is recorded in the
-     * Error Log first (R-E1).
-     *
-     * A record that has already been refused by the domain rules is left alone: it carries the
-     * message that tells the person what to change, and a second message on the same record
-     * would bury it.
-     */
-    private void report(Exception thrown, List<Relationship__c> records, String context) {
-        ErrorLogger.log(thrown, context);
-        for (Relationship__c record : records) {
-            if (!record.hasErrors()) {
-                record.addError(Label.Core_Relationship_SyncFailed);
-            }
+            reportFailure(
+                thrown,
+                records,
+                'RelationshipValidationHandler.applyAndValidate',
+                Label.Core_Relationship_SyncFailed
+            );
         }
     }
 }

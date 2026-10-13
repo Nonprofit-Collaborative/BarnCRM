@@ -49,7 +49,7 @@ public with sharing class AffiliationController {
     @AuraEnabled(cacheable=true)
     public static List<AffiliationView> getAffiliations(Id ownerId) {
         if (ownerId == null) {
-            throw messageFor(Label.Core_Affiliation_PersonRequired);
+            throw ControllerErrors.messageFor(Label.Core_Affiliation_PersonRequired);
         }
         try {
             List<AffiliationView> views = toViews(
@@ -62,7 +62,7 @@ public with sharing class AffiliationController {
             return views;
         } catch (Exception e) {
             ErrorLogger.log(e, 'AffiliationController.getAffiliations');
-            throw messageFor(Label.Core_Affiliation_LoadFailed);
+            throw ControllerErrors.messageFor(Label.Core_Affiliation_LoadFailed);
         }
     }
 
@@ -75,7 +75,7 @@ public with sharing class AffiliationController {
     @AuraEnabled
     public static List<AffiliationView> makePrimary(Id affiliationId, Id ownerId) {
         if (affiliationId == null || ownerId == null) {
-            throw messageFor(Label.Core_Affiliation_NotFound);
+            throw ControllerErrors.messageFor(Label.Core_Affiliation_NotFound);
         }
         try {
             Database.update(
@@ -86,7 +86,7 @@ public with sharing class AffiliationController {
             );
         } catch (Exception e) {
             ErrorLogger.log(e, 'AffiliationController.makePrimary');
-            throw messageFor(Label.Core_Affiliation_MakePrimaryFailed);
+            throw ControllerErrors.messageFor(Label.Core_Affiliation_MakePrimaryFailed);
         }
         return getAffiliations(ownerId);
     }
@@ -108,7 +108,7 @@ public with sharing class AffiliationController {
                 : record.Organization__r.Name;
             view.role = record.Role__c;
             view.status = record.Status__c;
-            view.isFormer = record.Status__c != 'Current';
+            view.isFormer = record.Status__c != ConnectionStatus.CURRENT;
             view.isPrimary = record.Is_Primary__c == true;
             view.startDate = record.Start_Date__c;
             view.endDate = record.End_Date__c;
@@ -120,18 +120,10 @@ public with sharing class AffiliationController {
     }
 
     private static String personName(Affiliation__c record) {
-        if (record.Contact__r != null && String.isNotBlank(record.Contact__r.Name)) {
-            return record.Contact__r.Name;
-        }
-        if (record.Person_Account__r != null && String.isNotBlank(record.Person_Account__r.Name)) {
-            return record.Person_Account__r.Name;
-        }
-        return Label.Core_Affiliation_UnnamedPerson;
-    }
-
-    private static AuraHandledException messageFor(String message) {
-        AuraHandledException e = new AuraHandledException(message);
-        e.setMessage(message);
-        return e;
+        return PersonReference.nameOf(
+            record.Contact__r,
+            record.Person_Account__r,
+            Label.Core_Affiliation_UnnamedPerson
+        );
     }
 }
