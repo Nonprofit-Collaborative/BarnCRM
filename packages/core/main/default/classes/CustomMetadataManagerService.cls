@@ -399,7 +399,12 @@ public with sharing class CustomMetadataManagerService {
 
     /**
      * A DeveloperName for a new row: the prefix, then the name with every run of characters a
-     * DeveloperName cannot hold turned into one underscore, then a number if it is taken.
+     * DeveloperName cannot hold turned into one underscore, then a short random code.
+     *
+     * The code is what keeps two adds of the same name apart while the first is still
+     * deploying (ADMIN-22): the rows read here are only the deployed ones, so a name worked out
+     * from them alone would be the same twice, and the second deployment would overwrite the
+     * first.
      */
     @TestVisible
     private static String newDeveloperName(
@@ -410,18 +415,28 @@ public with sharing class CustomMetadataManagerService {
         if (String.isBlank(body)) {
             body = 'Row';
         }
-        String base = (ORG_PREFIX + body).left(NAME_LIMIT - 3).removeEnd('_');
+        String base = (ORG_PREFIX + body).left(NAME_LIMIT - CODE_LENGTH - 1).removeEnd('_');
         Set<String> taken = new Set<String>();
         for (CustomMetadataManagerSelector.StoredRow row : rows) {
             taken.add(row.developerName.toLowerCase());
         }
-        String candidate = base;
-        Integer suffix = 2;
-        while (taken.contains(candidate.toLowerCase())) {
-            candidate = base + '_' + suffix;
-            suffix++;
-        }
+        String candidate;
+        do {
+            candidate = base + '_' + randomCode();
+        } while (taken.contains(candidate.toLowerCase()));
         return candidate;
+    }
+
+    private static final Integer CODE_LENGTH = 4;
+    private static final String CODE_CHARACTERS = 'abcdefghijkmnpqrstuvwxyz23456789';
+
+    private static String randomCode() {
+        String code = '';
+        for (Integer i = 0; i < CODE_LENGTH; i++) {
+            Integer index = Math.abs(Math.mod(Crypto.getRandomInteger(), CODE_CHARACTERS.length()));
+            code += CODE_CHARACTERS.substring(index, index + 1);
+        }
+        return code;
     }
 
     // ------------------------------------------------------------------ helpers
