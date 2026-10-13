@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13.
+Last refreshed from BMemory 2026-10-13 (through D-55).
 
 ## Decision log (plan Section 12)
 
@@ -48,13 +48,21 @@ Last refreshed from BMemory 2026-10-13.
 | D-38 | 2026-10-13 | Priority: a Core quality pass (test, optimize, improve, simplify, nothing removed) comes before C-38 and the non-core modules |
 | D-39 | 2026-10-13 | All 14 recommended platform features join the Core quality pass as Q-01 to Q-14, built in parallel now (`feature/q-NN-<slug>`; Q-14 optional, approved); C-38 on hold until Brandon is ready to start the next version |
 | D-40 | 2026-10-13 | Error Log entries older than 180 days deleted; staged import rows purged 90 days after their job finishes; both adjustable in BarnCRM Settings; every number setting has a minimum and a maximum |
-| D-41 | 2026-10-13 | Affiliations stay out of Core imports (spec and admin guide corrected; amends C-32); import templates shipped in later versions added to existing orgs on upgrade, not only through Health Check |
+| D-41 | 2026-10-13 | (affiliation part reversed by D-49) Affiliations stay out of Core imports (spec and admin guide corrected; amends C-32); import templates shipped in later versions added to existing orgs on upgrade, not only through Health Check |
 | D-42 | 2026-10-13 | "What's new" entries (C-27) refreshed from the release notes as part of each release |
 | D-43 | 2026-10-13 | The 9 components used only inside the BarnCRM Settings console are no longer offered in App Builder |
 | D-44 | 2026-10-13 | Fundraising Staff permission set group includes Giving Staff (closes plan 11.2 item 12) |
 | D-45 | 2026-10-13 | The renamed import tab reads "Data Jobs" in Title Case (amends ADR-0047 wording) |
 | D-46 | 2026-10-13 | Dev Hub snapshot `BarnPA` from `oi-pa` approved (Q-12) |
 | D-47 | 2026-10-13 | Duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38); inventory under way |
+| D-48 | 2026-10-13 | Core review recommendations approved: rollups recalculate only definitions that marked a target (ADR needed; narrows ADR-0082 decision 2); Instantly-mode fiscal-window rollups in the nightly run; Recalculate now checks budget and queues; import commit runs the previewed template; organizations created only for passing rows; people import reads values like Load one object; bulk delete undo covers deleted empty households; Health Check on Home shows last result plus Run now; one shared LWC helper module; faster test runs; namespace-safe object resolution. Code coverage still checked automatically on every gate, read via ApexCodeCoverageAggregate |
+| D-49 | 2026-10-13 | Affiliations return to Core imports: a people import links each person to the organization on their row by an affiliation. Reverses the affiliation part of D-41; plan Section 4.9 and C-32 restored |
+| D-50 | 2026-10-13 | Data tools parity (D-13 still holds): Data Manager hub with one job history and Undo; Org Optimizer page (Data Hygiene relabeled; Overview, Data quality, Duplicates moved from Settings, Field utilization embedded only here, Health Check on demand, Errors, Storage and limits, Unused setup admin-only, Automation and jobs); full results file; trial import (default 25 rows, a setting, per-file override, rest in the same job and undo); delete from a file of IDs; more transform steps; lookups and update matching on any Text, Email or Phone field; skip rows and one row per key; empty cells clear the field (off by default, journaled); delimiter and worksheet choice; download before delete; retry rejects into the same job; server-side export (C-36 remainder, in v1); parent and child loads. Not approved: seeding templates, files import. Scheduling and connectors stay C-38 on hold |
+| D-51 | 2026-10-13 | Import tab label is "Import" (amends D-45 for the tab), reached from Data Manager; Import and Bulk Update leave the app navigation; Find stays; job object label stays "Data Job" |
+| D-52 | 2026-10-13 | Erase a person (right to be forgotten) built in Core, with a Giving extension for gifts and receipts |
+| D-53 | 2026-10-13 | Commitment page: Clone and Printable View stay off |
+| D-54 | 2026-10-13 | Program Staff and Volunteer Coordinator groups get their module permission sets when those modules ship |
+| D-55 | 2026-10-13 | Shipped import templates added at install and on upgrade (closes Section 11.2 item 14) |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
@@ -65,7 +73,7 @@ D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the 
 - 4: Steward entity.
 - 7: Telemetry (C-26): resolved 2026-10-12, deferred indefinitely (D-24).
 - 12: Permission set groups that contain only the staff set: resolved 2026-10-13, Fundraising Staff includes Giving Staff (D-44).
-- 14: Shipped import templates copied at install or at first use.
+- 14: Shipped import templates: resolved 2026-10-13, added at install and on upgrade (D-55).
 - 16: Per-automation switches: optional end date or stay off until turned on.
 - 19 to 22: Opportunity mirror defaults (NPSP mode direction, deleted gift, double thanks, record-type filter).
 - 23: A separate nonprofit app in Giving.
