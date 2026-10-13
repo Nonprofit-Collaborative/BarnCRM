@@ -30,6 +30,19 @@ private class ImportControllerTest {
         );
     }
 
+    /** A page's position, so a failed assertion on an org run says what came back. */
+    private static String pageText(ImportController.RowPage page) {
+        return '(rows ' +
+            page.rows.size() +
+            ', nextIndex ' +
+            page.nextIndex +
+            ', total ' +
+            page.total +
+            ', hasMore ' +
+            page.hasMore +
+            ')';
+    }
+
     @IsTest
     static void refusesEveryChangeWithoutThePermission() {
         System.runAs(TestUsers.admin()) {
@@ -273,7 +286,8 @@ private class ImportControllerTest {
 
             List<ImportController.RowView> rejected = page.rows;
             Assert.areEqual(1, page.total, 'The cursor holds only the rejected row.');
-            Assert.isFalse(page.hasMore, 'And one page reads it all.');
+            Assert.areEqual(1, page.nextIndex, 'The next page starts after the one row.');
+            Assert.isFalse(page.hasMore, 'And one page reads it all. ' + pageText(page));
             Assert.areEqual(1, rejected.size(), 'Only the rejected row comes back.');
             Assert.areEqual(3, rejected[0].rowNumber, 'Named by its row number in the file.');
             Assert.areEqual(
@@ -327,6 +341,7 @@ private class ImportControllerTest {
                 500
             );
             read.addAll(page.rows);
+            List<String> trace = new List<String>{ pageText(page) };
             Integer calls = 1;
             while (page.hasMore && calls < 20) {
                 page = ImportController.getRowPage(
@@ -337,22 +352,35 @@ private class ImportControllerTest {
                     500
                 );
                 read.addAll(page.rows);
+                trace.add(pageText(page));
                 calls++;
             }
             Test.stopTest();
 
-            Assert.areEqual(expectedRejected, page.total, 'The cursor holds every rejected row.');
-            Assert.areEqual(expectedRejected, read.size(), 'And every one of them is read.');
-            Assert.areEqual(5, calls, 'In pages of 500.');
-            Assert.isFalse(page.hasMore, 'Then the read says it is done.');
+            String pages = ' Pages: ' + String.join(trace, '; ');
+            Assert.areEqual(
+                expectedRejected,
+                page.total,
+                'The cursor holds every rejected row.' + pages
+            );
+            Assert.areEqual(
+                expectedRejected,
+                read.size(),
+                'And every one of them is read.' + pages
+            );
+            Assert.areEqual(5, calls, 'In pages of 500.' + pages);
+            Assert.isFalse(page.hasMore, 'Then the read says it is done.' + pages);
             Integer previous = 0;
             for (ImportController.RowView row : read) {
                 Assert.areEqual(
                     ImportRowProcessor.STATUS_REJECTED,
                     row.status,
-                    'Only rejected rows.'
+                    'Only rejected rows; row ' + row.rowNumber + ' is ' + row.status
                 );
-                Assert.isTrue(row.rowNumber > previous, 'In file order, none twice.');
+                Assert.isTrue(
+                    row.rowNumber > previous,
+                    'In file order, none twice: row ' + row.rowNumber + ' after ' + previous
+                );
                 previous = row.rowNumber;
             }
             Assert.areEqual(2401, previous, 'Up to the last rejected row of the file.');
@@ -406,16 +434,33 @@ private class ImportControllerTest {
                 tooLarge.rows.size(),
                 'A page never holds more than the platform allows.'
             );
-            Assert.isTrue(tooLarge.hasMore, 'So the rest is left for the next page.');
+            Assert.areEqual(
+                ImportController.MAX_PAGE_ROWS,
+                tooLarge.nextIndex,
+                'The next page starts after the first. ' + pageText(tooLarge)
+            );
+            Assert.isTrue(
+                tooLarge.hasMore,
+                'So the rest is left for the next page. ' + pageText(tooLarge)
+            );
             Assert.areEqual(
                 2100 - ImportController.MAX_PAGE_ROWS,
                 noSize.rows.size(),
-                'No size reads a default page, cut at the end of the cursor.'
+                'No size reads a default page, cut at the end of the cursor. ' + pageText(noSize)
             );
-            Assert.isFalse(noSize.hasMore, 'Which ends the read.');
-            Assert.areEqual(0, pastTheEnd.rows.size(), 'A start past the end reads nothing.');
-            Assert.isFalse(pastTheEnd.hasMore, 'And says it is done.');
-            Assert.areEqual(0, noBatch.total, 'No batch, no rows, and no cursor opened.');
+            Assert.areEqual(2100, noSize.nextIndex, 'It ends at the end. ' + pageText(noSize));
+            Assert.isFalse(noSize.hasMore, 'Which ends the read. ' + pageText(noSize));
+            Assert.areEqual(
+                0,
+                pastTheEnd.rows.size(),
+                'A start past the end reads nothing. ' + pageText(pastTheEnd)
+            );
+            Assert.isFalse(pastTheEnd.hasMore, 'And says it is done. ' + pageText(pastTheEnd));
+            Assert.areEqual(
+                0,
+                noBatch.total,
+                'No batch, no rows, and no cursor opened. ' + pageText(noBatch)
+            );
             Assert.isNull(noBatch.cursor, 'So no cursor counts against the daily limit.');
         }
     }

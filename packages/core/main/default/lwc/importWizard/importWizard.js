@@ -1240,7 +1240,11 @@ export default class ImportWizard extends LightningElement {
         pageSize: DOWNLOAD_PAGE_ROWS
       });
       rows.push(...page.rows);
-      while (page.hasMore && page.rows.length > 0) {
+      let start = 0;
+      // Only ever forward: a next index that does not move past the last start ends the read,
+      // so a bad position can never re-read the file from the top.
+      while (page.hasMore && page.nextIndex > start) {
+        start = page.nextIndex;
         // Sequential on purpose: each page starts where the last one ended.
         // eslint-disable-next-line no-await-in-loop
         page = await getRowPage({

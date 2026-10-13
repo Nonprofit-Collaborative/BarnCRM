@@ -982,6 +982,23 @@ describe('the import wizard', () => {
         'Cursor expired.'
       );
     });
+
+    it('never reads the file again from the top when a page does not move forward', async () => {
+      serveRejected(2);
+      const element = await toFinishedDryRun(2);
+      getRowPage.mockClear();
+      getRowPage.mockResolvedValue({
+        cursor: { token: 'cursor-1' },
+        rows: [{ id: 'r0', rowNumber: 2, errorMessage: 'Bad.', values: '{}' }],
+        nextIndex: 0,
+        total: 2,
+        hasMore: true
+      });
+      click(element, 'download');
+      await flush();
+      expect(getRowPage).toHaveBeenCalledTimes(1);
+      expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(2);
+    });
   });
 });
 

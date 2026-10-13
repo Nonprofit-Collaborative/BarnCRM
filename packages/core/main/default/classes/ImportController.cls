@@ -714,7 +714,11 @@ public with sharing class ImportController {
                 for (SObject record : fetched.getRecords()) {
                     page.rows.add(toRowView((Import_Row__c) record));
                 }
-                page.nextIndex = fetched.getNextIndex();
+                // A page covers positions start to start + size - 1 (rows deleted since the
+                // cursor opened are skipped, not replaced), so the next page starts after it.
+                // The result's getNextIndex is not used: on the last page it comes back as a
+                // sentinel, not a position, and reading it as one restarted the read at row 0.
+                page.nextIndex = start + size;
             }
             // The cursor's own isDone is per page, so the whole read is judged by position.
             page.hasMore = page.nextIndex < page.total;
