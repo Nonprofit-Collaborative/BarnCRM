@@ -4,6 +4,11 @@
  */
 @IsTest
 private class RollupPlannerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c fromChildren(
         String aggregate,
         String sourceField,

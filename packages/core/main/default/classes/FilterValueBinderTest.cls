@@ -6,6 +6,11 @@
  */
 @IsTest
 private class FilterValueBinderTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static FilterValueBinder bind(String objectName, String conditions, String logic) {
         String document =
             '{"version": 1, ' +
