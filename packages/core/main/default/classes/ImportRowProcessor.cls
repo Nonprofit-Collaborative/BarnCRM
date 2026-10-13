@@ -223,6 +223,7 @@ public with sharing class ImportRowProcessor {
         matchOrganizations(working, batch, dryRun, outcome);
         resolvePeople(working, rule, batch, personAccounts, dryRun, outcome);
         tagAndNameHouseholds(working, batch, dryRun, outcome);
+        resolveAffiliations(working, batch, personAccounts, dryRun, outcome);
         offerToEntityProcessor(batch, template, mapping, working, dryRun, outcome);
         writeBack(working, outcome);
         if (
@@ -2269,6 +2270,142 @@ public with sharing class ImportRowProcessor {
                 WITH USER_MODE
             ]
         );
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Affiliations (R-AF5)
+    // -------------------------------------------------------------------------------------
+
+    private static final String AFFILIATION_FORMER = 'Former';
+
+    /**
+     * Links each clean row's first person to the row's organization (R-AF5): a current
+     * affiliation of the pair is matched and nothing is written; otherwise one is created, with
+     * the row's Affiliation values, once per pair in the chunk. A dry run counts the row as
+     * creating something. A created affiliation is journaled as Created, so an undo deletes it
+     * (R-IJ3). One whose save fails rejects its row with the reason: the people stay saved.
+     */
+    private static void resolveAffiliations(
+        List<Working> working,
+        Import_Batch__c batch,
+        Boolean personAccounts,
+        Boolean dryRun,
+        Outcome outcome
+    ) {
+        List<Working> linking = new List<Working>();
+        Set<Id> personIds = new Set<Id>();
+        Set<Id> organizationIds = new Set<Id>();
+        for (Working item : working) {
+            Boolean hasPerson =
+                item.person1Id != null ||
+                (dryRun && describesPerson(item, ImportMapping.ENTITY_CONTACT_1));
+            Boolean hasOrganization =
+                item.organizationId != null || (dryRun && item.organizationName != null);
+            if (item.error != null || !hasPerson || !hasOrganization) {
+                continue;
+            }
+            linking.add(item);
+            if (item.person1Id != null && item.organizationId != null) {
+                personIds.add(item.person1Id);
+                organizationIds.add(item.organizationId);
+            }
+        }
+        if (linking.isEmpty()) {
+            return;
+        }
+        Schema.SObjectField personField = personAccounts
+            ? Affiliation__c.Person_Account__c
+            : Affiliation__c.Contact__c;
+        Set<String> linked = existingAffiliations(personIds, organizationIds, personField);
+        List<Affiliation__c> toCreate = new List<Affiliation__c>();
+        List<Working> owners = new List<Working>();
+        for (Working item : linking) {
+            String pair = item.person1Id == null ||
+                item.organizationId == null
+                ? null
+                : String.valueOf(item.person1Id) + '>' + String.valueOf(item.organizationId);
+            if (pair != null && linked.contains(pair)) {
+                continue;
+            }
+            if (pair != null) {
+                linked.add(pair);
+            }
+            item.createdAnything = true;
+            if (dryRun) {
+                continue;
+            }
+            Affiliation__c affiliation = new Affiliation__c(Organization__c = item.organizationId);
+            affiliation.put(personField, item.person1Id);
+            applyValues(
+                affiliation,
+                Affiliation__c.SObjectType,
+                item.byEntity.get(ImportMapping.ENTITY_AFFILIATION),
+                new Set<String>{ 'Organization__c', 'Contact__c', 'Person_Account__c' },
+                outcome
+            );
+            toCreate.add(affiliation);
+            owners.add(item);
+        }
+        if (toCreate.isEmpty()) {
+            return;
+        }
+        List<Database.SaveResult> results = Database.insert(
+            toCreate,
+            saveOptions(),
+            AccessLevel.USER_MODE
+        );
+        List<Map<String, Object>> created = new List<Map<String, Object>>();
+        for (Integer i = 0; i < results.size(); i++) {
+            if (results[i].isSuccess()) {
+                created.add(
+                    ImportJournalService.created(
+                        String.valueOf(Affiliation__c.SObjectType),
+                        results[i].getId(),
+                        ImportValues.rowNumber(owners[i].row)
+                    )
+                );
+            } else {
+                owners[i].error = message(results[i]);
+            }
+        }
+        if (!ImportJournalService.write(batch.Id, ImportJournalService.PHASE_CREATED, created)) {
+            outcome.notes.add(Label.Core_Import_LogJournalFailed);
+        }
+    }
+
+    /** The person and organization pairs already joined by a current affiliation. */
+    private static Set<String> existingAffiliations(
+        Set<Id> personIds,
+        Set<Id> organizationIds,
+        Schema.SObjectField personField
+    ) {
+        Set<String> result = new Set<String>();
+        if (personIds.isEmpty()) {
+            return result;
+        }
+        String personName = personField.getDescribe().getName();
+        // Access mode: user mode, so only affiliations the importing user can see count.
+        for (
+            Affiliation__c found : (List<Affiliation__c>) Database.queryWithBinds(
+                'SELECT ' +
+                    personName +
+                    ', Organization__c FROM Affiliation__c WHERE ' +
+                    personName +
+                    ' IN :personIds AND Organization__c IN :organizationIds' +
+                    ' AND Status__c != :former',
+                new Map<String, Object>{
+                    'personIds' => personIds,
+                    'organizationIds' => organizationIds,
+                    'former' => AFFILIATION_FORMER
+                },
+                AccessLevel.USER_MODE
+            )
+        ) {
+            result.add(
+                String.valueOf(found.get(personName)) + '>' + String.valueOf(found.Organization__c)
+            );
+        }
+        return result;
     }
 
     // -------------------------------------------------------------------------------------

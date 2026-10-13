@@ -419,6 +419,15 @@ file's value, then any default the mapping holds. A value cannot be a person's n
 ID field, because every row would then be the same person. It can be an organization: for a
 staff list from one employer, give every row that organization's name.
 
+**A person and the organization on their row.** When a row names a person and an organization,
+the import links them with an affiliation (see [Affiliations](affiliations.md)): the row's first
+person, as a current affiliation of that organization. If the person already has a current
+affiliation with it, nothing new is made, and two rows of one file linking the same person and
+organization make one affiliation. A new affiliation follows the usual rules, so it becomes the person's primary one only when they
+have no other. The preview counts a row that would add an affiliation as one that creates
+something, and undoing the import deletes the affiliations it made. The row's second person is
+not linked: put them on a row of their own to link them too.
+
 **Salesforce record IDs.** If your file came out of Salesforce (a report export, for example),
 map its ID column to **Person: Salesforce record ID**, **Second person: Salesforce record ID**
 or **Organization: Salesforce record ID**. A row with an ID is loaded into exactly that record,

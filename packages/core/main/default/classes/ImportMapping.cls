@@ -31,10 +31,13 @@ public with sharing class ImportMapping {
     @NamespaceAccessible
     public static final String ENTITY_RECORD = 'Record';
 
+    /** The person-to-organization link Core makes from a row (R-AF5). */
+    @NamespaceAccessible
+    public static final String ENTITY_AFFILIATION = 'Affiliation';
+
     /** The row entities Core stages but does not write (R-IR6). */
     @NamespaceAccessible
     public static final Set<String> DEFERRED_ENTITIES = new Set<String>{
-        'Affiliation',
         'Gift',
         'Allocation',
         'SoftCredit',

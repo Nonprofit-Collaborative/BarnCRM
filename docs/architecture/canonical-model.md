@@ -2581,7 +2581,7 @@ batch record, so a large import does not sit in storage forever. Undo does not r
 reads the tag on the records and the journal (R-IB9, Section 17A).
 
 **R-IR6 Entities Core cannot resolve.** Core resolves `Organization`, `Household`,
-`Contact1` and `Contact2`. `Affiliation`, `Gift`, `Allocation`, `SoftCredit` and `Tribute`
+`Contact1`, `Contact2` and `Affiliation` (R-AF5). `Gift`, `Allocation`, `SoftCredit` and `Tribute`
 belong to features or packages Core may not reference (ADR-0014), so the processor offers
 them to an optional `ImportEntityProcessor` implementation, the class named
 `GiftImportProcessor`, found by namespace and name with `Type.forName` (the mechanism in
@@ -5470,7 +5470,16 @@ household.
 a former affiliation is never the primary one.
 
 **R-AF5 Created by the importer.** A spreadsheet row that names an employer creates or
-matches an affiliation (R-IR1), which is how most affiliations in a converted org arrive.
+matches an affiliation (R-IR1), which is how most affiliations in a converted org arrive. A
+people import links the row's first person to the row's organization once both are resolved,
+after the people are saved: a current affiliation of that person with that organization is
+matched and nothing is written; otherwise one is created with the row's `Affiliation`
+attributes, through the ordinary rules (R-AF1 to R-AF4, so it is primary only when R-AF2 makes
+it so). Two rows of a chunk naming the same pair make one. The dry run counts the row as
+creating something and writes nothing. A created affiliation carries no batch tag: it is
+journaled as Created (R-IJ3) and an undo deletes it before the people and organizations. The
+second person is not linked, as NPSP's import links only its first contact with its first
+account.
 
 ### Salesforce implementation
 
@@ -6839,6 +6848,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-3). No object or field added. R-IB1: a row's organization is created only after its people are matched and validated, so a rejected row creates nothing and the dry run counts what the commit does; a rejected row points at what it saved. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-10, owner decision). No object or field added. R-AF5 states how a people import creates or matches the first person's affiliation with the row's organization, journaled as Created for undo; R-IR6: Core resolves the `Affiliation` entity. |
 
 ---
 ## 32. Entity ownership by package
