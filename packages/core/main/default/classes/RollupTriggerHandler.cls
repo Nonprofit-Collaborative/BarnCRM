@@ -9,20 +9,35 @@
  * a household total reaches its household through the contact, so a person who moves household
  * has to mark both households for recalculation (R-R11). In junction mode the membership row is
  * the reparenting event, so the same is true there.
+ *
+ * The recursion guard is kept per event, never shared between events, and an update is not
+ * guarded at all. A save often updates the record it is saving: a gift on a pledge is inserted,
+ * and a handler earlier in the same save links it to its installment with a nested update. A
+ * guard shared by every event let that nested update claim the gift first, so the insert, the
+ * event that moves the donor, household, appeal and pledge totals, was skipped (rollup review
+ * ROLLUPS-1). Every update carries its own `Trigger.old`, `RollupChanges` marks nothing when no
+ * field a rollup reads changed, and recalculation recomputes (ADR-0082), so running each update
+ * is never wrong and costs nothing when nothing a rollup reads moved.
  */
 public with sharing class RollupTriggerHandler extends TriggerHandler {
     private static final String CONTEXT = 'RollupTriggerHandler';
 
+    /** One claim per event: each event of a record runs once per transaction. */
+    private static final String PHASE_INSERT = 'rollup.afterInsert';
+    private static final String PHASE_DELETE = 'rollup.beforeDelete';
+    private static final String PHASE_UNDELETE = 'rollup.afterUndelete';
+
     public override void afterInsert() {
-        run(newRecords(), null);
+        run(PHASE_INSERT, newRecords(), null);
     }
 
+    /** Not claimed: every update of a record is its own change (see the class comment). */
     public override void afterUpdate() {
-        run(newRecords(), oldRecordsById());
+        run(null, newRecords(), oldRecordsById());
     }
 
     public override void beforeDelete() {
-        run(oldRecords(), null);
+        run(PHASE_DELETE, oldRecords(), null);
     }
 
     /**
@@ -54,33 +69,37 @@ public with sharing class RollupTriggerHandler extends TriggerHandler {
     }
 
     public override void afterUndelete() {
-        run(newRecords(), null);
+        run(PHASE_UNDELETE, newRecords(), null);
     }
 
     /**
-     * Hands the records to the engine once per transaction per record, so a rollup that causes its
-     * own source object to be updated again does not run twice over the same rows.
+     * Hands the records to the engine. With a phase, once per record per transaction for that
+     * event, so the second 200 of a 400 record load still run while a repeat of the same event
+     * does not; without one (an update), every time.
      */
-    private void run(List<SObject> records, Map<Id, SObject> oldRecords) {
+    private void run(String phase, List<SObject> records, Map<Id, SObject> oldRecords) {
         if (records == null || records.isEmpty()) {
             return;
         }
         try {
-            Set<Id> recordIds = new Set<Id>();
-            for (SObject record : records) {
-                if (record.Id != null) {
-                    recordIds.add(record.Id);
+            List<SObject> toRun = records;
+            if (phase != null) {
+                Set<Id> recordIds = new Set<Id>();
+                for (SObject record : records) {
+                    if (record.Id != null) {
+                        recordIds.add(record.Id);
+                    }
+                }
+                Set<Id> unclaimed = claimRunFor(phase, recordIds);
+                toRun = new List<SObject>();
+                for (SObject record : records) {
+                    if (unclaimed.contains(record.Id)) {
+                        toRun.add(record);
+                    }
                 }
             }
-            Set<Id> unclaimed = claimRunFor('rollup', recordIds);
-            if (unclaimed.isEmpty()) {
+            if (toRun.isEmpty()) {
                 return;
-            }
-            List<SObject> toRun = new List<SObject>();
-            for (SObject record : records) {
-                if (unclaimed.contains(record.Id)) {
-                    toRun.add(record);
-                }
             }
             RollupService.runRealTime(objectNameOf(toRun), toRun, oldRecords);
         } catch (Exception failed) {
