@@ -2006,7 +2006,9 @@ public with sharing class ImportRowProcessor {
      */
     private static Set<String> notWrittenToPeople(Schema.SObjectType type) {
         Set<String> skipped = new Set<String>();
-        if (type == Account.SObjectType && ImportObjectSchema.fieldsOf(type).containsKey('lastname')) {
+        if (
+            type == Account.SObjectType && ImportObjectSchema.fieldsOf(type).containsKey('lastname')
+        ) {
             skipped.add('Name');
         }
         return skipped;
@@ -2861,7 +2863,8 @@ public with sharing class ImportRowProcessor {
 
     /** Whether a stored record's field is a checkbox. */
     private static Boolean isCheckbox(SObject stored, String lowerCaseName) {
-        Schema.SObjectField field = ImportObjectSchema.fieldsOf(stored.getSObjectType()).get(lowerCaseName);
+        Schema.SObjectField field = ImportObjectSchema.fieldsOf(stored.getSObjectType())
+            .get(lowerCaseName);
         return field != null && field.getDescribe().getType() == Schema.DisplayType.BOOLEAN;
     }
 
