@@ -64,8 +64,18 @@ public with sharing class HouseholdWriter {
      * member count.
      */
     public static void updateHouseholds(List<Account> households) {
+        updateHouseholdsReportingRefusals(households);
+    }
+
+    /**
+     * The same, answering the ids of the households the save refused, so a caller can save
+     * part of a refused change again (each refusal is logged). A refused save carries no id,
+     * so the refused records are found by their position in the list.
+     */
+    public static Set<Id> updateHouseholdsReportingRefusals(List<Account> households) {
+        Set<Id> refused = new Set<Id>();
         if (households == null || households.isEmpty()) {
-            return;
+            return refused;
         }
         List<Database.SaveResult> saves = Database.update(
             households,
@@ -73,6 +83,12 @@ public with sharing class HouseholdWriter {
             AccessLevel.SYSTEM_MODE
         );
         logFailures(saves, Label.Core_Households_ErrorContextNaming);
+        for (Integer i = 0; i < saves.size(); i++) {
+            if (!saves[i].isSuccess()) {
+                refused.add(households[i].Id);
+            }
+        }
+        return refused;
     }
 
     /**
