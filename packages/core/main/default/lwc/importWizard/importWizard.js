@@ -101,6 +101,25 @@ import changesButtonCount from '@salesforce/label/c.Core_Import_ChangesButtonCou
 import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
+import targetHouseholdField from '@salesforce/label/c.Core_Import_TargetHouseholdField';
+import fieldTitle from '@salesforce/label/c.Core_Import_FieldTitle';
+import fieldFirstName from '@salesforce/label/c.Core_Import_FieldFirstName';
+import fieldLastName from '@salesforce/label/c.Core_Import_FieldLastName';
+import fieldFullName from '@salesforce/label/c.Core_Import_FieldFullName';
+import fieldEmail from '@salesforce/label/c.Core_Import_FieldEmail';
+import fieldPhone from '@salesforce/label/c.Core_Import_FieldPhone';
+import fieldJobTitle from '@salesforce/label/c.Core_Import_FieldJobTitle';
+import fieldStreet from '@salesforce/label/c.Core_Import_FieldStreet';
+import fieldCity from '@salesforce/label/c.Core_Import_FieldCity';
+import fieldState from '@salesforce/label/c.Core_Import_FieldState';
+import fieldPostalCode from '@salesforce/label/c.Core_Import_FieldPostalCode';
+import fieldCountry from '@salesforce/label/c.Core_Import_FieldCountry';
+import fieldName from '@salesforce/label/c.Core_Import_FieldName';
+import fieldWebsite from '@salesforce/label/c.Core_Import_FieldWebsite';
+import ruleEmailExact from '@salesforce/label/c.Core_Import_RuleEmailExact';
+import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCode';
+import ruleExternalId from '@salesforce/label/c.Core_Import_RuleExternalId';
+import ruleNameExact from '@salesforce/label/c.Core_Import_RuleNameExact';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
 
@@ -133,33 +152,33 @@ const IGNORE = 'Ignore';
 
 /** What a column can be mapped to. Kept in step with ImportColumnLibrary. */
 const TARGETS = [
-  { value: 'Contact1.Salutation', label: 'Person: title' },
-  { value: 'Contact1.FirstName', label: 'Person: first name' },
-  { value: 'Contact1.LastName', label: 'Person: last name' },
-  { value: 'Contact1.FullName', label: 'Person: full name in one column' },
-  { value: 'Contact1.Email', label: 'Person: email' },
-  { value: 'Contact1.Phone', label: 'Person: phone' },
-  { value: 'Contact1.Title', label: 'Person: job title' },
-  { value: 'Contact1.MailingStreet', label: 'Person: street' },
-  { value: 'Contact1.MailingCity', label: 'Person: city' },
-  { value: 'Contact1.MailingState', label: 'Person: state or province' },
-  { value: 'Contact1.MailingPostalCode', label: 'Person: postal code' },
-  { value: 'Contact1.MailingCountry', label: 'Person: country' },
-  { value: 'Contact2.FirstName', label: 'Second person: first name' },
-  { value: 'Contact2.LastName', label: 'Second person: last name' },
-  { value: 'Contact2.FullName', label: 'Second person: full name in one column' },
-  { value: 'Contact2.Email', label: 'Second person: email' },
-  { value: 'Contact2.Phone', label: 'Second person: phone' },
-  { value: 'Household.Name', label: 'Household: name' },
-  { value: 'Organization.Name', label: 'Organization: name' },
-  { value: 'Organization.Phone', label: 'Organization: phone' },
-  { value: 'Organization.Website', label: 'Organization: website' },
-  { value: 'Organization.BillingStreet', label: 'Organization: street' },
-  { value: 'Organization.BillingCity', label: 'Organization: city' },
-  { value: 'Organization.BillingState', label: 'Organization: state or province' },
-  { value: 'Organization.BillingPostalCode', label: 'Organization: postal code' },
-  { value: 'Organization.BillingCountry', label: 'Organization: country' }
-];
+  ['Contact1.Salutation', targetFirstPersonField, fieldTitle],
+  ['Contact1.FirstName', targetFirstPersonField, fieldFirstName],
+  ['Contact1.LastName', targetFirstPersonField, fieldLastName],
+  ['Contact1.FullName', targetFirstPersonField, fieldFullName],
+  ['Contact1.Email', targetFirstPersonField, fieldEmail],
+  ['Contact1.Phone', targetFirstPersonField, fieldPhone],
+  ['Contact1.Title', targetFirstPersonField, fieldJobTitle],
+  ['Contact1.MailingStreet', targetFirstPersonField, fieldStreet],
+  ['Contact1.MailingCity', targetFirstPersonField, fieldCity],
+  ['Contact1.MailingState', targetFirstPersonField, fieldState],
+  ['Contact1.MailingPostalCode', targetFirstPersonField, fieldPostalCode],
+  ['Contact1.MailingCountry', targetFirstPersonField, fieldCountry],
+  ['Contact2.FirstName', targetSecondPersonField, fieldFirstName],
+  ['Contact2.LastName', targetSecondPersonField, fieldLastName],
+  ['Contact2.FullName', targetSecondPersonField, fieldFullName],
+  ['Contact2.Email', targetSecondPersonField, fieldEmail],
+  ['Contact2.Phone', targetSecondPersonField, fieldPhone],
+  ['Household.Name', targetHouseholdField, fieldName],
+  ['Organization.Name', targetOrganizationField, fieldName],
+  ['Organization.Phone', targetOrganizationField, fieldPhone],
+  ['Organization.Website', targetOrganizationField, fieldWebsite],
+  ['Organization.BillingStreet', targetOrganizationField, fieldStreet],
+  ['Organization.BillingCity', targetOrganizationField, fieldCity],
+  ['Organization.BillingState', targetOrganizationField, fieldState],
+  ['Organization.BillingPostalCode', targetOrganizationField, fieldPostalCode],
+  ['Organization.BillingCountry', targetOrganizationField, fieldCountry]
+].map(([value, pattern, field]) => ({ value, label: format(pattern, field) }));
 
 /**
  * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
@@ -169,18 +188,19 @@ const TARGETS = [
  */
 const DEFERRED_ENTITY_PREFIXES = ['Gift.', 'Allocation.', 'SoftCredit.', 'Tribute.'];
 
-const RULES = [
-  { value: 'Email exact', help: matchingEmailHelp },
-  { value: 'Name plus postal code', help: matchingNamePostalHelp },
-  { value: 'External ID', help: matchingExternalIdHelp }
-];
-
 const EXTERNAL_ID = 'External ID';
+
+/** The value is the stored rule name the server reads; the label is what the person sees. */
+const RULES = [
+  { value: 'Email exact', label: ruleEmailExact, help: matchingEmailHelp },
+  { value: 'Name plus postal code', label: ruleNamePostalCode, help: matchingNamePostalHelp },
+  { value: EXTERNAL_ID, label: ruleExternalId, help: matchingExternalIdHelp }
+];
 
 /** How organizations are matched (R-IT2); each says what it risks. */
 const ORGANIZATION_RULES = [
-  { value: 'Name exact', help: organizationNameHelp },
-  { value: EXTERNAL_ID, help: organizationExternalIdHelp }
+  { value: 'Name exact', label: ruleNameExact, help: organizationNameHelp },
+  { value: EXTERNAL_ID, label: ruleExternalId, help: organizationExternalIdHelp }
 ];
 
 /** What happens when several records match a row (R-IT9); rejecting is the default. */
@@ -931,7 +951,7 @@ export default class ImportWizard extends LightningElement {
   // ---------------------------------------------------------------------------------------
 
   get ruleOptions() {
-    return RULES.map((rule) => ({ label: rule.value, value: rule.value }));
+    return RULES.map((rule) => ({ label: rule.label, value: rule.value }));
   }
 
   get ruleHelp() {
@@ -976,7 +996,7 @@ export default class ImportWizard extends LightningElement {
   }
 
   get organizationRuleOptions() {
-    return ORGANIZATION_RULES.map((rule) => ({ label: rule.value, value: rule.value }));
+    return ORGANIZATION_RULES.map((rule) => ({ label: rule.label, value: rule.value }));
   }
 
   get organizationRuleHelp() {

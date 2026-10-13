@@ -47,7 +47,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   }
 
   get newCountLabel() {
-    return `${this.newCount} ${this.labels.newCount}`;
+    return this.labels.newCount.replace('{0}', this.newCount);
   }
 
   get entries() {

@@ -23,6 +23,9 @@ jest.mock('@salesforce/apex/AccessController.assignRole', () => ({ default: jest
 jest.mock('@salesforce/apex/AccessController.removeRole', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/label/c.Core_Access_RemovePerson', () => ({ default: 'Remove {0}' }), {
+  virtual: true
+});
 
 const MARIA_ID = '005000000000001AAA';
 const DAVID_ID = '005000000000002AAA';
@@ -188,6 +191,14 @@ describe('c-access-manager', () => {
       userId: DAVID_ID,
       roleDeveloperName: 'Fundraising_Staff'
     });
+  });
+
+  it('names each Remove button for its person from one label', async () => {
+    const element = createComponent();
+    getAccessOverview.emit(OVERVIEW);
+    await flush();
+    const remove = element.shadowRoot.querySelector('[data-id="remove-button"]');
+    expect(remove.title).toBe('Remove Maria Alvarez');
   });
 
   it('warns before someone removes their own BarnCRM Admin role', async () => {

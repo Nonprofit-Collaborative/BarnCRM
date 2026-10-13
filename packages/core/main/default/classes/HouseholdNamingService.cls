@@ -115,7 +115,8 @@ public with sharing class HouseholdNamingService {
                 continue;
             }
             if (person.isDeceased == true) {
-                part = Label.Core_Households_LatePrefix + ' ' + part;
+                // One label holding the whole phrase, so a translation can put the name first.
+                part = Label.Core_Households_LateName.replace('{0}', part);
             }
             parts.add(part);
         }

@@ -20,6 +20,24 @@ import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 
+// Real label values, so a test can see a column target built from its two labels.
+jest.mock(
+  '@salesforce/label/c.Core_Import_TargetSecondPersonField',
+  () => ({ default: 'Second person: {0}' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_Import_TargetOrganizationField',
+  () => ({ default: 'Organization: {0}' }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Core_Import_FieldEmail', () => ({ default: 'email' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Import_FieldName', () => ({ default: 'name' }), {
+  virtual: true
+});
+
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -257,6 +275,22 @@ describe('the import wizard', () => {
     await chooseFile(element);
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(rows[0].textContent).toContain('Ramirez, Okafor');
+  });
+
+  it('names each column target from custom labels, so the picker can be translated', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const options = element.shadowRoot.querySelector(
+      '[data-id="column-row"] lightning-combobox'
+    ).options;
+    expect(options).toContainEqual({ value: 'Contact2.Email', label: 'Second person: email' });
+    expect(options).toContainEqual({
+      value: 'Household.Name',
+      label: 'c.Core_Import_TargetHouseholdField'
+    });
   });
 
   it('refuses a file with no rows under its heading', async () => {
@@ -685,6 +719,15 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
   });
 
+  it('shows each matching rule by its label and stores the rule name', async () => {
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="rule"]').options).toEqual([
+      { label: 'c.Core_Import_RuleEmailExact', value: 'Email exact' },
+      { label: 'c.Core_Import_RuleNamePostalCode', value: 'Name plus postal code' },
+      { label: 'c.Core_Import_RuleExternalId', value: 'External ID' }
+    ]);
+  });
+
   it('offers the organization rule only where the file names an organization', async () => {
     let element = await toMatchingStep();
     expect(element.shadowRoot.querySelector('[data-id="organization-rule"]')).toBeNull();
@@ -703,6 +746,10 @@ describe('the import wizard', () => {
     element = await toMatchingStep();
     const rule = element.shadowRoot.querySelector('[data-id="organization-rule"]');
     expect(rule.value).toBe('Name exact');
+    expect(rule.options.map((option) => option.label)).toEqual([
+      'c.Core_Import_RuleNameExact',
+      'c.Core_Import_RuleExternalId'
+    ]);
     expect(element.shadowRoot.querySelector('[data-id="organization-rule-help"]').textContent).toBe(
       'c.Core_Import_OrganizationNameHelp'
     );

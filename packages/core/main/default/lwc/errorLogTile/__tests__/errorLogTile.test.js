@@ -16,7 +16,7 @@ jest.mock('@salesforce/apex/ErrorLogController.acknowledge', () => ({ default: j
   virtual: true
 });
 
-jest.mock('@salesforce/label/c.Core_ErrorLogTile_NewCount', () => ({ default: 'new' }), {
+jest.mock('@salesforce/label/c.Core_ErrorLogTile_NewCount', () => ({ default: '{0} new' }), {
   virtual: true
 });
 
