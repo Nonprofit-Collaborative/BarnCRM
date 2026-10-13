@@ -493,9 +493,10 @@ ID**; every other column is ignored.
 1. Select **Dry run**. Nothing is deleted. A row is **Matched** (would be deleted) when its ID
    names a record of the object that you can see; a row whose ID is wrong, of another object,
    repeats an earlier row, or names a record you cannot see is rejected.
-2. Instead of **Commit**, the results show how many records would be deleted and the kinds of
-   related record Salesforce deletes with them. Type that number into **Type the number of
-   records to confirm**, then press **Delete**.
+2. Instead of **Commit**, the results show the **Bulk delete** panel. Press **Preview**: it says
+   how many records would be deleted, names the first five, and lists the kinds of related
+   record Salesforce deletes with them. Type that number into **Type the number of records to
+   confirm**, then press **Delete**. The panel shows the delete's progress.
 3. The delete runs as a bulk delete: in chunks of up to 200, as you, with each record listed in
    the journal. A record deleted or hidden from you since the dry run is left alone and counted;
    a record Salesforce refuses is listed with the reason.

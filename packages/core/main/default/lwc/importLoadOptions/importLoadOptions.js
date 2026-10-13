@@ -7,6 +7,8 @@ import upsertOption from '@salesforce/label/c.Core_Import_OperationUpsert';
 import insertHelp from '@salesforce/label/c.Core_Import_LoadInsertHelp';
 import updateHelp from '@salesforce/label/c.Core_Import_LoadUpdateHelp';
 import upsertHelp from '@salesforce/label/c.Core_Import_LoadUpsertHelp';
+import deleteOption from '@salesforce/label/c.Core_Import_OperationDelete';
+import deleteHelp from '@salesforce/label/c.Core_Import_LoadDeleteHelp';
 import matchFieldLabel from '@salesforce/label/c.Core_Import_LoadMatchFieldLabel';
 import noKeyFields from '@salesforce/label/c.Core_Import_LoadNoKeyFields';
 import notFoundLabel from '@salesforce/label/c.Core_Import_LookupNotFoundLabel';
@@ -19,19 +21,22 @@ import leaveEmptyHelp from '@salesforce/label/c.Core_Import_LookupLeaveEmptyHelp
 export const INSERT = 'Insert';
 export const UPDATE = 'Update by record Id';
 export const UPSERT = 'Upsert by external ID';
+export const DELETE = 'Delete by record Id';
 export const LOOKUP_REJECT = 'Reject the row';
 export const LOOKUP_LEAVE_EMPTY = 'Leave it empty';
 
 const OPERATIONS = [
   { value: INSERT, label: insertOption, help: insertHelp },
   { value: UPDATE, label: updateOption, help: updateHelp },
-  { value: UPSERT, label: upsertOption, help: upsertHelp }
+  { value: UPSERT, label: upsertOption, help: upsertHelp },
+  { value: DELETE, label: deleteOption, help: deleteHelp }
 ];
 
 /**
  * What a mapping that loads one object does with each row (canonical model R-IT12, R-IT13):
- * insert, update by record ID, or upsert by an external ID field, with what each choice risks,
- * the field an upsert matches on, and what a row does when a lookup finds no record.
+ * insert, update by record ID, upsert by an external ID field, or delete by record ID (R-BD7),
+ * with what each choice risks, the field an upsert matches on, and what a row does when a lookup
+ * finds no record.
  * Presentational: the wizard owns the values and hears every change through a `change` event
  * whose detail is `{ operation, matchField, lookupNotFound }`.
  * See docs/admin-guide/importing.md, section 9.
@@ -40,7 +45,10 @@ export default class ImportLoadOptions extends LightningElement {
   @api operation = INSERT;
   @api matchField = '';
   @api lookupNotFound = LOOKUP_REJECT;
-  /** The operations the object allows (R-IT14); all three when not given. */
+  /**
+   * The operations the object allows (R-IT14, R-BD7); when not given, the three that load, never
+   * Delete, which the server offers only to a person who may bulk delete.
+   */
   @api operations;
   /** The object's external ID fields an upsert can match on: `{ label, value }`. */
   @api keyFields = [];
@@ -48,11 +56,17 @@ export default class ImportLoadOptions extends LightningElement {
   labels = { operationLabel, matchFieldLabel, notFoundLabel, noKeyFields };
 
   get operationOptions() {
-    const allowed = this.operations && this.operations.length > 0 ? this.operations : null;
-    return OPERATIONS.filter((each) => !allowed || allowed.includes(each.value)).map((each) => ({
+    const given = this.operations && this.operations.length > 0;
+    const allowed = given ? this.operations : [INSERT, UPDATE, UPSERT];
+    return OPERATIONS.filter((each) => allowed.includes(each.value)).map((each) => ({
       label: each.label,
       value: each.value
     }));
+  }
+
+  /** A delete reads only the record ID, so what a lookup does is not asked. */
+  get readsLookups() {
+    return this.operation !== DELETE;
   }
 
   get operationHelp() {

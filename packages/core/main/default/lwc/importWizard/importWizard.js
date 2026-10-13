@@ -102,7 +102,7 @@ import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesL
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
-import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
+import { INSERT, UPDATE, UPSERT, DELETE, LOOKUP_REJECT } from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
 const CHANGE_SAMPLE_ROWS = 5;
@@ -416,6 +416,20 @@ export default class ImportWizard extends LightningElement {
   /** Whether the chosen mapping loads one object rather than people (R-IT12). */
   get loadsOneObject() {
     return Boolean(this.selectedTemplate && this.selectedTemplate.targetObject);
+  }
+
+  /** Whether the mapping deletes the records the file names, as a bulk delete (R-BD7). */
+  get deletesByFile() {
+    return this.loadsOneObject && this.loadOperation === DELETE;
+  }
+
+  /** After a delete by file's dry run, the bulk delete confirm replaces Commit. */
+  get showDeleteConfirm() {
+    return this.isStepPreview && this.deletesByFile && !this.cannotCommit;
+  }
+
+  get showCommit() {
+    return !this.deletesByFile;
   }
 
   get loadsPeople() {
@@ -896,7 +910,7 @@ export default class ImportWizard extends LightningElement {
     if (!targets.some((target) => target.startsWith(RECORD_PREFIX))) {
       return false;
     }
-    if (this.loadOperation === UPDATE) {
+    if (this.loadOperation === UPDATE || this.loadOperation === DELETE) {
       return targets.includes(RECORD_ID);
     }
     if (this.loadOperation === UPSERT) {

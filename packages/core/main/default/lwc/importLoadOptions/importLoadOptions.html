@@ -24,14 +24,16 @@
             </p>
         </template>
     </template>
-    <lightning-radio-group
-        class="slds-var-m-top_small"
-        data-id="not-found"
-        name="lookup-not-found"
-        label={labels.notFoundLabel}
-        value={lookupNotFound}
-        options={notFoundOptions}
-        onchange={handleNotFoundChange}
-    ></lightning-radio-group>
-    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="not-found-help">{notFoundHelp}</p>
+    <template lwc:if={readsLookups}>
+        <lightning-radio-group
+            class="slds-var-m-top_small"
+            data-id="not-found"
+            name="lookup-not-found"
+            label={labels.notFoundLabel}
+            value={lookupNotFound}
+            options={notFoundOptions}
+            onchange={handleNotFoundChange}
+        ></lightning-radio-group>
+        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="not-found-help">{notFoundHelp}</p>
+    </template>
 </template>

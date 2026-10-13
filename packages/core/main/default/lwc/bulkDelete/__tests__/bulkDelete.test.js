@@ -3,6 +3,8 @@ import BulkDelete from 'c/bulkDelete';
 import previewDelete from '@salesforce/apex/BulkDeleteController.preview';
 import startDelete from '@salesforce/apex/BulkDeleteController.start';
 import getJob from '@salesforce/apex/BulkDeleteController.getJob';
+import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
+import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 
 jest.mock('@salesforce/apex/BulkDeleteController.preview', () => ({ default: jest.fn() }), {
   virtual: true
@@ -11,6 +13,12 @@ jest.mock('@salesforce/apex/BulkDeleteController.start', () => ({ default: jest.
   virtual: true
 });
 jest.mock('@salesforce/apex/BulkDeleteController.getJob', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkDeleteController.previewFile', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkDeleteController.startFile', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -150,6 +158,30 @@ describe('c-bulk-delete', () => {
     expect(element.shadowRoot.querySelector('[data-id="job"] li').textContent).toBe(
       '003000000000009: Has gifts'
     );
+  });
+
+  it('deletes what a delete by file dry run found, sending the batch and the count', async () => {
+    previewFile.mockResolvedValue(PREVIEW);
+    startFile.mockResolvedValue(RUNNING);
+    jest.spyOn(window, 'setInterval').mockImplementation(() => 1);
+    const element = createElement('c-bulk-delete', { is: BulkDelete });
+    element.batchId = 'a0B000000000009';
+    document.body.appendChild(element);
+    await flush();
+    expect(one(element, 'intro').textContent).toBe('c.Core_BulkDelete_FileIntro');
+
+    one(element, 'preview').click();
+    await flush();
+    expect(previewFile).toHaveBeenCalledWith({ batchId: 'a0B000000000009' });
+    expect(previewDelete).not.toHaveBeenCalled();
+    expect(one(element, 'cascades').textContent).toContain('Program Enrollments');
+
+    await change(one(element, 'confirm'), '200');
+    one(element, 'start').click();
+    await flush();
+    expect(startFile).toHaveBeenCalledWith({ batchId: 'a0B000000000009', confirmedCount: 200 });
+    expect(startDelete).not.toHaveBeenCalled();
+    expect(one(element, 'notice-message')).not.toBeNull();
   });
 
   it('shows a refusal and offers no delete', async () => {

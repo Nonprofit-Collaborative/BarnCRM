@@ -2,6 +2,9 @@ import { LightningElement, api } from 'lwc';
 import previewDelete from '@salesforce/apex/BulkDeleteController.preview';
 import startDelete from '@salesforce/apex/BulkDeleteController.start';
 import getJob from '@salesforce/apex/BulkDeleteController.getJob';
+import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
+import startFile from '@salesforce/apex/BulkDeleteController.startFile';
+import FILE_INTRO from '@salesforce/label/c.Core_BulkDelete_FileIntro';
 
 import TITLE from '@salesforce/label/c.Core_BulkDelete_Title';
 import PANEL_INTRO from '@salesforce/label/c.Core_BulkDelete_PanelIntro';
@@ -33,13 +36,17 @@ function format(template, ...values) {
  * Find opens it over the query it just ran (`queryJson`). The page sends only the query document
  * and the confirmed count; BulkDeleteController checks both as the person (canonical model R-BD1
  * to R-BD6). Undo is on the Bulk Update tab (bulkDeleteHistory).
+ *
+ * The import wizard opens it over a delete by file's completed dry run instead (`batchId`,
+ * R-BD7): the records are the dry run's Matched rows, and the page sends the batch and the count.
  */
 export default class BulkDelete extends LightningElement {
   @api queryJson;
+  /** A delete by file's import batch, in place of a query (R-BD7). */
+  @api batchId;
 
   labels = {
     title: TITLE,
-    panelIntro: PANEL_INTRO,
     cascades: CASCADES,
     preview: PREVIEW,
     confirm: CONFIRM,
@@ -60,6 +67,10 @@ export default class BulkDelete extends LightningElement {
 
   disconnectedCallback() {
     this.stopPolling();
+  }
+
+  get intro() {
+    return this.batchId ? FILE_INTRO : PANEL_INTRO;
   }
 
   get hasError() {
@@ -113,7 +124,9 @@ export default class BulkDelete extends LightningElement {
     this.confirmText = '';
     this.preview = undefined;
     await this.work(async () => {
-      this.preview = await previewDelete({ queryJson: this.queryJson });
+      this.preview = this.batchId
+        ? await previewFile({ batchId: this.batchId })
+        : await previewDelete({ queryJson: this.queryJson });
     });
   }
 
@@ -123,10 +136,10 @@ export default class BulkDelete extends LightningElement {
 
   async handleStart() {
     await this.work(async () => {
-      this.job = await startDelete({
-        queryJson: this.queryJson,
-        confirmedCount: this.preview.count
-      });
+      const confirmedCount = this.preview.count;
+      this.job = this.batchId
+        ? await startFile({ batchId: this.batchId, confirmedCount })
+        : await startDelete({ queryJson: this.queryJson, confirmedCount });
       this.noticeMessage = STARTED;
       this.preview = undefined;
       this.confirmText = '';

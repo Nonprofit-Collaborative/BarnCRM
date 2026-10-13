@@ -435,13 +435,23 @@
                         ></lightning-button>
                     </template>
                     <template lwc:if={isStepPreview}>
-                        <lightning-button
-                            variant="brand"
-                            label={labels.commitButton}
-                            data-id="commit"
-                            disabled={cannotCommit}
-                            onclick={handleCommit}
-                        ></lightning-button>
+                        <template lwc:if={showDeleteConfirm}>
+                            <c-bulk-delete
+                                class="slds-show slds-var-m-bottom_small"
+                                batch-id={batch.id}
+                                data-id="delete-by-file"
+                                onclose={handleStartOver}
+                            ></c-bulk-delete>
+                        </template>
+                        <template lwc:if={showCommit}>
+                            <lightning-button
+                                variant="brand"
+                                label={labels.commitButton}
+                                data-id="commit"
+                                disabled={cannotCommit}
+                                onclick={handleCommit}
+                            ></lightning-button>
+                        </template>
                         <lightning-button
                             class="slds-var-m-left_x-small"
                             label={labels.downloadExceptionsButton}
