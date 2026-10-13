@@ -5,6 +5,7 @@ import getPage from '@salesforce/apex/FindController.getPage';
 import previewQuery from '@salesforce/apex/FindController.previewQuery';
 import runQuery from '@salesforce/apex/FindController.runQuery';
 import exportPage from '@salesforce/apex/FindController.exportPage';
+import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import saveQuery from '@salesforce/apex/FindController.saveQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import getBulkPage from '@salesforce/apex/BulkUpdateController.getPage';
@@ -23,6 +24,9 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/apex/FindController.saveEdits', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/FindController.summarize', () => ({ default: jest.fn() }), {
@@ -443,6 +447,22 @@ describe('c-find-records', () => {
     expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     expect(blob.size).toBeGreaterThan(0);
     expect(one(element, 'notice-message').textContent).toBe('Exported 1 rows.');
+  });
+
+  it('hands the query and the column labels to the export to Files', async () => {
+    startServerExport.mockResolvedValue({ jobId: '707', tag: 'abc123', done: false, files: [] });
+    jest.spyOn(window, 'setInterval').mockImplementation(() => 1);
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), ['Name', 'Amount__c']);
+    one(element, 'export-files').click();
+    await flush();
+
+    expect(startServerExport).toHaveBeenCalledTimes(1);
+    const sent = startServerExport.mock.calls[0][0];
+    expect(JSON.parse(sent.queryJson).fields).toEqual(['Name', 'Amount__c']);
+    expect(Object.keys(JSON.parse(sent.labelsJson))).toEqual(['Name', 'Amount__c']);
+    expect(exportPage).not.toHaveBeenCalled();
   });
 
   it('saves grid edits as the person and marks the rows that failed', async () => {
