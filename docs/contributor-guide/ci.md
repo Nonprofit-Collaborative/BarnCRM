@@ -216,6 +216,10 @@ Salesforce org is needed for this job. Steps:
    in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
    carries no `// runs-as: deploying user (reason)` comment. See "Tests run as a user they
    create" below for why.
+   `scripts/ci/check-lwc-apex-params.py` fails the build if a component calls an Apex method
+   with an object literal whose keys are not that method's parameter names. The platform
+   drops an unknown key without an error and the parameter arrives as null, and a Jest mock
+   accepts any shape, so nothing else sees it (ADMIN-1, ADMIN-13).
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

@@ -98,6 +98,7 @@ public with sharing class HubController {
      */
     private static void readRollupFreshness(HomeModel model) {
         try {
+            failIfTestSaysSo(PART_ROLLUPS);
             model.rollupsLastCalculated = RollupService.lastCalculated();
             model.rollupsStale = RollupService.isStale();
         } catch (Exception e) {
@@ -116,6 +117,7 @@ public with sharing class HubController {
      */
     private static void readSeasonalAddressRun(HomeModel model) {
         try {
+            failIfTestSaysSo(PART_SEASONAL);
             model.seasonalAddressLastRun = SeasonalAddressService.lastRun();
             model.seasonalAddressLastRunSummary = SeasonalAddressService.lastRunSummary();
             model.seasonalAddressScheduled = SeasonalAddressScheduler.isScheduled();
@@ -159,6 +161,23 @@ public with sharing class HubController {
             ErrorLogger.log(e, ERROR_CONTEXT);
             return 0;
         }
+    }
+
+    /** Parts of the page a test can make fail, to see the page degrade instead (ADMIN-13). */
+    @TestVisible
+    private static final String PART_ROLLUPS = 'rollups';
+    @TestVisible
+    private static final String PART_SEASONAL = 'seasonal';
+    @TestVisible
+    private static Set<String> failingPartsForTest = new Set<String>();
+
+    private static void failIfTestSaysSo(String part) {
+        if (Test.isRunningTest() && failingPartsForTest.contains(part)) {
+            throw new HubPartException('A test made this part fail: ' + part);
+        }
+    }
+
+    private class HubPartException extends Exception {
     }
 
     private static AuraHandledException asAuraException(String message) {

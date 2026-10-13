@@ -102,6 +102,9 @@ jobs:
       - name: Check every Apex test runs as a user it creates, not as the deploying user
         run: python3 scripts/ci/check-tests-run-as.py
 
+      - name: Check every LWC call to Apex names that method's parameters
+        run: python3 scripts/ci/check-lwc-apex-params.py
+
       - name: Test the migration kit
         run: python3 -m unittest discover -s scripts/migration/tests
 
