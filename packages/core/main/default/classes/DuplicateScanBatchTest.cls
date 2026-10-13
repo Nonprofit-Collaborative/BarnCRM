@@ -248,4 +248,40 @@ private class DuplicateScanBatchTest {
             );
         }
     }
+
+    /**
+     * The people pass hands what it found to the households pass, so the one summary at the
+     * end covers the whole scan, failures included.
+     */
+    @IsTest
+    static void theNextPassCarriesWhatTheFirstFoundIntoOneSummary() {
+        System.runAs(TestUsers.admin()) {
+            DuplicateScanBatch people = new DuplicateScanBatch(
+                'Contact',
+                new List<String>{ 'Account' }
+            );
+            people.written = 3;
+            people.failedChunks = 1;
+
+            Test.startTest();
+            people.finish(null);
+            Test.stopTest();
+
+            List<Error_Log__c> summaries = [
+                SELECT Message__c, Severity__c
+                FROM Error_Log__c
+                WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
+            ];
+            Assert.areEqual(1, summaries.size(), 'One summary for the whole scan.');
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, summaries[0].Severity__c);
+            Assert.areEqual(
+                String.format(
+                    Label.Core_Duplicates_ScanFinishedWithFailures,
+                    new List<Object>{ 'Contact, Account', '3', '1' }
+                ),
+                summaries[0].Message__c,
+                'Both passes, with the first pass counts.'
+            );
+        }
+    }
 }

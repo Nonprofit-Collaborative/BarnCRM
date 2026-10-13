@@ -80,13 +80,13 @@ public with sharing class HealthCheckHouseholdChecks {
             Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
             Set<Id> excluded = new Set<Id>(personTypes);
             excluded.add(householdType);
-            count = HouseholdOrphanSelector.countContactsWithoutMembership(excluded, countCap + 1);
+            // Counted as the data hygiene console counts them, one rule for both.
+            count = HouseholdOrphanSelector.countPeopleWithoutMembership(
+                householdType,
+                countCap + 1
+            );
             first.addAll(HouseholdOrphanSelector.contactsWithoutMembership(excluded, LINKS_SHOWN));
             if (!personTypes.isEmpty()) {
-                count += HouseholdOrphanSelector.countPersonAccountsWithoutMembership(
-                    personTypes,
-                    countCap + 1
-                );
                 if (first.size() < LINKS_SHOWN) {
                     first.addAll(
                         HouseholdOrphanSelector.personAccountsWithoutMembership(

@@ -574,11 +574,10 @@ private class DuplicateServiceTest {
                 },
                 null
             );
-            // Somebody else's dismissal lands between this one's check and its write.
+            // Somebody else's dismissal is already there when this one writes.
             insert new Duplicate_Dismissal__c(
                 Pair_Key__c = DuplicateService.pairKey(people[0].Id, people[1].Id)
             );
-            DuplicateService.skipDismissedCheck = true;
 
             Test.startTest();
             Integer dismissed = DuplicateService.dismiss(

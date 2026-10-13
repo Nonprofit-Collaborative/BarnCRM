@@ -986,6 +986,21 @@ describe('the import wizard', () => {
     expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).toBeNull();
   });
 
+  it('warns for person accounts when only an organization rule is switched on', async () => {
+    getTemplates.mockResolvedValue([
+      { ...TEMPLATE, personMode: 'Person Accounts', useDuplicateRules: true }
+    ]);
+    getMatchFields.mockResolvedValue({
+      contact: [],
+      account: [],
+      contactRules: true,
+      accountRules: true,
+      personAccountRules: false
+    });
+    const element = await toMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).not.toBeNull();
+  });
+
   it('shows the values a finished dry run changed', async () => {
     jest.useFakeTimers({ doNotFake: ['setTimeout', 'nextTick', 'queueMicrotask'] });
     const changed = [{ rowNumber: 2, column: 'Email', before: 'A@X.ORG', after: 'a@x.org' }];

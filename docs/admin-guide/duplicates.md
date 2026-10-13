@@ -74,6 +74,9 @@ choose to save anyway.
    **Not a duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
    suggested again." Scan again and check that the pair does not come back. It stays off the
    panel even when a duplicate rule reports the pair again as someone saves one of the two.
+   A suggestion that names three or more records (one a duplicate rule wrote as someone saved)
+   is dismissed as a whole: every pair in it is noted. If two of them are in fact the same
+   person, merge those first, then dismiss the rest.
 
 ## Common mistakes
 
@@ -142,4 +145,5 @@ from this panel or with **Merge or split** on the household's page.
 
 **You dismissed a pair and now want it back.** Dismissals are records. On the panel, choose
 **View** next to **Dismissed pairs**, pick the **All Duplicate Dismissals** list, find the pair
-by its reason, and delete it. The next scan suggests that pair again.
+by its reason, and delete it. The next scan suggests that pair again. Anyone with BarnCRM
+Admin can delete a dismissal, whoever made it: a dismissal is the organization's decision.

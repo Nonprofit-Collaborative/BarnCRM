@@ -3,8 +3,9 @@
  * mode over the same document Find runs, with 200-record cases, the records each check must not
  * count, junction mode's count without a Find query, and a refusal shown in place of a number.
  *
- * No org has run these yet; they are written against the behaviour the classes document. Every
- * test states its membership mode and an org shape, so none depends on Person Accounts.
+ * Every test states its membership mode and an org shape, so none depends on Person Accounts;
+ * the person account count is reached through a shape that names a record type as a person
+ * type.
  */
 @IsTest(testFor='ApexClass:DataHygieneService')
 private class DataHygieneServiceTest {
@@ -118,6 +119,34 @@ private class DataHygieneServiceTest {
                 DataHygieneService.queryDocument(DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD),
                 'There is no document to open.'
             );
+        }
+    }
+
+    /**
+     * People kept as accounts are counted too: the shape names a record type as a person type,
+     * so its 200 accounts with no membership stand for 200 person accounts.
+     */
+    @IsTest
+    static void junctionModeCountsPeopleKeptAsAccountsWithNoMembership() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_JUNCTION);
+            List<Account> standIns = new List<Account>();
+            for (Integer index = 0; index < 200; index++) {
+                standIns.add(newOrganization('Stand-in ' + index));
+            }
+            insert standIns;
+            OrgShapeDetector.overrideShape.personAccountRecordTypeIds = new Set<Id>{
+                standIns[0].RecordTypeId
+            };
+            insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(3, 'Loose'));
+
+            DataHygieneService.CheckResult result = runAs(
+                maria(),
+                DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
+            );
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(203, result.count, 'Three contacts and 200 people kept as accounts.');
         }
     }
 

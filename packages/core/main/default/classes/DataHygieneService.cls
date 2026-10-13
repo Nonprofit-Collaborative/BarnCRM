@@ -112,6 +112,9 @@ public with sharing class DataHygieneService {
         } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
             result.errorMessage = refused.getMessage();
         } catch (System.QueryException noAccess) {
+            // Usually the user-mode refusal of a field or object, but a timeout on a large
+            // count reads the same way, so it is logged for whoever looks into it.
+            ErrorLogger.log(noAccess, 'Data hygiene check ' + key);
             result.errorMessage = System.Label.Core_DataHygiene_NoAccess;
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, 'Data hygiene check ' + key);
@@ -434,23 +437,10 @@ public with sharing class DataHygieneService {
      * counts them (ADR-0048), each read capped.
      */
     private static Integer countJunctionPeopleWithoutHousehold() {
-        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
-        Set<Id> excluded = new Set<Id>(personTypes);
-        Id householdType = HouseholdService.householdRecordTypeId();
-        if (householdType != null) {
-            excluded.add(householdType);
-        }
-        Integer found = HouseholdOrphanSelector.countContactsWithoutMembership(
-            excluded,
+        return HouseholdOrphanSelector.countPeopleWithoutMembership(
+            HouseholdService.householdRecordTypeId(),
             COUNT_CAP + 1
         );
-        if (!personTypes.isEmpty() && found <= COUNT_CAP) {
-            found += HouseholdOrphanSelector.countPersonAccountsWithoutMembership(
-                personTypes,
-                COUNT_CAP + 1
-            );
-        }
-        return found;
     }
 
     private static String title(String key) {

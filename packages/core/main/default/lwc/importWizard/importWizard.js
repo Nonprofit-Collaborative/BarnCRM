@@ -370,7 +370,8 @@ export default class ImportWizard extends LightningElement {
           personFields: (fields && fields.personFields) || [],
           organizationFields: (fields && fields.organizationFields) || [],
           contactRules: fields ? fields.contactRules : undefined,
-          accountRules: fields ? fields.accountRules : undefined
+          accountRules: fields ? fields.accountRules : undefined,
+          personAccountRules: fields ? fields.personAccountRules : undefined
         };
         if (this.templates.length > 0) {
           this.selectTemplate(this.templates[0].id);
@@ -902,7 +903,7 @@ export default class ImportWizard extends LightningElement {
     const template = this.selectedTemplate;
     const people =
       template && template.personMode === 'Person Accounts'
-        ? this.matchFields.accountRules
+        ? this.matchFields.personAccountRules
         : this.matchFields.contactRules;
     const organizations = this.mapsOrganization ? this.matchFields.accountRules : true;
     return this.useDuplicateRules && (people === false || organizations === false);

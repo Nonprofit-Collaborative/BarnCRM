@@ -180,8 +180,12 @@ public with sharing class ImportController {
          */
         @AuraEnabled
         public Boolean contactRules;
+        /** For organizations and households: an Account rule that is not a person account's. */
         @AuraEnabled
         public Boolean accountRules;
+        /** For people kept as person accounts: a person account rule (the person account subtype). */
+        @AuraEnabled
+        public Boolean personAccountRules;
     }
 
     /** One staged row as the exceptions table shows it. */
@@ -328,6 +332,10 @@ public with sharing class ImportController {
             view.organizationFields = ImportFieldCatalog.organizationFields();
             view.contactRules = ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType);
             view.accountRules = ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType);
+            view.personAccountRules = ImportDuplicateRuleMatcher.hasActiveRule(
+                Account.SObjectType,
+                true
+            );
             return view;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getMatchFields');

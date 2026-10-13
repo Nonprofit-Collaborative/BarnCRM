@@ -49,6 +49,24 @@ public with sharing class HouseholdOrphanSelector {
         return erased;
     }
 
+    /**
+     * Junction mode: the people in no household, contacts and person accounts together, as
+     * Health Check and the data hygiene console both count them. Stops at `cap`: the person
+     * accounts are not counted once the contacts alone reach it.
+     */
+    public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        Set<Id> excluded = new Set<Id>(personTypes);
+        if (householdRecordTypeId != null) {
+            excluded.add(householdRecordTypeId);
+        }
+        Integer found = countContactsWithoutMembership(excluded, cap);
+        if (!personTypes.isEmpty() && found < cap) {
+            found += countPersonAccountsWithoutMembership(personTypes, cap);
+        }
+        return found;
+    }
+
     /** Contact mode: contacts with no account at all. */
     public static Integer countContactsWithoutAccount(Integer cap) {
         return [

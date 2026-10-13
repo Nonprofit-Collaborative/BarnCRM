@@ -478,8 +478,10 @@ taken for organizations, and only people for people, whatever the rule compares.
 saved with the mapping.
 
 If no duplicate rule is switched on for people (or for organizations), the box changes nothing for
-them, the matching step says so, and the run log says the rule above was used alone. Turn a rule
-on as [Duplicates](duplicates.md) describes. A dry run matches only records that are already
+them, the matching step says so, and the run log says the rule above was used alone. Where your
+org keeps people as person accounts, a person account duplicate rule counts for those people
+only, and an account rule for organizations; turn on the one you need. Turn a rule on as
+[Duplicates](duplicates.md) describes. A dry run matches only records that are already
 there: a person an earlier row of the same file creates is found by the rule above, never by a
 duplicate rule, so the commit can match a few more rows than the dry run did.
 
