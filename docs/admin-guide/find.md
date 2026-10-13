@@ -39,7 +39,10 @@ builder and checks it exactly as if it had been built by hand.
    grants access to a record or field the person could not already see.
 2. Open the **Find** tab in the BarnCRM app.
 3. Optional: open **BarnCRM Settings**, choose **Import**, and set **Export row limit**
-   (default 50,000). An export stops at this many rows and says so.
+   (default 50,000). An export stops at this many rows and says so. The limit is a
+   convenience stop that keeps a file a size a spreadsheet opens, not a security control: a
+   person can still read every record their access allows, in several exports or other tools.
+   To keep data from someone, take away their access to it.
 
 ## 3. A five-minute walkthrough (as Maria)
 
@@ -71,6 +74,7 @@ a value; the operators offered depend on the field:
 |---|---|
 | Text, email, phone, URL | equals, does not equal, contains, does not contain, starts with, is one of, is not one of, is blank, is not blank |
 | Picklist | equals, does not equal, is one of, is not one of, is blank, is not blank |
+| Multi-select picklist | is exactly, is not exactly (the whole set of chosen values), is blank, is not blank |
 | Number, currency, percent | equals, does not equal, is less than, is at most, is greater than, is at least, is blank, is not blank |
 | Date, date and time | the number operators, plus is this year, is last year, is in the last N days |
 | Checkbox | equals True or False |

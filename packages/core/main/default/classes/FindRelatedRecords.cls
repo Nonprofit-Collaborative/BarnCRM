@@ -14,9 +14,6 @@ public with sharing class FindRelatedRecords {
     public static final Integer MAX_CHILD_FIELDS = 5;
     public static final Integer MAX_CHILD_ROWS = 10;
     private static final Pattern NAME = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*$');
-    private static final Pattern FIELD_PATH = Pattern.compile(
-        '^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
-    );
 
     /** One kind of related record, as Find offers it. */
     public class ChildOption {
@@ -160,14 +157,7 @@ public with sharing class FindRelatedRecords {
         List<String> fields = new List<String>{ 'Id' };
         for (Object rawField : rawFields) {
             String path = String.valueOf(rawField);
-            if (!FIELD_PATH.matcher(path).matches()) {
-                throw unknownField(path);
-            }
-            try {
-                QueryFieldCatalog.resolvePath(child.getName(), path);
-            } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
-                throw new QueryCompiler.QueryCompilerException(refused.getMessage());
-            }
+            QueryCompiler.resolve(child.getName(), path);
             if (!fields.contains(path)) {
                 fields.add(path);
             }
@@ -237,15 +227,6 @@ public with sharing class FindRelatedRecords {
             String.format(
                 System.Label.Core_Find_ErrorRelated,
                 new List<Object>{ String.valueOf(name).abbreviate(80) }
-            )
-        );
-    }
-
-    private static QueryCompiler.QueryCompilerException unknownField(String path) {
-        return new QueryCompiler.QueryCompilerException(
-            String.format(
-                System.Label.Core_Filter_ErrorUnknownField,
-                new List<Object>{ String.valueOf(path).abbreviate(80) }
             )
         );
     }

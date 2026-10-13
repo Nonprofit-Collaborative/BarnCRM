@@ -187,7 +187,11 @@ public with sharing class QueryCompiler {
      * (a count reads one query row per record, R-BU2).
      */
     public static Integer count(String queryJson, Integer atMost) {
-        Compiled compiled = selectAndWhere(parse(queryJson), null, null);
+        return count(selectAndWhere(parse(queryJson), null, null), atMost);
+    }
+
+    /** As `count`, from a query already compiled, so it is not read and checked again. */
+    public static Integer count(Compiled compiled, Integer atMost) {
         Map<String, Object> binds = new Map<String, Object>(compiled.binds);
         binds.put('countLimit', atMost);
         return Database.countQueryWithBinds(
@@ -271,11 +275,17 @@ public with sharing class QueryCompiler {
         return compiled;
     }
 
-    /** A field path checked against the running user's describe, or a refusal naming it. */
-    private static Schema.DescribeFieldResult resolve(String objectName, String path) {
+    /**
+     * A field path checked against the running user's describe, or a refusal naming it (cut to
+     * 80 characters). One check for the filter, the sort, the summary and the related columns.
+     */
+    public static Schema.DescribeFieldResult resolve(String objectName, String path) {
         if (String.isBlank(path) || !FIELD_PATH.matcher(path).matches()) {
             throw new QueryCompilerException(
-                String.format(System.Label.Core_Filter_ErrorUnknownField, new List<Object>{ path })
+                String.format(
+                    System.Label.Core_Filter_ErrorUnknownField,
+                    new List<Object>{ String.valueOf(path).abbreviate(80) }
+                )
             );
         }
         try {

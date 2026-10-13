@@ -162,6 +162,50 @@ private class QueryCompilerTest {
     }
 
     @IsTest
+    static void aCompiledQueryCountsWithoutCompilingAgain() {
+        System.runAs(TestUsers.admin()) {
+            makeLogs(200, 20);
+            String document = query(ERRORS_ONLY, null, 10);
+            QueryCompiler.Compiled compiled = QueryCompiler.compileSelection(
+                document,
+                new Set<String>{ 'Id' },
+                null
+            );
+            System.Assert.areEqual(
+                QueryCompiler.count(document, 1000),
+                QueryCompiler.count(compiled, 1000),
+                'The same count from the document or its compiled query'
+            );
+            System.Assert.areEqual(150, QueryCompiler.count(compiled, 150), 'Capped the same');
+        }
+    }
+
+    @IsTest
+    static void aMalformedPathIsRefusedNamingItsFirstEightyCharacters() {
+        System.runAs(TestUsers.admin()) {
+            String path = 'Message__c; ' + 'x'.repeat(200);
+            try {
+                QueryCompiler.resolve('Error_Log__c', path);
+                System.Assert.fail('A malformed path is refused');
+            } catch (QueryCompiler.QueryCompilerException refused) {
+                System.Assert.areEqual(
+                    String.format(
+                        System.Label.Core_Filter_ErrorUnknownField,
+                        new List<Object>{ path.abbreviate(80) }
+                    ),
+                    refused.getMessage(),
+                    'Filter, sort, summary and related columns share one refusal'
+                );
+            }
+            System.Assert.areEqual(
+                'Message__c',
+                QueryCompiler.resolve('Error_Log__c', 'Message__c').getName(),
+                'A readable field resolves'
+            );
+        }
+    }
+
+    @IsTest
     static void bulkUpdateCountsAtMostTheCapAndReadsChosenRecordsWithTheFilter() {
         System.runAs(TestUsers.admin()) {
             makeLogs(200, 20);

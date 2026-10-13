@@ -26,6 +26,13 @@ const GIFT = {
     { apiName: 'Gift_Date__c', label: 'Gift Date', dataType: 'date', filterable: true },
     { apiName: 'Notes__c', label: 'Notes', dataType: 'textarea', filterable: false },
     {
+      apiName: 'Programs__c',
+      label: 'Programs',
+      dataType: 'multipicklist',
+      filterable: true,
+      picklistValues: [{ label: 'Pantry', value: 'Pantry' }]
+    },
+    {
       apiName: 'Status__c',
       label: 'Status',
       dataType: 'picklist',
@@ -121,6 +128,21 @@ describe('c-filter-builder', () => {
       conditions: [{ id: 1, field: 'Status__c', operator: 'in', value: ['Received', 'Pledged'] }]
     });
     expect(last.summary).toBe('All of these: Status c.Core_Filter_OpIn Received, Pledged');
+  });
+
+  it('calls a multi-select equals "is exactly", since it matches the whole set', async () => {
+    const { element } = await render();
+    one(element, 'add').click();
+    await flush();
+    await choose(one(element, 'field'), 'f:Programs__c');
+    const labels = one(element, 'operator').options.map((option) => option.label);
+    expect(labels).toContain('c.Core_Filter_OpIsExactly');
+    expect(labels).toContain('c.Core_Filter_OpIsNotExactly');
+    expect(labels).not.toContain('c.Core_Filter_OpEquals');
+
+    await choose(one(element, 'field'), 'f:Status__c');
+    const picklistLabels = one(element, 'operator').options.map((option) => option.label);
+    expect(picklistLabels).toContain('c.Core_Filter_OpEquals');
   });
 
   it('writes a number as a number', async () => {
