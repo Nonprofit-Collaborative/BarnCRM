@@ -114,7 +114,10 @@ member from 2019 to 2022 and is a board member again now, that is two affiliatio
 date ranges, and both should have their dates filled in. Two affiliations for the same person,
 the same organization, and the same role with overlapping dates is refused with "Harper Garcia
 already has an affiliation with Bayview Hardware as Store Manager covering those dates.
-Open AF-000123 to change it." End the first one before you start the second.
+Open AF-000123 to change it." End the first one before you start the second. Two that
+already overlap (loaded before the rule, or with automation off) are checked only when you
+change the person, organization, role or dates on one of them: marking one primary or
+editing its description still saves, and changing its dates is how you fix the overlap.
 
 **Looking for a setting to turn on.** There is not one. Affiliations behaves the same way in
 every organization, so nothing is exposed in BarnCRM Settings, and there is nothing you can

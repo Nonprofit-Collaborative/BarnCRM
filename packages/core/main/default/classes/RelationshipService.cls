@@ -45,8 +45,6 @@ public with sharing class RelationshipService {
     @TestVisible
     private static final String STATUS_CURRENT = 'Current';
     @TestVisible
-    private static final String STATUS_FORMER = 'Former';
-    @TestVisible
     private static final String TYPE_OTHER = 'Other';
 
     private static Map<String, String> reciprocalByType;
