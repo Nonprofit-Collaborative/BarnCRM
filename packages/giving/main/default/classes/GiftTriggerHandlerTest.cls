@@ -106,13 +106,14 @@ private class GiftTriggerHandlerTest {
             if (!OrgShapeDetector.detect().hasPersonAccounts) {
                 return;
             }
-            Set<Id> personTypeIds = OrgShapeDetector.detect().personAccountRecordTypeIds;
-            if (personTypeIds.isEmpty()) {
+            // A person type the running user is given: one they are not is refused on insert.
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (personType == null) {
                 return;
             }
             Account person = new Account();
             person.put('LastName', 'Okafor');
-            person.put('RecordTypeId', new List<Id>(personTypeIds)[0]);
+            person.put('RecordTypeId', personType);
             insert person;
 
             Test.startTest();

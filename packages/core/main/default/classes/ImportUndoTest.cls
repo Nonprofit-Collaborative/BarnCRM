@@ -117,6 +117,9 @@ private class ImportUndoTest {
         runDeletePasses(batch, total, undoStartedAt, true);
     }
 
+    /** More records than any test here imports, so a pass given this is one chunk. */
+    private static final Integer MAX_ONE_CHUNK = 10000;
+
     private static void runDeletePasses(
         Import_Batch__c batch,
         Integer total,
@@ -130,6 +133,12 @@ private class ImportUndoTest {
      * pass its own governor limits, as the platform does for every chunk: its checks keep
      * what they cannot afford to ask about, so a budget the earlier passes spent here would
      * keep records the job itself deletes. Only for a caller that has not used Test.startTest.
+     *
+     * In that mode the earlier passes are each handed their records as one chunk. A chunk's
+     * checks cost about the same whatever its size, and the platform gives every chunk its own
+     * limits, so two chunks sharing this one transaction would spend a budget the job never
+     * shares. An org with many relationships on Contact (Nonprofit Cloud: about 18 queries a
+     * chunk) otherwise leaves the second chunk unchecked and kept, which the job would not do.
      */
     private static void runDeletePasses(
         Import_Batch__c batch,
@@ -152,12 +161,13 @@ private class ImportUndoTest {
             if (alone) {
                 Test.startTest();
             }
+            // Otherwise as the platform does: one chunk at a time, 100 at most.
+            Integer chunkSize = accountsPassAlone && !alone ? MAX_ONE_CHUNK : 100;
             Database.QueryLocatorIterator records = job.start(null).iterator();
             List<SObject> scope = new List<SObject>();
             while (records.hasNext()) {
                 scope.add(records.next());
-                // The platform hands the job at most one chunk at a time (100 at most).
-                if (scope.size() == 100) {
+                if (scope.size() == chunkSize) {
                     job.execute(null, scope);
                     scope = new List<SObject>();
                 }

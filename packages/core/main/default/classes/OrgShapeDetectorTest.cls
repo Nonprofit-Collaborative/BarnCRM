@@ -308,6 +308,100 @@ private class OrgShapeDetectorTest {
         }
     }
 
+    /**
+     * A person type that the running user is not given (here one the describe does not know at
+     * all) is never handed out for a new person: inserting with it is refused. With no other
+     * person type there is nothing to create with, and the answer is null.
+     */
+    @IsTest
+    static void aPersonTypeTheUserIsNotGivenIsNeverChosen() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.OrgShape shape = shapeWith(false, true, false);
+            shape.personAccountRecordTypeIds = new Set<Id>{ Id.valueOf('012000000000999') };
+            OrgShapeDetector.overrideShape = shape;
+
+            Assert.isNull(
+                OrgShapeDetector.creatablePersonRecordTypeId(),
+                'No person type the user can create with.'
+            );
+
+            shape.personAccountRecordTypeIds = new Set<Id>();
+            Assert.isNull(
+                OrgShapeDetector.creatablePersonRecordTypeId(),
+                'None at all where the org has no person types.'
+            );
+        }
+    }
+
+    /** A type the running user is given is chosen over one they are not. */
+    @IsTest
+    static void anAvailablePersonTypeIsChosen() {
+        System.runAs(TestUsers.admin()) {
+            Id available;
+            for (
+                Schema.RecordTypeInfo info : Account.SObjectType.getDescribe().getRecordTypeInfos()
+            ) {
+                if (info.isAvailable() && !info.isMaster()) {
+                    available = info.getRecordTypeId();
+                    break;
+                }
+            }
+            if (available == null) {
+                // An org with no Account record type of its own has none to stand in for one.
+                return;
+            }
+            OrgShapeDetector.OrgShape shape = shapeWith(false, true, false);
+            shape.personAccountRecordTypeIds = new Set<Id>{
+                Id.valueOf('012000000000999'),
+                available
+            };
+            OrgShapeDetector.overrideShape = shape;
+
+            Assert.areEqual(
+                available,
+                OrgShapeDetector.creatablePersonRecordTypeId(),
+                'The type the user is given.'
+            );
+        }
+    }
+
+    /** In the org as it is, the answer is always a person type the running user is given. */
+    @IsTest
+    static void theRealAnswerIsAnAvailablePersonType() {
+        System.runAs(TestUsers.admin()) {
+            Id chosen = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (chosen == null) {
+                Assert.isTrue(
+                    noneAvailable(OrgShapeDetector.detect().personAccountRecordTypeIds),
+                    'Null only where no person type is given to the user.'
+                );
+                return;
+            }
+            Assert.isTrue(
+                OrgShapeDetector.detect().personAccountRecordTypeIds.contains(chosen),
+                'A person type.'
+            );
+            Assert.isTrue(
+                Account.SObjectType.getDescribe()
+                    .getRecordTypeInfosById()
+                    .get(chosen)
+                    .isAvailable(),
+                'Given to the user.'
+            );
+        }
+    }
+
+    private static Boolean noneAvailable(Set<Id> recordTypeIds) {
+        Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe()
+            .getRecordTypeInfosById();
+        for (Id recordTypeId : recordTypeIds) {
+            if (infos.containsKey(recordTypeId) && infos.get(recordTypeId).isAvailable()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static OrgShapeDetector.OrgShape shapeWith(
         Boolean hasNpsp,
         Boolean hasPersonAccounts,

@@ -107,6 +107,13 @@ the next file: by their email under **Email exact**, and by their last name and 
 postal code under **Name plus postal code**. A person account's billing postal code counts
 too, because people loaded by other tools often have their postal code only there.
 
+Each new person account gets a person account record type the person running the import can
+use: their profile's default when it is a person type, otherwise the first person type
+assigned to them by name. If none is assigned to them, the import creates no people and the
+run log says so; assign a person account record type to their profile or a permission set
+and run the import again. A Nonprofit Cloud org can have a Person Account record type that
+the System Administrator profile is not given.
+
 Three things are worth knowing about it.
 
 - **The household is named from the file if you map a name for it.** Map a column to

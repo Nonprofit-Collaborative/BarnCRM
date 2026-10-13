@@ -14,7 +14,17 @@ private class ImportPersonAccountTest {
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 
+    /**
+     * Person accounts the running user can create. An org can have person accounts and still
+     * give the user none of its person types (a Nonprofit Cloud trial does not give its Person
+     * Account record type to the System Administrator profile); the import then creates
+     * nobody, which noPersonTypeGivenToTheUserCreatesNobodyAndSaysWhy proves.
+     */
     private static Boolean orgHasPersonAccounts() {
+        return personFieldsExist() && OrgShapeDetector.creatablePersonRecordTypeId() != null;
+    }
+
+    private static Boolean personFieldsExist() {
         return OrgShapeDetector.detect().hasPersonAccounts &&
             ImportMatcher.accountHasField('PersonEmail');
     }
@@ -113,6 +123,36 @@ private class ImportPersonAccountTest {
                     'No contact attribute was reported unknown to the account: ' + note
                 );
             }
+        }
+    }
+
+    /**
+     * Where none of the org's person types is given to the person running the import, nobody
+     * is created with a type the platform would refuse row by row: the run log says why once.
+     */
+    @IsTest
+    static void noPersonTypeGivenToTheUserCreatesNobodyAndSaysWhy() {
+        System.runAs(TestUsers.admin()) {
+            if (!personFieldsExist()) {
+                // Platform-only shape (ADR-0013): no person fields exist to be written.
+                return;
+            }
+            OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
+            // A person type the describe does not know, so none is available to the user.
+            shape.personAccountRecordTypeIds = new Set<Id>{ Id.valueOf('012000000000999') };
+            OrgShapeDetector.overrideShape = shape;
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            given(ImportTemplateService.RULE_EMAIL, anasRow('Treasurer'));
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(0, outcome.created, 'Nobody is created: ' + outcome.notes);
+            Assert.isTrue(
+                outcome.notes.contains(Label.Core_Import_LogPersonRecordTypeMissing),
+                'The run log says why: ' + outcome.notes
+            );
         }
     }
 
@@ -215,9 +255,7 @@ private class ImportPersonAccountTest {
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Account existing = new Account(
-                RecordTypeId = new List<Id>(
-                    OrgShapeDetector.detect().personAccountRecordTypeIds
-                )[0],
+                RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId(),
                 BillingPostalCode = '97201'
             );
             existing.put('FirstName', 'Ana');
