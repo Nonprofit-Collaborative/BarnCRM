@@ -15,8 +15,12 @@ The mappings only name columns. Nothing in BarnCRM depends on NPSP being install
 ## 2. How to turn it on
 
 BarnCRM brings the contacts mapping, and the Giving module brings the two payment mappings.
-In an org that has never opened the **Import** tab they appear the first time it opens. In an
-org that already had the generic mappings, add them once from Health Check:
+Each package adds its mappings when it is installed, and an upgrade adds any mapping a later
+version ships, so the **Import** tab normally lists them already. An upgrade never changes a
+mapping you have edited. A shipped mapping you deleted comes back on the next upgrade: switch
+it off instead if you do not want it in the list.
+
+If one is missing (an install that logged a problem, for example), add it from Health Check:
 
 1. Open the **BarnCRM** app, click **BarnCRM Settings** and choose **Health**.
 2. The report opens (click **Re-run** if it is from earlier). A finding reads "3 shipped

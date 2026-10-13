@@ -96,6 +96,42 @@ private class GivingPostInstallTest {
         }
     }
 
+    /**
+     * Installing Giving adds its import templates, the migration mappings among them, and an
+     * upgrade keeps one the administrator edited and adds none twice (D-41).
+     */
+    @IsTest
+    static void installingGivingAddsItsImportTemplatesOnce() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingPostInstall handler = new GivingPostInstall();
+            Test.testInstall(handler, null);
+            Import_Template__c npsp = [
+                SELECT Id, Name
+                FROM Import_Template__c
+                WHERE Template_Key__c = 'npsp_contacts'
+                WITH SYSTEM_MODE
+            ];
+            Integer afterInstall = [SELECT COUNT() FROM Import_Template__c WITH SYSTEM_MODE];
+            npsp.Name = 'NPSP contacts, our way';
+            update as system npsp;
+
+            Test.startTest();
+            Test.testInstall(handler, new Version(1, 0), true);
+            Test.stopTest();
+
+            Assert.areEqual(
+                afterInstall,
+                [SELECT COUNT() FROM Import_Template__c WITH SYSTEM_MODE],
+                'An upgrade adds no second copy.'
+            );
+            Assert.areEqual(
+                'NPSP contacts, our way',
+                [SELECT Name FROM Import_Template__c WHERE Id = :npsp.Id WITH SYSTEM_MODE].Name,
+                'And keeps the name the admin gave it.'
+            );
+        }
+    }
+
     @IsTest
     static void everyDefinitionCreatedNamesObjectsThisOrgHas() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
