@@ -1,4 +1,5 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
 import DataHygieneConsole from 'c/dataHygieneConsole';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import openInFind from '@salesforce/apex/DataHygieneController.openInFind';
@@ -136,8 +137,7 @@ describe('c-data-hygiene-console', () => {
       stateKey: 'c__savedQueryId'
     });
     const element = await render();
-    const toasts = jest.fn();
-    element.addEventListener('lightning__showtoast', toasts);
+    const toasts = jest.spyOn(Toast, 'show');
 
     row(element, 'people_without_household').querySelector('[data-id="open"]').click();
     await flush();
@@ -149,7 +149,7 @@ describe('c-data-hygiene-console', () => {
       state: { c__savedQueryId: 'a0X000000000001AAA' }
     });
     expect(toasts).toHaveBeenCalledTimes(1);
-    expect(toasts.mock.calls[0][0].detail.title).toBe(
+    expect(toasts.mock.calls[0][0].label).toBe(
       'In Find, choose "Data hygiene: People with no household" from Saved queries.'
     );
   });

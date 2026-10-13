@@ -1,5 +1,5 @@
 import { LightningElement, api, wire } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import getGiftSummary from '@salesforce/apex/GiftController.getGiftSummary';
 import refundGift from '@salesforce/apex/GiftController.refund';
@@ -129,7 +129,7 @@ export default class GiftRefund extends LightningElement {
   }
 
   toast(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 
   close() {

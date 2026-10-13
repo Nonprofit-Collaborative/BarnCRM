@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 
 import getAddresses from '@salesforce/apex/AddressController.getAddresses';
 import setDefault from '@salesforce/apex/AddressController.setDefault';
@@ -143,6 +143,6 @@ export default class AddressPanel extends LightningElement {
   }
 
   notify(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 }

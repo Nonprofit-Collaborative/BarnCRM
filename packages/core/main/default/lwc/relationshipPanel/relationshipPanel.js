@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 
 import getRelationships from '@salesforce/apex/RelationshipController.getRelationships';
 import removeRelationship from '@salesforce/apex/RelationshipController.removeRelationship';
@@ -128,6 +128,6 @@ export default class RelationshipPanel extends LightningElement {
   }
 
   notify(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 }
