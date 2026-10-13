@@ -3,13 +3,13 @@
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
-            <template if:true={isReadOnly}>
+            <template lwc:if={isReadOnly}>
                 <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small">
                     <p data-id="read-only-notice">{labels.readOnly}</p>
                 </div>
             </template>
 
-            <template if:true={hasError}>
+            <template lwc:if={hasError}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
                     role="alert"
@@ -23,7 +23,7 @@
                 </div>
             </template>
 
-            <template if:true={isPaused}>
+            <template lwc:if={isPaused}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
                     role="status"
@@ -83,7 +83,7 @@
                 </div>
             </div>
 
-            <template if:true={isEmpty}>
+            <template lwc:if={isEmpty}>
                 <p data-id="empty-state">{labels.empty}</p>
             </template>
 
@@ -97,7 +97,7 @@
                                 <p class="slds-text-body_small">
                                     {labels.runsOn} {automation.objectName}
                                 </p>
-                                <template if:true={automation.alwaysRuns}>
+                                <template lwc:if={automation.alwaysRuns}>
                                     <p
                                         class="slds-text-body_small slds-text-color_weak"
                                         data-id="always-runs-reason"
