@@ -52,6 +52,11 @@ public with sharing class RollupService {
 
     private static final Set<String> REAL_TIME_MODES = new Set<String>{ MODE_REAL_TIME, MODE_BOTH };
     private static final Set<String> SCHEDULED_MODES = new Set<String>{ MODE_SCHEDULED, MODE_BOTH };
+    private static final Set<String> EVERY_MODE = new Set<String>{
+        MODE_REAL_TIME,
+        MODE_SCHEDULED,
+        MODE_BOTH
+    };
 
     /** The records the last merge recalculated, so a test can see only survivors were. */
     @TestVisible
@@ -239,7 +244,10 @@ public with sharing class RollupService {
             System.isQueueable() ||
             Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()
         ) {
-            RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
+            queue(
+                new Map<String, Set<Id>>{ target => survivorIds },
+                new Map<String, List<Rollup_Definition__c>>{ target => definitions }
+            );
             return;
         }
         System.enqueueJob(new SurvivorRecalculation(target, survivorIds, definitions));
@@ -282,11 +290,15 @@ public with sharing class RollupService {
                 RollupQueue.retryLater(
                     target,
                     RollupEngine.recalculate(survivorIds, definitions).failed,
-                    0
+                    0,
+                    idsOf(definitions)
                 );
             } catch (Exception stopped) {
                 ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
-                RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
+                queue(
+                    new Map<String, Set<Id>>{ target => survivorIds },
+                    new Map<String, List<Rollup_Definition__c>>{ target => definitions }
+                );
             }
         }
     }
@@ -327,9 +339,13 @@ public with sharing class RollupService {
             return;
         }
         if (deleting == true) {
-            RollupQueue.add(
-                idsByTargetOf(RollupChanges.afterDelete(sourceObject, records, definitions))
+            RollupChanges.Marked marked = RollupChanges.afterDelete(
+                sourceObject,
+                records,
+                definitions
             );
+            Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
+            queue(idsByTarget, definitionsByTargetOf(marked, idsByTarget.keySet()));
             return;
         }
         recalculateNowOrQueue(
@@ -350,6 +366,53 @@ public with sharing class RollupService {
     }
 
     /**
+     * The definitions that marked each target entity's records, which are the ones recalculated
+     * (ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`): a gift save does not
+     * run the soft credit totals on the donor. When one of them has no record id to name it,
+     * every active definition on the entity runs, as before.
+     */
+    private static Map<String, List<Rollup_Definition__c>> definitionsByTargetOf(
+        RollupChanges.Marked marked,
+        Set<String> targets
+    ) {
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget = new Map<String, List<Rollup_Definition__c>>();
+        for (String target : targets) {
+            List<Rollup_Definition__c> definitions = marked.definitionsFor(target);
+            definitionsByTarget.put(
+                target,
+                definitions == null
+                    ? RollupSelector.selectActiveForTarget(target, EVERY_MODE)
+                    : definitions
+            );
+        }
+        return definitionsByTarget;
+    }
+
+    /** Queues the records with the definitions to recalculate for them. */
+    private static void queue(
+        Map<String, Set<Id>> idsByTarget,
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget
+    ) {
+        Map<String, Set<Id>> definitionIdsByTarget = new Map<String, Set<Id>>();
+        for (String target : definitionsByTarget.keySet()) {
+            definitionIdsByTarget.put(target, idsOf(definitionsByTarget.get(target)));
+        }
+        RollupQueue.add(idsByTarget, definitionIdsByTarget);
+    }
+
+    /** The definitions' ids; a definition with none leaves a null in, which queues every one. */
+    private static Set<Id> idsOf(List<Rollup_Definition__c> definitions) {
+        if (definitions == null) {
+            return null;
+        }
+        Set<Id> ids = new Set<Id>();
+        for (Rollup_Definition__c definition : definitions) {
+            ids.add(definition.Id);
+        }
+        return ids;
+    }
+
+    /**
      * R-R4: by default every save queues the records it marked, and the Rollup Queue
      * recalculates them just after the save (ADR-NEXT async rollups), so a save pays for marking
      * and one insert, never for the aggregate queries. With Rollup Processing set to In the
@@ -364,21 +427,26 @@ public with sharing class RollupService {
             return;
         }
         Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
-        if (!recalculatesInTheSave() || !canRecalculateNow(marked.size(), idsByTarget.keySet())) {
-            RollupQueue.add(idsByTarget);
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget = definitionsByTargetOf(
+            marked,
+            idsByTarget.keySet()
+        );
+        if (!recalculatesInTheSave() || !canRecalculateNow(marked.size(), definitionsByTarget)) {
+            queue(idsByTarget, definitionsByTarget);
             return;
         }
         try {
             for (String target : idsByTarget.keySet()) {
+                List<Rollup_Definition__c> definitions = definitionsByTarget.get(target);
                 RollupEngine.Result result = RollupEngine.recalculate(
                     idsByTarget.get(target),
-                    SettingsService.typeByName(target)
+                    definitions
                 );
-                RollupQueue.retryLater(target, result.failed, 0);
+                RollupQueue.retryLater(target, result.failed, 0, idsOf(definitions));
             }
         } catch (Exception stopped) {
             ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
-            RollupQueue.add(idsByTarget);
+            queue(idsByTarget, definitionsByTarget);
         }
     }
 
@@ -403,28 +471,30 @@ public with sharing class RollupService {
      * it. The estimate costs no query: definitions come from the transaction's cache.
      */
     @TestVisible
-    private static Boolean canRecalculateNow(Integer targetCount, Set<String> targets) {
+    private static Boolean canRecalculateNow(
+        Integer targetCount,
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget
+    ) {
         if (!canRecalculateNow(targetCount)) {
             return false;
         }
-        return plannedQueries(targets) <= Limits.getLimitQueries() - Limits.getQueries();
+        return plannedQueries(definitionsByTarget) <=
+            Limits.getLimitQueries() - Limits.getQueries();
     }
 
     /**
-     * The queries a recalculation of these target entities spends at most: one per definition
-     * (the planner folds some together, never splits one), one more for a path through a
-     * household token, and the fixed cost of each target entity. Counted, not planned, so a
-     * definition that cannot be planned is not logged twice.
+     * The queries a recalculation of these definitions spends at most: one per definition (the
+     * planner folds some together, never splits one), one more for a path through a household
+     * token, and the fixed cost of each target entity. Counted, not planned, so a definition
+     * that cannot be planned is not logged twice.
      */
     @TestVisible
-    private static Integer plannedQueries(Set<String> targets) {
+    private static Integer plannedQueries(
+        Map<String, List<Rollup_Definition__c>> definitionsByTarget
+    ) {
         Integer planned = 0;
-        for (String target : targets) {
-            List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(
-                target,
-                new Set<String>{ MODE_REAL_TIME, MODE_SCHEDULED, MODE_BOTH }
-            );
-            if (definitions.isEmpty()) {
+        for (List<Rollup_Definition__c> definitions : definitionsByTarget.values()) {
+            if (definitions == null || definitions.isEmpty()) {
                 continue;
             }
             planned += QUERIES_PER_TARGET;

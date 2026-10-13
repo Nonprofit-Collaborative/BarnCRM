@@ -144,6 +144,23 @@ public with sharing class RollupSelector {
         return matching;
     }
 
+    /**
+     * The active definitions among these, for a queue entry that names the definitions that
+     * queued it; one switched off or deleted since is left out.
+     */
+    public static List<Rollup_Definition__c> selectActiveByIds(Set<Id> definitionIds) {
+        List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
+        if (definitionIds == null || definitionIds.isEmpty()) {
+            return matching;
+        }
+        for (Rollup_Definition__c definition : selectAll()) {
+            if (definition.Active__c == true && definitionIds.contains(definition.Id)) {
+                matching.add(definition);
+            }
+        }
+        return matching;
+    }
+
     /** The active definitions the nightly batch runs. */
     public static List<Rollup_Definition__c> selectActiveForModes(Set<String> modes) {
         List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();

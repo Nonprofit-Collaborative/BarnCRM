@@ -188,6 +188,81 @@ private class RollupQueueTest {
         }
     }
 
+    /** Merged entries run the definitions any of them names; one naming none runs them all. */
+    @IsTest
+    static void mergedEntriesCarryTheUnionOfTheirDefinitions() {
+        System.runAs(TestUsers.admin()) {
+            List<Id> ids = new List<Id>(fakeAccountIds(3));
+            Id gifts = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+            );
+            Id softCredits = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix() + '000000000002'
+            );
+            List<Rollup_Queue__c> named = new List<Rollup_Queue__c>{
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[0],
+                    Definition_Ids__c = String.valueOf(gifts),
+                    Attempts__c = 0
+                ),
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[1],
+                    Definition_Ids__c = gifts + ',' + softCredits,
+                    Attempts__c = 0
+                )
+            };
+
+            RollupQueue.Slice slice = RollupQueue.take(named, 200);
+            Assert.areEqual(
+                new Set<Id>{ gifts, softCredits },
+                slice.definitionIdsFor('Account'),
+                'The union of what the entries name'
+            );
+
+            named.add(
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = ids[2],
+                    Attempts__c = 0
+                )
+            );
+            Assert.isNull(
+                RollupQueue.take(named, 200).definitionIdsFor('Account'),
+                'An entry naming none runs every definition'
+            );
+        }
+    }
+
+    @IsTest
+    static void anEntryNamesTheDefinitionsThatQueuedIt() {
+        System.runAs(TestUsers.admin()) {
+            Id gifts = Id.valueOf(
+                Rollup_Definition__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+            );
+
+            Test.startTest();
+            RollupQueue.add(
+                new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(250) },
+                new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ gifts } }
+            );
+            RollupQueue.retryLater(
+                'Account',
+                new Map<Id, String>{ new List<Id>(fakeAccountIds(1))[0] => 'Record locked.' },
+                0,
+                new Set<Id>{ gifts }
+            );
+            List<Rollup_Queue__c> queued = [SELECT Definition_Ids__c FROM Rollup_Queue__c];
+            Test.stopTest();
+
+            Assert.areEqual(3, queued.size(), 'Two entries for 250 records, one retry');
+            for (Rollup_Queue__c entry : queued) {
+                Assert.areEqual(String.valueOf(gifts), entry.Definition_Ids__c, 'Each split');
+            }
+        }
+    }
+
     @IsTest
     static void aRecordThatCannotBeSavedIsTriedLaterThenFails() {
         System.runAs(TestUsers.admin()) {

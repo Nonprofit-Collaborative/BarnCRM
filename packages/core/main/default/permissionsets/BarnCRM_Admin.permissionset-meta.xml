@@ -1344,6 +1344,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Rollup_Queue__c.Definition_Ids__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Rollup_Queue__c.Last_Error__c</field>
     <readable>true</readable>
   </fieldPermissions>
