@@ -41,6 +41,17 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
+        List<Import_Batch__c> batches = [
+            SELECT Retry_After_Row__c
+            FROM Import_Batch__c
+            WHERE Id = :owner
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        retryAfter = batches.isEmpty() ? null : batches[0].Retry_After_Row__c;
+        if (retryAfter != null) {
+            return retryRows();
+        }
         // System mode, stated because API 67.0 would otherwise read in user mode: the staged
         // rows are the package's own bookkeeping, written in system mode for the reason
         // ADR-0021 gives, and this read only feeds that processing. The records a row makes
@@ -70,6 +81,76 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         );
     }
 
+    /** A retry's open boundary, read at the start: rows after it are the fixed rows (R-IB17). */
+    private Decimal retryAfter;
+
+    /**
+     * A retry's rows (R-IB17): its preview reads only the fixed rows; its commit reads them and
+     * the earlier rejected rows, which `execute` marks Retried rather than processing. System
+     * mode for the reason `start` gives.
+     */
+    private Database.QueryLocator retryRows() {
+        Id owner = batchId;
+        Decimal after = retryAfter;
+        Set<String> replaced = dryRun
+            ? new Set<String>()
+            : new Set<String>{ ImportRowProcessor.STATUS_REJECTED };
+        return Database.getQueryLocator(
+            [
+                SELECT
+                    Id,
+                    Import_Batch__c,
+                    Row_Number__c,
+                    Raw_Values_JSON__c,
+                    Status__c,
+                    Error_Message__c,
+                    Household__c,
+                    Contact_1__c,
+                    Person_1_Account__c,
+                    Contact_2__c,
+                    Person_2_Account__c,
+                    Organization__c,
+                    Gift_Id__c,
+                    Soft_Credit_Id__c
+                FROM Import_Row__c
+                WHERE
+                    Import_Batch__c = :owner
+                    AND (Row_Number__c > :after
+                    OR Status__c IN :replaced)
+                WITH SYSTEM_MODE
+                ORDER BY Row_Number__c ASC
+            ]
+        );
+    }
+
+    /**
+     * Marks the earlier rejected rows a retry's commit met as Retried, and hands back the rest
+     * to process (R-IB17). Written in system mode for the reason `rejectChunk` gives.
+     */
+    private List<Import_Row__c> retireReplaced(List<Import_Row__c> scope) {
+        if (retryAfter == null || dryRun) {
+            return scope;
+        }
+        List<Import_Row__c> rest = new List<Import_Row__c>();
+        List<Import_Row__c> replaced = new List<Import_Row__c>();
+        for (Import_Row__c row : scope) {
+            if (row.Row_Number__c != null && row.Row_Number__c <= retryAfter) {
+                replaced.add(
+                    new Import_Row__c(
+                        Id = row.Id,
+                        Status__c = ImportBatchService.ROW_STATUS_RETRIED
+                    )
+                );
+            } else {
+                rest.add(row);
+            }
+        }
+        if (!replaced.isEmpty()) {
+            Database.update(replaced, AccessLevel.SYSTEM_MODE);
+        }
+        return rest;
+    }
+
     /** Makes a chunk die after its rows were processed, so a test can see the rollback. */
     @TestVisible
     private static Boolean failAfterProcessForTest = false;
@@ -95,13 +176,10 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 )
                 .withFileValues(batch.File_Values_JSON__c);
             ImportEntityProcessors.carriedState = processorState;
-            ImportRowProcessor.Outcome outcome = ImportRowProcessor.process(
-                batch,
-                template,
-                mapping,
-                scope,
-                dryRun
-            );
+            List<Import_Row__c> rows = retireReplaced(scope);
+            ImportRowProcessor.Outcome outcome = rows.isEmpty()
+                ? new ImportRowProcessor.Outcome()
+                : ImportRowProcessor.process(batch, template, mapping, rows, dryRun);
             if (failAfterProcessForTest) {
                 throw new ImportException('Failed for the test.');
             }

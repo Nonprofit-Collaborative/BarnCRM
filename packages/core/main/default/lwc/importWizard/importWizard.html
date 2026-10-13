@@ -402,6 +402,20 @@
                     ></c-import-results>
                 </template>
 
+                <template lwc:if={showRetry}>
+                    <div class="slds-var-m-top_medium" data-id="retry">
+                        <h3 class="slds-text-heading_small">{labels.retryHeading}</h3>
+                        <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.retryHelp}</p>
+                        <lightning-input
+                            type="file"
+                            data-id="retry-file"
+                            label={labels.retryFileLabel}
+                            accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            onchange={handleRetryFile}
+                        ></lightning-input>
+                    </div>
+                </template>
+
                 <div class="slds-var-m-top_medium">
                     <template lwc:if={canGoBack}>
                         <lightning-button

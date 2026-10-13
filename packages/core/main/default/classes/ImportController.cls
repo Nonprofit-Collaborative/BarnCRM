@@ -122,6 +122,12 @@ public with sharing class ImportController {
         /** False when the file does not match the control totals it was given (R-IB10). */
         @AuraEnabled
         public Boolean controlTotalsAgree;
+        /** True when the import's fixed rejected rows may be retried into it (R-IB17). */
+        @AuraEnabled
+        public Boolean canRetry;
+        /** True while a retry of the rejected rows is open (R-IB17). */
+        @AuraEnabled
+        public Boolean retrying;
     }
 
     /**
@@ -601,6 +607,20 @@ public with sharing class ImportController {
     }
 
     /**
+     * Opens a retry of a committed import's rejected rows, so its fixed rows can be staged,
+     * previewed and committed into the same import (R-IB17).
+     */
+    @AuraEnabled
+    public static BatchView openRetry(String batchId) {
+        try {
+            enforcePermission();
+            return toView(ImportBatchService.openRetry(batchId));
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.openRetry');
+        }
+    }
+
+    /**
      * What undoing an import would remove and put back, and why it cannot be undone when it
      * cannot. Nothing is deleted by it (R-IB8).
      */
@@ -774,7 +794,13 @@ public with sharing class ImportController {
         view.fileName = batch.File_Name__c;
         // An undo whose job was aborted shows as Undo failed, which it is (R-IB8).
         view.status = ImportUndoService.effectiveStatus(batch);
-        view.isDryRun = batch.Is_Dry_Run__c;
+        view.retrying = ImportBatchService.isRetrying(batch);
+        // A retry's preview runs over a committed import, so it is a dry run of its own rows.
+        view.isDryRun =
+            batch.Is_Dry_Run__c ||
+            (view.retrying &&
+            (ImportBatchService.STATUS_DRY_RUN.equals(view.status) ||
+            ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(view.status)));
         view.isFinished =
             ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(view.status) ||
             ImportBatchService.STATUS_COMPLETE.equals(view.status) ||
@@ -789,7 +815,9 @@ public with sharing class ImportController {
         view.runLog = batch.Run_Log__c;
         view.undoDeadline = batch.Undo_Deadline__c;
         view.canUndo = String.isBlank(ImportUndoService.refusal(batch, view.status));
-        view.controlTotalsAgree = ImportBatchService.controlTotalsAgree(batch);
+        // A retry's file is the fixed rows, which the totals do not describe (R-IB17).
+        view.controlTotalsAgree = view.retrying || ImportBatchService.controlTotalsAgree(batch);
+        view.canRetry = ImportBatchService.retryRefusal(batch) == null;
         return view;
     }
 

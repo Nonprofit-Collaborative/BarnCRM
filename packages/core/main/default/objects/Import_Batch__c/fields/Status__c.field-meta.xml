@@ -41,6 +41,11 @@
         <label>Complete</label>
       </value>
       <value>
+        <fullName>Retrying</fullName>
+        <default>false</default>
+        <label>Retrying</label>
+      </value>
+      <value>
         <fullName>Failed</fullName>
         <default>false</default>
         <label>Failed</label>

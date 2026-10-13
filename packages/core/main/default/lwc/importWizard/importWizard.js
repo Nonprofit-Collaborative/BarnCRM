@@ -104,6 +104,11 @@ import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesL
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
+import openRetry from '@salesforce/apex/ImportController.openRetry';
+import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
+import retryHelp from '@salesforce/label/c.Core_Import_RetryHelp';
+import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
+import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
 import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
@@ -312,7 +317,10 @@ export default class ImportWizard extends LightningElement {
     lookupFieldLabel,
     duplicateRulesLabel,
     duplicateRulesHelp,
-    duplicateRulesNone
+    duplicateRulesNone,
+    retryHeading,
+    retryHelp,
+    retryFileLabel
   };
 
   async connectedCallback() {
@@ -1156,6 +1164,47 @@ export default class ImportWizard extends LightningElement {
     }
   }
 
+  /**
+   * Retries the import's fixed rejected rows into it (R-IB17): the file must carry every
+   * column of the original, its rows are staged after the import's own and previewed, and
+   * the commit then replaces the rejected rows with them.
+   */
+  async handleRetryFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file || !this.batch) {
+      return;
+    }
+    this.message = undefined;
+    this.loading = true;
+    try {
+      const rows = isXlsx(file.name)
+        ? await this.readWorkbook(file)
+        : parseCsv(await this.readText(file));
+      const { headers, records } = toRecords(rows);
+      if (headers.length === 0 || records.length === 0) {
+        this.message = noHeaderRow;
+        return;
+      }
+      const missing = this.headers.filter((heading) => !headers.includes(heading));
+      if (missing.length > 0) {
+        this.message = format(retryColumnsMissing, missing.join(', '));
+        return;
+      }
+      this.batch = await openRetry({ batchId: this.batch.id });
+      this.records = records;
+      await this.stageAllRows();
+      this.batch = await startDryRun({ batchId: this.batch.id });
+      this.rejectedRows = [];
+      this.changedValues = [];
+      this.step = 5;
+      this.startPolling();
+    } catch (error) {
+      this.message = this.errorText(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
   startPolling() {
     this.stopPolling();
     this.pollTimer = setInterval(() => this.refresh(), POLL_INTERVAL_MS);
@@ -1285,8 +1334,14 @@ export default class ImportWizard extends LightningElement {
   get canGoBack() {
     return (
       (this.step > 1 && this.step < 5) ||
-      (this.step === 5 && Boolean(this.batch && this.batch.isFinished))
+      // A retry's preview belongs to a committed import, so there is no step to go back to.
+      (this.step === 5 && Boolean(this.batch && this.batch.isFinished && !this.batch.retrying))
     );
+  }
+
+  /** A finished import whose fixed rejected rows may be retried into it (R-IB17). */
+  get showRetry() {
+    return this.step === 6 && Boolean(this.batch && this.batch.isFinished && this.batch.canRetry);
   }
 
   get cannotLeaveTemplateStep() {

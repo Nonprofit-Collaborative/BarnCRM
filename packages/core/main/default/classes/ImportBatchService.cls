@@ -29,6 +29,15 @@ public with sharing class ImportBatchService {
     public static final String STATUS_UNDONE = 'Undone';
     @NamespaceAccessible
     public static final String STATUS_UNDO_FAILED = 'Undo failed';
+    /** A committed import taking in its fixed rejected rows (R-IB17). */
+    @NamespaceAccessible
+    public static final String STATUS_RETRYING = 'Retrying';
+    /** A rejected row a retry's commit replaced with its fixed row (R-IB17). */
+    @NamespaceAccessible
+    public static final String ROW_STATUS_RETRIED = 'Retried';
+    /** The most fixed rows one retry may stage (R-IB17). */
+    @NamespaceAccessible
+    public static final Integer MAX_RETRY_ROWS = 10000;
 
     /** The chunk size used when the setting is missing or nonsensical. */
     @NamespaceAccessible
@@ -162,14 +171,32 @@ public with sharing class ImportBatchService {
             throw new ImportException(Label.Core_Import_ErrorBatchGone);
         }
         // Rows join a file only while it is being read in: staging into a batch that has run
-        // would flip it back to Parsing, hiding a running job and an undoable commit.
-        if (batch.Status__c != STATUS_DRAFT && batch.Status__c != STATUS_PARSING) {
+        // would flip it back to Parsing, hiding a running job and an undoable commit. A retry
+        // opened on purpose takes the fixed rows (R-IB17).
+        Boolean retrying = STATUS_RETRYING.equals(batch.Status__c);
+        if (batch.Status__c != STATUS_DRAFT && batch.Status__c != STATUS_PARSING && !retrying) {
             throw new ImportException(Label.Core_Import_ErrorStagingClosed);
         }
         if (rows == null || rows.isEmpty()) {
             return batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue();
         }
         Integer start = firstRowNumber == null || firstRowNumber < 1 ? 1 : firstRowNumber;
+        if (retrying) {
+            // A fixed row is numbered after every row the batch had, so the retry reads only
+            // its own rows and the results keep both apart.
+            Integer after = batch.Retry_After_Row__c.intValue();
+            // The header is file row 1, so the fixed rows so far are the file rows before this
+            // page less the header.
+            if (Math.max(start - 2, 0) + rows.size() > MAX_RETRY_ROWS) {
+                throw new ImportException(
+                    String.format(
+                        Label.Core_Import_ErrorRetryTooLarge,
+                        new List<String>{ MAX_RETRY_ROWS.format() }
+                    )
+                );
+            }
+            start = after + start - 1;
+        }
         List<Import_Row__c> staged = new List<Import_Row__c>();
         for (Integer i = 0; i < rows.size(); i++) {
             String raw = JSON.serialize(rows[i]);
@@ -196,9 +223,92 @@ public with sharing class ImportBatchService {
         Integer total =
             (batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue()) + staged.size();
         batch.Row_Count__c = total;
-        batch.Status__c = STATUS_PARSING;
+        batch.Status__c = retrying ? STATUS_RETRYING : STATUS_PARSING;
         Database.update(batch, AccessLevel.USER_MODE);
         return total;
+    }
+
+    /**
+     * Opens a retry of a committed import's rejected rows (R-IB17): the batch takes the fixed
+     * rows numbered after every row it has, and its next dry run and commit read only them, so
+     * the one undo still covers everything the import created. Opened again, it discards the
+     * rows an unfinished retry staged.
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c openRetry(Id batchId) {
+        Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
+        String refused = retryRefusal(batch);
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        Decimal after = batch.Retry_After_Row__c;
+        Integer discarded = 0;
+        if (after == null) {
+            after = ImportBatchSelector.selectLastRowNumber(batch.Id);
+        } else {
+            discarded = discardRetryRows(batch.Id, after);
+        }
+        // The boundary and the status are the package's bookkeeping (ADR-0021).
+        Import_Batch__c opened = new Import_Batch__c(
+            Id = batch.Id,
+            Status__c = STATUS_RETRYING,
+            Retry_After_Row__c = after,
+            Row_Count__c = (batch.Row_Count__c == null ? 0 : batch.Row_Count__c) - discarded
+        );
+        Database.update(opened, AccessLevel.SYSTEM_MODE);
+        return ImportBatchSelector.selectById(batch.Id);
+    }
+
+    /**
+     * Why this batch cannot take a retry, or null (R-IB17): a file import committed by this
+     * user, complete with rejected rows or already retrying, still undoable, with its rows kept
+     * and no pass running.
+     */
+    @NamespaceAccessible
+    public static String retryRefusal(Import_Batch__c batch) {
+        if (batch == null) {
+            return Label.Core_Import_ErrorBatchGone;
+        }
+        Boolean open = batch.Retry_After_Row__c != null;
+        Boolean complete =
+            STATUS_COMPLETE.equals(batch.Status__c) &&
+            batch.Rows_Rejected__c != null &&
+            batch.Rows_Rejected__c > 0;
+        Boolean dataJob =
+            BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c) ||
+            BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c);
+        if (dataJob || !(complete || open) || isRunning(batch)) {
+            return Label.Core_Import_ErrorRetryNotOpen;
+        }
+        if (batch.Committed_By__c != UserInfo.getUserId()) {
+            return Label.Core_Import_ErrorRetryOtherUser;
+        }
+        String undo = ImportUndoService.refusal(batch);
+        if (undo != null) {
+            return undo;
+        }
+        return hasRows(batch.Id) ? null : Label.Core_Import_ErrorRowsRemoved;
+    }
+
+    /** Removes the rows an unfinished retry staged, bounded by its row cap; how many. */
+    private static Integer discardRetryRows(Id batchId, Decimal after) {
+        List<Import_Row__c> staged = [
+            SELECT Id
+            FROM Import_Row__c
+            WHERE Import_Batch__c = :batchId AND Row_Number__c > :after
+            WITH SYSTEM_MODE
+            LIMIT :MAX_RETRY_ROWS
+        ];
+        if (!staged.isEmpty()) {
+            Database.delete(staged, AccessLevel.SYSTEM_MODE);
+        }
+        return staged.size();
+    }
+
+    /** Whether a retry of the batch's rejected rows is open (R-IB17). */
+    @NamespaceAccessible
+    public static Boolean isRetrying(Import_Batch__c batch) {
+        return batch != null && batch.Retry_After_Row__c != null;
     }
 
     /**
@@ -223,7 +333,8 @@ public with sharing class ImportBatchService {
         if (!STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
             throw new ImportException(Label.Core_Import_ErrorDryRunFirst);
         }
-        if (!controlTotalsAgree(batch)) {
+        // A retry's file is the fixed rows, not the file the totals describe (R-IB17).
+        if (!isRetrying(batch) && !controlTotalsAgree(batch)) {
             throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
         }
         return start(batchId, false);
@@ -314,12 +425,17 @@ public with sharing class ImportBatchService {
             // Two passes of one batch at once would each overwrite the other's rows (R-IB13).
             throw new ImportException(Label.Core_Import_ErrorRunInProgress);
         }
-        if (dryRun && hasCommitted(batch)) {
+        Boolean retrying = isRetrying(batch);
+        if (retrying && batch.Committed_By__c != UserInfo.getUserId()) {
+            throw new ImportException(Label.Core_Import_ErrorRetryOtherUser);
+        }
+        if (dryRun && hasCommitted(batch) && !retrying) {
             throw new ImportException(Label.Core_Import_ErrorDryRunAfterCommit);
         }
         // A dry run reads the template as it stands and records it; the commit runs under what
-        // its dry run recorded, whatever has been edited since (R-IB1).
-        Import_Template__c template = dryRun
+        // its dry run recorded, whatever has been edited since (R-IB1). A retry keeps to the
+        // template the import committed under (R-IB17).
+        Import_Template__c template = dryRun && !retrying
             ? ImportTemplateSelector.selectById(batch.Import_Template__c)
             : templateFor(batch);
         if (template == null) {
@@ -357,10 +473,16 @@ public with sharing class ImportBatchService {
         // same two writes here however long the file (R-IB13).
         batch.Pass_Number__c = nextPass(batch);
         batch.Status__c = dryRun ? STATUS_DRY_RUN : STATUS_COMMITTING;
-        batch.Is_Dry_Run__c = dryRun;
-        batch.Started_At__c = Datetime.now();
-        batch.Completed_At__c = null;
-        batch.Run_Log__c = null;
+        if (!retrying) {
+            batch.Is_Dry_Run__c = dryRun;
+            batch.Started_At__c = Datetime.now();
+            batch.Completed_At__c = null;
+            batch.Run_Log__c = null;
+        } else if (!dryRun) {
+            // The retry's commit keeps the import's start and log, so one undo covers both
+            // runs; its finish stamps the new end (R-IB17).
+            batch.Completed_At__c = null;
+        }
         batch.Rows_Created__c = 0;
         batch.Rows_Updated__c = 0;
         batch.Rows_Matched__c = 0;
@@ -385,7 +507,7 @@ public with sharing class ImportBatchService {
             Pass_Number__c = batch.Pass_Number__c,
             Job_Id__c = batch.Job_Id__c
         );
-        if (dryRun) {
+        if (dryRun && !retrying) {
             bookkeeping.Template_Snapshot_JSON__c = JSON.serialize(template);
         }
         Database.update(bookkeeping, AccessLevel.SYSTEM_MODE);
@@ -418,8 +540,8 @@ public with sharing class ImportBatchService {
             Status__c = batch.Status__c,
             Is_Dry_Run__c = batch.Is_Dry_Run__c,
             Started_At__c = batch.Started_At__c,
-            Completed_At__c = null,
-            Run_Log__c = null,
+            Completed_At__c = batch.Completed_At__c,
+            Run_Log__c = batch.Run_Log__c,
             Rows_Created__c = 0,
             Rows_Updated__c = 0,
             Rows_Matched__c = 0,
@@ -559,19 +681,39 @@ public with sharing class ImportBatchService {
         if (batch == null) {
             return null;
         }
-        Map<String, Integer> counts = ImportBatchSelector.countRowsByStatus(batchId);
+        // A retry's preview counts its own rows; its commit counts every row, the replaced
+        // rejects now Retried and counted as nothing (R-IB17).
+        Boolean retrying = isRetrying(batch);
+        Boolean retryPreview = retrying && dryRun == true;
+        Map<String, Integer> counts = retryPreview
+            ? ImportBatchSelector.countRowsByStatusAfter(batchId, batch.Retry_After_Row__c)
+            : ImportBatchSelector.countRowsByStatus(batchId);
         batch.Rows_Created__c = count(counts, ImportRowProcessor.STATUS_CREATED);
         batch.Rows_Updated__c = count(counts, ImportRowProcessor.STATUS_UPDATED);
         batch.Rows_Matched__c = count(counts, ImportRowProcessor.STATUS_MATCHED);
         batch.Rows_Rejected__c = count(counts, ImportRowProcessor.STATUS_REJECTED);
-        batch.Completed_At__c = Datetime.now();
-        batch.File_Amount__c = fileAmount == null ? null : fileAmount.setScale(2);
+        if (!retryPreview) {
+            // A retry's preview leaves the commit's end and file total as they were, which
+            // undo and the control totals read (R-IB17).
+            batch.Completed_At__c = Datetime.now();
+        }
+        if (!retrying) {
+            batch.File_Amount__c = fileAmount == null ? null : fileAmount.setScale(2);
+        }
         if (dryRun == true) {
             batch.Processor_Settings_JSON__c = processorSettings;
         }
         List<String> lines = logLines == null ? new List<String>() : new List<String>(logLines);
-        lines.addAll(controlTotalLines(batch));
+        if (retrying) {
+            // The retry's log follows the import's own.
+            lines.add(0, String.isBlank(batch.Run_Log__c) ? '' : batch.Run_Log__c);
+        } else {
+            lines.addAll(controlTotalLines(batch));
+        }
         batch.Run_Log__c = String.join(lines, '\n').abbreviate(32768);
+        if (retrying && dryRun != true) {
+            batch.Retry_After_Row__c = null;
+        }
         if (failed == true) {
             batch.Status__c = STATUS_FAILED;
         } else if (dryRun == true) {
