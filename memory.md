@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-84).
+Last refreshed from BMemory 2026-10-13 (through D-86).
 
 ## Decision log (plan Section 12)
 
@@ -80,7 +80,7 @@ Last refreshed from BMemory 2026-10-13 (through D-84).
 | D-70 | 2026-10-13 | Record cards (Addresses, Affiliations, Relationships) that refuse a change for lack of access show a friendly message and write no Error Log entry; real failures still logged (Q-06) |
 | D-71 | 2026-10-13 | Rollup totals recalculated just after the save by default (Background), with a "During the save" setting (Q-01, PR #256); modifies ADR-0082 decision 4 via a new ADR written on that branch (number assigned at merge) |
 | D-72 | 2026-10-13 | RollupRecalcAction is global so subscriber Flow Builder can use it (permanent once managed) |
-| D-73 | 2026-10-13 | (amended by D-83) Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 |
+| D-73 | 2026-10-13 | (amended by D-83: InboundGiftAction lives in Connect, which depends on Giving, so Giving's sets cannot grant it) Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 |
 | D-74 | 2026-10-13 | Setup notes for Giving and Connect shown on each module's own page, using Core's note component (keeps ADR-0020) |
 | D-75 | 2026-10-13 | (reversed by D-82) The Bulk Update and Bulk Delete sets' 31 shared grants move into BarnCRM Find and Export (PLATFORM-17) |
 | D-76 | 2026-10-13 | All BarnCRM triggers declare all seven contexts, with a CI check, after PR #229 merges (PLATFORM-18) |
@@ -92,6 +92,8 @@ Last refreshed from BMemory 2026-10-13 (through D-84).
 | D-82 | 2026-10-13 | D-75 reversed: the Bulk Update and Bulk Delete sets keep their own data job read grants (moving them would let Find and Export holders read every data job and the undo journal) |
 | D-83 | 2026-10-13 | Connect's Record Inbound Gift action gets its own small permission set granting only that action (amends D-73) |
 | D-84 | 2026-10-13 | Working agreement: present only Core findings and decisions until the owner starts the modules; module notes go in plan Section 11.5, grouped by module. Goal now: Core v1.0 complete |
+| D-85 | 2026-10-13 | Working agreement: implement recommendations and tell the owner what is being changed, unless really important or contrary to his instructions. Module reviews or audits already in flight can finish; their findings are not processed with him now unless they relate to Core |
+| D-86 | 2026-10-13 | Erase a person: the preview lists activities and files for manual deletion (not erased automatically); Health Check skips erased people; PR #282 accepted at its size |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
