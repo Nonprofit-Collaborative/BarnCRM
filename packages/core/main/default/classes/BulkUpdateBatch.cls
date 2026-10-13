@@ -92,6 +92,10 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             );
             noLongerMatching += ids.size() - current.size();
             apply(checked, current, journal);
+        } catch (BulkUpdateFields.BulkUpdateException refused) {
+            stop(refused);
+        } catch (QueryCompiler.QueryCompilerException refused) {
+            stop(refused);
         } catch (Exception e) {
             failed = true;
             ErrorLogger.log(e, 'BulkUpdateBatch.execute', jobId);
@@ -99,6 +103,16 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
         if (!ImportJournalService.write(jobId, ImportJournalService.PHASE_COMMIT, journal)) {
             journalIncomplete = true;
         }
+    }
+
+    /**
+     * Stops the job for something the person can fix, found when a chunk checks the definition
+     * again (access taken away, a field deleted): the remaining chunks return at once, and the
+     * reason goes in the run log rather than one Error Log row per chunk.
+     */
+    private void stop(Exception refused) {
+        failed = true;
+        stoppedBecause = refused.getMessage();
     }
 
     /**
@@ -142,6 +156,23 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             }
             if (after.isEmpty()) {
                 unchanged++;
+                continue;
+            }
+            // Every saved record can be undone: one whose before and after values are too long
+            // for a journal page (long text) is refused rather than saved without an undo.
+            if (
+                !ImportJournalService.fitsOnAPage(
+                    ImportJournalService.updated(checked.objectName, record.Id, null, before, after)
+                )
+            ) {
+                failedRecords++;
+                journal.add(
+                    ImportJournalService.failed(
+                        checked.objectName,
+                        record.Id,
+                        System.Label.Core_BulkUpdate_ErrorTooLargeToUndo
+                    )
+                );
                 continue;
             }
             toSave.add(change);

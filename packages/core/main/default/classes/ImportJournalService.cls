@@ -273,6 +273,16 @@ public with sharing class ImportJournalService {
     }
 
     /**
+     * Whether one entry fits a journal page on its own. An entry that does not is never
+     * written (see `paginate`), so a caller that must be able to undo what it saves checks
+     * this before saving.
+     */
+    @NamespaceAccessible
+    public static Boolean fitsOnAPage(Map<String, Object> entry) {
+        return document(new List<Map<String, Object>>{ entry }).length() <= maxDocumentLength;
+    }
+
+    /**
      * Splits the entries into pages that each fit the attribute and the entry cap, halving
      * until they do. A single entry too large for a page on its own is never cut short: it is
      * left out and written to the Error Log, and the others are still written (R-IJ1).

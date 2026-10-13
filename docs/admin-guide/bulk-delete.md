@@ -96,7 +96,11 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
   is.
 - **The job was stopped part way.** A job stopped in Setup, or by Salesforce, deleted the
   records of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** still
-  offers to bring back exactly those records.
+  offers to bring back exactly those records. A job also stops when your access to the object
+  is taken away while it runs; the run log says why, and the records it had not reached are
+  left as they were.
+- **Undo is refused in Import.** A bulk delete is undone from the bulk delete history, which
+  brings the records back from the Recycle Bin; the import's own Undo refuses it.
 
 ## Field reference
 

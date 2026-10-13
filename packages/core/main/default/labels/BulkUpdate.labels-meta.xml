@@ -197,8 +197,8 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log line: a bulk update stopped before changing anything, and why.</shortDescription>
-        <value>Stopped before changing anything: {0}</value>
+        <shortDescription>Run log line: a bulk update stopped, and why.</shortDescription>
+        <value>Stopped, leaving every record not yet reached as it was: {0}</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_LogFinished</fullName>
@@ -559,6 +559,22 @@
         <protected>false</protected>
         <shortDescription>Refusal: the steps for a field have problems, listed.</shortDescription>
         <value>Fix the steps for {0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorHouseholdName</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One record: a household's name is kept by household naming.</shortDescription>
+        <value>This is a household, and household naming keeps its name, so it was left as it was. To name it yourself, check Custom name on the household.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkUpdate_ErrorTooLargeToUndo</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>One record: its old and new values are too long to keep for undo.</shortDescription>
+        <value>The old and new values of this record are too long to keep for an undo, so it was left as it was. Change it on the record itself.</value>
     </labels>
     <labels>
         <fullName>Core_BulkUpdate_ErrorStepResult</fullName>
