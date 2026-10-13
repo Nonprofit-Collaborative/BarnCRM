@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customNotifTypeName>BarnCRM job finished</customNotifTypeName>
+  <description>
+    Tells the person who started a long BarnCRM job, such as an import, bulk update or rollup
+    recalculation, that it finished or stopped. Sent by JobNotifier; turned off in BarnCRM Settings.
+  </description>
+  <desktop>true</desktop>
+  <masterLabel>BarnCRM job finished</masterLabel>
+  <mobile>true</mobile>
+</CustomNotificationType>
