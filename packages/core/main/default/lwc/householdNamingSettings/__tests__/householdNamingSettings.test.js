@@ -1,4 +1,6 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import HouseholdNamingSettings from 'c/householdNamingSettings';
 import preview from '@salesforce/apex/HouseholdController.preview';
 import getNamingSettings from '@salesforce/apex/HouseholdController.getNamingSettings';
@@ -80,6 +82,8 @@ describe('c-household-naming-settings', () => {
     getNamingSettings.mockResolvedValue(SAVED);
     recomputeAll.mockResolvedValue('707000000000000AAA');
     saveSettings.mockResolvedValue();
+    BarnConfirmModal.open.mockResolvedValue(true);
+    jest.spyOn(Toast, 'show');
   });
 
   afterEach(() => {
@@ -181,12 +185,25 @@ describe('c-household-naming-settings', () => {
 
     element.shadowRoot.querySelector('.recompute-button').dispatchEvent(new CustomEvent('click'));
     await flush();
-    expect(recomputeAll).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('.confirm-box')).not.toBeNull();
-
-    element.shadowRoot.querySelector('.confirm-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'c.Core_HouseholdNamingSettings_RecomputeConfirm' })
+    );
     expect(recomputeAll).toHaveBeenCalled();
+    expect(Toast.show).toHaveBeenCalledWith(
+      { label: 'c.Core_HouseholdNamingSettings_RecomputeStarted', variant: 'success' },
+      expect.anything()
+    );
+  });
+
+  it('does not recompute when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = build();
+    await flush();
+
+    element.shadowRoot.querySelector('.recompute-button').dispatchEvent(new CustomEvent('click'));
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    expect(recomputeAll).not.toHaveBeenCalled();
   });
 
   it('leaves the fields editable for a user who may change settings', async () => {

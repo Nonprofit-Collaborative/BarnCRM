@@ -43,41 +43,19 @@
                 </template>
 
                 <template if:true={canManage}>
-                    <template if:false={showConfirm}>
-                        <lightning-button
-                            variant="brand"
-                            label={labels.loadButtonLabel}
-                            onclick={handleLoadClick}
-                            disabled={loadDisabled}
-                            class="slds-m-right_small"
-                        ></lightning-button>
-                        <lightning-button
-                            variant="destructive"
-                            label={labels.removeButtonLabel}
-                            onclick={handleRemoveClick}
-                            disabled={removeDisabled}
-                        ></lightning-button>
-                    </template>
-
-                    <template if:true={showConfirm}>
-                        <div class="slds-box slds-m-top_small">
-                            <p class="slds-text-heading_small slds-m-bottom_x-small">{confirmTitle}</p>
-                            <p class="slds-m-bottom_small">{confirmBody}</p>
-                            <lightning-button
-                                variant="neutral"
-                                label={labels.cancelButtonLabel}
-                                onclick={handleCancel}
-                                disabled={isBusy}
-                                class="slds-m-right_small"
-                            ></lightning-button>
-                            <lightning-button
-                                variant="brand"
-                                label={labels.confirmButtonLabel}
-                                onclick={handleConfirm}
-                                disabled={isBusy}
-                            ></lightning-button>
-                        </div>
-                    </template>
+                    <lightning-button
+                        variant="brand"
+                        label={labels.loadButtonLabel}
+                        onclick={handleLoadClick}
+                        disabled={loadDisabled}
+                        class="slds-m-right_small"
+                    ></lightning-button>
+                    <lightning-button
+                        variant="destructive"
+                        label={labels.removeButtonLabel}
+                        onclick={handleRemoveClick}
+                        disabled={removeDisabled}
+                    ></lightning-button>
                 </template>
             </template>
         </div>

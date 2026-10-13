@@ -1,6 +1,7 @@
 import { LightningElement, wire, track } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 import getAccessOverview from '@salesforce/apex/AccessController.getAccessOverview';
 import searchUsersApex from '@salesforce/apex/AccessController.searchUsers';
@@ -106,28 +107,9 @@ export default class AccessManager extends LightningElement {
   highlightedIndex = -1;
   selectedUser;
   selectedRole = '';
-  pendingAction;
 
   overviewResult;
   pendingSearchTerm;
-
-  /** The confirmation whose heading already has focus, so it is focused once per opening. */
-  focusedConfirmation;
-
-  /**
-   * Moves focus to the confirmation's heading when it opens, so a keyboard or screen reader
-   * user hears the question rather than having to find it below the table.
-   */
-  renderedCallback() {
-    const open = this.pendingAction;
-    if (open && open !== this.focusedConfirmation) {
-      const heading = this.template.querySelector('[data-id="confirmation-heading"]');
-      if (heading) {
-        heading.focus();
-      }
-    }
-    this.focusedConfirmation = open;
-  }
 
   @wire(getAccessOverview)
   handleOverview(response) {
@@ -230,45 +212,15 @@ export default class AccessManager extends LightningElement {
     return !this.canSubmit;
   }
 
-  /** @returns {boolean} true when a confirmation is on screen */
-  get showConfirmation() {
-    return Boolean(this.pendingAction);
-  }
-
-  /** @returns {string} the heading of the confirmation on screen */
-  get confirmationTitle() {
-    if (!this.pendingAction) {
-      return '';
-    }
-    return this.pendingAction.isAssign
-      ? this.labels.confirmAddTitle
-      : this.labels.confirmRemoveTitle;
-  }
-
-  /** @returns {string} the question the confirmation asks */
-  get confirmationMessage() {
-    if (!this.pendingAction) {
-      return '';
-    }
-    const template = this.pendingAction.isAssign ? CONFIRM_ADD_MESSAGE : CONFIRM_REMOVE_MESSAGE;
-    return format(template, [this.pendingAction.userName, this.pendingAction.roleLabel]);
-  }
-
-  /** @returns {string} the button that carries out the confirmed action */
-  get confirmationButtonLabel() {
-    if (!this.pendingAction) {
-      return '';
-    }
-    return this.pendingAction.isAssign ? this.labels.addButton : this.labels.removeButton;
-  }
-
-  /** @returns {boolean} true when the person is about to remove their own admin role */
-  get showSelfRemovalWarning() {
-    return Boolean(
-      this.pendingAction &&
-      !this.pendingAction.isAssign &&
-      this.pendingAction.roleDeveloperName === ADMIN_ROLE &&
-      this.pendingAction.userId === this.currentUserId
+  /**
+   * @param {object} action the change about to be confirmed
+   * @returns {boolean} true when the person is about to remove their own admin role
+   */
+  isSelfRemoval(action) {
+    return (
+      !action.isAssign &&
+      action.roleDeveloperName === ADMIN_ROLE &&
+      action.userId === this.currentUserId
     );
   }
 
@@ -381,15 +333,15 @@ export default class AccessManager extends LightningElement {
   handleAddClick() {
     if (!this.selectedUser || !this.selectedRole) {
       this.showError(ERROR_INVALID_INPUT);
-      return;
+      return Promise.resolve();
     }
-    this.pendingAction = {
+    return this.confirmAndRun({
       isAssign: true,
       userId: this.selectedUser.userId,
       userName: this.selectedUser.name,
       roleDeveloperName: this.selectedRole,
       roleLabel: this.roleLabelFor(this.selectedRole)
-    };
+    });
   }
 
   /**
@@ -399,30 +351,47 @@ export default class AccessManager extends LightningElement {
    */
   handleRemoveClick(event) {
     const { userId, userName, role } = event.currentTarget.dataset;
-    this.pendingAction = {
+    return this.confirmAndRun({
       isAssign: false,
       userId,
       userName,
       roleDeveloperName: role,
       roleLabel: this.roleLabelFor(role)
-    };
+    });
   }
 
-  /** Closes the confirmation without changing anything. */
-  handleCancel() {
-    this.pendingAction = undefined;
-  }
-
-  /** Carries out the confirmed change. */
-  handleConfirm() {
-    const action = this.pendingAction;
-    if (!action) {
-      return;
+  /**
+   * Asks the person to confirm a change in a modal, and carries it out when they do.
+   * Cancel, Escape and the close button change nothing.
+   *
+   * @param {object} action the change: isAssign, userId, userName, roleDeveloperName, roleLabel
+   * @returns {Promise} settles once the change is done or declined
+   */
+  async confirmAndRun(action) {
+    const template = action.isAssign ? CONFIRM_ADD_MESSAGE : CONFIRM_REMOVE_MESSAGE;
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: action.isAssign ? this.labels.confirmAddTitle : this.labels.confirmRemoveTitle,
+      message: format(template, [action.userName, action.roleLabel]),
+      details: this.isSelfRemoval(action) ? [this.labels.selfRemovalWarning] : [],
+      confirmLabel: action.isAssign ? this.labels.addButton : this.labels.removeButton,
+      cancelLabel: this.labels.cancelButton
+    });
+    if (confirmed) {
+      await this.run(action);
     }
-    this.pendingAction = undefined;
+  }
+
+  /**
+   * Carries out a confirmed change.
+   *
+   * @param {object} action the change the person confirmed
+   * @returns {Promise} settles once the change is done
+   */
+  run(action) {
     this.working = true;
     const call = action.isAssign ? assignRoleApex : removeRoleApex;
-    call({ userId: action.userId, roleDeveloperName: action.roleDeveloperName })
+    return call({ userId: action.userId, roleDeveloperName: action.roleDeveloperName })
       .then((result) => {
         if (result && result.success) {
           const template = action.isAssign ? ASSIGN_SUCCESS : REMOVE_SUCCESS;
@@ -467,9 +436,7 @@ export default class AccessManager extends LightningElement {
    * @param {string} message what to say
    */
   showSuccess(message) {
-    this.dispatchEvent(
-      new ShowToastEvent({ title: TOAST_SUCCESS_TITLE, message, variant: 'success' })
-    );
+    Toast.show({ label: TOAST_SUCCESS_TITLE, message, variant: 'success' }, this);
   }
 
   /**
@@ -478,13 +445,14 @@ export default class AccessManager extends LightningElement {
    * @param {string} message what to say
    */
   showError(message) {
-    this.dispatchEvent(
-      new ShowToastEvent({
-        title: TOAST_ERROR_TITLE,
+    Toast.show(
+      {
+        label: TOAST_ERROR_TITLE,
         message: message || ERROR_UNEXPECTED,
         variant: 'error',
         mode: 'sticky'
-      })
+      },
+      this
     );
   }
 }

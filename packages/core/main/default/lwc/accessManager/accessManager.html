@@ -106,38 +106,6 @@
                 </p>
             </template>
 
-            <template if:true={showConfirmation}>
-                <!-- An inline box, not a modal: role="region", and focus moves to its heading when it opens. -->
-                <section
-                    class="slds-box slds-var-m-top_medium"
-                    role="region"
-                    aria-label={confirmationTitle}
-                    data-id="confirmation"
-                >
-                    <h2 class="slds-text-heading_small" tabindex="-1" data-id="confirmation-heading">
-                        {confirmationTitle}
-                    </h2>
-                    <p class="slds-var-m-vertical_x-small">{confirmationMessage}</p>
-                    <template if:true={showSelfRemovalWarning}>
-                        <p class="slds-var-m-bottom_x-small" data-id="self-removal-warning">
-                            {labels.selfRemovalWarning}
-                        </p>
-                    </template>
-                    <lightning-button
-                        variant="brand"
-                        data-id="confirm-button"
-                        label={confirmationButtonLabel}
-                        onclick={handleConfirm}
-                    ></lightning-button>
-                    <lightning-button
-                        class="slds-var-m-left_x-small"
-                        data-id="cancel-button"
-                        label={labels.cancelButton}
-                        onclick={handleCancel}
-                    ></lightning-button>
-                </section>
-            </template>
-
             <div class="slds-grid slds-wrap slds-gutters slds-var-m-top_medium">
                 <template for:each={roleCards} for:item="role">
                     <div

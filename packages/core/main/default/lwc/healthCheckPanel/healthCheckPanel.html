@@ -34,41 +34,6 @@
                 </p>
             </template>
 
-            <template if:true={pendingFix}>
-                <section
-                    class="slds-box slds-theme_shade slds-m-bottom_medium"
-                    data-id="confirm"
-                    role="dialog"
-                    aria-labelledby="confirm-heading"
-                    aria-describedby="confirm-detail"
-                    tabindex="-1"
-                    onkeydown={handleConfirmKeydown}
-                >
-                    <h2 class="slds-text-heading_small" id="confirm-heading">{labels.confirmHeading}</h2>
-                    <p class="slds-text-body_small slds-m-top_xx-small">{labels.confirmIntro}</p>
-                    <p class="slds-m-top_x-small slds-text-title_bold" data-id="confirm-title">
-                        {pendingFix.title}
-                    </p>
-                    <p class="slds-text-body_small" data-id="confirm-detail" id="confirm-detail">
-                        {pendingFix.detail}
-                    </p>
-                    <div class="slds-m-top_small">
-                        <lightning-button
-                            class="slds-m-right_x-small"
-                            label={labels.cancel}
-                            onclick={handleCancelFix}
-                            data-id="confirm-cancel"
-                        ></lightning-button>
-                        <lightning-button
-                            variant="brand"
-                            label={labels.confirm}
-                            onclick={handleConfirmFix}
-                            data-id="confirm-run"
-                        ></lightning-button>
-                    </div>
-                </section>
-            </template>
-
             <template if:true={isReadOnly}>
                 <p class="slds-text-body_small slds-m-bottom_small" data-id="read-only">
                     {labels.readOnly}
