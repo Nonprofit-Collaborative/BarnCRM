@@ -132,6 +132,13 @@ Your org uses the flexible way of belonging, where the field follows whoever is 
 primary on the household's members. Use **Make primary** on the **Household Members** panel
 instead; the field updates on its own.
 
+**"A membership record I made by hand, or loaded, was refused."**
+In the flexible way, a membership record names exactly one person: a contact or a person
+account, never both and never neither. A person can also have only one current membership
+in a household, so a second one for the same person and household is refused with "This
+person is already a current member of this household." Edit the membership they already
+have instead. An ended membership beside a current one is history and is kept.
+
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account
 while the org uses the simple way of belonging, because that move cannot be carried out.

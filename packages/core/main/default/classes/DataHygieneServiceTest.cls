@@ -156,14 +156,24 @@ private class DataHygieneServiceTest {
             mode(HouseholdTestDataFactory.MODE_JUNCTION);
             Account household = HouseholdTestDataFactory.newHousehold('The Kept Family');
             insert household;
+            // A membership is saved naming a person (R-M4); it comes to name nobody when that
+            // person is deleted with the household automation off, which is how it happens.
+            List<Contact> gone = insertWithoutAutomaticHouseholds(
+                HouseholdTestDataFactory.manyContacts(200, 'Gone')
+            );
             List<Household_Member__c> rows = new List<Household_Member__c>();
-            for (Integer index = 0; index < 200; index++) {
-                rows.add(new Household_Member__c(Household__c = household.Id));
+            for (Contact goner : gone) {
+                rows.add(
+                    new Household_Member__c(Household__c = household.Id, Contact__c = goner.Id)
+                );
             }
             Contact person = HouseholdTestDataFactory.newContact('Eve', 'Named');
             insertWithoutAutomaticHouseholds(new List<Contact>{ person });
             rows.add(new Household_Member__c(Household__c = household.Id, Contact__c = person.Id));
             insert rows;
+            AutomationControl.bypass('ContactTriggerHandler');
+            delete gone;
+            AutomationControl.clearBypass('ContactTriggerHandler');
             User maria = maria();
 
             DataHygieneService.CheckResult result = runAs(

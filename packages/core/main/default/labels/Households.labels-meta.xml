@@ -9,6 +9,14 @@
         <value>and</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ErrorAlreadyCurrentMember</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A second current membership of one person in one household</shortDescription>
+        <value>This person is already a current member of this household. Edit their existing membership instead of adding another.</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_ErrorContextMembership</fullName>
         <categories>Households</categories>
         <language>en_US</language>

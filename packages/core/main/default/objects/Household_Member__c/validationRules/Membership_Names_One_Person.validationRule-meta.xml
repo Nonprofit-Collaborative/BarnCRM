@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Membership_Names_One_Person</fullName>
+  <active>true</active>
+  <description>A membership names exactly one person: a contact, or a person stored as an account (canonical model R-M4). A row the platform emptied when its person was deleted is left alone until somebody changes who it names.</description>
+  <errorConditionFormula>AND(IF(NOT(ISBLANK(Contact__c)), 1, 0) + IF(NOT(ISBLANK(Account__c)), 1, 0) != 1, OR(ISNEW(), ISCHANGED(Contact__c), ISCHANGED(Account__c)))</errorConditionFormula>
+  <errorMessage>A membership names one person: either a contact or a person account. Choose only one.</errorMessage>
+</ValidationRule>
