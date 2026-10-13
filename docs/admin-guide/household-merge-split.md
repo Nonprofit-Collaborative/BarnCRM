@@ -71,9 +71,10 @@ Maria does this from the sample data, after an import left her with the Garcia f
 6. Choose the values you want to keep. Take the name **The Garcia Family**, the anniversary
    from the duplicate (the import brought it in and the original never had one), and the
    left-hand address.
-7. Click **Merge**. A confirmation appears saying which household survives, which one goes
-   away, and that a merge cannot be undone. Read it, then click **Merge households**.
-8. You land on the surviving household. It lists all of the members from both households,
+7. Click **Merge**. A dialog opens saying which household survives, which one goes away, and
+   that a merge cannot be undone. Read it, then click **Merge households** (or **Cancel** or
+   the Escape key to go back without merging).
+8. The window closes and the surviving household refreshes in place. It lists all of the members from both households,
    the member count is right, and the name has been recalculated from the members unless you
    chose to keep a custom name. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
@@ -83,8 +84,9 @@ Maria does this from the sample data, after an import left her with the Garcia f
 9. Still on the Garcia household, click **Merge or split households** again and choose the
    **Split** tab.
 10. Tick **Diego Garcia** in the member list.
-11. Leave **A new household** selected and click **Split**. Confirm.
-12. You land on Diego's new household, named **The Garcia Family** because that is what
+11. Leave **A new household** selected and click **Split**. A dialog headed **Split this
+    household?** opens; click **Split**.
+12. The window closes and you land on Diego's new household, named **The Garcia Family** because that is what
     its one member makes it. Go back to the household you split him out of: its member
     count is one lower. Both names were recalculated for you.
 
