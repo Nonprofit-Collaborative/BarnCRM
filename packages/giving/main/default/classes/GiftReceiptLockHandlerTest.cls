@@ -311,9 +311,10 @@ private class GiftReceiptLockHandlerTest {
                 'And the receipt the donor is holding.'
             );
             Assert.isTrue(
-                logged[0].Message__c.contains('amount') &&
-                    logged[0].Message__c.contains('gift date') &&
-                    logged[0].Message__c.contains('donor contact'),
+                logged[0].Message__c.contains(Gift__c.Amount__c.getDescribe().getLabel()) &&
+                    logged[0].Message__c.contains(Gift__c.Gift_Date__c.getDescribe().getLabel()) &&
+                    logged[0]
+                        .Message__c.contains(Gift__c.Donor_Contact__c.getDescribe().getLabel()),
                 'And each value that moved, so the change can be reconstructed: ' +
                 logged[0].Message__c
             );
@@ -350,7 +351,7 @@ private class GiftReceiptLockHandlerTest {
                 'At Warning, which is what the Error Log page filters on.'
             );
             Assert.isTrue(
-                logged[0].Message__c.contains('the gift was deleted'),
+                logged[0].Message__c.contains(Label.Giving_Gift_OverrideDeleted),
                 'Saying what was done, not just that something was: ' + logged[0].Message__c
             );
         }

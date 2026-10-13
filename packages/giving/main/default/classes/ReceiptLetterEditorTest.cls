@@ -73,6 +73,7 @@ private class ReceiptLetterEditorTest {
     @IsTest
     static void thePreviewFillsInASampleGiftAndWritesNothing() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTemplateService.managePermission = true;
             Integer dmlBefore = Limits.getDmlStatements();
             Integer receiptsBefore = [SELECT COUNT() FROM Receipt__c];
 
@@ -109,6 +110,7 @@ private class ReceiptLetterEditorTest {
     @IsTest
     static void aStatementPreviewPutsTheGiftLinesWhereTheParagraphTokenIs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTemplateService.managePermission = true;
             Test.startTest();
             String html = ReceiptController.previewTemplate(
                 ReceiptNumberSequence.TYPE_STATEMENT,
@@ -134,8 +136,31 @@ private class ReceiptLetterEditorTest {
     }
 
     @IsTest
+    static void aLetterCannotBePreviewedWithoutPermissionToManageLetters() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTemplateService.managePermission = false;
+            Test.startTest();
+            try {
+                ReceiptController.previewTemplate(
+                    ReceiptNumberSequence.TYPE_PER_GIFT,
+                    '<p>Dear {{DonorName}}.</p>'
+                );
+                Assert.fail('A user who may not edit letters previewed one.');
+            } catch (AuraHandledException refused) {
+                Assert.areEqual(
+                    Label.Giving_Receipt_NoTemplatePermission,
+                    refused.getMessage(),
+                    'It names the role to ask for.'
+                );
+            }
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
     static void anEmptyLetterCannotBePreviewed() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTemplateService.managePermission = true;
             Test.startTest();
             try {
                 ReceiptController.previewTemplate(ReceiptNumberSequence.TYPE_PER_GIFT, ' ');

@@ -95,7 +95,7 @@
                 </div>
                 <template lwc:if={estimate}>
                     <div class="slds-box slds-var-m-top_small" data-id="estimate">
-                        <p data-id="estimate-summary">{estimate.summary}</p>
+                        <p role="status" data-id="estimate-summary">{estimate.summary}</p>
                         <template lwc:if={estimate.workingHours}>
                             <p class="slds-text-color_error" data-id="working-hours">
                                 {labels.workingHours}

@@ -8,14 +8,18 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
     }
 
     public override void beforeInsert() {
-        GiftPostingLock.enforceOnAllocations((List<Gift_Allocation__c>) Trigger.new, null, 'added');
+        GiftPostingLock.enforceOnAllocations(
+            (List<Gift_Allocation__c>) Trigger.new,
+            null,
+            Label.Giving_Posting_OverrideAllocationAdded
+        );
     }
 
     public override void beforeUpdate() {
         GiftPostingLock.enforceOnAllocations(
             (List<Gift_Allocation__c>) Trigger.new,
             (Map<Id, Gift_Allocation__c>) Trigger.oldMap,
-            'changed'
+            Label.Giving_Posting_OverrideAllocationChanged
         );
     }
 
@@ -23,7 +27,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
         GiftPostingLock.enforceOnAllocations(
             (List<Gift_Allocation__c>) Trigger.old,
             null,
-            'deleted'
+            Label.Giving_Posting_OverrideAllocationDeleted
         );
     }
 
@@ -32,7 +36,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
         GiftPostingLock.enforceOnAllocations(
             (List<Gift_Allocation__c>) Trigger.new,
             null,
-            'restored'
+            Label.Giving_Posting_OverrideAllocationRestored
         );
     }
 }

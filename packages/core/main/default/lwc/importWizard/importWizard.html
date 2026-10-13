@@ -97,7 +97,7 @@
                     ></lightning-input>
                     <p class="slds-text-body_small slds-var-m-top_x-small">{labels.uploadHint}</p>
                     <template lwc:if={parsing}>
-                        <p class="slds-text-body_small" data-id="parsing">
+                        <p role="status" class="slds-text-body_small" data-id="parsing">
                             {labels.parsingMessage}
                         </p>
                     </template>

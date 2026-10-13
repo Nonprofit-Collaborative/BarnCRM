@@ -122,7 +122,7 @@ private class OpportunityMirrorUnavailableTest {
             OpportunityMirrorService.unavailableForTest = true;
             Gift__c given = GivingTestDataFactory.buildGift(luisId(), 40);
             // Brought in from another system: the value is kept as it was typed.
-            given.Opportunity_Id__c = '006000000000001AAA';
+            given.Opportunity_Id__c = FakeIds.ofPrefix('006', 1);
 
             Test.startTest();
             System.runAs(maria()) {

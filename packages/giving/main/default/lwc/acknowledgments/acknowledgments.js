@@ -32,6 +32,9 @@ import RULES_HEADING from '@salesforce/label/c.Giving_Acknowledgments_RulesHeadi
 import NEW_RULE from '@salesforce/label/c.Giving_Acknowledgments_NewRule';
 import EDIT_RULE from '@salesforce/label/c.Giving_Acknowledgments_EditRule';
 import EDIT_RULE_OF from '@salesforce/label/c.Giving_Acknowledgments_EditRuleOf';
+import MATCH_FROM_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_MatchFromAmount';
+import MATCH_UP_TO_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_MatchUpToAmount';
+import MATCH_FIRST_GIFT_ONLY from '@salesforce/label/c.Giving_Acknowledgments_MatchFirstGiftOnly';
 import NEW_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_NewRuleHeading';
 import EDIT_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_EditRuleHeading';
 import TEMPLATE_FIELD from '@salesforce/label/c.Giving_Acknowledgments_TemplateField';
@@ -264,10 +267,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
   describe(rule) {
     const parts = [];
     if (rule.minimumAmount !== null && rule.minimumAmount !== undefined) {
-      parts.push(`${rule.minimumAmount} and up`);
+      parts.push(MATCH_FROM_AMOUNT.replace('{0}', rule.minimumAmount));
     }
     if (rule.maximumAmount !== null && rule.maximumAmount !== undefined) {
-      parts.push(`up to ${rule.maximumAmount}`);
+      parts.push(MATCH_UP_TO_AMOUNT.replace('{0}', rule.maximumAmount));
     }
     if (rule.giftType) {
       parts.push(rule.giftType);
@@ -276,7 +279,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       parts.push(rule.appealName);
     }
     if (rule.firstGiftOnly) {
-      parts.push('first gift only');
+      parts.push(MATCH_FIRST_GIFT_ONLY);
     }
     return parts.length ? parts.join(', ') : ANY_AMOUNT;
   }

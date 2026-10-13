@@ -24,10 +24,26 @@ find the right feature string for your entitlement.
 
 Two things follow from that.
 
-**The `NonprofitCloud` feature string in the definition file is unverified.** Nobody has run
-this shape against an entitled Dev Hub yet. If creation fails naming an unknown feature, the
-error lists what your Dev Hub can grant: take the right name from that list and correct
-`config/scratch-defs/nonprofit-cloud.json`. That is the one line expected to need editing.
+**The definition file is unverified.** Nobody has run this shape against an entitled Dev Hub
+yet. It asks for what Salesforce's Nonprofit Cloud developer documentation lists for a
+Nonprofit Cloud scratch org, rather than the single `NonprofitCloud` string it used before,
+which is not a documented feature:
+
+| Entry                                                              | What it turns on                            | Status     |
+| ------------------------------------------------------------------ | ------------------------------------------- | ---------- |
+| Feature `PersonAccounts`                                           | Person accounts (Nonprofit Cloud needs them) | Verified on the Person Accounts shape |
+| Feature `ContactsToMultipleAccounts`                               | Contacts related to several accounts        | Unverified |
+| Feature `Fundraising`                                              | Fundraising objects (Gift Transaction, and so on) | Unverified |
+| Feature `ProgramManagement`                                        | Program and benefit objects                 | Unverified |
+| `accountSettings.enableRelateContactToMultipleAccounts`            | The setting behind the feature above        | Unverified |
+| `industriesSettings.enableFundraising`                             | Fundraising in Setup                        | Unverified |
+| `industriesSettings.enableGiftEntryGrid`                           | Gift entry grid                             | Unverified |
+| `industriesSettings.enableGroupMembershipPref`                     | Household (group) membership                | Unverified |
+| `industriesSettings.enableBenefitManagementPreference`             | Benefit management                          | Unverified |
+
+If creation fails naming an unknown feature or setting, the error lists what your Dev Hub can
+grant: take the right name from that list, correct `config/scratch-defs/nonprofit-cloud.json`,
+and mark the row verified here.
 
 **Continuous integration does not run this shape at all.** An earlier version of this page
 said it runs when `nonprofit-cloud` is named in an `SF_ORG_TEST_SHAPES` repository variable.

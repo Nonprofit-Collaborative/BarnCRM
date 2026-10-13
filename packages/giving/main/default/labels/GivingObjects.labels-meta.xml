@@ -280,4 +280,36 @@
         <shortDescription>Error Log entry for a gift set back to Pending</shortDescription>
         <value>Gift {0} set back from Cancelled to Pending.</value>
     </labels>
+    <labels>
+        <fullName>Giving_Gift_OverrideCreatedWithNumber</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Receipt lock override: gift created with a receipt number</shortDescription>
+        <value>the gift was created already carrying that receipt number</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Gift_OverrideDeleted</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Receipt lock override: gift deleted</shortDescription>
+        <value>the gift was deleted</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Gift_OverrideChange</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Lock override log: one field, its old and new value</shortDescription>
+        <value>{0} {1} to {2}</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Gift_OverrideValueNone</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Lock override log: an empty value</shortDescription>
+        <value>none</value>
+    </labels>
 </CustomLabels>

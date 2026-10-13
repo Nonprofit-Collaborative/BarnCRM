@@ -4,13 +4,13 @@
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
       <template lwc:if={hasError}>
-        <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
 
       <template lwc:if={hasNotice}>
-        <p data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
+        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
           {noticeMessage}
         </p>
       </template>
@@ -34,7 +34,7 @@
               <th scope="col">{labels.columnSteps}</th>
               <th scope="col">{labels.columnRunning}</th>
               <th scope="col">{labels.columnActive}</th>
-              <th scope="col"></th>
+              <th scope="col"><span class="slds-assistive-text">{labels.columnActions}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -48,6 +48,9 @@
                     label={plan.name}
                     onclick={handleSelect}
                   ></lightning-button>
+                  <template lwc:if={plan.isSelected}>
+                    <span class="slds-assistive-text" data-id="plan-selected">{labels.selected}</span>
+                  </template>
                 </td>
                 <td data-id="plan-event" data-label={labels.columnEvent}>{plan.triggerEvent}</td>
                 <td data-id="plan-steps" data-label={labels.columnSteps}>{plan.stepCount}</td>
@@ -162,7 +165,7 @@
                   <th scope="col">{labels.stepDays}</th>
                   <th scope="col">{labels.stepAssign}</th>
                   <th scope="col">{labels.stepPriority}</th>
-                  <th scope="col"></th>
+                  <th scope="col"><span class="slds-assistive-text">{labels.columnActions}</span></th>
                 </tr>
               </thead>
               <tbody>

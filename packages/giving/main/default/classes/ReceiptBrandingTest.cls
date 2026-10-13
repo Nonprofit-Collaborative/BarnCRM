@@ -235,7 +235,7 @@ private class ReceiptBrandingTest {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
             giving.SetupOwnerId = UserInfo.getOrganizationId();
-            giving.Receipt_Logo_Document_Id__c = '069000000000000AAA';
+            giving.Receipt_Logo_Document_Id__c = FakeIds.of(ContentDocument.SObjectType, 0);
             upsert giving;
             ReceiptLogoSource.reset();
 

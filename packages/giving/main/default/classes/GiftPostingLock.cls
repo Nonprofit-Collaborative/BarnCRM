@@ -124,8 +124,8 @@ public with sharing class GiftPostingLock {
                     describe(
                         gift.Id,
                         isUndelete
-                            ? 'the gift was restored into the books'
-                            : 'the gift was created in the books'
+                            ? Label.Giving_Posting_OverrideRestored
+                            : Label.Giving_Posting_OverrideCreated
                     )
                 );
             } else if (isUndelete) {
@@ -171,10 +171,7 @@ public with sharing class GiftPostingLock {
                 List<String> moved = changesTo(LOCKED_FIELDS, previous, gift);
                 if (!isInBooks(gift)) {
                     moved.add(
-                        'status ' +
-                            valueOrNone(previous.Status__c) +
-                            ' to ' +
-                            valueOrNone(gift.Status__c)
+                        GiftService.change(Gift__c.Status__c, previous.Status__c, gift.Status__c)
                     );
                 }
                 if (!moved.isEmpty()) {
@@ -183,7 +180,10 @@ public with sharing class GiftPostingLock {
                 }
             } else if (isInBooks(gift) && isInClosedPeriod(gift.Gift_Date__c, closed)) {
                 changes.add(
-                    'the gift entered the books dated ' + String.valueOf(gift.Gift_Date__c)
+                    String.format(
+                        Label.Giving_Posting_OverrideEnteredBooks,
+                        new List<String>{ String.valueOf(gift.Gift_Date__c) }
+                    )
                 );
                 refusal = String.format(
                     Label.Giving_Posting_ClosedPeriodNewGift,
@@ -220,7 +220,7 @@ public with sharing class GiftPostingLock {
                 continue;
             }
             if (overridden) {
-                overrides.add(describe(gift.Id, 'the gift was deleted'));
+                overrides.add(describe(gift.Id, Label.Giving_Posting_OverrideDeleted));
             } else {
                 gift.addError(refusal);
             }
@@ -257,7 +257,7 @@ public with sharing class GiftPostingLock {
                 continue;
             }
             if (overridden) {
-                overrides.add(describe(record.Id, 'a donor named by a locked gift was deleted'));
+                overrides.add(describe(record.Id, Label.Giving_Posting_OverrideDonorDeleted));
             } else {
                 record.addError(Label.Giving_Posting_DonorLocked);
             }
@@ -299,7 +299,8 @@ public with sharing class GiftPostingLock {
     /**
      * An allocation of a locked gift is not inserted, changed in fund or amount, or deleted.
      * `oldAllocations` is null on insert and on delete; `records` is the new rows on insert and
-     * update and the old rows on delete.
+     * update and the old rows on delete. `action` is the translated Error Log phrase for what
+     * happened to the allocation, used when an override lets it through.
      */
     public static void enforceOnAllocations(
         List<Gift_Allocation__c> records,
@@ -338,7 +339,7 @@ public with sharing class GiftPostingLock {
                 continue;
             }
             if (overridden) {
-                overrides.add(describe(allocation.Gift__c, 'an allocation was ' + action));
+                overrides.add(describe(allocation.Gift__c, action));
             } else {
                 allocation.addError(Label.Giving_Posting_AllocationLocked);
             }
@@ -412,13 +413,7 @@ public with sharing class GiftPostingLock {
             Object before = previous.get(field);
             Object after = current.get(field);
             if (differs(before, after)) {
-                changes.add(
-                    field.getDescribe().getLocalName() +
-                        ' ' +
-                        valueOrNone(before) +
-                        ' to ' +
-                        valueOrNone(after)
-                );
+                changes.add(GiftService.change(field, before, after));
             }
         }
         return changes;
@@ -440,9 +435,5 @@ public with sharing class GiftPostingLock {
             Label.Giving_Posting_OverrideLogged,
             new List<String>{ String.valueOf(giftId), what }
         );
-    }
-
-    private static String valueOrNone(Object value) {
-        return value == null ? 'none' : String.valueOf(value);
     }
 }

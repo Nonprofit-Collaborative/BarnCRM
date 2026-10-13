@@ -68,6 +68,7 @@
     <connector>
       <targetReference>Recalculate_rollups</targetReference>
     </connector>
+    <filterFormula>NOT(ISBLANK({!$Record.Id}))</filterFormula>
     <object>Contact</object>
     <recordTriggerType>CreateAndUpdate</recordTriggerType>
     <triggerType>RecordAfterSave</triggerType>

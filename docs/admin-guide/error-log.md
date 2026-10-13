@@ -30,7 +30,9 @@ You will find it in two places:
   it, filter it, and build reports on it like any other list in Salesforce.
 
 Everyone with the BarnCRM Staff or BarnCRM Admin role can read the Error Log. Only the
-BarnCRM Admin role can change an entry's status.
+BarnCRM Admin role can change an entry's status, and only the BarnCRM Admin role sees an
+entry's **Technical detail**: the error Salesforce raised can repeat values from a record
+that a colleague's own access would not show them.
 
 Errors are recorded whatever else is happening: turning an automation off, or pausing all
 automation, never stops the Error Log from recording a problem.

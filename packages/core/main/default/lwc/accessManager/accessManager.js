@@ -110,6 +110,24 @@ export default class AccessManager extends LightningElement {
   overviewResult;
   pendingSearchTerm;
 
+  /** The confirmation whose heading already has focus, so it is focused once per opening. */
+  focusedConfirmation;
+
+  /**
+   * Moves focus to the confirmation's heading when it opens, so a keyboard or screen reader
+   * user hears the question rather than having to find it below the table.
+   */
+  renderedCallback() {
+    const open = this.pendingAction;
+    if (open && open !== this.focusedConfirmation) {
+      const heading = this.template.querySelector('[data-id="confirmation-heading"]');
+      if (heading) {
+        heading.focus();
+      }
+    }
+    this.focusedConfirmation = open;
+  }
+
   @wire(getAccessOverview)
   handleOverview(response) {
     this.overviewResult = response;

@@ -4,7 +4,7 @@
  */
 @IsTest
 private class CustomMetadataDeployCallbackTest {
-    private static final Id JOB = Id.valueOf('0Af000000000002');
+    private static final Id JOB = FakeIds.ofPrefix('0Af', 2);
 
     /** The platform's context cannot be built with a job Id, so the test supplies one. */
     private class TestContext extends Metadata.DeployCallbackContext {

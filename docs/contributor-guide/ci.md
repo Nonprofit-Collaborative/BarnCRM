@@ -212,8 +212,7 @@ Salesforce org is needed for this job. Steps:
 18. `scripts/ci/check-flow-templates.py`, failing the build if a switchable Core automation
    has neither a Flow template (`Template_<registry name>`) nor a row on
    `docs/admin-guide/flow-templates.md` saying why it has none, or if a template ships active
-   or not marked as a template (ADR-0040, ADR-NEXT
-   `NEXT-flow-templates-which-automations-get-one.md`).
+   or not marked as a template (ADR-0040, ADR-0090).
 19. A grep check that fails the build if any tracked file contains an em dash character.
 20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
@@ -393,15 +392,17 @@ needs no org run. A pull request from a fork gets a read-only token and cannot p
 way, so a maintainer runs the script for it, which is the right outcome for untested code from
 outside anyway.
 
-**Test classes run in parallel, all as the same running user**, each in a transaction that
-rolls back. Anything the platform keeps per user is therefore shared between classes that
-happen to run at the same moment, and a test that writes it fails now and then for no reason
-in its own code. Two have been found: a permission set assignment to the running user (one
-row per person and set, so a second insert is refused), and a saved file (it goes into the
-user's private library, and a save is refused with `INVALID_CROSS_REFERENCE_KEY, invalid
-cross reference id: []` while another transaction on that library rolls back). A test that
-does either runs as a person created for it: `TestDataFactory.createUser`, or
-`ReceiptTestDataFactory.issuer()` for a test that saves a receipt, letter or logo file.
+**Test classes run in parallel**, each in a transaction that rolls back, and each as a user it
+creates for itself (see "Tests run as a user they create" below), not as the user who started
+the run. That also keeps classes from colliding over what the platform keeps per user, which
+used to make tests fail now and then for no reason in their own code when every class ran as
+the same person. Two such collisions were found: a permission set assignment to the running
+user (one row per person and set, so a second insert is refused), and a saved file (it goes
+into the user's private library, and a save is refused with `INVALID_CROSS_REFERENCE_KEY,
+invalid cross reference id: []` while another transaction on that library rolls back). The
+few tests marked `// runs-as: deploying user` still share the running user, so they must do
+neither. A test that saves a receipt, letter or logo file runs as
+`ReceiptTestDataFactory.issuer()`.
 
 **A test run that returns no results is retried once.** When `sf apex run test` comes back
 with no test results and its output names `UNKNOWN_EXCEPTION` or a platform or network error

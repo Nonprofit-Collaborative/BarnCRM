@@ -804,7 +804,7 @@ private class SettingsServiceTest {
 
     /** An Id of the given object that no record needs to carry: only its prefix is read. */
     private static String idOf(Schema.SObjectType type) {
-        return type.getDescribe().getKeyPrefix() + '000000000001AAA';
+        return FakeIds.of(type, 1);
     }
 
     private static String refusalOf(String key, Object value) {

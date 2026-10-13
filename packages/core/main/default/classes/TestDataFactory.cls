@@ -142,11 +142,9 @@ public class TestDataFactory {
         System.runAs(new User(Id = UserInfo.getUserId())) {
             insert person;
             List<PermissionSetAssignment> assignments = new List<PermissionSetAssignment>();
-            for (PermissionSet packaged : [
-                SELECT Id
-                FROM PermissionSet
-                WHERE Name IN :permissionSetNames
-            ]) {
+            for (
+                PermissionSet packaged : TestUsers.permissionSetsByName(permissionSetNames).values()
+            ) {
                 assignments.add(
                     new PermissionSetAssignment(
                         AssigneeId = person.Id,

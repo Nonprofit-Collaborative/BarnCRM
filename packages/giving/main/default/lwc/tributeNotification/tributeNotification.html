@@ -2,7 +2,7 @@
   <lightning-card title={labels.title} icon-name="custom:custom25">
     <div class="slds-var-p-horizontal_medium">
       <template lwc:if={hasError}>
-        <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
