@@ -37,7 +37,7 @@ public class TestDataFactory {
         } else {
             update settings;
         }
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
         AutomationControl.clearCache();
     }
 

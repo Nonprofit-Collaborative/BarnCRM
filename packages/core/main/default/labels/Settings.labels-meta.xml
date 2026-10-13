@@ -89,14 +89,6 @@
         <value>The settings page could not load. The error is recorded in the Error Log.</value>
     </labels>
     <labels>
-        <fullName>Core_Settings_ModeValueInvalid</fullName>
-        <categories>Core, Settings</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Settings mode value not allowed</shortDescription>
-        <value>That is not one of the choices for this setting. Pick a value from the list on the settings page.</value>
-    </labels>
-    <labels>
         <fullName>Core_Settings_OpenSectionButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>

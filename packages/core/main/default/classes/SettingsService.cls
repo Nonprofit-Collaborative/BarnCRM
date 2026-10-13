@@ -742,11 +742,13 @@ public with sharing class SettingsService {
     @NamespaceAccessible
     public static final String MEMBERSHIP_MODE_DEFAULT = 'Contact';
 
+    @TestVisible
     private static final Set<String> COEXISTENCE_MODES = new Set<String>{
         'Standalone',
         'NPSP',
         'NonprofitCloud'
     };
+    @TestVisible
     private static final Set<String> MEMBERSHIP_MODES = new Set<String>{ 'Contact', 'Junction' };
 
     private static String storedOrDefault(String stored, Set<String> allowed, String fallback) {
@@ -771,37 +773,6 @@ public with sharing class SettingsService {
         Database.insert(change, AccessLevel.USER_MODE);
     }
 
-    /**
-     * Checks a value on its way in. Anything outside the allowed list is refused with a message
-     * the console can show.
-     */
-    @NamespaceAccessible
-    public static String validated(String value, Set<String> allowed) {
-        if (allowed == null || String.isBlank(value) || !allowed.contains(value)) {
-            throw new SettingsServiceException(Label.Core_Settings_ModeValueInvalid);
-        }
-        return value;
-    }
-
-    /**
-     * Alias kept for callers written against the Core-only service (C-04). Clears every
-     * cached settings record, whichever package owns the object.
-     */
-    @NamespaceAccessible
-    public static void clearCache() {
-        clearCaches();
-    }
-
-    @NamespaceAccessible
-    public static Set<String> coexistenceModes() {
-        return COEXISTENCE_MODES.clone();
-    }
-
-    @NamespaceAccessible
-    public static Set<String> membershipModes() {
-        return MEMBERSHIP_MODES.clone();
-    }
-
     @NamespaceAccessible
     public static String coexistenceMode() {
         return storedOrDefault(
@@ -818,9 +789,5 @@ public with sharing class SettingsService {
             MEMBERSHIP_MODES,
             MEMBERSHIP_MODE_DEFAULT
         );
-    }
-
-    @NamespaceAccessible
-    public class SettingsServiceException extends Exception {
     }
 }

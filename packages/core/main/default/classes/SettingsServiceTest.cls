@@ -532,36 +532,6 @@ private class SettingsServiceTest {
     }
 
     @IsTest
-    static void aModeIsCheckedOnItsWayIn() {
-        System.runAs(TestUsers.admin()) {
-            Assert.areEqual(
-                'NPSP',
-                SettingsService.validated('NPSP', SettingsService.coexistenceModes()),
-                'An offered value is accepted.'
-            );
-
-            for (String rejected : new List<String>{ 'npsp', '', null }) {
-                try {
-                    SettingsService.validated(rejected, SettingsService.membershipModes());
-                    Assert.fail('The value "' + rejected + '" should be refused.');
-                } catch (SettingsService.SettingsServiceException expected) {
-                    Assert.areEqual(
-                        Label.Core_Settings_ModeValueInvalid,
-                        expected.getMessage(),
-                        'Maria is told to pick from the list.'
-                    );
-                }
-            }
-            try {
-                SettingsService.validated('Contact', null);
-                Assert.fail('A value with no list to check against should be refused.');
-            } catch (SettingsService.SettingsServiceException expected) {
-                Assert.isNotNull(expected.getMessage(), 'With a message.');
-            }
-        }
-    }
-
-    @IsTest
     static void theShippedDefaultsAreExactlyWhatTheFieldsSay() {
         System.runAs(TestUsers.admin()) {
             // A text field default value is a formula, so whatever sits inside the quotes is the
@@ -608,12 +578,13 @@ private class SettingsServiceTest {
             }
 
             Assert.isTrue(
-                SettingsService.coexistenceModes()
-                    .contains(SettingsService.COEXISTENCE_MODE_DEFAULT),
+                SettingsService.COEXISTENCE_MODES.contains(
+                    SettingsService.COEXISTENCE_MODE_DEFAULT
+                ),
                 'And the code default is itself one of the offered values.'
             );
             Assert.isTrue(
-                SettingsService.membershipModes().contains(SettingsService.MEMBERSHIP_MODE_DEFAULT),
+                SettingsService.MEMBERSHIP_MODES.contains(SettingsService.MEMBERSHIP_MODE_DEFAULT),
                 'For both keys.'
             );
         }

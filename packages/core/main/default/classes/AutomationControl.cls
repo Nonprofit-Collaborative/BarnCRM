@@ -218,7 +218,7 @@ public with sharing class AutomationControl {
             return false;
         }
         AutomationSettingsWriter.savePausedUntil(null);
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
         SettingsService.logChange(PAUSE_SETTING_NAME, String.valueOf(stored), '');
         return true;
     }
@@ -264,7 +264,7 @@ public with sharing class AutomationControl {
         // one stored, not one another person replaced a moment ago.
         Datetime previous = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
         AutomationSettingsWriter.savePausedUntil(until);
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
         SettingsService.logChange(
             PAUSE_SETTING_NAME,
             previous == null ? '' : String.valueOf(previous),

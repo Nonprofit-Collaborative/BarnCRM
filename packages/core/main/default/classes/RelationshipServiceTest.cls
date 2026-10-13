@@ -215,7 +215,7 @@ private class RelationshipServiceTest {
                 SetupOwnerId = UserInfo.getOrganizationId(),
                 Relationship_Auto_Reciprocal__c = false
             );
-            SettingsService.clearCache();
+            SettingsService.clearCaches();
             List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
 
             Test.startTest();
