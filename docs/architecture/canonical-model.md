@@ -1604,7 +1604,11 @@ merges and sorts their identifiers, recalculates a slice (R-R11), and deletes th
 finished. Target records that failed are written back as a new entry with Attempts increased
 and Next Attempt set later each time; after the fifth attempt the entry is Failed. The
 processor runs again while Pending entries remain. A second processor started by accident is
-harmless, because recalculation recomputes (R-R11).
+harmless, because recalculation recomputes (R-R11). A save inside a Queueable job never starts
+the processor: the platform lets a Queueable queue one job, and that job belongs to the running
+job's own next step (the sample data load, the household soft credit recompute, a subscriber's
+integration). Its entries wait for the next processor a later save starts, the one the job
+starts itself when its chain ends (`RollupService.startQueuedRecalculation`), or the nightly run.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
@@ -6593,6 +6597,7 @@ mirrors the primary member).
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
+| v0.6 | 2026-10-13 | Rollup Queue and Queueable jobs (rollup comparison run on `oi-test`). No object or field added. R-RQ3: a save inside a Queueable leaves the processor to a later save, to the job's own chain end (`RollupService.startQueuedRecalculation`) or to the nightly run, because taking the job's one chained job stopped the sample data load with "Too many queueable jobs added to the queue: 2". |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 
 ---

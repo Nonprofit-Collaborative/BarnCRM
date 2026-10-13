@@ -97,6 +97,10 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
             Limits.getQueueableJobs() < Limits.getLimitQueueableJobs()
         ) {
             System.enqueueJob(new HouseholdSoftCreditRecompute(remaining));
+        } else if (remaining.isEmpty()) {
+            // The chain has ended. The rollup engine queued the soft credit totals without
+            // taking this job's one chained job, so they are calculated now.
+            RollupService.startQueuedRecalculation();
         }
     }
 
