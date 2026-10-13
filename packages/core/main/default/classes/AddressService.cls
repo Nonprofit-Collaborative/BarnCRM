@@ -9,6 +9,8 @@
  *    reports, and other apps keep reading the address they have always read (R-AD3).
  * 2. captureFromStandardFields: an address typed into the standard fields, or changed
  *    there, becomes or updates an address record, so the records stay the truth (R-AD5).
+ *    A person account's mailing address is captured the same way, on insert and on update
+ *    (capturePersonMailingChanges).
  *
  * No Person Account field is referenced statically anywhere in this class. Where people
  * are person accounts their mailing fields are written dynamically, by name, only in an
@@ -338,15 +340,61 @@ public with sharing class AddressService {
             List<Address__c> toInsert = new List<Address__c>();
             captureAccounts(accounts, toInsert);
             captureContacts(contacts, toInsert);
-            if (toInsert.isEmpty()) {
-                return;
-            }
-            Database.insert(toInsert, AccessLevel.USER_MODE);
-            clearOtherDefaults(toInsert);
-            applyToStandardFields(toInsert);
+            insertCaptured(toInsert);
         } finally {
             isPropagating = false;
         }
+    }
+
+    /**
+     * A person account saved with a mailing address, or whose mailing address was changed,
+     * gets an address record of their own, so the records stay the truth for people held as
+     * accounts too (R-AD5, PEOPLE-17). Contact triggers do not fire for person account saves,
+     * so the Account handler calls this after update. Only a person whose mailing address
+     * differs from the one before the save is looked at. Does nothing, and runs no query, in an
+     * org with no person accounts.
+     */
+    public static void capturePersonMailingChanges(
+        List<Account> accounts,
+        Map<Id, SObject> previousById
+    ) {
+        if (accounts == null || accounts.isEmpty() || isPropagating) {
+            return;
+        }
+        Set<Id> personTypes = personRecordTypeIds();
+        if (personTypes.isEmpty()) {
+            return;
+        }
+        List<Account> moved = new List<Account>();
+        for (Account account : accounts) {
+            SObject before = previousById == null ? null : previousById.get(account.Id);
+            if (
+                personTypes.contains(account.RecordTypeId) &&
+                (before == null || personMailingChanged(account, before))
+            ) {
+                moved.add(account);
+            }
+        }
+        if (moved.isEmpty()) {
+            return;
+        }
+        isPropagating = true;
+        try {
+            List<Address__c> toInsert = new List<Address__c>();
+            capturePersonAccounts(moved, toInsert);
+            insertCaptured(toInsert);
+        } finally {
+            isPropagating = false;
+        }
+    }
+
+    private static void insertCaptured(List<Address__c> toInsert) {
+        if (toInsert.isEmpty()) {
+            return;
+        }
+        Database.insert(toInsert, AccessLevel.USER_MODE);
+        clearOtherDefaults(toInsert);
+        applyToStandardFields(toInsert);
     }
 
     // ---------------------------------------------------------------- seasonal helper
@@ -721,8 +769,10 @@ public with sharing class AddressService {
             )
             .getRecordTypeInfosById();
         Set<Id> personRecordTypeIds = OrgShapeDetector.personRecordTypeIds();
+        List<Account> people = new List<Account>();
         for (Account account : accounts) {
             if (personRecordTypeIds.contains(account.RecordTypeId)) {
+                people.add(account);
                 continue;
             }
             String developerName = account.RecordTypeId == null ||
@@ -759,6 +809,87 @@ public with sharing class AddressService {
                 )
             );
         }
+        capturePersonAccounts(people, toInsert);
+    }
+
+    /**
+     * People held as accounts keep their mailing address as an address record of their own
+     * (type Home, default). The person fields are read by name with get, never referenced, so
+     * this compiles in an org with no person accounts, where it returns at once.
+     */
+    private static void capturePersonAccounts(List<Account> people, List<Address__c> toInsert) {
+        if (people == null || people.isEmpty() || !personAccountFieldsAvailable()) {
+            return;
+        }
+        List<Account> withAddress = new List<Account>();
+        for (Account person : people) {
+            if (
+                hasAnyValue(
+                    (String) person.get(PERSON_MAILING_STREET),
+                    (String) person.get(PERSON_MAILING_CITY),
+                    (String) person.get(PERSON_MAILING_STATE),
+                    (String) person.get(PERSON_MAILING_POSTAL_CODE),
+                    (String) person.get(PERSON_MAILING_COUNTRY)
+                )
+            ) {
+                withAddress.add(person);
+            }
+        }
+        if (withAddress.isEmpty()) {
+            return;
+        }
+        Map<Id, Address__c> defaultByPerson = new Map<Id, Address__c>();
+        for (
+            Address__c address : AddressSelector.selectDefaultsByOwnerIds(
+                new Map<Id, Account>(withAddress).keySet(),
+                null
+            )
+        ) {
+            if (address.Person_Account__c != null) {
+                defaultByPerson.put(address.Person_Account__c, address);
+            }
+        }
+        for (Account person : withAddress) {
+            Address__c existing = defaultByPerson.get(person.Id);
+            Address__c typed = new Address__c(
+                Person_Account__c = person.Id,
+                Type__c = TYPE_HOME,
+                Is_Default__c = true,
+                Street__c = (String) person.get(PERSON_MAILING_STREET),
+                City__c = (String) person.get(PERSON_MAILING_CITY),
+                State__c = (String) person.get(PERSON_MAILING_STATE),
+                Postal_Code__c = (String) person.get(PERSON_MAILING_POSTAL_CODE),
+                Country__c = (String) person.get(PERSON_MAILING_COUNTRY)
+            );
+            if (!sameAddress(existing, typed)) {
+                toInsert.add(typed);
+            }
+        }
+    }
+
+    private static Set<Id> personRecordTypeIds() {
+        if (!personAccountFieldsAvailable()) {
+            return new Set<Id>();
+        }
+        Set<Id> found = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        return found == null ? new Set<Id>() : found;
+    }
+
+    private static Boolean personMailingChanged(Account person, SObject before) {
+        for (
+            String field : new List<String>{
+                PERSON_MAILING_STREET,
+                PERSON_MAILING_CITY,
+                PERSON_MAILING_STATE,
+                PERSON_MAILING_POSTAL_CODE,
+                PERSON_MAILING_COUNTRY
+            }
+        ) {
+            if (!sameText((String) person.get(field), (String) before.get(field))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void captureContacts(List<Contact> contacts, List<Address__c> toInsert) {
@@ -865,6 +996,16 @@ public with sharing class AddressService {
             sameText(existing.State__c, source.MailingState) &&
             sameText(existing.Postal_Code__c, source.MailingPostalCode) &&
             sameText(existing.Country__c, source.MailingCountry);
+    }
+
+    /** The same test against an address record built from a person account's mailing fields. */
+    private static Boolean sameAddress(Address__c existing, Address__c typed) {
+        return existing != null &&
+            sameText(existing.Street__c, typed.Street__c) &&
+            sameText(existing.City__c, typed.City__c) &&
+            sameText(existing.State__c, typed.State__c) &&
+            sameText(existing.Postal_Code__c, typed.Postal_Code__c) &&
+            sameText(existing.Country__c, typed.Country__c);
     }
 
     private static Boolean sameText(String left, String right) {
