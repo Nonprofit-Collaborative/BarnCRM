@@ -55,7 +55,13 @@ setting in Setup (her role, or the organization-wide default for gifts), not som
 Open it from **BarnCRM Settings**, **Giving**, **Accounting export**, or search the App
 Launcher for **Accounting Export**. There are no settings.
 
-The **Accounting Export** permission set includes **Post Gifts**, which shows the **Mark these
+The **Accounting Export** permission set includes **Export Accounting**, the permission the
+page checks before it builds or marks a file. Someone without it who opens the page, or calls
+the export from elsewhere, is told they need the Accounting Export permission set and gets no
+file. Giving Admin alone does not include it, so give the administrator the Accounting Export
+permission set as well if they run the export.
+
+It also includes **Post Gifts**, which shows the **Mark these
 gifts posted** button and lets Jen unpost a single gift from its page.
 
 ## A five-minute walkthrough

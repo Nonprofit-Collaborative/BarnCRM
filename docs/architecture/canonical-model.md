@@ -6351,7 +6351,9 @@ as Stewardship Plan Template, Stewardship Plan Step and the running Stewardship 
 Gift Batch left this table in v0.5 and is specified in Section 25L, together with Gift
 Batch Row (25M), the line of a batch.
 
-The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Connect entity: the
+The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Connect entity (the export is
+gated by the custom permission `Export_Accounting`, on the `Accounting_Export` permission set, see
+the 2026-10-12 accounting export row of Section 31): the
 API writes ordinary gifts through Giving, and the export reads gifts and allocations and
 records nothing (ADR-0051). The posting flag plan Section 4.12 mentions is G-20's, in Giving:
 two attributes on Gift and one Giving settings key, and no new entity (R-G13, R-G14, ADR-0053).
@@ -6493,6 +6495,7 @@ mirrors the primary member).
 | post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
 | v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
+| v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 
 ---
 ## 32. Entity ownership by package

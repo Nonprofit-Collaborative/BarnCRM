@@ -263,7 +263,10 @@ private class ImportObjectSchemaTest {
             keyForEveryRow.defaults.add(new ImportMapping.Assignment('Record.Pair_Key__c', 'same'));
             ImportMapping idForEveryRow = mapping(new List<String>{ 'Reason__c' });
             idForEveryRow.defaults.add(
-                new ImportMapping.Assignment('Record.Id', 'a0B000000000001')
+                new ImportMapping.Assignment(
+                    'Record.Id',
+                    String.valueOf(FakeIds.of(Duplicate_Dismissal__c.SObjectType, 1))
+                )
             );
             String dismissal = 'Duplicate_Dismissal__c';
             String byKey = ImportObjectSchema.OPERATION_UPSERT;

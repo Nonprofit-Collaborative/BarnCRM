@@ -52,7 +52,7 @@ private class RollupChangesTest {
     }
 
     private static Id fakeId(Schema.SObjectType entity) {
-        return Id.valueOf(entity.getDescribe().getKeyPrefix() + '000000000001');
+        return FakeIds.of(entity, 1);
     }
 
     private static Set<Id> markedAccounts(RollupChanges.Marked marked) {
@@ -66,8 +66,8 @@ private class RollupChangesTest {
             Rollup_Definition__c children = definition('Account', 'ParentId', null);
             Account child = organization('Child');
             child.Id = fakeId(Account.SObjectType);
-            Id oldParent = Id.valueOf('001000000000002');
-            Id newParent = Id.valueOf('001000000000003');
+            Id oldParent = FakeIds.of(Account.SObjectType, 2);
+            Id newParent = FakeIds.of(Account.SObjectType, 3);
             Account now = child.clone(true);
             now.ParentId = newParent;
             Account before = child.clone(true);

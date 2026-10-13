@@ -137,6 +137,14 @@
     <value>Choose a payment method from the list.</value>
   </labels>
   <labels>
+    <fullName>Connect_AccountingExport_NoExportPermission</fullName>
+    <categories>Connect, Accounting Export</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Export refused: no Accounting Export permission set</shortDescription>
+    <value>The accounting export needs the Accounting Export permission set. Ask your administrator for it.</value>
+  </labels>
+  <labels>
     <fullName>Connect_AccountingExport_ErrorFailed</fullName>
     <categories>Connect, Accounting Export</categories>
     <language>en_US</language>

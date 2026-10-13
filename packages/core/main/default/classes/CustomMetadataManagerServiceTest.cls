@@ -8,7 +8,7 @@
 @IsTest
 private class CustomMetadataManagerServiceTest {
     private static final String TYPE_NAME = 'Relationship_Type__mdt';
-    private static final Id FAKE_JOB = Id.valueOf('0Af000000000001');
+    private static final Id FAKE_JOB = FakeIds.ofPrefix('0Af', 1);
 
     private class CapturingDeployer implements CustomMetadataManagerService.Deployer {
         public Metadata.DeployContainer container;

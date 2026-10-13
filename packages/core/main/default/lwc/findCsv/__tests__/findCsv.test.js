@@ -17,6 +17,18 @@ describe('c/findCsv', () => {
     expect(cell(false)).toBe('false');
   });
 
+  it('defuses values a spreadsheet would run as formulas', () => {
+    expect(cell('=SUM(A1:A9)')).toBe("'=SUM(A1:A9)");
+    expect(cell('+1 555')).toBe("'+1 555");
+    expect(cell('-2+3')).toBe("'-2+3");
+    expect(cell('@cmd')).toBe("'@cmd");
+    expect(cell('\tTabbed')).toBe("'\tTabbed");
+    expect(cell('\rReturn')).toBe('"\'\rReturn"');
+    expect(cell('=HYPERLINK("x","y")')).toBe('"\'=HYPERLINK(""x"",""y"")"');
+    expect(cell('a=b')).toBe('a=b');
+    expect(cell(-5)).toBe('-5');
+  });
+
   it('writes a byte-order mark, a header of labels and one line per row', () => {
     const csv = toCsv(
       [

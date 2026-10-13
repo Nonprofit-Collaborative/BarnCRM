@@ -1,7 +1,9 @@
 /**
  * Writes Find results as CSV the way canonical model R-SQ3 says: UTF-8 with a byte-order mark,
  * so Excel opens names with accents correctly, one header row of column labels, and every value
- * quoted when it holds a comma, a quote or a line break.
+ * quoted when it holds a comma, a quote or a line break. A text value that starts with = + - @ or
+ * a tab or carriage return gets a leading single quote, so a spreadsheet shows it as text and
+ * never runs it as a formula. Real numbers are left alone, so a negative amount stays a number.
  */
 
 // Written as a code point so the source holds no invisible character.
@@ -22,7 +24,10 @@ export function cell(value) {
   if (value === undefined || value === null) {
     return '';
   }
-  const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  let text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  if (typeof value !== 'number' && /^[=+\-@\t\r]/.test(text)) {
+    text = `'${text}`;
+  }
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
