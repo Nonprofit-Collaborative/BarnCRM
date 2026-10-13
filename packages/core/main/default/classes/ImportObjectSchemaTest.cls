@@ -8,6 +8,12 @@
  */
 @IsTest
 private class ImportObjectSchemaTest {
+    static {
+        // Dismissals are the package's bookkeeping, which an import refuses; here they stand in
+        // for an org's own object with an External ID, which Core does not otherwise have.
+        DataProtectedFields.ordinaryForTest.add('duplicate_dismissal__c');
+    }
+
     private static User admin() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }

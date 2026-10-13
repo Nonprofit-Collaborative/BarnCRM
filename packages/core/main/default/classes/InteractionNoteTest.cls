@@ -12,6 +12,9 @@
  */
 @IsTest
 private class InteractionNoteTest {
+    // Notes are saved `as system`: access to Task and its Type comes from the user's profile,
+    // not from a BarnCRM permission set (admin guide, "Who can log one"), and a scratch org's
+    // administrator profile may hide Type. API 67.0 runs plain DML in user mode.
     // The predefined values of Contact.Log_Interaction and Account.Log_Interaction.
     private static final String STATUS_COMPLETED = 'Completed';
     private static final String TYPE_MEETING = 'Meeting';
@@ -43,7 +46,7 @@ private class InteractionNoteTest {
             Assert.isNotNull(person.AccountId, 'Contact mode gives the person a household (R-C1).');
 
             Test.startTest();
-            insert note(person.Id, null, 'Coffee');
+            insert as system note(person.Id, null, 'Coffee');
             Test.stopTest();
 
             Task saved = [
@@ -71,7 +74,7 @@ private class InteractionNoteTest {
             Contact person = personWithHousehold();
 
             Test.startTest();
-            insert note(person.Id, person.AccountId, 'Visit');
+            insert as system note(person.Id, person.AccountId, 'Visit');
             Test.stopTest();
 
             Task saved = [SELECT WhatId, AccountId, IsClosed FROM Task WHERE WhoId = :person.Id];
@@ -95,7 +98,7 @@ private class InteractionNoteTest {
             }
 
             Test.startTest();
-            insert notes;
+            insert as system notes;
             Test.stopTest();
 
             Assert.areEqual(

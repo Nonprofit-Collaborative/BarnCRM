@@ -256,7 +256,8 @@ public with sharing class FilterValueBinder {
             return '(' + String.join(shown, ', ') + ')';
         }
         if (value instanceof Date) {
-            return String.valueOf(value);
+            // Cast first: String.valueOf of an untyped Date adds a time, which SOQL refuses.
+            return String.valueOf((Date) value);
         }
         if (value instanceof Datetime) {
             return ((Datetime) value).formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'');

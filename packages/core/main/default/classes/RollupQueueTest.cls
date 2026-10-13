@@ -100,11 +100,22 @@ private class RollupQueueTest {
             Assert.areEqual(1, processors, 'One processor per transaction, however many entries');
             Test.stopTest();
 
+            // One run recalculates one slice of 200 (R-RQ3). The 10 are among the first 200, so
+            // their entry merges into the first slice; the two entries that do not fit wait for
+            // the next run, which a test cannot run.
+            List<Rollup_Queue__c> left = entries();
             Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Rollup_Queue__c],
+                2,
+                left.size(),
                 'Records with no totals to write are finished and their entries deleted'
             );
+            Decimal stillWaiting = 0;
+            for (Rollup_Queue__c entry : left) {
+                stillWaiting += entry.Record_Count__c;
+                Assert.areEqual(RollupQueue.STATUS_PENDING, entry.Status__c, 'Still pending');
+            }
+            Assert.areEqual(250, stillWaiting, 'The records past the first slice wait');
+            Assert.areEqual(0, RollupQueue.lastChainDelay, 'The next run is asked for now');
         }
     }
 

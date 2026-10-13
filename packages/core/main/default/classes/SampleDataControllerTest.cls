@@ -73,7 +73,7 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testLoadStartsTheChainForAPermittedUser() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataController.permissionOverride = true;
             SampleDataLoader.jsonOverride = buildJson(2, 2);
 
@@ -97,7 +97,7 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testRemoveDeletesForAPermittedUser() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataController.permissionOverride = true;
             loadEverything(buildJson(2, 2));
 
@@ -113,7 +113,7 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testStatusReportsCountsAndLoadedState() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(1, 3));
 
             SampleDataLoader.Counts status = SampleDataController.getStatus();
@@ -127,7 +127,7 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testCanManageIsTrueForAPermittedUser() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataController.permissionOverride = true;
             System.assertEquals(
                 true,
@@ -139,7 +139,7 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testStandardUserWithoutThePermissionIsRefused() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             User standardUser = buildStandardUser();
             insert standardUser;
 
@@ -179,7 +179,7 @@ private class SampleDataControllerTest {
 
     @IsTest
     static void testAlreadyLoadedSurfacesAsAnAuraHandledException() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataController.permissionOverride = true;
             loadEverything(buildJson(1, 1));
             SampleDataLoader.jsonOverride = buildJson(1, 1);

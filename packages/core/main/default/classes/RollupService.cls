@@ -181,8 +181,10 @@ public with sharing class RollupService {
      * once it has read the survivors off the deleted records. A person stored as an account
      * has a second record behind it, its person contact, whose own totals the merge also
      * changes; `AccountTriggerHandler` names those here, since the deleted account records
-     * only name the surviving account. In the same save when there are few, otherwise queued,
-     * as for any save (R-R4).
+     * only name the surviving account. Run just after the save, not in it (R-R4): the platform
+     * refuses a trigger's write to a record while it is in a merge, so a recalculation in the
+     * same save would fail and wait minutes for a retry. A save that cannot start a job, or has
+     * many survivors, hands them to the Rollup Queue instead.
      *
      * @param targetObject the entity whose totals the merge changed
      * @param survivorIds the records of that entity that survived the merge
@@ -202,19 +204,48 @@ public with sharing class RollupService {
         }
         lastParentIds = survivorIds;
         String target = String.valueOf(targetType);
-        if (!canRecalculateNow(survivorIds.size())) {
+        if (
+            survivorIds.size() > instantLimit ||
+            Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()
+        ) {
             RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
             return;
         }
-        try {
-            RollupQueue.retryLater(
-                target,
-                RollupEngine.recalculate(survivorIds, definitions).failed,
-                0
-            );
-        } catch (Exception stopped) {
-            ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
-            RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
+        System.enqueueJob(new SurvivorRecalculation(target, survivorIds, definitions));
+    }
+
+    /**
+     * The real-time totals on merge survivors, recalculated once the merge is saved. Only the
+     * definitions the merge asked for: the Rollup Queue would also run the nightly ones. A
+     * record the platform still refuses is queued to be tried again, and anything that stops
+     * the run queues the lot, as in a save.
+     */
+    private class SurvivorRecalculation implements Queueable {
+        private final String target;
+        private final Set<Id> survivorIds;
+        private final List<Rollup_Definition__c> definitions;
+
+        SurvivorRecalculation(
+            String target,
+            Set<Id> survivorIds,
+            List<Rollup_Definition__c> definitions
+        ) {
+            this.target = target;
+            this.survivorIds = survivorIds;
+            this.definitions = definitions;
+        }
+
+        public void execute(QueueableContext context) {
+            try {
+                RollupQueue.retryLater(
+                    target,
+                    RollupEngine.recalculate(survivorIds, definitions).failed,
+                    0
+                );
+            } catch (Exception stopped) {
+                ErrorLogger.log(stopped, CONTEXT_REAL_TIME);
+                RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
+            }
         }
     }
 

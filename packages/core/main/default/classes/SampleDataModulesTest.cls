@@ -45,7 +45,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testInstalledResolvesOnlyUsableModules() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             // No override, so this asks the org itself. In an org with Core alone the list is
             // empty; where a module package is installed every entry has to be usable, because
             // Core calls these methods from the load chain and from the status card.
@@ -73,7 +73,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testStartFirstStartsOnlyTheFirstModule() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule first = new StubModule('First', 3);
             StubModule second = new StubModule('Second', 5);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
@@ -91,7 +91,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testStartAfterStartsTheNextModule() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule first = new StubModule('First', 3);
             StubModule second = new StubModule('Second', 5);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
@@ -113,7 +113,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testStartAfterTheLastModuleStartsNothing() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule only = new StubModule('Only', 3);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ only };
 
@@ -129,7 +129,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testStartAfterAnUnknownModuleStartsNothing() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule only = new StubModule('Only', 3);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ only };
 
@@ -141,7 +141,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testRemoveAllAsksEveryModuleAndSumsWhatWent() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule first = new StubModule('First', 3);
             StubModule second = new StubModule('Second', 5);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
@@ -156,7 +156,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void testCountsCarryEachModuleNameLabelAndNumber() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataModules.moduleOverride = new List<SampleDataModule>{
                 new StubModule('Giving', 709)
             };
@@ -176,7 +176,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void aClassOfTheWrongShapeIsLeftOutAndLogged() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             // A real class with a no-argument constructor that is not a SampleDataModule.
             SampleDataModule module = SampleDataModules.resolve('SampleDataModules');
             Test.getEventBus().deliver();
@@ -192,7 +192,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void aModuleThatIsNotInstalledIsNotAnError() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataModule module = SampleDataModules.resolve('NoSuchSampleDataModuleFu3');
             Test.getEventBus().deliver();
 
@@ -207,7 +207,7 @@ private class SampleDataModulesTest {
 
     @IsTest
     static void installedModulesAreLookedUpOncePerTransaction() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             List<SampleDataModule> first = SampleDataModules.installed();
             List<SampleDataModule> second = SampleDataModules.installed();
 

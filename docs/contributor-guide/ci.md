@@ -453,6 +453,10 @@ So every test is self-contained:
   name, preferring the ones in this package's namespace. `withPermissionSets(names)` takes any
   other list. It keeps one user per list of sets per transaction, and finds the user a
   `@TestSetup` made again in every test method, so setup data and the test share an owner.
+- A Core test whose code calls into whichever modules are installed (the sample data loader
+  counts and removes each module's records) runs as `TestUsers.adminWithInstalledModules()`:
+  BarnCRM Admin plus the admin permission set of each module the org has, and `admin()` in
+  an org with Core alone.
 - The profile stays the running user's so a test keeps what an administrator's profile gave
   it before (View All Data over Giving's Private objects, Manage Users for the tests that
   create people) and loses only the dependence on permission set assignments. A test that has

@@ -66,7 +66,8 @@ private class MigrationTemplatesTest {
         ];
         found.Person_Mode__c = personMode;
         update found;
-        return found;
+        // Read back the way the import batch reads it, so every field the run uses is there.
+        return ImportTemplateSelector.selectById(found.Id);
     }
 
     /**
