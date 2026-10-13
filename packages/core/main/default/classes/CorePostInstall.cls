@@ -102,19 +102,23 @@ public with sharing class CorePostInstall implements InstallHandler {
      * A read shown to somebody, so it runs in user mode (ADR-0021). It sits on this class
      * rather than on the Hub's own controller because the contexts it counts are declared
      * here, and a count that drifted from them would be confidently wrong.
+     *
+     * The count stops at `cap + 1`, like every Error Log count on the home page (ADMIN-8); the
+     * home model reads it, so the page makes one server call rather than two.
      */
-    @AuraEnabled(cacheable=true)
-    public static Integer countInstallProblems() {
+    public static Integer countInstallProblemsUpTo(Integer cap) {
         if (!ErrorLogCountSelector.isReadable()) {
             return null;
         }
         String pattern = CONTEXT_PREFIX + '%';
         String statusNew = ErrorLogger.STATUS_NEW;
+        Integer readUpTo = cap + 1;
         return [
             SELECT COUNT()
             FROM Error_Log__c
             WHERE Context__c LIKE :pattern AND Status__c = :statusNew
             WITH USER_MODE
+            LIMIT :readUpTo
         ];
     }
 

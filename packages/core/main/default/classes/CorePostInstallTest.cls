@@ -768,7 +768,7 @@ private class CorePostInstallTest {
 
             Assert.areEqual(
                 1,
-                CorePostInstall.countInstallProblems(),
+                CorePostInstall.countInstallProblemsUpTo(999),
                 'The install step that failed is counted, so the Hub can say setup had a problem.'
             );
         }

@@ -1,18 +1,9 @@
 import { createElement } from 'lwc';
 import HubErrors from 'c/hubErrors';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
-import countInstallProblems from '@salesforce/apex/CorePostInstall.countInstallProblems';
 
 jest.mock(
   '@salesforce/apex/HubController.getHomeModel',
-  () => {
-    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
-    return { default: createApexTestWireAdapter(jest.fn()) };
-  },
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/apex/CorePostInstall.countInstallProblems',
   () => {
     const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
     return { default: createApexTestWireAdapter(jest.fn()) };
@@ -93,7 +84,7 @@ describe('c-hub-errors', () => {
 
   it('says setup completed when the install logged nothing', async () => {
     const element = build();
-    countInstallProblems.emit(0);
+    getHomeModel.emit({ newErrorCount: 0, installProblemCount: 0 });
     await settle();
 
     const status = byId(element, 'install-status');
@@ -103,7 +94,7 @@ describe('c-hub-errors', () => {
 
   it('says setup had problems when the install logged some, and not by color alone', async () => {
     const element = build();
-    countInstallProblems.emit(2);
+    getHomeModel.emit({ newErrorCount: 2, installProblemCount: 2 });
     await settle();
 
     const status = byId(element, 'install-status');
@@ -115,7 +106,7 @@ describe('c-hub-errors', () => {
 
   it('says nothing about the install to someone who cannot read the Error Log', async () => {
     const element = build();
-    countInstallProblems.emit(null);
+    getHomeModel.emit({ newErrorCount: 0, installProblemCount: null });
     await settle();
 
     expect(byId(element, 'install-status')).toBeNull();
@@ -124,7 +115,6 @@ describe('c-hub-errors', () => {
   it('still shows the count when the install count cannot be read', async () => {
     const element = build();
     getHomeModel.emit({ newErrorCount: 0 });
-    countInstallProblems.error();
     await settle();
 
     expect(byId(element, 'install-status')).toBeNull();

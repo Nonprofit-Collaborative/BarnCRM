@@ -128,6 +128,14 @@ describe('c-error-log-tile', () => {
     expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('0 new');
   });
 
+  it('says there are more when the count stopped at its cap', async () => {
+    const element = createComponent();
+    getTile.emit({ ...TILE, newCount: 999, newCountCapped: true });
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('999+ new');
+  });
+
   it('disables the action for a person who may only read', async () => {
     const element = createComponent();
     getTile.emit({ ...TILE, canUpdate: false });

@@ -160,10 +160,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>HubErrorCountSelector</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>ImportBatchSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>

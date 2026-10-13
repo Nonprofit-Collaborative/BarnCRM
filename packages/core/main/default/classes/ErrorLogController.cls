@@ -8,6 +8,10 @@
 public with sharing class ErrorLogController {
     private static final Integer DEFAULT_ROWS = 5;
 
+    /** The tile counts this many and then says "more". A test lowers it. */
+    @TestVisible
+    private static Integer newCountCap = 999;
+
     /**
      * One entry as the tile shows it.
      */
@@ -34,6 +38,9 @@ public with sharing class ErrorLogController {
     public class ErrorLogTileView {
         @AuraEnabled
         public Integer newCount { get; set; }
+        /** True when there are more new entries than `newCount`, the most the tile counts. */
+        @AuraEnabled
+        public Boolean newCountCapped { get; set; }
         @AuraEnabled
         public Boolean canUpdate { get; set; }
         @AuraEnabled
@@ -88,7 +95,11 @@ public with sharing class ErrorLogController {
 
     private static ErrorLogTileView currentTile(Integer rowCount) {
         ErrorLogTileView tile = new ErrorLogTileView();
-        tile.newCount = ErrorLogSelector.countNew();
+        // One capped count for every Error Log tile (ADMIN-8): a flooded log costs at most
+        // newCountCap + 1 query rows.
+        Integer found = ErrorLogCountSelector.countNewUpTo(newCountCap);
+        tile.newCountCapped = found > newCountCap;
+        tile.newCount = Math.min(found, newCountCap);
         tile.canUpdate = Schema.SObjectType.Error_Log__c.isUpdateable();
         tile.recent = new List<ErrorLogView>();
         for (Error_Log__c entry : ErrorLogSelector.selectRecent(rowCount)) {

@@ -30,13 +30,13 @@ public with sharing class OpportunityMirrorSchedulable implements Schedulable {
         CronTrigger existing = job();
         return existing != null
             ? existing.Id
-            : System.schedule(JOB_NAME, CRON, new OpportunityMirrorSchedulable());
+            : ScheduledJobSelector.schedule(JOB_NAME, CRON, new OpportunityMirrorSchedulable());
     }
 
     public static void stop() {
         CronTrigger existing = job();
         if (existing != null) {
-            System.abortJob(existing.Id);
+            ScheduledJobSelector.abort(existing.Id);
         }
     }
 

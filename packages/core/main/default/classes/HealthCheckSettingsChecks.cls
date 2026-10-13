@@ -187,6 +187,37 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     /**
+     * Scheduled BarnCRM jobs whose owner has been deactivated (ADMIN-12). Such a job stops
+     * running but keeps its trigger, so every other check and page reads it as scheduled.
+     */
+    public class InactiveOwnerJobsCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            List<String> stopped = HealthCheckService.fixScope(
+                HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+            );
+            if (stopped.isEmpty()) {
+                return null;
+            }
+            return new HealthCheckService.Finding(
+                    'jobs_inactive_owner',
+                    System.Label.Core_HealthCheck_InactiveOwnerJobsTitle,
+                    String.format(
+                        System.Label.Core_HealthCheck_InactiveOwnerJobsDetail,
+                        new List<Object>{ String.join(stopped, ', ') }
+                    ),
+                    HealthCheckService.SEVERITY_WARNING,
+                    HealthCheckService.CATEGORY_SETTINGS
+                )
+                .withFix(
+                    System.Label.Core_HealthCheck_InactiveOwnerJobsFix,
+                    HealthCheckService.FIX_ACTION_PREFIX +
+                    HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+                )
+                .withScope(stopped);
+        }
+    }
+
+    /**
      * Every BarnCRM nightly job that is not scheduled, Core's and those modules register, in
      * one finding with one fix that schedules them all (ADR-0075,
      * health-check-schedules-every-nightly-job). Nothing is scheduled on install, so this is

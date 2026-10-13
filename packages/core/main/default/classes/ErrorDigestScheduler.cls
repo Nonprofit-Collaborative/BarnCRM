@@ -28,14 +28,14 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(JOB_NAME, DAILY_CRON, new ErrorDigestScheduler());
+        return ScheduledJobSelector.schedule(JOB_NAME, DAILY_CRON, new ErrorDigestScheduler());
     }
 
     /** Stops the daily run. Nothing already sent is affected. */
     public static void stop() {
         Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 

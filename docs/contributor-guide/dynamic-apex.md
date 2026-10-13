@@ -287,7 +287,7 @@ insert runs it once per 200 records.
 - **Force the other shape with seams**, not with the org: `OrgShapeDetector.overrideShape`,
   `CustomPermissionSelector.holdersOverride`, the resolver overrides in section 3,
   `CampaignSyncService.unavailableForTest` (Campaign absent: `CampaignSyncUnavailableTest`),
-  `HealthCheckOrgShapeChecks.connectInstalledOverride`, `HubErrorCountSelector.absentForTest`.
+  `HealthCheckOrgShapeChecks.connectInstalledOverride`.
 - **Test orgs:** `oi-test` and `oi-pa` both have Person Accounts and the Sales Cloud objects
   (see [ci.md](ci.md)). Every feature-present branch runs on them; no feature-absent branch
   does.

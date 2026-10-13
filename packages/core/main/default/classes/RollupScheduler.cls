@@ -59,14 +59,14 @@ public with sharing class RollupScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(jobNameInUse, NIGHTLY_CRON, new RollupScheduler());
+        return ScheduledJobSelector.schedule(jobNameInUse, NIGHTLY_CRON, new RollupScheduler());
     }
 
     /** Stops the nightly run. */
     public static void stop() {
         Id existing = scheduledJobId();
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 
@@ -86,12 +86,12 @@ public with sharing class RollupScheduler implements Schedulable {
             ? Date.today()
             : Date.today().addDays(1);
         String name = jobNameInUse + ' ' + String.valueOf(night);
-        Id existing = jobIdNamed(name);
+        Id existing = ScheduledJobSelector.triggerIdByName(name);
         if (existing != null) {
             return existing;
         }
         String cron = '0 0 2 ' + night.day() + ' ' + night.month() + ' ? ' + night.year();
-        return System.schedule(name, cron, new RollupScheduler(true));
+        return ScheduledJobSelector.schedule(name, cron, new RollupScheduler(true));
     }
 
     /** True when the nightly run is scheduled. */
@@ -101,42 +101,11 @@ public with sharing class RollupScheduler implements Schedulable {
 
     /** When the nightly run is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
-        Id jobId = scheduledJobId();
-        if (jobId == null) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT NextFireTime
-            FROM CronTrigger
-            WHERE Id = :jobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].NextFireTime;
+        return ScheduledJobSelector.nextFireTime(jobNameInUse);
     }
 
+    // One lookup for every scheduled job, read once per transaction (ADMIN-11).
     private static Id scheduledJobId() {
-        return jobIdNamed(jobNameInUse);
-    }
-
-    private static Id jobIdNamed(String name) {
-        List<CronJobDetail> details = [
-            SELECT Id
-            FROM CronJobDetail
-            WHERE Name = :name AND JobType = '7'
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        if (details.isEmpty()) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT Id
-            FROM CronTrigger
-            WHERE CronJobDetailId = :details[0].Id
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].Id;
+        return ScheduledJobSelector.triggerIdByName(jobNameInUse);
     }
 }

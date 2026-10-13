@@ -281,6 +281,38 @@
         <value>Done. Scheduled: {0}.</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_FixStoppedOnly</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>After the deactivated owner fix: jobs stopped, not rescheduled. {0} names.</shortDescription>
+        <value>Stopped, and not scheduled again because Health Check never schedules them for you: {0}. Schedule each again on its own page if you still want it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_InactiveOwnerJobsTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Finding title: scheduled jobs owned by a deactivated user</shortDescription>
+        <value>Scheduled jobs belong to a deactivated person</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_InactiveOwnerJobsDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Finding detail: deactivated owner jobs. {0} the job names.</shortDescription>
+        <value>These jobs run as a person who has been deactivated, so they stopped running although their pages still show them as scheduled: {0}. The fix stops each one and schedules it again to run as you.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_InactiveOwnerJobsFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fix button: reschedule deactivated owner jobs as me</shortDescription>
+        <value>Schedule them again as me</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_FixStale</fullName>
         <categories>Core</categories>
         <language>en_US</language>

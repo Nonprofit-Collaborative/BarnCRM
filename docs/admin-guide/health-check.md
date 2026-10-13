@@ -106,6 +106,7 @@ Nothing is broken today.
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
 | Settings | Whether any BarnCRM nightly job is not scheduled: the rollup recalculation, the seasonal address swap and the error digest, plus the nightly jobs of any module that registers them. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Connect it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
+| Settings | Whether any scheduled BarnCRM job belongs to a person who has been deactivated. A scheduled job runs as the person who scheduled it, and stops running the day that person is deactivated, while it still looks scheduled on its page. |
 | Settings | Whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | Whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
@@ -150,7 +151,9 @@ Every fix that runs is recorded under **Recent changes** in BarnCRM Settings, as
 
 Every fix only creates something that is missing or switches on something that is off. No
 fix deletes anything or changes a value you chose, and pressing it twice does no more than
-pressing it once. Most can be undone on their own page:
+pressing it once. The one fix that stops something stops only jobs that have already stopped
+running, because their owner was deactivated, and schedules them again as you. Most can be
+undone on their own page:
 
 | Finding | What the fix does | How to undo it |
 |---|---|---|
@@ -158,6 +161,7 @@ pressing it once. Most can be undone on their own page:
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
 | **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
 | **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollups page, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Connect. |
+| **Scheduled jobs belong to a deactivated person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
 | **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
@@ -241,8 +245,8 @@ runs an automation whose switch is left over, so it does no harm.
 
 **Waiting for install to schedule the nightly jobs.** Nothing is scheduled when BarnCRM is
 installed, because a scheduled job runs as the person who scheduled it. Press **Schedule all
-nightly jobs** once, as the administrator the jobs should run as. If that person later leaves,
-stop the jobs on their pages and press the fix again as somebody else.
+nightly jobs** once, as the administrator the jobs should run as. If that person later leaves
+and is deactivated, Health Check says so: press **Schedule them again as me** on that finding.
 
 **Wondering why "Nightly totals are not scheduled" has no button.** It explains what an
 unscheduled rollup run costs you. The button that fixes it is **Schedule all nightly jobs**, on

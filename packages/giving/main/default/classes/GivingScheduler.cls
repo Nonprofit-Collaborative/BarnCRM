@@ -97,7 +97,7 @@ public with sharing class GivingScheduler {
     public static void stopAll() {
         for (CronTrigger job : jobTriggers()) {
             try {
-                System.abortJob(job.Id);
+                ScheduledJobSelector.abort(job.Id);
             } catch (Exception abortFailure) {
                 // A job somebody else has already aborted, or a user who may not abort Apex.
                 ErrorLogger.log(abortFailure, 'GivingScheduler.stopAll');
@@ -190,7 +190,7 @@ public with sharing class GivingScheduler {
             if (status != null && status.scheduled == true) {
                 return null;
             }
-            return System.schedule(jobName, cron, job);
+            return ScheduledJobSelector.schedule(jobName, cron, job);
         } catch (Exception scheduleFailure) {
             // The running user cannot schedule Apex, or the job was scheduled between the
             // query above and this line. Either way the rest of the jobs still get their turn.
