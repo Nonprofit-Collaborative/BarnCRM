@@ -13,6 +13,7 @@ import rejectedHeading from '@salesforce/label/c.Core_Import_RejectedHeading';
 import rowNumberHeader from '@salesforce/label/c.Core_Import_RowNumberHeader';
 import reasonHeader from '@salesforce/label/c.Core_Import_ReasonHeader';
 import noRejectedRows from '@salesforce/label/c.Core_Import_NoRejectedRows';
+import rejectedShownOf from '@salesforce/label/c.Core_Import_RejectedShownOf';
 import runningMessage from '@salesforce/label/c.Core_Import_RunningMessage';
 import loadingAltText from '@salesforce/label/c.Core_Import_LoadingAltText';
 import changedValuesHeading from '@salesforce/label/c.Core_Import_ChangedValuesHeading';
@@ -99,6 +100,20 @@ export default class ImportResults extends LightningElement {
 
   get hasRejectedRows() {
     return Array.isArray(this.rejectedRows) && this.rejectedRows.length > 0;
+  }
+
+  /**
+   * The table shows the first page of rejected rows; when the batch has more, this says how
+   * many are shown, and that the exceptions file holds them all. Empty otherwise.
+   */
+  get rejectedShownNote() {
+    const shown = Array.isArray(this.rejectedRows) ? this.rejectedRows.length : 0;
+    const total = (this.batch && this.batch.rejected) || 0;
+    return shown > 0 && total > shown
+      ? rejectedShownOf
+          .replace('{0}', shown.toLocaleString())
+          .replace('{1}', total.toLocaleString())
+      : '';
   }
 
   get runLogLines() {

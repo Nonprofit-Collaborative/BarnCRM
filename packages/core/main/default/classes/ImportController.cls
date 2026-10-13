@@ -192,6 +192,28 @@ public with sharing class ImportController {
         public String values;
     }
 
+    /**
+     * One page of rows read through a pagination cursor. The screen hands the cursor and
+     * nextIndex back to read the next page, until hasMore is false.
+     */
+    public class RowPage {
+        @AuraEnabled
+        public Database.PaginationCursor cursor;
+        @AuraEnabled
+        public List<RowView> rows = new List<RowView>();
+        @AuraEnabled
+        public Integer nextIndex = 0;
+        /** How many rows the cursor holds, at most ImportRowSelector.MAX_CURSOR_ROWS. */
+        @AuraEnabled
+        public Integer total = 0;
+        @AuraEnabled
+        public Boolean hasMore = false;
+    }
+
+    /** The most rows one page may hold (the platform's limit for a pagination cursor page). */
+    @TestVisible
+    private static final Integer MAX_PAGE_ROWS = 2000;
+
     /** How many rows the changed values are shown for, in the wizard and after a dry run. */
     @TestVisible
     private static final Integer CHANGED_SAMPLE_ROWS = 5;
@@ -656,29 +678,64 @@ public with sharing class ImportController {
     }
 
     /**
-     * One page of a batch's rows, optionally only those in one status. The exceptions file is
-     * built from this with status Rejected.
+     * One page of a batch's rows in file order, optionally only those in one status. The
+     * rejected-rows table reads the first page; the exceptions file reads every page with
+     * status Rejected. Pass no cursor to open one; then pass back the cursor and nextIndex
+     * this returned, until hasMore is false.
+     *
+     * @param pageSize rows per page, held between 1 and MAX_PAGE_ROWS
      */
     @AuraEnabled
-    public static List<RowView> getRows(String batchId, String status, Integer offsetRows) {
+    public static RowPage getRowPage(
+        String batchId,
+        String status,
+        Database.PaginationCursor cursor,
+        Integer startIndex,
+        Integer pageSize
+    ) {
         try {
-            List<Import_Row__c> rows = String.isBlank(status)
-                ? ImportRowSelector.selectByBatch(batchId, offsetRows)
-                : ImportRowSelector.selectByBatchAndStatus(batchId, status, offsetRows);
-            List<RowView> result = new List<RowView>();
-            for (Import_Row__c row : rows) {
-                RowView view = new RowView();
-                view.id = row.Id;
-                view.rowNumber = row.Row_Number__c == null ? null : row.Row_Number__c.intValue();
-                view.status = row.Status__c;
-                view.errorMessage = row.Error_Message__c;
-                view.values = row.Raw_Values_JSON__c;
-                result.add(view);
+            RowPage page = new RowPage();
+            if (String.isBlank(batchId)) {
+                return page;
             }
-            return result;
+            page.cursor = cursor == null
+                ? ImportRowSelector.openCursor(Id.valueOf(batchId), status)
+                : cursor;
+            page.total = page.cursor.getNumRecords();
+            Integer start = startIndex == null || startIndex < 0 ? 0 : startIndex;
+            Integer size = pageSize == null ||
+                pageSize < 1
+                ? ImportRowSelector.PAGE_SIZE
+                : Math.min(pageSize, MAX_PAGE_ROWS);
+            size = Math.min(size, page.total - start);
+            page.nextIndex = Math.min(start, page.total);
+            if (size > 0) {
+                Database.CursorFetchResult fetched = page.cursor.fetchPage(start, size);
+                for (SObject record : fetched.getRecords()) {
+                    page.rows.add(toRowView((Import_Row__c) record));
+                }
+                // A page covers positions start to start + size - 1 (rows deleted since the
+                // cursor opened are skipped, not replaced), so the next page starts after it.
+                // The result's getNextIndex is not used: on the last page it comes back as a
+                // sentinel, not a position, and reading it as one restarted the read at row 0.
+                page.nextIndex = start + size;
+            }
+            // The cursor's own isDone is per page, so the whole read is judged by position.
+            page.hasMore = page.nextIndex < page.total;
+            return page;
         } catch (Exception e) {
-            throw auraError(e, 'ImportController.getRows');
+            throw auraError(e, 'ImportController.getRowPage');
         }
+    }
+
+    private static RowView toRowView(Import_Row__c row) {
+        RowView view = new RowView();
+        view.id = row.Id;
+        view.rowNumber = row.Row_Number__c == null ? null : row.Row_Number__c.intValue();
+        view.status = row.Status__c;
+        view.errorMessage = row.Error_Message__c;
+        view.values = row.Raw_Values_JSON__c;
+        return view;
     }
 
     /**
@@ -748,7 +805,7 @@ public with sharing class ImportController {
             if (mapping.transformsBySourceKey().isEmpty()) {
                 return result;
             }
-            List<Import_Row__c> rows = ImportRowSelector.selectByBatch(batchId, 0);
+            List<Import_Row__c> rows = ImportRowSelector.selectFirstPage(batchId);
             for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
                 for (List<String> cell : ImportRowProcessor.changedValues(rows[i], mapping)) {
                     ChangedValue changed = new ChangedValue();

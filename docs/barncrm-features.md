@@ -98,6 +98,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Import wizard | Major | Uploads a spreadsheet, suggests column mappings, runs a dry run showing what would be created, updated, matched or rejected, then commits with per-row results. | Shipped | C-14 |
+| Complete import exceptions file | Minor | Download exceptions holds every rejected row (up to 100,000 per download), read through an Apex pagination cursor, written with the same Excel-safe CSV writer as Find (byte-order mark, formula guard); the rejected-rows table says when it shows only the first 200. | Built, not merged (feature/q-03-apex-cursors) | Q-03, C-14 |
 | Import undo | Major | Undoes a committed import within a set window: removes what it created and puts back values it changed, keeping anything that has since gained a life of its own. | Shipped | C-19 |
 | Excel workbook import | Major | Reads .xlsx files directly in the browser, no CSV conversion needed. | Shipped | C-19, ADR-0049 |
 | Import matching rules | Major | Separate matching rules for people and for organizations (email, name plus postal code, or an ID field you choose), set per file in the import wizard. | Shipped | C-32 |

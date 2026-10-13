@@ -58,6 +58,18 @@ describe('the import results view', () => {
     const rows = element.shadowRoot.querySelectorAll('[data-id="rejected-row"]');
     expect(rows).toHaveLength(2);
     expect(rows[0].textContent).toContain('Required value missing: last name.');
+    // Every rejected row is in the table, so there is no "first N of M" note.
+    expect(element.shadowRoot.querySelector('[data-id="rejected-shown"]')).toBeNull();
+  });
+
+  it('says when the table shows only the first of the rejected rows', () => {
+    const element = render({
+      batch: { ...DRY_RUN, rejected: 3500 },
+      rejectedRows: [{ id: 'r1', rowNumber: 4, errorMessage: 'Required value missing.' }]
+    });
+    expect(element.shadowRoot.querySelector('[data-id="rejected-shown"]').textContent).toContain(
+      'c.Core_Import_RejectedShownOf'
+    );
   });
 
   it('says plainly when nothing was rejected', () => {

@@ -3,8 +3,13 @@
  * so Excel opens names with accents correctly, one header row of column labels, and every value
  * quoted when it holds a comma, a quote or a line break. A text value that starts with = + - @ or
  * a tab or carriage return gets a leading single quote, so a spreadsheet shows it as text and
- * never runs it as a formula. Real numbers are left alone, so a negative amount stays a number.
+ * never runs it as a formula. Real numbers are left alone, so a negative amount stays a number,
+ * and so is text that is only a negative number such as "-25.00" (an import's exceptions file
+ * holds every value as text, and nothing in it can run).
  */
+
+/** Text that is a plain negative decimal and nothing else. */
+const NEGATIVE_NUMBER = /^-\d+(\.\d+)?$/;
 
 // Written as a code point so the source holds no invisible character.
 export const BYTE_ORDER_MARK = String.fromCharCode(0xfeff);
@@ -25,7 +30,7 @@ export function cell(value) {
     return '';
   }
   let text = typeof value === 'object' ? JSON.stringify(value) : String(value);
-  if (typeof value !== 'number' && /^[=+\-@\t\r]/.test(text)) {
+  if (typeof value !== 'number' && /^[=+\-@\t\r]/.test(text) && !NEGATIVE_NUMBER.test(text)) {
     text = `'${text}`;
   }
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;

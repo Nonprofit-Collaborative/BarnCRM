@@ -30,6 +30,19 @@ private class ImportControllerTest {
         );
     }
 
+    /** A page's position, so a failed assertion on an org run says what came back. */
+    private static String pageText(ImportController.RowPage page) {
+        return '(rows ' +
+            page.rows.size() +
+            ', nextIndex ' +
+            page.nextIndex +
+            ', total ' +
+            page.total +
+            ', hasMore ' +
+            page.hasMore +
+            ')';
+    }
+
     @IsTest
     static void refusesEveryChangeWithoutThePermission() {
         System.runAs(TestUsers.admin()) {
@@ -262,13 +275,19 @@ private class ImportControllerTest {
             update rows;
 
             Test.startTest();
-            List<ImportController.RowView> rejected = ImportController.getRows(
+            ImportController.RowPage page = ImportController.getRowPage(
                 batch.Id,
                 ImportRowProcessor.STATUS_REJECTED,
-                0
+                null,
+                0,
+                null
             );
             Test.stopTest();
 
+            List<ImportController.RowView> rejected = page.rows;
+            Assert.areEqual(1, page.total, 'The cursor holds only the rejected row.');
+            Assert.areEqual(1, page.nextIndex, 'The next page starts after the one row.');
+            Assert.isFalse(page.hasMore, 'And one page reads it all. ' + pageText(page));
             Assert.areEqual(1, rejected.size(), 'Only the rejected row comes back.');
             Assert.areEqual(3, rejected[0].rowNumber, 'Named by its row number in the file.');
             Assert.areEqual(
@@ -280,6 +299,169 @@ private class ImportControllerTest {
                 rejected[0].values,
                 'And the original values, for the exceptions file.'
             );
+        }
+    }
+
+    /**
+     * The exceptions file must hold every rejected row, not the first 200 (the old page size)
+     * or the first 2,000 (the old OFFSET ceiling). 2,400 staged rows, 2,160 of them rejected,
+     * read through one cursor in pages of 500.
+     */
+    @IsTest
+    static void readsEveryRejectedRowThroughTheCursor() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = permittedTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            List<Import_Row__c> staged = new List<Import_Row__c>();
+            Integer expectedRejected = 0;
+            for (Integer i = 0; i < 2400; i++) {
+                Boolean rejected = Math.mod(i, 10) != 0;
+                expectedRejected += rejected ? 1 : 0;
+                staged.add(
+                    new Import_Row__c(
+                        Import_Batch__c = batch.Id,
+                        Row_Number__c = i + 2,
+                        Raw_Values_JSON__c = '{"Last Name":"Row ' + i + '"}',
+                        Status__c = rejected
+                            ? ImportRowProcessor.STATUS_REJECTED
+                            : ImportRowProcessor.STATUS_PENDING,
+                        Error_Message__c = rejected ? Label.Core_Import_ErrorLastNameMissing : null
+                    )
+                );
+            }
+            insert staged;
+
+            Test.startTest();
+            List<ImportController.RowView> read = new List<ImportController.RowView>();
+            ImportController.RowPage page = ImportController.getRowPage(
+                batch.Id,
+                ImportRowProcessor.STATUS_REJECTED,
+                null,
+                0,
+                500
+            );
+            read.addAll(page.rows);
+            List<String> trace = new List<String>{ pageText(page) };
+            Integer calls = 1;
+            while (page.hasMore && calls < 20) {
+                page = ImportController.getRowPage(
+                    batch.Id,
+                    ImportRowProcessor.STATUS_REJECTED,
+                    page.cursor,
+                    page.nextIndex,
+                    500
+                );
+                read.addAll(page.rows);
+                trace.add(pageText(page));
+                calls++;
+            }
+            Test.stopTest();
+
+            String pages = ' Pages: ' + String.join(trace, '; ');
+            Assert.areEqual(
+                expectedRejected,
+                page.total,
+                'The cursor holds every rejected row.' + pages
+            );
+            Assert.areEqual(
+                expectedRejected,
+                read.size(),
+                'And every one of them is read.' + pages
+            );
+            Assert.areEqual(5, calls, 'In pages of 500.' + pages);
+            Assert.isFalse(page.hasMore, 'Then the read says it is done.' + pages);
+            Integer previous = 0;
+            for (ImportController.RowView row : read) {
+                Assert.areEqual(
+                    ImportRowProcessor.STATUS_REJECTED,
+                    row.status,
+                    'Only rejected rows; row ' + row.rowNumber + ' is ' + row.status
+                );
+                Assert.isTrue(
+                    row.rowNumber > previous,
+                    'In file order, none twice: row ' + row.rowNumber + ' after ' + previous
+                );
+                previous = row.rowNumber;
+            }
+            Assert.areEqual(2401, previous, 'Up to the last rejected row of the file.');
+        }
+    }
+
+    @IsTest
+    static void holdsAPageBetweenOneRowAndTheCursorPageLimit() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = permittedTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            List<Import_Row__c> staged = new List<Import_Row__c>();
+            for (Integer i = 0; i < 2100; i++) {
+                staged.add(
+                    new Import_Row__c(
+                        Import_Batch__c = batch.Id,
+                        Row_Number__c = i + 2,
+                        Status__c = ImportRowProcessor.STATUS_REJECTED
+                    )
+                );
+            }
+            insert staged;
+
+            Test.startTest();
+            ImportController.RowPage tooLarge = ImportController.getRowPage(
+                batch.Id,
+                ImportRowProcessor.STATUS_REJECTED,
+                null,
+                0,
+                5000
+            );
+            ImportController.RowPage noSize = ImportController.getRowPage(
+                batch.Id,
+                null,
+                tooLarge.cursor,
+                tooLarge.nextIndex,
+                0
+            );
+            ImportController.RowPage pastTheEnd = ImportController.getRowPage(
+                batch.Id,
+                null,
+                tooLarge.cursor,
+                9999,
+                10
+            );
+            ImportController.RowPage noBatch = ImportController.getRowPage(null, null, null, 0, 10);
+            Test.stopTest();
+
+            Assert.areEqual(
+                ImportController.MAX_PAGE_ROWS,
+                tooLarge.rows.size(),
+                'A page never holds more than the platform allows.'
+            );
+            Assert.areEqual(
+                ImportController.MAX_PAGE_ROWS,
+                tooLarge.nextIndex,
+                'The next page starts after the first. ' + pageText(tooLarge)
+            );
+            Assert.isTrue(
+                tooLarge.hasMore,
+                'So the rest is left for the next page. ' + pageText(tooLarge)
+            );
+            Assert.areEqual(
+                2100 - ImportController.MAX_PAGE_ROWS,
+                noSize.rows.size(),
+                'No size reads a default page, cut at the end of the cursor. ' + pageText(noSize)
+            );
+            Assert.areEqual(2100, noSize.nextIndex, 'It ends at the end. ' + pageText(noSize));
+            Assert.isFalse(noSize.hasMore, 'Which ends the read. ' + pageText(noSize));
+            Assert.areEqual(
+                0,
+                pastTheEnd.rows.size(),
+                'A start past the end reads nothing. ' + pageText(pastTheEnd)
+            );
+            Assert.isFalse(pastTheEnd.hasMore, 'And says it is done. ' + pageText(pastTheEnd));
+            Assert.areEqual(
+                0,
+                noBatch.total,
+                'No batch, no rows, and no cursor opened. ' + pageText(noBatch)
+            );
+            Assert.isNull(noBatch.cursor, 'So no cursor counts against the daily limit.');
         }
     }
 

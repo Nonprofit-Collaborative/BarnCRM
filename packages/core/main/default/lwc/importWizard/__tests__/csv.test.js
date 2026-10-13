@@ -1,4 +1,5 @@
-import { parseCsv, toRecords, toCsv } from '../csv';
+import { parseCsv, toRecords } from '../csv';
+import { toCsv } from 'c/findCsv';
 
 describe('the CSV reader', () => {
   it('reads a plain file', () => {
@@ -69,17 +70,17 @@ describe('the CSV reader', () => {
     });
   });
 
-  describe('writing the exceptions file', () => {
-    it('quotes only what has to be quoted', () => {
-      const text = toCsv(['Row', 'Reason'], [{ Row: 2, Reason: 'Missing, last name' }]);
-      expect(text).toBe('Row,Reason\r\n2,"Missing, last name"');
-    });
-
-    it('survives a round trip', () => {
-      const headers = ['Name', 'Note'];
-      const records = [{ Name: 'Ramirez, Ana', Note: 'She said "hi"' }];
-      const again = toRecords(parseCsv(toCsv(headers, records))).records;
-      expect(again).toEqual(records);
+  describe('reading back the exceptions file', () => {
+    it('survives a round trip through the shared CSV writer, byte-order mark and all', () => {
+      const columns = [
+        { label: 'Name', path: 'Name' },
+        { label: 'Note', path: 'Note' },
+        { label: 'Amount', path: 'Amount' }
+      ];
+      const records = [{ Name: 'Muñoz, Ana', Note: 'She said "hi"', Amount: '-25.00' }];
+      const parsed = toRecords(parseCsv(toCsv(columns, records)));
+      expect(parsed.headers).toEqual(['Name', 'Note', 'Amount']);
+      expect(parsed.records).toEqual(records);
     });
   });
 });
