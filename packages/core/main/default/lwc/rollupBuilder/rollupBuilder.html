@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title={labels.title} icon-name="utility:builder">
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={notice}>
+                <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small" role="status">
+                    <span data-id="notice">{notice}</span>
+                </div>
+            </template>
+            <template lwc:if={error}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+                    <span data-id="error">{error}</span>
+                </div>
+            </template>
+            <template lwc:if={editing}>
+                <c-rollup-wizard model={model} draft={draft} onsaved={handleSaved} oncancel={handleCancel}></c-rollup-wizard>
+            </template>
+        </div>
+        <div class={listClass}>
+            <c-rollup-definitions builder onnew={handleNew} onedit={handleEdit} oncopy={handleCopy}></c-rollup-definitions>
+            <c-rollup-needs-attention></c-rollup-needs-attention>
+        </div>
+    </lightning-card>
+</template>

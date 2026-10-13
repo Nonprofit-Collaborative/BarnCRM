@@ -75,6 +75,9 @@ public with sharing class RollupController {
         public List<ModeOption> modeOptions { get; set; }
         @AuraEnabled
         public List<RollupView> rollups { get; set; }
+        /** The Rollup Builder tab, with the package namespace when there is one. */
+        @AuraEnabled
+        public String builderTabApiName { get; set; }
     }
 
     /** One mode: the stored value and the name the picklist gives it. */
@@ -180,6 +183,89 @@ public with sharing class RollupController {
         }
     }
 
+    /** A rough rate for a full run, from the first measured runs; an org run refines it. */
+    @TestVisible
+    private static final Integer RECORDS_PER_MINUTE = 1650;
+
+    /** The moment the estimate treats as now, so a test can pick a weekday or a night. */
+    @TestVisible
+    private static Datetime estimatedAt = null;
+
+    /** What Recalculate all will go through, said before it starts (ADR decision 12, S12). */
+    public class FullRunEstimate {
+        @AuraEnabled
+        public String summary { get; set; }
+        @AuraEnabled
+        public Boolean workingHours { get; set; }
+    }
+
+    /**
+     * Counts the records the nightly run goes through: every record of each entity an active
+     * Scheduled or Both rollup writes. The time is a rough figure, and during working hours
+     * (8 AM to 6 PM, Monday to Friday, in the user's time zone) the Builder suggests tonight.
+     */
+    @AuraEnabled
+    public static FullRunEstimate estimateFullRun() {
+        try {
+            requirePermission();
+            Set<Schema.SObjectType> targets = new Set<Schema.SObjectType>();
+            for (
+                Rollup_Definition__c definition : RollupSelector.selectActiveForModes(
+                    RollupService.scheduledModes()
+                )
+            ) {
+                Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
+                if (target != null) {
+                    targets.add(target);
+                }
+            }
+            Integer records = 0;
+            for (Schema.SObjectType target : targets) {
+                records += Database.countQueryWithBinds(
+                    'SELECT COUNT() FROM ' + String.valueOf(target),
+                    new Map<String, Object>(),
+                    AccessLevel.USER_MODE
+                );
+            }
+            Integer minutes = Math.max(
+                1,
+                (Integer) Math.ceil(records / (Decimal) RECORDS_PER_MINUTE)
+            );
+            Datetime moment = estimatedAt == null ? Datetime.now() : estimatedAt;
+            Integer weekday = Integer.valueOf(moment.format('u'));
+            Integer hour = Integer.valueOf(moment.format('H'));
+            FullRunEstimate estimate = new FullRunEstimate();
+            estimate.summary = String.format(
+                Label.Core_RollupBuilder_Estimate,
+                new List<String>{ records.format(), minutes.format() }
+            );
+            estimate.workingHours = weekday <= 5 && hour >= 8 && hour < 18;
+            return estimate;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Estimate the full recalculation');
+        }
+    }
+
+    /**
+     * Recalculate all, tonight: nothing extra when the nightly run is scheduled, since it
+     * recalculates every total at 2:00 AM; otherwise one run at 2:00 AM tonight.
+     *
+     * @return what to tell the administrator
+     */
+    @AuraEnabled
+    public static String runTonight() {
+        try {
+            requirePermission();
+            if (RollupScheduler.isScheduled()) {
+                return Label.Core_RollupBuilder_TonightAlreadyScheduled;
+            }
+            RollupScheduler.scheduleTonight();
+            return Label.Core_RollupBuilder_TonightScheduled;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Recalculate all rollups tonight');
+        }
+    }
+
     private static RollupPageView currentPage() {
         RollupPageView page = new RollupPageView();
         page.canManage = canManage();
@@ -194,6 +280,7 @@ public with sharing class RollupController {
             RollupService.MODE_BOTH
         };
         page.modeOptions = modeOptions(page.modes);
+        page.builderTabApiName = NamespaceUtil.qualify('Rollup_Builder');
         page.rollups = new List<RollupView>();
         Map<String, String> aggregateLabels = labelsOf(Rollup_Definition__c.Aggregate__c);
         Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);

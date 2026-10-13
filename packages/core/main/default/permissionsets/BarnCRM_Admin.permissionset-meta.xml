@@ -260,6 +260,14 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>RollupAttentionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>RollupBuilderController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RollupController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -1632,6 +1640,10 @@
   </tabSettings>
   <tabSettings>
     <tab>BarnCRM_Settings</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Rollup_Builder</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
