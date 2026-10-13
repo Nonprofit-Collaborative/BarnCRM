@@ -935,7 +935,17 @@ a BarnCRM record.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, field utilization count, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
+| `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
+
+### Org Optimizer keys
+
+Added by Org Optimizer (ADR-NEXT `NEXT-org-optimizer-and-data-manager-pages.md`). Shown in
+the console's General section. Each number has a minimum and a maximum (D-40); a value out of
+range reads as the nearest end.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Stale_Record_Years__c` | integer | 5 | Years without a change before the Data quality check People not changed lists a person (R-SQ6). From 1 to 20; empty reads as 5. |
 
 ### Rules
 
@@ -6086,6 +6096,10 @@ and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved 
 the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
 own saved query of that name if there is one. Nothing else about Saved Query changes
 (ADR-0079, `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+Three person checks read standard Contact fields: no email, phone, mobile, mailing city or
+postal code on a living person; Deceased with an email and Email Opt Out not ticked; and
+Last Modified Date older than `Stale_Record_Years__c` years, the cut-off written into the
+document when it is built.
 
 **R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
 in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists
