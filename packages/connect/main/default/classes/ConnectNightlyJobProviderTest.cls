@@ -82,7 +82,12 @@ private class ConnectNightlyJobProviderTest {
 
     @IsTest
     static void aScheduledRunIsNoLongerWaiting() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+        // The run reads in user mode as whoever scheduled it, so it is scheduled by someone
+        // who holds the mirror's permission set, as on the Opportunity mirror page.
+        User maria = TestUsers.withPermissionSets(
+            new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Admin', 'Opportunity_Mirror' }
+        );
+        System.runAs(maria) {
             if (!OpportunityMirrorService.isAvailable()) {
                 return;
             }

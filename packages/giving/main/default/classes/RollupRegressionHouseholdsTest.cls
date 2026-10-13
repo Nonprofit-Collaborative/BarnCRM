@@ -303,7 +303,7 @@ private class RollupRegressionHouseholdsTest {
             Contact luis = RecognitionTestData.person('Luis', 'Garcia', null);
             Contact wei = RecognitionTestData.person('Wei', 'Lee', null);
             RecognitionTestData.membership(garcia.Id, ana.Id, 'Head');
-            RecognitionTestData.membership(garcia.Id, luis.Id, 'Member');
+            RecognitionTestData.membership(garcia.Id, luis.Id, 'Other');
             RecognitionTestData.membership(lee.Id, wei.Id, 'Head');
             GivingRollupTestData.installShippedRollups();
 

@@ -372,7 +372,7 @@ public with sharing class ImportBatchService {
             throw new ImportException(Label.Core_Import_ErrorPersonModeUnavailable);
         }
         // No reset of the staged rows: each chunk clears and stamps its own, so a pass costs the
-        // same one write here however long the file (R-IB13).
+        // same two writes here however long the file (R-IB13).
         batch.Pass_Number__c = nextPass(batch);
         batch.Status__c = dryRun ? STATUS_DRY_RUN : STATUS_COMMITTING;
         batch.Is_Dry_Run__c = dryRun;
@@ -395,8 +395,39 @@ public with sharing class ImportBatchService {
             new ImportProcessorBatch(batch.Id, dryRun),
             scopeSize(batch.Chunk_Size__c)
         );
-        Database.update(batch, AccessLevel.USER_MODE);
+        Database.update(passStamp(batch), AccessLevel.USER_MODE);
+        // The pass number and job are the package's bookkeeping, read only in every permission
+        // set, so they are written in system mode (ADR-0021).
+        Database.update(
+            new Import_Batch__c(
+                Id = batch.Id,
+                Pass_Number__c = batch.Pass_Number__c,
+                Job_Id__c = batch.Job_Id__c
+            ),
+            AccessLevel.SYSTEM_MODE
+        );
         return batch.Job_Id__c;
+    }
+
+    /** Only what starting a pass changes and the person starting it may edit, saved as them. */
+    private static Import_Batch__c passStamp(Import_Batch__c batch) {
+        Import_Batch__c stamp = new Import_Batch__c(
+            Id = batch.Id,
+            Status__c = batch.Status__c,
+            Is_Dry_Run__c = batch.Is_Dry_Run__c,
+            Started_At__c = batch.Started_At__c,
+            Completed_At__c = null,
+            Run_Log__c = null,
+            Rows_Created__c = 0,
+            Rows_Updated__c = 0,
+            Rows_Matched__c = 0,
+            Rows_Rejected__c = 0
+        );
+        if (batch.Is_Dry_Run__c != true) {
+            stamp.Committed_By__c = batch.Committed_By__c;
+            stamp.Undo_Deadline__c = batch.Undo_Deadline__c;
+        }
+        return stamp;
     }
 
     /** Set by a test to stand for the platform's answer about a batch's job. */

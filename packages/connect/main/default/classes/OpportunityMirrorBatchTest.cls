@@ -25,8 +25,19 @@ private class OpportunityMirrorBatchTest {
         settings.Opportunity_Mirror_Direction__c = direction;
         settings.Opportunity_Mirror_Start__c = startDate == null
             ? null
-            : Datetime.newInstance(startDate, Time.newInstance(0, 0, 0, 0));
+            : midnightInTheOrgTimeZone(startDate);
         upsert settings;
+    }
+
+    /**
+     * The run reads the start date in the org's default time zone (OpportunityGiftService),
+     * so it is stored as midnight there, whatever time zone the test user has.
+     */
+    private static Datetime midnightInTheOrgTimeZone(Date day) {
+        String zone = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1]
+        .TimeZoneSidKey;
+        Datetime gmtMidnight = Datetime.newInstanceGmt(day, Time.newInstance(0, 0, 0, 0));
+        return gmtMidnight.addSeconds(-TimeZone.getTimeZone(zone).getOffset(gmtMidnight) / 1000);
     }
 
     private static User maria() {

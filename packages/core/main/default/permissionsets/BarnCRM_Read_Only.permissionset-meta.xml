@@ -726,6 +726,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Setting_Change__c.Deployment_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Setting_Change__c.New_Value__c</field>
     <readable>true</readable>
   </fieldPermissions>

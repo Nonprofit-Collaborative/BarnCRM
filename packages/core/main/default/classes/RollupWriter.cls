@@ -155,6 +155,11 @@ public without sharing class RollupWriter {
             return text.length() > describe.getLength() ? text.left(describe.getLength()) : text;
         }
         if (type == Schema.DisplayType.DATE) {
+            // A Date is also `instanceof Datetime` in Apex, so test for Date first: calling
+            // `.date()` on one reads it as midnight GMT and gives the day before west of GMT.
+            if (value instanceof Date) {
+                return value;
+            }
             return value instanceof Datetime ? ((Datetime) value).date() : value;
         }
         if (type == Schema.DisplayType.DATETIME) {

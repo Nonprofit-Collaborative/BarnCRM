@@ -337,16 +337,35 @@ private class RollupRegressionPathsTest {
             Contact bea = bea();
             Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
             Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 75);
-
-            Test.startTest();
+            // Each save is its own transaction in the org; a test is one, and a save that finds
+            // half its query budget spent queues its totals instead (R-R4). So the gift and its
+            // credit are set up before Test.startTest without their real-time totals, the fund
+            // and Bea are then brought up to date as those saves would leave them, and the
+            // delete under test has the room a single save has.
+            List<String> rollups = new List<String>{
+                'Giving_Rollups_Gift',
+                'Giving_Rollups_Gift_Allocation',
+                'Giving_Rollups_Soft_Credit'
+            };
+            for (String rollup : rollups) {
+                AutomationControl.bypass(rollup);
+            }
             insert gift;
-            GivingRollupTestData.nextSave();
             insert new Soft_Credit__c(
                 Gift__c = gift.Id,
                 Contact__c = bea.Id,
                 Role__c = 'Solicitor',
                 Amount__c = 75
             );
+            for (String rollup : rollups) {
+                AutomationControl.clearBypass(rollup);
+            }
+            RollupEngine.recalculate(new Set<Id>{ general.Id }, Fund__c.SObjectType);
+            RollupEngine.recalculate(new Set<Id>{ bea.Id }, Contact.SObjectType);
+            Fund__c fundBeforeDelete = GivingRollupTestData.fund(general.Id);
+            Contact beaBeforeDelete = GivingRollupTestData.person(bea.Id);
+
+            Test.startTest();
             GivingRollupTestData.nextSave();
             delete gift;
             Fund__c fundAfterDelete = GivingRollupTestData.fund(general.Id);
@@ -355,6 +374,8 @@ private class RollupRegressionPathsTest {
             undelete gift;
             Test.stopTest();
 
+            Assert.areEqual(75, fundBeforeDelete.Total_Raised__c, 'The fund had the gift');
+            Assert.areEqual(75, beaBeforeDelete.Total_Soft_Credits__c, 'Bea had the credit');
             Assert.areEqual(
                 0,
                 GivingRollupTestData.valueOf(fundAfterDelete.Total_Raised__c),

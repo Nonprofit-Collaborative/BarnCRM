@@ -128,14 +128,14 @@ private class DataProtectedFieldsTest {
             DataProtectionExtensions.noneForTest = true;
             Test.startTest();
             String affiliations = refusal(Affiliation__c.SObjectType);
-            String dismissals = refusal(Duplicate_Dismissal__c.SObjectType);
+            String relationships = refusal(Relationship__c.SObjectType);
             String contacts = refusal(Contact.SObjectType);
             String accounts = refusal(Account.SObjectType);
             String tasks = refusal(Task.SObjectType);
             Test.stopTest();
 
             Assert.isNull(affiliations, 'A custom object of the org may be loaded.');
-            Assert.isNull(dismissals, 'Any custom object that is not bookkeeping.');
+            Assert.isNull(relationships, 'Any custom object that is not bookkeeping.');
             Assert.isNull(contacts, 'People are a business record.');
             Assert.isNull(accounts, 'So are accounts.');
             Assert.isNull(tasks, 'And tasks.');
