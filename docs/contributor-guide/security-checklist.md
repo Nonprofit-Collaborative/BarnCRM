@@ -88,7 +88,6 @@ personal data, or any LWC that renders text. The last full pass was the v0.11 ha
 
 | Item | Where | Why it is open |
 | ---- | ----- | -------------- |
-| `without sharing` with no header justification | `RollupCurrency.cls` | Rollup classes were being changed on another branch; add the line ADR-0021 asks for |
 | CSV cells not guarded against formula injection | `lwc/findCsv/findCsv.js` `cell()` | Find was being changed on another branch |
 | Accounting export has no custom permission, only user-mode reads | `AccountingExportController.exportGifts` | Owner decision: gate on the posting permission or accept user-mode reads |
 | `Error_Log_Event__e` readable by Staff and Read Only | BarnCRM Staff and Read Only permission sets | Check in an org whether publishing needs Read; if not, remove it |

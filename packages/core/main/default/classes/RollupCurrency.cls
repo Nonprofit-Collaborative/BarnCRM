@@ -13,8 +13,11 @@
  *
  * `CurrencyType` and `CurrencyIsoCode` exist only in a multi-currency org, so both are named as
  * text and read dynamically, never compiled against.
+ *
+ * `inherited sharing`: its one read is the conversion rates, in system mode; the rest is describe
+ * calls and arithmetic, so the class needs no sharing of its own.
  */
-public without sharing class RollupCurrency {
+public inherited sharing class RollupCurrency {
     public static final String ISO_FIELD = 'CurrencyIsoCode';
 
     /** Read only after `isMultiCurrency` says the org has the object. */
