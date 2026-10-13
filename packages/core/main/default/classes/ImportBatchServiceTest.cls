@@ -90,6 +90,68 @@ private class ImportBatchServiceTest {
         }
     }
 
+    /** Rows cannot join a batch that has run: it would flip back to Parsing. */
+    @IsTest
+    static void refusesToStageIntoABatchThatHasRun() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
+            batch.Status__c = ImportBatchService.STATUS_COMPLETE;
+            update batch;
+
+            Test.startTest();
+            String refused;
+            try {
+                ImportBatchService.stageRows(
+                    batch.Id,
+                    new List<Map<String, Object>>{ new Map<String, Object>{ 'Email' => 'a@b.org' } },
+                    2
+                );
+            } catch (ImportException e) {
+                refused = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(Label.Core_Import_ErrorStagingClosed, refused, 'Refused, and why.');
+            Import_Batch__c after = ImportBatchSelector.selectById(batch.Id);
+            Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'Unchanged.');
+            Assert.areEqual(0, ImportTestDataFactory.reload(batch.Id).size(), 'Nothing staged.');
+        }
+    }
+
+    /** A row too long to hold is refused by its number, not cut into unreadable text. */
+    @IsTest
+    static void refusesARowTooLongToHold() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
+            List<Map<String, Object>> page = new List<Map<String, Object>>{
+                new Map<String, Object>{ 'Email' => 'a@b.org' },
+                new Map<String, Object>{
+                    'Notes' => 'x'.repeat(ImportBatchService.MAX_ROW_LENGTH)
+                }
+            };
+
+            Test.startTest();
+            String refused;
+            try {
+                ImportBatchService.stageRows(batch.Id, page, 2);
+            } catch (ImportException e) {
+                refused = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                String.format(Label.Core_Import_ErrorRowTooLong, new List<String>{ '3' }),
+                refused,
+                'The second row of the page is file row three.'
+            );
+            Assert.areEqual(
+                0,
+                ImportTestDataFactory.reload(batch.Id).size(),
+                'No row of the page was staged.'
+            );
+        }
+    }
+
     @IsTest
     static void stagingNothingChangesNothing() {
         System.runAs(TestUsers.admin()) {

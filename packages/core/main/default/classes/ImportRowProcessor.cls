@@ -1379,16 +1379,7 @@ public with sharing class ImportRowProcessor {
     }
 
     private static Boolean describesPerson(Working item, String entity) {
-        Map<String, String> held = item.byEntity.get(entity);
-        if (held == null) {
-            return false;
-        }
-        for (String value : held.values()) {
-            if (String.isNotBlank(value)) {
-                return true;
-            }
-        }
-        return false;
+        return hasAnyValue(item.byEntity.get(entity));
     }
 
     private static Boolean hasLastName(Working item, String entity) {
@@ -2306,6 +2297,9 @@ public with sharing class ImportRowProcessor {
             rows.add(item.row);
             entitiesByRowId.put(item.row.Id, item.byEntity);
         }
+        // A processor that throws part way must leave none of its records behind, and the rows
+        // whose entities it never loaded must not read as loaded. The people saved above stay.
+        Savepoint beforeProcessor = Database.setSavepoint();
         try {
             ImportEntityResult result = processor.resolve(
                 batch,
@@ -2324,10 +2318,59 @@ public with sharing class ImportRowProcessor {
                 outcome.processorSettings = result.settings;
             }
         } catch (Exception e) {
+            Database.rollback(beforeProcessor);
             ErrorLogger.log(e, 'ImportRowProcessor.offerToEntityProcessor');
             outcome.notes.add(e.getMessage());
+            rejectUnloadedEntities(working, deferred, e.getMessage());
         }
         foldProcessorOutcome(working);
+    }
+
+    /**
+     * Rejects every row that carried values for the processor's entities, after the processor
+     * failed and its writes were rolled back: those values were not loaded, and a row that
+     * says Created would hide that. The row keeps the people it resolved, which stay saved.
+     */
+    private static void rejectUnloadedEntities(
+        List<Working> working,
+        Set<String> deferred,
+        String reason
+    ) {
+        for (Working item : working) {
+            if (item.error != null) {
+                continue;
+            }
+            List<String> carried = new List<String>();
+            for (String entity : deferred) {
+                if (hasAnyValue(item.byEntity.get(entity))) {
+                    carried.add(entity);
+                }
+            }
+            if (carried.isEmpty()) {
+                continue;
+            }
+            item.error = String.format(
+                Label.Core_Import_ErrorEntitiesNotLoaded,
+                new List<String>{ String.join(carried, ', '), reason }
+            );
+            item.row.Status__c = STATUS_REJECTED;
+            item.row.Error_Message__c = item.error.abbreviate(4000);
+            // Whatever the processor stamped before it failed was rolled back with it.
+            item.row.Gift_Id__c = null;
+            item.row.Soft_Credit_Id__c = null;
+        }
+    }
+
+    private static Boolean hasAnyValue(Map<String, String> held) {
+        if (held == null) {
+            return false;
+        }
+        for (String value : held.values()) {
+            if (String.isNotBlank(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -2547,20 +2590,59 @@ public with sharing class ImportRowProcessor {
             }
             rows.add(row);
         }
-        if (rows.isEmpty()) {
+        saveRows(rows, outcome, 'ImportRowProcessor.writeBack');
+    }
+
+    /**
+     * Saves staged rows and says when any could not be saved. The rows are the package's own
+     * bookkeeping and must record what happened even where the running user cannot edit them,
+     * for the reason ADR-0021 gives. A row that fails to save keeps its last pass's status, so
+     * the failure goes to the Error Log and, once per chunk, to the run log.
+     */
+    @NamespaceAccessible
+    public static void saveRows(List<Import_Row__c> rows, Outcome outcome, String context) {
+        if (rows == null || rows.isEmpty()) {
             return;
         }
-        // The staged rows are the package's own bookkeeping and must record what happened even
-        // where the running user cannot edit them, for the reason ADR-0021 gives.
-        Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+        List<Database.SaveResult> results = Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+        Integer failed = 0;
+        Integer firstIndex;
+        for (Integer i = 0; i < results.size(); i++) {
+            if (!results[i].isSuccess()) {
+                failed++;
+                firstIndex = firstIndex == null ? i : firstIndex;
+            }
+        }
+        if (failed == 0) {
+            return;
+        }
+        List<Database.Error> errors = results[firstIndex].getErrors();
+        String line = String.format(
+            Label.Core_Import_LogRowsNotSaved,
+            new List<String>{
+                String.valueOf(failed),
+                String.valueOf(
+                    rows[firstIndex].Row_Number__c != null
+                        ? (Object) rows[firstIndex].Row_Number__c
+                        : rows[firstIndex].Id
+                ),
+                errors.isEmpty() ? '' : errors[0].getMessage()
+            }
+        );
+        ErrorLogger.logMessage(line, context, ErrorLogger.SEVERITY_ERROR);
+        if (outcome != null) {
+            outcome.notes.add(line);
+        }
     }
 
     /** Writes the people and the organization the row resolved to onto the row. */
     private static void stampResolved(Working item) {
         Import_Row__c row = item.row;
+        // Either person decides: a row may give only a second person, and an Account Id in a
+        // Contact lookup fails the row's save.
+        Id either = item.person1Id != null ? item.person1Id : item.person2Id;
         Boolean personAccountRow =
-            item.person1Id != null &&
-            item.person1Id.getSObjectType() == Account.SObjectType;
+            either != null && either.getSObjectType() == Account.SObjectType;
         if (personAccountRow) {
             row.Person_1_Account__c = item.person1Id;
             row.Person_2_Account__c = item.person2Id;

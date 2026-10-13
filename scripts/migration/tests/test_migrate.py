@@ -196,6 +196,23 @@ class KitTest(unittest.TestCase):
         self.assertEqual({u["ns__Original__c"] for u in updates}, {id_map[sid("a02", 1)[:15]]})
         self.assertEqual(len(updates), 2)
 
+    def test_a_refused_lookup_fill_in_counts_as_refused(self):
+        self.gifts(3)
+        org = FakeOrg()
+        patch = org.rest
+
+        def refuse_fill_ins(method, path, body):
+            if method == "PATCH" and any("ns__Level_Id__c" in r and "Id" in r and len(r) == 3
+                                         for r in body["records"]):
+                return [{"success": False, "errors": [{"message": "locked"}]} for _ in body["records"]]
+            return patch(method, path, body)
+
+        org.rest = refuse_fill_ins
+        summary = self.kit(org).reimport()
+        self.assertEqual(summary["Gift__c"], (3, 3))  # all three loaded, their pass-two links refused
+        with open(os.path.join(self.folder, "refused.csv")) as handle:
+            self.assertEqual(len([r for r in csv.DictReader(handle) if r["object"] == "Gift__c"]), 3)
+
     def test_related_tasks_follow_their_record_and_orphans_are_refused(self):
         self.gifts(1)
         self.write("Task", [{"Id": sid("00T", 1), "WhatId": sid("a02", 1), "Subject": "Thank"},

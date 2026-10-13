@@ -258,7 +258,10 @@ class Kit:
                         record[ns(field["name"], self.namespace)] = id_map[key]
                 if len(record) > 2:
                     updates.append((row["Id"], record))
-            self.send(entry, api, updates, refused, update=True)
+            linked = self.send(entry, api, updates, refused, update=True)
+            if len(linked) < len(updates):  # a refused fill-in leaves a lookup blank: count it
+                loaded, failed = summary.get(entry["name"], (0, 0))
+                summary[entry["name"]] = (loaded, failed + len(updates) - len(linked))
 
         for related in self.mapping["related"]:
             summary[related["object"]] = self.reimport_related(related, id_map, log, refused)

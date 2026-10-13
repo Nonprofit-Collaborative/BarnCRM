@@ -868,6 +868,8 @@ private class ImportRowProcessorTest {
             Boolean dryRun
         ) {
             if (throwOnResolve) {
+                // Something saved before the failure, as a gift would be, must not survive it.
+                insert as user new Account(Name = 'Saved before the failure');
                 throw new IllegalArgumentException('stub failed');
             }
             sawDryRun = dryRun;
@@ -1054,12 +1056,20 @@ private class ImportRowProcessorTest {
         }
     }
 
+    /**
+     * A processor that throws part way leaves nothing of its own behind, and every row that
+     * carried its columns is rejected with the reason, not reported loaded. The people stay,
+     * on the row, and a row without its columns keeps Core's outcome.
+     */
     @IsTest
-    static void aProcessorThatThrowsDoesNotFailTheImport() {
+    static void aProcessorThatThrowsIsRolledBackAndItsRowsRejected() {
         System.runAs(TestUsers.admin()) {
-            givenGiftRows(
-                new List<Map<String, String>>{ giftRow('ana@example.org', 'Ramirez', '50') }
-            );
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 199; i++) {
+                values.add(giftRow('donor' + i + '@example.org', 'Surname' + i, '50'));
+            }
+            values.add(giftRow('nogift@example.org', 'Nogift', ''));
+            givenGiftRows(values);
             StubProcessor stub = new StubProcessor();
             stub.throwOnResolve = true;
             ImportEntityProcessors.processorOverride = stub;
@@ -1068,8 +1078,65 @@ private class ImportRowProcessorTest {
             ImportRowProcessor.Outcome outcome = run(false);
             Test.stopTest();
 
-            Assert.areEqual(1, outcome.created, 'The person still loaded.');
-            Assert.isTrue(outcome.notes.contains('stub failed'), 'And the run log says why.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Name = 'Saved before the failure'],
+                'What the processor saved before it failed was rolled back.'
+            );
+            Assert.areEqual(200, [SELECT COUNT() FROM Contact], 'The people stay saved.');
+            Assert.areEqual(199, outcome.rejected, 'Every row with a gift is rejected.');
+            Assert.areEqual(1, outcome.created, 'The row without one keeps its outcome.');
+            Assert.isTrue(outcome.notes.contains('stub failed'), 'The run log says why.');
+            Map<String, Import_Row__c> rows = rowsByEmail();
+            Import_Row__c rejected = rows.get('donor0@example.org');
+            Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.Status__c);
+            Assert.areEqual(
+                String.format(
+                    Label.Core_Import_ErrorEntitiesNotLoaded,
+                    new List<String>{ 'Gift', 'stub failed' }
+                ),
+                rejected.Error_Message__c,
+                'The row says its gift was not loaded, and why.'
+            );
+            Assert.isNotNull(rejected.Contact_1__c, 'And still points at its person.');
+            Assert.areEqual(
+                ImportRowProcessor.STATUS_CREATED,
+                rows.get('nogift@example.org').Status__c,
+                'Nothing was lost for a row with no gift.'
+            );
+        }
+    }
+
+    /** A staged row that cannot be saved is said, in the run log, not left silently stale. */
+    @IsTest
+    static void aRowThatCannotBeSavedIsReported() {
+        System.runAs(TestUsers.admin()) {
+            givenGiftRows(
+                new List<Map<String, String>>{
+                    giftRow('ana@example.org', 'Ramirez', '50'),
+                    giftRow('ben@example.org', 'Okafor', '50')
+                }
+            );
+            List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
+            delete rows[1];
+            for (Import_Row__c row : rows) {
+                row.Status__c = ImportRowProcessor.STATUS_MATCHED;
+            }
+            ImportRowProcessor.Outcome outcome = new ImportRowProcessor.Outcome();
+
+            Test.startTest();
+            ImportRowProcessor.saveRows(rows, outcome, 'ImportRowProcessorTest');
+            Test.stopTest();
+
+            Assert.areEqual(1, outcome.notes.size(), 'One line for the chunk: ' + outcome.notes);
+            String line = new List<String>(outcome.notes)[0];
+            Assert.isTrue(line.startsWith('1 '), 'It counts the row that failed: ' + line);
+            Assert.isTrue(line.contains(' 3: '), 'And names it by its file row: ' + line);
+            Assert.areEqual(
+                ImportRowProcessor.STATUS_MATCHED,
+                ImportTestDataFactory.reload(batch.Id)[0].Status__c,
+                'The other row saved.'
+            );
         }
     }
 

@@ -418,4 +418,50 @@ private class ImportPersonAccountTest {
             );
         }
     }
+
+    /**
+     * A row that gives only a second person points at them through the person account lookup:
+     * an Account Id in the Contact lookup would fail the row's save and leave it Pending.
+     */
+    @IsTest
+    static void aRowWithOnlyASecondPersonPointsAtThem() {
+        System.runAs(TestUsers.admin()) {
+            if (!orgHasPersonAccounts()) {
+                // Platform-only shape (ADR-0013): no person accounts to create.
+                return;
+            }
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            ImportMapping secondOnly = new ImportMapping();
+            secondOnly.columns.add(new ImportMapping.Column('First 2', 'Contact2.FirstName'));
+            secondOnly.columns.add(new ImportMapping.Column('Last 2', 'Contact2.LastName'));
+            secondOnly.columns.add(new ImportMapping.Column('Email 2', 'Contact2.Email'));
+            template = ImportTestDataFactory.template(
+                secondOnly.serialize(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            template.Person_Mode__c = ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS;
+            update template;
+            batch = ImportTestDataFactory.batch(template);
+            ImportTestDataFactory.rows(
+                batch,
+                new List<Map<String, String>>{
+                    new Map<String, String>{
+                        'First 2' => 'Ben',
+                        'Last 2' => 'Okafor',
+                        'Email 2' => 'ben@example.org'
+                    }
+                }
+            );
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
+            Assert.areEqual(1, outcome.created, 'The row created Ben: ' + outcome.notes);
+            Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, 'Saved as such.');
+            Assert.isNotNull(row.Person_2_Account__c, 'Pointing at Ben.');
+            Assert.isNull(row.Contact_2__c, 'Not through the Contact lookup.');
+        }
+    }
 }
