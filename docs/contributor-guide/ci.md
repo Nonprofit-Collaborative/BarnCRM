@@ -28,6 +28,16 @@ Salesforce org is needed for this job. Steps:
    of the rule silently. Without the rule the next edit can pull in the platform and the
    module stops being reusable outside Salesforce or testable without stubs (plan Section
    4.4, portability at near-zero cost).
+   The next workflow step, `npm run lint:slds`, runs Salesforce's SLDS linter
+   (`@salesforce-ux/slds-linter`, pinned in `package.json`) over every component's HTML and
+   CSS under `packages/`, failing the build on any SLDS 2 (Cosmos theme) finding: a
+   hard-coded color, spacing, font size, shadow or radius instead of a `--slds-g-*` global
+   styling hook, a deprecated `--lwc-*` design token, a private or unsupported hook, an
+   override of an SLDS class, a retired class name (`--` modifiers instead of `_`), or the
+   modal close button issue. The CLI exits 0 when it finds warnings only, and most SLDS 2
+   findings are warnings, so the script passes only when the linter prints "No SLDS
+   Violations found". `npx slds-linter lint packages --fix` applies the safe fixes; review
+   each one.
 4. `npm run test:unit:coverage`
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
@@ -231,6 +241,7 @@ tests run on a laptop too, through the gate script described under "The org test
 ```
 npm run prettier:verify
 npm run lint
+npm run lint:slds
 npm run test:unit
 npm run check:namespace
 npm run check:standard-objects
