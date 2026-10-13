@@ -239,4 +239,37 @@ private class ModuleDetectionServiceTest {
             );
         }
     }
+
+    @IsTest
+    static void anotherPackagesFundAndAppealDoNotLookLikeGiving() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            NamespaceUtil.cachedPrefix = '';
+            String otherPrefix = 'other__';
+            NamespaceUtil.describeOverride = new Map<String, Schema.SObjectType>{
+                otherPrefix + 'fund__c' => Account.SObjectType,
+                otherPrefix + 'appeal__c' => Contact.SObjectType
+            };
+
+            Test.startTest();
+            Boolean foreignLooksLikeGiving = ModuleDetectionService.isGivingPresent();
+            String foreignFund = ModuleDetectionService.resolveObject('Fund__c');
+            NamespaceUtil.describeOverride.put('fund__c', Account.SObjectType);
+            NamespaceUtil.describeOverride.put('appeal__c', Contact.SObjectType);
+            Boolean ownLooksLikeGiving = ModuleDetectionService.isGivingPresent();
+            Test.stopTest();
+
+            Assert.isFalse(
+                foreignLooksLikeGiving,
+                'Objects of the same name in another namespace are not Giving'
+            );
+            Assert.isNull(foreignFund, 'Another package\'s Fund__c does not resolve');
+            Assert.isTrue(ownLooksLikeGiving, 'The package\'s own objects are found');
+            Assert.areEqual(
+                'Account',
+                ModuleDetectionService.resolveObject('Fund__c'),
+                'The real API name of the matching object comes back'
+            );
+        }
+    }
 }

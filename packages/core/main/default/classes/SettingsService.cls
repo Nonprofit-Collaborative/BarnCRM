@@ -492,43 +492,17 @@ public with sharing class SettingsService {
     /** Settings objects already described and found to be hierarchy settings, this transaction. */
     private static Set<Schema.SObjectType> checkedSettingsTypes = new Set<Schema.SObjectType>();
 
-    /** Objects by trimmed lower-case name, null when absent, looked up once per transaction. */
-    private static Map<String, Schema.SObjectType> typesByName = new Map<String, Schema.SObjectType>();
-
     private static String objectName(String settingsObject) {
         return String.isBlank(settingsObject) ? CORE_SETTINGS_OBJECT : settingsObject.trim();
     }
 
     /**
-     * The object with this API name, whether or not a namespace is in front of it. Metadata rows
-     * name objects without a prefix, and a packaged org's describe keys carry one, so an exact
-     * match is tried first and then a match on the part after the namespace.
+     * The object a metadata row names, BarnCRM's own before any other of the same name, cached
+     * per transaction. See `NamespaceUtil.objectType`.
      */
     @NamespaceAccessible
     public static Schema.SObjectType typeByName(String apiName) {
-        if (String.isBlank(apiName)) {
-            return null;
-        }
-        String cacheKey = apiName.trim().toLowerCase();
-        if (!typesByName.containsKey(cacheKey)) {
-            typesByName.put(cacheKey, describeTypeByName(apiName.trim()));
-        }
-        return typesByName.get(cacheKey);
-    }
-
-    private static Schema.SObjectType describeTypeByName(String name) {
-        Map<String, Schema.SObjectType> globals = Schema.getGlobalDescribe();
-        Schema.SObjectType type = globals.get(name);
-        if (type != null) {
-            return type;
-        }
-        String suffix = '__' + name.toLowerCase();
-        for (String key : globals.keySet()) {
-            if (key.toLowerCase().endsWith(suffix)) {
-                return globals.get(key);
-            }
-        }
-        return null;
+        return NamespaceUtil.objectType(apiName);
     }
 
     private static Set<String> registeredObjects() {
