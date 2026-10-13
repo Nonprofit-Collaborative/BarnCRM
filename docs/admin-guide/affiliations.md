@@ -33,6 +33,9 @@ both switched on as they ship:
 They are two rows on purpose. Switching the upkeep off before a large import, which is the
 usual reason to touch it, leaves every check running.
 
+A people import links each row's first person to the organization on the row with an
+affiliation, or finds the one they already have (see [Importing](importing.md), section 8).
+
 To let your team see and manage affiliations, make sure they have one of the packaged access
 levels (BarnCRM Admin, Program Staff, or, with Giving installed, Fundraising Staff) on the **Access** page in
 BarnCRM Settings. Read Only users see affiliations and cannot change them.
