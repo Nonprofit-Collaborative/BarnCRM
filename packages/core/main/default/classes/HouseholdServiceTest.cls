@@ -1785,6 +1785,52 @@ private class HouseholdServiceTest {
     }
 
     /**
+     * PEOPLE-7. The hidden contact behind a person stored as an account, handed to
+     * addMembers, joins as that account: one membership, on the account side, and no row
+     * naming the contact.
+     */
+    @IsTest
+    static void thePersonContactBehindAnAccountJoinsAsTheAccount() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            HouseholdService.personAccountOverride = true;
+            Account person = new Account(Name = 'Maria Garcia');
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Household');
+            insert new List<Account>{ person, household };
+            Contact behind = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert behind;
+            PersonRecordSelector.accountBehindContactOverride = new Map<Id, Id>{
+                behind.Id => person.Id
+            };
+
+            Test.startTest();
+            HouseholdService.addMembers(
+                new Map<Id, Set<Id>>{ household.Id => new Set<Id>{ behind.Id } }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household.Id AND Account__c = :person.Id
+                ],
+                'The person joins by the account side'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c = :household.Id AND Contact__c = :behind.Id
+                ],
+                'No membership names the hidden contact'
+            );
+        }
+    }
+
+    /**
      * The short circuit: an org OrgShapeDetector reports as having no native household
      * groups at all is never asked the per-record question.
      */

@@ -9,6 +9,8 @@
  * way for the same reason.
  */
 public with sharing class HouseholdOfPersonController {
+    private static final String CONTACT_SEARCH_WITHOUT_PERSON_ACCOUNTS = 'SELECT Id, Name FROM Contact WHERE Name LIKE :likeTerm AND IsPersonAccount = false ORDER BY Name LIMIT 10'; // detection-only: used only after isPersonAccountOrg found person accounts, so each such person is offered once, as the account
+
     /**
      * One household as the panel on a person's record shows it.
      */
@@ -112,9 +114,11 @@ public with sharing class HouseholdOfPersonController {
         }
         try {
             String likeTerm = '%' + trimmed + '%';
-            result.addAll(searchContacts(likeTerm));
             if (HouseholdService.isPersonAccountOrg()) {
+                result.addAll(searchContactsWithoutPersonAccounts(likeTerm));
                 result.addAll(searchPersonAccounts(likeTerm));
+            } else {
+                result.addAll(searchContacts(likeTerm));
             }
             return result;
         } catch (Exception e) {
@@ -255,6 +259,26 @@ public with sharing class HouseholdOfPersonController {
             LIMIT 10
         ]) {
             result.add(toPersonResult(record.Id, record.Name));
+        }
+        return result;
+    }
+
+    /**
+     * Contacts that are people in their own right, in an org that also stores people as
+     * accounts. The contact the platform keeps behind each such account is left out, because
+     * that person is offered as the account (PEOPLE-7) and joins by the account side.
+     */
+    private static List<PersonResult> searchContactsWithoutPersonAccounts(String likeTerm) {
+        List<PersonResult> result = new List<PersonResult>();
+        Map<String, Object> binds = new Map<String, Object>{ 'likeTerm' => likeTerm };
+        for (
+            SObject record : Database.queryWithBinds(
+                CONTACT_SEARCH_WITHOUT_PERSON_ACCOUNTS,
+                binds,
+                AccessLevel.USER_MODE
+            )
+        ) {
+            result.add(toPersonResult(record.Id, (String) record.get('Name')));
         }
         return result;
     }

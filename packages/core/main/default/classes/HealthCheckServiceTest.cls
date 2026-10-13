@@ -1457,4 +1457,37 @@ private class HealthCheckServiceTest {
             );
         }
     }
+
+    /** A count past the cap reads "More than" the cap, not a number nobody counted (PEOPLE-3). */
+    @IsTest
+    static void aCountPastTheCapSaysMoreThan() {
+        System.runAs(TestUsers.admin()) {
+            Integer cap = OrgShapeSelector.NATIVE_COUNT_CAP;
+            String moreThan = String.format(
+                System.Label.Core_HealthCheck_OrphansMoreThan,
+                new List<Object>{ cap.format() }
+            );
+            Assert.areEqual(moreThan, HealthCheckOrgShapeChecks.cappedCount(cap + 1), 'Past');
+            Assert.areEqual(String.valueOf(cap), HealthCheckOrgShapeChecks.cappedCount(cap), 'At');
+            Assert.areEqual('3', HealthCheckOrgShapeChecks.cappedCount(3), 'Under');
+
+            OrgShapeDetector.OrgShape orgShape = shape(false, false, false, false);
+            orgShape.hasNativeHouseholdGroups = true;
+            orgShape.nativeHouseholdGroupCount = cap + 1;
+            OrgShapeDetector.overrideShape = orgShape;
+            HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
+
+            Test.startTest();
+            HealthCheckService.Finding finding = find(
+                HealthCheckService.run(),
+                'native_households'
+            );
+            Test.stopTest();
+
+            Assert.isTrue(
+                finding.detail.contains(moreThan),
+                'The native households finding says more than the cap: ' + finding.detail
+            );
+        }
+    }
 }

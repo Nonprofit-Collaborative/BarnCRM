@@ -252,15 +252,27 @@ public with sharing class CoexistenceService {
      * type. Zero in any org without Person Accounts, because there is no such record type.
      */
     public static Integer countPeopleStoredAsAccounts() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        if (
-            shape == null ||
-            shape.personAccountRecordTypeIds == null ||
-            shape.personAccountRecordTypeIds.isEmpty()
-        ) {
+        return countPeopleStoredAsAccounts(null);
+    }
+
+    /**
+     * The same, stopping at `cap` when one is given, so that Health Check on an org with a
+     * great many person accounts does not count every one of them against the query row limit.
+     */
+    public static Integer countPeopleStoredAsAccounts(Integer cap) {
+        Set<Id> personTypes = OrgShapeDetector.personAccountRecordTypeIds();
+        if (personTypes == null || personTypes.isEmpty()) {
             return 0;
         }
-        Set<Id> personTypes = shape.personAccountRecordTypeIds;
+        if (cap != null) {
+            return [
+                SELECT COUNT()
+                FROM Account
+                WHERE RecordTypeId IN :personTypes
+                WITH SYSTEM_MODE
+                LIMIT :cap
+            ];
+        }
         return [SELECT COUNT() FROM Account WHERE RecordTypeId IN :personTypes WITH SYSTEM_MODE];
     }
 

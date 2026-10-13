@@ -425,7 +425,7 @@ public with sharing class AddressService {
         if (accountIds == null || accountIds.isEmpty() || !personAccountFieldsAvailable()) {
             return found;
         }
-        Set<Id> personRecordTypeIds = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        Set<Id> personRecordTypeIds = OrgShapeDetector.personAccountRecordTypeIds();
         if (personRecordTypeIds == null || personRecordTypeIds.isEmpty()) {
             return found;
         }
@@ -515,7 +515,7 @@ public with sharing class AddressService {
     }
 
     private static Boolean personAccountFieldsAvailable() {
-        if (!OrgShapeDetector.detect().hasPersonAccounts) {
+        if (!OrgShapeDetector.hasPersonAccounts()) {
             return false;
         }
         if (accountFields == null) {
@@ -534,7 +534,7 @@ public with sharing class AddressService {
                 SObjectDescribeOptions.DEFERRED
             )
             .getRecordTypeInfosById();
-        Set<Id> personAccountRecordTypeIds = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        Set<Id> personAccountRecordTypeIds = OrgShapeDetector.personAccountRecordTypeIds();
         for (Account account : accounts) {
             if (
                 personAccountRecordTypeIds != null &&

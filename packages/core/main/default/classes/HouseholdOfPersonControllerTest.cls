@@ -242,6 +242,36 @@ private class HouseholdOfPersonControllerTest {
         }
     }
 
+    /**
+     * PEOPLE-7. A person stored as an account is offered once, as the account, and never a
+     * second time as the contact the platform keeps behind it. Needs real person accounts.
+     */
+    @IsTest
+    static void searchOffersAPersonStoredAsAnAccountOnce() {
+        System.runAs(TestUsers.admin()) {
+            if (PersonAccountTestShape.skipReason() != null) {
+                // The reason is checked and logged.
+                return;
+            }
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account person = new Account(
+                RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+            );
+            person.put('FirstName', 'Quillon');
+            person.put('LastName', 'Vantrees');
+            insert person;
+
+            Test.startTest();
+            List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+                'Vantrees'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, hits.size(), 'One person, offered once: ' + hits);
+            Assert.areEqual(person.Id, hits[0].id, 'Offered as the account');
+        }
+    }
+
     @IsTest
     static void searchWithFewerThanTwoCharactersFindsNothing() {
         System.runAs(TestUsers.admin()) {

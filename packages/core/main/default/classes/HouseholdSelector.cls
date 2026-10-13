@@ -310,7 +310,7 @@ public with sharing class HouseholdSelector {
         if (accountIds == null || accountIds.isEmpty()) {
             return new Set<Id>();
         }
-        if (OrgShapeDetector.detect().hasNativeHouseholdGroups != true) {
+        if (OrgShapeDetector.hasNativeHouseholdGroups() != true) {
             return new Set<Id>();
         }
         return getAccountsWithNativeDependents(accountIds);
