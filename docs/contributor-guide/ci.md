@@ -233,6 +233,22 @@ Salesforce org is needed for this job. Steps:
 If `packages/` has no Apex or JavaScript yet, Code Analyzer may report nothing to scan.
 That is expected in the early scaffold and is not a failure.
 
+### One command for every offline check
+
+`bash scripts/ci/run-offline-checks.sh` runs every check that needs no org, in CI's order:
+each `scripts/ci/*.py`, each `scripts/ci/check-*.sh`, the offline Apex compile check, the
+OpenAPI check, the migration kit tests, the em dash scan, `npm run lint`,
+`npm run prettier:verify`, `npm run lint:slds` and `npx sfdx-lwc-jest --silent`. It prints one
+`PASS` or `FAIL` line per check and, for a failure only, the last 30 lines of that check's
+output. The exit status is non-zero if anything failed. If `node_modules` is missing it tells
+you to run `npm ci` and stops.
+
+- `--fast` skips Jest and Code Analyzer.
+- `--allow-adr-next` counts a `check-adrs.py` failure as a pass when the only problems are
+  unnumbered `NEXT-*.md` decision records, so a branch with a new ADR reads clean.
+- `--analyzer` also runs `sf code-analyzer run --severity-threshold 2` on the Apex and
+  JavaScript files changed against `origin/main`. It is slow, so it is off by default.
+
 ### Run the same checks locally, before you push
 
 Every gate above except the org tests runs on a laptop, and all of them are fast (the org
