@@ -108,6 +108,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0097](0097-record-pages-own-their-actions-and-lists.md) | Every packaged record page places its own actions, and Giving's own pages their own related lists (amends ADR-0043) | Accepted (builder decision) |
 | [0098](0098-real-time-rollups-recalculated-just-after-the-save.md) | Real-time rollups are recalculated just after the save, by default (modifies ADR-0082 decision 4) | Proposed (builder decision) |
 | [0099](0099-rollups-recalculate-only-what-a-save-changed.md) | A save recalculates only the rollups its change can affect (narrows ADR-0082 decision 2) | Accepted (owner decision D-48) |
+| [0100](0100-rollup-queue-ready-event-from-queueable-jobs.md) | A platform event starts the Rollup Queue after a save inside a Queueable | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

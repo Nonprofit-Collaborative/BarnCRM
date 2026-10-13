@@ -415,6 +415,41 @@ private class RollupQueueTest {
             RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
             Assert.areEqual(1, processorsQueued(), 'A save outside a Queueable starts one');
             Test.stopTest();
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'No event outside a Queueable');
+        }
+    }
+
+    @IsTest
+    static void insideAQueueableOneReadyEventCoversEveryChange() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = true;
+            // 200 changes saved in one Queueable, queued in several writes.
+            Set<Id> ids = fakeAccountIds(200);
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => ids });
+            for (Id oneId : fakeAccountIds(20)) {
+                RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ oneId } });
+            }
+
+            Assert.areEqual(1, RollupQueue.readyEventsPublished, 'One event per transaction');
+            Assert.areEqual(0, Limits.getQueueableJobs(), 'The chained job is left free');
+            Assert.areEqual(0, processorsQueued(), 'The event, not this job, starts it');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void theReadyEventStartsTheProcessor() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = true;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
+            Assert.areEqual(0, processorsQueued(), 'Nothing starts inside the Queueable');
+
+            Test.getEventBus().deliver();
+
+            Assert.areEqual(1, processorsQueued(), 'The subscriber starts one processor');
+            Test.stopTest();
         }
     }
 }
