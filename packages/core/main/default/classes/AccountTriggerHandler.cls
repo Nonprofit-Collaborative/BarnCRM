@@ -21,8 +21,6 @@
  * written, so that it holds whichever of their three addresses they chose (R-C6).
  */
 public with sharing class AccountTriggerHandler extends TriggerHandler {
-    private static Boolean running = false;
-
     /**
      * The households the people currently being deleted are leaving. Filled in
      * `beforeDelete` and consumed in `afterDelete`, which is also where it is emptied
@@ -81,13 +79,9 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
                 renamedPeople.add(record);
             }
         }
-        if (!released.isEmpty()) {
-            // Mutual exclusion (product-plan Section 11.2 item 9): clearing Custom Name on a
-            // household that Nonprofit Cloud manages natively must not hand its name to
-            // BarnCRM's naming, the same guard the other two naming callers apply.
-            released.removeAll(HouseholdSelector.nativeHouseholdAccountsAmong(released));
-            HouseholdNamingService.applyNaming(released);
-        }
+        // A household that Nonprofit Cloud manages natively keeps its name: applyNaming
+        // leaves it alone (mutual exclusion, product-plan Section 11.2 item 9).
+        HouseholdNamingService.applyNaming(released);
         // R-H4 and R-H11. A person renamed, marked deceased, given a preferred name, moved
         // to another household role or excluded from the wording changes what every
         // household they belong to is called.
@@ -285,7 +279,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
      * was told nothing about it.
      */
     private static void createHouseholdsForNewPeople(List<Account> records) {
-        if (running || records == null || records.isEmpty()) {
+        if (records == null || records.isEmpty()) {
             return;
         }
         if (!handlesPeople()) {
@@ -299,11 +293,8 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         if (people.isEmpty()) {
             return;
         }
-        running = true;
-        try {
-            HouseholdService.createHouseholdsForPersonAccounts(people);
-        } finally {
-            running = false;
-        }
+        // HouseholdService guards its own creation pass against the saves it makes coming
+        // back round through this trigger (ADR-0037).
+        HouseholdService.createHouseholdsForPersonAccounts(people);
     }
 }

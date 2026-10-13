@@ -193,7 +193,7 @@ public with sharing class HouseholdMergeService {
             }
             MemberChoice row = new MemberChoice();
             row.personId = person.id;
-            row.name = fullName(person);
+            row.name = person.fullName();
             row.role = person.role;
             row.source = person.sourceObject;
             row.isPrimary = person.isPrimary == true;
@@ -546,16 +546,5 @@ public with sharing class HouseholdMergeService {
         String a = left == null ? '' : left.trim();
         String b = right == null ? '' : right.trim();
         return a != b;
-    }
-
-    private static String fullName(HouseholdService.Person person) {
-        String first = String.isNotBlank(person.preferredName)
-            ? person.preferredName
-            : person.firstName;
-        String full =
-            (first == null ? '' : first) +
-            ' ' +
-            (person.lastName == null ? '' : person.lastName);
-        return full.trim();
     }
 }

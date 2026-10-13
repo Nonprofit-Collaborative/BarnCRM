@@ -142,6 +142,13 @@ public with sharing class HouseholdService {
                 : null;
         }
 
+        /** The name a screen shows: the preferred name, or else the first name, and the surname. */
+        @NamespaceAccessible
+        public String fullName() {
+            String first = String.isNotBlank(preferredName) ? preferredName : firstName;
+            return ((first == null ? '' : first) + ' ' + (lastName == null ? '' : lastName)).trim();
+        }
+
         @NamespaceAccessible
         public Person copy() {
             Person result = new Person();
@@ -540,10 +547,7 @@ public with sharing class HouseholdService {
                 for (Household_Member__c version : new List<Household_Member__c>{ row, before }) {
                     if (version != null) {
                         addIfSet(change.householdIds, version.Household__c);
-                        addIfSet(
-                            change.personIds,
-                            version.Contact__c != null ? version.Contact__c : version.Account__c
-                        );
+                        addIfSet(change.personIds, personOf(version));
                     }
                 }
             }
@@ -746,7 +750,8 @@ public with sharing class HouseholdService {
         return affected;
     }
 
-    private static Id personOf(Household_Member__c row) {
+    /** The person a membership row is for, whichever object they are stored on. */
+    public static Id personOf(Household_Member__c row) {
         return row.Contact__c != null ? row.Contact__c : row.Account__c;
     }
 
