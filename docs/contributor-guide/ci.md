@@ -1064,3 +1064,38 @@ each with the default that shipped and a recommendation.
   for a clean tree only when it starts.
 - **Staging:** stage by explicit path. A synced checkout can create untracked copies named
   like `file 2.md`.
+
+## Scratch org snapshots
+
+Snapshots shorten recreating a test org from a full deploy (many minutes, and the stalled deploys
+described above) to creating an org from saved state. They are a local convenience: nothing in
+continuous integration creates or uses one.
+
+**Dev Hub requirements.** The Dev Hub must have Scratch Org Snapshots turned on (Setup, Dev Hub,
+enable scratch org snapshots; the orchestrator confirms the exact label). Snapshot count and the
+snapshot's own lifetime are limited and set by Salesforce; check the current values with
+`sf org list snapshot` and Salesforce's scratch org snapshot documentation before relying on a
+snapshot older than a few weeks. The source org must be an active scratch org of that Dev Hub.
+A snapshot cannot be created from an org that is not a scratch org.
+
+**Commands.**
+
+```bash
+scripts/org/create-snapshot.sh oi-pa BarnPA              # snapshot an existing org (refreshes if BarnPA exists)
+scripts/org/create-org-from-snapshot.sh person-accounts oi-pa --days 7 --replace
+scripts/org/create-org-from-snapshot.sh platform-only barn-core --days 7
+sf org list snapshot                                      # status and names
+```
+
+**Owner approval.** Creating a snapshot and creating any scratch org need the owner's approval.
+Pre-approved without asking: recreating `oi-pa` or `barn-core` (expires 2026-10-15) when it
+expires. Replacing `oi-test` also means updating the `SF_TEST_ORG_AUTH_URL` secret, because the
+new org has a new auth URL.
+
+**When to refresh.** After any change under `packages/` that the next test run needs (a snapshot
+does not track the repository), after the Dev Hub or the Salesforce release changes the shape,
+and before the snapshot's own expiry. The script warns when `packages/` changed after the
+snapshot date. Sample data is seeded into the source org before the snapshot, so it carries over.
+
+**After creating an org from a snapshot,** run `scripts/org/run-org-tests.sh <alias>` once and
+check the shape line it prints, as for any new org.
