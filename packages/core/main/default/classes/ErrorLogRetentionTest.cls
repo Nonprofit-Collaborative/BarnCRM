@@ -2,8 +2,13 @@
  * Error Log retention (R-E6, ADMIN-26): the daily Error Log run deletes entries older than the
  * setting, whatever their status, and 0 keeps every entry.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ErrorLogRetention')
 private class ErrorLogRetentionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static List<Error_Log__c> entries(Integer count, String status) {
         List<Error_Log__c> created = new List<Error_Log__c>();
         for (Integer i = 0; i < count; i++) {

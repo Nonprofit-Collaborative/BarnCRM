@@ -4,8 +4,13 @@
  * a request that cannot be saved answered in plain words while the others are saved; and a
  * user without the access a person needs refused with nothing created.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CreatePersonAction')
 private class CreatePersonActionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aPersonWithNoHouseholdNamedGetsOneOfTheirOwn() {
         System.runAs(TestUsers.admin()) {

@@ -2,8 +2,13 @@
  * The last full Health Check result that BarnCRM Home shows instead of running every check on
  * each load (ADMIN-7).
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckLastRun, ApexClass:HealthCheckController')
 private class HealthCheckLastRunTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static HealthCheckService.Finding finding(String key, String severity) {
         return new HealthCheckService.Finding(
             key,

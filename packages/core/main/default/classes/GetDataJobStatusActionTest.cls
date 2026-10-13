@@ -3,8 +3,13 @@
  * when no id is given, anything else answered as not found, and a user who cannot read data
  * jobs refused in plain words.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GetDataJobStatusAction')
 private class GetDataJobStatusActionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aJobIsReportedByItsId() {
         System.runAs(TestUsers.admin()) {

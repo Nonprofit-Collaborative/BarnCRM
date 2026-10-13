@@ -4,7 +4,7 @@
  * test (ADMIN-13 e). The console groups the keys by the settings object each row names and
  * saves each object in turn, so this is the path a module's row takes in a real org.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SettingsController, ApexClass:SettingsService')
 private class ConsoleSaveAcrossModulesTest {
     private static final String CORE_KEY = 'Household_Name_Pattern__c';
     private static final String GIVING_KEY = 'Organization_EIN__c';

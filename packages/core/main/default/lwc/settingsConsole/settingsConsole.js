@@ -149,6 +149,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   renderedCallback() {
     this.nameTab();
+    this.focusChosenSetting();
   }
 
   nameTab() {
@@ -327,7 +328,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   // The admin guide says a search result takes you to the setting, not just its section, so
   // once the section has rendered the chosen row is scrolled to and focused (ADMIN-21).
-  renderedCallback() {
+  focusChosenSetting() {
     if (!this.focusKey) {
       return;
     }

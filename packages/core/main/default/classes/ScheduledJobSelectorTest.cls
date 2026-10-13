@@ -2,8 +2,13 @@
  * The one lookup for BarnCRM's scheduled jobs (ADMIN-11), and the deactivated owner finding
  * and fix built on it (ADMIN-12).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ScheduledJobSelector, ApexClass:NightlyJobs')
 private class ScheduledJobSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String DAILY = '0 0 3 * * ?';
     private static final String OTHER_JOB = 'BarnCRM Selector test job';
 

@@ -3,8 +3,13 @@
  * belongs to, in either membership mode, every search answered in its own position, and a
  * user who cannot read people answered with a plain refusal rather than a failure.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FindPeopleAction')
 private class FindPeopleActionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aNameFindsThePersonAndTheirHousehold() {
         System.runAs(TestUsers.admin()) {

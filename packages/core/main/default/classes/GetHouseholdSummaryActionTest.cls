@@ -4,8 +4,13 @@
  * first; anything that is not a household answered in plain words; and a user who cannot
  * read the household's fields refused rather than shown part of it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GetHouseholdSummaryAction')
 private class GetHouseholdSummaryActionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aHouseholdIsSummarizedByItsOwnId() {
         System.runAs(TestUsers.admin()) {
