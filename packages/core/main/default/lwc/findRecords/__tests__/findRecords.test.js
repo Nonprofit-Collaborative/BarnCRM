@@ -350,6 +350,32 @@ describe('c-find-records', () => {
     expect(element.shadowRoot.querySelector('c-bulk-update')).toBeNull();
   });
 
+  it('offers bulk delete only with its permission, one bulk panel at a time', async () => {
+    getBulkPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5 });
+    getTargets.mockResolvedValue([]);
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    expect(one(element, 'bulk-delete')).toBeNull();
+    element.remove();
+
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true, canBulkDelete: true });
+    const allowed = await render();
+    await choose(one(allowed, 'object'), 'Gift__c');
+    one(allowed, 'bulk-update').click();
+    await flush();
+    one(allowed, 'bulk-delete').click();
+    await flush();
+
+    expect(allowed.shadowRoot.querySelector('c-bulk-update')).toBeNull();
+    const panel = allowed.shadowRoot.querySelector('c-bulk-delete');
+    expect(panel.queryJson).toBe(
+      JSON.stringify({ version: 1, object: 'Gift__c', fields: ['Name'], limit: 200 })
+    );
+    await choose(one(allowed, 'columns'), ['Name', 'Amount__c']);
+    expect(allowed.shadowRoot.querySelector('c-bulk-delete')).toBeNull();
+  });
+
   /* ---------- Advanced Find (C-36) ---------- */
 
   it('opens and runs the saved query a link names in its page state', async () => {
