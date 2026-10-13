@@ -66,7 +66,7 @@ public with sharing class BulkUpdateController {
     }
 
     /** The tab: the run limit and the recent bulk updates. */
-    public class Page {
+    public class BulkUpdatePage {
         @AuraEnabled
         public Integer runLimit;
         @AuraEnabled
@@ -76,10 +76,10 @@ public with sharing class BulkUpdateController {
     }
 
     @AuraEnabled
-    public static Page getPage() {
+    public static BulkUpdatePage getPage() {
         try {
             requirePermission();
-            Page page = new Page();
+            BulkUpdatePage page = new BulkUpdatePage();
             page.runLimit = BulkUpdateService.runLimit();
             page.maxChanges = BulkUpdateService.MAX_CHANGES;
             page.jobs = new List<JobView>();
