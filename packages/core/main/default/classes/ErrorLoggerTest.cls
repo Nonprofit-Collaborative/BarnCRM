@@ -49,9 +49,18 @@ private class ErrorLoggerTest {
             Error_Log__c entry = logged[0];
             Assert.areEqual('Household naming', entry.Context__c, 'Named in words, not in code.');
             Assert.areEqual(
-                Label.Core_ErrorLog_UnexpectedFailure,
+                ErrorLogger.friendlyMessage('Household naming'),
                 entry.Message__c,
                 'What Maria reads is the plain language explanation, with no developer text in it.'
+            );
+            Assert.isTrue(
+                entry.Message__c.contains('Household naming'),
+                'And it names where it happened, so entries from different places differ.'
+            );
+            Assert.areEqual(
+                Label.Core_ErrorLog_UnexpectedFailure,
+                ErrorLogger.friendlyMessage(' '),
+                'With nowhere to name, the plain explanation stands alone.'
             );
             Assert.isTrue(
                 entry.Technical_Detail__c.contains('SampleException'),

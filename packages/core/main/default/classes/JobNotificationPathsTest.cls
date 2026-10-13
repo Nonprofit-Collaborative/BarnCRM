@@ -54,7 +54,7 @@ private class JobNotificationPathsTest {
             SetupOwnerId = UserInfo.getOrganizationId(),
             Job_Notifications__c = turnedOn
         );
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
     }
 
     private static Import_Batch__c job(String operation) {

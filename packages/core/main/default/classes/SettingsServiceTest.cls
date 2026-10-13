@@ -228,10 +228,9 @@ private class SettingsServiceTest {
                 );
             } catch (SettingsService.SettingsException e) {
                 refused = true;
-                Assert.areEqual(
-                    System.Label.Core_Settings_InvalidValueError,
-                    e.getMessage(),
-                    'The message says the value is not one this setting takes'
+                Assert.isTrue(
+                    e.getMessage().endsWith(System.Label.Core_Settings_InvalidValueError),
+                    'The message says the value is not one this setting takes: ' + e.getMessage()
                 );
             }
             Test.stopTest();
@@ -304,9 +303,15 @@ private class SettingsServiceTest {
             } catch (SettingsService.SettingsException e) {
                 refused = true;
                 Assert.areEqual(
-                    System.Label.Core_Settings_InvalidValueError,
+                    String.format(
+                        System.Label.Core_Settings_ErrorForSetting,
+                        new List<Object>{
+                            'Automation paused until',
+                            System.Label.Core_Settings_InvalidValueError
+                        }
+                    ),
                     e.getMessage(),
-                    'The message names the problem and what to do'
+                    'The message names the setting, the problem and what to do'
                 );
             }
             Test.stopTest();
@@ -532,36 +537,6 @@ private class SettingsServiceTest {
     }
 
     @IsTest
-    static void aModeIsCheckedOnItsWayIn() {
-        System.runAs(TestUsers.admin()) {
-            Assert.areEqual(
-                'NPSP',
-                SettingsService.validated('NPSP', SettingsService.coexistenceModes()),
-                'An offered value is accepted.'
-            );
-
-            for (String rejected : new List<String>{ 'npsp', '', null }) {
-                try {
-                    SettingsService.validated(rejected, SettingsService.membershipModes());
-                    Assert.fail('The value "' + rejected + '" should be refused.');
-                } catch (SettingsService.SettingsServiceException expected) {
-                    Assert.areEqual(
-                        Label.Core_Settings_ModeValueInvalid,
-                        expected.getMessage(),
-                        'Maria is told to pick from the list.'
-                    );
-                }
-            }
-            try {
-                SettingsService.validated('Contact', null);
-                Assert.fail('A value with no list to check against should be refused.');
-            } catch (SettingsService.SettingsServiceException expected) {
-                Assert.isNotNull(expected.getMessage(), 'With a message.');
-            }
-        }
-    }
-
-    @IsTest
     static void theShippedDefaultsAreExactlyWhatTheFieldsSay() {
         System.runAs(TestUsers.admin()) {
             // A text field default value is a formula, so whatever sits inside the quotes is the
@@ -608,12 +583,13 @@ private class SettingsServiceTest {
             }
 
             Assert.isTrue(
-                SettingsService.coexistenceModes()
-                    .contains(SettingsService.COEXISTENCE_MODE_DEFAULT),
+                SettingsService.COEXISTENCE_MODES.contains(
+                    SettingsService.COEXISTENCE_MODE_DEFAULT
+                ),
                 'And the code default is itself one of the offered values.'
             );
             Assert.isTrue(
-                SettingsService.membershipModes().contains(SettingsService.MEMBERSHIP_MODE_DEFAULT),
+                SettingsService.MEMBERSHIP_MODES.contains(SettingsService.MEMBERSHIP_MODE_DEFAULT),
                 'For both keys.'
             );
         }
@@ -888,15 +864,13 @@ private class SettingsServiceTest {
             String accepted = refusalOf(RECORD_KEY, accountId);
             Test.stopTest();
 
-            Assert.areEqual(
-                System.Label.Core_Settings_InvalidValueError,
-                wrongObject,
-                'A record of another object is refused'
+            Assert.isTrue(
+                wrongObject.endsWith(System.Label.Core_Settings_InvalidValueError),
+                'A record of another object is refused: ' + wrongObject
             );
-            Assert.areEqual(
-                System.Label.Core_Settings_InvalidValueError,
-                notAnId,
-                'A name typed instead of a picked record is refused'
+            Assert.isTrue(
+                notAnId.endsWith(System.Label.Core_Settings_InvalidValueError),
+                'A name typed instead of a picked record is refused: ' + notAnId
             );
             Assert.isNull(accepted, 'A record of the row object is accepted');
             Assert.areEqual(
@@ -921,9 +895,8 @@ private class SettingsServiceTest {
             String cleared = refusalOf(RECORD_TYPES_KEY, '');
             Test.stopTest();
 
-            Assert.areEqual(
-                System.Label.Core_Settings_InvalidValueError,
-                unknown,
+            Assert.isTrue(
+                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
                 'A record type the object does not have is refused, with the known one beside it'
             );
             Assert.isNull(accepted, 'A record type the object has is accepted');

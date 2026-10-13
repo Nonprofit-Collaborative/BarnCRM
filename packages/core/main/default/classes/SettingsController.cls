@@ -144,15 +144,19 @@ public with sharing class SettingsController {
         String needle = term.trim().toLowerCase();
         try {
             for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
-                if (!isVisible(definition) || !matches(definition, needle)) {
+                if (!matches(definition, needle)) {
+                    continue;
+                }
+                // The console's own test for showing a row, so search never lists a row the
+                // page hides (ADMIN-21).
+                SettingModel shown = toSetting(definition);
+                if (shown == null) {
                     continue;
                 }
                 SearchHit hit = new SearchHit();
-                hit.key = String.isBlank(definition.Setting_Key__c)
-                    ? definition.DeveloperName
-                    : definition.Setting_Key__c;
-                hit.label = definition.MasterLabel;
-                hit.section = definition.Section__c;
+                hit.key = shown.key;
+                hit.label = shown.label;
+                hit.section = shown.section;
                 hits.add(hit);
             }
         } catch (Exception e) {

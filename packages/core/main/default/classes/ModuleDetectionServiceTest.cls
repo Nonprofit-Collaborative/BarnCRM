@@ -277,4 +277,23 @@ private class ModuleDetectionServiceTest {
             );
         }
     }
+
+    @IsTest
+    static void anObjectIsFoundByItsUnprefixedNameInAnyCase() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            String found = ModuleDetectionService.resolveObject('error_log__c');
+            String again = ModuleDetectionService.resolveObject('Error_Log__c');
+            String missing = ModuleDetectionService.resolveObject('No_Such_Object__c');
+            Test.stopTest();
+
+            Assert.areEqual(
+                Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
+                found,
+                'The real API name comes back, prefix and all once a namespace exists'
+            );
+            Assert.areEqual(found, again, 'The second ask, from the cache, gives the same answer');
+            Assert.isNull(missing, 'An object this org lacks resolves to nothing');
+        }
+    }
 }

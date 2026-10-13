@@ -65,12 +65,20 @@
         <value>This section has no settings yet.</value>
     </labels>
     <labels>
+        <fullName>Core_Settings_ErrorForSetting</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings console: a save error naming the setting ({0}) before the reason ({1})</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
         <fullName>Core_Settings_InvalidValueError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console: a value is not in the format the setting expects</shortDescription>
-        <value>One of the values is not in the format this setting expects, so nothing was saved. Check the value and save again.</value>
+        <value>That value is not in the format this setting expects, so nothing was saved. Check the value and save again.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_NumberOutOfRange</fullName>
@@ -103,14 +111,6 @@
         <protected>true</protected>
         <shortDescription>Settings console: message shown when the page could not load</shortDescription>
         <value>The settings page could not load. The error is recorded in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Settings_ModeValueInvalid</fullName>
-        <categories>Core, Settings</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Settings mode value not allowed</shortDescription>
-        <value>That is not one of the choices for this setting. Pick a value from the list on the settings page.</value>
     </labels>
     <labels>
         <fullName>Core_Settings_OpenSectionButton</fullName>

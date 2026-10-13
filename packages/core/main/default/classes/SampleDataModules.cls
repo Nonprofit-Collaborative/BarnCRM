@@ -115,14 +115,7 @@ public with sharing class SampleDataModules {
      */
     @TestVisible
     private static SampleDataModule resolve(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type moduleType = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (moduleType == null) {
-            moduleType = Type.forName(className);
-        }
+        Type moduleType = NamespaceUtil.resolveType(className);
         if (moduleType == null) {
             return null;
         }

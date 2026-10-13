@@ -124,6 +124,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   componentTypes = {};
   requestedSection;
   enclosingTabId;
+  focusKey;
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -320,6 +321,29 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   handleSearchSelect(event) {
     if (event.detail && event.detail.section) {
       this.selectedSection = event.detail.section;
+      this.focusKey = event.detail.key;
+    }
+  }
+
+  // The admin guide says a search result takes you to the setting, not just its section, so
+  // once the section has rendered the chosen row is scrolled to and focused (ADMIN-21).
+  renderedCallback() {
+    if (!this.focusKey) {
+      return;
+    }
+    const key = this.focusKey;
+    const row = Array.from(this.template.querySelectorAll('[data-key]')).find(
+      (candidate) => candidate.dataset.key === key
+    );
+    if (!row) {
+      return;
+    }
+    this.focusKey = undefined;
+    if (typeof row.scrollIntoView === 'function') {
+      row.scrollIntoView({ block: 'center' });
+    }
+    if (typeof row.focus === 'function') {
+      row.focus();
     }
   }
 

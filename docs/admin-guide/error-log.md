@@ -115,7 +115,9 @@ Maria has heard from a colleague that "something did not save this morning."
 4. Read the **Message**. It is written for you, not for a developer: it says what went
    wrong and what to do about it, for example "This household could not be renamed because
    every member is marked deceased. Add a living member, or set a custom name on the
-   household."
+   household." When BarnCRM hit something it did not expect, the message names where it
+   happened, for example "BarnCRM hit a problem it did not expect in Household naming.",
+   so two such entries from different places read differently in the list.
 5. Do what it says on the record it names. The **Record reference** on the entry is the
    record involved, so you can open it and fix the data.
 6. Come back to the Error Log entry and set **Status** to **Resolved**, then save. It

@@ -84,6 +84,24 @@ public with sharing class NamespaceUtil {
     }
 
     /**
+     * An Apex class by name: in this package's namespace first, then with none (today, and
+     * unmanaged deploys), or null when neither is visible. A class name is not an API name, so
+     * the prefix goes in without its `__` (dynamic-apex.md section 3). Every "find the module's
+     * class by name" seam resolves through this one place.
+     */
+    @NamespaceAccessible
+    public static Type resolveType(String className) {
+        if (String.isBlank(className)) {
+            return null;
+        }
+        String packagePrefix = prefix();
+        Type found = String.isBlank(packagePrefix)
+            ? null
+            : Type.forName(packagePrefix.removeEnd('__'), className);
+        return found == null ? Type.forName(className) : found;
+    }
+
+    /**
      * The key a page state parameter has to use. Lightning namespaces these too: a package
      * with no namespace uses the `c__` prefix, and a managed package uses its own.
      */

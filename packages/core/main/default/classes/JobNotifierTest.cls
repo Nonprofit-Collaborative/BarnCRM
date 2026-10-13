@@ -20,7 +20,7 @@ private class JobNotifierTest {
             SetupOwnerId = UserInfo.getOrganizationId(),
             Job_Notifications__c = turnedOn
         );
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
     }
 
     @IsTest
@@ -96,7 +96,7 @@ private class JobNotifierTest {
     @IsTest
     static void shipsSwitchedOnBeforeTheOrgHasSavedItsSettings() {
         System.runAs(TestUsers.admin()) {
-            SettingsService.clearCache();
+            SettingsService.clearCaches();
 
             JobNotifier.aboutSettings(
                 UserInfo.getUserId(),

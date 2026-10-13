@@ -186,8 +186,7 @@ public with sharing class SettingsService {
                 throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
             }
             Object oldValue = record.get(token);
-            Object newValue = coerce(values.get(key), field);
-            checkAllowedValue(definition, newValue);
+            Object newValue = checkedValue(values.get(key), field, definition);
             String oldText = asText(oldValue);
             String newText = asText(newValue);
             if (oldText.equals(newText)) {
@@ -251,6 +250,36 @@ public with sharing class SettingsService {
         String refusal = ErrorDigestRecipients.refusal(newText);
         if (refusal != null) {
             throw new SettingsException(refusal);
+        }
+    }
+
+    /**
+     * The value read in the field's type and checked against its row. A value that cannot be
+     * used is refused with a message that names the setting, as the admin guide promises
+     * (ADMIN-21): with a whole section saved at once, "one of the values" is not enough.
+     */
+    private static Object checkedValue(
+        Object rawValue,
+        Schema.DescribeFieldResult field,
+        Setting_Definition__mdt definition
+    ) {
+        try {
+            Object newValue = coerce(rawValue, field);
+            checkAllowedValue(definition, newValue);
+            return newValue;
+        } catch (SettingsException refused) {
+            if (refused.getMessage() != System.Label.Core_Settings_InvalidValueError) {
+                throw refused;
+            }
+            String name = definition != null && String.isNotBlank(definition.MasterLabel)
+                ? definition.MasterLabel
+                : field.getLabel();
+            throw new SettingsException(
+                String.format(
+                    System.Label.Core_Settings_ErrorForSetting,
+                    new List<Object>{ name, refused.getMessage() }
+                )
+            );
         }
     }
 
@@ -360,7 +389,10 @@ public with sharing class SettingsService {
         if (type == null) {
             return chosen;
         }
-        for (Schema.RecordTypeInfo info : type.getDescribe().getRecordTypeInfos()) {
+        for (
+            Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getRecordTypeInfos()
+        ) {
             if (info.isActive() && !info.isMaster()) {
                 chosen.add(info);
             }
@@ -708,11 +740,13 @@ public with sharing class SettingsService {
     @NamespaceAccessible
     public static final String MEMBERSHIP_MODE_DEFAULT = 'Contact';
 
+    @TestVisible
     private static final Set<String> COEXISTENCE_MODES = new Set<String>{
         'Standalone',
         'NPSP',
         'NonprofitCloud'
     };
+    @TestVisible
     private static final Set<String> MEMBERSHIP_MODES = new Set<String>{ 'Contact', 'Junction' };
 
     private static String storedOrDefault(String stored, Set<String> allowed, String fallback) {
@@ -737,37 +771,6 @@ public with sharing class SettingsService {
         Database.insert(change, AccessLevel.USER_MODE);
     }
 
-    /**
-     * Checks a value on its way in. Anything outside the allowed list is refused with a message
-     * the console can show.
-     */
-    @NamespaceAccessible
-    public static String validated(String value, Set<String> allowed) {
-        if (allowed == null || String.isBlank(value) || !allowed.contains(value)) {
-            throw new SettingsServiceException(Label.Core_Settings_ModeValueInvalid);
-        }
-        return value;
-    }
-
-    /**
-     * Alias kept for callers written against the Core-only service (C-04). Clears every
-     * cached settings record, whichever package owns the object.
-     */
-    @NamespaceAccessible
-    public static void clearCache() {
-        clearCaches();
-    }
-
-    @NamespaceAccessible
-    public static Set<String> coexistenceModes() {
-        return COEXISTENCE_MODES.clone();
-    }
-
-    @NamespaceAccessible
-    public static Set<String> membershipModes() {
-        return MEMBERSHIP_MODES.clone();
-    }
-
     @NamespaceAccessible
     public static String coexistenceMode() {
         return storedOrDefault(
@@ -784,9 +787,5 @@ public with sharing class SettingsService {
             MEMBERSHIP_MODES,
             MEMBERSHIP_MODE_DEFAULT
         );
-    }
-
-    @NamespaceAccessible
-    public class SettingsServiceException extends Exception {
     }
 }

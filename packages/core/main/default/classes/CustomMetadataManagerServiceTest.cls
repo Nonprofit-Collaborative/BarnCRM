@@ -119,10 +119,14 @@ private class CustomMetadataManagerServiceTest {
 
             Assert.areEqual(FAKE_JOB, jobId, 'The page waits on the deployment Id');
             Metadata.CustomMetadata record = (Metadata.CustomMetadata) deployer.container.getMetadata()[0];
-            Assert.areEqual(
-                NamespaceUtil.prefix() + 'Relationship_Type.Org_Close_friend',
-                record.fullName,
-                'A new row is named with the Org_ prefix, so no shipped row can collide with it'
+            Assert.isTrue(
+                Pattern.matches(
+                    NamespaceUtil.prefix() + 'Relationship_Type\\.Org_Close_friend_[a-z0-9]{4}',
+                    record.fullName
+                ),
+                'A new row is named with the Org_ prefix, so no shipped row can collide with it, ' +
+                    'and a short code: ' +
+                    record.fullName
             );
             Assert.areEqual('Close friend', record.label, 'The name Maria typed');
             Assert.isFalse(record.protected_x, 'Her row is not protected');
@@ -299,7 +303,10 @@ private class CustomMetadataManagerServiceTest {
             }
 
             Test.startTest();
-            String next = CustomMetadataManagerService.newDeveloperName('Close friend', rows);
+            Set<String> made = new Set<String>();
+            for (Integer i = 0; i < 10; i++) {
+                made.add(CustomMetadataManagerService.newDeveloperName('Close friend', rows));
+            }
             String cleaned = CustomMetadataManagerService.newDeveloperName(
                 '  Mentor / mentee!! ',
                 rows
@@ -308,9 +315,23 @@ private class CustomMetadataManagerServiceTest {
             String longName = CustomMetadataManagerService.newDeveloperName('B'.repeat(40), rows);
             Test.stopTest();
 
-            Assert.areEqual('Org_Close_friend_201', next, 'The next free number');
-            Assert.areEqual('Org_Mentor_mentee', cleaned, 'Runs of other characters become one _');
-            Assert.areEqual('Org_Row', symbols, 'A name with no letters still gets a valid name');
+            // Ten adds of one name, as if each were made before the last had deployed, beside two
+            // hundred deployed rows of that name.
+            Assert.areEqual(10, made.size(), 'Every add of the same name gets its own name');
+            for (String name : made) {
+                Assert.isTrue(
+                    Pattern.matches('Org_Close_friend_[a-z0-9]{4}', name),
+                    'The name, then a short code: ' + name
+                );
+            }
+            Assert.isTrue(
+                Pattern.matches('Org_Mentor_mentee_[a-z0-9]{4}', cleaned),
+                'Runs of other characters become one _: ' + cleaned
+            );
+            Assert.isTrue(
+                Pattern.matches('Org_Row_[a-z0-9]{4}', symbols),
+                'A name with no letters still gets a valid name: ' + symbols
+            );
             Assert.isTrue(longName.length() <= 40, 'A DeveloperName holds at most 40 characters');
         }
     }

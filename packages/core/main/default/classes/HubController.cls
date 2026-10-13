@@ -81,14 +81,26 @@ public with sharing class HubController {
     private static HomeModel buildModel() {
         HomeModel model = new HomeModel();
         model.canEdit = BarnCRMPermissions.canManageSettings();
-        List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
-        model.stepsTotal = steps.size();
-        model.stepsCompleted = SetupAssistantService.countCompleted(steps);
         model.automationPaused = readAutomationPaused();
-        readErrorCounts(model);
-        readRollupFreshness(model);
-        readSeasonalAddressRun(model);
         model.recurringSources = readRecurringSources();
+        if (model.canEdit) {
+            List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
+            model.stepsTotal = steps.size();
+            model.stepsCompleted = SetupAssistantService.countCompleted(steps);
+            readErrorCounts(model);
+            readRollupFreshness(model);
+            readSeasonalAddressRun(model);
+        } else {
+            // The checklist and the administrator tiles are hidden from staff (the page's
+            // visibility rules, barncrm-app.md), so their numbers are not worked out (ADMIN-10).
+            model.stepsTotal = 0;
+            model.stepsCompleted = 0;
+            model.newErrorCount = 0;
+            model.newErrorCountCapped = false;
+            model.rollupsStale = false;
+            model.seasonalAddressScheduled = false;
+            model.seasonalAddressStale = false;
+        }
         return model;
     }
 

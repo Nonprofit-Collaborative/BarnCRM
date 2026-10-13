@@ -180,4 +180,31 @@ private class NamespaceUtilTest {
             'The org\'s own describe answers when no stub is set'
         );
     }
+
+    @IsTest
+    static void aClassIsFoundByNameAndAMissingOneIsNull() {
+        NamespaceUtil.cachedPrefix = null;
+
+        Assert.areEqual(
+            NamespaceUtil.class,
+            NamespaceUtil.resolveType('NamespaceUtil'),
+            'A packaged class is found by its bare name, whatever the namespace.'
+        );
+        Assert.isNull(
+            NamespaceUtil.resolveType('NoSuchClassAnywhere'),
+            'A module that is not installed resolves to nothing, not an error.'
+        );
+        Assert.isNull(NamespaceUtil.resolveType(''), 'A blank name resolves to nothing.');
+    }
+
+    @IsTest
+    static void aClassIsStillFoundWhenThePrefixNamesNoInstalledNamespace() {
+        NamespaceUtil.cachedPrefix = 'example__';
+
+        Assert.areEqual(
+            NamespaceUtil.class,
+            NamespaceUtil.resolveType('NamespaceUtil'),
+            'With no class under the prefix, the bare name is tried next.'
+        );
+    }
 }

@@ -232,7 +232,7 @@ public with sharing class AutomationControl {
             return false;
         }
         AutomationSettingsWriter.savePausedUntil(locked, null);
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
         SettingsService.logChange(PAUSE_SETTING_NAME, String.valueOf(stored), '');
         startWaitingRollups();
         return true;
@@ -280,7 +280,7 @@ public with sharing class AutomationControl {
         BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
         Datetime previous = locked?.Automation_Paused_Until__c;
         AutomationSettingsWriter.savePausedUntil(locked, until);
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
         SettingsService.logChange(
             PAUSE_SETTING_NAME,
             previous == null ? '' : String.valueOf(previous),

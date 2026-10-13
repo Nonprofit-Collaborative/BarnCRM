@@ -225,6 +225,29 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void searchNeverListsARowThePageHides() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+
+            Test.startTest();
+            List<SettingsController.SearchHit> hits = SettingsController.search('grant program');
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    Assert.areNotEqual(
+                        'Default_Grant_Program__c',
+                        setting.key,
+                        'The page hides a row whose module is not installed'
+                    );
+                }
+            }
+            Assert.isTrue(hits.isEmpty(), 'So search does not offer it either: ' + hits);
+        }
+    }
+
+    @IsTest
     static void aRowForAModulePermissionIsHiddenFromThoseWithoutIt() {
         System.runAs(TestUsers.admin()) {
             stubDefinitions();

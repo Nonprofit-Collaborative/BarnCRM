@@ -42,14 +42,7 @@ public with sharing class SetupAssistantExtensions {
 
     @TestVisible
     private static SetupAssistantExtension resolve(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type extensionType = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (extensionType == null) {
-            extensionType = Type.forName(className);
-        }
+        Type extensionType = NamespaceUtil.resolveType(className);
         if (extensionType == null) {
             return null;
         }
