@@ -50,10 +50,10 @@ first error.
 | --- | --------------- | --------- |
 | Trigger path during load | The bulk loads above | No failed rows from limits (`Too many SOQL queries`, `CPU time`, `UNABLE_TO_LOCK_ROW`); lock errors under 0.1% and gone on retry |
 | Full rollup recalculation | Rollups page, **Recalculate all** (`RollupFullRecalcBatch`) | Completes with no failed batches; Error Log has no limit errors; spot check 20 households and 20 contacts against a SOQL aggregate |
-| Household naming | `HouseholdNamingBatch` from the Household Naming page | Completes; names match the naming preview for a sample |
-| Duplicate scan | Duplicates page, full scan (`DuplicateScanBatch`) | Completes; no CPU limit errors on the largest match groups |
-| Donor levels and acknowledgments | `DonorLevelBatch`, `AcknowledgmentBatch` through the Giving scheduler | Complete with no failed batches |
-| Field utilization | `FieldUtilizationBatch` | Completes |
+| Household naming | **Recompute all households** on the household naming settings (`HouseholdNamingBatch`) | Completes; names match the naming preview for a sample |
+| Duplicate scan | **Scan for duplicates** (`DuplicateScanBatch`) | Completes; no batch reported as not checked; no CPU limit errors on the largest match groups |
+| Donor levels and acknowledgments | `DonorLevelBatch` and `AcknowledgmentBatch`, started from anonymous Apex with `Database.executeBatch` if the scheduler is not due | Complete with no failed batches |
+| Field utilization | `FieldUtilizationBatch`, the same way | Completes |
 | Import | Import wizard with a 250k-row file on tier 2 (a 25k-row file on tier 1), contacts plus gifts | Completes; rows processed per minute recorded; undo of the whole batch (`ImportUndoBatch`) completes |
 | Interactive pages | Open a household with 30 members, a contact with 500 gifts, the Giving dashboard, Find with a broad search | Each page usable in under 5 seconds; no `Too many query rows` error |
 
