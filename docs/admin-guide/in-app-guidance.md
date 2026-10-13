@@ -2,7 +2,7 @@
 
 ## What it does
 
-BarnCRM ships four short tips that Salesforce shows the first time someone opens a BarnCRM
+BarnCRM ships five short tips that Salesforce shows the first time someone opens a BarnCRM
 page where a pointer saves them a search through this guide. They use Salesforce's own
 In-App Guidance (prompts), so they look and behave like any other Salesforce tip.
 
@@ -12,6 +12,7 @@ In-App Guidance (prompts), so they look and behave like any other Salesforce tip
 | Import | Floating | Check the preview before you import; an import can be undone from Recent imports |
 | Find | Floating | Run, save and export a query; bulk update and bulk delete start here |
 | Bulk Update | Floating | The tab lists recent bulk updates and deletes with their undo; new ones start in Find |
+| Field Utilization | Floating | Count how often each field is filled in, and save the counts to compare; nothing is changed |
 
 Each tip appears once for each person, in the BarnCRM app only. The tips do not repeat the
 Setup Assistant or the What's new card on the Home tab: those already show themselves on the
