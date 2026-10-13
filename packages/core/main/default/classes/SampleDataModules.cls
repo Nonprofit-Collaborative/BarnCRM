@@ -91,7 +91,13 @@ public with sharing class SampleDataModules {
 
     private static void start(Integer index) {
         List<SampleDataModule> modules = installed();
-        if (index < 0 || index >= modules.size()) {
+        if (index >= modules.size()) {
+            // The load has ended. The engine queued the totals of the people and gifts it saved
+            // without taking the chain's one job (R-RQ3), so they are calculated now.
+            RollupService.startQueuedRecalculation();
+            return;
+        }
+        if (index < 0) {
             return;
         }
         modules[index].enqueueLoad();

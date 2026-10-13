@@ -55,6 +55,10 @@ public without sharing class RollupQueue implements Queueable {
     /** Set once a processor is queued, or is this job, so one transaction asks for one only. */
     private static Boolean processorRequested = false;
 
+    /** Test seam: true or false stands in for `System.isQueueable()`; null reads the platform. */
+    @TestVisible
+    private static Boolean queueableForTest;
+
     private final Integer sliceSize;
 
     public RollupQueue() {
@@ -210,13 +214,47 @@ public without sharing class RollupQueue implements Queueable {
      * Queues a processor unless one already waits to start: a waiting one reads every entry
      * committed by the time it starts. When the transaction can queue no more jobs, the entries
      * wait for the next save that queues one, or for the nightly run.
+     *
+     * Never from inside a Queueable (R-RQ3). A Queueable may queue one job, and the job running
+     * may need that one job for its own next step: the sample data load and the household soft
+     * credit recompute chain themselves after saving gifts and people, and so may a subscriber's
+     * integration. Taking it stopped the sample data load with "Too many queueable jobs added to
+     * the queue: 2". The entries wait for the next processor: one a later save starts, one the
+     * chain starts when it ends (`startProcessor`), or the nightly run.
      */
     private static void requestProcessor() {
+        if (processorRequested || AutomationControl.isPaused() || inQueueable()) {
+            return;
+        }
+        startProcessor();
+    }
+
+    /** Whether this transaction is a Queueable job, whose one chained job is not the engine's. */
+    private static Boolean inQueueable() {
+        return queueableForTest == null ? System.isQueueable() : queueableForTest;
+    }
+
+    /**
+     * Starts a processor now when entries are pending and none waits to start. For a background
+     * job that saved records the engine queued, called when the job has no next step of its own,
+     * so its totals catch up within minutes instead of waiting for the nightly run.
+     */
+    public static void startProcessor() {
         if (processorRequested || AutomationControl.isPaused()) {
             return;
         }
         processorRequested = true;
         if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+            return;
+        }
+        Integer pending = [
+            SELECT COUNT()
+            FROM Rollup_Queue__c
+            WHERE Status__c = :STATUS_PENDING
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        if (pending == 0) {
             return;
         }
         Integer waiting = [

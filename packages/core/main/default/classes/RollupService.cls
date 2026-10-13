@@ -204,14 +204,28 @@ public with sharing class RollupService {
         }
         lastParentIds = survivorIds;
         String target = String.valueOf(targetType);
+        // Inside a Queueable the one job it may queue belongs to its own next step, never to
+        // the engine (`RollupQueue.requestProcessor`), so survivors go to the queue there too.
         if (
             survivorIds.size() > instantLimit ||
+            System.isQueueable() ||
             Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()
         ) {
             RollupQueue.add(new Map<String, Set<Id>>{ target => survivorIds });
             return;
         }
         System.enqueueJob(new SurvivorRecalculation(target, survivorIds, definitions));
+    }
+
+    /**
+     * Starts the Rollup Queue's processor when entries are pending. A background job that saved
+     * records calls this when it has no next step of its own: inside a Queueable the engine
+     * never takes the job's one chained job, so the totals it queued would otherwise wait for a
+     * later save or the nightly run.
+     */
+    @NamespaceAccessible
+    public static void startQueuedRecalculation() {
+        RollupQueue.startProcessor();
     }
 
     /**

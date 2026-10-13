@@ -278,4 +278,68 @@ private class RollupQueueTest {
             Assert.areEqual(1, ids.size(), 'Only the identifier is kept');
         }
     }
+
+    private static Integer processorsQueued() {
+        return [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'RollupQueue'];
+    }
+
+    @IsTest
+    static void insideAQueueableTheEngineLeavesTheChainedJobFree() {
+        System.runAs(TestUsers.admin()) {
+            insertChildCount();
+            Set<Id> parents = parentsWithOneChild(200);
+            Test.startTest();
+            RollupQueue.queueableForTest = true;
+            // A bulk change saved inside a Queueable queues its 200 parents (R-R4).
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => parents });
+
+            Assert.areEqual(
+                0,
+                Limits.getQueueableJobs(),
+                'The one job a Queueable may queue is left for its own next step'
+            );
+            Assert.areEqual(0, processorsQueued(), 'No processor is started from a Queueable');
+            Decimal waiting = 0;
+            for (Rollup_Queue__c entry : entries()) {
+                waiting += entry.Record_Count__c;
+                Assert.areEqual(RollupQueue.STATUS_PENDING, entry.Status__c, 'Waiting');
+            }
+            Assert.areEqual(200, waiting, 'Every parent waits in the queue');
+
+            // The chain ends and starts the processor itself.
+            RollupService.startQueuedRecalculation();
+            Assert.areEqual(1, processorsQueued(), 'The end of the chain starts one processor');
+            RollupService.startQueuedRecalculation();
+            Assert.areEqual(1, processorsQueued(), 'Asking again starts no second one');
+            Test.stopTest();
+
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Account WHERE Id IN :parents AND NumberOfEmployees = 1],
+                'The processor the chain started calculated every total'
+            );
+            Assert.areEqual(0, entries().size(), 'Every entry is finished');
+        }
+    }
+
+    @IsTest
+    static void startingTheProcessorWithNothingPendingStartsNothing() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupService.startQueuedRecalculation();
+            Assert.areEqual(0, processorsQueued(), 'No entries, no processor');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void outsideAQueueableABulkChangeStillStartsTheProcessor() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
+            Assert.areEqual(1, processorsQueued(), 'A save outside a Queueable starts one');
+            Test.stopTest();
+        }
+    }
 }
