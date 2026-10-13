@@ -2,6 +2,7 @@
   <lightning-card title={labels.title} icon-name="custom:custom25">
     <div class="slds-var-p-horizontal_medium">
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
+      <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
 
       <template lwc:if={hasError}>
         <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">

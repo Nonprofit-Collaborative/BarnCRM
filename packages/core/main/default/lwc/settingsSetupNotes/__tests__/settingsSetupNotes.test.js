@@ -84,4 +84,36 @@ describe('c-settings-setup-notes', () => {
     expect(fiscal.querySelector('[data-id="status"]')).toBeNull();
     expect(fiscal.querySelector('lightning-icon').iconName).toBe('utility:info');
   });
+
+  it('shows the notes a module page passes in, in place of any section', async () => {
+    getSetupChecks.mockResolvedValue({ emailDeliverability: true });
+    const element = createElement('c-settings-setup-notes', { is: SettingsSetupNotes });
+    element.section = 'Households';
+    element.notes = [
+      { key: 'fromAddress', what: 'Add the address', why: 'Salesforce asks', where: 'Setup, X' },
+      { key: 'pages', what: 'Assign the page', why: 'Only Setup', where: 'Setup, Y', met: false },
+      {
+        key: 'email',
+        what: 'Send email',
+        why: 'Digest',
+        where: 'Setup, Z',
+        check: 'emailDeliverability'
+      }
+    ];
+    document.body.appendChild(element);
+    await flushPromises();
+
+    expect(note(element, 'duplicates')).toBeNull();
+    const from = note(element, 'fromAddress');
+    expect(from.textContent).toContain('Add the address');
+    expect(from.textContent).toContain('Setup, X');
+    expect(from.querySelector('[data-id="status"]')).toBeNull();
+    expect(note(element, 'pages').querySelector('[data-id="status"]').textContent).toBe(
+      'c.Core_SetupNote_NotDone'
+    );
+    expect(note(element, 'email').querySelector('[data-id="status"]').textContent).toBe(
+      'c.Core_SetupNote_Done'
+    );
+    expect(getSetupChecks).toHaveBeenCalledTimes(1);
+  });
 });

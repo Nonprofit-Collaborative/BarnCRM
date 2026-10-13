@@ -55,6 +55,13 @@ describe('c-campaign-sync', () => {
     jest.clearAllMocks();
   });
 
+  it('says what Campaign sync needs from Setup at the top of the page', async () => {
+    const element = await mount(READY);
+    const notes = element.shadowRoot.querySelector('c-settings-setup-notes');
+    expect(notes.notes).toHaveLength(1);
+    expect(notes.notes[0].where).toBe('c.Connect_SetupNote_CampaignSync_Where');
+  });
+
   it('counts the appeals with a Campaign and offers Sync all appeals', async () => {
     const element = await mount(READY);
     expect(find(element, 'on')).not.toBeNull();

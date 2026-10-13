@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
-  <isExposed>false</isExposed>
+  <isExposed>true</isExposed>
+  <masterLabel>BarnCRM Setup Notes</masterLabel>
   <description>
-    The note at the top of a BarnCRM Settings section that needs a change in Setup: what, why
-    and where, and whether it is done when BarnCRM can tell.
+    What a settings section or module settings page needs changed in Setup: what, why, where,
+    and whether it is done. Exposed with no targets so Giving and Connect can nest it.
   </description>
 </LightningComponentBundle>

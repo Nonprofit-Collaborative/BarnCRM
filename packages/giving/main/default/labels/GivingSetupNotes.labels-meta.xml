@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Giving_SetupNote_Access_What</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Receipts: what to change for Giving access</shortDescription>
+        <value>Give fundraising staff Giving Staff, give yourself Giving Admin, and give people who only read gifts Giving Read Only.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Access_Where</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Receipts: Setup path for Giving permission sets</shortDescription>
+        <value>Setup, Users, the person, Permission Set Assignments</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Access_Why</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Receipts: why Giving access needs Setup</shortDescription>
+        <value>The roles on the Access page carry what Core provides, not Giving, and a module's permission set can be assigned only in Setup for now.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Email_What</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: what to change for email</shortDescription>
+        <value>Let this org send email, so emailed thank yous can go out.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Email_Where</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: Setup path for email</shortDescription>
+        <value>Setup, Deliverability, Access level: All email</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Email_Why</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: why email needs Setup</shortDescription>
+        <value>When Deliverability is set to system email only or no access, Salesforce sends no thank you emails, and only Setup can change it.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_FromAddress_What</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: what to change for the From address</shortDescription>
+        <value>To send thank yous from a shared address such as giving@yourorg.org, add and verify it as an organization-wide address, then choose it in Acknowledgments from address.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_FromAddress_Where</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: Setup path for the From address</shortDescription>
+        <value>Setup, Organization-Wide Addresses, Add</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_FromAddress_Why</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: why the From address needs Setup</shortDescription>
+        <value>Salesforce sends from a shared address only once it is verified, and only Setup can add one. Without it, thank yous come from whoever sends them.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_RecordPages_What</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Receipts: what to change for record pages</shortDescription>
+        <value>Assign Gift Record Page as the org default for Gift, so every gift shows the Receipts, Soft credits and Tribute panels. To show giving in the BarnCRM app, also assign Giving Contact Record Page and Giving Account Record Page to that app.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_RecordPages_Where</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Receipts: Setup path for record pages</shortDescription>
+        <value>Setup, Lightning App Builder, the page, Activation</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_RecordPages_Why</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Receipts: why record pages need Setup</shortDescription>
+        <value>Only Setup can assign a record page, and a page from Giving can be assigned to the BarnCRM app only there.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Templates_What</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: what to change for wording</shortDescription>
+        <value>Write or change what an emailed thank you says in an email template. BarnCRM ships one to start from: BarnCRM: thank you for your gift.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Templates_Where</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: Setup path for templates</shortDescription>
+        <value>Setup, Classic Email Templates, folder BarnCRM Acknowledgments</value>
+    </labels>
+    <labels>
+        <fullName>Giving_SetupNote_Templates_Why</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Acknowledgments: why templates need Setup</shortDescription>
+        <value>Salesforce keeps template editing, preview and test sends in its own editor, for everybody.</value>
+    </labels>
+</CustomLabels>
