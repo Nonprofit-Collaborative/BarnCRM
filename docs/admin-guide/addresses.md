@@ -179,6 +179,13 @@ one. Choose **Set as default** on the address you want instead.
 household, organization or person with none is saved as the default, so it is in use straight
 away. After that, a new address is added unmarked until you choose **Set as default**.
 
+**Two defaults just after a merge.** When Salesforce's own merge combines two records that
+each had a default address, the kept record briefly has both. Within a minute or so BarnCRM
+keeps one: the one that matches the kept record's address boxes (billing for a household or
+organization, mailing for a contact), or else the most recently created. The other stays on
+the card as an ordinary address. This runs in the background because Salesforce does not let
+anything change records while it is merging them.
+
 **Filling in a seasonal address with no dates.** A Seasonal address needs all four date
 boxes: start month, start day, end month, end day. Saving without them gives you
 "A seasonal address needs a start month, a start day, an end month, and an end day so we

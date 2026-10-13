@@ -62,6 +62,10 @@ choose to save anyway.
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because
    records can still point at it: merge it into the kept person's household with **Merge households** (step 6).
+   Within a minute or so BarnCRM also tidies the kept person in the background: one default
+   address stays (see [Addresses](addresses.md)), a relationship the two records had with each
+   other is removed, so is a second copy of a relationship both had with the same person, and
+   their primary affiliation is chosen again.
 5. Back on the Duplicates panel, refresh. The pair is gone.
 6. If the scan found two households, choose **Merge households** on the pair. You see the two
    side by side, the fields where they disagree, and which one is kept. Choose the household to
@@ -95,8 +99,12 @@ person's totals are recalculated straight away.
 
 **A household pair should not be merged with the Salesforce merge.** Always merge households
 from this panel or with **Merge or split** on the household's record page. That merge moves
-the members, recalculates the totals and renames the household; Salesforce's own account merge
-does none of that, which is why the household record page does not offer it.
+the members, recalculates the totals and renames the household, and lets you choose what to
+keep. If two households are merged with Salesforce's own account merge anyway, BarnCRM recounts
+and renames the kept household, settles its primary member and keeps one default address within
+a minute or so, in the background, because Salesforce does not let anything change the records
+while it is merging them. It cannot ask which name or members to keep, which is why the
+household record page does not offer that merge.
 
 **A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of
 Org Optimizer, and scanning, dismissing and merging from it, need the Manage BarnCRM Settings

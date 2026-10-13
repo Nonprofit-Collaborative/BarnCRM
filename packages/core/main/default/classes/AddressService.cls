@@ -229,6 +229,91 @@ public with sharing class AddressService {
         }
     }
 
+    /**
+     * Leaves each of these owners with one default address (R-AD2), for the survivor of a
+     * merge, which arrives with the other record's default as well as its own (PEOPLE-15).
+     *
+     * The default kept is the one that matches the owner's standard address fields (billing
+     * for an account, mailing for a contact), because those hold the address the merge chose;
+     * otherwise, and for a person account, the most recently created, as when a default is
+     * deleted. The others stay as ordinary addresses. Nothing is copied into the standard
+     * fields: the kept default is the one they already hold, or the merge left them as chosen.
+     */
+    public static void keepOneDefault(Set<Id> ownerIds) {
+        if (ownerIds == null || ownerIds.isEmpty()) {
+            return;
+        }
+        Map<Id, List<Address__c>> defaultsByOwner = new Map<Id, List<Address__c>>();
+        // Newest first, so the first address held for an owner is the fallback to keep.
+        for (Address__c address : AddressSelector.selectDefaultsByOwnerIds(ownerIds, null)) {
+            Id ownerId = ownerIdOf(address);
+            if (!defaultsByOwner.containsKey(ownerId)) {
+                defaultsByOwner.put(ownerId, new List<Address__c>());
+            }
+            defaultsByOwner.get(ownerId).add(address);
+        }
+        Set<Id> crowded = new Set<Id>();
+        Set<Id> crowdedAccounts = new Set<Id>();
+        Set<Id> crowdedContacts = new Set<Id>();
+        for (Id ownerId : defaultsByOwner.keySet()) {
+            if (defaultsByOwner.get(ownerId).size() > 1) {
+                crowded.add(ownerId);
+                if (ownerId.getSObjectType() == Contact.SObjectType) {
+                    crowdedContacts.add(ownerId);
+                } else {
+                    crowdedAccounts.add(ownerId);
+                }
+            }
+        }
+        if (crowded.isEmpty()) {
+            return;
+        }
+        Map<Id, String> standardKeyByOwner = new Map<Id, String>();
+        for (Account owner : AddressSelector.selectAccountBillingAddresses(crowdedAccounts)) {
+            standardKeyByOwner.put(
+                owner.Id,
+                addressKey(owner.BillingStreet, owner.BillingCity, owner.BillingPostalCode)
+            );
+        }
+        for (Contact owner : AddressSelector.selectContactMailingAddresses(crowdedContacts)) {
+            standardKeyByOwner.put(
+                owner.Id,
+                addressKey(owner.MailingStreet, owner.MailingCity, owner.MailingPostalCode)
+            );
+        }
+        List<Address__c> stale = new List<Address__c>();
+        for (Id ownerId : crowded) {
+            List<Address__c> defaults = defaultsByOwner.get(ownerId);
+            Address__c kept = defaults[0];
+            for (Address__c address : defaults) {
+                String key = addressKey(address.Street__c, address.City__c, address.Postal_Code__c);
+                if (key == standardKeyByOwner.get(ownerId)) {
+                    kept = address;
+                    break;
+                }
+            }
+            for (Address__c address : defaults) {
+                if (address.Id != kept.Id) {
+                    stale.add(new Address__c(Id = address.Id, Is_Default__c = false));
+                }
+            }
+        }
+        isPropagating = true;
+        try {
+            Database.update(stale, AccessLevel.USER_MODE);
+        } finally {
+            isPropagating = false;
+        }
+    }
+
+    private static String addressKey(String street, String city, String postalCode) {
+        return (String.isBlank(street) ? '' : street.trim().toLowerCase()) +
+            '|' +
+            (String.isBlank(city) ? '' : city.trim().toLowerCase()) +
+            '|' +
+            (String.isBlank(postalCode) ? '' : postalCode.trim().toLowerCase());
+    }
+
     // ---------------------------------------------------------------- direction two
 
     /**

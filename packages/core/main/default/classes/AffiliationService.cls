@@ -59,6 +59,18 @@ public with sharing class AffiliationService {
         recompute(personIds, justSaved);
     }
 
+    /**
+     * Settles the primary affiliation of these people from scratch: the newest current one
+     * marked primary keeps the flag. For the survivor of a merge, who can arrive with the
+     * other record's primary affiliation as well as their own (PEOPLE-15).
+     */
+    public static void refreshPrimariesFor(Set<Id> personIds) {
+        if (personIds == null || personIds.isEmpty()) {
+            return;
+        }
+        recompute(personIds, new Set<Id>());
+    }
+
     private static void collectPeople(
         List<Affiliation__c> records,
         Set<Id> personIds,

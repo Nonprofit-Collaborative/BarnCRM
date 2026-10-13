@@ -88,4 +88,32 @@ public with sharing class AddressSelector {
             LIMIT 10000
         ];
     }
+
+    /** The billing address in the standard fields of these accounts. */
+    public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds) {
+        if (accountIds == null || accountIds.isEmpty()) {
+            return new List<Account>();
+        }
+        return [
+            SELECT Id, BillingStreet, BillingCity, BillingPostalCode
+            FROM Account
+            WHERE Id IN :accountIds
+            WITH USER_MODE
+            LIMIT 10000
+        ];
+    }
+
+    /** The mailing address in the standard fields of these contacts. */
+    public static List<Contact> selectContactMailingAddresses(Set<Id> contactIds) {
+        if (contactIds == null || contactIds.isEmpty()) {
+            return new List<Contact>();
+        }
+        return [
+            SELECT Id, MailingStreet, MailingCity, MailingPostalCode
+            FROM Contact
+            WHERE Id IN :contactIds
+            WITH USER_MODE
+            LIMIT 10000
+        ];
+    }
 }

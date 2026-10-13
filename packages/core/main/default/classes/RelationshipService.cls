@@ -282,6 +282,66 @@ public with sharing class RelationshipService {
         withoutReentry(null, null, null, stillThere);
     }
 
+    /**
+     * After a merge has moved one person's relationships onto another (PEOPLE-15): deletes
+     * the relationships these people now have with themselves, and every second copy of a
+     * relationship they now hold twice with the same person, type and status, keeping the
+     * oldest. Both sides of each pair are read, from these people and from the people they
+     * are related to, and deleted together, so no other side is left behind.
+     */
+    public static void removeSelfAndDuplicates(Set<Id> personIds) {
+        if (personIds == null || personIds.isEmpty()) {
+            return;
+        }
+        List<Relationship__c> rows = RelationshipSelector.selectByFromPersonIds(personIds);
+        Set<Id> others = new Set<Id>();
+        for (Relationship__c row : rows) {
+            Id related = relatedOf(row);
+            if (related != null && !personIds.contains(related)) {
+                others.add(related);
+            }
+        }
+        for (Relationship__c row : RelationshipSelector.selectByFromPersonIds(others)) {
+            if (personIds.contains(relatedOf(row))) {
+                rows.add(row);
+            }
+        }
+        Map<String, Relationship__c> keptByKey = new Map<String, Relationship__c>();
+        List<Relationship__c> deletes = new List<Relationship__c>();
+        for (Relationship__c row : rows) {
+            Id person = PersonReference.idOf(row.Contact__c, row.Person_Account__c);
+            if (person == null) {
+                continue;
+            }
+            if (person == relatedOf(row)) {
+                deletes.add(row);
+                continue;
+            }
+            String key = person + '|' + relatedOf(row) + '|' + row.Type__c + '|' + row.Status__c;
+            Relationship__c held = keptByKey.get(key);
+            if (held == null) {
+                keptByKey.put(key, row);
+            } else if (isOlder(row, held)) {
+                deletes.add(held);
+                keptByKey.put(key, row);
+            } else {
+                deletes.add(row);
+            }
+        }
+        withoutReentry(null, null, null, deletes);
+    }
+
+    private static Id relatedOf(Relationship__c row) {
+        return PersonReference.idOf(row.Related_Contact__c, row.Related_Person_Account__c);
+    }
+
+    private static Boolean isOlder(Relationship__c row, Relationship__c held) {
+        if (row.CreatedDate != held.CreatedDate) {
+            return row.CreatedDate < held.CreatedDate;
+        }
+        return String.valueOf(row.Id) < String.valueOf(held.Id);
+    }
+
     // ------------------------------------------------------------------ helpers
 
     /**

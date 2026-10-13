@@ -140,6 +140,12 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         mayTidy.removeAll(keptByMerge);
         refresh(mayTidy, true);
         refresh(keptByMerge, false);
+        if (!survivorByMerged.isEmpty()) {
+            // The survivors' addresses, relationships and affiliations, once the merge is
+            // saved (PEOPLE-15). Their households were settled above: none is in the merge.
+            Set<Id> survivors = new Set<Id>(survivorByMerged.values());
+            MergeSettlement.afterMerge(new Set<Id>(), survivors, survivors);
+        }
     }
 
     /**
