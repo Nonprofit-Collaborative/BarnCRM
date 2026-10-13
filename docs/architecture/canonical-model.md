@@ -1606,9 +1606,12 @@ and Next Attempt set later each time; after the fifth attempt the entry is Faile
 processor runs again while Pending entries remain. A second processor started by accident is
 harmless, because recalculation recomputes (R-R11). A save inside a Queueable job never starts
 the processor: the platform lets a Queueable queue one job, and that job belongs to the running
-job's own next step (the sample data load, the household soft credit recompute, a subscriber's
-integration). Its entries wait for the next processor a later save starts, the one the job
-starts itself when its chain ends (`RollupService.startQueuedRecalculation`), or the nightly run.
+job's own next step (the household soft credit recompute, a subscriber's integration). Instead
+the transaction publishes one `Rollup_Queue_Ready__e` (publish after commit, however many
+entries it wrote), and its subscriber calls `RollupService.startQueuedRecalculation`, which
+starts the processor unless one is already waiting (ADR-NEXT). A job that rolls back publishes
+nothing. If the event cannot be published, the entries wait for the next processor a later save
+starts, the one a BarnCRM job starts itself when its chain ends, or the nightly run.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
@@ -1637,6 +1640,9 @@ and processed; the nightly run puts the totals right afterwards in Both mode.
 
 - **Service:** `RollupQueue`, which writes entries and is the one processor (a Queueable with a
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
+- **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
+  After Commit, published at most once per transaction by a save inside a Queueable job (R-RQ3).
+  `RollupQueueReadyTrigger` subscribes and starts the processor.
 
 ---
 
@@ -6599,6 +6605,7 @@ mirrors the primary member).
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Rollup Queue and Queueable jobs (rollup comparison run on `oi-test`). No object or field added. R-RQ3: a save inside a Queueable leaves the processor to a later save, to the job's own chain end (`RollupService.startQueuedRecalculation`) or to the nightly run, because taking the job's one chained job stopped the sample data load with "Too many queueable jobs added to the queue: 2". |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.6 | 2026-10-13 | Rollup Queue ready event (ADR-NEXT, `NEXT-rollup-queue-ready-event-from-queueable-jobs.md`). New platform event `Rollup_Queue_Ready__e` (no fields, Publish After Commit), subscribed by `RollupQueueReadyTrigger`; the three packaged permission sets grant Read and Create on it, as on `Error_Log_Event__e`. R-RQ3: a save inside a Queueable publishes one event per transaction and its subscriber starts the processor, so those totals stay near real time without taking the job's one chained job. |
 
 ---
 ## 32. Entity ownership by package

@@ -55,6 +55,10 @@ public without sharing class RollupQueue implements Queueable {
     /** Set once a processor is queued, or is this job, so one transaction asks for one only. */
     private static Boolean processorRequested = false;
 
+    /** How many Rollup_Queue_Ready__e this transaction published: one at most. */
+    @TestVisible
+    private static Integer readyEventsPublished = 0;
+
     /** Test seam: true or false stands in for `System.isQueueable()`; null reads the platform. */
     @TestVisible
     private static Boolean queueableForTest;
@@ -219,14 +223,38 @@ public without sharing class RollupQueue implements Queueable {
      * may need that one job for its own next step: the sample data load and the household soft
      * credit recompute chain themselves after saving gifts and people, and so may a subscriber's
      * integration. Taking it stopped the sample data load with "Too many queueable jobs added to
-     * the queue: 2". The entries wait for the next processor: one a later save starts, one the
-     * chain starts when it ends (`startProcessor`), or the nightly run.
+     * the queue: 2". There the transaction publishes one Rollup_Queue_Ready__e instead, after
+     * commit, and its subscriber starts the processor (ADR-NEXT).
      */
     private static void requestProcessor() {
-        if (processorRequested || AutomationControl.isPaused() || inQueueable()) {
+        if (processorRequested || AutomationControl.isPaused()) {
+            return;
+        }
+        if (inQueueable()) {
+            announceReady();
             return;
         }
         startProcessor();
+    }
+
+    /**
+     * Publishes one Rollup_Queue_Ready__e per transaction. It is published after commit, so a
+     * job that rolls back announces nothing, and it takes no queueable job. If it cannot be
+     * published the entries wait for a later processor or the nightly run, as before.
+     */
+    private static void announceReady() {
+        if (readyEventsPublished > 0) {
+            return;
+        }
+        readyEventsPublished++;
+        Database.SaveResult result = EventBus.publish(new Rollup_Queue_Ready__e());
+        if (!result.isSuccess()) {
+            ErrorLogger.logMessage(
+                result.getErrors()[0].getMessage(),
+                'RollupQueue.announceReady',
+                'Warning'
+            );
+        }
     }
 
     /** Whether this transaction is a Queueable job, whose one chained job is not the engine's. */
