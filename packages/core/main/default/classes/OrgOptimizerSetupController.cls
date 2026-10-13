@@ -17,10 +17,17 @@ public with sharing class OrgOptimizerSetupController {
     private static final Integer COUNT_CAP = 1000;
     /** How many names each check shows as examples. */
     private static final Integer EXAMPLES = 5;
-    /** A user who has not logged in for this many days counts as inactive. */
-    private static final Integer LOGIN_DAYS = 90;
-    /** A report not run for this many days counts as stale. */
-    private static final Integer REPORT_DAYS = 365;
+    /**
+     * A user who has not logged in for this many days counts as inactive: BarnCRM Settings
+     * `Unused_Login_Days__c`, empty reads as the default, held between the bounds (D-40).
+     */
+    public static final Integer DEFAULT_LOGIN_DAYS = 90;
+    public static final Integer MIN_LOGIN_DAYS = 30;
+    public static final Integer MAX_LOGIN_DAYS = 365;
+    /** A report not run for this many days counts as stale: `Unused_Report_Days__c`, likewise. */
+    public static final Integer DEFAULT_REPORT_DAYS = 365;
+    public static final Integer MIN_REPORT_DAYS = 90;
+    public static final Integer MAX_REPORT_DAYS = 1095;
     /** Templates and flows younger than this are left out: they may be new work. */
     private static final Integer NEW_DAYS = 90;
 
@@ -54,9 +61,9 @@ public with sharing class OrgOptimizerSetupController {
         @AuraEnabled
         public Integer countCap = COUNT_CAP;
         @AuraEnabled
-        public Integer loginDays = LOGIN_DAYS;
+        public Integer loginDays = loginDays();
         @AuraEnabled
-        public Integer reportDays = REPORT_DAYS;
+        public Integer reportDays = reportDays();
     }
 
     private class Check {
@@ -80,13 +87,13 @@ public with sharing class OrgOptimizerSetupController {
             throw asAuraError(Label.Core_OrgOptimizer_ErrorNoPermission);
         }
         Datetime now = Datetime.now();
+        Result result = new Result();
         Map<String, Object> binds = new Map<String, Object>{
-            'loginCutoff' => now.addDays(-LOGIN_DAYS),
-            'reportCutoff' => now.addDays(-REPORT_DAYS),
+            'loginCutoff' => now.addDays(-result.loginDays),
+            'reportCutoff' => now.addDays(-result.reportDays),
             'newCutoff' => now.addDays(-NEW_DAYS),
             'readUpTo' => COUNT_CAP + 1
         };
-        Result result = new Result();
         for (Check check : checks()) {
             result.findings.add(run(check, binds));
         }
@@ -169,6 +176,35 @@ public with sharing class OrgOptimizerSetupController {
             finding.examples.clear();
         }
         return finding;
+    }
+
+    /** Days without a login before an active user is listed, from BarnCRM Settings. */
+    public static Integer loginDays() {
+        return bounded('Unused_Login_Days__c', DEFAULT_LOGIN_DAYS, MIN_LOGIN_DAYS, MAX_LOGIN_DAYS);
+    }
+
+    /** Days without a run before a report is listed, from BarnCRM Settings. */
+    public static Integer reportDays() {
+        return bounded(
+            'Unused_Report_Days__c',
+            DEFAULT_REPORT_DAYS,
+            MIN_REPORT_DAYS,
+            MAX_REPORT_DAYS
+        );
+    }
+
+    /** A number setting: empty or unreadable reads as the default, out of range as the nearest end. */
+    private static Integer bounded(String key, Integer fallback, Integer minimum, Integer maximum) {
+        Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
+        if (configured == null) {
+            return fallback;
+        }
+        try {
+            Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
+            return Math.max(minimum, Math.min(value, maximum));
+        } catch (Exception ignored) {
+            return fallback;
+        }
     }
 
     private static String nameOf(SObject row, String field) {

@@ -79,14 +79,18 @@ Each count stops at 1,000 and then says **More than 1000**.
 
 | Check | What counts | Left out |
 |---|---|---|
-| Active users who have not logged in for 90 days | Active, full Salesforce users whose last login is more than 90 days ago, or who never logged in. | Inactive users, and portal and integration user types. |
+| Active users who have not logged in for 90 days | Active, full Salesforce users whose last login is more than 90 days ago (or the days you set), or who never logged in. | Inactive users, and portal and integration user types. |
 | Permission sets nobody is assigned | Your own permission sets with no user assigned. | Profile permission sets, permission sets from installed packages, and those inside a permission set group. |
-| Reports not run for 365 days | Reports nobody has run for a year, or ever. Only reports you can see are counted. | Reports from installed packages. |
+| Reports not run for 365 days | Reports nobody has run for a year (or the days you set), or ever. Only reports you can see are counted. | Reports from installed packages. |
 | Email templates never used | Templates that have never been sent and are more than 90 days old. | Templates from installed packages, and new ones. |
 | Inactive flows | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
 | Scheduled jobs owned by inactive users | Scheduled jobs still waiting to run whose owner is no longer active. These may stop working. | Finished and deleted jobs. |
 
-The thresholds (90 and 365 days) are fixed. Nothing here is deleted or changed for you:
+Two thresholds are settings, under **General** in **BarnCRM Settings**: **Days before a user
+is unused** (90 unless you change it; 30 to 365) and **Days before a report is unused** (365;
+90 to 1,095). A value outside the range is read as the nearest end, and each check's name
+shows the number in use. The 90 days that keep new email templates and flows out are fixed.
+Nothing here is deleted or changed for you:
 **Open in Setup** opens the Setup page where you can review and remove each item.
 
 ## 6. Common mistakes
