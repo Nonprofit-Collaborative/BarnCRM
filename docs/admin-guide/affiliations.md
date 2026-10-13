@@ -37,6 +37,12 @@ To let your team see and manage affiliations, make sure they have one of the pac
 levels (BarnCRM Admin, Program Staff, or, with Giving installed, Fundraising Staff) on the **Access** page in
 BarnCRM Settings. Read Only users see affiliations and cannot change them.
 
+The upkeep does not depend on what the person saving can see or edit. Someone who may add an
+affiliation but cannot edit the person it belongs to, or cannot see that person's other
+affiliations (for example under private sharing), still ends up with one primary and the
+right **Primary Affiliation** on the person: BarnCRM makes those two corrections itself. The
+affiliation they save is still checked against their own access.
+
 Affiliations appear in three places once you are set up: an **Affiliations** card on every
 person's record, an **Affiliations** card on every organization's record showing the people
 connected to it, and an **Affiliations** tab in the BarnCRM app for reporting and list
