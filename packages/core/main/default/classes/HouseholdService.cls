@@ -750,6 +750,65 @@ public with sharing class HouseholdService {
         return affected;
     }
 
+    /**
+     * Collapses a person's duplicate current memberships in a household to one row, for the
+     * households a Salesforce merge of two households has just folded together. The merge
+     * moves both households' rows onto the survivor, so a person who was in both is in the
+     * survivor twice and would be counted twice.
+     *
+     * The row kept is the one the household choice rule would pick (R-M3, `comesFirst`):
+     * primary first, then the earlier start date, then the older row. It takes Is Primary
+     * if any duplicate had it. The others are removed in system mode (upkeep, ADR-0021).
+     * Junction mode only; ended rows are history and are left alone. Answers the number of
+     * rows removed.
+     */
+    @NamespaceAccessible
+    public static Integer collapseDuplicateMemberships(Set<Id> householdIds) {
+        if (householdIds == null || householdIds.isEmpty() || !isJunctionMode()) {
+            return 0;
+        }
+        Map<String, List<Household_Member__c>> rowsByPersonHousehold = new Map<String, List<Household_Member__c>>();
+        for (Household_Member__c row : HouseholdSelector.getMemberships(householdIds)) {
+            Id personId = personOf(row);
+            if (personId == null || row.Household__c == null) {
+                continue;
+            }
+            String key = survivorHouseholdKey(personId, row.Household__c);
+            if (!rowsByPersonHousehold.containsKey(key)) {
+                rowsByPersonHousehold.put(key, new List<Household_Member__c>());
+            }
+            rowsByPersonHousehold.get(key).add(row);
+        }
+        List<Household_Member__c> redundant = new List<Household_Member__c>();
+        List<Household_Member__c> promoted = new List<Household_Member__c>();
+        for (List<Household_Member__c> rows : rowsByPersonHousehold.values()) {
+            if (rows.size() < 2) {
+                continue;
+            }
+            Household_Member__c kept;
+            Boolean anyPrimary = false;
+            for (Household_Member__c row : rows) {
+                anyPrimary = anyPrimary || row.Is_Primary__c == true;
+                if (comesFirst(row, kept)) {
+                    kept = row;
+                }
+            }
+            for (Household_Member__c row : rows) {
+                if (row.Id != kept.Id) {
+                    redundant.add(row);
+                }
+            }
+            if (anyPrimary && kept.Is_Primary__c != true) {
+                promoted.add(new Household_Member__c(Id = kept.Id, Is_Primary__c = true));
+            }
+        }
+        HouseholdWriter.collapseMemberships(promoted, redundant);
+        if (!redundant.isEmpty()) {
+            HOUSEHOLD_ID_BY_PERSON.clear();
+        }
+        return redundant.size();
+    }
+
     /** The person a membership row is for, whichever object they are stored on. */
     public static Id personOf(Household_Member__c row) {
         return row.Contact__c != null ? row.Contact__c : row.Account__c;
