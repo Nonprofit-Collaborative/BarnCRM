@@ -5,6 +5,8 @@ import { RefreshEvent } from 'lightning/refresh';
 import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import Toast from 'lightning/toast';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { openInWorkspace, refreshEnclosingTab } from 'c/workspaceTabs';
 import searchHouseholds from '@salesforce/apex/HouseholdMergeController.searchHouseholds';
 import canEdit from '@salesforce/apex/HouseholdMergeController.canEdit';
 import getPreview from '@salesforce/apex/HouseholdMergeController.preview';
@@ -100,6 +102,8 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   @track splitSearchResults = [];
   splitSearchTerm = '';
   splitSearchedOnce = false;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   @wire(getRecord, { recordId: '$recordId', fields: [RECORD_TYPE_FIELD] })
   wiredAccount({ data, error }) {
@@ -397,15 +401,23 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
 
   /**
    * After a merge or split: close the quick action if this runs in one (a no-op on a record
-   * page), tell LDS and the page that this household changed (its header and the members
-   * panel otherwise stay stale until a reload), and go to the household the action ended on
-   * only when it is another record, since a merge ends on the page it started from.
+   * page) and show that this household changed. In a console its tab is refreshed in place;
+   * everywhere else LDS and the page are told (its header and the members panel otherwise
+   * stay stale until a reload). The page moves only when the action ended on another
+   * household, since a merge ends on the page it started from: in a console a split's other
+   * household opens beside it as a subtab, elsewhere the page goes to it.
    */
-  finish(recordId) {
+  async finish(recordId) {
+    const refreshedTab = await refreshEnclosingTab(this);
     this.dispatchEvent(new CloseActionScreenEvent());
-    notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
-    this.dispatchEvent(new RefreshEvent());
-    if (recordId && recordId !== this.recordId) {
+    if (!refreshedTab) {
+      notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
+      this.dispatchEvent(new RefreshEvent());
+    }
+    if (!recordId || recordId === this.recordId) {
+      return;
+    }
+    if (!refreshedTab || !(await openInWorkspace(this, { recordId }))) {
       this.goTo(recordId);
     }
   }

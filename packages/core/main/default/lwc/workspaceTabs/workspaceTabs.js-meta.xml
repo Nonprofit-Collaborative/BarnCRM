@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Console tab handling through the Workspace API: opens records as subtabs, names tool tabs,
+    refreshes a tab after an action. Does nothing outside a console app, so callers keep their
+    usual navigation there. Imported by Core components.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

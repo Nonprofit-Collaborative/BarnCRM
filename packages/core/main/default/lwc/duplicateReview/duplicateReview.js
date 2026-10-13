@@ -1,5 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 // Bare, and correctly so: a custom permission in the same package resolves without a prefix.
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import DISMISSAL_OBJECT from '@salesforce/schema/Duplicate_Dismissal__c';
@@ -105,6 +107,8 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
 
   /** The data-id of the box heading already given focus, so it is focused once per opening. */
   focusedHeading;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   connectedCallback() {
     this.load();
@@ -255,6 +259,17 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   handleRefresh() {
     this.noticeMessage = undefined;
     this.load();
+  }
+
+  /** In a console a suggested record opens as a subtab, so the review stays where it was. */
+  handleRecordClick(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    followLinkInWorkspace(this, event, { recordId }, () =>
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId, actionName: 'view' }
+      })
+    );
   }
 
   handleViewDismissed() {

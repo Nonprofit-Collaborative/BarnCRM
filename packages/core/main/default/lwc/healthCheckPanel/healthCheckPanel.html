@@ -87,7 +87,7 @@
                                             <ul class="slds-list_dotted slds-text-body_small" data-id="finding-links">
                                                 <template for:each={finding.links} for:item="link">
                                                     <li key={link.url}>
-                                                        <a href={link.url} data-id="finding-link">{link.label}</a>
+                                                        <a href={link.url} data-id="finding-link" onclick={handleFindingLink}>{link.label}</a>
                                                     </li>
                                                 </template>
                                             </ul>

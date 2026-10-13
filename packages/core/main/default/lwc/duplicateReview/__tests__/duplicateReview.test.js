@@ -5,6 +5,7 @@ import startScan from '@salesforce/apex/DuplicateController.startScan';
 import dismissSuggestion from '@salesforce/apex/DuplicateController.dismiss';
 import previewMerge from '@salesforce/apex/DuplicateController.previewMerge';
 import mergeHouseholds from '@salesforce/apex/DuplicateController.mergeHouseholds';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock('@salesforce/apex/DuplicateController.getView', () => ({ default: jest.fn() }), {
   virtual: true
@@ -279,5 +280,29 @@ describe('c-duplicate-review', () => {
     document.body.appendChild(element);
     await flush();
     expect(q(element, 'error').textContent).toContain('c.Core_Duplicates_ErrorUnexpected');
+  });
+
+  it('lets the browser open a suggested record outside a console', async () => {
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR], totalSuggestions: 1 }));
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    qa(element, 'record-link')[0].dispatchEvent(event);
+    await flush();
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
+  });
+
+  it('opens a suggested record as a subtab in a console', async () => {
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR], totalSuggestions: 1 }));
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    qa(element, 'record-link')[1].dispatchEvent(event);
+    await flush();
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(openSubtab).toHaveBeenCalledWith('tab0', { recordId: HOUSEHOLD_B, focus: true });
   });
 });

@@ -90,6 +90,25 @@ whether anything went wrong.
 When every step is done, the checklist collapses to a small **Setup complete** tile, and
 the welcome sentence points at the tabs instead of the checklist.
 
+## Working in console tabs
+
+When the app you are in is a console app (tabs across the top, each holding its own
+subtabs), BarnCRM pages use those tabs instead of replacing the page you are on:
+
+- A record you open from a BarnCRM panel opens as a subtab of the tab you are in. That
+  covers the household link on a person, a record a Health Check finding names, a record
+  in a duplicate suggestion, and an entry in the Error Log tile. Hold Ctrl (Cmd on a Mac)
+  while clicking to open the record in a new browser tab instead.
+- **BarnCRM Settings**, **Import**, **Find** and **Rollup Builder** name their tab for what
+  is on screen, for example "BarnCRM Settings: Households", "Import: donors.csv",
+  "Find: Contact" or "Rollup Builder: Household total giving", with the page's own icon.
+- After **Merge** or **Split** in Household Merge and Split, the household's tab refreshes
+  in place, and a split opens the other household as a subtab beside it.
+
+In a standard (non-console) app, and in an org that uses another app, these pages work
+exactly as before: records open as pages and nothing is renamed. There is nothing to turn
+on.
+
 ## Rearranging the home page
 
 The home page is a standard Lightning page, and each tile on it is its own component, so

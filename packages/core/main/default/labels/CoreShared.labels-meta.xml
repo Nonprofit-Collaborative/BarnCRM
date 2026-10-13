@@ -97,6 +97,14 @@
         <value>not confirmed yet</value>
     </labels>
     <labels>
+        <fullName>Core_Console_TabLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Console tab name: a page, then what it shows</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
         <fullName>Core_ErrorLog_ActionFailed</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>

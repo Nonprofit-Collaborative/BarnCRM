@@ -1,4 +1,7 @@
 import { LightningElement, api, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
 
 import TITLE from '@salesforce/label/c.Core_HouseholdPanel_OfPersonTitle';
@@ -14,8 +17,10 @@ import FORMAL_GREETING from '@salesforce/label/c.Core_HouseholdPanel_FormalGreet
  * many people are in it, and the formal greeting. In the flexible way of belonging a person
  * can be in more than one household, so the panel lists each one.
  */
-export default class HouseholdOfPerson extends LightningElement {
+export default class HouseholdOfPerson extends NavigationMixin(LightningElement) {
   @api recordId;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   label = {
     title: TITLE,
@@ -55,6 +60,17 @@ export default class HouseholdOfPerson extends LightningElement {
 
   get isEmpty() {
     return this.loaded && !this.errorMessage && !this.hasHouseholds;
+  }
+
+  /** In a console the household opens as a subtab beside the person. */
+  handleHouseholdClick(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    followLinkInWorkspace(this, event, { recordId }, () =>
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId, actionName: 'view' }
+      })
+    );
   }
 
   memberCountText(count) {

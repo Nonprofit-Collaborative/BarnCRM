@@ -11,7 +11,12 @@
 
             <template for:each={households} for:item="household">
                 <div key={household.householdId} class="slds-var-m-bottom_small household-row">
-                    <a href={household.url} class="slds-text-heading_small household-link">{household.name}</a>
+                    <a
+                        href={household.url}
+                        class="slds-text-heading_small household-link"
+                        data-record-id={household.householdId}
+                        onclick={handleHouseholdClick}
+                    >{household.name}</a>
                     <p class="slds-text-body_small member-count">{household.memberCountText}</p>
                     <template if:true={household.formalGreeting}>
                         <p class="slds-text-body_small formal-greeting">

@@ -1,4 +1,6 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { labelTab } from 'c/workspaceTabs';
 import { parseCsv, toRecords, toCsv } from './csv';
 import { isXlsx, readXlsx, XLSX_ERRORS } from './xlsx';
 
@@ -21,6 +23,8 @@ import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 
 import cardTitle from '@salesforce/label/c.Core_Import_CardTitle';
+import tabLabel from '@salesforce/label/c.Core_Import_TabLabel';
+import tabLabelDetail from '@salesforce/label/c.Core_Console_TabLabel';
 import stepTemplate from '@salesforce/label/c.Core_Import_StepTemplate';
 import stepUpload from '@salesforce/label/c.Core_Import_StepUpload';
 import stepColumns from '@salesforce/label/c.Core_Import_StepColumns';
@@ -255,6 +259,25 @@ export default class ImportWizard extends LightningElement {
   fileName;
   pollTimer;
   storeFileError;
+  enclosingTabId;
+
+  /** In a console the tab is named for the file being imported. */
+  @wire(EnclosingTabId)
+  wiredTabId(tabId) {
+    this.enclosingTabId = tabId;
+    this.nameTab();
+  }
+
+  renderedCallback() {
+    this.nameTab();
+  }
+
+  nameTab() {
+    const label = this.fileName
+      ? tabLabelDetail.replace('{0}', tabLabel).replace('{1}', this.fileName)
+      : tabLabel;
+    labelTab(this, label, 'standard:file');
+  }
   /** The columns an installed module loads, empty where none is (R-IR6). */
   entityTargets = [];
   /** The control totals for this file (R-IB10), kept as typed. */

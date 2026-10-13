@@ -6,6 +6,7 @@ import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRe
 import applyJunctionMembership from '@salesforce/apex/HealthCheckController.applyJunctionMembership';
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -387,6 +388,57 @@ describe('c-health-check-panel', () => {
     expect(links[0].textContent).toBe('Ann Lee');
     expect(links[0].getAttribute('href')).toBe('/lightning/r/Contact/003000000000001AAA/view');
     expect(element.shadowRoot.querySelector('[data-id="fix"]')).toBeNull();
+
+    // Outside a console the browser follows the link as it always did.
+    const outside = new MouseEvent('click', { bubbles: true, cancelable: true });
+    links[0].dispatchEvent(outside);
+    await flush();
+    expect(outside.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
+
+    // In a console the record opens as a subtab and the report stays where it was.
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    EnclosingTabId.emit('tab0');
+    await flush();
+    const inside = new MouseEvent('click', { bubbles: true, cancelable: true });
+    links[1].dispatchEvent(inside);
+    await flush();
+    expect(inside.defaultPrevented).toBe(true);
+    expect(openSubtab).toHaveBeenCalledWith('tab0', {
+      url: '/lightning/r/Contact/003000000000002AAA/view',
+      focus: true
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('opens a finding record the usual way when the console refuses a subtab', async () => {
+    openSubtab.mockRejectedValueOnce(new Error('no workspace'));
+    getReport.mockResolvedValue(
+      agentforceReport({
+        findings: [
+          {
+            key: 'people_without_household',
+            title: '1 person is not in a household',
+            severity: 'Warning',
+            category: 'Settings',
+            links: [{ label: 'Ann Lee', url: '/lightning/r/Contact/003000000000001AAA/view' }]
+          }
+        ]
+      })
+    );
+    const element = createPanel();
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    element.shadowRoot
+      .querySelector('[data-id="finding-link"]')
+      .dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await flush();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__webPage',
+      attributes: { url: '/lightning/r/Contact/003000000000001AAA/view' }
+    });
   });
 
   it('navigates to a relative URL fix', async () => {
