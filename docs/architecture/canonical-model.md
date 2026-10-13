@@ -6469,11 +6469,10 @@ is closed deliberately rather than discovered.
 
 | Rule | Gap | Why it is open |
 |---|---|---|
-
-R-M3's Primary Contact mirror was closed on 2026-09-23 by C-22 (ADR-0044, primary contact
-mirrors the primary member).
-| R-M3 (Section 6) | The primary member is not mirrored to the household's Primary Contact. | `Primary_Contact__c` is a lookup to Contact, so it cannot name a person stored as a Person Account, which is the org shape junction membership serves. Closing the gap means changing the field (a Contact and Account pair, per Section 4) or dropping the second half of the rule. Needs an ADR either way. |
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
+
+Closed: R-M3's Primary Contact mirror, on 2026-09-23 by C-22 (ADR-0044, primary contact
+mirrors the primary member).
 
 ---
 
