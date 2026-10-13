@@ -189,8 +189,8 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: no person account record type</shortDescription>
-        <value>This org has no person account record type, so no person was created.</value>
+        <shortDescription>Import run log: no usable person account record type</shortDescription>
+        <value>No person account record type is available to you, so no person was created. Ask your administrator to assign one to your profile or a permission set.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LogChunkFailed</fullName>

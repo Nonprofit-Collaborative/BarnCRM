@@ -119,6 +119,44 @@ public with sharing class OrgShapeDetector {
     }
 
     /**
+     * The person account record type the running user creates a new person with, or null when
+     * none is available to them.
+     *
+     * personAccountRecordTypeIds holds every person type in the org, which is right for
+     * telling a person account from an organization but not for creating one: a record type
+     * not assigned to the user's profile or permission sets is refused on insert
+     * (INVALID_CROSS_REFERENCE_KEY). A Nonprofit Cloud trial ships a Person Account record
+     * type that the System Administrator profile is not given. So the choice is made from the
+     * running user's describe: their default record type when it is a person type, otherwise
+     * the available person type whose developer name sorts first, so the answer is the same
+     * every time. Not cached: the describe follows System.runAs.
+     */
+    public static Id creatablePersonRecordTypeId() {
+        Set<Id> personTypes = detect().personAccountRecordTypeIds;
+        if (personTypes == null || personTypes.isEmpty()) {
+            return null;
+        }
+        Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
+            .getRecordTypeInfosById();
+        Schema.RecordTypeInfo chosen;
+        for (Id recordTypeId : personTypes) {
+            Schema.RecordTypeInfo info = infos.get(recordTypeId);
+            if (info == null || !info.isAvailable()) {
+                continue;
+            }
+            if (info.isDefaultRecordTypeMapping()) {
+                return recordTypeId;
+            }
+            if (chosen == null || info.getDeveloperName() < chosen.getDeveloperName()) {
+                chosen = info;
+            }
+        }
+        return chosen == null ? null : chosen.getRecordTypeId();
+    }
+
+    /**
      * The coexistence mode this org shape calls for (plan Section 4.5). Nonprofit Cloud
      * wins over NPSP: an org with both is a Nonprofit Cloud org that also has the older
      * package in it. A mode named after a product is recommended only where that product is

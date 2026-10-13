@@ -519,18 +519,12 @@ private class InboundGiftServiceTest {
     @IsTest
     static void aPersonStoredAsAnAccountIsCreditedOnTheAccount() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Set<Id> personTypeIds = OrgShapeSelector.personTypeRecordTypeIds();
-            // IsActive exists on RecordType in every org; an inactive type cannot be inserted against.
-            List<RecordType> personTypes = [
-                SELECT Id
-                FROM RecordType
-                WHERE Id IN :personTypeIds AND IsActive = TRUE
-                LIMIT 1
-            ];
-            if (personTypes.isEmpty()) {
+            // Active and given to the running user: any other person type is refused on insert.
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (personType == null) {
                 return; // An org without person accounts has no such path to prove.
             }
-            SObject person = new Account(RecordTypeId = personTypes[0].Id);
+            SObject person = new Account(RecordTypeId = personType);
             person.put('LastName', 'Okafor');
             person.put('PersonEmail', 'ada.okafor.inbound@example.org');
             insert person;

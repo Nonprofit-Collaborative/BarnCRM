@@ -14,6 +14,22 @@ private class GiftBatchServiceTest {
         );
     }
 
+    /**
+     * Whether the org's default sharing leaves a contact some users cannot read: contacts
+     * private, or controlled by an account that is private.
+     */
+    private static Boolean contactsCanBeHidden() {
+        Organization org = [
+            SELECT DefaultAccountAccess, DefaultContactAccess
+            FROM Organization
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        return org.DefaultContactAccess == 'None' ||
+            (org.DefaultContactAccess == 'ControlledByParent' &&
+            org.DefaultAccountAccess == 'None');
+    }
+
     private static Fund__c fund(String name, Boolean isDefault) {
         Fund__c fund = new Fund__c(Name = name, Active__c = true, Is_Default__c = isDefault);
         insert fund;
@@ -455,6 +471,13 @@ private class GiftBatchServiceTest {
             // A donor David cannot see: a colleague's contact he has no access to. The platform
             // refuses the one gift that names it, and the partial-success insert retries the other
             // 199, which has to fit in the limits before everything is rolled back.
+            // An org whose default sharing lets every user read every contact (a Nonprofit Cloud
+            // trial sets Account to Public Read/Write) has no donor David cannot see, so there
+            // is no refusal to provoke this way and the test stops here. Where contacts are
+            // private, the precondition below still has to hold.
+            if (!contactsCanBeHidden()) {
+                return;
+            }
             fund('General', true);
             User fundraiser = david();
             Contact hidden = new Contact(FirstName = 'Private', LastName = 'Donor');

@@ -636,6 +636,10 @@ private class ImportRowProcessorTest {
                 shape.hasPersonAccounts = true;
                 shape.personAccountRecordTypeIds = new Set<Id>{ organizationRecordTypeId() };
                 OrgShapeDetector.overrideShape = shape;
+            } else if (OrgShapeDetector.creatablePersonRecordTypeId() == null) {
+                // Person accounts, but none of their record types is given to the running
+                // user, so the import creates nobody (ImportPersonAccountTest proves that).
+                return;
             }
             givenACoupleOnOneRow(ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS);
 

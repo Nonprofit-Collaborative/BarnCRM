@@ -630,14 +630,15 @@ private class MigrationTemplatesTest {
     @IsTest
     static void giftTransactionsFindDonorsAlreadyHeldAsPersonAccounts() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-            if (shape.hasPersonAccounts != true || shape.personAccountRecordTypeIds.isEmpty()) {
-                // Not a person accounts org: nothing to test here (see the comment above).
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (OrgShapeDetector.detect().hasPersonAccounts != true || personType == null) {
+                // Not a person accounts org, or none of its person types is given to the
+                // running user: nothing to test here (see the comment above).
                 return;
             }
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             Account ana = new Account();
-            ana.put('RecordTypeId', new List<Id>(shape.personAccountRecordTypeIds)[0]);
+            ana.put('RecordTypeId', personType);
             ana.put('FirstName', 'Ana');
             ana.put('LastName', 'Okafor');
             ana.put('PersonEmail', 'ana.okafor@example.org');

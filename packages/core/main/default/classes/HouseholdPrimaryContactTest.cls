@@ -164,9 +164,10 @@ private class HouseholdPrimaryContactTest {
     @IsTest
     static void aRealPersonAccountIsItsNewHouseholdsPrimaryContact() {
         System.runAs(TestUsers.admin()) {
-            Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
-            if (personTypes.isEmpty()) {
-                // Proven on every shape by the test above; this one needs real person accounts.
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+            if (personType == null) {
+                // Proven on every shape by the test above; this one needs real person accounts,
+                // of a record type the running user is given.
                 return;
             }
             BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
@@ -176,7 +177,7 @@ private class HouseholdPrimaryContactTest {
             settings.Delete_Empty_Households__c = false;
             HouseholdTestDataFactory.save(settings);
             SObject person = Account.SObjectType.newSObject();
-            person.put('RecordTypeId', new List<Id>(personTypes)[0]);
+            person.put('RecordTypeId', personType);
             person.put('LastName', 'Okafor');
             person.put('FirstName', 'Ada');
 

@@ -2780,10 +2780,8 @@ public with sharing class ImportRowProcessor {
         return OrgShapeDetector.detect().personAccountRecordTypeIds;
     }
 
+    /** A person type the running user can create with, never merely the first in the org. */
     private static Id anyPersonRecordTypeId() {
-        for (Id recordTypeId : personRecordTypeIds()) {
-            return recordTypeId;
-        }
-        return null;
+        return OrgShapeDetector.creatablePersonRecordTypeId();
     }
 }
