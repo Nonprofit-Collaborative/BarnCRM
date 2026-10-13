@@ -32,6 +32,12 @@ public class TestUsers {
     @NamespaceAccessible
     public static final String CORE_ADMIN = 'BarnCRM_Admin';
 
+    /**
+     * The admin permission set of each module Core calls into by name, as SampleDataModules
+     * names their sample data classes. Named as strings: Core cannot depend on a module.
+     */
+    private static final List<String> MODULE_ADMINS = new List<String>{ 'Giving_Admin' };
+
     private static final String DOMAIN = '@barncrm.example.invalid';
     private static final String PREFIX = 'barn-test.';
 
@@ -58,6 +64,28 @@ public class TestUsers {
     @NamespaceAccessible
     public static User adminWith(String modulePermissionSet) {
         return withPermissionSets(new List<String>{ CORE_ADMIN, modulePermissionSet });
+    }
+
+    /**
+     * A user holding BarnCRM Admin and the admin permission set of every module installed in
+     * this org, for a Core test whose code calls into whichever modules are there (the sample
+     * data loader counts and removes each module's records in user mode). In an org with Core
+     * alone it is `admin()`.
+     *
+     * @return the test user, created on first use in this transaction
+     */
+    @NamespaceAccessible
+    public static User adminWithInstalledModules() {
+        List<String> names = new List<String>{ CORE_ADMIN };
+        for (PermissionSet installed : [
+            SELECT Name
+            FROM PermissionSet
+            WHERE Name IN :MODULE_ADMINS AND IsOwnedByProfile = FALSE
+            WITH SYSTEM_MODE
+        ]) {
+            names.add(installed.Name);
+        }
+        return withPermissionSets(names);
     }
 
     /**

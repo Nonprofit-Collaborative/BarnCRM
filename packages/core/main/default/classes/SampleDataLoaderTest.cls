@@ -185,7 +185,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testStagesInsertHouseholdsOrganizationsAndContacts() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(3, 2, true));
 
             SampleDataLoader.Counts status = SampleDataLoader.status();
@@ -203,7 +203,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testFirstQueueableRunsTheHouseholdStage() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             // The only chaining-dependent assertion the platform allows: a test context runs
             // the first enqueued job and nothing it enqueues, so only stage one's effects
             // exist afterwards.
@@ -230,7 +230,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testContactChunksAtOneHundred() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             // Five households of fifty members each: 250 contacts, three chunks of 100, 100
             // and 50, matching the governor-limit rule in plan Section 7.2.
             SampleDataSet data = SampleDataSet.parse(buildJson(5, 50, false));
@@ -269,7 +269,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testLoadThrowsWhenAlreadyLoaded() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(1, 1, false));
             SampleDataLoader.jsonOverride = buildJson(1, 1, false);
 
@@ -290,7 +290,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testJunctionModeJoinsEveryPersonWithAMembershipRow() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             SettingsService.clearCaches();
 
@@ -329,7 +329,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testJunctionModeIsReportedToTheCard() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             SettingsService.clearCaches();
 
@@ -343,7 +343,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testContactModeIsStillJoinedThroughTheContactHousehold() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             SettingsService.clearCaches();
 
@@ -369,7 +369,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testRemoveInJunctionModeTakesTheMembershipRowsWithIt() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
             SettingsService.clearCaches();
             loadEverything(buildJson(2, 2, false));
@@ -392,7 +392,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testLoadRefusesWhileALoadIsRunning() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataLoader.jsonOverride = buildJson(1, 1, false);
             SampleDataLoader.runningJobOverride = true;
 
@@ -413,7 +413,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testRemoveRefusesWhileALoadIsRunning() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(1, 1, false));
             SampleDataLoader.runningJobOverride = true;
 
@@ -442,7 +442,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testStatusReportsLoadingWhileAJobRuns() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(1, 1, false));
             SampleDataLoader.runningJobOverride = true;
 
@@ -454,7 +454,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testRemoveDeletesEverythingFlagged() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(2, 2, false));
 
             SampleDataLoader.Counts removed = SampleDataLoader.remove();
@@ -484,7 +484,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverythingIncludingConnections(buildJsonWithConnections());
             Account ownRecord = new Account(Name = 'A real household');
             insert ownRecord;
@@ -544,7 +544,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testConnectionStageLoadsRelationshipsAndAffiliations() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverythingIncludingConnections(buildJsonWithConnections());
 
             SampleDataLoader.Counts status = SampleDataLoader.status();
@@ -593,7 +593,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testEveryPersonAndHouseholdKeepsItsGeneratorKey() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(2, 2, false));
 
             System.assertEquals(
@@ -628,7 +628,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testRemoveAsksEveryModuleToRemoveItsOwnRecords() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(1, 1, false));
             StubModule module = new StubModule(12);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
@@ -660,7 +660,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testStatusReportsEachModuleCountWithItsOwnLabel() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ new StubModule(709) };
 
             SampleDataLoader.Counts status = SampleDataLoader.status();
@@ -678,7 +678,7 @@ private class SampleDataLoaderTest {
 
     @IsTest
     static void testStatusReportsNotLoadedBeforeAnyLoad() {
-        System.runAs(TestUsers.admin()) {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
             SampleDataLoader.Counts status = SampleDataLoader.status();
             System.assertEquals(0, status.householdCount);
             System.assertEquals(0, status.organizationCount);
