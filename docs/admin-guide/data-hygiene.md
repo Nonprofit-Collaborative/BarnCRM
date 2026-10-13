@@ -42,12 +42,11 @@ paused for the load. She wants to know what the load left behind.
 1. Maria opens the **Data Hygiene** tab. Six checks are listed, each with a number. **People
    with no household** says **214**. **Default addresses with parts missing** says **38**. The
    others say **0**.
-2. Next to **People with no household** she presses **Open in Find**. The Find tab opens. Under
-   **Saved queries** there is a new query of hers, **Data hygiene: People with no household**.
-   She chooses it.
+2. Next to **People with no household** she presses **Open in Find**. The Find tab opens with a
+   new saved query of hers, **Data hygiene: People with no household**, already open.
 3. The query is filled in: object Contact, columns Name and Created Date, one condition
-   (**Account ID is blank**), sorted oldest first. She presses **Run** and reads the list. They
-   are all from last month's load.
+   (**Account ID is blank**), sorted oldest first, and it has already run. She reads the list.
+   They are all from last month's load.
 4. She presses **Export to CSV**, works through the file with the volunteer coordinator, and
    adds the people to households (see [Households](households.md)).
 5. Back on **Data Hygiene**, she presses **Recount**. **People with no household** says **0**.
@@ -78,8 +77,9 @@ shows at once. Find's export reads every matching record.
 1. Press **Open in Find** next to a check. BarnCRM saves the check's query as one of your own
    saved queries, named **Data hygiene:** followed by the check's name, not shared with anyone,
    and opens the Find tab.
-2. In Find, choose that query from **Saved queries**. It opens with its object, columns,
-   conditions and sort filled in, ready to **Run**, **Export to CSV**, or change.
+2. Find opens that query with its object, columns, conditions and sort filled in, and runs it.
+   The list is ready to read, **Export to CSV**, or change. The query also stays under
+   **Saved queries** for next time.
 3. Pressing **Open in Find** again later puts that saved query back to the check's own query,
    so your copy always matches what the console counted. To keep a version you changed, use
    **Save as** in Find and give it another name.
