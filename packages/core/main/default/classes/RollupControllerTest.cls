@@ -247,6 +247,44 @@ private class RollupControllerTest {
         }
     }
 
+    /** Recalculate all rebuilds Instantly totals too, so the estimate counts their records. */
+    @IsTest
+    static void theEstimateCountsTheRecordsOfAnInstantlyRollup() {
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c instantly = definition();
+            instantly.Mode__c = RollupService.MODE_REAL_TIME;
+            insert instantly;
+            List<Account> accounts = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                accounts.add(new Account(Name = 'Household ' + i));
+            }
+            insert accounts;
+            User admin = maria();
+            Integer records;
+            System.runAs(admin) {
+                records = [SELECT COUNT() FROM Account WITH USER_MODE];
+            }
+
+            Test.startTest();
+            RollupController.FullRunEstimate estimate = estimateAt(
+                admin,
+                Date.newInstance(2026, 10, 12),
+                Time.newInstance(20, 0, 0, 0)
+            );
+            Test.stopTest();
+
+            System.Assert.isTrue(records >= 200, 'The accounts are visible to Maria');
+            System.Assert.areEqual(
+                String.format(
+                    Label.Core_RollupBuilder_Estimate,
+                    new List<String>{ records.format(), (1).format() }
+                ),
+                estimate.summary,
+                'Every account the Instantly rollup writes is counted'
+            );
+        }
+    }
+
     @IsTest
     static void eveningsAndWeekendsAreNotWorkingHours() {
         System.runAs(TestUsers.admin()) {

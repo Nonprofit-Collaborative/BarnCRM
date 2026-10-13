@@ -517,13 +517,31 @@ public with sharing class RollupService {
 
     /**
      * Starts the nightly run now: every active Scheduled and Both definition, over every record
-     * (R-R4). The scheduled job and the Recalculate all button both call this.
+     * (R-R4). The nightly job calls this.
      *
      * @return the batch job started, the full run still going when there is one (R-R14), or
      *         null when nothing started
      */
     public static Id startNightlyRun() {
         return RollupFullRecalcBatch.begin(RollupSelector.selectActiveForModes(SCHEDULED_MODES));
+    }
+
+    /**
+     * Recalculate all: every active definition whatever its mode, Instantly ones too, over every
+     * record. An administrator who clicks it expects every total rebuilt (owner decision on
+     * ROLLUPS-8), which the nightly run's Scheduled and Both scope does not do.
+     *
+     * @return the batch job started, the full run still going when there is one (R-R14), or
+     *         null when nothing started
+     */
+    public static Id startFullRunOfEveryDefinition() {
+        return RollupFullRecalcBatch.begin(RollupSelector.selectActiveForModes(EVERY_MODE));
+    }
+
+    /** The modes Recalculate all covers: every one. */
+    @NamespaceAccessible
+    public static Set<String> everyMode() {
+        return new Set<String>(EVERY_MODE);
     }
 
     /**

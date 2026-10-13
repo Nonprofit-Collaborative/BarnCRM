@@ -109,6 +109,91 @@ private class RollupSchedulerTest {
         }
     }
 
+    /** 200 parents with one child each, saved before any rollup exists, so nothing is counted. */
+    private static List<Account> twoHundredParents() {
+        List<Account> parents = new List<Account>();
+        for (Integer i = 0; i < 200; i++) {
+            parents.add(organization('Parent ' + i, null));
+        }
+        insert parents;
+        List<Account> children = new List<Account>();
+        for (Account parent : parents) {
+            children.add(organization('Child', parent.Id));
+        }
+        insert children;
+        return parents;
+    }
+
+    /** Owner decision on ROLLUPS-8: Recalculate all rebuilds every active total, Instantly too. */
+    @IsTest
+    static void recalculateAllCoversEveryActiveRollupIncludingInstantly() {
+        System.runAs(TestUsers.admin()) {
+            List<Account> parents = twoHundredParents();
+            insert new List<Rollup_Definition__c>{
+                childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
+                childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
+                childCount(
+                    'Core_Inactive',
+                    'NumberOfEmployees',
+                    RollupService.MODE_SCHEDULED,
+                    false
+                )
+            };
+            User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+
+            Test.startTest();
+            System.runAs(maria) {
+                RollupController.recalculateAll();
+            }
+            Test.stopTest();
+
+            Set<String> keys = new Set<String>();
+            for (Rollup_Definition__c definition : [
+                SELECT Definition_Key__c
+                FROM Rollup_Definition__c
+                WHERE Last_Calculated__c != NULL
+            ]) {
+                keys.add(definition.Definition_Key__c);
+            }
+            Assert.areEqual(
+                new Set<String>{ 'Core_Real_Time', 'Core_Both' },
+                keys,
+                'Every active rollup ran, and the inactive one did not'
+            );
+            for (Account parent : [
+                SELECT AnnualRevenue, Member_Count__c, NumberOfEmployees
+                FROM Account
+                WHERE Id IN :parents
+            ]) {
+                Assert.areEqual(1, parent.AnnualRevenue, 'The Instantly total is rebuilt');
+                Assert.areEqual(1, parent.Member_Count__c, 'And the Both one');
+                Assert.isNull(parent.NumberOfEmployees, 'An inactive rollup writes nothing');
+            }
+        }
+    }
+
+    /** The one run Recalculate all sets up for tonight covers every definition. */
+    @IsTest
+    static void theTonightRunCoversInstantlyRollups() {
+        System.runAs(TestUsers.admin()) {
+            insert organization('Parent', null);
+            insert new List<Rollup_Definition__c>{
+                childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
+                childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true)
+            };
+
+            Test.startTest();
+            new RollupScheduler(true).execute(null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Rollup_Definition__c WHERE Last_Calculated__c != NULL],
+                'The tonight run covers the Instantly rollup too'
+            );
+        }
+    }
+
     @IsTest
     static void theScheduleIsStartedAndStoppedFromTheConsole() {
         System.runAs(TestUsers.admin()) {

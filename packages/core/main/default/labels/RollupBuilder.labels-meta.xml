@@ -766,7 +766,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Run tonight: the nightly run already covers it</shortDescription>
-        <value>The nightly run already recalculates every total at 2:00 AM, so there is nothing more to do.</value>
+        <value>The nightly run already recalculates every Every night and Both total at 2:00 AM. Instantly totals are kept by each save; to rebuild them too, choose Start now.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_TonightScheduled</fullName>
