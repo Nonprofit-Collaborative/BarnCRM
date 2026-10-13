@@ -402,7 +402,10 @@ user (one row per person and set, so a second insert is refused), and a saved fi
 into the user's private library, and a save is refused with `INVALID_CROSS_REFERENCE_KEY,
 invalid cross reference id: []` while another transaction on that library rolls back). The
 few tests marked `// runs-as: deploying user` still share the running user, so they must do
-neither. A test that saves a receipt, letter or logo file runs as
+neither. The gate gives that user no BarnCRM permission set, so they must need none either: a
+describe or field access check counts (three classes that check field access while parsing a
+filter or an import row failed this way and now run as a `TestUsers` user). A test that saves
+a receipt, letter or logo file runs as
 `ReceiptTestDataFactory.issuer()`.
 
 **A test run that returns no results is retried once.** When `sf apex run test` comes back
@@ -473,8 +476,11 @@ So every test is self-contained:
   `scripts/ci/check-tests-run-as.py` fails the build on any other test method without
   `System.runAs`.
 
-To prove a branch is self-contained, run its tests in an org as a user who holds none of the
-BarnCRM permission sets.
+The gate is the proof that a branch is self-contained: it assigns no permission set, so it
+runs the tests as whoever starts it, and that user should hold none of the BarnCRM, Giving or
+Connect permission sets. On `barn-core` the running user holds none. If you hold them in your
+own org, remove them (or run as a user who lacks them), so the run shows what a subscriber's
+administrator would see.
 
 ### `org-tests`
 
