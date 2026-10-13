@@ -179,8 +179,12 @@ public with sharing class RollupBuilderController {
         }
     }
 
-    /** Step 1: the fields of this entity BarnCRM can fill, and which a rollup already fills. */
-    @AuraEnabled(cacheable=true)
+    /**
+     * Step 1: the fields of this entity BarnCRM can fill, and which a rollup already fills. Not
+     * cacheable: which rollup fills a field changes with every save, and the wizard asks again
+     * for each new rollup (ROLLUPS-16).
+     */
+    @AuraEnabled
     public static List<FieldOption> getTargetFields(String targetObject) {
         try {
             Schema.SObjectType targetType = requireEntity(targetObject);
@@ -278,6 +282,12 @@ public with sharing class RollupBuilderController {
     @AuraEnabled
     public static PreviewResult preview(Draft draft, Id recordId) {
         try {
+            // It calculates any field of any record in system mode, so only an admin may ask.
+            if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_Rollups_ErrorNoPermission
+                );
+            }
             if (draft != null) {
                 draft.name = String.isBlank(draft.name) ? draft.targetField : draft.name;
                 draft.active = false;
@@ -287,7 +297,7 @@ public with sharing class RollupBuilderController {
                 throw new RollupService.RollupServiceException(problem);
             }
             Schema.SObjectType targetType = SettingsService.typeByName(draft.targetObject);
-            String condition = RollupFilterParser.toWhereClause(draft.targetFilterJson);
+            String condition = RollupFilterParser.toWhereClause(draft.targetFilterJson, targetType);
             Integer count = Database.countQueryWithBinds(
                 'SELECT COUNT() FROM ' +
                     String.valueOf(targetType) +
@@ -373,6 +383,15 @@ public with sharing class RollupBuilderController {
                 throw new RollupService.RollupServiceException(problem);
             }
             Rollup_Definition__c definition = toRecord(draft);
+            // Checked on save only: the preview runs before the mode is chosen (ROLLUPS-8).
+            if (
+                RollupService.MODE_REAL_TIME.equals(definition.Mode__c) &&
+                RollupDateWindow.movesWithTheDate(definition)
+            ) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+                );
+            }
             RollupWriter.saveAsUser(definition);
             SaveResult result = new SaveResult();
             result.recordId = definition.Id;
@@ -481,7 +500,9 @@ public with sharing class RollupBuilderController {
             String dateField = String.isNotBlank(draft.fiscalDateField)
                 ? draft.fiscalDateField
                 : draft.sourceField;
-            if (!DATE_TYPES.contains(typeOf(fields, dateField))) {
+            // A date only: the window's bounds are dates, which SOQL refuses against a date
+            // and time (ROLLUPS-3).
+            if (typeOf(fields, dateField) != Schema.DisplayType.DATE) {
                 return Label.Core_RollupBuilder_ErrorWindowNeedsDate;
             }
         }
@@ -499,7 +520,7 @@ public with sharing class RollupBuilderController {
 
     private static String documentProblem(Schema.SObjectType entity, String document) {
         try {
-            RollupFilterParser.toWhereClause(document);
+            RollupFilterParser.toWhereClause(document, entity);
         } catch (Exception unreadable) {
             return Label.Core_Rollups_ErrorInvalidFilter;
         }
@@ -522,7 +543,7 @@ public with sharing class RollupBuilderController {
         Schema.SObjectType targetType,
         Schema.SObjectField target
     ) {
-        String mine = RollupFilterParser.toWhereClause(draft.targetFilterJson);
+        String mine = RollupFilterParser.toWhereClause(draft.targetFilterJson, targetType);
         Map<String, Schema.SObjectField> fields = fieldMap(targetType);
         for (Rollup_Definition__c other : RollupSelector.selectAll()) {
             if (
@@ -536,7 +557,7 @@ public with sharing class RollupBuilderController {
             }
             String theirs;
             try {
-                theirs = RollupFilterParser.toWhereClause(other.Target_Filter_JSON__c);
+                theirs = RollupFilterParser.toWhereClause(other.Target_Filter_JSON__c, targetType);
             } catch (Exception unreadable) {
                 continue;
             }

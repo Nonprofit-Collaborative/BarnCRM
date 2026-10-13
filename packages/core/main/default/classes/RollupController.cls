@@ -133,6 +133,14 @@ public with sharing class RollupController {
             if (!isKnownMode(mode)) {
                 throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorInvalidMode);
             }
+            if (
+                RollupService.MODE_REAL_TIME.equals(mode) &&
+                RollupDateWindow.movesWithTheDate(definition)
+            ) {
+                throw new RollupService.RollupServiceException(
+                    Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+                );
+            }
             RollupWriter.saveAsUser(new Rollup_Definition__c(Id = definition.Id, Mode__c = mode));
             return currentPage();
         } catch (Exception caught) {

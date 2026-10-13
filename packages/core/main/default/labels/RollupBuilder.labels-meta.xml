@@ -78,7 +78,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Builder error: a fiscal year window without a date field.</shortDescription>
-        <value>A fiscal year window needs the date that decides which year a record falls in. Choose a date field in step 3.</value>
+        <value>A fiscal year window needs the date that decides which year a record falls in. Choose a date field in step 3, not a date and time field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_ErrorInstantMovesWithDate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Builder error: an Instantly total that changes as the date moves on.</shortDescription>
+        <value>This total changes as the date moves on, with no record saved, so only the nightly run keeps it right. Choose Both (recommended) or Every night.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ErrorOverlap</fullName>

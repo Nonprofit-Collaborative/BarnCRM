@@ -129,6 +129,32 @@ private class RollupControllerTest {
         }
     }
 
+    /** ROLLUPS-8: a year based total cannot be Instantly only, from the list either. */
+    @IsTest
+    static void aYearBasedTotalCannotBeSwitchedToInstantlyOnly() {
+        System.runAs(TestUsers.admin()) {
+            Rollup_Definition__c rollup = definition();
+            rollup.Fiscal_Year_Aware__c = true;
+            rollup.Fiscal_Year_Offset__c = 0;
+            rollup.Fiscal_Date_Field__c = 'Start_Date__c';
+            insert rollup;
+
+            String message;
+            try {
+                RollupController.setMode(rollup.Id, RollupService.MODE_REAL_TIME);
+            } catch (AuraHandledException refused) {
+                message = refused.getMessage();
+            }
+
+            System.Assert.areEqual(Label.Core_RollupBuilder_ErrorInstantMovesWithDate, message);
+            System.Assert.areEqual(
+                RollupService.MODE_BOTH,
+                [SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :rollup.Id].Mode__c,
+                'The mode is unchanged'
+            );
+        }
+    }
+
     @IsTest
     static void recalculatingSomethingThatIsGoneSaysSoRatherThanFailing() {
         System.runAs(TestUsers.admin()) {
