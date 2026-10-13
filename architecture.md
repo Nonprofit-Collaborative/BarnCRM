@@ -75,4 +75,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Apex sharing reason API names end in `__c` (`Saved_Query__Share.RowCause.Shared_With_Find_Users__c`).
 - `Page` is a reserved type name: an inner class named `Page` fails to deploy.
 - A check-only deploy runs tests as the deploying administrator without FLS on new fields, so tests that rely on that user's access fail; hence `TestUsers` (above).
+- `oi-test`: the scratch admin profile hides `Account.Site`, `Account.AccountNumber` and `Task.Type`; tests must not depend on them.
+- The gate user's time zone is America/Los_Angeles, while `TestUsers` and `TestDataFactory` users are GMT; date tests must hold in both.
+- The platform refuses trigger writes to a record that is mid-merge (ADR-0092 recalculates survivors after the merge instead).
+- A queued batch without `Test.stopTest` still runs when the test method ends.
+- After `Database.emptyRecycleBin` a record can still be returned by `ALL ROWS`, and its undelete fails `UNDELETE_FAILED` "Entity is not in the recycle bin"; treat it as purged.
+- A Nonprofit Cloud trial org (production edition, `barn-npc`) rejects unpackaged deploys of custom settings and custom metadata types with visibility Protected; only developer, sandbox and scratch orgs accept them.
 - A new ADR on a branch uses the placeholder file `NEXT-<title>.md` and never a chosen number; the integrator numbers it at merge (see the repo `CLAUDE.md`).
