@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title={labels.title} icon-name="standard:settings">
+        <lightning-button slot="actions" label={labels.refresh} onclick={handleRefresh} data-id="refresh"></lightning-button>
+        <div class="slds-var-p-horizontal_medium slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.refresh} size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={errorMessage}>
+                <p role="alert" class="slds-text-color_error" data-id="error">{errorMessage}</p>
+            </template>
+            <p class="slds-text-body_small slds-var-m-bottom_small">{labels.intro}</p>
+            <ul class="slds-has-dividers_bottom-space" data-id="findings">
+                <template for:each={findings} for:item="finding">
+                    <li key={finding.key} class="slds-item" data-id={finding.key}>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col">
+                                <p>{finding.title}</p>
+                                <template lwc:if={finding.hasExamples}>
+                                    <p class="slds-text-body_small slds-text-color_weak" data-id="examples">{finding.examplesText}</p>
+                                </template>
+                            </div>
+                            <span class={finding.countClass} data-id="count">{finding.countText}</span>
+                            <a
+                                class="slds-var-m-left_medium"
+                                href={finding.setupUrl}
+                                target="_blank"
+                                data-id="setup-link"
+                            >{labels.openInSetup}</a>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </lightning-card>
+</template>

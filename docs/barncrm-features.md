@@ -94,6 +94,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Shipped | C-28 |
 | Org Optimizer | Major | The Data Hygiene tab becomes Org Optimizer: one page with lazily loaded sections for data quality, duplicates, field utilization and Health Check (run on demand), each shown only to people who may use it. Duplicate review moves here from BarnCRM Settings, which keeps a link. | Built, not merged (`feature/org-optimizer-shell`) | ADR-NEXT org-optimizer-and-data-manager-pages |
 | Org Optimizer: errors, storage and limits | Minor | Errors section (unread count, recent entries, acknowledge, link to the Error Log) and a read-only Storage and limits section: data and file storage, daily API requests, background jobs and single emails used, and the records BarnCRM's own objects keep at about 2 KB each. | Built, not merged (`feature/optimizer-errors-storage`) | ADR-NEXT org-optimizer-and-data-manager-pages |
+| Org Optimizer: unused setup | Minor | Admin-only, read-only section listing setup nobody seems to use: users not logged in for 90 days, unassigned permission sets, reports not run for a year, never-used email templates, inactive flows, and scheduled jobs owned by inactive users, each with a count, five names and a Setup link. | Built, not merged (`feature/optimizer-setup-checks`) | ADR-NEXT org-optimizer-and-data-manager-pages, owner decision 2026-10-13 |
 
 ### 1.5 Import and Data Management
 

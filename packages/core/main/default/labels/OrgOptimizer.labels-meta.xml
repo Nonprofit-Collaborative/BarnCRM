@@ -264,4 +264,92 @@
         <shortDescription>Org Optimizer: button that reads the section again</shortDescription>
         <value>Refresh</value>
     </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Setup</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Unused setup section name</shortDescription>
+        <value>Unused setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_SetupText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview line for Unused setup</shortDescription>
+        <value>Users, permission sets, reports, email templates, flows and jobs nobody seems to use. Read only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_SetupIntro</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: line at the top of the Unused setup section</shortDescription>
+        <value>Nothing here is changed for you. Open each item in Setup and decide whether to remove it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckInactiveUsers</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title; {0} is the number of days</shortDescription>
+        <value>Active users who have not logged in for {0} days</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckUnassignedPermissionSets</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title, permission sets with nobody assigned</shortDescription>
+        <value>Permission sets nobody is assigned</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckStaleReports</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title; {0} is the number of days</shortDescription>
+        <value>Reports not run for {0} days</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckUnusedEmailTemplates</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title, email templates never used</shortDescription>
+        <value>Email templates never used</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckInactiveFlows</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title, flows left inactive</shortDescription>
+        <value>Inactive flows</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckJobsOfInactiveUsers</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title, scheduled jobs owned by inactive users</shortDescription>
+        <value>Scheduled jobs owned by inactive users</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CouldNotCheck</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: shown when a check could not run</shortDescription>
+        <value>Could not check: your access or this org does not allow it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_OpenInSetup</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: link to the Setup page for a check</shortDescription>
+        <value>Open in Setup</value>
+    </labels>
 </CustomLabels>

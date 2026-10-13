@@ -20,6 +20,7 @@ opens quickly however large your database is.
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
 | **Storage and limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
+| **Unused setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, and scheduled jobs owned by inactive users. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. A section you cannot use is not shown.
@@ -58,7 +59,9 @@ Start from the sample data (see [Sample data](sample-data.md)).
    first, each with what to do.
 6. Choose **Storage and limits**. **Data storage (MB)** shows how much of your allowance is
    used, and **What BarnCRM stores** lists the sample data's import and error records.
-7. Go back to **Data quality** and press **Recount**: the counts are fresh each time you ask.
+7. Choose **Unused setup**. In a fresh org most lines say **0**; any with a count list the
+   first five names, and **Open in Setup** takes you to the page where you can remove them.
+8. Go back to **Data quality** and press **Recount**: the counts are fresh each time you ask.
 
 ## 4. Why sections load only when opened
 
@@ -68,7 +71,25 @@ the first time you open it, and Health Check runs only when you press its button
 back to a section you already opened shows what it found, and each section has its own
 **Recount**, **Count again** or **Run** button for fresh numbers.
 
-## 5. Common mistakes
+## 5. What Unused setup checks
+
+Each check reads as you, so it sees what your own access lets you see in Setup. A check that
+your access or your org does not allow says **Could not check** and the others still run.
+Each count stops at 1,000 and then says **More than 1000**.
+
+| Check | What counts | Left out |
+|---|---|---|
+| Active users who have not logged in for 90 days | Active, full Salesforce users whose last login is more than 90 days ago, or who never logged in. | Inactive users, and portal and integration user types. |
+| Permission sets nobody is assigned | Your own permission sets with no user assigned. | Profile permission sets, permission sets from installed packages, and those inside a permission set group. |
+| Reports not run for 365 days | Reports nobody has run for a year, or ever. Only reports you can see are counted. | Reports from installed packages. |
+| Email templates never used | Templates that have never been sent and are more than 90 days old. | Templates from installed packages, and new ones. |
+| Inactive flows | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
+| Scheduled jobs owned by inactive users | Scheduled jobs still waiting to run whose owner is no longer active. These may stop working. | Finished and deleted jobs. |
+
+The thresholds (90 and 365 days) are fixed. Nothing here is deleted or changed for you:
+**Open in Setup** opens the Setup page where you can review and remove each item.
+
+## 6. Common mistakes
 
 - **Looking for the Data Hygiene tab.** It is the same tab, renamed **Org Optimizer**. The
   record checks are under **Data quality**.
@@ -78,6 +99,8 @@ back to a section you already opened shows what it found, and each section has i
   org for the **BarnCRM Admin** role on the **Access** page.
 - **Expecting Health Check to run as the page opens.** It runs when you press **Run Health
   Check**, here, or on **BarnCRM Settings > Health**.
+- **Removing something Unused setup lists without checking it.** A report nobody runs may be
+  on a dashboard, and an inactive flow may be kept as a draft. Open it in Setup first.
 
 ## Field reference
 
