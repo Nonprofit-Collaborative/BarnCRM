@@ -109,4 +109,64 @@ private class HubControllerTest {
             Assert.isNull(model.recurringSources[0].lastImportDate, 'Never imported yet.');
         }
     }
+
+    @IsTest
+    static void showsTheLastSeasonalSwapAndTheRollupFreshness() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            Datetime finished = Datetime.now().addHours(-2);
+            SeasonalAddressWriter.recordRun(finished, '3 moved in, 1 moved back, 0 failed.');
+
+            Test.startTest();
+            HubController.HomeModel model = HubController.getHomeModel();
+            Test.stopTest();
+
+            Assert.areEqual(finished, model.seasonalAddressLastRun, 'When the swap last ran');
+            Assert.areEqual(
+                '3 moved in, 1 moved back, 0 failed.',
+                model.seasonalAddressLastRunSummary,
+                'and what it did'
+            );
+            Assert.areEqual(
+                SeasonalAddressScheduler.isScheduled(),
+                model.seasonalAddressScheduled,
+                'Whether the nightly swap is scheduled'
+            );
+            Assert.isFalse(model.seasonalAddressStale, 'A run two hours ago is not stale');
+            Assert.areEqual(
+                RollupService.lastCalculated(),
+                model.rollupsLastCalculated,
+                'When the rollups last completed'
+            );
+            Assert.areEqual(
+                RollupService.isStale(),
+                model.rollupsStale,
+                'and whether that is too long ago'
+            );
+        }
+    }
+
+    @IsTest
+    static void aTileThatCannotAnswerIsLostNotThePage() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            SeasonalAddressWriter.recordRun(Datetime.now(), 'Nothing to swap.');
+            HubController.failingPartsForTest = new Set<String>{
+                HubController.PART_ROLLUPS,
+                HubController.PART_SEASONAL
+            };
+
+            Test.startTest();
+            HubController.HomeModel model = HubController.getHomeModel();
+            Test.stopTest();
+
+            Assert.isNotNull(model, 'The page still loads');
+            Assert.areEqual(8, model.stepsTotal, 'with its checklist');
+            Assert.isNull(model.rollupsLastCalculated, 'The rollup tile has nothing to show');
+            Assert.isFalse(model.rollupsStale, 'and raises no false alarm');
+            Assert.isNull(model.seasonalAddressLastRun, 'Nor does the seasonal tile');
+            Assert.isFalse(model.seasonalAddressScheduled, 'It does not claim a schedule');
+            Assert.isFalse(model.seasonalAddressStale, 'or a missed run');
+        }
+    }
 }
