@@ -20,7 +20,7 @@ An inner class does not take its outer class's sharing, so one that touches the
 database states its own.
 
 Test classes are not checked: they run as the test user and set up data on
-purpose. The vendored rollup engine (packages/*/vendor) is not ours to edit.
+purpose.
 """
 
 import glob
@@ -117,9 +117,7 @@ def check(path):
 
 
 def main():
-    files = sorted(
-        {f for pattern in SOURCES for f in glob.glob(pattern, recursive=True) if "/vendor/" not in f}
-    )
+    files = sorted({f for pattern in SOURCES for f in glob.glob(pattern, recursive=True)})
     total = 0
     for f in files:
         for line, message in sorted(check(f)):

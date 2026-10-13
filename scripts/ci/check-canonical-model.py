@@ -20,9 +20,7 @@ Four checks, all cheap enough to run on every pull request:
    name appears as a word. This is canonical model rule 1 ("no field without a
    canonical entry") enforced rather than reviewed: without it, a field added straight
    to the metadata silently ends the model's claim to be complete, and with it the
-   portability promise (plan Section 4.4). The vendored rollup engine
-   (`packages/core/vendor/`) is not BarnCRM's data model and is outside this path on
-   purpose; VENDOR.md and ADR-0015 describe it.
+   portability promise (plan Section 4.4).
 
 Exit code 1 on any finding.
 """

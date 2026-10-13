@@ -6,11 +6,10 @@
 # WHY IN STAGES. The first deploy this project ever attempted sent all 982 components in one
 # request and came back with UNKNOWN_EXCEPTION, zero components deployed, zero component
 # errors, and a Salesforce ErrorId. A failure with no component attached tells you nothing
-# about which of 982 things caused it. Deploying the vendored tree separately from
-# BarnCRM's own source, and Core before Giving, means the next such failure names a stage.
+# about which of 982 things caused it. Deploying Core before Giving means the next such
+# failure names a stage.
 #
-# It also matches how the packages actually depend on each other: the vendored engine is
-# self contained, Core does not call it yet, and Giving depends on Core.
+# It also matches how the packages actually depend on each other: Giving depends on Core.
 #
 # WHY CORE IS SEVERAL STAGES. docs/contributor-guide/ci.md records this same failure
 # hitting the undivided Core stage four times across four separate runs before 2026-09-09:
@@ -353,8 +352,6 @@ if [[ ${#unstaged[@]} -gt 0 ]]; then
   echo "No deploy stage names ${CORE_DIR}/${unstaged[*]}. Add it to a stage and to CORE_STAGED." >&2
   exit 1
 fi
-
-deploy_stage "the vendored rollup engine" "packages/core/vendor" || exit $?
 
 # One stage per object, not a file-count split. The two-way file-count split this replaced
 # produced the same two groups every run, since only file content had been changing, not

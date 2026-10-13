@@ -164,6 +164,29 @@ painful in DLRS is mitigated as follows:
   engines inside a savepoint it rolls back and lists every value that differs
   (`docs/contributor-guide/rollup-engine-comparison.md`). S9 deletes them once every difference
   is explained.
+- S9 deletes the vendored tree, `RollupAdapter`, `Rollup__mdt`, `RollupCalcItem__c`, the
+  `VENDOR_ONLY` allowlist section, the `.prettierignore` and `NOTICE` entries, the vendored
+  deploy stage, and `RollupEngineComparison` with its guide and labels: the utility compares
+  the two engines, so it cannot outlive one of them, and its last run is the record of
+  decision 1. The deletion lands only after that run on a test org has explained every
+  difference.
+- That run (`oi-test`, 2026-10-13, main at `cbf2f3c4`, sample data, the 50 shipped
+  definitions, one definition per transaction, each target field blanked first so neither
+  engine could pass by leaving the stored value): 49 definitions and 6,226 values compared,
+  3,284 differences, all explained. 3,016 are zero against blank: a sum or count with nothing
+  to count is zero in BarnCRM's engine and left blank by the vendored one. 260 are the
+  household soft credit totals, whose `{Household}` path the vendored engine cannot walk
+  (BarnCRM's matched a direct query). 8 are the one Written off gift and its refund: the
+  vendored engine splits its filter on spaces, so the value `Written off` never matched
+  (ADR-0022 counts it; BarnCRM's matched a direct query). `Fund_Last_Gift_Date` was not
+  compared: the vendored engine refuses a source attribute read through a relationship.
+  Several definitions in one transaction made the vendored engine leave minimums and maximums
+  blank, which is why each ran alone.
+- The deletion also fixes deployability. A check-only deploy to a sandbox showed the vendored
+  apex-rollup test classes fail to compile on an org without the Data Protection and Privacy
+  objects (`ContactPointAddress`, `Individual`, `ContactPointConsent`), which upstream's tests
+  use as fixtures. Those classes ship inside Core's package, so while the tree stays, Core
+  cannot install on such an org, against ADR-0013; with it gone, Core names none of them.
 - Decision 6's finalizer cannot apply to a batch (a `System.Finalizer` attaches only to a
   Queueable). The full recalculation batch instead raises `BatchApexErrorEvent`
   (`Database.RaisesPlatformEvents`), and a handler writes a stopped chunk's records to the

@@ -18,9 +18,6 @@
  * Freshness is the engine's own: `RollupWriter` stamps `Rollups_Last_Calculated__c` on a record
  * in the same write as its totals, and the full recalculation marks a definition calculated when
  * its run has finished (R-R13).
- *
- * The vendored apex-rollup tree and `RollupAdapter` are no longer reached from here. They stay in
- * the repository only for `RollupEngineComparison`, until the comparison run the ADR requires.
  */
 @NamespaceAccessible
 public with sharing class RollupService {

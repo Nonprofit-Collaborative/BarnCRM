@@ -1563,8 +1563,8 @@ types below; any other pairing is refused on save (R-R10) and by the planner.
   system mode (R-RQ4, R-RQ5).
 - **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
   in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
-  apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the
-  comparison `RollupEngineComparison` makes before they are deleted). That core is
+  the vendored apex-rollup tree, `RollupAdapter`, `Rollup__mdt` and `RollupCalcItem__c` were
+  deleted in slice S9). That core is
   `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
   `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
   `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
