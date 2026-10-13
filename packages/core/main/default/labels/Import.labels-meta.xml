@@ -318,7 +318,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: what kind of file to upload</shortDescription>
-        <value>A CSV file or an Excel workbook (.xlsx) whose first row is the column headings. Only the first sheet of a workbook is read.</value>
+        <value>A CSV or other text file (columns separated by commas, semicolons, tabs or pipes) or an Excel workbook (.xlsx) whose first row is the column headings. You can choose the separator or the sheet on the next step.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ColumnHeader</fullName>
