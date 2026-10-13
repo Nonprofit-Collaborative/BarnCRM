@@ -5,7 +5,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: more steps than one value may have</shortDescription>
+        <shortDescription>Column changes: more steps than one value may have; {0} is the most</shortDescription>
         <value>A value can have at most {0} changes.</value>
     </labels>
     <labels>
@@ -13,7 +13,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: a step names no change BarnCRM knows</shortDescription>
+        <shortDescription>Column changes: a step names no known change; {0} is the step</shortDescription>
         <value>"{0}" is not a change BarnCRM knows. Remove it and choose one from the list.</value>
     </labels>
     <labels>
@@ -37,7 +37,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: add other columns names none or too many</shortDescription>
+        <shortDescription>Column changes: add other columns needs 1 to {0} columns; {0} the most</shortDescription>
         <value>Add other columns needs between one and {0} columns.</value>
     </labels>
     <labels>
@@ -61,7 +61,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: a column&apos;s changes cannot be saved</shortDescription>
+        <shortDescription>Import wizard: column changes not saved; {0} column, {1} the reason</shortDescription>
         <value>The changes to column {0} cannot be saved. {1}</value>
     </labels>
 </CustomLabels>

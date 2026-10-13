@@ -13,7 +13,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the object is the package's own records</shortDescription>
+        <shortDescription>Load one object: BarnCRM's own records; {0} is the object plural</shortDescription>
         <value>{0} are kept by BarnCRM itself and cannot be loaded from a file.</value>
     </labels>
     <labels>
@@ -21,7 +21,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the object is a setup or security object</shortDescription>
+        <shortDescription>Load one object: a setup or security object; {0} is the object plural</shortDescription>
         <value>{0} are managed in Setup and cannot be loaded from a file here.</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: household members are managed by households</shortDescription>
+        <shortDescription>Load one object: household members; {0} is the object plural</shortDescription>
         <value>{0} are kept by the households they belong to and cannot be loaded from a file. Load people with a people mapping instead.</value>
     </labels>
     <labels>
@@ -37,7 +37,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Load one object: the object is not a record a file can load</shortDescription>
+        <shortDescription>Load one object: not a loadable record; {0} is the object plural</shortDescription>
         <value>{0} are not records a file can load: settings, metadata, events, history and similar records are kept by Salesforce.</value>
     </labels>
 </CustomLabels>

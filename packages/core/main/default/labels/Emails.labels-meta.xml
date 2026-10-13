@@ -5,7 +5,7 @@
         <categories>Emails</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Shown on save when the email address chosen as preferred has been left empty</shortDescription>
+        <shortDescription>Save refused: the preferred email is empty; {0} is its kind, such as Work</shortDescription>
         <value>The {0} email address is empty, so there is nothing to put in the ordinary Email box. Type that address in, or choose a different preferred email.</value>
     </labels>
 </CustomLabels>

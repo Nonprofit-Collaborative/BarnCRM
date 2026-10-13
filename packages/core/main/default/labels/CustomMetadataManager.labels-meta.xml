@@ -21,7 +21,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Save refused: the row ships with BarnCRM; names the row</shortDescription>
+        <shortDescription>Save refused: the row ships with BarnCRM; {0} is the row</shortDescription>
         <value>{0} ships with BarnCRM and cannot be changed here.</value>
     </labels>
     <labels>
@@ -45,7 +45,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Save refused: a required box is empty; names the box</shortDescription>
+        <shortDescription>Save refused: a required box is empty; {0} is the box</shortDescription>
         <value>Enter {0}.</value>
     </labels>
     <labels>
@@ -53,7 +53,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Save refused: a value is too long; names the box and the limit</shortDescription>
+        <shortDescription>Save refused: value too long; {0} is the box, {1} the limit</shortDescription>
         <value>Keep {0} to {1} characters or fewer.</value>
     </labels>
     <labels>
@@ -61,7 +61,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Save refused: value missing from a picklist; value, field, object</shortDescription>
+        <shortDescription>Save refused: not a picklist choice; {0} value, {1} field, {2} object</shortDescription>
         <value>{0} is not a choice in the {1} list on {2}. Add it in Setup (Object Manager, {2}, Fields, {1}), then save again.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Save refused: another active row uses the value; value, row name</shortDescription>
+        <shortDescription>Save refused: another active row uses it; {0} value, {1} row name</shortDescription>
         <value>{0} already has an active row, {1}. Only one active row can use it.</value>
     </labels>
     <labels>
@@ -85,7 +85,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Error Log entry: the background save failed; row name, reason</shortDescription>
+        <shortDescription>Error Log: the background save failed; {0} row name, {1} reason</shortDescription>
         <value>The change to {0} was not saved: {1}</value>
     </labels>
     <labels>
@@ -253,7 +253,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Custom metadata page: heading of the form for a row; names the row</shortDescription>
+        <shortDescription>Custom metadata page: heading of a row's form; {0} is the row</shortDescription>
         <value>Edit {0}</value>
     </labels>
     <labels>
@@ -269,7 +269,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Custom metadata page: a save finished; names the row</shortDescription>
+        <shortDescription>Custom metadata page: a save finished; {0} is the row</shortDescription>
         <value>Saved. {0} is in the list.</value>
     </labels>
     <labels>

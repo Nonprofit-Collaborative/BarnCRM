@@ -685,7 +685,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Preview: calculated value and the value on the record now</shortDescription>
+        <shortDescription>Preview: {0} the calculated value, {1} the value on the record now</shortDescription>
         <value>Calculated: {0}. On the record now: {1}.</value>
     </labels>
     <labels>
@@ -717,7 +717,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Step 5: how many records the rollup maintains</shortDescription>
+        <shortDescription>Step 5: how many records the rollup maintains; {0} is the count</shortDescription>
         <value>This rollup will maintain about {0} records.</value>
     </labels>
     <labels>
@@ -725,7 +725,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Recalculate all: records and rough minutes</shortDescription>
+        <shortDescription>Recalculate all estimate: {0} records, {1} rough minutes</shortDescription>
         <value>About {0} records, roughly {1} minutes.</value>
     </labels>
     <labels>
@@ -781,7 +781,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Needs attention: records waiting and the age of the oldest</shortDescription>
+        <shortDescription>Needs attention: {0} records waiting, {1} minutes since the oldest</shortDescription>
         <value>{0} records waiting, oldest {1} minutes ago.</value>
     </labels>
     <labels>
@@ -877,7 +877,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Needs attention: how the last full run ended</shortDescription>
+        <shortDescription>Needs attention last run: {0} outcome, {1} finish time, {2} parts stopped</shortDescription>
         <value>Last full run: {0}, finished {1}, {2} parts stopped.</value>
     </labels>
     <labels>
@@ -885,7 +885,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Needs attention: a full run is going</shortDescription>
+        <shortDescription>Needs attention: a full run is going; {0} parts done of {1}</shortDescription>
         <value>A full run is going: {0} of {1} parts done.</value>
     </labels>
     <labels>

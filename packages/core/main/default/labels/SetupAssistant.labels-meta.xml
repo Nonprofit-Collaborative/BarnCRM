@@ -253,7 +253,7 @@
         <categories>Setup Assistant</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Setup progress, finished steps out of the total</shortDescription>
+        <shortDescription>Setup progress: {0} finished steps out of {1} in all</shortDescription>
         <value>{0} of {1}</value>
     </labels>
     <labels>

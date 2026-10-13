@@ -29,7 +29,7 @@
         <categories>Relationships</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Save refused: relationship already on file; names both people and the record</shortDescription>
+        <shortDescription>Save refused: relationship on file; {0} person, {1} other, {2} record</shortDescription>
         <value>{0} already has this relationship with {1}. Open {2} to change it.</value>
     </labels>
     <labels>

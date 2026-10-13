@@ -5,7 +5,7 @@
         <categories>Households</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Household search result: accessible name with location, as names can repeat</shortDescription>
+        <shortDescription>Household search result name; {0} household name, {1} its location</shortDescription>
         <value>{0}, {1}</value>
     </labels>
     <labels>

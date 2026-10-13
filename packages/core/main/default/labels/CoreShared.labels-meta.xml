@@ -13,7 +13,7 @@
         <categories>Core, Automation</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Automation handler unavailable</shortDescription>
+        <shortDescription>Error Log: an automation handler could not start; {0} is its name</shortDescription>
         <value>BarnCRM could not start one of its automations ({0}), so it was skipped. Everything else ran as usual. Send this entry to whoever supports your Salesforce.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Shown when a coexistence mode value is not one of the three.</shortDescription>
+        <shortDescription>A coexistence mode value is not one of the three; {0} is the value</shortDescription>
         <value>{0} is not a coexistence mode. Choose one of the modes BarnCRM offers for this org.</value>
     </labels>
     <labels>

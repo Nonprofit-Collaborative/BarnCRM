@@ -7,6 +7,11 @@ stage had finally deployed. Nothing offline reads label files, so this does.
 
 Limits (Salesforce custom labels): name 80 characters, short description 1 to 80,
 value 1 to 1000.
+
+Translation readiness (v0.11): a translator sees the short description beside the value and
+nothing else, so a Core label with placeholders must say in its description what each one
+holds, writing each as it appears in the value ("{0} is the count"). Giving and Connect
+join PLACEHOLDER_PACKAGES once their labels are swept.
 """
 
 import glob
@@ -16,6 +21,8 @@ import sys
 
 LABEL = re.compile(r"<labels>(.*?)</labels>", re.DOTALL)
 LIMITS = {"fullName": 80, "shortDescription": 80, "value": 1000}
+PLACEHOLDER = re.compile(r"\{\d+\}")
+PLACEHOLDER_PACKAGES = {"core"}
 
 
 def text_of(block, tag):
@@ -36,6 +43,15 @@ def main():
                     problems.append(f"{path}: {name} has no {tag}")
                 elif len(value) > limit:
                     problems.append(f"{path}: {name} {tag} is {len(value)} characters, over {limit}")
+            if path.split("/")[1] in PLACEHOLDER_PACKAGES:
+                described = text_of(block, "shortDescription") or ""
+                unexplained = sorted(
+                    set(PLACEHOLDER.findall(text_of(block, "value") or "")) - set(PLACEHOLDER.findall(described))
+                )
+                if unexplained:
+                    problems.append(
+                        f"{path}: {name} short description does not say what {', '.join(unexplained)} holds"
+                    )
 
     for problem in problems:
         print(problem, file=sys.stderr)

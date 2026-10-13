@@ -37,7 +37,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that packaged automation is paused.</shortDescription>
+        <shortDescription>Health Check: packaged automation is paused; {0} is the end time</shortDescription>
         <value>Automation is paused until {0}. While it is paused, households are not created and names are not recomputed. That is right during a bulk load and wrong the rest of the time.</value>
     </labels>
     <labels>
@@ -109,7 +109,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that one check could not run.</shortDescription>
+        <shortDescription>Health Check: one check could not run; {0} is the check name</shortDescription>
         <value>Health Check could not finish the check named {0}. The rest of this report is still accurate. The details are in the Error Log.</value>
     </labels>
     <labels>
@@ -213,7 +213,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that there are unread Error Log entries.</shortDescription>
+        <shortDescription>Health Check: unread Error Log entries; {0} is the count</shortDescription>
         <value>The Error Log has {0} new entries. Each one says what went wrong and what to do about it. Work through them, then mark them resolved.</value>
     </labels>
     <labels>
@@ -229,7 +229,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the unread errors finding.</shortDescription>
+        <shortDescription>Health Check title: unread errors; {0} is the count</shortDescription>
         <value>{0} errors nobody has looked at</value>
     </labels>
     <labels>
@@ -245,7 +245,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: Setup and BarnCRM fiscal year start months differ</shortDescription>
+        <shortDescription>Health Check: fiscal year starts differ; {0} BarnCRM month, {1} Setup month</shortDescription>
         <value>BarnCRM starts its fiscal year in {0}, and the fiscal year in Setup starts in {1}. Every year based total BarnCRM calculates is measured from the first, and reports grouped by fiscal year are measured from the second, so the two disagree and nothing else in the app will say so. Set both to the same month, then recalculate rollups.</value>
     </labels>
     <labels>
@@ -381,7 +381,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that the coexistence mode matches the org.</shortDescription>
+        <shortDescription>Health Check: coexistence mode matches the org; {0} is the mode</shortDescription>
         <value>This org is set to {0}, which is what BarnCRM recommends for what is installed here.</value>
     </labels>
     <labels>
@@ -397,7 +397,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that the coexistence mode does not match the org.</shortDescription>
+        <shortDescription>Health Check: mode does not match; {0} mode set, {1} mode recommended</shortDescription>
         <value>This org is set to {0}, but what is installed points to {1}. If that is deliberate, leave it. If it is not, switch: households and imports behave differently in each mode.</value>
     </labels>
     <labels>
@@ -413,7 +413,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that nobody has confirmed a coexistence mode.</shortDescription>
+        <shortDescription>Health Check: no mode confirmed; {0} mode in use, {1} mode recommended</shortDescription>
         <value>BarnCRM is running as {0} because nobody has confirmed a mode yet. This org looks like {1}. Confirm it before you create households or load data.</value>
     </labels>
     <labels>
@@ -557,7 +557,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>The org shape sentence, with what was detected and the recommended mode.</shortDescription>
+        <shortDescription>Health Check org shape: {0} what was detected, {1} the recommended mode</shortDescription>
         <value>{0} BarnCRM supports this org shape directly. The coexistence mode it recommends is {1}. Shield Platform Encryption cannot be detected from inside the app: if your org uses it, say so before you load data.</value>
     </labels>
     <labels>
@@ -797,7 +797,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Explains that active users hold no BarnCRM role.</shortDescription>
+        <shortDescription>Health Check: active users hold no BarnCRM role; {0} is the count</shortDescription>
         <value>{0} active users have a Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use BarnCRM.</value>
     </labels>
     <labels>
@@ -805,7 +805,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Title of the users without access finding.</shortDescription>
+        <shortDescription>Health Check title: users without access; {0} is the count</shortDescription>
         <value>{0} users cannot see the app</value>
     </labels>
     <labels>
@@ -821,7 +821,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Detail of the finding for a pause nothing will end.</shortDescription>
+        <shortDescription>Health Check: a pause nothing will end; {0} is the end time</shortDescription>
         <value>Automation is paused until {0}, and nothing is set to switch it back on by then and record that it did. The pause was started before automatic resume existed, or somewhere other than the Automation page. Open the Automation page and click Resume automation, then pause again for a set time if you still need to.</value>
     </labels>
     <labels>
