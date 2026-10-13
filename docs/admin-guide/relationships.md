@@ -138,6 +138,8 @@ person, use **Move to another household** on their record, which is the Househol
 both sides, because they are one connection. If you meant to keep the other person's
 record, edit the relationship and set an end date instead: it then reads Former on both
 sides and stays on file, which is what you want for anything you may need to explain later.
+If you delete one by mistake, restore either side from the recycle bin: the other side comes
+back with it, paired as before, and no extra copy is made.
 
 **Turning the setting off and wondering why nothing mirrors.** With **Keep both sides of a
 relationship in step** switched off, BarnCRM writes only the side you entered and
