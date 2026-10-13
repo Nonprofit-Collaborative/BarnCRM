@@ -60,7 +60,9 @@ private class RollupOperationsTest {
                 new Account(
                     Name = 'Organization ' + i,
                     RecordTypeId = organizationType,
-                    Site = 'stale',
+                    // Targets are attributes BarnCRM Admin grants: a standard one such as Site
+                    // may be hidden by the profile, and then the engine cannot write it.
+                    Preferred_Name__c = 'stale',
                     Sample_Data_Key__c = 'stale',
                     Sample_Data__c = true,
                     Exclude_From_Greetings__c = false
@@ -99,7 +101,7 @@ private class RollupOperationsTest {
         anyRoleOne.Filter_JSON__c = filter('Title', 'equals', 'Role 1');
         Rollup_Definition__c noBoard = definition('NONE', null, 'Exclude_From_Greetings__c', mode);
         noBoard.Filter_JSON__c = filter('Department', 'equals', 'Board');
-        Rollup_Definition__c eldest = definition('FIRST', 'Title', 'Site', mode);
+        Rollup_Definition__c eldest = definition('FIRST', 'Title', 'Preferred_Name__c', mode);
         eldest.Order_By_Field__c = 'Birthdate';
         Rollup_Definition__c youngest = definition('LAST', 'LastName', 'Sample_Data_Key__c', mode);
         youngest.Order_By_Field__c = 'Birthdate';
@@ -109,7 +111,12 @@ private class RollupOperationsTest {
     private static Map<Id, Account> reread(List<Account> organizations) {
         return new Map<Id, Account>(
             [
-                SELECT Id, Sample_Data__c, Exclude_From_Greetings__c, Site, Sample_Data_Key__c
+                SELECT
+                    Id,
+                    Sample_Data__c,
+                    Exclude_From_Greetings__c,
+                    Preferred_Name__c,
+                    Sample_Data_Key__c
                 FROM Account
                 WHERE Id IN :organizations
             ]
@@ -126,7 +133,11 @@ private class RollupOperationsTest {
                 organization.Exclude_From_Greetings__c,
                 context + ': None is checked only where nobody is on the Board'
             );
-            Assert.areEqual('Role 0', organization.Site, context + ': the eldest person\'s title');
+            Assert.areEqual(
+                'Role 0',
+                organization.Preferred_Name__c,
+                context + ': the eldest person\'s title'
+            );
             Assert.areEqual(
                 'P19',
                 organization.Sample_Data_Key__c,
@@ -183,7 +194,11 @@ private class RollupOperationsTest {
         Test.stopTest();
 
         Assert.isFalse(afterMove.get(leaving.Id).Sample_Data__c, 'Role 1 moved out');
-        Assert.areEqual('Role 2', afterMove.get(leaving.Id).Site, 'Baker is now the eldest');
+        Assert.areEqual(
+            'Role 2',
+            afterMove.get(leaving.Id).Preferred_Name__c,
+            'Baker is now the eldest'
+        );
         Assert.isTrue(afterMove.get(joining.Id).Sample_Data__c, 'And moved in');
         Assert.areEqual(
             'Ames',
@@ -194,7 +209,7 @@ private class RollupOperationsTest {
         Account emptied = reread(organizations).get(leaving.Id);
         Assert.isFalse(emptied.Sample_Data__c, 'Any of nobody is unchecked');
         Assert.isTrue(emptied.Exclude_From_Greetings__c, 'None of nobody is checked');
-        Assert.isNull(emptied.Site, 'First of nobody is blank');
+        Assert.isNull(emptied.Preferred_Name__c, 'First of nobody is blank');
         Assert.isNull(emptied.Sample_Data_Key__c, 'Last of nobody is blank');
     }
 
@@ -209,7 +224,7 @@ private class RollupOperationsTest {
         List<Account> empty = organizations(1);
         Assert.areEqual(
             'stale',
-            reread(organizations).get(organizations[0].Id).Site,
+            reread(organizations).get(organizations[0].Id).Preferred_Name__c,
             'Nothing ran on save'
         );
 
@@ -221,7 +236,7 @@ private class RollupOperationsTest {
         Account cleared = reread(empty).get(empty[0].Id);
         Assert.isFalse(cleared.Sample_Data__c, 'Any of nobody is unchecked');
         Assert.isTrue(cleared.Exclude_From_Greetings__c, 'None of nobody is checked');
-        Assert.isNull(cleared.Site, 'A stale First is cleared');
+        Assert.isNull(cleared.Preferred_Name__c, 'A stale First is cleared');
         Set<Id> ids = new Map<Id, Account>(organizations).keySet();
         Assert.isTrue(
             RollupEngine.recalculate(ids, definitions).written.isEmpty(),
@@ -243,7 +258,7 @@ private class RollupOperationsTest {
         Rollup_Definition__c first = definition(
             'FIRST',
             'LastName',
-            'Site',
+            'Preferred_Name__c',
             RollupService.MODE_SCHEDULED
         );
         first.Order_By_Field__c = 'Birthdate';
@@ -264,7 +279,7 @@ private class RollupOperationsTest {
         Test.stopTest();
 
         Account stored = reread(organizations).get(organizations[0].Id);
-        Assert.areEqual(lowest, stored.Site, 'First takes the lower Id on a tie');
+        Assert.areEqual(lowest, stored.Preferred_Name__c, 'First takes the lower Id on a tie');
         Assert.areEqual(lowest, stored.Sample_Data_Key__c, 'And so does Last');
     }
 
@@ -281,7 +296,7 @@ private class RollupOperationsTest {
         Rollup_Definition__c birthday = definition(
             'FIRST',
             'Birthdate',
-            'Site',
+            'Preferred_Name__c',
             RollupService.MODE_SCHEDULED
         );
         birthday.Order_By_Field__c = 'Birthdate';
@@ -301,7 +316,7 @@ private class RollupOperationsTest {
         Test.stopTest();
 
         Account stored = reread(organizations).get(organizations[0].Id);
-        Assert.areEqual('1970-03-01', stored.Site, 'A date, written plainly');
+        Assert.areEqual('1970-03-01', stored.Preferred_Name__c, 'A date, written plainly');
         Assert.areEqual(
             'Abcdefghijklmnopqrst',
             stored.Sample_Data_Key__c,
@@ -370,7 +385,7 @@ private class RollupOperationsTest {
         Rollup_Definition__c firstWithNothing = definition(
             'FIRST',
             null,
-            'Site',
+            'Preferred_Name__c',
             RollupService.MODE_BOTH
         );
         firstWithNothing.Order_By_Field__c = 'Birthdate';

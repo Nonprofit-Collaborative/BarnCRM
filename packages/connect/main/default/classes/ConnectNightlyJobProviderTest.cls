@@ -74,8 +74,16 @@ private class ConnectNightlyJobProviderTest {
             return;
         }
         choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+        // The run reads in user mode as whoever scheduled it, so it is scheduled by someone
+        // who holds the mirror's permission set, as on the Opportunity mirror page.
+        User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
+            'Maria',
+            new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+        );
         Test.startTest();
-        OpportunityMirrorSchedulable.schedule();
+        System.runAs(maria) {
+            OpportunityMirrorSchedulable.schedule();
+        }
         Test.stopTest();
 
         NightlyJob job = new ConnectNightlyJobProvider().nightlyJobs()[0];

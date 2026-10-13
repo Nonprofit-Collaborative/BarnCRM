@@ -46,7 +46,9 @@ private class RollupTextListsTest {
                     RecordTypeId = organizationType,
                     NumberOfEmployees = 99,
                     Description = 'stale',
-                    AccountNumber = 'stale'
+                    // A target BarnCRM Admin grants: a standard one such as AccountNumber may be
+                    // hidden by the profile, and then the engine cannot write it.
+                    Preferred_Name__c = 'stale'
                 )
             );
         }
@@ -78,14 +80,14 @@ private class RollupTextListsTest {
         return new List<Rollup_Definition__c>{
             definition('COUNT_DISTINCT', 'Title', 'NumberOfEmployees', mode),
             names,
-            definition('TEXT_LIST_DISTINCT', 'Title', 'AccountNumber', mode)
+            definition('TEXT_LIST_DISTINCT', 'Title', 'Preferred_Name__c', mode)
         };
     }
 
     private static Map<Id, Account> reread(List<Account> organizations) {
         return new Map<Id, Account>(
             [
-                SELECT Id, NumberOfEmployees, Description, AccountNumber, Sample_Data_Key__c
+                SELECT Id, NumberOfEmployees, Description, Preferred_Name__c, Sample_Data_Key__c
                 FROM Account
                 WHERE Id IN :organizations
             ]
@@ -113,7 +115,7 @@ private class RollupTextListsTest {
             );
             Assert.areEqual(
                 'Role 0, Role 1, Role 2, Role 3',
-                result.AccountNumber,
+                result.Preferred_Name__c,
                 context + ': each title once, blanks left out, a comma by default'
             );
         }
@@ -156,12 +158,16 @@ private class RollupTextListsTest {
         Test.stopTest();
 
         Assert.areEqual('Baker; Cole', afterMove.get(leaving.Id).Description, 'Ames moved out');
-        Assert.areEqual('Role 2', afterMove.get(leaving.Id).AccountNumber, 'Role 2 listed once');
+        Assert.areEqual(
+            'Role 2',
+            afterMove.get(leaving.Id).Preferred_Name__c,
+            'Role 2 listed once'
+        );
         Assert.areEqual(1, afterMove.get(leaving.Id).NumberOfEmployees, 'One title left');
         Assert.areEqual('Ames', afterMove.get(joining.Id).Description, 'Ames moved in');
         Account emptied = reread(organizations).get(leaving.Id);
         Assert.isNull(emptied.Description, 'A list of nobody is blank');
-        Assert.isNull(emptied.AccountNumber, 'Each value once, of nobody, is blank');
+        Assert.isNull(emptied.Preferred_Name__c, 'Each value once, of nobody, is blank');
         Assert.areEqual(0, emptied.NumberOfEmployees, 'No titles to count');
     }
 
@@ -346,7 +352,7 @@ private class RollupTextListsTest {
         Rollup_Definition__c titles = definition(
             'TEXT_LIST_DISTINCT',
             'Title',
-            'AccountNumber',
+            'Preferred_Name__c',
             RollupService.MODE_SCHEDULED
         );
         titles.Relationship_Path__c = '{Household}';
@@ -366,11 +372,11 @@ private class RollupTextListsTest {
         Test.stopTest();
 
         Account stored = [
-            SELECT AccountNumber, NumberOfEmployees
+            SELECT Preferred_Name__c, NumberOfEmployees
             FROM Account
             WHERE Id = :household.Id
         ];
-        Assert.areEqual('Gold', stored.AccountNumber, 'Listed once across the two members');
+        Assert.areEqual('Gold', stored.Preferred_Name__c, 'Listed once across the two members');
         Assert.areEqual(1, stored.NumberOfEmployees, 'And counted once');
     }
 
