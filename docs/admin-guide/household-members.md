@@ -89,6 +89,18 @@ Open any person and the **Household** panel shows the household's name as a link
 people are in it, and the formal greeting, so you can check how a letter to that household
 will open without leaving the person's record. Click the name to open the household.
 
+The panel is on the contact page BarnCRM ships. Where your org stores people as person
+accounts, add it to the person account page yourself, because BarnCRM ships no page for
+them:
+
+1. Open a person account, click the gear icon, and choose **Edit Page**.
+2. Drag **Household of Person** from the custom components onto the page.
+3. If the same page is also used for organizations, select the component, click **Add
+   Filter** under **Set Component Visibility**, and show it only when **Is Person Account**
+   equals **True**. On an organization the panel has no person to look up and would only
+   say the record is not in a household.
+4. Save, and activate the page for the person account record type if it is new.
+
 In the flexible way of belonging a person can be in more than one household (a child of
 divorced parents, for example). The panel then lists each household they belong to.
 

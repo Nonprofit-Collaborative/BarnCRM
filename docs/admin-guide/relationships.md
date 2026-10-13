@@ -88,20 +88,23 @@ from the sample data.
    - **Status**: leave it as Current
    - **Start date**: leave it empty
    Choose **Save**.
-4. The card now shows one line: "Luis Garcia, Spouse, Current". Nothing else was asked of
-   you.
-5. Open **Luis Garcia**. His **Relationships** card already shows "Harper Garcia, Spouse,
-   Current". You did not enter it. BarnCRM wrote it when you saved Harper's.
-6. Go back to **Harper Garcia** and choose **Edit** on the Luis line. Set **End date** to
-   last month and choose **Save**. The line now reads **Former**.
-7. Open **Luis Garcia** again. His line reads **Former** too, with the same end date. The
-   two records can never disagree.
+4. The card now shows one line: Luis Garcia, Spouse. A current relationship carries no
+   badge. Nothing else was asked of you.
+5. Open **Luis Garcia**. His **Relationships** card already shows Harper Garcia, Spouse.
+   You did not enter it. BarnCRM wrote it when you saved Harper's.
+6. The card has no Edit action, so change a relationship on its own record: open the App
+   Launcher, search for **Relationships**, open Harper's relationship to Luis, and choose
+   **Edit**. Set **End date** to last month and choose **Save**. Back on Harper's record,
+   the Luis line now carries a **Former** badge.
+7. Open **Luis Garcia** again. His line carries **Former** too, and his record has the same
+   end date. The two records can never disagree.
 8. Now add a second one from Harper: choose **Add relationship**, pick **Diego Garcia**,
    type **Child**, and save. Harper's card reads "Diego Garcia, Child", because the type
    says what the other person is to the person whose record you are on. Open **Diego
    Garcia** and his card reads "Harper Garcia, Parent", the same fact from his side.
-9. Finally, delete the Luis line from Harper's card. Open Luis and the matching line is gone
-   from his card too.
+9. Finally, choose **Remove** on the Luis line of Harper's card. It is deleted at once,
+   with no confirmation, so check the line before you click. Open Luis and the matching
+   line is gone from his card too.
 
 That is the whole feature: enter one side, get both, and never clean up after yourself.
 

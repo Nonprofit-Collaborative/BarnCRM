@@ -12,6 +12,28 @@ jest.mock(
   { virtual: true }
 );
 
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const GenerateUrl = Symbol('GenerateUrl');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+        [GenerateUrl](pageReference) {
+          return Promise.resolve(`/lightning/r/${pageReference.attributes.recordId}/view`);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    NavigationMixin.GenerateUrl = GenerateUrl;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
+
 const PERSON_ID = '003000000000001AAA';
 const HOUSEHOLD_ID = '001000000000001AAA';
 
@@ -48,7 +70,7 @@ describe('c-household-of-person', () => {
 
     const link = element.shadowRoot.querySelector('.household-link');
     expect(link.textContent).toBe('The Garcia Family');
-    expect(link.getAttribute('href')).toBe(`/${HOUSEHOLD_ID}`);
+    expect(link.getAttribute('href')).toBe(`/lightning/r/${HOUSEHOLD_ID}/view`);
     // Labels resolve to their names under Jest, so the plural label is what is checked for.
     expect(element.shadowRoot.querySelector('.member-count').textContent).toBe(
       'c.Core_HouseholdPanel_MemberCountMany'
@@ -58,6 +80,17 @@ describe('c-household-of-person', () => {
     );
     expect(element.shadowRoot.querySelector('.empty-message')).toBeNull();
     expect(element.shadowRoot.querySelector('lightning-spinner')).toBeNull();
+  });
+
+  it('works on a person account page as on a contact page', async () => {
+    const element = createElement('c-household-of-person', { is: HouseholdOfPerson });
+    element.recordId = '001000000000009AAA';
+    document.body.appendChild(element);
+    getHouseholdsForPerson.emit([GARCIA]);
+    await flush();
+
+    expect(getHouseholdsForPerson.getLastConfig()).toEqual({ personId: '001000000000009AAA' });
+    expect(element.shadowRoot.querySelectorAll('.household-row').length).toBe(1);
   });
 
   it('says one member without a plural', async () => {
