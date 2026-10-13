@@ -42,11 +42,6 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 
     public override void beforeInsert() {
         HouseholdService.ensureHouseholds((List<Contact>) Trigger.new);
-        PreferredEmailService.apply((List<Contact>) Trigger.new);
-    }
-
-    public override void beforeUpdate() {
-        PreferredEmailService.apply((List<Contact>) Trigger.new);
     }
 
     public override void afterInsert() {

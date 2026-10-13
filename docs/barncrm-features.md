@@ -39,7 +39,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Household merge and split | Major | Merges two households into one or moves people out into a new or existing household from buttons on the household page, recalculating totals. | Shipped | C-09 |
 | Merge and split finish in place | Minor | Merge and split confirm in a platform dialog; afterwards the action window closes and the household page and members panel refresh without a reload. | Built, not merged (feature/q-05-modern-dialogs-1) | C-09, Q-05 |
 | Person Account support | Major | Works fully in orgs that store people as person accounts (as Nonprofit Cloud orgs usually do), without depending on them. | Shipped | C-22 |
-| Multiple email addresses | Major | Gives each person personal, work and alternate email boxes plus a Preferred Email choice that keeps the standard email field in step. | Shipped | C-25 |
+| Multiple email addresses | Major | Gives each person personal, work and alternate email boxes plus a Preferred Email choice that keeps the standard email field in step, with its own switches on the Automation page, separate from household upkeep. | Built, not merged (fix/people-20) | C-25, PEOPLE-28 |
 | Automatic household creation switch | Minor | Setting to turn automatic household creation on or off (ships on). | Shipped | C-01 |
 | Delete empty households setting | Minor | Optional tidy-up that removes a household when its last member leaves; ships off, and never removes a household something outside BarnCRM depends on. | Shipped | C-01, ADR-0036 |
 | Households with gifts are kept | Minor | The empty household tidy-up never removes a household that gifts or pledges are credited to, so past gifts keep their household. | Shipped | ADR-0070 (D-20) |
