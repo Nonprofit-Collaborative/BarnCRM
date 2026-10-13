@@ -394,22 +394,10 @@ public with sharing class HealthCheckOrgShapeChecks {
         return connectInstalled;
     }
 
-    /**
-     * Whether an Apex class of this name is visible: in this package's namespace first, then
-     * with none (today, and unmanaged deploys). A class name is not an API name, so the prefix
-     * goes in without its `__` (dynamic-apex.md section 3).
-     */
+    /** Whether an Apex class of this name is visible (`NamespaceUtil.resolveType`). */
     @TestVisible
     private static Boolean classExists(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type found = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (found == null) {
-            found = Type.forName(className);
-        }
-        return found != null;
+        return NamespaceUtil.resolveType(className) != null;
     }
 
     private static HealthCheckService.Finding multiCurrencyFinding(

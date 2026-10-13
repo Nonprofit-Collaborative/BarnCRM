@@ -120,14 +120,7 @@ public with sharing class NightlyJobs {
     }
 
     private static NightlyJobProvider resolve(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type providerType = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (providerType == null) {
-            providerType = Type.forName(className);
-        }
+        Type providerType = NamespaceUtil.resolveType(className);
         if (providerType == null) {
             return null;
         }

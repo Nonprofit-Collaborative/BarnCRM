@@ -94,14 +94,7 @@ public with sharing class ImportEntityProcessors {
     /** The class by name, namespace first; tests pass names of their own. */
     @TestVisible
     private static ImportEntityProcessor resolve(String className) {
-        String prefix = NamespaceUtil.prefix();
-        Type processorType = Type.forName(
-            String.isBlank(prefix) ? null : prefix.removeEnd('__'),
-            className
-        );
-        if (processorType == null) {
-            processorType = Type.forName(className);
-        }
+        Type processorType = NamespaceUtil.resolveType(className);
         if (processorType == null) {
             return null;
         }
