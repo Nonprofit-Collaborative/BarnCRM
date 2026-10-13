@@ -85,7 +85,7 @@
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log of a save from Find's grid. {0} user, {1} time, {2}-{5}.</shortDescription>
+        <shortDescription>Find save log: {0} user, {1} time, {2} object, {3} saved, {4} same, {5} refused</shortDescription>
         <value>Edited in Find by {0} on {1}: {2}, {3} saved, {4} already held the values, {5} refused.</value>
     </labels>
     <labels>

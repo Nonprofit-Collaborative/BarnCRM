@@ -37,7 +37,7 @@
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Field utilization: run summary, objects skipped as too large</shortDescription>
+        <shortDescription>Field utilization: objects skipped as too large; {0} lists them</shortDescription>
         <value>Skipped as too large to count: {0}.</value>
     </labels>
     <labels>
@@ -45,7 +45,7 @@
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Field utilization: run summary sentence</shortDescription>
+        <shortDescription>Field utilization summary: {0} fields, {1} objects, {2} not counted</shortDescription>
         <value>Counted {0} fields on {1} kinds of records. {2} could not be counted.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Field utilization: a chosen object cannot be counted</shortDescription>
+        <shortDescription>Field utilization: a chosen object cannot be counted; {0} is it</shortDescription>
         <value>{0} cannot be counted. Choose from the list.</value>
     </labels>
     <labels>

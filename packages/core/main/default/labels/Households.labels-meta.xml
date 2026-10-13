@@ -117,7 +117,7 @@
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Empty household kept because records outside BarnCRM point at it</shortDescription>
+        <shortDescription>Empty household kept, outside records use it; {0} name, {1} record Id</shortDescription>
         <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting the household would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
     </labels>
     <labels>

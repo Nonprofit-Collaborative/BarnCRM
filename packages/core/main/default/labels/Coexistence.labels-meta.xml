@@ -5,7 +5,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Save refused: simple mode would hide membership records; names how many</shortDescription>
+        <shortDescription>Refused switch to simple mode; {0} people with membership records</shortDescription>
         <value>You cannot switch to the simple way of belonging yet. {0} people belong to a household through a membership record, and the simple way cannot see those records: their households would be counted as empty, renamed, and possibly deleted. Moving them needs a migration, which BarnCRM does not do yet, so keep the flexible way for now.</value>
     </labels>
     <labels>
@@ -13,7 +13,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Save refused: flexible mode would strand linked people; names how many</shortDescription>
+        <shortDescription>Refused switch to flexible mode; {0} people linked with no membership</shortDescription>
         <value>You cannot switch to the flexible way of belonging yet. {0} people are linked straight to their household and have no membership record, so the flexible way would not show them in any household. Moving them needs a migration, which BarnCRM does not do yet, so keep the simple way for now.</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: simple mode hides membership records; names how many</shortDescription>
+        <shortDescription>Health Check: simple mode hides memberships; {0} people affected</shortDescription>
         <value>{0} people belong to a household through a membership record, but the simple way of belonging is on and cannot see those records. Their households read as empty, and an empty household can be renamed or deleted. Switch back to the flexible way, or plan a migration before changing the setting again.</value>
     </labels>
     <labels>
@@ -37,7 +37,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: flexible mode, people lack membership; names how many</shortDescription>
+        <shortDescription>Health Check: flexible mode, people lack membership; {0} people</shortDescription>
         <value>{0} people are linked straight to their household but have no membership record, and the flexible way of belonging only sees membership records. They do not appear in any household. Switch back to the simple way, or plan a migration before changing the setting again.</value>
     </labels>
     <labels>
@@ -53,7 +53,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check title: simple mode chosen, person accounts since appeared</shortDescription>
+        <shortDescription>Health Check title: simple mode, person accounts appeared; {0} people</shortDescription>
         <value>{0} people are stored as accounts and cannot join a household</value>
     </labels>
     <labels>
@@ -61,7 +61,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Health Check detail: simple mode cannot house person accounts; names how many</shortDescription>
+        <shortDescription>Health Check: simple mode cannot house person accounts; {0} people</shortDescription>
         <value>You chose the simple way of belonging, which is fine while everyone is stored as a contact. This org now stores {0} people as accounts, and the simple way cannot put a person stored as an account into a household. Switch to the flexible way, or keep storing people as contacts.</value>
     </labels>
     <labels>
@@ -77,7 +77,7 @@
         <categories>Coexistence</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: install or upgrade problems nobody has reviewed; names how many</shortDescription>
+        <shortDescription>Hub home: unreviewed install or upgrade problems; {0} is the count</shortDescription>
         <value>Setup finished with {0} problems, see the Error Log.</value>
     </labels>
 </CustomLabels>

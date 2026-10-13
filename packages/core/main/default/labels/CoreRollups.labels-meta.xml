@@ -317,7 +317,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Rollup Queue: why a record's totals could not be saved.</shortDescription>
+        <shortDescription>Rollup Queue: a record's totals could not be saved; {0} is the reason</shortDescription>
         <value>The totals could not be saved: {0} BarnCRM tries again automatically, and the nightly run puts them right if it still cannot.</value>
     </labels>
     <labels>
@@ -325,7 +325,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Rollup Queue: why a background recalculation stopped.</shortDescription>
+        <shortDescription>Rollup Queue: a background recalculation stopped; {0} is the reason</shortDescription>
         <value>The background recalculation stopped before it finished: {0} BarnCRM tries these records again, a few at a time.</value>
     </labels>
     <labels>
@@ -333,7 +333,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error Log summary when queued totals could not be saved.</shortDescription>
+        <shortDescription>Error Log: queued totals not saved; {0} is the record count</shortDescription>
         <value>{0} records' totals could not be saved in the background and wait in the Rollup Queue. They are tried again automatically; after five tries they wait for Retry.</value>
     </labels>
     <labels>
@@ -349,7 +349,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error Log summary when a full recalculation did not save everything.</shortDescription>
+        <shortDescription>Error Log: full run incomplete; {0} records not saved, {1} batches stopped</shortDescription>
         <value>The rollup recalculation finished, but {0} records' totals could not be saved and {1} batches of records stopped before they finished. The saves are tried again automatically; rollups whose records stopped are not marked calculated and are put right by the next run.</value>
     </labels>
     <labels>
@@ -365,7 +365,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error Log: a full recalculation did not start, one was running.</shortDescription>
+        <shortDescription>Error Log: full run not started, one running; {0} is the job Id</shortDescription>
         <value>A rollup recalculation did not start because another one was still running (job {0}). The running one brings the totals up to date.</value>
     </labels>
     <labels>
@@ -373,7 +373,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error Log: records of a stopped recalculation chunk were queued.</shortDescription>
+        <shortDescription>Error Log: a stopped chunk's records were queued; {0} is the count</shortDescription>
         <value>Part of a rollup recalculation stopped before it finished. The totals of its {0} records are recalculated in the background within minutes.</value>
     </labels>
     <labels>
@@ -381,7 +381,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Engine comparison: the opening line of the report.</shortDescription>
+        <shortDescription>Engine comparison opening: {0} definitions, {1} values, {2} differences</shortDescription>
         <value>Engine comparison: {0} definitions and {1} values compared, {2} differences.</value>
     </labels>
     <labels>
@@ -389,7 +389,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Engine comparison: one value the two engines disagree on.</shortDescription>
+        <shortDescription>Engine diff: {0} rollup {1} field {2} record {3} stored {4} ours {5} vendored</shortDescription>
         <value>{0} writes {1} on {2}: stored {3}, BarnCRM engine {4}, vendored engine {5}.</value>
     </labels>
     <labels>
@@ -397,7 +397,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Engine comparison: a definition that was not compared, and why.</shortDescription>
+        <shortDescription>Engine comparison: a definition not compared; {0} name, {1} reason</shortDescription>
         <value>{0} was not compared: {1}</value>
     </labels>
     <labels>
@@ -405,7 +405,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Engine comparison: definitions the run stopped before.</shortDescription>
+        <shortDescription>Engine comparison: definitions not reached; {0} lists their keys</shortDescription>
         <value>The run stopped before these definitions to stay within limits. Run it again with these keys: {0}</value>
     </labels>
     <labels>
@@ -437,7 +437,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Engine comparison: the vendored engine failed on the definition.</shortDescription>
+        <shortDescription>Engine comparison: the vendored engine failed; {0} is the reason</shortDescription>
         <value>The vendored engine failed: {0}</value>
     </labels>
     <labels>
@@ -445,7 +445,7 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Engine comparison: run undone, the vendored engine started a job.</shortDescription>
+        <shortDescription>Engine comparison: run undone, a job started; {0} is the report</shortDescription>
         <value>The vendored engine started a background job, so nothing from this run was kept. Compare fewer records or fewer definitions at a time. The report: {0}</value>
     </labels>
 </CustomLabels>

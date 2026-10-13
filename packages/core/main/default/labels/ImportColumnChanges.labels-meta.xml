@@ -13,7 +13,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: the changes button when a column has some</shortDescription>
+        <shortDescription>Import wizard: the changes button; {0} is how many changes</shortDescription>
         <value>Change values ({0})</value>
     </labels>
     <labels>
@@ -21,7 +21,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: the heading of a column&apos;s changes</shortDescription>
+        <shortDescription>Import wizard: heading of a column's changes; {0} is the column</shortDescription>
         <value>Change values: {0}</value>
     </labels>
     <labels>

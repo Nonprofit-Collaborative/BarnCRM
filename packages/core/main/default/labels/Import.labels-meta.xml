@@ -85,7 +85,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import row: its new person is on an earlier row that did not save</shortDescription>
+        <shortDescription>Import row: earlier row's same new person failed; {0} the reason</shortDescription>
         <value>An earlier row of this file names the same new person, and they could not be saved: {0}</value>
     </labels>
     <labels>
@@ -133,7 +133,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: columns staged but not loaded, list of entities</shortDescription>
+        <shortDescription>Import run log: columns staged, not loaded; {0} lists the entities</shortDescription>
         <value>These columns were kept with each row but not loaded, because nothing in this org loads them yet: {0}.</value>
     </labels>
     <labels>
@@ -141,7 +141,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a mapped attribute the object does not have</shortDescription>
+        <shortDescription>Import run log: a mapped attribute the org lacks; {0} the attribute</shortDescription>
         <value>The mapping refers to {0}, which this org does not have. Those values were skipped.</value>
     </labels>
     <labels>
@@ -149,7 +149,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a mapped field the importing user cannot edit</shortDescription>
+        <shortDescription>Import run log: a mapped field the user cannot edit; {0} the field</shortDescription>
         <value>Not loaded: you do not have access to {0}. Those values were skipped. Ask your administrator for edit access to the field, then import the file again.</value>
     </labels>
     <labels>
@@ -157,7 +157,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a matching field the importing user cannot read</shortDescription>
+        <shortDescription>Import run log: a matching field the user cannot read; {0} the field</shortDescription>
         <value>Not matched on {0}: you do not have access to it, so nobody could be found by it, and a person your org holds only by that field counts as new. Ask your administrator for access to the field before you import.</value>
     </labels>
     <labels>
@@ -165,7 +165,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a value the field would not take</shortDescription>
+        <shortDescription>Import run log: a value the field refused; {0} field, {1} the value</shortDescription>
         <value>{0} would not accept the value &quot;{1}&quot;. Those values were skipped.</value>
     </labels>
     <labels>
@@ -205,7 +205,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: one chunk failed, with its number and reason</shortDescription>
+        <shortDescription>Import run log: one chunk failed; {0} chunk number, {1} the reason</shortDescription>
         <value>Chunk {0} failed and its rows were rejected: {1}</value>
     </labels>
     <labels>
@@ -557,7 +557,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a new household could not be tagged</shortDescription>
+        <shortDescription>Import run log: a new household was not tagged; {0} the reason</shortDescription>
         <value>A household this import created could not be marked with the import, so an undo will not remove it: {0}</value>
     </labels>
     <labels>
@@ -589,7 +589,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import undo: refused after the deadline</shortDescription>
+        <shortDescription>Import undo: refused after the deadline; {0} is the deadline</shortDescription>
         <value>The time to undo this import ended on {0}. The records it created are ordinary records now; delete any you do not want by hand.</value>
     </labels>
     <labels>
@@ -605,7 +605,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import undo: refused because the count changed</shortDescription>
+        <shortDescription>Import undo: count changed; {0} confirmed, {1} carrying the mark now</shortDescription>
         <value>You confirmed {0} records, but {1} now carry this import's mark. Nothing was deleted. Look at the new count and confirm again.</value>
     </labels>
     <labels>
@@ -685,7 +685,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: the undo line</shortDescription>
+        <shortDescription>Import undo log: {0} person, {1} time, {2} deleted, {3} kept, {4} put back</shortDescription>
         <value>Undone by {0} on {1}: {2} records deleted, {3} kept, {4} values put back.</value>
     </labels>
     <labels>
@@ -877,7 +877,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: row control total agrees</shortDescription>
+        <shortDescription>Import run log: row control total agrees; {0} is the row count</shortDescription>
         <value>Control total: the file has {0} rows, as expected.</value>
     </labels>
     <labels>
@@ -885,7 +885,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: row control total differs</shortDescription>
+        <shortDescription>Import run log: row control total differs; {0} rows, {1} expected</shortDescription>
         <value>Control total: the file has {0} rows, but {1} were expected. The import is refused until they agree.</value>
     </labels>
     <labels>
@@ -893,7 +893,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: amount control total agrees</shortDescription>
+        <shortDescription>Import run log: amount control total agrees; {0} is the total</shortDescription>
         <value>Control total: the file's gift amounts add up to {0}, as expected.</value>
     </labels>
     <labels>
@@ -901,7 +901,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: amount control total differs</shortDescription>
+        <shortDescription>Import run log: amount control total differs; {0} total, {1} expected</shortDescription>
         <value>Control total: the file's gift amounts add up to {0}, but {1} was expected. The import is refused until they agree.</value>
     </labels>
     <labels>
@@ -1077,7 +1077,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a field that cannot be matched on was chosen</shortDescription>
+        <shortDescription>Import error: a field that cannot be matched on; {0} is the field</shortDescription>
         <value>{0} cannot be used to match. Choose a field marked External ID or Unique that holds text or an email.</value>
     </labels>
     <labels>
@@ -1085,7 +1085,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: the chosen matching field no longer qualifies</shortDescription>
+        <shortDescription>Import run log: matching field no longer qualifies; {0} the field</shortDescription>
         <value>Nobody was matched on {0}: the field is gone, is no longer marked External ID or Unique, or you may not read it. Choose another field and dry run again.</value>
     </labels>
     <labels>
@@ -1093,7 +1093,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a value for every row would name one person</shortDescription>
+        <shortDescription>Import error: a value for every row names one person; {0} the field</shortDescription>
         <value>A value for every row cannot give a person's name, email or matching ID, because every row would then be the same person. Remove the value for {0} and try again.</value>
     </labels>
     <labels>
@@ -1245,7 +1245,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column target, a first person's ID field</shortDescription>
+        <shortDescription>Import wizard: column target on the first person; {0} is the field</shortDescription>
         <value>Person: {0}</value>
     </labels>
     <labels>
@@ -1253,7 +1253,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column target, a second person's ID field</shortDescription>
+        <shortDescription>Import wizard: column target on the second person; {0} is the field</shortDescription>
         <value>Second person: {0}</value>
     </labels>
     <labels>
@@ -1261,7 +1261,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: column target, an organization's ID field</shortDescription>
+        <shortDescription>Import wizard: column target on the organization; {0} is the field</shortDescription>
         <value>Organization: {0}</value>
     </labels>
     <labels>
@@ -1269,7 +1269,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a record ID column holds something that is not an ID</shortDescription>
+        <shortDescription>Import error: a record ID column holds a non-ID; {0} is the value</shortDescription>
         <value>"{0}" is not a Salesforce record ID. Fix the ID, or set its column to Do not load, then import the row again.</value>
     </labels>
     <labels>
@@ -1277,7 +1277,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: a person's record ID belongs to another kind of record</shortDescription>
+        <shortDescription>Import error: a person's record ID is another kind; {0} is the ID</shortDescription>
         <value>The ID {0} is not a person. Map the column to the right record ID, or fix the ID, then import the row again.</value>
     </labels>
     <labels>
@@ -1285,7 +1285,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: an organization's record ID belongs to another kind of record</shortDescription>
+        <shortDescription>Import error: an organization's record ID is another kind; {0} the ID</shortDescription>
         <value>The ID {0} is not an organization. Map the column to the right record ID, or fix the ID, then import the row again.</value>
     </labels>
     <labels>
@@ -1293,7 +1293,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: no visible record has the record ID the row gives</shortDescription>
+        <shortDescription>Import error: no visible record has the row's ID; {0} is the ID</shortDescription>
         <value>No record with the ID {0} was found that you can see. A row with an ID never creates a record: check the ID and your access to it, then import the row again.</value>
     </labels>
     <labels>

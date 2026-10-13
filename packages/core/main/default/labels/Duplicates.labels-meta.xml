@@ -341,7 +341,7 @@
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Duplicates panel: listed count when more exist than were counted.</shortDescription>
+        <shortDescription>Duplicates panel: count past the cap; {0} shown, {1} the cap</shortDescription>
         <value>Showing {0} of more than {1} suggestions, newest first.</value>
     </labels>
     <labels>

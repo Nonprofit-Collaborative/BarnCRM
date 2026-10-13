@@ -101,7 +101,7 @@
         <categories>Relationships</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Save refused: dates overlap an affiliation on file; names it</shortDescription>
+        <shortDescription>Save refused, dates overlap; {0} person, {1} org, {2} role, {3} record</shortDescription>
         <value>{0} already has an affiliation with {1} as {2} covering those dates. Open {3} to change it.</value>
     </labels>
     <labels>

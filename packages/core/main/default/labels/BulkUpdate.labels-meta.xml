@@ -5,7 +5,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: the query's object cannot be bulk updated, and why.</shortDescription>
+        <shortDescription>Refusal: object cannot be bulk updated; {0} object, {1} reason</shortDescription>
         <value>{0} cannot be bulk updated: {1}</value>
     </labels>
     <labels>
@@ -13,7 +13,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a field cannot be bulk updated, and why.</shortDescription>
+        <shortDescription>Refusal: field cannot be bulk updated; {0} field, {1} reason</shortDescription>
         <value>{0} cannot be bulk updated: {1}</value>
     </labels>
     <labels>
@@ -21,7 +21,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a change names a field the person cannot see.</shortDescription>
+        <shortDescription>Refusal: a change names a field the person cannot see; {0} field</shortDescription>
         <value>A change names a field that is not available to you: {0}. Remove that change, or ask your administrator for access.</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a value to set does not fit its field.</shortDescription>
+        <shortDescription>Refusal: a value to set does not fit its field; {0} is the field</shortDescription>
         <value>The value for {0} does not fit that field. Check it and try again.</value>
     </labels>
     <labels>
@@ -101,7 +101,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: the same field is changed twice.</shortDescription>
+        <shortDescription>Refusal: the same field is changed twice; {0} is the field</shortDescription>
         <value>{0} is changed twice. Keep one change for each field.</value>
     </labels>
     <labels>
@@ -109,7 +109,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a required field cannot be cleared.</shortDescription>
+        <shortDescription>Refusal: a required field cannot be cleared; {0} is the field</shortDescription>
         <value>{0} is required, so it cannot be cleared.</value>
     </labels>
     <labels>
@@ -117,7 +117,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a copy between fields of different types.</shortDescription>
+        <shortDescription>Refusal: copy between field types; {0} source field, {1} target field</shortDescription>
         <value>{0} cannot be copied into {1}. Choose a field of a matching type.</value>
     </labels>
     <labels>
@@ -133,7 +133,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: more records match than the run limit.</shortDescription>
+        <shortDescription>Refusal: more records match than the run limit; {0} is the limit</shortDescription>
         <value>More than {0} records match, the run limit for one bulk update. Narrow the query, or run it in parts.</value>
     </labels>
     <labels>
@@ -157,7 +157,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: more records match now than were confirmed.</shortDescription>
+        <shortDescription>Refusal: more match now than confirmed; {0} is the confirmed count</shortDescription>
         <value>More records match now than the {0} you confirmed. Nothing was changed. Preview again and confirm the new number.</value>
     </labels>
     <labels>
@@ -189,7 +189,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log line: who started a bulk update, when, and on how many records.</shortDescription>
+        <shortDescription>Bulk update log: {0} person, {1} time, {2} count, {3} object, {4} confirmed</shortDescription>
         <value>{0} started a bulk update on {1}: {2} {3} matched; {4} confirmed.</value>
     </labels>
     <labels>
@@ -197,7 +197,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log line: a bulk update stopped before changing anything, and why.</shortDescription>
+        <shortDescription>Run log: bulk update stopped before changing; {0} is the reason</shortDescription>
         <value>Stopped before changing anything: {0}</value>
     </labels>
     <labels>
@@ -205,7 +205,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log line: what a bulk update did.</shortDescription>
+        <shortDescription>Bulk update log: {0} updated, {1} unchanged, {2} no longer matched, {3} failed</shortDescription>
         <value>Finished: {0} updated, {1} already held the new values, {2} no longer matched, {3} failed.</value>
     </labels>
     <labels>
@@ -341,7 +341,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Preview line: how many records match.</shortDescription>
+        <shortDescription>Preview line: how many records match; {0} is the count</shortDescription>
         <value>{0} records match. The first ones, before and after:</value>
     </labels>
     <labels>
@@ -381,7 +381,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button: start the bulk update of this many records.</shortDescription>
+        <shortDescription>Button: start the bulk update; {0} is the record count</shortDescription>
         <value>Update {0} records</value>
     </labels>
     <labels>
@@ -397,7 +397,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Progress line while the job runs.</shortDescription>
+        <shortDescription>Bulk update progress: {0} chunks done, {1} chunks in all</shortDescription>
         <value>Updating: {0} of {1} chunks done.</value>
     </labels>
     <labels>
@@ -405,7 +405,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>What a finished bulk update did.</shortDescription>
+        <shortDescription>Bulk update result: {0} matched, {1} updated, {2} unchanged, {3} failed</shortDescription>
         <value>{0} matched: {1} updated, {2} already held the new values, {3} failed.</value>
     </labels>
     <labels>
@@ -453,7 +453,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Undo confirmation: what it puts back.</shortDescription>
+        <shortDescription>Bulk update undo: what it puts back; {0} is the count to type</shortDescription>
         <value>Undo puts back the values on {0} records, except any somebody changed since. Type {0} to confirm.</value>
     </labels>
     <labels>
@@ -541,7 +541,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a lookup field cannot be changed with steps.</shortDescription>
+        <shortDescription>Refusal: a lookup cannot be changed with steps; {0} is the field</shortDescription>
         <value>{0} cannot be changed with steps. Set it or copy it instead.</value>
     </labels>
     <labels>
@@ -549,7 +549,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: a change with steps has no step.</shortDescription>
+        <shortDescription>Refusal: a change with steps has no step; {0} is the field</shortDescription>
         <value>Add at least one step for {0}.</value>
     </labels>
     <labels>
@@ -557,7 +557,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Refusal: the steps for a field have problems, listed.</shortDescription>
+        <shortDescription>Refusal: the steps have problems; {0} field, {1} the problems</shortDescription>
         <value>Fix the steps for {0}: {1}</value>
     </labels>
     <labels>
@@ -565,7 +565,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>One record: the changed value does not fit its field.</shortDescription>
+        <shortDescription>One record: changed value does not fit; {0} field, {1} the value</shortDescription>
         <value>{0} cannot take the changed value "{1}", so this record was left as it was.</value>
     </labels>
     <labels>
