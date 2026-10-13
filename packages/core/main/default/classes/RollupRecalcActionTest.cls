@@ -6,6 +6,14 @@
  */
 @IsTest
 private class RollupRecalcActionTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static Rollup_Definition__c childCount() {
         return new Rollup_Definition__c(
             Name = 'Child organization count',

@@ -6,8 +6,10 @@
  * happen:
  *
  * - **Real time.** A trigger on a source entity calls `runRealTime`. `RollupChanges` works out
- *   which target records the save marks (R-R11), and they are recalculated in the same save or,
- *   for a bulk or background save, written to the Rollup Queue (R-R4, Section 14A).
+ *   which target records the save marks (R-R11). By default they are written to the Rollup Queue
+ *   and recalculated just after the save, so the save itself only marks and queues; an org that
+ *   sets Rollup Processing to In the save recalculates a normal save's totals in it, and a bulk
+ *   or background save still queues (R-R4, Section 14A, ADR-NEXT async rollups).
  * - **Scheduled.** `RollupScheduler` calls `startNightlyRun` for the definitions in Scheduled or
  *   Both mode, which is the nightly reconciliation R-R4 describes: `RollupFullRecalcBatch`.
  * - **On demand.** `recalculate` runs one definition over every record now, which is what the
@@ -61,6 +63,32 @@ public with sharing class RollupService {
      */
     @TestVisible
     private static Integer instantLimit = 50;
+
+    /** The setting that says when real-time totals are recalculated (R-R4, ADR-NEXT). */
+    @NamespaceAccessible
+    public static final String PROCESSING_SETTING = 'Rollup_Processing__c';
+    /** Queued and recalculated just after the save: the default. */
+    @NamespaceAccessible
+    public static final String PROCESSING_BACKGROUND = 'Background';
+    /** Recalculated in the save itself when it is small enough, as before ADR-NEXT. */
+    @NamespaceAccessible
+    public static final String PROCESSING_IN_SAVE = 'In_Save';
+
+    /**
+     * Queries a recalculation in the save spends on top of its planned aggregate queries for one
+     * target entity: the stored values, the target filter and the write's own automation.
+     */
+    private static final Integer QUERIES_PER_TARGET = 4;
+
+    /**
+     * Whether a normal save recalculates its real-time totals itself. Anything but In the save,
+     * including a setting never saved, means just after the save.
+     */
+    @NamespaceAccessible
+    public static Boolean recalculatesInTheSave() {
+        Object stored = SettingsService.getValue(PROCESSING_SETTING);
+        return stored != null && PROCESSING_IN_SAVE.equals(String.valueOf(stored));
+    }
 
     /** The modes a nightly run covers. */
     @NamespaceAccessible
@@ -308,17 +336,21 @@ public with sharing class RollupService {
     }
 
     /**
-     * R-R4: a normal save that marks a few records recalculates them in the same save; a bulk
-     * change, or a save already running in the background, queues them. A record the platform
-     * refuses to save is queued to be tried again, and anything that stops the recalculation
-     * queues the lot, so nothing marked is lost.
+     * R-R4: by default every save queues the records it marked, and the Rollup Queue
+     * recalculates them just after the save (ADR-NEXT async rollups), so a save pays for marking
+     * and one insert, never for the aggregate queries. With Rollup Processing set to In the
+     * save, a normal save that marks a few records recalculates them in the same save when the
+     * transaction has room for it; a bulk change, a save already running in the background, or
+     * one without the room queues them. A record the platform refuses to save is queued to be
+     * tried again, and anything that stops the recalculation queues the lot, so nothing marked
+     * is lost.
      */
     private static void recalculateNowOrQueue(RollupChanges.Marked marked) {
         if (marked.isEmpty()) {
             return;
         }
         Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
-        if (!canRecalculateNow(marked.size())) {
+        if (!recalculatesInTheSave() || !canRecalculateNow(marked.size(), idsByTarget.keySet())) {
             RollupQueue.add(idsByTarget);
             return;
         }
@@ -346,7 +378,48 @@ public with sharing class RollupService {
             !System.isScheduled() &&
             Limits.getQueries() * 2 < Limits.getLimitQueries() &&
             Limits.getDmlStatements() * 2 < Limits.getLimitDmlStatements() &&
-            Limits.getCpuTime() * 2 < Limits.getLimitCpuTime();
+            Limits.getCpuTime() * 2 < Limits.getLimitCpuTime() &&
+            Limits.getQueryRows() * 2 < Limits.getLimitQueryRows();
+    }
+
+    /**
+     * As above, and the queries the recalculation is planned to spend fit in what the
+     * transaction has left (ROLLUPS-2): a save that reaches the rollups with 45 queries used
+     * must queue, since a limit error there would fail the person's save and no catch can stop
+     * it. The estimate costs no query: definitions come from the transaction's cache.
+     */
+    @TestVisible
+    private static Boolean canRecalculateNow(Integer targetCount, Set<String> targets) {
+        if (!canRecalculateNow(targetCount)) {
+            return false;
+        }
+        return plannedQueries(targets) <= Limits.getLimitQueries() - Limits.getQueries();
+    }
+
+    /**
+     * The queries a recalculation of these target entities spends at most: one per definition
+     * (the planner folds some together, never splits one), one more for a path through a
+     * household token, and the fixed cost of each target entity. Counted, not planned, so a
+     * definition that cannot be planned is not logged twice.
+     */
+    @TestVisible
+    private static Integer plannedQueries(Set<String> targets) {
+        Integer planned = 0;
+        for (String target : targets) {
+            List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(
+                target,
+                new Set<String>{ MODE_REAL_TIME, MODE_SCHEDULED, MODE_BOTH }
+            );
+            if (definitions.isEmpty()) {
+                continue;
+            }
+            planned += QUERIES_PER_TARGET;
+            for (Rollup_Definition__c definition : definitions) {
+                String path = definition.Relationship_Path__c;
+                planned += String.isNotBlank(path) && path.contains('{') ? 2 : 1;
+            }
+        }
+        return planned;
     }
 
     // ---------------------------------------------------------------------------- full runs

@@ -10,6 +10,14 @@
  */
 @IsTest
 private class RollupOperationsTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static final Integer ORGANIZATIONS = 10;
     private static final Integer PEOPLE_EACH = 20;
 

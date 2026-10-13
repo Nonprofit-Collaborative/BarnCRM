@@ -6,6 +6,14 @@
  */
 @IsTest
 private class RollupChangesTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
+    @TestSetup
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
+    }
+
     private static Account organization(String name) {
         return new Account(
             Name = name,

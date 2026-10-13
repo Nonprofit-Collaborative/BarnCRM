@@ -843,6 +843,7 @@ assistant that wrote them (they are Giving keys from v0.6, Section 21A).
 |---|---|---|---|
 | `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
+| `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as Just after the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
@@ -1325,9 +1326,14 @@ Windows are never stored on the definition, so changing the fiscal year start mo
 recalculating is enough to correct every fiscal rollup in the org.
 
 **R-R4 Modes.** Real-time (shown as Instantly) keeps the number current as source records
-change: a normal save updates the totals in the same save, and a bulk change (an import, a
-data loader run, a large update, or any save that is already running in the background) is
-queued (Section 14A) and finishes within minutes. Scheduled (shown as Every night)
+change. By default a save marks the target records (R-R11), writes them to the Rollup Queue
+(Section 14A) and returns, and the queue recalculates them just after the save, usually within
+a minute; a bulk change (an import, a data loader run, a large update) goes the same way and
+finishes within minutes (ADR-NEXT
+`NEXT-real-time-rollups-recalculated-just-after-the-save.md`). With
+`Rollup_Processing__c` set to In_Save (Section 12), a normal save recalculates in the same save
+instead, when the queries it is planned to spend fit what the transaction has left; a bulk
+change, a save already running in the background, or one without the room is queued. Scheduled (shown as Every night)
 recalculates in the nightly full run. Both (shown as Both (recommended)) does the first and
 reconciles with the second, so the nightly run is the safety net for anything the first
 missed; it is the mode the packaged giving definitions ship with, because it is the
@@ -1335,7 +1341,7 @@ combination that keeps the numbers visibly right (Principle 2). Real-time needs 
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
 
-One exception to "in the same save": a merge (of people, Section 29A, or of households,
+A merge has its own path, whichever `Rollup_Processing__c` says (of people, Section 29A, or of households,
 R-H13).
 The platform refuses a trigger's write to a record while it is in a merge, so the
 survivors' real-time totals are recalculated just after the merge is saved, by a small
@@ -6593,6 +6599,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.6 | 2026-10-13 | Real-time rollups recalculated just after the save (ADR-NEXT, `NEXT-real-time-rollups-recalculated-just-after-the-save.md`, Core quality pass Q-01). BarnCRM Settings gains `Rollup_Processing__c` (Section 12, Background or In_Save, default Background). R-R4: by default a save queues its marked targets and the Rollup Queue recalculates them just after the save; In_Save keeps recalculation in the save when the planned queries fit. R-RQ3: the nightly run, the end of a pause, Retry and Start now start a processor for Pending entries no save started one for. R-RQ4: Health Check reports Failed entries and Pending entries older than an hour. No object added. |
 
 ---
 ## 32. Entity ownership by package
