@@ -502,6 +502,50 @@ private class HouseholdMergeServiceTest {
     // ------------------------------------------------------------------ refusals
 
     @IsTest
+    static void aNonprofitCloudHouseholdIsNeitherPreviewedNorMerged() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account ours = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            // Theirs carries a native household group, as in a Nonprofit Cloud org.
+            Account theirs = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert new List<Account>{ ours, theirs };
+            HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{ theirs.Id };
+
+            List<String> messages = new List<String>();
+            Test.startTest();
+            try {
+                HouseholdMergeService.preview(ours.Id, theirs.Id);
+            } catch (HouseholdException e) {
+                messages.add(e.getMessage());
+            }
+            try {
+                HouseholdMergeService.mergeHouseholds(
+                    theirs.Id,
+                    ours.Id,
+                    new HouseholdMergeService.MergeChoices(null)
+                );
+            } catch (HouseholdException e) {
+                messages.add(e.getMessage());
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<String>{
+                    Label.Core_HouseholdMerge_ErrorNativeHousehold,
+                    Label.Core_HouseholdMerge_ErrorNativeHousehold
+                },
+                messages,
+                'Either direction is refused, before anything is moved.'
+            );
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Account WHERE Id IN :new List<Id>{ ours.Id, theirs.Id }],
+                'Both households are still there.'
+            );
+        }
+    }
+
+    @IsTest
     static void anOrganizationCannotBeMergedIntoAHousehold() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);

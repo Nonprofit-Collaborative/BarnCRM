@@ -90,10 +90,12 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Duplicate scan and review | Major | Scans existing people and households with Salesforce's own duplicate rules and lists every likely pair on one page for review. | Shipped | C-20 |
+| Duplicate scan and review | Major | Scans existing people and households with Salesforce's own duplicate rules and lists every likely pair on one page for review. Never proposes a Nonprofit Cloud household or a person account paired with a contact; one scan runs at a time. | Shipped; fixes built, not merged (`fix/duplicates-1`) | C-20 |
 | Household merge from a duplicate pair | Minor | Merges a duplicate household pair in one step using the standard household merge. | Shipped | C-20 |
 | Person merge upkeep | Minor | After Salesforce's person merge, the kept person joins the other's households and totals recalculate. Shortly after any Salesforce merge, the kept record keeps one default address, a kept person loses relationships with themselves and second copies, their primary affiliation is chosen again, and a household merged this way is recounted and renamed, with a person who was in both households left with one membership. | Built, not merged (fix/people-13-merge) | C-20 |
 | "Not a duplicate" dismissals | Minor | A dismissed pair, with a reason, is not suggested again. | Shipped | C-20 |
+| Person merge upkeep | Minor | After Salesforce's person merge, the kept person joins the other's households and totals recalculate. | Shipped | C-20 |
+| "Not a duplicate" dismissals | Minor | A dismissed pair, with a reason, is not suggested again, including when a duplicate rule reports it again on save. | Shipped; fix built, not merged (`fix/duplicates-1`) | C-20 |
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
 | Relationships and affiliations with no person | Minor | Health Check counts and links relationships with no person on one side and affiliations with no person (left by a person delete), changing nothing. | Built, not merged (fix/people-19) | PEOPLE-19 |

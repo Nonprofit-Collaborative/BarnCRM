@@ -5719,7 +5719,11 @@ field by field to decide whether they are duplicates.
 **R-DP2 Only pairs BarnCRM can act on are proposed.** A suggestion is two people, or two
 households. A pair of accounts where either side is not a household (an organization, or a
 person stored as an account) is passed over, because the household merge (R-H13) is the only
-account merge BarnCRM performs and a suggestion nobody can act on here is noise.
+account merge BarnCRM performs and a suggestion nobody can act on here is noise. A household
+that also carries a Nonprofit Cloud household group (`PartyRelationshipGroup`) is passed over
+and refused by the merge (ADR-0036), and so is a pair naming a person account's contact half,
+which the platform cannot merge with a contact. The panel applies the same rule to sets a
+duplicate rule wrote on save, and hides a set whose every pair is dismissed (R-DP5).
 
 **R-DP3 The scan finds what the rules would have found.** A duplicate rule runs when a record
 is saved, so records already in the org, and records saved past an alert, are never compared

@@ -104,6 +104,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   merging;
   mergePreview;
   keepId;
+  previewRequest = 0;
 
   /** The data-id of the box heading already given focus, so it is focused once per opening. */
   focusedHeading;
@@ -250,6 +251,11 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return this.busy || !this.canManage || !this.canReviewSuggestions;
   }
 
+  /** A second scan beside a running one would record the same pairs twice; the server refuses it too. */
+  get scanDisabled() {
+    return this.controlsDisabled || this.scanRunning;
+  }
+
   // ------------------------------------------------------------------ scan and refresh
 
   handleScan() {
@@ -319,16 +325,29 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     this.loadPreview();
   }
 
+  /**
+   * Only the answer to the latest request is shown: after a quick change of the kept household
+   * an earlier, slower answer would otherwise describe the other direction.
+   */
   async loadPreview() {
+    this.previewRequest += 1;
+    const request = this.previewRequest;
     this.busy = true;
     this.errorMessage = undefined;
     try {
-      this.mergePreview = await previewMerge({ survivorId: this.keepId, victimId: this.otherId });
+      const preview = await previewMerge({ survivorId: this.keepId, victimId: this.otherId });
+      if (request === this.previewRequest) {
+        this.mergePreview = preview;
+      }
     } catch (error) {
-      this.errorMessage = this.messageFrom(error);
-      this.merging = undefined;
+      if (request === this.previewRequest) {
+        this.errorMessage = this.messageFrom(error);
+        this.merging = undefined;
+      }
     } finally {
-      this.busy = false;
+      if (request === this.previewRequest) {
+        this.busy = false;
+      }
     }
   }
 

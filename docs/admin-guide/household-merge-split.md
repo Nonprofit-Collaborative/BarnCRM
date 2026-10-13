@@ -119,6 +119,11 @@ distinction the whole product relies on. If two organizations are duplicates, me
 with the standard Salesforce account merge instead. The message you see is "Both records
 must be households. Choose a household, not an organization."
 
+**"It says one of these households is also a Salesforce Nonprofit Cloud household."**
+In an org that also uses Nonprofit Cloud households, BarnCRM does not merge a household that
+is one of those: the merge deletes one of the two records, and its Nonprofit Cloud household
+group would be deleted or moved with it. Combine them with Nonprofit Cloud's own tools.
+
 **"It says I cannot edit one of these households."**
 Merging edits both records, so you need edit access on both. A split works the same way when
 you send people to a household you already have: you need edit access on the household they

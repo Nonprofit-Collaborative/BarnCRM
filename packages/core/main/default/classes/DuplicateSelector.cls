@@ -12,6 +12,15 @@ public with sharing class DuplicateSelector {
     /** The objects duplicates are reviewed for, in the order a scan covers them. */
     public static final List<String> REVIEWED_OBJECTS = new List<String>{ 'Contact', 'Account' };
 
+    private static final String PERSON_CONTACTS_QUERY = 'SELECT Id FROM Contact WHERE Id IN :contactIds AND IsPersonAccount = true'; // detection-only: run only after isPersonAccountOrg found person accounts, so a person account's contact half is never proposed as a duplicate of a contact
+
+    private static final Set<String> SCAN_UNFINISHED = new Set<String>{
+        'Holding',
+        'Queued',
+        'Preparing',
+        'Processing'
+    };
+
     /** Every duplicate rule for these objects, active or not. */
     public static List<DuplicateRule> rulesFor(Set<String> objectNames) {
         if (objectNames == null || objectNames.isEmpty()) {
@@ -174,6 +183,49 @@ public with sharing class DuplicateSelector {
             ORDER BY CreatedDate DESC
             LIMIT :limitRows
         ];
+    }
+
+    /**
+     * Whether a scan is waiting or running, whoever started it, so a second one is not started
+     * beside it: two scans read the same pairs before either writes, and both write them.
+     *
+     * An upkeep read (ADR-0021), in system mode because a person without View Setup sees only
+     * their own jobs, and the scan another administrator started is the one that matters. Only
+     * the panel's scan guard and its "scan running" line reach it, its input is a class name
+     * the controller holds as a constant, it reads one status field, and its answer is a yes or
+     * no that names nobody's job.
+     */
+    public static Boolean scanRunning(String className) {
+        return [
+                SELECT COUNT()
+                FROM AsyncApexJob
+                WHERE
+                    JobType = 'BatchApex'
+                    AND ApexClass.Name = :className
+                    AND Status IN :SCAN_UNFINISHED
+                WITH SYSTEM_MODE
+            ] > 0;
+    }
+
+    /**
+     * The person account contact halves among these contacts. Empty in an org without person
+     * accounts, where the field the question needs does not exist (ADR-0013).
+     */
+    public static Set<Id> personContactIds(Set<Id> contactIds) {
+        Set<Id> result = new Set<Id>();
+        if (contactIds == null || contactIds.isEmpty() || !HouseholdService.isPersonAccountOrg()) {
+            return result;
+        }
+        for (
+            SObject person : Database.queryWithBinds(
+                PERSON_CONTACTS_QUERY,
+                new Map<String, Object>{ 'contactIds' => contactIds },
+                AccessLevel.USER_MODE
+            )
+        ) {
+            result.add(person.Id);
+        }
+        return result;
     }
 
     /** The households among these account identifiers. */

@@ -72,7 +72,8 @@ choose to save anyway.
    keep and choose **Merge these two**. You see "The two households are now one."
 7. For a pair that is not the same person, for example twin sisters at one address, choose
    **Not a duplicate**, type a short reason, and confirm. You see "Noted. This pair will not be
-   suggested again." Scan again and check that the pair does not come back.
+   suggested again." Scan again and check that the pair does not come back. It stays off the
+   panel even when a duplicate rule reports the pair again as someone saves one of the two.
 
 ## Common mistakes
 
@@ -96,6 +97,19 @@ accounts, merge two of them with Salesforce's own account merge. BarnCRM handles
 does a merge of two contacts: the kept person joins every household the other one belonged
 to, each household keeps its primary member, an emptied household is kept, and the kept
 person's totals are recalculated straight away.
+
+**A Nonprofit Cloud household never appears.** In an org that also uses Salesforce Nonprofit
+Cloud households, a household that is one of those is not suggested and cannot be merged here
+or with **Merge or split**: merging deletes one of the two records, and its Nonprofit Cloud
+household group would be deleted or moved with it. Combine those with Nonprofit Cloud's own
+tools.
+
+**A person account is never paired with a contact.** Salesforce cannot merge the two, so such
+a pair is not suggested.
+
+**Scan for duplicates is greyed out.** A scan is already running, perhaps one a colleague
+started. Wait for it to finish and choose **Refresh**. Two scans at once would suggest the
+same pairs twice, so a second one is refused.
 
 **A household pair should not be merged with the Salesforce merge.** Always merge households
 from this panel or with **Merge or split** on the household's record page. That merge moves

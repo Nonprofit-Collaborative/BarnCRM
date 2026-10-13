@@ -96,6 +96,14 @@ public with sharing class DataHygieneService {
                 result.count = count(document);
                 result.canOpenInFind = true;
             }
+            // A household that is also a Nonprofit Cloud household keeps its members there, so
+            // it reads as empty here, and deleting it would delete its native group (ADR-0036).
+            if (
+                key == HOUSEHOLDS_WITHOUT_MEMBERS &&
+                OrgShapeDetector.detect().hasNativeHouseholdGroups == true
+            ) {
+                result.note = System.Label.Core_DataHygiene_NativeHouseholdsListed;
+            }
             result.countLabel = countLabel(result.count);
         } catch (QueryCompiler.QueryCompilerException refused) {
             result.errorMessage = refused.getMessage();

@@ -361,6 +361,41 @@ private class DataHygieneServiceTest {
     }
 
     @IsTest
+    static void emptyHouseholdsWarnNotToDeleteWhenNonprofitCloudHouseholdsExist() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            User maria = maria();
+            DataHygieneService.CheckResult platformOnly = runAs(
+                maria,
+                DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
+            );
+            OrgShapeDetector.OrgShape nativeShape = new OrgShapeDetector.OrgShape();
+            nativeShape.hasNativeHouseholdGroups = true;
+            OrgShapeDetector.overrideShape = nativeShape;
+
+            Test.startTest();
+            DataHygieneService.CheckResult withNative = runAs(
+                maria,
+                DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS
+            );
+            DataHygieneService.CheckResult otherCheck = runAs(
+                maria,
+                DataHygieneService.MEMBERSHIPS_WITHOUT_PERSON
+            );
+            Test.stopTest();
+
+            Assert.isNull(platformOnly.note, 'No note where there are no native households.');
+            Assert.areEqual(
+                System.Label.Core_DataHygiene_NativeHouseholdsListed,
+                withNative.note,
+                'The empty households check warns not to delete a Nonprofit Cloud household.'
+            );
+            Assert.isTrue(withNative.canOpenInFind, 'It still opens in Find.');
+            Assert.isNull(otherCheck.note, 'Only that check carries the warning.');
+        }
+    }
+
+    @IsTest
     static void aCheckOnAnObjectThePersonCannotSeeSaysSoInsteadOfANumber() {
         System.runAs(TestUsers.admin()) {
             mode(HouseholdTestDataFactory.MODE_CONTACT);

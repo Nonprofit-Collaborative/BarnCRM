@@ -121,6 +121,14 @@
         <value>Scanning, dismissing and merging from this panel need the Manage BarnCRM Settings permission. Ask your BarnCRM administrator.</value>
     </labels>
     <labels>
+        <fullName>Core_Duplicates_ErrorScanRunning</fullName>
+        <categories>Duplicates</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicates: a scan is already running</shortDescription>
+        <value>A duplicate scan is already running. Wait for it to finish, choose Refresh, and then scan again if you need to.</value>
+    </labels>
+    <labels>
         <fullName>Core_Duplicates_ErrorUnexpected</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
