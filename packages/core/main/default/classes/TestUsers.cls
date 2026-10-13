@@ -4,8 +4,9 @@
  *
  * From API version 67.0 a query or DML statement with no access mode runs in user mode, in
  * test classes too. A test that runs as whoever deploys or runs it therefore passes only when
- * that person was given the BarnCRM permission sets first: the org test gate does that, but a
- * check-only deploy, a subscriber org or a different administrator does not, and every such
+ * that person was given the BarnCRM permission sets first. The org test gate gives the
+ * running user none, and a check-only deploy, a subscriber org or a different administrator
+ * may not have them either, and every such
  * test fails with "fields being inaccessible", "No such column" or "You need the Manage
  * BarnCRM Settings permission". So a test that touches BarnCRM data or code runs inside
  * `System.runAs(TestUsers.admin())`, or the module's equivalent, and gets the access it needs
@@ -28,7 +29,7 @@
 @IsTest
 @NamespaceAccessible
 public class TestUsers {
-    /** The permission set the org test gate gives the running user for Core. */
+    /** The permission set an installing administrator gets for Core. */
     @NamespaceAccessible
     public static final String CORE_ADMIN = 'BarnCRM_Admin';
 
@@ -44,8 +45,8 @@ public class TestUsers {
     private static Map<String, User> usersByKey = new Map<String, User>();
 
     /**
-     * A user holding BarnCRM Admin: the access the org test gate gave the running user for
-     * Core's tests.
+     * A user holding BarnCRM Admin: the access Core's tests need, given to the test user
+     * rather than expected of whoever runs the tests.
      *
      * @return the test user, created on first use in this transaction
      */

@@ -3,9 +3,9 @@
 
 From API version 67.0 a query or DML statement with no access mode runs in user
 mode, in test classes too. A test that runs as the deploying user therefore passes
-only where that person already holds the BarnCRM permission sets: the org test
-gate assigns them, but a check-only deploy, a subscriber org or another
-administrator does not, and such a test fails there with "fields being
+only where that person already holds the BarnCRM permission sets. The org test
+gate assigns them to no one, and a check-only deploy, a subscriber org or another
+administrator may not have them, and such a test fails there with "fields being
 inaccessible", "No such column" or "You need the Manage BarnCRM Settings
 permission". A check-only deploy to a real sandbox failed 565 of 1008 Core tests
 this way.

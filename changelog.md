@@ -6,6 +6,10 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-13
 
+### Built, not merged
+
+- Test self-containment (`fix/tests-self-contained`): `run-org-tests.sh` no longer assigns BarnCRM_Admin and Giving_Admin to the running user; on `barn-core`, with both removed from that user (left removed), the full suite ran 2805 tests with 6 failures in three classes opted out as "deploying user" that read field access (`FilterValueBinderTest`, `RollupPlannerTest`, `GiftImportRowTest`), now run as `TestUsers` users and passing.
+
 ### Merged to main
 
 - Landing batch 7 (#219, squash fe05faa3): everything that was built but not merged, batches 2 to 6 (including the Rollup Builder), org test fixes, test self-containment (`TestUsers`), v0.11 hardening, security follow-ups, C-37 part 2 and the merge survivors recalculation (ADR-0092). PRs #201 to #218 closed as landed through #219. Not landed: `feature/rollup-s9-remove-vendored`; rollup S14 is unbuilt.
