@@ -10,9 +10,9 @@
  * 1. The mode-resolved tokens are not relationships. In contact mode `{Household}` happens to be
  *    `Account` on a Contact, but in junction mode it is a row on `Household_Member__c` and no
  *    single relationship path exists at all (ADR-0015). So a path holding a token is resolved by
- *    `HouseholdService`, per record, and handed to the engine as parent ids rather than as a
- *    relationship the engine walks itself. `HouseholdService` stays the only class that knows
- *    which membership mode is in use (plan Section 4.6).
+ *    `HouseholdService` (`RollupChanges` when marking targets, `RollupAggregator` when
+ *    calculating) rather than as a relationship the engine walks itself. `HouseholdService`
+ *    stays the only class that knows which membership mode is in use (plan Section 4.6).
  * 2. Everything else is a relationship the engine can walk. One reference attribute is a plain
  *    lookup; two or more are a grandparent path, which the engine expresses as a dot-separated
  *    chain ending in the attribute on the ultimate parent.
@@ -154,104 +154,5 @@ public with sharing class RollupPath {
         return referenceField.endsWith('Id') && referenceField.length() > 2
             ? referenceField.removeEnd('Id')
             : referenceField;
-    }
-
-    /**
-     * The target record ids a set of source records reaches, for every branch that needs
-     * `HouseholdService` to resolve it.
-     *
-     * The alternatives are tried in order and the first that resolves to a record wins, which is
-     * exactly what R-R1 asks for: a source record whose alternatives all resolve to nothing is not
-     * counted, so it simply contributes no id.
-     *
-     * @param parsed the path
-     * @param sourceRecords the records being aggregated
-     * @return the ids of the target records those source records reach
-     */
-    public static Map<Id, Set<Id>> resolveTargets(Parsed parsed, List<SObject> sourceRecords) {
-        Map<Id, Set<Id>> targetsBySource = new Map<Id, Set<Id>>();
-        if (parsed == null || sourceRecords == null || sourceRecords.isEmpty()) {
-            return targetsBySource;
-        }
-        for (Branch branch : parsed.branches) {
-            Map<Id, Id> personBySource = new Map<Id, Id>();
-            for (SObject source : sourceRecords) {
-                if (source.Id == null || targetsBySource.containsKey(source.Id)) {
-                    continue;
-                }
-                Id reached = walkReferencePrefix(source, branch.referencePrefix());
-                if (reached != null) {
-                    personBySource.put(source.Id, reached);
-                }
-            }
-            if (personBySource.isEmpty()) {
-                continue;
-            }
-            applyBranch(branch, personBySource, targetsBySource);
-        }
-        return targetsBySource;
-    }
-
-    /**
-     * Reads the reference attributes before the first token off one source record. Only the first
-     * hop can be read from the record in front of us; a longer prefix means the caller has queried
-     * the relationship, so the value is read through the relationship name.
-     */
-    private static Id walkReferencePrefix(SObject source, List<String> prefix) {
-        if (prefix.isEmpty()) {
-            return source.Id;
-        }
-        SObject current = source;
-        for (Integer i = 0; i < prefix.size() - 1; i++) {
-            current = current == null ? null : current.getSObject(relationshipNameFor(prefix[i]));
-        }
-        if (current == null) {
-            return null;
-        }
-        Object value = current.get(prefix[prefix.size() - 1]);
-        return value == null ? null : (Id) value;
-    }
-
-    private static void applyBranch(
-        Branch branch,
-        Map<Id, Id> personBySource,
-        Map<Id, Set<Id>> targetsBySource
-    ) {
-        String token = firstTokenOf(branch);
-        Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(
-            new Set<Id>(personBySource.values())
-        );
-        if (TOKEN_HOUSEHOLD_MEMBERS.equalsIgnoreCase(token)) {
-            Set<Id> householdIds = new Set<Id>();
-            for (Id householdId : householdByPerson.values()) {
-                if (householdId != null) {
-                    householdIds.add(householdId);
-                }
-            }
-            Map<Id, Set<Id>> membersByHousehold = HouseholdService.getMemberPersonIds(householdIds);
-            for (Id sourceId : personBySource.keySet()) {
-                Id householdId = householdByPerson.get(personBySource.get(sourceId));
-                Set<Id> members = householdId == null ? null : membersByHousehold.get(householdId);
-                if (members != null && !members.isEmpty()) {
-                    targetsBySource.put(sourceId, new Set<Id>(members));
-                }
-            }
-            return;
-        }
-        for (Id sourceId : personBySource.keySet()) {
-            Id householdId = householdByPerson.get(personBySource.get(sourceId));
-            if (householdId != null) {
-                targetsBySource.put(sourceId, new Set<Id>{ householdId });
-            }
-        }
-    }
-
-    private static String firstTokenOf(Branch branch) {
-        for (String segment : branch.segments) {
-            if (isToken(segment)) {
-                return segment;
-            }
-        }
-        return null;
     }
 }

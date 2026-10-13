@@ -106,6 +106,65 @@ public with sharing class RollupFilterParser {
         return false;
     }
 
+    /** One `equals` or `not equals` test of a text attribute, for evaluation in Apex. */
+    public class TextEquality {
+        public String field;
+        public Boolean negated;
+        public String value;
+    }
+
+    /**
+     * A document's conditions when every one is `equals` or `not equals` a text value on a text or
+     * picklist attribute of this entity and they are all joined by AND, or null for any other
+     * shape. The engine then tests target records it has already read instead of querying them
+     * again (ROLLUPS-12); anything else keeps its query.
+     */
+    public static List<TextEquality> textEqualities(
+        String filterDocument,
+        Schema.SObjectType entity
+    ) {
+        if (String.isBlank(filterDocument) || entity == null) {
+            return null;
+        }
+        List<TextEquality> equalities = new List<TextEquality>();
+        try {
+            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+                filterDocument
+            );
+            if (String.isNotBlank((String) parsed.get('logic'))) {
+                return null;
+            }
+            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+                Map<String, Object> condition = (Map<String, Object>) rawCondition;
+                String field = (String) condition.get('field');
+                String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
+                Object value = condition.get('value');
+                Schema.DisplayType type = String.isBlank(field) ||
+                    !FIELD_NAME.matcher(field).matches()
+                    ? null
+                    : typeAt(entity, field);
+                if (
+                    (operator != 'equals' &&
+                    operator != 'not equals') ||
+                    !(value instanceof String) ||
+                    String.isBlank((String) value) ||
+                    (type != Schema.DisplayType.STRING &&
+                    type != Schema.DisplayType.PICKLIST)
+                ) {
+                    return null;
+                }
+                TextEquality equality = new TextEquality();
+                equality.field = field.trim();
+                equality.negated = operator == 'not equals';
+                equality.value = (String) value;
+                equalities.add(equality);
+            }
+        } catch (Exception unreadable) {
+            return null;
+        }
+        return equalities.isEmpty() ? null : equalities;
+    }
+
     /**
      * Renders a filter document over one object with every value in a bind variable. The clause
      * is empty when the document is; the binder carries the values and the display rendering.
@@ -357,9 +416,9 @@ public with sharing class RollupFilterParser {
     }
 
     /**
-     * Numbers, booleans, dates and datetimes go in unquoted, because both the engine's query and
-     * its in-memory evaluator read them that way. Everything else is a string: it is quoted and
-     * escaped, which is the only place an administrator's typing reaches a query.
+     * Numbers, booleans, dates and datetimes go in unquoted, because the engine's query reads them
+     * that way. Everything else is a string: it is quoted and escaped, which is the only place an
+     * administrator's typing reaches a query.
      */
     private static String renderValue(Object value, Boolean datesAsText) {
         if (value == null) {

@@ -17,9 +17,8 @@
  * too little leaves a total wrong until the nightly run. So the collector marks every alternative
  * of a path, not only the one that resolves.
  *
- * Paths are resolved here, not by `RollupPath.resolveTargets`, which keys its answer by record id
- * and so cannot hold the old and the new version of one record: a soft credit moved to another
- * person used to leave the household it left unmarked.
+ * Paths are resolved here from both the old and the new version of each record, so a soft credit
+ * moved to another person marks the household it left as well as the one it joined.
  *
  * DOCUMENTED EXCEPTION to user mode reads (plan Section 4.13): a path walked beyond its first
  * reference is read in system mode and without sharing, for the reason `RollupAggregator` gives.

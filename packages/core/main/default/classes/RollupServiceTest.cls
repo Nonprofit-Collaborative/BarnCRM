@@ -202,8 +202,7 @@ private class RollupServiceTest {
                 )
             };
 
-            List<Rollup_Definition__c> forRealTime = RollupSelector.selectActiveForSource(
-                'Household_Member__c',
+            List<Rollup_Definition__c> forRealTime = RollupSelector.selectActiveForModes(
                 new Set<String>{ RollupService.MODE_REAL_TIME, RollupService.MODE_BOTH }
             );
 

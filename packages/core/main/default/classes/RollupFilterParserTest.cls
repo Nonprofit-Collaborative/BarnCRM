@@ -167,6 +167,61 @@ private class RollupFilterParserTest {
         System.Assert.isFalse(RollupFilterParser.usesRelativeDate('{not json'), 'Unreadable');
     }
 
+    /** ROLLUPS-12: the filters simple enough for the engine to test in Apex. */
+    @IsTest
+    static void textEqualitiesAreReadOnlyFromSimpleTextFilters() {
+        String both =
+            '{"version": 1, "conditions": [' +
+            '{"id": 1, "field": "Site", "operator": "equals", "value": "North"},' +
+            '{"id": 2, "field": "RecordType.DeveloperName", "operator": "Not Equals", "value": "Household"}]}';
+        List<RollupFilterParser.TextEquality> equalities = RollupFilterParser.textEqualities(
+            both,
+            Account.SObjectType
+        );
+        System.Assert.areEqual(2, equalities.size(), 'Both conditions');
+        System.Assert.areEqual('Site', equalities[0].field, 'The first field');
+        System.Assert.isFalse(equalities[0].negated, 'Equals');
+        System.Assert.areEqual('North', equalities[0].value, 'The first value');
+        System.Assert.areEqual(
+            'RecordType.DeveloperName',
+            equalities[1].field,
+            'A text field through a relationship'
+        );
+        System.Assert.isTrue(equalities[1].negated, 'Not equals, whatever its case');
+
+        String one = '{"version": 1, "conditions": [{"id": 1, "field": "Site", "operator": "equals", "value": "North"}]}';
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(
+                one.replace('"equals"', '"contains"'),
+                Account.SObjectType
+            ),
+            'Another operator is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(
+                one.replace('"Site"', '"NumberOfEmployees"').replace('"North"', '"5"'),
+                Account.SObjectType
+            ),
+            'A number field is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(one.replace('"North"', '""'), Account.SObjectType),
+            'A blank value is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities(
+                one.replace('"conditions"', '"logic": "1", "conditions"'),
+                Account.SObjectType
+            ),
+            'A logic string is queried'
+        );
+        System.Assert.isNull(
+            RollupFilterParser.textEqualities('{not json', Account.SObjectType),
+            'Unreadable'
+        );
+        System.Assert.isNull(RollupFilterParser.textEqualities(one, null), 'No entity');
+    }
+
     @IsTest
     static void relativeDatesRenderAsDateLiterals() {
         System.Assert.areEqual(

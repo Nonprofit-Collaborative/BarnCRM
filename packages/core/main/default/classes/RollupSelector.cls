@@ -102,27 +102,6 @@ public with sharing class RollupSelector {
         ];
     }
 
-    /** The active definitions whose source entity is the one that just changed. */
-    public static List<Rollup_Definition__c> selectActiveForSource(
-        String sourceObject,
-        Set<String> modes
-    ) {
-        if (String.isBlank(sourceObject) || modes == null || modes.isEmpty()) {
-            return new List<Rollup_Definition__c>();
-        }
-        List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
-        for (Rollup_Definition__c definition : selectAll()) {
-            if (
-                definition.Active__c == true &&
-                sourceObject.equalsIgnoreCase(definition.Source_Object__c) &&
-                modes.contains(definition.Mode__c)
-            ) {
-                matching.add(definition);
-            }
-        }
-        return matching;
-    }
-
     /** The active definitions whose target entity is this one, for a merge of its records. */
     public static List<Rollup_Definition__c> selectActiveForTarget(
         String targetObject,
