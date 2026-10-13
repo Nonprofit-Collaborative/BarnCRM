@@ -172,10 +172,16 @@ public with sharing class SettingsController {
     public static List<ChangeModel> getRecentChanges(Integer limitCount) {
         List<ChangeModel> changes = new List<ChangeModel>();
         try {
+            Map<String, String> labels = labelsByStoredName();
             for (Setting_Change__c record : SettingChangeSelector.getRecent(limitCount)) {
                 ChangeModel change = new ChangeModel();
                 change.id = record.Id;
-                change.settingName = record.Setting_Name__c;
+                String stored = record.Setting_Name__c == null
+                    ? ''
+                    : record.Setting_Name__c.toLowerCase();
+                change.settingName = labels.containsKey(stored)
+                    ? labels.get(stored)
+                    : record.Setting_Name__c;
                 change.oldValue = record.Old_Value__c;
                 change.newValue = record.New_Value__c;
                 change.changedBy = record.Changed_By__r == null ? null : record.Changed_By__r.Name;
@@ -187,6 +193,28 @@ public with sharing class SettingsController {
             throw asAuraException(System.Label.Core_Settings_LoadErrorMessage);
         }
         return changes;
+    }
+
+    /**
+     * Each setting's label by the name an audit row stores ("BarnCRM_Settings__c.Key__c",
+     * lower case), so Recent changes reads "Household naming pattern", not an API name
+     * (ADMIN-20). A row that names something else, such as a Health Check fix, is shown as stored.
+     */
+    private static Map<String, String> labelsByStoredName() {
+        Map<String, String> labels = new Map<String, String>();
+        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+            if (String.isBlank(definition.Setting_Key__c)) {
+                continue;
+            }
+            String settingsObject = String.isBlank(definition.Settings_Object__c)
+                ? SettingsService.CORE_SETTINGS_OBJECT
+                : definition.Settings_Object__c.trim();
+            labels.put(
+                (settingsObject + '.' + definition.Setting_Key__c.trim()).toLowerCase(),
+                definition.MasterLabel
+            );
+        }
+        return labels;
     }
 
     /**

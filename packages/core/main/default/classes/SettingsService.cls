@@ -128,7 +128,7 @@ public with sharing class SettingsService {
      */
     @NamespaceAccessible
     public static BarnCRM_Settings__c saveValues(Map<String, Object> values) {
-        applyValues(CORE_SETTINGS_OBJECT, values, true);
+        applyValues(CORE_SETTINGS_OBJECT, values, true, true);
         return getSettings();
     }
 
@@ -139,17 +139,27 @@ public with sharing class SettingsService {
      */
     @NamespaceAccessible
     public static SObject saveValues(String settingsObject, Map<String, Object> values) {
-        return applyValues(settingsObject, values, true);
+        return applyValues(settingsObject, values, true, true);
     }
 
     /**
-     * Saves one value the package itself owns, such as the setup checklist progress,
-     * which has no Setting Definition row because it is not an editable setting.
+     * Saves one value the package itself owns, such as the modules turned off, which has no
+     * Setting Definition row because it is not edited on the settings page. Audited.
      */
     @NamespaceAccessible
     public static BarnCRM_Settings__c saveSystemValue(String key, Object value) {
-        applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false);
+        applyValues(CORE_SETTINGS_OBJECT, new Map<String, Object>{ key => value }, false, true);
         return getSettings();
+    }
+
+    /**
+     * Saves the package's own bookkeeping, such as how far the setup checklist has got, in one
+     * write and with no audit row (ADMIN-20). A checklist click is not a settings change, and
+     * auditing it pushed real changes out of the Recent changes list.
+     */
+    @NamespaceAccessible
+    public static void saveBookkeeping(Map<String, Object> values) {
+        applyValues(CORE_SETTINGS_OBJECT, values, false, false);
     }
 
     /**
@@ -164,7 +174,8 @@ public with sharing class SettingsService {
     private static SObject applyValues(
         String settingsObject,
         Map<String, Object> values,
-        Boolean requireDefinition
+        Boolean requireDefinition,
+        Boolean audit
     ) {
         Schema.SObjectType type = settingsType(settingsObject);
         if (values == null || values.isEmpty()) {
@@ -195,6 +206,9 @@ public with sharing class SettingsService {
             refuseIfMembershipDataWouldBeStranded(token, oldText, newText);
             refuseIfDigestRecipientsAreNotUsers(token, newText);
             changed.put(token, newValue);
+            if (!audit) {
+                continue;
+            }
             changes.add(
                 new Setting_Change__c(
                     Setting_Name__c = objectName + '.' + localName,
@@ -205,11 +219,13 @@ public with sharing class SettingsService {
                 )
             );
         }
-        if (changes.isEmpty()) {
+        if (changed.isEmpty()) {
             return record;
         }
         SettingsWriter.saveOrgDefault(type, storedRecord, changed);
-        Database.insert(changes, AccessLevel.USER_MODE);
+        if (!changes.isEmpty()) {
+            Database.insert(changes, AccessLevel.USER_MODE);
+        }
         clearCaches();
         return orgDefault(type);
     }

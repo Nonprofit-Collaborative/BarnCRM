@@ -282,13 +282,11 @@ public with sharing class SetupAssistantService {
     }
 
     public static List<Step> markComplete(String stepKey) {
-        ensureStarted();
         return setMembership(PROGRESS_KEY, stepKey, true);
     }
 
     /** Moves a step out of the way without counting it done, so the assistant offers it again. */
     public static List<Step> markSkipped(String stepKey) {
-        ensureStarted();
         return setMembership(SKIPPED_KEY, stepKey, true);
     }
 
@@ -298,16 +296,17 @@ public with sharing class SetupAssistantService {
      * is: re-running setup revisits decisions, it does not empty the org's settings.
      */
     public static List<Step> reset() {
-        SettingsService.saveSystemValue(PROGRESS_KEY, '');
-        SettingsService.saveSystemValue(SKIPPED_KEY, '');
-        SettingsService.saveSystemValue(STARTED_KEY, null);
+        // One write, and no audit row: this is the checklist's bookkeeping (ADMIN-20).
+        SettingsService.saveBookkeeping(
+            new Map<String, Object>{ PROGRESS_KEY => '', SKIPPED_KEY => '', STARTED_KEY => null }
+        );
         return getSteps();
     }
 
     /** Records when Maria first changed something, so the completion screen can say how long setup took. */
     public static void ensureStarted() {
         if (getStartedAt() == null) {
-            SettingsService.saveSystemValue(STARTED_KEY, System.now());
+            SettingsService.saveBookkeeping(new Map<String, Object>{ STARTED_KEY => System.now() });
         }
     }
 
@@ -407,7 +406,12 @@ public with sharing class SetupAssistantService {
         if (joined.length() > PROGRESS_LENGTH) {
             joined = joined.substring(0, PROGRESS_LENGTH);
         }
-        SettingsService.saveSystemValue(settingKey, joined);
+        // The step and, on the first click, when setup started: one write, no audit row.
+        Map<String, Object> values = new Map<String, Object>{ settingKey => joined };
+        if (getStartedAt() == null) {
+            values.put(STARTED_KEY, System.now());
+        }
+        SettingsService.saveBookkeeping(values);
         return getSteps();
     }
 
