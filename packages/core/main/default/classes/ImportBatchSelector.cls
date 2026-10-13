@@ -31,8 +31,8 @@ public with sharing class ImportBatchSelector {
 
     /**
      * The most recent imports, newest first, for the results screen's history list. Bulk
-     * updates are listed on their own page (canonical model Section 29E); a batch from before
-     * Operation existed has none, and SOQL's not-equal keeps it.
+     * updates and bulk deletes are listed on their own page (canonical model Section 29E); a
+     * batch from before Operation existed has none, and is kept by the explicit null test.
      */
     @NamespaceAccessible
     public static List<Import_Batch__c> selectRecent(Integer howMany) {
@@ -40,11 +40,14 @@ public with sharing class ImportBatchSelector {
         return Database.queryWithBinds(
             'SELECT ' +
                 FIELDS +
-                ' FROM Import_Batch__c WHERE Operation__c != :bulkUpdate' +
+                ' FROM Import_Batch__c WHERE (Operation__c = NULL OR Operation__c NOT IN :notImports)' +
                 ' ORDER BY CreatedDate DESC LIMIT :limitSize',
             new Map<String, Object>{
                 'limitSize' => limitSize,
-                'bulkUpdate' => BulkUpdateService.OPERATION_UPDATE
+                'notImports' => new List<String>{
+                    BulkUpdateService.OPERATION_UPDATE,
+                    BulkDeleteService.OPERATION_DELETE
+                }
             },
             AccessLevel.USER_MODE
         );
