@@ -26,11 +26,12 @@ once:
 2. Open **BarnCRM Settings**, choose **Giving**, and check the settings on that page:
    **Default Fund**, **Default Appeal** (optional), and **Automatic Household Soft Credits**.
 
-Then give your fundraising staff the **Giving Staff** permission set, and give yourself
-**Giving Admin**. People who only need to see gifts get **Giving Read Only**.
+Then give your fundraising staff the **Fundraising Staff** role on the Access page: it
+includes the **Giving Staff** permission set. Give yourself **Giving Admin**. People who only
+need to see gifts get **Giving Read Only**.
 
-Those three are assigned in Salesforce Setup, which is the one step here that BarnCRM
-cannot yet do for you: the roles on the Access page carry what Core provides and do not
+Those two are assigned in Salesforce Setup, which is the one step here that BarnCRM cannot
+yet do for you: the BarnCRM Admin and Read Only roles carry what Core provides and do not
 include a module's permission sets. The one exception is **Giving Admin**, which the Module
 Manager gives you when you turn Giving on there.
 

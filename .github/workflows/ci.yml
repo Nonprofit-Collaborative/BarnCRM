@@ -111,6 +111,9 @@ jobs:
       - name: Check every switchable Core automation has a Flow template or a reason
         run: python3 scripts/ci/check-flow-templates.py
 
+      - name: Warn when the newest release notes have no What's New entries
+        run: python3 scripts/ci/check-whats-new.py
+
       - name: Fail on em dash characters
         run: |
           set +e

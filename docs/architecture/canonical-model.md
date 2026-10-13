@@ -649,6 +649,11 @@ found nothing moves the covered window on, and a run that could not send leaves 
 was, so no entry is counted twice or dropped. A run reads at most the newest 2,000 entries
 and says "more than 2,000" beyond that, so a flooded Error Log cannot stop the digest. A
 digest that is scheduled but has not run for two days is a Health Check warning (ADR-0055).
+**R-E6 Entries are kept for a set time.** Each run of the daily Error Log job (the digest's)
+first starts a batch that deletes every entry, whatever its Status, created more than
+`Error_Log_Retention_Days__c` days before (default 180, 0 keeps every entry). The delete is
+package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
+setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
 
 ### Salesforce implementation
 
@@ -900,6 +905,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
+| `Error_Log_Retention_Days__c` | number(4, 0) | 180 | How many days an Error Log entry is kept before the daily Error Log job deletes it (R-E6). 0 keeps every entry; otherwise 1 to 3,650. Added 2026-10-13 (owner decision, ADMIN-26). |
 
 ### v0.7 keys
 
@@ -6675,6 +6681,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Rollup Queue ready event (ADR-0100, `0100-rollup-queue-ready-event-from-queueable-jobs.md`). New platform event `Rollup_Queue_Ready__e` (no fields, Publish After Commit), subscribed by `RollupQueueReadyTrigger`; the three packaged permission sets grant Read and Create on it, as on `Error_Log_Event__e`. R-RQ3: a save inside a Queueable publishes one event per transaction and its subscriber starts the processor, so those totals stay near real time without taking the job's one chained job. |
 | post-1.0 | 2026-10-13 | Field utilization on demand (ADR-0101, `0101-field-utilization-on-demand.md`, owner decision). `BarnCRM_Settings__c` loses `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c`. Section 29F: R-FU1 (objects as Find offers them), R-FU5, R-FU7 (on demand, saved by choice, no retention job) and R-FU8 (previous saved count shown) rewritten; `Field_Utilization_Snapshot__c` unchanged. |
 | v0.6 | 2026-10-13 | Health Check on Home shows the last result (ADMIN-7, ADR-NEXT `NEXT-health-check-on-home-shows-the-last-result.md`). No object added. `BarnCRM_Settings__c` gains `Health_Check_Last_Run__c` and `Health_Check_Last_Result__c` (Section 12, Health Check keys). |
+| v0.6 | 2026-10-13 | Error Log retention (owner decision 2026-10-13, ADMIN-26). `BarnCRM_Settings__c` gains `Error_Log_Retention_Days__c` (default 180; Section 12, v0.6 keys). New rule R-E6: the daily Error Log job deletes entries older than that, whatever their status. No object added. |
 
 ---
 ## 32. Entity ownership by package

@@ -217,6 +217,10 @@ Salesforce org is needed for this job. Steps:
    has neither a Flow template (`Template_<registry name>`) nor a row on
    `docs/admin-guide/flow-templates.md` saying why it has none, or if a template ships active
    or not marked as a template (ADR-0040, ADR-0090).
+   `scripts/ci/check-whats-new.py` warns (a build annotation, not a failure) when the newest
+   version named in `docs/release-notes` has no `Release_Note` custom metadata record, so the
+   What's New card would still show an older release. Run with `--release` it fails instead;
+   the release checklist in `docs/release-notes/README.md` runs it that way.
 19. A grep check that fails the build if any tracked file contains an em dash character.
 20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.

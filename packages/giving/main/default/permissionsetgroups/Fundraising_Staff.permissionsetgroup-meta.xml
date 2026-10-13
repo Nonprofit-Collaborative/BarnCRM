@@ -2,10 +2,11 @@
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     For development and fundraising staff. Day to day work with people, households, and
-    organizations, and with giving records once the Giving module is turned on. Does not include
-    BarnCRM Settings.
+    organizations, and with giving records through Giving Staff. Does not include BarnCRM
+    Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Fundraising Staff</label>
   <permissionSets>BarnCRM_Staff</permissionSets>
+  <permissionSets>Giving_Staff</permissionSets>
 </PermissionSetGroup>
