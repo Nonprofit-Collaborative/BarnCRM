@@ -247,4 +247,15 @@ describe('c-access-manager', () => {
     const link = element.shadowRoot.querySelector('[data-id="setup-link"]');
     expect(link.href).toContain('/lightning/setup/ManageUsers/home');
   });
+
+  it('links to the automatic access guide, in a new tab, even in read-only mode', async () => {
+    const element = createComponent();
+    getAccessOverview.emit({ ...OVERVIEW, canManage: false });
+    await flush();
+
+    const link = element.shadowRoot.querySelector('[data-id="automatic-access-link"]');
+    expect(link.href).toContain('docs/admin-guide/automatic-access.md');
+    expect(link.target).toBe('_blank');
+    expect(link.textContent).toBe('c.Core_Access_AutomaticAccessLink');
+  });
 });

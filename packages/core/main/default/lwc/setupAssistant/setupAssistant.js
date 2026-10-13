@@ -32,6 +32,7 @@ import ROLE_LABEL from '@salesforce/label/c.Core_SetupAssistant_RoleLabel';
 import GIVE_ACCESS from '@salesforce/label/c.Core_SetupAssistant_GiveAccessButton';
 import ACCESS_GRANTED from '@salesforce/label/c.Core_SetupAssistant_AccessGrantedMessage';
 import CREATE_USER from '@salesforce/label/c.Core_SetupAssistant_CreateUserLink';
+import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_SetupAssistant_AutomaticAccessLink';
 import LOAD_SAMPLE from '@salesforce/label/c.Core_SetupAssistant_LoadSampleButton';
 import IMPORT_BUTTON from '@salesforce/label/c.Core_SetupAssistant_ImportButton';
 import IMPORT_MISSING from '@salesforce/label/c.Core_SetupAssistant_ImportMissingNotice';
@@ -42,6 +43,9 @@ import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionBut
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 
 const CREATE_USER_URL = '/lightning/setup/ManageUsers/home';
+// User access policies are created in Setup, not by a package (ADR-NEXT), so the step links to the guide.
+const AUTOMATIC_ACCESS_GUIDE =
+  'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/automatic-access.md';
 // The tabs the assistant opens, by page reference rather than by URL, so the links keep
 // working on the mobile app and once a namespace is assigned (Decision D-01).
 const IMPORT_TAB = 'Import';
@@ -93,6 +97,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     giveAccess: GIVE_ACCESS,
     accessGranted: ACCESS_GRANTED,
     createUser: CREATE_USER,
+    automaticAccess: AUTOMATIC_ACCESS,
     loadSample: LOAD_SAMPLE,
     importButton: IMPORT_BUTTON,
     importMissing: IMPORT_MISSING,
@@ -103,6 +108,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   };
 
   createUserUrl = CREATE_USER_URL;
+  automaticAccessUrl = AUTOMATIC_ACCESS_GUIDE;
 
   connectedCallback() {
     this.load();

@@ -103,6 +103,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-04 | [Automation control](automation-control.md) | Core | v0.1 |
 | C-05 | [Error Log](error-log.md) | Core | v0.1 |
 | C-06 | [Access](access.md) | Core (the Fundraising Staff role comes with Giving) | v0.1 |
+| Q-09 Automatic access | [automatic-access.md](automatic-access.md) | Core, with policies for Giving | Core quality pass |
 | C-01 Household model | [households.md](households.md) | Core | v0.1 |
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core | v0.1 |
 | C-07 | [Coexistence mode](coexistence-mode.md) | Core | v0.1 |

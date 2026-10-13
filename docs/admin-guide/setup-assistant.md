@@ -194,6 +194,10 @@ one. Give access to as many colleagues as you like, one at a time. The roles are
 The person has to exist as a Salesforce user first. If someone is missing from the list,
 click **Create a user in Setup**, create them there, come back, and refresh the step.
 
+If you add people often, the step's **Set up automatic access** link opens
+[Automatic access](automatic-access.md): a Salesforce user access policy, created once in
+Setup, that gives each new user with your staff profile a role without this step.
+
 **What Maria sees:** her four colleagues in the picker. She gives David the Fundraising
 Staff role and Tom the Read Only role. The step marks itself done.
 
