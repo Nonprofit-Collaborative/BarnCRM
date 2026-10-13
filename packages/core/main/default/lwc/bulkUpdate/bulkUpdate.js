@@ -63,7 +63,7 @@ function shown(value) {
  *
  * Find opens it over the query it just ran (`queryJson`). The page sends only the query document
  * and the changes: BulkUpdateController checks both as the person, from describe, and never takes
- * SOQL (canonical model R-BU1, R-BU4). Undo is on the Bulk Update tab (bulkUpdateHistory).
+ * SOQL (canonical model R-BU1, R-BU4). Undo is on the Bulk Update tab (dataJobHistory).
  */
 export default class BulkUpdate extends LightningElement {
   @api queryJson;

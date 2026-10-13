@@ -737,30 +737,6 @@
         <value>Recent imports</value>
     </labels>
     <labels>
-        <fullName>Core_Import_HistoryEmpty</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: nothing imported yet</shortDescription>
-        <value>Nothing has been imported yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_HistoryUndoUntil</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: before the undo deadline</shortDescription>
-        <value>Can be undone until</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UndoButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: the undo button</shortDescription>
-        <value>Undo</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_UndoConfirmHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -807,14 +783,6 @@
         <protected>false</protected>
         <shortDescription>Import history: the button that starts the undo</shortDescription>
         <value>Undo this import</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UndoCancelButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: leave the undo</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoStarted</fullName>

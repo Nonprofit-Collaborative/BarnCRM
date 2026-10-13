@@ -63,8 +63,8 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
    were updated, how many already held the new value and how many failed, with the reason for
    each failure. The job's run log, on the Data Job record, also says how many no longer matched
    the query.
-7. To undo it, open the **Bulk Update** tab. Find the job under **Recent bulk updates**, press
-   **Undo**, check the number, and confirm.
+7. To undo it, open the **Bulk Update** tab. Find the job under **Data jobs** (choose **Bulk
+   updates** in **Show** to list only those), press **Undo**, type the number, and confirm.
 
 ## 4. What can and cannot be changed
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Data job history: imports, bulk updates and bulk deletes in one list, newest first, with
+    each one's undo. Lists only the kinds the person may run.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Data Job History</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__AppPage">
+      <property name="kinds" type="String" label="Kinds of job" description="Comma separated: Import, Update, Delete. Blank lists every kind." />
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

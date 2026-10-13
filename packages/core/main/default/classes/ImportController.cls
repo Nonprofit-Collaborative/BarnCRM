@@ -113,6 +113,9 @@ public with sharing class ImportController {
         public Integer rejected;
         @AuraEnabled
         public String runLog;
+        /** When the run started, so the job history can list imports among other data jobs. */
+        @AuraEnabled
+        public Datetime startedAt;
         /** The end of the window in which this import can be undone (R-IB7). */
         @AuraEnabled
         public Datetime undoDeadline;
@@ -847,6 +850,7 @@ public with sharing class ImportController {
         view.matched = intOf(batch.Rows_Matched__c);
         view.rejected = intOf(batch.Rows_Rejected__c);
         view.runLog = batch.Run_Log__c;
+        view.startedAt = batch.Started_At__c;
         view.undoDeadline = batch.Undo_Deadline__c;
         view.canUndo = String.isBlank(ImportUndoService.refusal(batch));
         view.controlTotalsAgree = ImportBatchService.controlTotalsAgree(batch);
