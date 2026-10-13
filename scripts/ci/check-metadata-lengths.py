@@ -18,6 +18,7 @@ that way, was refused; duplicateReview's, 251, deployed):
 - layout action lists: no two actions with the same sort order or the same name
 - record page visibility rules: none tests a lookup field itself (the platform refuses EQUAL
   and NE on a reference field; test a field across it, such as Donor_Account__r.Name)
+- dynamic related list columns: one field per valueListItems, never several in one value
 """
 
 import glob
@@ -141,6 +142,16 @@ def check_visibility_on_lookups(problems, path):
                 )
 
 
+def check_related_list_columns(problems, path):
+    """Each related list column is its own valueListItems; one value naming several is refused."""
+    text = read(path)
+    pattern = r"<name>relatedListFieldAliases</name>\s*<valueList>(.*?)</valueList>"
+    for block in re.findall(pattern, text, re.DOTALL):
+        for value in re.findall(r"<value>(.*?)</value>", block, re.DOTALL):
+            if len(value.split()) > 1:
+                problems.append(f"{path}: related list column '{value}' names several fields")
+
+
 def main():
     problems = []
     checked = 0
@@ -152,6 +163,7 @@ def main():
 
     for path in sorted(glob.glob("packages/*/main/default/flexipages/*.flexipage-meta.xml")):
         check_visibility_on_lookups(problems, path)
+        check_related_list_columns(problems, path)
 
     for path in sorted(glob.glob(FIELDS)):
         checked += 1
