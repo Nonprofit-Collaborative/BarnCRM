@@ -219,7 +219,7 @@ public with sharing class AutomationControl {
         }
         AutomationSettingsWriter.savePausedUntil(null);
         SettingsService.clearCaches();
-        SettingsService.logChange(PAUSE_SETTING_NAME, String.valueOf(stored), '');
+        SettingsService.logChange(PAUSE_SETTING_NAME, SettingsService.asText(stored), '');
         return true;
     }
 
@@ -265,10 +265,11 @@ public with sharing class AutomationControl {
         Datetime previous = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
         AutomationSettingsWriter.savePausedUntil(until);
         SettingsService.clearCaches();
+        // asText: the one way a value is written in Recent changes (ADMIN-20).
         SettingsService.logChange(
             PAUSE_SETTING_NAME,
-            previous == null ? '' : String.valueOf(previous),
-            until == null ? '' : String.valueOf(until)
+            SettingsService.asText(previous),
+            SettingsService.asText(until)
         );
         return until;
     }

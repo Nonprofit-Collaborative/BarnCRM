@@ -427,6 +427,42 @@ private class SettingsControllerTest {
     }
 
     @IsTest
+    static void recentChangesNameASettingByItsLabel() {
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            insert new List<Setting_Change__c>{
+                new Setting_Change__c(
+                    Setting_Name__c = SettingsService.CORE_SETTINGS_OBJECT + '.' + TEXT_KEY,
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now()
+                ),
+                new Setting_Change__c(
+                    Setting_Name__c = 'Health Check: Create the missing rollups',
+                    Changed_By__c = UserInfo.getUserId(),
+                    Changed_At__c = System.now().addMinutes(-1)
+                )
+            };
+
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
+
+            Set<String> names = new Set<String>();
+            for (SettingsController.ChangeModel change : changes) {
+                names.add(change.settingName);
+            }
+            Assert.isTrue(
+                names.contains('Household name pattern'),
+                'A setting reads as its label, not its API name: ' + names
+            );
+            Assert.isTrue(
+                names.contains('Health Check: Create the missing rollups'),
+                'A row that is not a setting reads as it was stored: ' + names
+            );
+        }
+    }
+
+    @IsTest
     static void aRecordRowNamesItsObjectAndARecordTypeRowListsItsChoices() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{

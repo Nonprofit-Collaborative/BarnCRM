@@ -51,9 +51,10 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    are saved. The new value is in effect immediately: the next contact you add gets the new
    greeting, with no waiting and no cache to clear.
 6. Scroll to **Recent changes** at the bottom of the page. Your change is the first row,
-   showing the setting, the old value, the new value, your name, and the time. Nothing is
-   ever changed silently: one row is written per setting you actually changed, and saving a
-   page without changing anything writes nothing.
+   showing the setting by the name you see on this page, the old value, the new value, your
+   name, and the time. Nothing is ever changed silently: one row is written per setting you
+   actually changed, and saving a page without changing anything writes nothing. Ticking or
+   skipping a step in the setup checklist is not a settings change, so it is not listed.
 7. Now sign in as David, who has the Program Staff role and not Manage BarnCRM
    Settings. He opens the same tab and sees the same sections and the same values, with a
    notice across the top: "You can read these settings but not change them. Ask your
