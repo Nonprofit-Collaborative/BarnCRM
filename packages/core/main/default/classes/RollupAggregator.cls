@@ -69,11 +69,6 @@ public without sharing class RollupAggregator {
         public String bestId;
         public List<Listed> listed = new List<Listed>();
 
-        /** The value to write: zero for a sum or count of nothing, blank otherwise. */
-        public Object result(String aggregate) {
-            return result(aggregate, RollupPlanner.separatorFor(null));
-        }
-
         /**
          * The value to write, a text list joined by this separator (canonical model R-R15):
          * ordered, each value once for TEXT_LIST_DISTINCT, blank when nothing was listed.
@@ -522,8 +517,7 @@ public without sharing class RollupAggregator {
     }
 
     /** A value read through a dotted path such as `Gift__r.Gift_Date__c`. */
-    @TestVisible
-    private static Object valueAt(SObject row, String path) {
+    public static Object valueAt(SObject row, String path) {
         List<String> parts = path.split('\\.');
         SObject current = row;
         for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {

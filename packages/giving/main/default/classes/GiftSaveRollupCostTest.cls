@@ -190,6 +190,78 @@ private class GiftSaveRollupCostTest {
     }
 
     /**
+     * ROLLUPS-4 (ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`): in the save,
+     * a soft credit save runs only the soft credit totals, so it spends at most the marking
+     * budget plus what those definitions are planned to cost. Before, it also ran every gift
+     * and pledge total on the donor's account and contact, about 24 queries more.
+     */
+    @IsTest
+    static void aSoftCreditSaveInTheSaveRunsOnlyTheSoftCreditTotals() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact ana = ana();
+            Contact bea = bea();
+            RollupTestSupport.recalculateInTheSave();
+            bypassRollups(true);
+            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
+            insert gift;
+            Map<String, List<Rollup_Definition__c>> softCreditTotals = new Map<String, List<Rollup_Definition__c>>();
+            for (Rollup_Definition__c definition : [
+                SELECT Target_Object__c, Relationship_Path__c
+                FROM Rollup_Definition__c
+                WHERE
+                    Active__c = TRUE
+                    AND Source_Object__c = 'Soft_Credit__c'
+                    AND Mode__c != :RollupService.MODE_SCHEDULED
+            ]) {
+                if (!softCreditTotals.containsKey(definition.Target_Object__c)) {
+                    softCreditTotals.put(
+                        definition.Target_Object__c,
+                        new List<Rollup_Definition__c>()
+                    );
+                }
+                softCreditTotals.get(definition.Target_Object__c).add(definition);
+            }
+
+            Test.startTest();
+            Cost without = new Cost(
+                new Soft_Credit__c(
+                    Gift__c = gift.Id,
+                    Contact__c = bea.Id,
+                    Role__c = 'Solicitor',
+                    Amount__c = 100
+                )
+            );
+            bypassRollups(false);
+            Cost inTheSave = new Cost(
+                new Soft_Credit__c(
+                    Gift__c = gift.Id,
+                    Contact__c = bea.Id,
+                    Role__c = 'Solicitor',
+                    Amount__c = 300
+                )
+            );
+            Contact person = GivingRollupTestData.person(bea.Id);
+            Test.stopTest();
+
+            Integer rollupQueries = inTheSave.queries - without.queries;
+            Integer planned = QUEUED_QUERY_BUDGET + RollupService.plannedQueries(softCreditTotals);
+            Assert.areEqual(
+                400,
+                person.Total_Soft_Credits__c,
+                'In the save, the soft credit total counts both credits'
+            );
+            Assert.isTrue(
+                rollupQueries <= planned,
+                'A soft credit save in the save adds ' +
+                    rollupQueries +
+                    ' queries, more than the ' +
+                    planned +
+                    ' its own totals are planned to cost'
+            );
+        }
+    }
+
+    /**
      * The same gift save with the totals recalculated in the save, as before ADR-NEXT: the
      * "before" number. There is no warm-up save here, because the recalculation in the save
      * needs the room a fresh transaction has (`RollupService.canRecalculateNow`), so the

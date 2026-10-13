@@ -193,13 +193,6 @@ public with sharing class RollupEngine {
     /** Calculates one plan for records of its target entity; ran and refused go on `result`. */
     private static Computation compute(RollupPlanner.Plan plan, Set<Id> targetIds, Result result) {
         Computation computation = new Computation();
-        List<Set<Id>> admittedByDefinition = admitted(plan, targetIds);
-        Set<Id> anyAdmitted = new Set<Id>();
-        for (Set<Id> admittedIds : admittedByDefinition) {
-            anyAdmitted.addAll(admittedIds);
-        }
-        RollupAggregator.Answer answer = RollupAggregator.calculate(plan, anyAdmitted);
-
         Boolean converts = RollupCurrency.isMultiCurrency();
         Set<String> columns = new Set<String>();
         for (Schema.SObjectField field : plan.targetFields) {
@@ -208,8 +201,23 @@ public with sharing class RollupEngine {
         if (converts) {
             columns.add(RollupCurrency.ISO_FIELD);
         }
-        Map<Id, SObject> stored = RollupAggregator.stored(plan.targetType, columns, anyAdmitted);
+        // The records are read first, with what a simple target filter tests, so the filter is
+        // answered from them rather than by a query of its own (ROLLUPS-12).
+        Map<String, List<RollupFilterParser.TextEquality>> inApex = inApexFilters(plan);
+        for (List<RollupFilterParser.TextEquality> equalities : inApex.values()) {
+            for (RollupFilterParser.TextEquality equality : equalities) {
+                columns.add(equality.field);
+            }
+        }
+        Map<Id, SObject> stored = RollupAggregator.stored(plan.targetType, columns, targetIds);
         computation.stored = stored;
+
+        List<Set<Id>> admittedByDefinition = admitted(plan, targetIds, stored, inApex);
+        Set<Id> anyAdmitted = new Set<Id>();
+        for (Set<Id> admittedIds : admittedByDefinition) {
+            anyAdmitted.addAll(admittedIds);
+        }
+        RollupAggregator.Answer answer = RollupAggregator.calculate(plan, anyAdmitted);
         Map<Id, Map<Schema.SObjectField, Object>> computed = computation.computed;
         for (Integer i = 0; i < plan.definitions.size(); i++) {
             Rollup_Definition__c definition = plan.definitions[i];
@@ -257,11 +265,67 @@ public with sharing class RollupEngine {
         return computation;
     }
 
+    /** The target filters, by where clause, that are simple enough to test in Apex. */
+    private static Map<String, List<RollupFilterParser.TextEquality>> inApexFilters(
+        RollupPlanner.Plan plan
+    ) {
+        Map<String, List<RollupFilterParser.TextEquality>> inApex = new Map<String, List<RollupFilterParser.TextEquality>>();
+        for (Integer i = 0; i < plan.targetFilters.size(); i++) {
+            String targetFilter = plan.targetFilters[i];
+            if (String.isBlank(targetFilter) || inApex.containsKey(targetFilter)) {
+                continue;
+            }
+            List<RollupFilterParser.TextEquality> equalities = RollupFilterParser.textEqualities(
+                plan.definitions[i].Target_Filter_JSON__c,
+                plan.targetType
+            );
+            if (equalities != null) {
+                inApex.put(targetFilter, equalities);
+            }
+        }
+        return inApex;
+    }
+
+    /**
+     * The records that pass these tests, as SOQL would answer them: text compared without regard
+     * to case. Null when a record holds a blank where a test looks, so SOQL answers instead.
+     */
+    @TestVisible
+    private static Set<Id> passingInApex(
+        List<RollupFilterParser.TextEquality> equalities,
+        Map<Id, SObject> stored
+    ) {
+        Set<Id> passing = new Set<Id>();
+        for (SObject record : stored.values()) {
+            Boolean admits = true;
+            for (RollupFilterParser.TextEquality equality : equalities) {
+                Object value = RollupAggregator.valueAt(record, equality.field);
+                if (value == null) {
+                    return null;
+                }
+                if (String.valueOf(value).equalsIgnoreCase(equality.value) == equality.negated) {
+                    admits = false;
+                    break;
+                }
+            }
+            if (admits) {
+                passing.add(record.Id);
+            }
+        }
+        return passing;
+    }
+
     /**
      * The records each definition may write: all of them, or those its target filter admits.
-     * Definitions sharing a target filter share its query.
+     * Definitions sharing a target filter share its answer, tested in Apex on the records already
+     * read when it is simple, and queried otherwise.
      */
-    private static List<Set<Id>> admitted(RollupPlanner.Plan plan, Set<Id> targetIds) {
+    private static List<Set<Id>> admitted(
+        RollupPlanner.Plan plan,
+        Set<Id> targetIds,
+        Map<Id, SObject> stored,
+        Map<String, List<RollupFilterParser.TextEquality>> inApex
+    ) {
         Map<String, Set<Id>> passingByFilter = new Map<String, Set<Id>>();
         List<Set<Id>> result = new List<Set<Id>>();
         for (String targetFilter : plan.targetFilters) {
@@ -270,9 +334,17 @@ public with sharing class RollupEngine {
                 continue;
             }
             if (!passingByFilter.containsKey(targetFilter)) {
-                Set<Id> passing;
+                Set<Id> passing = inApex.containsKey(targetFilter)
+                    ? passingInApex(inApex.get(targetFilter), stored)
+                    : null;
                 try {
-                    passing = RollupAggregator.passing(plan.targetType, targetFilter, targetIds);
+                    if (passing == null) {
+                        passing = RollupAggregator.passing(
+                            plan.targetType,
+                            targetFilter,
+                            targetIds
+                        );
+                    }
                 } catch (Exception refused) {
                     // A target filter the org cannot query writes nothing rather than everything.
                     ErrorLogger.log(refused, 'RollupEngine.admitted');

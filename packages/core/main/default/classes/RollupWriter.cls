@@ -10,9 +10,7 @@
  * 2. `Last_Calculated__c` on a definition, and the `Rollups_Last_Calculated__c` freshness stamp on
  *    a target record. A total that was calculated is a fact about the package's own run, not an
  *    edit the running user made, and a nightly batch runs as whoever scheduled it.
- * 3. Deactivating a definition the engine has refused, so a broken rollup stops rather than fails
- *    every save.
- * 4. The totals BarnCRM's own engine calculated (`writeTotals`), with the freshness stamp in the
+ * 3. The totals BarnCRM's own engine calculated (`writeTotals`), with the freshness stamp in the
  *    same save. A total is the package's arithmetic over records, not an edit by whoever saved
  *    the gift that changed it.
  *
@@ -44,17 +42,6 @@ public without sharing class RollupWriter {
             );
         }
         Database.update(toStamp, AccessLevel.SYSTEM_MODE);
-    }
-
-    /** Turns a definition off after the engine has refused it. */
-    public static void deactivate(Id definitionId) {
-        if (definitionId == null) {
-            return;
-        }
-        Database.update(
-            new Rollup_Definition__c(Id = definitionId, Active__c = false),
-            AccessLevel.SYSTEM_MODE
-        );
     }
 
     /** What one write of totals did: the records saved, and the ones the platform refused. */
