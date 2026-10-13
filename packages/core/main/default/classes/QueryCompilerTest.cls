@@ -223,7 +223,15 @@ private class QueryCompilerTest {
                     null,
                     null
                 ),
-                'future version' => '{"version": 2, "object": "Error_Log__c", "fields": ["Name"]}'
+                'future version' => '{"version": 2, "object": "Error_Log__c", "fields": ["Name"]}',
+                // The right part with the wrong shape is refused, not a type error.
+                'sort by a bare name' => query(null, '["Context__c"]', null),
+                'object as a list' => '{"version": 1, "object": ["Error_Log__c"], "fields": ["Name"]}',
+                'conditions as names' => query(
+                    '{"version": 1, "conditions": ["Context__c"]}',
+                    null,
+                    null
+                )
             };
             for (String reason : refused.keySet()) {
                 try {

@@ -59,6 +59,15 @@ public with sharing class QueryCompiler {
         if (raw == null) {
             throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
         }
+        try {
+            return read(raw);
+        } catch (TypeException wrongShape) {
+            // A part of the right name but the wrong shape, such as "orderBy": ["Name"].
+            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+        }
+    }
+
+    private static QueryDocument read(Map<String, Object> raw) {
         Object version = raw.get('version');
         if (version != null && String.valueOf(version) != String.valueOf(SUPPORTED_VERSION)) {
             throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);

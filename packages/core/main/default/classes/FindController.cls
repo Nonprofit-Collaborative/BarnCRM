@@ -15,7 +15,8 @@ public with sharing class FindController {
     public static final String PERMISSION = 'Find_And_Export_Records';
     public static final Integer DEFAULT_EXPORT_LIMIT = 50000;
     public static final Integer MAX_EXPORT_LIMIT = 500000;
-    private static final Integer MAX_SAVED_QUERIES = 500;
+    @TestVisible
+    private static Integer maxSavedQueries = 500;
 
     /** One choice in a list. */
     public class Option {
@@ -281,29 +282,46 @@ public with sharing class FindController {
         page.exportPageSize = QueryCompiler.EXPORT_PAGE_SIZE;
         page.canBulkUpdate = BulkUpdateController.hasPermission();
         page.canBulkDelete = BulkDeleteController.hasPermission();
-        List<SavedQueryView> mine = new List<SavedQueryView>();
-        List<SavedQueryView> others = new List<SavedQueryView>();
+        // The person's own first, read on their own, so other people's shared queries never
+        // push one of theirs past the cap; others fill what is left of it.
         Id me = UserInfo.getUserId();
+        page.savedQueries = new List<SavedQueryView>();
         for (Saved_Query__c query : [
             SELECT Id, Name, Object_Name__c, Query_JSON__c, Shared__c, OwnerId, Owner.Name
             FROM Saved_Query__c
+            WHERE OwnerId = :me
             WITH USER_MODE
             ORDER BY Name
-            LIMIT :MAX_SAVED_QUERIES
+            LIMIT :maxSavedQueries
         ]) {
-            SavedQueryView view = new SavedQueryView();
-            view.recordId = query.Id;
-            view.name = query.Name;
-            view.objectName = query.Object_Name__c;
-            view.queryJson = query.Query_JSON__c;
-            view.shared = query.Shared__c;
-            view.mine = query.OwnerId == me;
-            view.ownerName = query.Owner?.Name;
-            (view.mine ? mine : others).add(view);
+            page.savedQueries.add(savedQueryView(query, true));
         }
-        page.savedQueries = new List<SavedQueryView>(mine);
-        page.savedQueries.addAll(others);
+        Integer room = maxSavedQueries - page.savedQueries.size();
+        if (room > 0) {
+            for (Saved_Query__c query : [
+                SELECT Id, Name, Object_Name__c, Query_JSON__c, Shared__c, OwnerId, Owner.Name
+                FROM Saved_Query__c
+                WHERE OwnerId != :me
+                WITH USER_MODE
+                ORDER BY Name
+                LIMIT :room
+            ]) {
+                page.savedQueries.add(savedQueryView(query, false));
+            }
+        }
         return page;
+    }
+
+    private static SavedQueryView savedQueryView(Saved_Query__c query, Boolean mine) {
+        SavedQueryView view = new SavedQueryView();
+        view.recordId = query.Id;
+        view.name = query.Name;
+        view.objectName = query.Object_Name__c;
+        view.queryJson = query.Query_JSON__c;
+        view.shared = query.Shared__c;
+        view.mine = mine;
+        view.ownerName = query.Owner?.Name;
+        return view;
     }
 
     private static Saved_Query__c requireOwn(String recordId) {

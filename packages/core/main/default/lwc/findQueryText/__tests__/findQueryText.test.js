@@ -66,6 +66,18 @@ describe('c/findQueryText', () => {
     expect(problemOf("SELECT Name FROM Account WHERE Name LIKE 'S_ith'")).toBe(PROBLEMS.LIKE);
   });
 
+  it('reads back the backslashes the shown query writes, in a value and in a LIKE', () => {
+    // As FilterValueBinder.display writes C:\temp (equals) and a\b (contains).
+    const document = parseQueryText(
+      "SELECT Name FROM Error_Log__c WHERE Context__c = 'C:\\\\temp' AND Message__c LIKE '%a\\\\\\\\b%' AND Name LIKE '%50\\% off%'"
+    );
+    expect(document.filter.conditions.map(({ operator, value }) => [operator, value])).toEqual([
+      ['equals', 'C:\\temp'],
+      ['contains', 'a\\b'],
+      ['contains', '50% off']
+    ]);
+  });
+
   it('writes AND, OR, NOT and brackets as condition logic', () => {
     const document = parseQueryText(
       "SELECT Name FROM Account WHERE City__c = 'A' AND (Type = 'Household' OR Type = null) AND NOT Name LIKE '%Test%'"
