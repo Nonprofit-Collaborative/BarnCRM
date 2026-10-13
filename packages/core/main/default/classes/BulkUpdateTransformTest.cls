@@ -285,6 +285,11 @@ private class BulkUpdateTransformTest {
             Schema.DescribeFieldResult lastName = contact.get('LastName').getDescribe();
 
             System.Assert.areEqual(1250, BulkUpdateFields.fromText(employees, '1,250'));
+            System.Assert.areEqual(
+                1250,
+                BulkUpdateFields.fromText(employees, '1,250.00'),
+                'The point is kept: not 125000'
+            );
             System.Assert.isTrue(
                 (Decimal) BulkUpdateFields.fromText(revenue, '$1,250.50') == 1250.5,
                 'Symbols and separators are dropped'
@@ -300,6 +305,7 @@ private class BulkUpdateTransformTest {
                 List<Object> refused : new List<List<Object>>{
                     new List<Object>{ birthdate, '31/12/2025' },
                     new List<Object>{ employees, 'many' },
+                    new List<Object>{ employees, '12.5' },
                     new List<Object>{ lastName, '' }
                 }
             ) {
@@ -313,6 +319,83 @@ private class BulkUpdateTransformTest {
                     System.Assert.isTrue(String.isNotBlank(expected.getMessage()));
                 }
             }
+        }
+    }
+
+    /**
+     * A stored value is read as the text `fromText` reads back, so a step that changes nothing
+     * gives the same value: run as a person whose time zone is not GMT, since a Date/Time
+     * written out in GMT and read back in local time would move by the offset.
+     */
+    @IsTest
+    static void aStoredValueRoundTripsThroughTextOutsideGmt() {
+        User pacific = TestDataFactory.createUserOnTheRunningUsersProfile(
+            'Pacific',
+            new List<String>()
+        );
+        pacific.TimeZoneSidKey = 'America/Los_Angeles';
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            update pacific;
+        }
+        Map<String, Schema.SObjectField> account = Schema.SObjectType.Account.fields.getMap();
+        Map<String, Schema.SObjectField> contact = Schema.SObjectType.Contact.fields.getMap();
+        Schema.DescribeFieldResult birthdate = contact.get('Birthdate').getDescribe();
+        Schema.DescribeFieldResult bounced = contact.get('EmailBouncedDate').getDescribe();
+        Schema.DescribeFieldResult revenue = account.get('AnnualRevenue').getDescribe();
+        Schema.DescribeFieldResult employees = account.get('NumberOfEmployees').getDescribe();
+        Date day = Date.newInstance(2025, 12, 31);
+        Datetime moment = Datetime.newInstanceGmt(2025, 12, 31, 9, 30, 15);
+
+        System.runAs(pacific) {
+            System.Assert.areEqual('2025-12-31', BulkUpdateFields.toText(birthdate, day));
+            System.Assert.areEqual(
+                day,
+                BulkUpdateFields.fromText(birthdate, BulkUpdateFields.toText(birthdate, day)),
+                'A date comes back as itself'
+            );
+            System.Assert.areEqual(
+                moment,
+                BulkUpdateFields.fromText(bounced, BulkUpdateFields.toText(bounced, moment)),
+                'A date and time comes back as the same moment'
+            );
+            System.Assert.areEqual(
+                '10000000.5',
+                BulkUpdateFields.toText(revenue, Decimal.valueOf('10000000.5')),
+                'A number without exponent'
+            );
+            System.Assert.areEqual(
+                12,
+                BulkUpdateFields.fromText(employees, BulkUpdateFields.toText(employees, 12))
+            );
+            System.Assert.isNull(BulkUpdateFields.toText(birthdate, null), 'Null stays null');
+        }
+    }
+
+    @IsTest
+    static void aStepThatChangesNothingLeavesTwoHundredBirthdatesAlone() {
+        System.runAs(TestUsers.admin()) {
+            List<Contact> people = makeVolunteers(200);
+            for (Contact person : people) {
+                person.Birthdate = Date.newInstance(1980, 6, 15);
+            }
+            update people;
+
+            Import_Batch__c job = run(
+                transform(
+                    'Birthdate',
+                    new List<Map<String, Object>>{ step(DataTransform.OP_TRIM) }
+                ),
+                200
+            );
+
+            System.Assert.areEqual(0, job.Rows_Rejected__c, job.Run_Log__c);
+            System.Assert.areEqual(0, job.Rows_Updated__c, 'Nothing changed');
+            System.Assert.areEqual(200, job.Rows_Matched__c, 'Each counted as unchanged');
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE Birthdate = 1980-06-15],
+                'Every birthdate kept'
+            );
         }
     }
 }

@@ -84,16 +84,23 @@ public with sharing class ImportUndoService {
             return view;
         }
         countTagged(batch.Id, view);
-        view.updates = ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT);
         // A bulk update journals a Failed entry for each record it could not save, which has
-        // nothing to put back, so its count is the records it saved (R-BU5). A job the platform
-        // stopped before its finish counted them keeps the journal's count.
-        if (
-            BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c) &&
-            batch.Rows_Updated__c != null &&
-            batch.Rows_Updated__c > 0
-        ) {
-            view.updates = batch.Rows_Updated__c.intValue();
+        // nothing to put back, so its count is the records it saved (R-BU5). A job aborted or
+        // stopped before its finish counted them is counted from its Updated entries.
+        if (BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)) {
+            view.updates = batch.Rows_Updated__c != null &&
+                batch.Rows_Updated__c > 0
+                ? batch.Rows_Updated__c.intValue()
+                : ImportJournalService.actionCount(
+                      batch.Id,
+                      ImportJournalService.PHASE_COMMIT,
+                      ImportJournalService.ACTION_UPDATED
+                  );
+        } else {
+            view.updates = ImportJournalService.entryCount(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT
+            );
         }
         if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
             view.reason = Label.Core_Import_UndoErrorNothingToUndo;

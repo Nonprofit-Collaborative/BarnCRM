@@ -234,6 +234,27 @@ public with sharing class ImportJournalService {
         return total == null ? 0 : ((Decimal) total).intValue();
     }
 
+    /**
+     * How many entries of one action one phase of a batch holds, read from the pages (at most
+     * 200 of them): what a job whose finish never counted its rows did, for example the records
+     * an aborted bulk update saved, leaving out the ones it journaled as Failed.
+     */
+    @NamespaceAccessible
+    public static Integer actionCount(Id batchId, String phase, String action) {
+        Integer total = 0;
+        if (batchId == null) {
+            return total;
+        }
+        for (Import_Journal__c page : pages(batchId, phase, 200)) {
+            for (Map<String, Object> entry : entries(page)) {
+                if (action != null && action.equals(entry.get('action'))) {
+                    total++;
+                }
+            }
+        }
+        return total;
+    }
+
     /** The pages of one phase of a batch, in the order they were written. */
     @NamespaceAccessible
     public static List<Import_Journal__c> pages(Id batchId, String phase, Integer howMany) {

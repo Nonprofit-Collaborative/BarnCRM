@@ -65,6 +65,9 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
   the detail records of a master-detail relationship (for example, every line of a record that
   owns its lines), and a few standard ones (deleting an account deletes its contacts). The
   preview lists these kinds of record. The undo brings them back with their parent.
+- **Emptied households can go too.** With **Delete empty households** on, deleting the last
+  people in a household also deletes the household. The undo brings that household back first,
+  so the people return into it.
 - **Objects BarnCRM keeps itself** cannot be bulk deleted: imports and their journal, import
   templates, the error log, settings and setting changes, automation settings, rollup
   definitions, duplicate dismissals, saved queries, household membership rows (use the
@@ -91,6 +94,9 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
   Bin (after 15 days, by somebody emptying it, or because the bin was full) is gone for good;
   the undo counts these in the job's run log. A record somebody already restored is left as it
   is.
+- **The job was stopped part way.** A job stopped in Setup, or by Salesforce, deleted the
+  records of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** still
+  offers to bring back exactly those records.
 
 ## Field reference
 

@@ -54,12 +54,12 @@ public with sharing class BulkUpdateService {
                 for (Schema.DescribeFieldResult other : otherFields) {
                     others.put(
                         DataTransform.key(other.getName()),
-                        text(record.get(other.getName()))
+                        BulkUpdateFields.toText(other, record.get(other.getName()))
                     );
                 }
                 String result = DataTransform.apply(
                     steps,
-                    text(record.get(target.getName())),
+                    BulkUpdateFields.toText(target, record.get(target.getName())),
                     others
                 );
                 return BulkUpdateFields.fromText(target, result);
@@ -328,11 +328,6 @@ public with sharing class BulkUpdateService {
             }
         }
         return change;
-    }
-
-    /** A stored value as the text a transform step reads; null stays null. */
-    public static String text(Object value) {
-        return value == null ? null : String.valueOf(value);
     }
 
     // -------------------------------------------------------------------------------------

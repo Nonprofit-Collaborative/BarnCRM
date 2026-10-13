@@ -298,6 +298,31 @@ public with sharing class BulkUpdateFields {
         }
     }
 
+    /**
+     * A stored value as the text a transform step reads, in the form `fromText` reads back, so
+     * a step that changes nothing gives the same value back: a date as `yyyy-MM-dd`, a date and
+     * time as `yyyy-MM-dd HH:mm:ss` in the person's own time zone (which `Datetime.valueOf`
+     * reads), and a number without exponent. Decided by the field's type, never by
+     * `instanceof`, because in Apex a Date is also an instance of Datetime. Null stays null.
+     */
+    public static String toText(Schema.DescribeFieldResult field, Object value) {
+        if (value == null) {
+            return null;
+        }
+        Schema.DisplayType kind = field == null ? null : field.getType();
+        if (kind == Schema.DisplayType.DATE) {
+            Date day = (Date) value;
+            return String.valueOf(day);
+        }
+        if (kind == Schema.DisplayType.DATETIME) {
+            return ((Datetime) value).format('yyyy-MM-dd HH:mm:ss');
+        }
+        if (NUMBERS.contains(kind) && value instanceof Decimal) {
+            return ((Decimal) value).toPlainString();
+        }
+        return String.valueOf(value);
+    }
+
     /** Whether a target may be changed with transform steps: any writable type but a lookup (R-BU7). */
     public static Boolean canTransform(Schema.DescribeFieldResult field) {
         return WRITABLE.contains(field.getType()) &&
@@ -339,7 +364,12 @@ public with sharing class BulkUpdateFields {
         try {
             switch on kind {
                 when INTEGER {
-                    return Integer.valueOf(text.replaceAll('[^0-9\\-]', ''));
+                    // The point is kept, so "1,250.00" is 1250 and "12.5" is refused, not 125.
+                    Decimal whole = Decimal.valueOf(text.replaceAll('[^0-9\\.\\-]', ''));
+                    if (whole.stripTrailingZeros().scale() > 0) {
+                        throw refused;
+                    }
+                    return whole.intValue();
                 }
                 when DOUBLE, CURRENCY, PERCENT {
                     return Decimal.valueOf(text.replaceAll('[^0-9\\.\\-]', ''));

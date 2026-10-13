@@ -204,6 +204,13 @@ public with sharing class BulkDeleteController {
         view.running = ImportBatchService.STATUS_COMMITTING.equals(view.status);
         view.canUndo = String.isBlank(ImportUndoService.refusal(job)) && view.deleted > 0;
         view.recordsToUndo = view.deleted;
+        // A job aborted, or stopped before its finish counted, deleted records it never
+        // counted: the undo's own count (from the journal) is the number to confirm.
+        if (view.deleted == 0 && String.isBlank(ImportUndoService.refusal(job))) {
+            BulkDeleteService.UndoPreview undoPreview = BulkDeleteService.undoPreview(job.Id);
+            view.canUndo = undoPreview.allowed;
+            view.recordsToUndo = undoPreview.records;
+        }
         if (detail && view.running && String.isNotBlank(job.Job_Id__c)) {
             Id asyncJobId = job.Job_Id__c;
             for (AsyncApexJob progress : [
