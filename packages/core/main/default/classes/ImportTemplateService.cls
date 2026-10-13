@@ -148,6 +148,9 @@ public with sharing class ImportTemplateService {
         public String lookupNotFound;
         @NamespaceAccessible
         public String severalMatches;
+        /** The related records each row also creates, `Object.Field`, or blank (R-IT17). */
+        @NamespaceAccessible
+        public String related;
     }
 
     /**
@@ -198,8 +201,52 @@ public with sharing class ImportTemplateService {
             ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
             : ImportObjectSchema.LOOKUP_REJECT;
         template.Several_Matches__c = normalizedSeveralMatches(given.severalMatches);
+        setRelated(template, type, given.related);
         Database.update(template, AccessLevel.USER_MODE);
         return template;
+    }
+
+    /**
+     * Sets the related records a one-object template creates (R-IT17) from `Object.Field`, or
+     * clears them when blank. Refused, with the reason, under Insert, which has no parent key,
+     * and for an object a load may not create or a field that does not point at the object.
+     */
+    private static void setRelated(
+        Import_Template__c template,
+        Schema.SObjectType type,
+        String chosen
+    ) {
+        template.Related_Object__c = null;
+        template.Related_Parent_Field__c = null;
+        if (String.isBlank(chosen)) {
+            return;
+        }
+        if (template.Load_Operation__c == ImportObjectSchema.OPERATION_INSERT) {
+            throw new ImportException(Label.Core_Import_ErrorRelatedNeedsKey);
+        }
+        Schema.SObjectType related = ImportObjectSchema.typeNamed(chosen.substringBefore('.'));
+        String refused = ImportObjectSchema.insertRefusal(related);
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        String field = ImportObjectSchema.relatedParentField(
+            type,
+            related,
+            chosen.substringAfter('.')
+        );
+        if (field == null) {
+            throw new ImportException(
+                String.format(
+                    Label.Core_Import_ErrorRelatedFieldUnusable,
+                    new List<String>{
+                        related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
+                        type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
+                    }
+                )
+            );
+        }
+        template.Related_Object__c = related.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        template.Related_Parent_Field__c = field;
     }
 
     /** A chosen matching field as describe names it, or null for none; refused when not offered. */
