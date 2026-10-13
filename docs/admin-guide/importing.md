@@ -23,6 +23,11 @@ Nothing to turn on. The **Import** tab is in the BarnCRM app for anyone with the
 **Manage BarnCRM Settings** permission. If you do not see the tab, ask whoever set up
 your org to give you the BarnCRM Admin role on the **Access** page.
 
+Every import, bulk update ([Bulk update](bulk-update.md)) and bulk delete
+([Bulk delete](bulk-delete.md)) is saved as one **Data Job** record, with its counts, run log
+and undo deadline. In reports and list views look for **Data Jobs**; the object's API name,
+`Import_Batch__c`, has not changed.
+
 A few things are worth knowing before your first large file:
 
 1. Open **BarnCRM Settings** and choose **Import**.
@@ -570,20 +575,20 @@ For building a report on your imports.
 
 | What you want | Object | Field |
 |---|---|---|
-| One upload and its counts | Import Batch | Row Count, Rows Created, Rows Updated, Rows Matched, Rows Rejected |
-| Why an import failed as a whole | Import Batch | Run Log |
+| One upload and its counts | Data Job | Row Count, Rows Created, Rows Updated, Rows Matched, Rows Rejected |
+| Why an import failed as a whole | Data Job | Run Log |
 | One row of the file | Import Row | Row Number, Status, Error Message |
 | Rows that matched more than one record | Import Row | Several Matches |
 | How a mapping matches rows | Import Template | Person Matching Rule, Person Match Field, Organization Matching Rule, Organization Match Field, Several Matches, Use Duplicate Rules |
 | Rows your duplicate rules matched | Import Row | Matched By Duplicate Rule |
 | How a mapping changes values as they load | Import Template | Column Mapping (each column's changes) |
-| The values given to every row of a file | Import Batch | File Values |
-| Whether a file only matched existing records | Import Batch | Match Only |
+| The values given to every row of a file | Data Job | File Values |
+| Whether a file only matched existing records | Data Job | Match Only |
 | The records a row resolved to | Import Row | Household, Contact 1, Contact 2, Organization, Resulting Record, Second Resulting Record |
-| The control totals of a file | Import Batch | Expected Count (and, with Giving, Expected Amount, File Amount) |
+| The control totals of a file | Data Job | Expected Count (and, with Giving, Expected Amount, File Amount) |
 | The import a record came from | Account, Contact (and Gift, with Giving) | Created By Import Batch |
 | Which mappings are for a recurring file, and when each was last used | Import Template | Is Recurring, Source Name, Last Import Date |
-| When an import can be undone until | Import Batch | Undo Deadline |
+| When an import can be undone until | Data Job | Undo Deadline |
 | What an import changed on existing records, and what an undo kept | Import Journal | Phase, Entry Count, Entries |
 | The records an import that loaded one object created | Import Journal (Phase Created), Import Row | Entries; Resulting Record |
 | What a mapping that loads one object loads, and how | Import Template | Target Object, Load Operation, Load Match Field, Lookup Not Found |
