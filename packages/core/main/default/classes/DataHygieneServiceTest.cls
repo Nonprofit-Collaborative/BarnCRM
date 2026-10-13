@@ -408,6 +408,106 @@ private class DataHygieneServiceTest {
     }
 
     @IsTest
+    static void countsTwoHundredPeopleNobodyCanReachButNotTheReachableOrTheDeceased() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Silent');
+            Contact emailed = HouseholdTestDataFactory.newContact('Em', 'Mailed');
+            emailed.Email = 'em.mailed@example.org';
+            Contact phoned = HouseholdTestDataFactory.newContact('Ph', 'Oned');
+            phoned.MobilePhone = '555 0100';
+            Contact posted = HouseholdTestDataFactory.newContact('Po', 'Sted');
+            posted.MailingPostalCode = '02139';
+            Contact deceased = HouseholdTestDataFactory.newContact('De', 'Ceased');
+            deceased.Deceased__c = true;
+            people.addAll(new List<Contact>{ emailed, phoned, posted, deceased });
+            insertWithoutAutomaticHouseholds(people);
+            User maria = maria();
+
+            Test.startTest();
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.PEOPLE_UNREACHABLE
+            );
+            Integer listed = findRows(maria, DataHygieneService.PEOPLE_UNREACHABLE);
+            Test.stopTest();
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(200, result.count, 'Only the 200 with no way to reach them.');
+            Assert.isTrue(result.canOpenInFind, 'It opens in Find.');
+            Assert.areEqual(200, listed, 'Find lists exactly what was counted.');
+        }
+    }
+
+    @IsTest
+    static void countsTwoHundredDeceasedPeopleWhoCanStillBeEmailed() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Late');
+            for (Integer index = 0; index < people.size(); index++) {
+                people[index].Deceased__c = true;
+                people[index].Email = 'late' + index + '@example.org';
+            }
+            Contact optedOut = HouseholdTestDataFactory.newContact('Op', 'Out');
+            optedOut.Deceased__c = true;
+            optedOut.Email = 'op.out@example.org';
+            optedOut.HasOptedOutOfEmail = true;
+            Contact living = HouseholdTestDataFactory.newContact('Li', 'Ving');
+            living.Email = 'li.ving@example.org';
+            people.addAll(new List<Contact>{ optedOut, living });
+            insertWithoutAutomaticHouseholds(people);
+            User maria = maria();
+
+            Test.startTest();
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.DECEASED_STILL_EMAILED
+            );
+            Integer listed = findRows(maria, DataHygieneService.DECEASED_STILL_EMAILED);
+            Test.stopTest();
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(200, result.count, 'Not the opted out, not the living.');
+            Assert.areEqual(200, listed, 'Find lists exactly what was counted.');
+        }
+    }
+
+    @IsTest
+    static void peopleNotChangedReadTheirYearsFromSettingsWithinBounds() {
+        System.runAs(TestUsers.admin()) {
+            mode(HouseholdTestDataFactory.MODE_CONTACT);
+            Assert.areEqual(
+                DataHygieneService.DEFAULT_STALE_YEARS,
+                DataHygieneService.staleYears(),
+                'Empty reads as the default.'
+            );
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Stale_Record_Years__c = 50;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(20, DataHygieneService.staleYears(), 'Above the maximum reads as 20.');
+            settings.Stale_Record_Years__c = 0;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(1, DataHygieneService.staleYears(), 'Below the minimum reads as 1.');
+            settings.Stale_Record_Years__c = 3;
+            HouseholdTestDataFactory.save(settings);
+            insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(200, 'Fresh'));
+            User maria = maria();
+
+            Test.startTest();
+            DataHygieneService.CheckResult result = runAs(
+                maria,
+                DataHygieneService.PEOPLE_NOT_UPDATED
+            );
+            Test.stopTest();
+
+            Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
+            Assert.areEqual(0, result.count, 'People changed today are not listed.');
+            Assert.isTrue(result.title.contains('3'), 'The title names the years: ' + result.title);
+            Assert.isTrue(result.canOpenInFind, 'It opens in Find.');
+        }
+    }
+
+    @IsTest
     static void anUnknownCheckIsRefused() {
         System.runAs(TestUsers.admin()) {
             try {

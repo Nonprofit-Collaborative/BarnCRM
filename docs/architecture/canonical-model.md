@@ -925,6 +925,16 @@ None. ADR-0086 added three (`Field_Utilization_Objects__c`, `Field_Utilization_L
 `Field_Utilization_Last_Run_Summary__c`); ADR-NEXT `NEXT-field-utilization-on-demand.md`
 removed them when the count moved to Org Optimizer and runs on demand (Section 29F).
 
+### Org Optimizer keys
+
+Added by Org Optimizer (ADR-NEXT `NEXT-org-optimizer-and-data-manager-pages.md`). Shown in
+the console's General section. Each number has a minimum and a maximum (D-40); a value out of
+range reads as the nearest end.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Stale_Record_Years__c` | integer | 5 | Years without a change before the Data quality check People not changed lists a person (R-SQ6). From 1 to 20; empty reads as 5. |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -6038,6 +6048,10 @@ and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved 
 the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
 own saved query of that name if there is one. Nothing else about Saved Query changes
 (ADR-0079, `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+Three person checks read standard Contact fields: no email, phone, mobile, mailing city or
+postal code on a living person; Deceased with an email and Email Opt Out not ticked; and
+Last Modified Date older than `Stale_Record_Years__c` years, the cut-off written into the
+document when it is built.
 
 **R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
 in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists

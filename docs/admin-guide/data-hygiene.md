@@ -20,6 +20,9 @@ export them, or change them.
 | **Addresses that belong to nobody** | Address records whose household, organization or person was deleted. |
 | **Default addresses with parts missing** | The address each household, organization or person is mailed at, missing a street, a city or a postal code. |
 | **Default addresses that failed verification** | The address each one is mailed at, marked **Failed** by an address verification app. |
+| **People with no way to reach them** | Living people with no email, phone, mobile or mailing address. |
+| **Deceased people who can still be emailed** | People marked Deceased who have an email and are not opted out of email. |
+| **People not changed in 5 years** | People nobody has changed for the number of years you set (5 unless you change it). |
 
 Data hygiene never changes a record. The counts, like everything in Find, are read with your
 own access: a record you cannot open is not counted, and a check whose object or field you
@@ -34,14 +37,16 @@ cannot see says so instead of showing a number.
    and choose **Data quality**. The checks run as the section opens.
 3. Press **Recount** whenever you want fresh numbers. Nothing is saved between visits.
 
-There is nothing to configure.
+There is one setting: **Years before a person is not changed**, under **General** in
+**BarnCRM Settings**. It is 5 unless you change it, and accepts 1 to 20; anything outside that
+is read as the nearest end. The check's name shows the number in use.
 
 ## 3. A five-minute walkthrough (as Maria)
 
 Maria's organization loaded 3,000 people from a spreadsheet last month, with automation
 paused for the load. She wants to know what the load left behind.
 
-1. Maria opens the **Org Optimizer** tab and chooses **Data quality**. Six checks are listed, each with a number. **People
+1. Maria opens the **Org Optimizer** tab and chooses **Data quality**. Nine checks are listed, each with a number. **People
    with no household** says **214**. **Default addresses with parts missing** says **38**. The
    others say **0**.
 2. Next to **People with no household** she presses **Open in Find**. The Find tab opens. Under
@@ -66,6 +71,9 @@ paused for the load. She wants to know what the load left behind.
 | **Addresses that belong to nobody** | Address records with no household, organization or person: the record they belonged to was deleted. | They are kept on purpose (an address is history), but nobody will ever see them from a record page. | Delete them, or set an owner if the address should be kept. |
 | **Default addresses with parts missing** | Default addresses (the one copied to the standard address fields) with no street, no city, or no postal code. | A letter to that address will not arrive. | Fill in the missing part on the address card. Only the default address is checked: older addresses are the record of where mail went, and are left as they are. |
 | **Default addresses that failed verification** | Default addresses whose **Verification Status** is **Failed**. BarnCRM never sets this field; an address verification app does. | The verification app could not confirm the address. | Check the address with the person, then correct it. Without a verification app this check always says 0. |
+| **People with no way to reach them** | Contacts (people) not marked **Deceased** with no **Email**, **Phone** or **Mobile**, and no **Mailing City** or **Mailing Postal Code**. The mailing fields are where the default address is copied. | Nothing you send reaches them, and they still count in your totals. | Find a way to reach them, or decide whether to keep them. Another email field (personal, work) is not looked at. |
+| **Deceased people who can still be emailed** | People marked **Deceased** who have an **Email** and do not have **Email Opt Out** ticked. | A message to someone who has died hurts the family and your organization. | Tick **Email Opt Out** (Bulk update can do it from the Find query). |
+| **People not changed in N years** | People whose **Last Modified Date** is older than the years in **Years before a person is not changed** (5 unless set). | Old records nobody looks at may be out of date, or may be candidates for archiving. | Review them in Find. Nothing is archived or deleted for you. |
 
 **Open in Find** is not offered for **People with no household** in an org that uses
 membership records. Find cannot yet ask "has no current membership", which is a question about
@@ -122,6 +130,11 @@ saving the household again puts it right.
   other records may still name it. Merge it into the right household instead of deleting it.
 
 ## 8. What Data hygiene does not do (yet)
+
+Checking that an email address is well formed is left to Salesforce: an Email field refuses
+an address that is not one. Checking that a household's **Member Count** is up to date needs
+the members counted again, which a query cannot do; saving the household puts it right (see
+section 6).
 
 Checking whether a household's name still matches the naming rule needs every name worked out
 again, which is not a question a query can ask; it is not offered. Checks on related records
