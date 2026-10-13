@@ -148,18 +148,24 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
             String.valueOf(written),
             String.valueOf(failedChunks)
         };
-        if (failedChunks > 0) {
-            ErrorLogger.logMessage(
-                String.format(Label.Core_Duplicates_ScanFinishedWithFailures, values),
-                LOG_CONTEXT,
-                ErrorLogger.SEVERITY_WARNING
-            );
-        } else {
-            ErrorLogger.logMessage(
-                String.format(Label.Core_Duplicates_ScanFinished, values),
-                LOG_CONTEXT,
-                ErrorLogger.SEVERITY_INFO
-            );
-        }
+        String summary = String.format(
+            failedChunks > 0
+                ? Label.Core_Duplicates_ScanFinishedWithFailures
+                : Label.Core_Duplicates_ScanFinished,
+            values
+        );
+        ErrorLogger.logMessage(
+            summary,
+            LOG_CONTEXT,
+            failedChunks > 0 ? ErrorLogger.SEVERITY_WARNING : ErrorLogger.SEVERITY_INFO
+        );
+        // The scan only ever starts from the Duplicates panel, as the person who runs it.
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            Label.Core_JobNotice_DuplicateScan,
+            false,
+            summary,
+            JobNotifier.SECTION_HOUSEHOLDS
+        );
     }
 }

@@ -190,6 +190,21 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                 ? ImportBatchService.STATUS_UNDO_FAILED
                 : ImportBatchService.STATUS_UNDONE;
             Database.update(job, AccessLevel.SYSTEM_MODE);
+            JobNotifier.aboutRecord(
+                UserInfo.getUserId(),
+                System.Label.Core_JobNotice_BulkDeleteUndo,
+                failed,
+                String.format(
+                    System.Label.Core_JobNotice_BulkDeleteUndoBody,
+                    new List<Object>{
+                        restored.format(),
+                        purged.format(),
+                        alreadyBack.format(),
+                        refused.format()
+                    }
+                ),
+                jobId
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkDeleteUndoBatch.finish', jobId);
         }

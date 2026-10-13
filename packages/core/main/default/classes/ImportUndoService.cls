@@ -186,7 +186,7 @@ public with sharing class ImportUndoService {
             left.total = Math.max(left.total - (createdGone == null ? 0 : createdGone), 0);
             Integer counted = countedAtStart == null ? 0 : countedAtStart;
             Import_Batch__c batch = [
-                SELECT Id, Run_Log__c
+                SELECT Id, Run_Log__c, Operation__c
                 FROM Import_Batch__c
                 WHERE Id = :batchId
                 WITH SYSTEM_MODE
@@ -210,6 +210,22 @@ public with sharing class ImportUndoService {
                 ? ImportBatchService.STATUS_UNDO_FAILED
                 : ImportBatchService.STATUS_UNDONE;
             Database.update(batch, AccessLevel.SYSTEM_MODE);
+            JobNotifier.aboutRecord(
+                UserInfo.getUserId(),
+                BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
+                    ? Label.Core_JobNotice_BulkUpdateUndo
+                    : Label.Core_JobNotice_ImportUndo,
+                failed == true,
+                String.format(
+                    Label.Core_JobNotice_ImportUndoBody,
+                    new List<Object>{
+                        Math.max(counted - left.total, 0).format(),
+                        left.total.format(),
+                        (restored == null ? 0 : restored).format()
+                    }
+                ),
+                batchId
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, 'ImportUndoService.finish', batchId);
         }

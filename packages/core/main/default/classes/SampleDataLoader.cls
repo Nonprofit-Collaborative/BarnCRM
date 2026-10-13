@@ -112,6 +112,46 @@ public with sharing class SampleDataLoader {
     }
 
     /**
+     * Tells the person who loaded the sample data that the whole load, every module's included,
+     * is in, with Core's counts (Q-04). Called once, when no module is left to start.
+     */
+    public static void notifyLoadFinished() {
+        String body;
+        try {
+            SampleDataSelector selector = new SampleDataSelector();
+            body = String.format(
+                Label.Core_JobNotice_SampleDataBody,
+                new List<Object>{
+                    selector.countSampleHouseholds().format(),
+                    selector.countSampleContacts().format(),
+                    selector.countSampleOrganizations().format()
+                }
+            );
+        } catch (Exception notCounted) {
+            // The counts are a courtesy: a load that is in must never be undone by counting it.
+            ErrorLogger.log(notCounted, JobNotifier.LOG_CONTEXT);
+        }
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            Label.Core_JobNotice_SampleData,
+            false,
+            body,
+            JobNotifier.SECTION_GENERAL
+        );
+    }
+
+    /** Tells the person who loaded the sample data that a stage of the load stopped (Q-04). */
+    public static void notifyLoadStopped() {
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            Label.Core_JobNotice_SampleData,
+            true,
+            Label.Core_JobNotice_SampleDataStoppedBody,
+            JobNotifier.SECTION_GENERAL
+        );
+    }
+
+    /**
      * Whether a stage of the load may queue the next one. The platform refuses a queueable
      * that queues another inside an Apex test (it throws "Maximum stack depth has been
      * reached"), so there the chain stops after the job the test started, and each stage is

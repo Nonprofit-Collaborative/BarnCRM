@@ -29,10 +29,25 @@ public with sharing class HouseholdNamingBatch implements Database.Batchable<SOb
         householdsChanged += HouseholdNamingService.applyNaming(eligible);
     }
 
+    /**
+     * The counts stay on the job (read, rewritten, and left alone because the household is a
+     * native Nonprofit Cloud one) so that the settings page can report what happened, and the
+     * person who started the recompute is told (Q-04).
+     */
     public void finish(Database.BatchableContext context) {
-        // Counts stay on the job (read, rewritten, and left alone because the household is a
-        // native Nonprofit Cloud one) so that the settings page can report what happened;
-        // there is nothing further to do once the batch is done.
-        return;
+        JobNotifier.aboutSettings(
+            UserInfo.getUserId(),
+            System.Label.Core_JobNotice_HouseholdNaming,
+            false,
+            String.format(
+                System.Label.Core_JobNotice_HouseholdNamingBody,
+                new List<Object>{
+                    householdsRead.format(),
+                    householdsChanged.format(),
+                    householdsSkippedNative.format()
+                }
+            ),
+            JobNotifier.SECTION_HOUSEHOLDS
+        );
     }
 }

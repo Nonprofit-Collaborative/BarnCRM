@@ -613,6 +613,21 @@ public with sharing class ImportBatchService {
         if (failed != true && dryRun != true) {
             ImportTemplateService.recordImport(batch.Import_Template__c, Date.today());
         }
+        JobNotifier.aboutRecord(
+            UserInfo.getUserId(),
+            dryRun == true ? Label.Core_JobNotice_ImportPreview : Label.Core_JobNotice_Import,
+            failed == true,
+            String.format(
+                Label.Core_JobNotice_ImportBody,
+                new List<Object>{
+                    batch.Rows_Created__c.format(),
+                    batch.Rows_Updated__c.format(),
+                    batch.Rows_Matched__c.format(),
+                    batch.Rows_Rejected__c.format()
+                }
+            ),
+            batch.Id
+        );
         return batch;
     }
 

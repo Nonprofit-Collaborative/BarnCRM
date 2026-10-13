@@ -89,12 +89,14 @@ public with sharing class SampleDataModules {
         return counts;
     }
 
+    /** Starts the module at this place in the load order, or ends the load when none is left. */
     private static void start(Integer index) {
         List<SampleDataModule> modules = installed();
         if (index >= modules.size()) {
             // The load has ended. The engine queued the totals of the people and gifts it saved
             // without taking the chain's one job (R-RQ3), so they are calculated now.
             RollupService.startQueuedRecalculation();
+            SampleDataLoader.notifyLoadFinished();
             return;
         }
         if (index < 0) {
