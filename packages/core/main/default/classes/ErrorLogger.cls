@@ -63,7 +63,7 @@ public with sharing class ErrorLogger {
                 }
                 entries.add(
                     buildEntry(
-                        friendlyMessage(failure),
+                        friendlyMessage(context),
                         technicalDetail(failure),
                         context,
                         SEVERITY_ERROR,
@@ -166,12 +166,19 @@ public with sharing class ErrorLogger {
     }
 
     /**
-     * What Maria reads. Deliberately the label and nothing else: an exception's own message is
-     * written for a developer ("Attempt to de-reference a null object") and belongs in the
-     * technical detail, which is the field the admin guide tells her to forward.
+     * What Maria reads: the label, naming where it happened so two entries from different
+     * places read differently in the list and the digest (ADMIN-23). Never the exception's own
+     * message, which is written for a developer ("Attempt to de-reference a null object") and
+     * belongs in the technical detail, the field the admin guide tells her to forward.
      */
-    private static String friendlyMessage(Exception thrown) {
-        return Label.Core_ErrorLog_UnexpectedFailure;
+    @TestVisible
+    private static String friendlyMessage(String context) {
+        return String.isBlank(context)
+            ? Label.Core_ErrorLog_UnexpectedFailure
+            : String.format(
+                  Label.Core_ErrorLog_UnexpectedFailureIn,
+                  new List<Object>{ context.trim() }
+              );
     }
 
     private static String technicalDetail(Exception thrown) {

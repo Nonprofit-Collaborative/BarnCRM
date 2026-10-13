@@ -121,6 +121,14 @@
         <value>BarnCRM hit a problem it did not expect. The technical detail on this entry is what a support contact needs to work out why.</value>
     </labels>
     <labels>
+        <fullName>Core_ErrorLog_UnexpectedFailureIn</fullName>
+        <categories>Core, Error Log</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error log default message naming where it happened ({0})</shortDescription>
+        <value>BarnCRM hit a problem it did not expect in {0}. The technical detail on this entry is what a support contact needs to work out why.</value>
+    </labels>
+    <labels>
         <fullName>Core_ErrorLogTile_Acknowledge</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>

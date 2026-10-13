@@ -140,7 +140,7 @@ private class RollupTriggerHandlerTest {
                 'So the entry can be grouped by what it is about'
             );
             System.Assert.areEqual(
-                Label.Core_ErrorLog_UnexpectedFailure,
+                ErrorLogger.friendlyMessage('RollupPlanner.plan'),
                 logged[0].Message__c,
                 'What Maria reads is plain language'
             );
