@@ -16,6 +16,12 @@ Status as of 2026-10-13 (main at PR #222, squash 55e6b3d9). #219 landed batches 
    - Rollup S9 after a clean engine comparison run (`feature/rollup-s9-remove-vendored`, not landed); S14 only if the scale test needs it; S15 to S17 spike.
    - Inventory of unfinished Core work, under way (D-47): duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38).
    - Find, bulk update and duplicates fix batch, in progress.
+   - Approved review recommendations (D-48): rollups recalculate only definitions that marked a target (ADR needed); fiscal-window rollups in the nightly run; Recalculate now checks budget and queues; import commit runs the previewed template; organizations only for passing rows; people import reads values like Load one object; bulk delete undo covers deleted empty households; Health Check on Home shows last result plus Run now; one shared LWC helper module; faster test runs; namespace-safe object resolution.
+   - Affiliations in Core people imports, restored (D-49; C-32).
+   - Data tools parity (D-50): Data Manager hub with one job history and Undo; Org Optimizer (Data Hygiene relabeled; Duplicates moved from Settings; Field utilization embedded only there); full results file; trial import then the rest in the same job; delete from a file of IDs; more transform steps; lookups and update matching on any Text, Email or Phone field; skip rows and one row per key; empty cells clear the field (off by default, journaled); delimiter and worksheet choice; download before delete; retry rejects into the same job; server-side export (C-36 remainder); parent and child loads. Not approved: seeding templates, files import. C-38 stays on hold.
+   - Import tab label "Import", reached from Data Manager; Import and Bulk Update leave the navigation; Find stays (D-51).
+   - Erase a person in Core, with a Giving extension (D-52).
+   - Shipped import templates added at install and on upgrade (D-55).
 2. On hold: C-38 scheduled imports and connections, until Brandon is ready to start the next version (D-39).
 3. After the Core quality pass: the non-core modules, in plan Section 6 order.
 4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
