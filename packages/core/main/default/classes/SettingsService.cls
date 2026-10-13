@@ -192,8 +192,7 @@ public with sharing class SettingsService {
                 throw new SettingsException(System.Label.Core_Settings_UnknownKeyError);
             }
             Object oldValue = record.get(token);
-            Object newValue = coerce(values.get(key), field);
-            checkAllowedValue(definition, newValue);
+            Object newValue = checkedValue(values.get(key), field, definition);
             String oldText = asText(oldValue);
             String newText = asText(newValue);
             if (oldText.equals(newText)) {
@@ -257,6 +256,36 @@ public with sharing class SettingsService {
         String refusal = ErrorDigestRecipients.refusal(newText);
         if (refusal != null) {
             throw new SettingsException(refusal);
+        }
+    }
+
+    /**
+     * The value read in the field's type and checked against its row. A value that cannot be
+     * used is refused with a message that names the setting, as the admin guide promises
+     * (ADMIN-21): with a whole section saved at once, "one of the values" is not enough.
+     */
+    private static Object checkedValue(
+        Object rawValue,
+        Schema.DescribeFieldResult field,
+        Setting_Definition__mdt definition
+    ) {
+        try {
+            Object newValue = coerce(rawValue, field);
+            checkAllowedValue(definition, newValue);
+            return newValue;
+        } catch (SettingsException refused) {
+            if (refused.getMessage() != System.Label.Core_Settings_InvalidValueError) {
+                throw refused;
+            }
+            String name = definition != null && String.isNotBlank(definition.MasterLabel)
+                ? definition.MasterLabel
+                : field.getLabel();
+            throw new SettingsException(
+                String.format(
+                    System.Label.Core_Settings_ErrorForSetting,
+                    new List<Object>{ name, refused.getMessage() }
+                )
+            );
         }
     }
 

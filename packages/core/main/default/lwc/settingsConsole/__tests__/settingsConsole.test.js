@@ -261,6 +261,33 @@ describe('c-settings-console', () => {
     expect(combobox.value).toBe('Standalone');
   });
 
+  it('scrolls to and focuses the setting a search result names', async () => {
+    const element = build();
+    await settle();
+    const focus = jest.fn();
+    const scrollIntoView = jest.fn();
+    const originalFocus = HTMLElement.prototype.focus;
+    const originalScroll = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.focus = focus;
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    try {
+      const search = element.shadowRoot.querySelector('c-settings-search');
+      search.dispatchEvent(
+        new CustomEvent('settingselect', {
+          detail: { section: 'General', key: 'Coexistence_Mode__c' }
+        })
+      );
+      await settle();
+    } finally {
+      HTMLElement.prototype.focus = originalFocus;
+      HTMLElement.prototype.scrollIntoView = originalScroll;
+    }
+
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(focus.mock.instances[0].dataset.key).toBe('Coexistence_Mode__c');
+  });
+
   it('opens the section a setup step asked for', async () => {
     const element = build();
     openSection('General');
