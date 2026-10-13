@@ -14,7 +14,8 @@ private class FieldUtilizationBatchTest {
         .getName();
     private static final String REASON = Duplicate_Dismissal__c.Reason__c.getDescribe().getName();
     private static final String PHONE = Account.Phone.getDescribe().getName();
-    private static final String ACCOUNT = Account.SObjectType.getDescribe(
+    // Not named ACCOUNT: Apex names are case-insensitive, so that would shadow the Account type.
+    private static final String ACCOUNT_TYPE = Account.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         )
         .getName();
@@ -108,7 +109,7 @@ private class FieldUtilizationBatchTest {
                 }
                 insert accounts;
                 FieldUtilizationBatch batch = new FieldUtilizationBatch(
-                    new List<String>{ ACCOUNT }
+                    new List<String>{ ACCOUNT_TYPE }
                 );
                 batch.onlyFields = new Set<String>{ PHONE };
                 runBatch(batch);
@@ -146,7 +147,7 @@ private class FieldUtilizationBatchTest {
                 }
                 insert accounts;
                 FieldUtilizationBatch batch = new FieldUtilizationBatch(
-                    new List<String>{ ACCOUNT }
+                    new List<String>{ ACCOUNT_TYPE }
                 );
                 batch.onlyFields = new Set<String>{ description };
                 runBatch(batch);
