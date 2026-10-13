@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:DataProtectedFields')
 private class DataProtectedFieldsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String refusal(Schema.SObjectType type) {
         return DataProtectedFields.objectRefusal(type);
     }

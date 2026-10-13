@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:ErrorLogController')
 private class ErrorLogControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void theTileCountsWhatIsWaitingAndListsTheMostRecent() {
         System.runAs(TestUsers.admin()) {

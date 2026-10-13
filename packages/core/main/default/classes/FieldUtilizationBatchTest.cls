@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:FieldUtilizationBatch')
 private class FieldUtilizationBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String DISMISSAL = Duplicate_Dismissal__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         )

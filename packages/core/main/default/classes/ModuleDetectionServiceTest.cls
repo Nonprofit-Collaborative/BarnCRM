@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:ModuleDetectionService')
 private class ModuleDetectionServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void listsTheSixPackagesAndSaysWhichAreHere() {
         System.runAs(TestUsers.admin()) {

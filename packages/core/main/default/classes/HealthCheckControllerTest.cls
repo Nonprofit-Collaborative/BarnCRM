@@ -11,6 +11,11 @@
  */
 @IsTest(testFor='ApexClass:HealthCheckController')
 private class HealthCheckControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void anyoneCanReadTheReport() {
         System.runAs(TestUsers.admin()) {

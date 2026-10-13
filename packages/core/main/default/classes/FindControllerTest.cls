@@ -6,6 +6,11 @@
  */
 @IsTest(critical=true)
 private class FindControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String ERRORS_ONLY =
         '{"version": 1, "object": "Error_Log__c", "fields": ["Context__c", "Severity__c"], ' +
         '"filter": {"version": 1, "conditions": [{"id": 1, "field": "Severity__c", "operator": "equals", "value": "Error"}]}, ' +

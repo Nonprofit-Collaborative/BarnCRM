@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:DuplicateScanBatch')
 private class DuplicateScanBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
         Database.DMLOptions options = new Database.DMLOptions();
         options.DuplicateRuleHeader.allowSave = true;

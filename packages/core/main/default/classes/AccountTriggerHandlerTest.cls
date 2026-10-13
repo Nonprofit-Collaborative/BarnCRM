@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:AccountTriggerHandler')
 private class AccountTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aHouseholdSavedWithNoNameGetsAPlaceholder() {
         System.runAs(TestUsers.admin()) {

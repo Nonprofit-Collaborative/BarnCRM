@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:RollupEngineComparison')
 private class RollupEngineComparisonTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String KEY = 'Test_People_Per_Organization';
     private static final Integer STORED = 99;
 

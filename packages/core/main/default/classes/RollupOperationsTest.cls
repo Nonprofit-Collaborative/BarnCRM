@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:RollupPlanner, ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupOperationsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final Integer ORGANIZATIONS = 10;
     private static final Integer PEOPLE_EACH = 20;
 

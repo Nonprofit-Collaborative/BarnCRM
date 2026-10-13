@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:FindInlineEditService')
 private class FindInlineEditServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static List<Contact> makePeople(Integer count) {
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;

@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:RollupWriter')
 private class RollupWriterTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void valuesAreComparedAsTheyWouldBeStored() {
         System.runAs(TestUsers.admin()) {

@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:HubErrorCountSelector')
 private class HubErrorCountSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static void insertNewErrors(Integer howMany) {
         List<Error_Log__c> errors = new List<Error_Log__c>();
         for (Integer i = 0; i < howMany; i++) {

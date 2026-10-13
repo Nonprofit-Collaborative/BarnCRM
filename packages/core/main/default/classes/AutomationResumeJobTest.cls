@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:AutomationResumeJob')
 private class AutomationResumeJobTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User barnCrmAdmin() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
     }

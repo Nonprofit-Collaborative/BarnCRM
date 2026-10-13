@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:UserSelector')
 private class UserSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /**
      * Inserts one active user.
      *

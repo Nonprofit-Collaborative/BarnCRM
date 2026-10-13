@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:AccountTriggerHandler')
 private class PersonAccountMergeTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void theSurvivorTakesTheMergedPersonsHouseholdAndItsPrimary() {
         System.runAs(TestUsers.admin()) {

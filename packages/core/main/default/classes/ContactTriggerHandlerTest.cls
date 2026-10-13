@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:ContactTriggerHandler')
 private class ContactTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void changingASurnameRenamesTheHousehold() {
         System.runAs(TestUsers.admin()) {

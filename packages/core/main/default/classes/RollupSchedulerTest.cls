@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:RollupScheduler')
 private class RollupSchedulerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c childCount(
         String key,
         String targetField,

@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:HealthCheckService')
 private class HealthCheckServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void npspOrgReportsNpspDetectedAndRecommendsIt() {
         System.runAs(TestUsers.admin()) {

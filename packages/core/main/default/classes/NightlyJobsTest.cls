@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:NightlyJobs')
 private class NightlyJobsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** A job that only remembers whether it was scheduled. */
     private class FakeJob implements NightlyJob {
         private final String name;

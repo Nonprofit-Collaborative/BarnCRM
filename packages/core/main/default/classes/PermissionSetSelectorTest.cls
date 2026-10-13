@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:PermissionSetSelector')
 private class PermissionSetSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void selectByNameFindsThePackagedAdminPermissionSet() {
         System.runAs(TestUsers.admin()) {

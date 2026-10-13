@@ -23,6 +23,10 @@ with a comment naming why:
 
 placed anywhere in the class to cover every method, or inside one method (or on
 the lines between the previous method and its annotation) to cover that method.
+
+A @TestSetup method whose body only calls TestUsers (creating the class's test
+user once, so its test methods find it instead of each creating one) needs no
+runAs.
 """
 
 import glob
@@ -45,6 +49,15 @@ METHOD = re.compile(
 )
 LEGACY = re.compile(r"\b(?:static\s+testmethod|testmethod\s+static)\s+void\s+(\w+)\s*\(\s*\)\s*\{", re.I)
 RUN_AS = re.compile(r"\bSystem\s*\.\s*runAs\s*\(", re.I)
+TEST_SETUP = re.compile(r"@TestSetup\b", re.I)
+# A @TestSetup whose body only creates the class's test users (TestUsers writes them in a
+# context of its own) needs no runAs: there is nothing in it to run as anyone.
+TEST_USERS_ONLY = re.compile(r"\s*(?:TestUsers\s*\.\s*\w+\s*\([^;]*\)\s*;\s*)+", re.I)
+
+
+def creates_test_users_only(text, start, body, close):
+    """True for a @TestSetup method whose body is only TestUsers calls."""
+    return bool(TEST_SETUP.search(text, start, body)) and bool(TEST_USERS_ONLY.fullmatch(text, body + 1, close))
 
 
 def strip(source):
@@ -121,7 +134,7 @@ def check(path):
         return problems
     previous_end = 0
     for name, start, body, close in methods:
-        if RUN_AS.search(text, body, close):
+        if RUN_AS.search(text, body, close) or creates_test_users_only(text, start, body, close):
             previous_end = close
             continue
         if OPT_OUT.search(raw, previous_end, close):

@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:CustomPermissionSelector')
 private class CustomPermissionSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** A developer name deliberately belonging to no package in this repository. */
     private static final String ABSENT_PERMISSION = 'No_Package_Ships_This_Permission';
 

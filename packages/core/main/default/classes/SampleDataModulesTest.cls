@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:SampleDataModules')
 private class SampleDataModulesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWithInstalledModules();
+    }
+
     private class StubModule implements SampleDataModule {
         private final String name;
         private Integer loaded;

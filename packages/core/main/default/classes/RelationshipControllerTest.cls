@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:RelationshipController')
 private class RelationshipControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void readsARelationshipFromThePersonsOwnSide() {
         System.runAs(TestUsers.admin()) {

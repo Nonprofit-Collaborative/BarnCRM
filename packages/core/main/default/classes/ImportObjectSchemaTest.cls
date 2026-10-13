@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:ImportObjectSchema')
 private class ImportObjectSchemaTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in
         // for an org's own object with an External ID, which Core does not otherwise have.

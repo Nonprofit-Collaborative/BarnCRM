@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:ErrorDigestController')
 private class ErrorDigestControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static List<CronTrigger> digestJobs() {
         return [
             SELECT Id, CronExpression, NextFireTime

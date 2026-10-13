@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:BulkUpdateController')
 private class BulkUpdateControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,

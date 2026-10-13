@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:BulkDeleteBatch')
 private class BulkDeleteBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,

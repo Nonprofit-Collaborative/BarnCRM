@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:WhatsNewController')
 private class WhatsNewControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static User readOnlyUser() {
         return TestDataFactory.createUser('Reader', new List<String>{ 'BarnCRM_Read_Only' });
     }

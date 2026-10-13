@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:RollupChanges')
 private class RollupChangesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Account organization(String name) {
         return new Account(
             Name = name,

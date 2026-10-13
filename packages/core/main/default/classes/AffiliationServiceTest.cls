@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:AffiliationService')
 private class AffiliationServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void copiesThePrimaryOrganizationToThePerson() {
         System.runAs(TestUsers.admin()) {

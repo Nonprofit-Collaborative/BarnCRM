@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:BulkDeleteService')
 private class BulkDeleteServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(String objectName, String field, String value) {
         Map<String, Object> document = new Map<String, Object>{
             'version' => 1,

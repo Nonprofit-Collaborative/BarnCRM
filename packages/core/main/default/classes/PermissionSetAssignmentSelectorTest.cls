@@ -3,6 +3,11 @@
  */
 @IsTest(testFor='ApexClass:PermissionSetAssignmentSelector')
 private class PermissionSetAssignmentSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String PROGRAM_ROLE = 'Program_Staff';
 
     /**

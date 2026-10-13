@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:HouseholdMemberTriggerHandler')
 private class HouseholdMemberTriggerHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Account household;
     private static Contact john;
 

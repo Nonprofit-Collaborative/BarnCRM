@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:HouseholdMergeService, ApexClass:HouseholdService')
 private class HouseholdPrimaryContactTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Account household(String name) {
         Account record = HouseholdTestDataFactory.newHousehold(name);
         insert record;

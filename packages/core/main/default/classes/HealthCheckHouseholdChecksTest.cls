@@ -10,6 +10,11 @@
  */
 @IsTest(testFor='ApexClass:HealthCheckHouseholdChecks')
 private class HealthCheckHouseholdChecksTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String PEOPLE = 'people_without_household';
     private static final String HOUSEHOLDS = 'households_without_members';
 

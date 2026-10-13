@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:RollupCurrency')
 private class RollupCurrencyTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void amountsGoThroughTheCorporateCurrency() {
         System.runAs(TestUsers.admin()) {

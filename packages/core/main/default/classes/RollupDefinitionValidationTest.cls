@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:RollupDefinitionValidationHandler, ApexClass:RollupController')
 private class RollupDefinitionValidationTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c definition(
         String key,
         String aggregate,

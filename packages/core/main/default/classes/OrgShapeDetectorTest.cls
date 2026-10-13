@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:OrgShapeDetector')
 private class OrgShapeDetectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     // Held as text here for the same reason it is held as text in OrgShapeSelector: these
     // tests have to pass on a Platform-only org, where the object does not exist, so they may
     // not compile against it either.

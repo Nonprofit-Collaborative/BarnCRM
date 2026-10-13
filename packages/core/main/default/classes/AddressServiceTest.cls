@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:AddressService')
 private class AddressServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String HOME_STREET = '812 Willow Lane';
     private static final String HOME_CITY = 'Springfield';
     private static final String WINTER_STREET = '4120 East Camelback Road';

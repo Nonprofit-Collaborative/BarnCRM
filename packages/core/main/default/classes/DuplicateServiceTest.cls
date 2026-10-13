@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:DuplicateService')
 private class DuplicateServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Id fakeContactId(Integer n) {
         return Id.valueOf('003' + String.valueOf(n).leftPad(12, '0'));
     }

@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:HouseholdController')
 private class HouseholdControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void thePreviewShowsFiveSampleHouseholds() {
         System.runAs(TestUsers.admin()) {

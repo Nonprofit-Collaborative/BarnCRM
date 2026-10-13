@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:RollupAdapter')
 private class RollupAdapterTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c givingTotal() {
         return new Rollup_Definition__c(
             Name = 'Household total giving',

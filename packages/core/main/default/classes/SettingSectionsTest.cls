@@ -1,6 +1,11 @@
 /** One vocabulary of section names, so a setup step and a shipped row can agree on one. */
 @IsTest(testFor='ApexClass:SettingSections')
 private class SettingSectionsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void namesEverySectionTheConsoleGroupsBy() {
         System.runAs(TestUsers.admin()) {

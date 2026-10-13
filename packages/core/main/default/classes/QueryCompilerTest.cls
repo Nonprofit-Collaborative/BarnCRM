@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:QueryCompiler')
 private class QueryCompilerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(String filter, String orderBy, Object rowLimit) {
         Map<String, Object> document = new Map<String, Object>{
             'version' => 1,

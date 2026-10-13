@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:ImportJournalService')
 private class ImportJournalServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Batch__c newBatch() {
         TestDataFactory.defaultSettings();
         return ImportTestDataFactory.batch(

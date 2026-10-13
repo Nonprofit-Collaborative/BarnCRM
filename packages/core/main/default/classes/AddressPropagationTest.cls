@@ -12,6 +12,11 @@
     testFor='ApexClass:AddressService, ApexClass:AccountAddressHandler, ApexClass:ContactAddressHandler, ApexClass:AddressTriggerHandler'
 )
 private class AddressPropagationTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String WINTER_STREET = '4120 East Camelback Road';
     private static final String WINTER_CITY = 'Phoenix';
     private static final String MEMBER_OWN_STREET = '1912 North Third Street';

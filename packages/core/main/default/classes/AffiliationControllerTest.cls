@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:AffiliationController')
 private class AffiliationControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void namesTheOrganizationOnAPersonRecord() {
         System.runAs(TestUsers.admin()) {

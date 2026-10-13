@@ -4,6 +4,11 @@
  */
 @IsTest(testFor='ApexClass:SettingsRecordSelector')
 private class SettingsRecordSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void readsNothingWhenTheOrgHasNeverSaved() {
         System.runAs(TestUsers.admin()) {

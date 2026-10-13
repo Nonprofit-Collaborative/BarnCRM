@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:RollupEngine')
 private class RollupEngineTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Id organizationType() {
         return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
             .get('Organization')

@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:AutomationControlController')
 private class AutomationControlControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String NAMING = 'Household_Naming';
 
     private static User barnCrmAdmin() {
