@@ -283,29 +283,21 @@ private class AccountingExportServiceTest {
     }
 
     @IsTest
-    static void thePageGetsItsFileAndItsWords() {
+    static void thePageNeedsTheAccountingExportPermissionSet() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            List<AccountingExportController.Option> methods = AccountingExportController.getPaymentMethods();
-            AccountingExportController.ExportView view = AccountingExportController.exportGifts(
-                AUGUST_FIRST,
-                AUGUST_LAST,
-                null,
-                null,
-                false
-            );
-            String refusal;
+            String exportRefusal;
+            String markRefusal;
             try {
                 AccountingExportController.exportGifts(
-                    AUGUST_LAST,
                     AUGUST_FIRST,
+                    AUGUST_LAST,
                     null,
                     null,
                     false
                 );
             } catch (AuraHandledException refused) {
-                refusal = refused.getMessage();
+                exportRefusal = refused.getMessage();
             }
-            String markRefusal;
             try {
                 AccountingExportController.markPosted(
                     AUGUST_FIRST,
@@ -313,23 +305,70 @@ private class AccountingExportServiceTest {
                     null,
                     null,
                     false,
-                    'a file downloaded before'
+                    'a digest'
                 );
             } catch (AuraHandledException refused) {
                 markRefusal = refused.getMessage();
             }
 
-            for (AccountingExportController.Option option : methods) {
-                Assert.areNotEqual('In-kind', option.value);
-            }
-            Assert.isFalse(methods.isEmpty());
-            Assert.areEqual('accounting-export-2026-08-01-to-2026-08-31.csv', view.fileName);
-            Assert.areEqual(5, view.rowCount);
-            Assert.areEqual(410, view.total);
-            Assert.areEqual(64, view.digest.length(), 'A SHA-256 in hex');
-            Assert.areEqual(Label.Connect_AccountingExport_ErrorDateOrder, refusal);
-            Assert.areEqual(Label.Connect_AccountingExport_ChangedSinceDownload, markRefusal);
+            Assert.areEqual(
+                Label.Connect_AccountingExport_NoExportPermission,
+                exportRefusal,
+                'Giving Admin can see every gift but does not hold Export Accounting.'
+            );
+            Assert.areEqual(Label.Connect_AccountingExport_NoExportPermission, markRefusal);
         }
+    }
+
+    @IsTest
+    static void thePageGetsItsFileAndItsWords() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User jen = bookkeeperOwningAugust();
+            System.runAs(jen) {
+                assertPageGetsItsFileAndItsWords();
+            }
+        }
+    }
+
+    private static void assertPageGetsItsFileAndItsWords() {
+        List<AccountingExportController.Option> methods = AccountingExportController.getPaymentMethods();
+        AccountingExportController.ExportView view = AccountingExportController.exportGifts(
+            AUGUST_FIRST,
+            AUGUST_LAST,
+            null,
+            null,
+            false
+        );
+        String refusal;
+        try {
+            AccountingExportController.exportGifts(AUGUST_LAST, AUGUST_FIRST, null, null, false);
+        } catch (AuraHandledException refused) {
+            refusal = refused.getMessage();
+        }
+        String markRefusal;
+        try {
+            AccountingExportController.markPosted(
+                AUGUST_FIRST,
+                AUGUST_LAST,
+                null,
+                null,
+                false,
+                'a file downloaded before'
+            );
+        } catch (AuraHandledException refused) {
+            markRefusal = refused.getMessage();
+        }
+
+        for (AccountingExportController.Option option : methods) {
+            Assert.areNotEqual('In-kind', option.value);
+        }
+        Assert.isFalse(methods.isEmpty());
+        Assert.areEqual('accounting-export-2026-08-01-to-2026-08-31.csv', view.fileName);
+        Assert.areEqual(5, view.rowCount);
+        Assert.areEqual(410, view.total);
+        Assert.areEqual(64, view.digest.length(), 'A SHA-256 in hex');
+        Assert.areEqual(Label.Connect_AccountingExport_ErrorDateOrder, refusal);
+        Assert.areEqual(Label.Connect_AccountingExport_ChangedSinceDownload, markRefusal);
     }
 
     // ------------------------------------------------------------------------------------

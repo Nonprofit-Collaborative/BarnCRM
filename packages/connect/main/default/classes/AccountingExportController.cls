@@ -4,6 +4,7 @@
  */
 public with sharing class AccountingExportController {
     private static final String CONTEXT = 'AccountingExportController';
+    private static final String EXPORT_PERMISSION = 'Export_Accounting';
 
     /** One choice in the payment method list. */
     public class Option {
@@ -56,6 +57,7 @@ public with sharing class AccountingExportController {
         String paymentMethod,
         Boolean onlyUnposted
     ) {
+        requireExport();
         try {
             AccountingExportService.ExportFile built = AccountingExportService.build(
                 fromDate,
@@ -99,6 +101,7 @@ public with sharing class AccountingExportController {
         Boolean onlyUnposted,
         String digest
     ) {
+        requireExport();
         try {
             return AccountingExportService.markPosted(
                 fromDate,
@@ -113,6 +116,13 @@ public with sharing class AccountingExportController {
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, CONTEXT);
             throw asAuraException(Label.Connect_AccountingExport_ErrorFailed);
+        }
+    }
+
+    /** The export builds a file of every gift the person can see, so it needs its own permission. */
+    private static void requireExport() {
+        if (!FeatureManagement.checkPermission(EXPORT_PERMISSION)) {
+            throw asAuraException(Label.Connect_AccountingExport_NoExportPermission);
         }
     }
 

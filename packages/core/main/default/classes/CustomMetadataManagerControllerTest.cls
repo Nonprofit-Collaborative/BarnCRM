@@ -9,7 +9,7 @@
 @IsTest
 private class CustomMetadataManagerControllerTest {
     private static final String TYPE_NAME = 'Relationship_Type__mdt';
-    private static final Id JOB = Id.valueOf('0Af000000000003');
+    private static final Id JOB = FakeIds.ofPrefix('0Af', 3);
 
     private class StubDeployer implements CustomMetadataManagerService.Deployer {
         public Id deploy(Metadata.DeployContainer container, Metadata.DeployCallback callback) {
