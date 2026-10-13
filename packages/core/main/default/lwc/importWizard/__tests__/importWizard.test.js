@@ -17,6 +17,7 @@ import getLoadableObjects from '@salesforce/apex/ImportController.getLoadableObj
 import createObjectTemplate from '@salesforce/apex/ImportController.createObjectTemplate';
 import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
+import getRowMatchFields from '@salesforce/apex/ImportController.getRowMatchFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 
@@ -71,6 +72,9 @@ jest.mock('@salesforce/apex/ImportController.getObjectFields', () => ({ default:
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getKeyFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getRowMatchFields', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getChangedValues', () => ({ default: jest.fn() }), {
@@ -905,6 +909,10 @@ describe('the import wizard loading one object', () => {
       }
     ]);
     getKeyFields.mockResolvedValue([{ value: 'Session_Key__c', label: 'Session Key' }]);
+    getRowMatchFields.mockResolvedValue([
+      { value: 'Notes__c', label: 'Notes' },
+      { value: 'Session_Key__c', label: 'Session Key' }
+    ]);
     suggestMapping.mockResolvedValue(
       JSON.stringify({
         version: 1,
@@ -1034,6 +1042,48 @@ describe('the import wizard loading one object', () => {
       { source: 'Program', target: 'Record.Program__c', lookupField: 'Name' },
       { source: 'Notes', target: 'Ignore' }
     ]);
+  });
+
+  it('updates by a field the user chooses, which a column must feed', async () => {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    const options = loadOptions(element);
+    expect(options.rowMatchFields).toEqual([
+      { value: 'Notes__c', label: 'Notes' },
+      { value: 'Session_Key__c', label: 'Session Key' }
+    ]);
+    options.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Update by a matching field',
+          matchField: 'Notes__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    // No column feeds Notes, so nothing can find the records.
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(true);
+    options.dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Update by a matching field',
+          matchField: 'Session_Key__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="dry-run"]').disabled).toBe(false);
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).load).toEqual({
+      operation: 'Update by a matching field',
+      matchField: 'Session_Key__c',
+      lookupNotFound: 'Reject the row',
+      severalMatches: 'Reject the row'
+    });
   });
 
   it('needs a record ID column before an update can dry run', async () => {

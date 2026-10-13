@@ -1670,8 +1670,8 @@ Maria load the same payment processor export every month without rebuilding the 
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Target Object | text | no | The API name of the one object this template loads, as describe gives it; empty for a template that loads people and organizations (R-IT12). |
-| Load Operation | picklist(Insert, Update by record Id, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
-| Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; required then (R-IT12). |
+| Load Operation | picklist(Insert, Update by record Id, Update by a matching field, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
+| Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; under Update by a matching field, the API name of the text, email or phone field they are found by; required under both (R-IT12). |
 | Lookup Not Found | picklist(Reject the row, Leave it empty) | no | What a row of a one-object template does when a lookup column finds no record; empty means Reject the row (R-IT13). |
 
 ### Relationships
@@ -1784,6 +1784,11 @@ in every chunk. Load Operation decides what a row does:
 - **Update by record Id** changes the record named by the row's `Record.Id`. An ID that is not
   a valid ID of the target object, or names no record the user can see, rejects the row, and
   nothing is created for it.
+- **Update by a matching field** changes the record whose Load Match Field (any text, email or
+  phone field of the object that the user may read and filter on) holds the row's value,
+  compared ignoring case. A row with no value in the field, or whose value no record holds, is
+  rejected, and nothing is created for it. A value several records hold follows Several Matches
+  (R-IT9). The field is subject to the large object guard (R-IT13).
 - **Upsert by external ID** finds the record whose Load Match Field (a field the object marks
   External ID, holding text or an email, that the user may read) holds the row's value,
   compared ignoring case; it changes that record, or creates one when none holds the value. A
@@ -1796,12 +1801,12 @@ before. An update writes only the values that differ from the record's, and a ro
 nothing is Matched. A value its field cannot take (a date or number that cannot be read, a
 checkbox value that is neither ticked nor cleared under R-IT11, text longer than the field) rejects the row, naming
 the field and the value, because a row is one record. A row naming the same record as an
-earlier row of the file (the same ID or upsert value) is rejected wherever the file's chunks
+earlier row of the file (the same ID or Load Match Field value) is rejected wherever the file's chunks
 fall, through a digest in its Processor Key (Section 17). Under Match only (R-IB15) a row that
 would create a record is rejected. A value for every row of the file (R-IB14) may not be the
 record ID or the Load Match Field. Each row's resulting record is written to its Resulting
 Record. A row a save refuses carries the platform's words. Account and Contact load by Update
-by record Id only (R-IT14).
+by record Id or Update by a matching field only (R-IT14).
 
 **R-IT13 Lookup columns.** A column mapped to a lookup field of the target object names its
 parent by the column's `lookupField` (R-IT1): the record ID when it is empty or `Id`, or else
@@ -1838,9 +1843,9 @@ from describe at run time, so a new object is judged without a code change:
    names through the data protection seam (`DataProtectionExtension`; Giving names receipts,
    receipt runs, receipt number sequences, acknowledgments and acknowledgment runs).
 5. The user can read it and query it, and can create records of it for Insert, edit them for
-   Update, or both for Upsert.
+   either Update, or both for Upsert.
 
-Account and Contact may be loaded only by Update by record Id: people, households and
+Account and Contact may be loaded only by Update by record Id or Update by a matching field: people, households and
 organizations are created by a people template, which builds households (R-IR1a).
 
 These fields are never written, whatever the file holds: the fields the platform keeps (Id,
@@ -1990,7 +1995,7 @@ from Nonprofit Cloud", section 5).
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
 | Target Object | `Target_Object__c` | Text (255) |
-| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Upsert by external ID |
+| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Update by a matching field, Upsert by external ID |
 | Load Match Field | `Load_Match_Field__c` | Text (255) |
 | Lookup Not Found | `Lookup_Not_Found__c` | Picklist: Reject the row, Leave it empty |
 
@@ -6615,6 +6620,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 | v0.6 | 2026-10-13 | Load one object lookups by any field (data tools parity). No object or field added. R-IT13: a lookup may name its parent by any text, email or phone field the user may read and filter on, and the large object guard refuses an unindexed field on an object over 100,000 records. |
+| v0.6 | 2026-10-13 | Load one object updates by a field you choose (data tools parity). `Import_Template__c.Load_Operation__c` gains Update by a matching field, and Load Match Field serves it. R-IT12 gains that operation, which finds each row's record by any text, email or phone field, rejects a row it finds nothing for, and follows Several Matches; Account and Contact may use it (R-IT14). |
 
 ---
 ## 32. Entity ownership by package

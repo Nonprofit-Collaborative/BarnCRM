@@ -20,13 +20,14 @@ describe('what each row of a one-object mapping does', () => {
     }
   });
 
-  it('offers the three operations, each with what it risks', async () => {
+  it('offers the four operations, each with what it risks', async () => {
     const element = render();
     await flush();
     const operation = element.shadowRoot.querySelector('[data-id="operation"]');
     expect(operation.options.map((option) => option.value)).toEqual([
       'Insert',
       'Update by record Id',
+      'Update by a matching field',
       'Upsert by external ID'
     ]);
     expect(element.shadowRoot.querySelector('[data-id="operation-help"]').textContent).toContain(
@@ -66,6 +67,35 @@ describe('what each row of a one-object mapping does', () => {
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="match-field"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="no-key-fields"]')).not.toBeNull();
+  });
+
+  it('offers any text, email or phone field under an update by a matching field', async () => {
+    const element = render({
+      operation: 'Update by a matching field',
+      keyFields: [{ value: 'Pair_Key__c', label: 'Pair Key' }],
+      rowMatchFields: [
+        { value: 'Email__c', label: 'Email' },
+        { value: 'Phone__c', label: 'Phone' }
+      ]
+    });
+    await flush();
+    const field = element.shadowRoot.querySelector('[data-id="match-field"]');
+    expect(field.options).toEqual([
+      { label: 'Email', value: 'Email__c' },
+      { label: 'Phone', value: 'Phone__c' }
+    ]);
+    expect(element.shadowRoot.querySelector('[data-id="operation-help"]').textContent).toContain(
+      'c.Core_Import_LoadUpdateByFieldHelp'
+    );
+  });
+
+  it('says so when the object has no field an update can match on', async () => {
+    const element = render({ operation: 'Update by a matching field', rowMatchFields: [] });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="match-field"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="no-key-fields"]').textContent).toContain(
+      'c.Core_Import_LoadNoMatchFields'
+    );
   });
 
   it('reports every change with all three choices', async () => {

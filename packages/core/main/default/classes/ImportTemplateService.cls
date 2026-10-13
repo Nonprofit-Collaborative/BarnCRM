@@ -152,9 +152,10 @@ public with sharing class ImportTemplateService {
 
     /**
      * Saves what a one-object template does with each row (R-IT12, R-IT13, R-IT9): the
-     * operation, the external ID field an upsert matches on, what a row whose lookup finds no
-     * record does, and what a row matching several does. People and organizations keep Update
-     * by record Id. An upsert field the object does not offer is refused, naming it.
+     * operation, the field an upsert or an update by a matching field finds records by, what a
+     * row whose lookup finds no record does, and what a row matching several does. People and
+     * organizations keep one of the two updates. A match field the object does not offer is
+     * refused, naming it.
      */
     @NamespaceAccessible
     public static Import_Template__c saveLoad(Id templateId, LoadChoices choices) {
@@ -165,19 +166,26 @@ public with sharing class ImportTemplateService {
         LoadChoices given = choices == null ? new LoadChoices() : choices;
         Schema.SObjectType type = ImportObjectSchema.typeOf(template);
         template.Load_Operation__c = given.operation;
-        template.Load_Operation__c = ImportObjectSchema.updatesOnly(type)
+        String operation = ImportObjectSchema.operationOf(template);
+        template.Load_Operation__c = ImportObjectSchema.updatesOnly(type) &&
+            !ImportObjectSchema.neverCreates(operation)
             ? ImportObjectSchema.OPERATION_UPDATE
-            : ImportObjectSchema.operationOf(template);
+            : operation;
         template.Load_Match_Field__c = null;
+        Boolean byKey = template.Load_Operation__c == ImportObjectSchema.OPERATION_UPSERT;
         if (
-            template.Load_Operation__c == ImportObjectSchema.OPERATION_UPSERT &&
+            (byKey || template.Load_Operation__c == ImportObjectSchema.OPERATION_UPDATE_BY_FIELD) &&
             String.isNotBlank(given.matchField)
         ) {
-            String found = ImportObjectSchema.keyField(type, given.matchField);
+            String found = byKey
+                ? ImportObjectSchema.keyField(type, given.matchField)
+                : ImportObjectSchema.matchField(type, given.matchField);
             if (found == null) {
                 throw new ImportException(
                     String.format(
-                        Label.Core_Import_ErrorKeyFieldUnusable,
+                        byKey
+                            ? Label.Core_Import_ErrorKeyFieldUnusable
+                            : Label.Core_Import_ErrorMatchFieldUnusable,
                         new List<String>{ given.matchField.trim().abbreviate(80) }
                     )
                 );

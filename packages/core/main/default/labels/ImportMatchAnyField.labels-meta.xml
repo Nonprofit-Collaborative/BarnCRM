@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Core_Import_OperationUpdateByField</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the Update by a matching field load operation</shortDescription>
+        <value>Update by a field you choose</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadUpdateByFieldHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what Update by a matching field does and risks</shortDescription>
+        <value>Finds the record whose field you choose (for example Email) holds the row's value and changes it. Nothing is created. Risk: a value several records hold follows the several-matches choice.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LoadNoMatchFields</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the object has no field rows can be matched on</shortDescription>
+        <value>This object has no text, email or phone field you can read and search by, so rows cannot be matched. Choose another action.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchFieldRequired</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: update by a matching field has no field chosen</shortDescription>
+        <value>Update by a field you choose needs the field rows are matched on. Choose it in the matching step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchFieldUnusable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the chosen field cannot match rows</shortDescription>
+        <value>Rows cannot be matched on {0}: it is not a text, email or phone field of this object that you can read and search by. Choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchColumnMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no column feeds the field rows are matched on</shortDescription>
+        <value>Update by a field you choose needs a column mapped to {0}, the field rows are matched on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorMatchValueMissing</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: the row has no value in the field rows are matched on</shortDescription>
+        <value>This row has no {0}, which rows are matched on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorNoRecordMatched</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: no record holds the row's value in the match field</shortDescription>
+        <value>No record you can see has this {0}. Check the value, or ask your Salesforce administrator for access to the record.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_ErrorFieldNotSelective</fullName>
         <categories>Import</categories>
         <language>en_US</language>

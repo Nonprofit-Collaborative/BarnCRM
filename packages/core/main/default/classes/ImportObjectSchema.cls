@@ -14,6 +14,9 @@ public with sharing class ImportObjectSchema {
     public static final String OPERATION_INSERT = 'Insert';
     @NamespaceAccessible
     public static final String OPERATION_UPDATE = 'Update by record Id';
+    /** Each row updates the record a field the user chose finds (R-IT12). */
+    @NamespaceAccessible
+    public static final String OPERATION_UPDATE_BY_FIELD = 'Update by a matching field';
     @NamespaceAccessible
     public static final String OPERATION_UPSERT = 'Upsert by external ID';
 
@@ -109,7 +112,13 @@ public with sharing class ImportObjectSchema {
     @NamespaceAccessible
     public static String operationOf(Import_Template__c template) {
         String chosen = template == null ? null : template.Load_Operation__c;
-        for (String known : new List<String>{ OPERATION_UPDATE, OPERATION_UPSERT }) {
+        for (
+            String known : new List<String>{
+                OPERATION_UPDATE,
+                OPERATION_UPDATE_BY_FIELD,
+                OPERATION_UPSERT
+            }
+        ) {
             if (known.equalsIgnoreCase(chosen)) {
                 return known;
             }
@@ -124,10 +133,25 @@ public with sharing class ImportObjectSchema {
             LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(template.Lookup_Not_Found__c);
     }
 
-    /** The field an upsert matches rows on, as describe names it, or null when it cannot. */
+    /**
+     * The field an upsert or an update by a matching field finds rows' records by, as describe
+     * names it, or null when it cannot.
+     */
     @NamespaceAccessible
     public static String keyFieldOf(Import_Template__c template) {
-        return template == null ? null : keyField(typeOf(template), template.Load_Match_Field__c);
+        if (template == null) {
+            return null;
+        }
+        Schema.SObjectType type = typeOf(template);
+        return operationOf(template) == OPERATION_UPDATE_BY_FIELD
+            ? matchField(type, template.Load_Match_Field__c)
+            : keyField(type, template.Load_Match_Field__c);
+    }
+
+    /** True for the operations that change records and never create them. */
+    @NamespaceAccessible
+    public static Boolean neverCreates(String operation) {
+        return operation == OPERATION_UPDATE || operation == OPERATION_UPDATE_BY_FIELD;
     }
 
     /** True when a one-object load may only update records of this object (R-IT14). */
@@ -174,12 +198,17 @@ public with sharing class ImportObjectSchema {
         return sortedValues(byLabel);
     }
 
-    /** The operations a load of this object may use: Update only for people (R-IT14). */
+    /** The operations a load of this object may use: the two updates only for people (R-IT14). */
     @NamespaceAccessible
     public static List<String> operationsFor(Schema.SObjectType type) {
         return updatesOnly(type)
-            ? new List<String>{ OPERATION_UPDATE }
-            : new List<String>{ OPERATION_INSERT, OPERATION_UPDATE, OPERATION_UPSERT };
+            ? new List<String>{ OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD }
+            : new List<String>{
+                  OPERATION_INSERT,
+                  OPERATION_UPDATE,
+                  OPERATION_UPDATE_BY_FIELD,
+                  OPERATION_UPSERT
+              };
     }
 
     /**
@@ -491,7 +520,7 @@ public with sharing class ImportObjectSchema {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         List<String> plural = new List<String>{ described.getLabelPlural() };
         String operation = operationOf(template);
-        if (updatesOnly(type) && operation != OPERATION_UPDATE) {
+        if (updatesOnly(type) && !neverCreates(operation)) {
             return String.format(Label.Core_Import_ErrorPeopleUpdateOnly, plural);
         }
         if (!canRun(described, operation)) {
@@ -506,21 +535,28 @@ public with sharing class ImportObjectSchema {
         if (operation == OPERATION_UPDATE && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
             return Label.Core_Import_ErrorIdColumnMissing;
         }
-        if (operation == OPERATION_UPSERT) {
+        if (operation == OPERATION_UPSERT || operation == OPERATION_UPDATE_BY_FIELD) {
+            Boolean byKey = operation == OPERATION_UPSERT;
             String chosen = template.Load_Match_Field__c;
             if (String.isBlank(chosen)) {
-                return Label.Core_Import_ErrorKeyFieldRequired;
+                return byKey
+                    ? Label.Core_Import_ErrorKeyFieldRequired
+                    : Label.Core_Import_ErrorMatchFieldRequired;
             }
-            key = keyField(type, chosen);
+            key = byKey ? keyField(type, chosen) : matchField(type, chosen);
             if (key == null) {
                 return String.format(
-                    Label.Core_Import_ErrorKeyFieldUnusable,
+                    byKey
+                        ? Label.Core_Import_ErrorKeyFieldUnusable
+                        : Label.Core_Import_ErrorMatchFieldUnusable,
                     new List<String>{ chosen.trim().abbreviate(80) }
                 );
             }
             if (!mapsField(attributes, key)) {
                 return String.format(
-                    Label.Core_Import_ErrorKeyColumnMissing,
+                    byKey
+                        ? Label.Core_Import_ErrorKeyColumnMissing
+                        : Label.Core_Import_ErrorMatchColumnMissing,
                     new List<String>{ labelOf(type, key) }
                 );
             }
@@ -565,7 +601,7 @@ public with sharing class ImportObjectSchema {
         if (operation == OPERATION_INSERT) {
             return described.isCreateable();
         }
-        if (operation == OPERATION_UPDATE) {
+        if (neverCreates(operation)) {
             return described.isUpdateable();
         }
         return described.isCreateable() && described.isUpdateable();

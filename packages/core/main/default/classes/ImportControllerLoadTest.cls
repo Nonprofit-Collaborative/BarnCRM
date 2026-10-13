@@ -63,13 +63,13 @@ private class ImportControllerLoadTest {
                     sessions.loadOperation,
                     'Insert.'
                 );
-                Assert.areEqual(3, sessions.loadOperations.size(), 'All three operations offered.');
+                Assert.areEqual(4, sessions.loadOperations.size(), 'All four operations offered.');
                 Assert.areEqual(
                     ImportObjectSchema.OPERATION_UPDATE,
                     people.loadOperation,
                     'People start on Update.'
                 );
-                Assert.areEqual(1, people.loadOperations.size(), 'And have nothing else.');
+                Assert.areEqual(2, people.loadOperations.size(), 'And the two updates only.');
                 Assert.isNotNull(refused, 'The package bookkeeping is never a target.');
                 Assert.isTrue(
                     unnamed.contains(Label.Core_Import_ErrorObjectTemplateName),
