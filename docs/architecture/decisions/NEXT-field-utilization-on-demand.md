@@ -1,4 +1,4 @@
-# ADR-NEXT: Field utilization runs on demand from its own tab
+# ADR-NEXT: Field utilization runs on demand in Org Optimizer
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-13)
 **Date:** 2026-10-13
@@ -23,11 +23,9 @@ Lightning server call should return in well under two minutes.
 
 ## Decision
 
-1. **A Field Utilization page, opened from Org Optimizer.** A Lightning app page
-   (`Field_Utilization`) and custom tab host the `fieldUtilization` component. The tab is not in
-   the BarnCRM app navigation and no permission set makes it visible: field utilization lives
-   inside Org Optimizer, which embeds the same component as a section (owner decision,
-   2026-10-13: "Field utilization lives only inside Org Optimizer"). The person picks an object;
+1. **A Field utilization section of Org Optimizer.** The `fieldUtilization` component is a
+   section of Org Optimizer and has no app page or tab of its own (owner decision, 2026-10-13:
+   "Field utilization lives only inside Org Optimizer"). The person picks an object;
    the page lists every countable field of it with its label, API name, record type, filled
    count, record count and percent, sortable. The console panel is removed: the feature has no
    setting left to live in the console.
@@ -78,8 +76,7 @@ Lightning server call should return in well under two minutes.
   `NightlyJobs` registration, and the labels only the old page used. An org upgraded from a
   build with the weekly job needs those components removed by a destructive deploy, and its
   scheduled job "BarnCRM Field Utilization" aborted.
-- Added: tab and app page `Field_Utilization`, kept out of the BarnCRM app navigation and out
-  of every permission set's tab visibility; the component is reached from Org Optimizer.
+- The component is reached only from Org Optimizer; no tab or app page is added.
 - `FindController.isOffered` becomes public so both pages offer objects by one rule.
 - An object with many fields takes several calls; a 300-field object is eight calls.
 - ADR-0086's revisit of chunk size after the 1M-gift scale test now applies to the 40 and 10
