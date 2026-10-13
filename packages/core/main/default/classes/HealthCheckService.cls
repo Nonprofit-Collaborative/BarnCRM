@@ -81,6 +81,7 @@ public with sharing class HealthCheckService {
     public static final String FIX_KEY_RESTORE_AUTOMATION_SWITCHES = 'restoreAutomationSwitches';
     public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
     public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
+    public static final String FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS = 'rescheduleInactiveOwnerJobs';
 
     /**
      * What one of those fixes would change if it ran now: the names of the rows it would create,
@@ -104,6 +105,9 @@ public with sharing class HealthCheckService {
         }
         if (FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
             return NightlyJobs.unscheduledLabels();
+        }
+        if (FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
+            return ScheduledJobSelector.namesOwnedByInactiveUsers();
         }
         return null;
     }
@@ -502,6 +506,12 @@ public with sharing class HealthCheckService {
             );
             steps.add(
                 new CheckStep('nightly_jobs', new HealthCheckSettingsChecks.NightlyJobsCheck())
+            );
+            steps.add(
+                new CheckStep(
+                    'jobs_inactive_owner',
+                    new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()
+                )
             );
             steps.add(
                 new CheckStep(

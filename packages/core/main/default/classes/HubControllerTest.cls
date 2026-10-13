@@ -62,13 +62,18 @@ private class HubControllerTest {
                 );
             }
             insert errors;
-            HubErrorCountSelector.countCap = 2;
+            HubController.errorCountCap = 2;
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
             System.runAs(maria) {
                 HubController.HomeModel model = HubController.getHomeModel();
                 Assert.areEqual(2, model.newErrorCount, 'The tile shows the cap');
                 Assert.isTrue(model.newErrorCountCapped, 'and says there are more than that');
+                Assert.areEqual(
+                    0,
+                    model.installProblemCount,
+                    'Errors from elsewhere are not install problems, and the count arrives in the same model'
+                );
             }
 
         }

@@ -214,7 +214,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Stalled digest finding | Minor | Warns when the error digest is scheduled but has not run for two days. | Shipped | C-23 |
 | Module findings extension | Minor | Lets installed modules add their own Health Check findings without Core knowing about them. | Shipped | ADR-0057 |
 | Schedule all nightly jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Connect add), and one fix schedules them all. | Shipped | C-21, ADR-0075 |
+| Jobs of a deactivated owner | Minor | Health Check names every scheduled BarnCRM job whose owner was deactivated (it has stopped but still looks scheduled), and one fix schedules them again as the admin. | Built, not merged (fix/admin-4) | ADMIN-12, new ADR |
 | Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Shipped | plan 11.3 |
+| One capped error count | Minor | The home page, the Error Log tile and Health Check share one capped count of new errors, and the install problem count arrives in the home page's one server call. | Built, not merged (fix/admin-4) | ADMIN-8 |
 
 ### 1.9 Record Pages and App Experience
 

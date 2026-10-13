@@ -371,7 +371,7 @@ private class ErrorLoggerTest {
             TestDataFactory.insertErrorLogs(2, ErrorLogger.STATUS_RESOLVED);
 
             Test.startTest();
-            Integer newCount = ErrorLogSelector.countNew();
+            Integer newCount = ErrorLogCountSelector.countNewUpTo(1000);
             List<Error_Log__c> recent = ErrorLogSelector.selectRecent(5);
             List<Error_Log__c> defaulted = ErrorLogSelector.selectRecent(null);
             List<Error_Log__c> capped = ErrorLogSelector.selectRecent(-3);

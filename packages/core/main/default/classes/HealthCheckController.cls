@@ -143,11 +143,38 @@ public with sharing class HealthCheckController {
         if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
             return System.Label.Core_HealthCheck_NightlyJobsFix;
         }
+        if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
+            return System.Label.Core_HealthCheck_InactiveOwnerJobsFix;
+        }
         return null;
     }
 
     /** Runs the fix and returns the sentence that says what it did. */
     private static String runFix(String fixKey, List<String> scope) {
+        if (HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
+            List<String> stoppedOnly = NightlyJobs.rescheduleAsRunningUser(scope);
+            List<String> again = new List<String>();
+            for (String name : scope) {
+                if (!stoppedOnly.contains(name)) {
+                    again.add(name);
+                }
+            }
+            String outcome = again.isEmpty()
+                ? ''
+                : String.format(
+                      System.Label.Core_HealthCheck_FixScheduled,
+                      new List<Object>{ String.join(again, ', ') }
+                  );
+            if (!stoppedOnly.isEmpty()) {
+                outcome +=
+                    (outcome == '' ? '' : ' ') +
+                    String.format(
+                        System.Label.Core_HealthCheck_FixStoppedOnly,
+                        new List<Object>{ String.join(stoppedOnly, ', ') }
+                    );
+            }
+            return outcome;
+        }
         if (HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS.equals(fixKey)) {
             return String.format(
                 System.Label.Core_HealthCheck_FixScheduled,

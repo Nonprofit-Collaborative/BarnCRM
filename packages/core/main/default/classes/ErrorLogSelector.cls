@@ -9,16 +9,7 @@ public with sharing class ErrorLogSelector {
     private static final Integer DEFAULT_ROWS = 5;
     private static final Integer MAX_ROWS = 200;
 
-    public static Integer countNew() {
-        String statusNew = ErrorLogger.STATUS_NEW;
-        return [
-            SELECT COUNT()
-            FROM Error_Log__c
-            WHERE Status__c = :statusNew
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-    }
+    // Counting new entries is ErrorLogCountSelector.countNewUpTo, the one capped count.
 
     public static List<Error_Log__c> selectRecent(Integer rowCount) {
         Integer rows = rowCount == null ||

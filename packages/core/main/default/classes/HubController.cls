@@ -14,6 +14,13 @@ public with sharing class HubController {
     private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'BarnCRM home';
 
+    /**
+     * The tile counts this many new errors and then says "more", so a flooded Error Log costs
+     * the home page at most this many query rows plus one. A test lowers it.
+     */
+    @TestVisible
+    private static Integer errorCountCap = 999;
+
     public class HomeModel {
         @AuraEnabled
         public Boolean canEdit;
@@ -24,6 +31,12 @@ public with sharing class HubController {
         /** True when there are more new errors than `newErrorCount`, the most the tile counts. */
         @AuraEnabled
         public Boolean newErrorCountCapped;
+        /**
+         * Problems the install and its upgrades logged that nobody has looked at, capped like
+         * the error count; null for someone who cannot read the Error Log.
+         */
+        @AuraEnabled
+        public Integer installProblemCount;
         @AuraEnabled
         public Integer stepsCompleted;
         @AuraEnabled
@@ -73,9 +86,7 @@ public with sharing class HubController {
         model.stepsTotal = steps.size();
         model.stepsCompleted = SetupAssistantService.countCompleted(steps);
         model.automationPaused = readAutomationPaused();
-        Integer newErrors = readNewErrorCount();
-        model.newErrorCountCapped = newErrors > HubErrorCountSelector.cap();
-        model.newErrorCount = model.newErrorCountCapped ? HubErrorCountSelector.cap() : newErrors;
+        readErrorCounts(model);
         readRollupFreshness(model);
         readSeasonalAddressRun(model);
         model.recurringSources = readRecurringSources();
@@ -152,12 +163,24 @@ public with sharing class HubController {
         return result;
     }
 
-    private static Integer readNewErrorCount() {
+    /**
+     * The new error count and the install problem count, both capped (ADMIN-8). The Error Log
+     * ships in Core, so the static, user mode count in ErrorLogCountSelector is enough: it
+     * answers zero for someone who cannot read the log.
+     */
+    private static void readErrorCounts(HomeModel model) {
         try {
-            return HubErrorCountSelector.countNewErrors();
+            Integer newErrors = ErrorLogCountSelector.countNewUpTo(errorCountCap);
+            model.newErrorCountCapped = newErrors > errorCountCap;
+            model.newErrorCount = Math.min(newErrors, errorCountCap);
+            Integer installProblems = CorePostInstall.countInstallProblemsUpTo(errorCountCap);
+            model.installProblemCount = installProblems == null
+                ? null
+                : Math.min(installProblems, errorCountCap);
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            return 0;
+            model.newErrorCount = 0;
+            model.newErrorCountCapped = false;
         }
     }
 

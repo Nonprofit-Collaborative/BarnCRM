@@ -20,14 +20,18 @@ public with sharing class FieldUtilizationScheduler implements Schedulable {
         if (existing != null) {
             return existing;
         }
-        return System.schedule(JOB_NAME, WEEKLY_CRON, new FieldUtilizationScheduler());
+        return ScheduledJobSelector.schedule(
+            JOB_NAME,
+            WEEKLY_CRON,
+            new FieldUtilizationScheduler()
+        );
     }
 
     /** Stops the weekly count. Saved counts stay. */
     public static void stop() {
         Id existing = ScheduledJobSelector.triggerIdByName(JOB_NAME);
         if (existing != null) {
-            System.abortJob(existing);
+            ScheduledJobSelector.abort(existing);
         }
     }
 

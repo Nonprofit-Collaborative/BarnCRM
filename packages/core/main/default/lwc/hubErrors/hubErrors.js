@@ -1,7 +1,6 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
-import countInstallProblems from '@salesforce/apex/CorePostInstall.countInstallProblems';
 import HEADING from '@salesforce/label/c.Core_HubHome_ErrorTileHeading';
 import LINK from '@salesforce/label/c.Core_HubHome_ErrorTileLinkLabel';
 import INSTALL_COMPLETED from '@salesforce/label/c.Core_HubHome_InstallCompleted';
@@ -20,7 +19,8 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
   newErrorCountCapped = false;
   errorMessage;
 
-  // How many problems the install logged, or undefined for someone who cannot read the log.
+  // How many problems the install logged, or null or undefined for someone who cannot read
+  // the log. It arrives in the home model, the one server call the tiles share (ADMIN-8).
   installProblemCount;
 
   @wire(getHomeModel)
@@ -28,19 +28,10 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
     if (data) {
       this.newErrorCount = data.newErrorCount || 0;
       this.newErrorCountCapped = Boolean(data.newErrorCountCapped);
+      this.installProblemCount = data.installProblemCount;
       this.errorMessage = undefined;
     } else if (error) {
       this.errorMessage = LOAD_ERROR;
-    }
-  }
-
-  // Optional: a count that cannot be read costs the tile one line, not the tile.
-  @wire(countInstallProblems)
-  wiredInstallProblems({ data, error }) {
-    if (error) {
-      this.installProblemCount = undefined;
-    } else if (data !== undefined) {
-      this.installProblemCount = data;
     }
   }
 

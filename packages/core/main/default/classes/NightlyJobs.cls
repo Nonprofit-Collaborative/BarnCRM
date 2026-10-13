@@ -78,6 +78,34 @@ public with sharing class NightlyJobs {
         return scheduled;
     }
 
+    /**
+     * Stops each named job and schedules it again to run as the running user, for jobs whose
+     * owner was deactivated (ADMIN-12): such a job stops running but keeps its trigger, so it
+     * reads as scheduled. Every job this class knows is scheduled again by `scheduleAll`, and the
+     * end of a running automation pause by AutomationResumeJob. Returns the names that are not
+     * scheduled afterwards, such as a module job Health Check never schedules for anyone.
+     */
+    public static List<String> rescheduleAsRunningUser(List<String> jobNames) {
+        Datetime pauseEnds = AutomationControl.pausedUntil();
+        for (String name : jobNames) {
+            Id triggerId = ScheduledJobSelector.triggerIdByName(name);
+            if (triggerId != null) {
+                ScheduledJobSelector.abort(triggerId);
+            }
+        }
+        scheduleAll();
+        if (jobNames.contains(AutomationResumeJob.JOB_NAME) && pauseEnds != null) {
+            AutomationResumeJob.scheduleAt(pauseEnds);
+        }
+        List<String> stoppedOnly = new List<String>();
+        for (String name : jobNames) {
+            if (ScheduledJobSelector.triggerIdByName(name) == null) {
+                stoppedOnly.add(name);
+            }
+        }
+        return stoppedOnly;
+    }
+
     private static List<NightlyJob> providedBy(String className) {
         try {
             NightlyJobProvider provider = providerOverrides.containsKey(className)

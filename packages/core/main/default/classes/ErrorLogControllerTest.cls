@@ -20,6 +20,22 @@ private class ErrorLogControllerTest {
             Assert.isNotNull(tile.recent[0].message, 'Each line shows the message.');
             Assert.isNotNull(tile.recent[0].context, 'And where it came from.');
             Assert.isNotNull(tile.recent[0].occurredAt, 'And when it happened.');
+            Assert.isFalse(tile.newCountCapped, 'Under the cap the count is exact.');
+        }
+    }
+
+    @IsTest
+    static void theTileCountStopsAtItsCap() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.insertErrorLogs(7, ErrorLogger.STATUS_NEW);
+            ErrorLogController.newCountCap = 5;
+
+            Test.startTest();
+            ErrorLogController.ErrorLogTileView tile = ErrorLogController.getTile(5);
+            Test.stopTest();
+
+            Assert.areEqual(5, tile.newCount, 'The tile shows the cap.');
+            Assert.isTrue(tile.newCountCapped, 'And says there are more than that.');
         }
     }
 
