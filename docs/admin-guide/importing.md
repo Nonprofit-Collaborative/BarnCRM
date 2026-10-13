@@ -488,8 +488,12 @@ and organizations (accounts), and the standard ones not already listed, wherever
 them. Fields Salesforce calculates (formulas, roll-ups, auto numbers), lookups to other records
 and the fields BarnCRM keeps for itself are not listed. A value is read as the field's type,
 the same way a one-object load reads it (section 9): a date as 2026-10-12 or as your Salesforce
-locale writes dates (4/2/1980 in the United States), a number with or without thousands
-separators and a currency or percent sign, a time as 14:30. A value the field cannot take (a
+locale writes dates (4/2/1980 in the United States), a number as a spreadsheet exports it, a
+time as 14:30. For numbers that means a currency symbol or code ($1,250.00, €100, USD 1,250),
+grouping as your locale writes it (1,250.50 in the United States, 1.250,50 in Germany, 1 250,50
+in France), a percent sign, and a minus sign or brackets for a negative ((45.00) is -45). A
+value whose decimal mark cannot be told, such as 1.250 when your locale writes decimals with a
+comma and groups with spaces, is refused rather than guessed. A value the field cannot take (a
 date or number that cannot be read, text longer than the field) rejects the row, and the row
 names the field and the value; checkboxes are below. Fix the cell and import the rejected rows
 again.
