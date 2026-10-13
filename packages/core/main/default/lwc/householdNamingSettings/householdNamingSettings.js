@@ -149,7 +149,8 @@ export default class HouseholdNamingSettings extends LightningElement {
     values[NAME_KEY] = this.namePattern;
     values[FORMAL_KEY] = this.formalPattern;
     values[INFORMAL_KEY] = this.informalPattern;
-    return saveSettings({ settings: values })
+    // The key must match the Apex parameter name (SettingsController.saveSettings(values)).
+    return saveSettings({ values })
       .then(() => {
         this.errorMessage = undefined;
         this.toast(SAVED, 'success');
