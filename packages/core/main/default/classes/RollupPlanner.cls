@@ -342,7 +342,7 @@ public with sharing class RollupPlanner {
         return String.join(parts, '.');
     }
 
-    /** The filter and the fiscal window, as `RollupAdapter` builds them for the vendored engine. */
+    /** The filter and the fiscal window of one definition, as one WHERE clause. */
     private static String whereClauseFor(Rollup_Definition__c definition) {
         List<String> fragments = new List<String>();
         String filterClause = RollupFilterParser.toWhereClause(definition.Filter_JSON__c);

@@ -32,8 +32,6 @@ There is no exemption marker. The `// detection-only:` marker `check-standard-ob
 honors exists for string constants, which this check already accepts; anything it would
 still find is a compile-time reference, which no marker makes safe.
 
-The vendored rollup engine (packages/*/vendor) is third party source and is not scanned.
-
 Exit code 1 on any reference found.
 """
 

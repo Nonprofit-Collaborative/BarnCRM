@@ -154,7 +154,7 @@ def check_group(path):
     """Every permission set a group names that no package ships.
 
     A permission set group is deployed with the sets it contains, and the packages deploy in
-    stages: the vendored engine, then Core, then Giving. A Core group naming a Giving
+    stages: Core, then Giving. A Core group naming a Giving
     permission set would therefore be undeployable at the moment Core goes in, whatever the
     final org looks like once both packages are installed.
     """

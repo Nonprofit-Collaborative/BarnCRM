@@ -37,8 +37,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /** Children never counted as something a record gained: the import's own bookkeeping. */
     private static final Set<String> NOT_GAINED = new Set<String>{
         'import_row__c',
-        'import_journal__c',
-        'rollupcalcitem__c'
+        'import_journal__c'
     };
 
     /**

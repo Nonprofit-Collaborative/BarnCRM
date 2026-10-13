@@ -74,8 +74,6 @@ Governance is BDFL (the project owner decides) for v0.x, with a maintainers grou
 
 BarnCRM is licensed under the [Apache License, Version 2.0](LICENSE) (Decision D-08, confirmed 2026-09-22). Apache-2.0 is permissive and carries an explicit patent grant, which protects both the organizations that install BarnCRM and the people who contribute to it. Attribution notices are in [NOTICE](NOTICE).
 
-Third party code carried in this repository is licensed separately by its authors. There is one such component today: [apex-rollup](https://github.com/jamessimone/apex-rollup) (Copyright (c) 2019 James Simone, MIT), vendored under [`packages/core/vendor/apex-rollup/`](packages/core/vendor/apex-rollup/) with its license text alongside it.
-
 BarnCRM is the project name. The name and any associated logo are the project's marks. Distinctiveness rests on the pair of words and a consistent visual identity, so please do not use the name or marks for a fork, a derivative product, or a service in a way that suggests it is the official project.
 
 ## Not goals

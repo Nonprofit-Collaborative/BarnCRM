@@ -164,6 +164,17 @@ painful in DLRS is mitigated as follows:
   engines inside a savepoint it rolls back and lists every value that differs
   (`docs/contributor-guide/rollup-engine-comparison.md`). S9 deletes them once every difference
   is explained.
+- S9 deletes the vendored tree, `RollupAdapter`, `Rollup__mdt`, `RollupCalcItem__c`, the
+  `VENDOR_ONLY` allowlist section, the `.prettierignore` and `NOTICE` entries, the vendored
+  deploy stage, and `RollupEngineComparison` with its guide and labels: the utility compares
+  the two engines, so it cannot outlive one of them, and its last run is the record of
+  decision 1. The deletion lands only after that run on a test org has explained every
+  difference.
+- The deletion also fixes deployability. A check-only deploy to a sandbox showed the vendored
+  apex-rollup test classes fail to compile on an org without the Data Protection and Privacy
+  objects (`ContactPointAddress`, `Individual`, `ContactPointConsent`), which upstream's tests
+  use as fixtures. Those classes ship inside Core's package, so while the tree stays, Core
+  cannot install on such an org, against ADR-0013; with it gone, Core names none of them.
 - Decision 6's finalizer cannot apply to a batch (a `System.Finalizer` attaches only to a
   Queueable). The full recalculation batch instead raises `BatchApexErrorEvent`
   (`Database.RaisesPlatformEvents`), and a handler writes a stopped chunk's records to the
