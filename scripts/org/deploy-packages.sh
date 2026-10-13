@@ -443,6 +443,7 @@ deploy_stage "Core (Apex)" \
 # After Apex, which a flow can call, and before the UI, which can launch a flow.
 deploy_stage "Core (flows)" "packages/core/main/default/flows" || exit $?
 deploy_stage "Core (UI and permissions)" \
+  "packages/core/main/default/contentassets" \
   "packages/core/main/default/permissionsets" \
   "packages/core/main/default/permissionsetgroups" \
   "packages/core/main/default/layouts" \

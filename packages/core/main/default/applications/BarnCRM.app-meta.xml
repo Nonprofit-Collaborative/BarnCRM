@@ -33,7 +33,9 @@
     <pageOrSobjectType>Contact</pageOrSobjectType>
   </actionOverrides>
   <brand>
-    <headerColor>#1B5E20</headerColor>
+    <headerColor>#007A9E</headerColor>
+    <logo>BarnCRM_Logo</logo>
+    <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
@@ -44,8 +46,9 @@
   <formFactors>Small</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+  <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM</label>
-  <navType>Standard</navType>
+  <navType>Console</navType>
   <tabs>BarnCRM_Home</tabs>
   <tabs>Households</tabs>
   <tabs>standard-Contact</tabs>
@@ -57,5 +60,60 @@
   <tabs>BarnCRM_Settings</tabs>
   <tabs>Rollup_Builder</tabs>
   <tabs>Error_Log__c</tabs>
+  <tabs>Address__c</tabs>
+  <tabs>Relationship__c</tabs>
+  <tabs>Affiliation__c</tabs>
+  <tabs>Household_Member__c</tabs>
   <uiType>Lightning</uiType>
+  <workspaceConfig>
+    <mappings>
+      <tab>BarnCRM_Home</tab>
+    </mappings>
+    <mappings>
+      <tab>Households</tab>
+    </mappings>
+    <mappings>
+      <tab>standard-Contact</tab>
+    </mappings>
+    <mappings>
+      <tab>Organizations</tab>
+    </mappings>
+    <mappings>
+      <tab>Import</tab>
+    </mappings>
+    <mappings>
+      <tab>Find</tab>
+    </mappings>
+    <mappings>
+      <tab>Bulk_Update</tab>
+    </mappings>
+    <mappings>
+      <tab>Data_Hygiene</tab>
+    </mappings>
+    <mappings>
+      <tab>BarnCRM_Settings</tab>
+    </mappings>
+    <mappings>
+      <tab>Rollup_Builder</tab>
+    </mappings>
+    <mappings>
+      <tab>Error_Log__c</tab>
+    </mappings>
+    <mappings>
+      <fieldName>Account__c</fieldName>
+      <tab>Address__c</tab>
+    </mappings>
+    <mappings>
+      <fieldName>Contact__c</fieldName>
+      <tab>Affiliation__c</tab>
+    </mappings>
+    <mappings>
+      <fieldName>Household__c</fieldName>
+      <tab>Household_Member__c</tab>
+    </mappings>
+    <mappings>
+      <fieldName>Contact__c</fieldName>
+      <tab>Relationship__c</tab>
+    </mappings>
+  </workspaceConfig>
 </CustomApplication>

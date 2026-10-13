@@ -41,6 +41,28 @@ person what they can act on:
 **New household** button, and the quick links. They are not shown a checklist they cannot
 finish or an error count for a log they cannot open.
 
+## How records open: tabs in a console
+
+The BarnCRM app is a console app, shown with a blue barn logo in the app launcher. Instead of
+replacing the page each time you click, it keeps the records you are working on open side by
+side in tabs across the top.
+
+- **Households, organizations, people and Error Log entries open in their own tab** (a
+  workspace tab). Open three households and you have three tabs; click one to go back to it.
+- **The records that belong to one of them open inside its tab** (a subtab):
+  - an address opens under its household,
+  - a relationship or an affiliation opens under the person it belongs to,
+  - a household member row opens under its household.
+
+  If that link is blank (for example an address that belongs to a person, not a household),
+  the record opens in its own tab instead.
+- **Pages such as Find, Import and BarnCRM Settings open as tabs too.** Choose them from the
+  navigation menu (the arrow next to the app name). Addresses, Relationships, Affiliations and
+  Household Members are at the end of that menu.
+- **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
+  still there when you come back.
+- **On a phone**, the Salesforce mobile app shows BarnCRM as an ordinary app without tabs.
+
 ## A five-minute walkthrough
 
 Maria has just installed BarnCRM and has the sample data loaded. She has the BarnCRM
@@ -145,6 +167,14 @@ compare it with the page that came with the package.
 - **Reading the checklist as a one-time task.** When every step is done the checklist
   collapses to a small **Setup complete** tile with a **Reopen setup** button. Re-run it
   whenever your organization changes: a new fiscal year, a new staff member, a new address.
+- **Expecting a record to replace the page.** In the console, a record opens in a tab and
+  the page you were on stays open in its own tab. If the screen feels crowded, close the tabs
+  you have finished with.
+- **Updating an org that already had the BarnCRM app without tabs.** Salesforce will not
+  switch an existing app to console tabs during a deployment. Before deploying, open Setup,
+  **App Manager**, click the arrow next to **BarnCRM**, choose **Edit**, then under **App
+  Options** set **Navigation Style** to **Console Navigation** and save. A new installation
+  needs nothing.
 - **Assuming an empty Errors tile means nothing failed.** The tile counts errors with the
   status **New**. If someone has already marked an error Acknowledged or Resolved, it
   stops counting. Open the Error Log tab to see everything.
