@@ -2266,4 +2266,141 @@ private class HouseholdServiceTest {
             Assert.areEqual(new Set<Id>{ occupied.Id }, result, 'Only the occupied household');
         }
     }
+
+    // ---------------------------------------------------------- one read per upkeep pass
+
+    /** An org shape with no native household groups, so the mutual exclusion asks nothing. */
+    private static OrgShapeDetector.OrgShape shapeWithoutNativeHouseholds() {
+        OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+        shape.hasNativeHouseholdGroups = false;
+        shape.hasPersonAccounts = false;
+        return shape;
+    }
+
+    /**
+     * PEOPLE-34: one upkeep pass reads the households once and their members once. In
+     * contact mode that is two queries, the households and the contacts in them, where the
+     * pass used to read both again for the primary, the count, the wording and the tidy-up.
+     */
+    @IsTest
+    static void oneUpkeepPassReadsTheDatabaseTwiceInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
+            insert household;
+            insert new Contact(
+                Salutation = 'Mr.',
+                FirstName = 'John',
+                LastName = 'Smith',
+                AccountId = household.Id
+            );
+            Set<Id> householdIds = new Set<Id>{ household.Id };
+            // A first pass settles the household and fills every per-transaction cache, so
+            // the pass measured has nothing to save and only its reads are counted.
+            HouseholdService.afterMembershipChange(householdIds, false);
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            HouseholdService.afterMembershipChange(householdIds, true);
+            Integer used = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.areEqual(2, used, 'One read of the households and one of their contacts');
+        }
+    }
+
+    /**
+     * PEOPLE-34 in junction mode: three queries, the households, their membership rows and
+     * the contacts those rows name.
+     */
+    @IsTest
+    static void oneUpkeepPassReadsTheDatabaseThreeTimesInJunctionMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
+            insert household;
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            insert john;
+            insert new Household_Member__c(
+                Household__c = household.Id,
+                Contact__c = john.Id,
+                Role__c = 'Head',
+                Is_Primary__c = true,
+                Start_Date__c = Date.today()
+            );
+            Set<Id> householdIds = new Set<Id>{ household.Id };
+            HouseholdService.afterMembershipChange(householdIds, false);
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            HouseholdService.afterMembershipChange(householdIds, true);
+            Integer used = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.areEqual(
+                3,
+                used,
+                'One read of the households, one of the membership rows, one of the contacts'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-34 in bulk: 200 households joined without upkeep, so each has a stale count,
+     * name and primary, are all put right by one pass.
+     */
+    @IsTest
+    static void oneUpkeepPassSettlesTwoHundredHouseholds() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
+            List<Account> households = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                households.add(HouseholdTestDataFactory.newHousehold('Household ' + i));
+            }
+            insert households;
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
+            insert people;
+            List<Household_Member__c> rows = new List<Household_Member__c>();
+            for (Integer i = 0; i < 200; i++) {
+                rows.add(
+                    new Household_Member__c(
+                        Household__c = households[i].Id,
+                        Contact__c = people[i].Id,
+                        Role__c = 'Head',
+                        Is_Primary__c = true,
+                        Start_Date__c = Date.today()
+                    )
+                );
+            }
+            AutomationControl.bypass('HouseholdMemberTriggerHandler');
+            insert rows;
+            AutomationControl.clearBypass('HouseholdMemberTriggerHandler');
+            Set<Id> householdIds = new Map<Id, Account>(households).keySet();
+
+            Test.startTest();
+            HouseholdService.afterMembershipChange(householdIds, true);
+            Test.stopTest();
+
+            Integer settled = 0;
+            for (Account household : [
+                SELECT Name, Member_Count__c, Primary_Contact__c
+                FROM Account
+                WHERE Id IN :householdIds
+            ]) {
+                Boolean right =
+                    household.Member_Count__c == 1 &&
+                    household.Primary_Contact__c != null &&
+                    household.Name.startsWith('The Bulk');
+                settled += right ? 1 : 0;
+            }
+            Assert.areEqual(
+                200,
+                settled,
+                'Every household was counted, named and given its primary'
+            );
+        }
+    }
 }

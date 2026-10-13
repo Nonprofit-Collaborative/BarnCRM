@@ -865,23 +865,213 @@ public with sharing class HouseholdService {
         try {
             // Who belongs to what has just changed, so any answer already given is stale.
             HOUSEHOLD_ID_BY_PERSON.clear();
-            // Before naming, so that the naming pass reads the primary as it now stands.
-            settlePrimaryContacts(householdIds);
-            recalculateMemberCounts(householdIds);
-            // Mutual exclusion (product-plan Section 11.2 item 9): a household that already
-            // carries a native Nonprofit Cloud household group keeps the name and greetings
-            // the customer maintains there. The member count above is BarnCRM's own
-            // bookkeeping and is left alone; only the naming write is guarded.
-            Set<Id> namableHouseholds = new Set<Id>(householdIds);
-            namableHouseholds.removeAll(
-                HouseholdSelector.nativeHouseholdAccountsAmong(householdIds)
-            );
-            HouseholdNamingService.applyNaming(namableHouseholds);
+            // One read of the households and one of their members for the whole pass
+            // (PEOPLE-34): the primary, the count and the wording are worked out from them in
+            // memory and saved in one write, and the tidy-up reads the same members.
+            List<Account> households = HouseholdSelector.getHouseholdsByIds(householdIds);
+            Map<Id, List<Person>> membersByHousehold = getMembers(householdIds);
+            settleHouseholds(households, membersByHousehold);
             if (mayTidyAway == true) {
-                deleteEmptyHouseholds(householdIds);
+                deleteEmptyHouseholds(households, membersByHousehold);
             }
         } finally {
             upkeepRunning = false;
+        }
+    }
+
+    /**
+     * The primary, the member count, the name and the greetings of each household, from one
+     * read of the households and their members, saved in one write.
+     *
+     * Each part keeps the rule it has on its own: the primary is settled on a household only
+     * (settlePrimaryContacts), the count on every account given when the org has no household
+     * record type (recalculateMemberCounts), and the wording skips a custom name and a
+     * household that carries a native Nonprofit Cloud household group (mutual exclusion,
+     * product-plan Section 11.2 item 9). The wording reads the primary as it now stands.
+     * Working out the wording is logged and skipped if it fails, as applyNaming does, and a
+     * household whose new wording is refused on save still gets its count and primary.
+     */
+    private static void settleHouseholds(
+        List<Account> households,
+        Map<Id, List<Person>> membersByHousehold
+    ) {
+        if (households.isEmpty()) {
+            return;
+        }
+        Id recordTypeId = householdRecordTypeId();
+        Map<Id, Id> primaryByHousehold = recordTypeId == null
+            ? new Map<Id, Id>()
+            : settledPrimaries(households, membersByHousehold, recordTypeId);
+        Map<Id, Account> worded = wordingOf(households, membersByHousehold, primaryByHousehold);
+        List<Account> updates = new List<Account>();
+        Map<Id, Account> bookkeepingById = new Map<Id, Account>();
+        for (Account household : households) {
+            Account change = new Account(Id = household.Id);
+            Boolean bookkept = false;
+            List<Person> members = membersByHousehold.get(household.Id);
+            Decimal count = members == null ? 0 : members.size();
+            Boolean counted = recordTypeId == null || household.RecordTypeId == recordTypeId;
+            if (counted && household.Member_Count__c != count) {
+                change.Member_Count__c = count;
+                bookkept = true;
+            }
+            Id primaryId = primaryByHousehold.get(household.Id);
+            if (
+                primaryByHousehold.containsKey(household.Id) &&
+                household.Primary_Contact__c != primaryId
+            ) {
+                change.Primary_Contact__c = primaryId;
+                bookkept = true;
+            }
+            if (bookkept) {
+                bookkeepingById.put(household.Id, change.clone(true, true));
+            }
+            Account renamed = worded.get(household.Id);
+            if (renamed != null) {
+                change.Name = renamed.Name;
+                change.Household_Formal_Greeting__c = renamed.Household_Formal_Greeting__c;
+                change.Household_Informal_Greeting__c = renamed.Household_Informal_Greeting__c;
+            }
+            if (bookkept || renamed != null) {
+                updates.add(change);
+            }
+        }
+        Set<Id> refused = writeSettledHouseholds(updates);
+        // A household whose wording was refused, by a duplicate rule on the name for example,
+        // still gets the count and primary it would have had with the wording saved apart.
+        List<Account> retries = new List<Account>();
+        for (Id householdId : refused) {
+            if (worded.containsKey(householdId) && bookkeepingById.containsKey(householdId)) {
+                retries.add(bookkeepingById.get(householdId));
+            }
+        }
+        writeSettledHouseholds(retries);
+    }
+
+    /**
+     * The Primary Contact each household should hold, keyed by household id, for households
+     * only: an organization shares the field (R-O3), where it names the person the
+     * organization deals with, and household upkeep never touches it.
+     *
+     * Junction mode: the field names the current member marked Is Primary. A member stored as
+     * a contact is named as that contact; a member stored as a person account is named as the
+     * contact the platform keeps behind that account, which a Contact lookup accepts. More
+     * than one primary, which only a data load can produce, mirrors the first in member order.
+     *
+     * Contact mode: the field is the mark itself, set by a person, and is kept unless the
+     * person it names has left.
+     *
+     * Either way nothing is promoted when there is no primary (R-H10): the canonical model says
+     * the next member is proposed, not silently assigned, so a split that moves the primary
+     * out leaves the household with no primary rather than one naming somebody who has left.
+     */
+    private static Map<Id, Id> settledPrimaries(
+        List<Account> households,
+        Map<Id, List<Person>> membersByHousehold,
+        Id recordTypeId
+    ) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        Boolean junction = isJunctionMode();
+        Set<Id> primariesStoredAsAccounts = new Set<Id>();
+        for (Account household : households) {
+            if (household.RecordTypeId != recordTypeId) {
+                continue;
+            }
+            List<Person> members = membersByHousehold.get(household.Id);
+            Id primaryId = junction
+                ? firstPrimaryId(members)
+                : memberOrNull(household.Primary_Contact__c, members);
+            result.put(household.Id, primaryId);
+            if (primaryId != null && primaryId.getSObjectType() == Account.SObjectType) {
+                primariesStoredAsAccounts.add(primaryId);
+            }
+        }
+        if (primariesStoredAsAccounts.isEmpty()) {
+            return result;
+        }
+        // One read for every household in the pass, and none when no primary is an account.
+        Map<Id, Id> personContactByAccount = PersonRecordSelector.getPersonContactIds(
+            primariesStoredAsAccounts
+        );
+        for (Id householdId : result.keySet()) {
+            Id primaryId = result.get(householdId);
+            if (primaryId != null && primariesStoredAsAccounts.contains(primaryId)) {
+                result.put(householdId, personContactByAccount.get(primaryId));
+            }
+        }
+        return result;
+    }
+
+    /** The person given when they are among the members, otherwise null. */
+    private static Id memberOrNull(Id personId, List<Person> members) {
+        if (personId == null || members == null) {
+            return null;
+        }
+        for (Person member : members) {
+            if (member.id == personId) {
+                return personId;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The name and greetings each household now calls for, keyed by household id, holding
+     * only the households whose wording changes. Logged and empty on a failure, as
+     * applyNaming is, so the count and primary are still saved.
+     */
+    private static Map<Id, Account> wordingOf(
+        List<Account> households,
+        Map<Id, List<Person>> membersByHousehold,
+        Map<Id, Id> primaryByHousehold
+    ) {
+        Map<Id, Account> result = new Map<Id, Account>();
+        try {
+            Set<Id> natives = HouseholdSelector.nativeHouseholdAccountsAmong(
+                new Map<Id, Account>(households).keySet()
+            );
+            HouseholdNamingService.Wording wording = new HouseholdNamingService.Wording();
+            // R-H5 reads the primary from the mode's own source of truth: the membership rows
+            // in junction mode (getMembers has already flagged it), the settled field in
+            // contact mode.
+            Boolean primaryFromField = !isJunctionMode();
+            for (Account household : households) {
+                if (natives.contains(household.Id)) {
+                    continue;
+                }
+                Id primaryId = null;
+                if (primaryFromField) {
+                    primaryId = primaryByHousehold.containsKey(household.Id)
+                        ? primaryByHousehold.get(household.Id)
+                        : household.Primary_Contact__c;
+                }
+                List<Person> members = membersByHousehold.get(household.Id);
+                Account change = new Account(Id = household.Id);
+                if (wording.apply(household, members, primaryId, change)) {
+                    result.put(household.Id, change);
+                }
+            }
+        } catch (Exception e) {
+            ErrorLogger.log(e, Label.Core_Households_ErrorContextNaming);
+            result.clear();
+        }
+        return result;
+    }
+
+    /**
+     * Saves the settled households as package upkeep (ADR-0021), marked as the package's own
+     * Primary Contact write so the junction mode guard lets it through, and answers the ids
+     * the save refused (HouseholdWriter logs each refusal).
+     */
+    private static Set<Id> writeSettledHouseholds(List<Account> updates) {
+        if (updates.isEmpty()) {
+            return new Set<Id>();
+        }
+        writingPrimaryContacts = true;
+        try {
+            return HouseholdWriter.updateHouseholdsReportingRefusals(updates);
+        } finally {
+            writingPrimaryContacts = false;
         }
     }
 
@@ -1937,59 +2127,24 @@ public with sharing class HouseholdService {
         if (householdIds == null || householdIds.isEmpty()) {
             return;
         }
-        if (isJunctionMode()) {
-            mirrorPrimaryMembers(householdIds);
-        } else {
-            clearDepartedPrimaryContacts(householdIds);
-        }
-    }
-
-    /**
-     * Junction mode: Primary Contact names the current member marked Is Primary. A member
-     * stored as a contact is named as that contact. A member stored as a person account is
-     * named as the contact the platform keeps behind that account, which a Contact lookup
-     * accepts; PersonRecordSelector reads it without naming it at compile time. No primary
-     * member means no Primary Contact: nobody is promoted (R-H10). More than one, which only a
-     * data load can produce, mirrors the first in member order and leaves the rows alone.
-     *
-     * Only households: an organization shares the field (R-O3) and is never touched. The
-     * member read is upkeep (ADR-0021), the same system mode read naming and counting use.
-     */
-    private static void mirrorPrimaryMembers(Set<Id> householdIds) {
         Id recordTypeId = householdRecordTypeId();
-        Map<Id, Account> households = new Map<Id, Account>();
-        for (Account household : HouseholdSelector.getHouseholdsByIds(householdIds)) {
-            if (recordTypeId != null && household.RecordTypeId == recordTypeId) {
-                households.put(household.Id, household);
-            }
-        }
-        if (households.isEmpty()) {
+        if (recordTypeId == null) {
             return;
         }
-        Map<Id, List<Person>> membersByHousehold = getMembers(households.keySet());
-        Map<Id, Id> primaryByHousehold = new Map<Id, Id>();
-        Set<Id> primariesStoredAsAccounts = new Set<Id>();
-        for (Id householdId : households.keySet()) {
-            Id primaryId = firstPrimaryId(membersByHousehold.get(householdId));
-            primaryByHousehold.put(householdId, primaryId);
-            if (primaryId != null && primaryId.getSObjectType() == Account.SObjectType) {
-                primariesStoredAsAccounts.add(primaryId);
-            }
-        }
-        // One read for every household in the pass, and none when no primary is an account.
-        Map<Id, Id> personContactByAccount = PersonRecordSelector.getPersonContactIds(
-            primariesStoredAsAccounts
+        List<Account> households = HouseholdSelector.getHouseholdsByIds(householdIds);
+        Map<Id, Id> primaryByHousehold = settledPrimaries(
+            households,
+            getMembers(householdIds),
+            recordTypeId
         );
         List<Account> updates = new List<Account>();
-        for (Account household : households.values()) {
+        for (Account household : households) {
             Id primaryId = primaryByHousehold.get(household.Id);
-            Id mirrored = primaryId == null
-                ? null
-                : primaryId.getSObjectType() == Contact.SObjectType
-                      ? primaryId
-                      : personContactByAccount.get(primaryId);
-            if (household.Primary_Contact__c != mirrored) {
-                updates.add(new Account(Id = household.Id, Primary_Contact__c = mirrored));
+            if (
+                primaryByHousehold.containsKey(household.Id) &&
+                household.Primary_Contact__c != primaryId
+            ) {
+                updates.add(new Account(Id = household.Id, Primary_Contact__c = primaryId));
             }
         }
         writePrimaryContacts(updates);
@@ -2110,60 +2265,6 @@ public with sharing class HouseholdService {
     }
 
     /**
-     * Clears Primary Contact on any household whose primary contact is no longer one of
-     * its current members. R-H10.
-     *
-     * The reference is cleared and nothing is promoted in its place: the canonical model
-     * says the next member by ordering is proposed, not silently assigned, so choosing a
-     * new primary contact stays a decision somebody makes. A split that moves the primary
-     * contact out therefore leaves the household with no primary contact rather than with
-     * a reference to somebody who has left.
-     *
-     * Contact mode only: in junction mode the field is a mirror, settled by
-     * mirrorPrimaryMembers instead.
-     */
-    private static void clearDepartedPrimaryContacts(Set<Id> householdIds) {
-        Id recordTypeId = householdRecordTypeId();
-        List<Account> households = HouseholdSelector.getHouseholdsByIds(householdIds);
-        Set<Id> withPrimary = new Set<Id>();
-        for (Account household : households) {
-            // Only a household. An organization shares the Primary Contact field (R-O3),
-            // where it names the person the organization deals with rather than a member, and
-            // household upkeep never touches it.
-            Boolean isHousehold = recordTypeId != null && household.RecordTypeId == recordTypeId;
-            if (isHousehold && household.Primary_Contact__c != null) {
-                withPrimary.add(household.Id);
-            }
-        }
-        if (withPrimary.isEmpty()) {
-            return;
-        }
-        // One read of the members of every household that has a primary contact, so a
-        // split of fifty households still asks once.
-        Map<Id, List<Person>> membersByHousehold = getMembers(withPrimary);
-        List<Account> updates = new List<Account>();
-        for (Account household : households) {
-            if (!withPrimary.contains(household.Id)) {
-                continue;
-            }
-            Boolean stillAMember = false;
-            List<Person> members = membersByHousehold.get(household.Id);
-            if (members != null) {
-                for (Person member : members) {
-                    if (member.id == household.Primary_Contact__c) {
-                        stillAMember = true;
-                        break;
-                    }
-                }
-            }
-            if (!stillAMember) {
-                updates.add(new Account(Id = household.Id, Primary_Contact__c = null));
-            }
-        }
-        writePrimaryContacts(updates);
-    }
-
-    /**
      * Recounts current members on each household given. R-H11.
      */
     @NamespaceAccessible
@@ -2211,14 +2312,31 @@ public with sharing class HouseholdService {
         if (householdIds == null || householdIds.isEmpty()) {
             return;
         }
+        if (!deletesEmptyHouseholds()) {
+            return;
+        }
+        deleteEmptyHouseholds(
+            HouseholdSelector.getHouseholdsByIds(householdIds),
+            getMembers(householdIds)
+        );
+    }
+
+    private static Boolean deletesEmptyHouseholds() {
         BarnCRM_Settings__c settings = SettingsService.getSettings();
-        if (settings == null || settings.Delete_Empty_Households__c != true) {
+        return settings != null && settings.Delete_Empty_Households__c == true;
+    }
+
+    /** The same, from households and members the caller has already read. */
+    private static void deleteEmptyHouseholds(
+        List<Account> households,
+        Map<Id, List<Person>> membersByHousehold
+    ) {
+        if (!deletesEmptyHouseholds()) {
             return;
         }
         Id recordTypeId = householdRecordTypeId();
-        Map<Id, List<Person>> membersByHousehold = getMembers(householdIds);
         List<Account> empties = new List<Account>();
-        for (Account household : HouseholdSelector.getHouseholdsByIds(householdIds)) {
+        for (Account household : households) {
             List<Person> members = membersByHousehold.get(household.Id);
             Boolean isHousehold = recordTypeId != null && household.RecordTypeId == recordTypeId;
             if (isHousehold && (members == null || members.isEmpty())) {
