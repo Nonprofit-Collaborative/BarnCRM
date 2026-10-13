@@ -7,8 +7,6 @@
  * authorization for everything the run does in system mode afterwards (ADR-0027).
  */
 public with sharing class SeasonalAddressController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
-
     /** Raised with a message the panel shows as it is. */
     public class SeasonalAddressException extends Exception {
     }
@@ -81,7 +79,7 @@ public with sharing class SeasonalAddressController {
     }
 
     private static Boolean canManage() {
-        return FeatureManagement.checkPermission(EDIT_PERMISSION);
+        return BarnCRMPermissions.canManageSettings();
     }
 
     private static void requirePermission() {

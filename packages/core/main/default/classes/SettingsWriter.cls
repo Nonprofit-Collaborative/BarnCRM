@@ -25,9 +25,6 @@
  * Reads are unaffected and stay as they were.
  */
 public with sharing class SettingsWriter {
-    @TestVisible
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
-
     /** Raised when a caller reaches the write without the Manage BarnCRM Settings permission. */
     public class PermissionException extends Exception {
     }
@@ -46,7 +43,7 @@ public with sharing class SettingsWriter {
         if (changed == null || changed.isEmpty()) {
             return;
         }
-        if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw new PermissionException(System.Label.Core_Settings_PermissionRequiredError);
         }
         OrgSettingsSystemWriter.saveOver(type, stored, changed);

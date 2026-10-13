@@ -18,9 +18,6 @@ public with sharing class CoexistenceService {
     public static final String KEY_COEXISTENCE_MODE = 'Coexistence_Mode__c';
     public static final String KEY_MEMBERSHIP_MODE = 'Household_Membership_Mode__c';
 
-    /** The custom permission that gates changing the mode. */
-    public static final String MANAGE_SETTINGS = 'Manage_BarnCRM_Settings';
-
     private static final Set<String> VALID_MODES = new Set<String>{
         MODE_STANDALONE,
         MODE_NPSP,
@@ -279,7 +276,7 @@ public with sharing class CoexistenceService {
      */
     @NamespaceAccessible
     public static void applyMode(String mode) {
-        if (!FeatureManagement.checkPermission(MANAGE_SETTINGS)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw new CoexistenceException(System.Label.Core_HealthCheck_PermissionRequired);
         }
         setMode(mode);

@@ -5,7 +5,6 @@
  * return a message Maria can act on.
  */
 public with sharing class ModuleManagerController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'Module Manager';
 
     /** Everything the Module Manager draws. */
@@ -70,7 +69,7 @@ public with sharing class ModuleManagerController {
 
     private static ManagerState buildState() {
         ManagerState state = new ManagerState();
-        state.canEdit = FeatureManagement.checkPermission(EDIT_PERMISSION);
+        state.canEdit = BarnCRMPermissions.canManageSettings();
         state.modules = ModuleManagerService.getModules();
         return state;
     }
@@ -83,7 +82,7 @@ public with sharing class ModuleManagerController {
     }
 
     private static void requireEdit() {
-        if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw asAuraException(System.Label.Core_Settings_PermissionRequiredError);
         }
     }

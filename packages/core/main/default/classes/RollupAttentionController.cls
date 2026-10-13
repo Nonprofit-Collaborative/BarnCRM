@@ -49,7 +49,7 @@ public with sharing class RollupAttentionController {
     public static Attention getAttention() {
         try {
             Attention attention = new Attention();
-            attention.canManage = FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+            attention.canManage = BarnCRMPermissions.canManageSettings();
             attention.waiting = waiting();
             attention.failed = failedRecords();
             attention.nightlyScheduled = RollupScheduler.isScheduled();
@@ -69,7 +69,7 @@ public with sharing class RollupAttentionController {
     @AuraEnabled
     public static Attention retry(List<Id> entryIds) {
         try {
-            if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
+            if (!BarnCRMPermissions.canManageSettings()) {
                 throw new RollupService.RollupServiceException(
                     Label.Core_Rollups_ErrorNoPermission
                 );

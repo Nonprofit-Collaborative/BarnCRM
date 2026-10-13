@@ -19,8 +19,6 @@ public with sharing class ErrorDigestRecipients {
     @TestVisible
     private static Integer recipientCap = MAX_RECIPIENTS;
 
-    private static final String MANAGE_SETTINGS = 'Manage_BarnCRM_Settings';
-
     /**
      * The users the digest goes to: those whose addresses are listed, in the order listed, or,
      * when none is, every active user holding Manage BarnCRM Settings. At most MAX_RECIPIENTS (50).
@@ -28,7 +26,7 @@ public with sharing class ErrorDigestRecipients {
     public static List<User> resolve(String configured) {
         if (String.isBlank(configured)) {
             return ErrorDigestSelector.activeUsers(
-                CustomPermissionSelector.holderIds(MANAGE_SETTINGS),
+                CustomPermissionSelector.holderIds(BarnCRMPermissions.MANAGE_SETTINGS),
                 recipientCap
             );
         }

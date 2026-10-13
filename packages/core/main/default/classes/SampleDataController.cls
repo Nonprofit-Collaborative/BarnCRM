@@ -59,7 +59,7 @@ public with sharing class SampleDataController {
         if (permissionOverride != null) {
             return permissionOverride;
         }
-        return FeatureManagement.checkPermission('Manage_BarnCRM_Settings');
+        return BarnCRMPermissions.canManageSettings();
     }
 
     /**

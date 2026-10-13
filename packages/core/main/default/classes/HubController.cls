@@ -11,7 +11,6 @@
  * page.
  */
 public with sharing class HubController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String ERROR_CONTEXT = 'BarnCRM home';
 
     public class HomeModel {
@@ -68,7 +67,7 @@ public with sharing class HubController {
 
     private static HomeModel buildModel() {
         HomeModel model = new HomeModel();
-        model.canEdit = FeatureManagement.checkPermission(EDIT_PERMISSION);
+        model.canEdit = BarnCRMPermissions.canManageSettings();
         List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
         model.stepsTotal = steps.size();
         model.stepsCompleted = SetupAssistantService.countCompleted(steps);

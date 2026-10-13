@@ -8,7 +8,6 @@
  * and when was everybody last placed.
  */
 public with sharing class DonorLevelController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String CONTEXT = 'Donor Levels page';
 
     public class LadderModel {
@@ -47,7 +46,7 @@ public with sharing class DonorLevelController {
         try {
             LadderModel model = new LadderModel();
             model.enabled = DonorLevelService.isEnabled();
-            model.canRecalculate = FeatureManagement.checkPermission(EDIT_PERMISSION);
+            model.canRecalculate = BarnCRMPermissions.canManageSettings();
             model.sourceFieldLabel = sourceLabel();
             model.lastRecalculated = Giving_Settings__c.getOrgDefaults()
                 .Donor_Levels_Last_Recalculated__c;
@@ -77,7 +76,7 @@ public with sharing class DonorLevelController {
      */
     @AuraEnabled
     public static Id recalculate() {
-        if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
+        if (!BarnCRMPermissions.canManageSettings()) {
             throw refuse(Label.Giving_DonorLevels_NotPermitted);
         }
         if (!DonorLevelService.isEnabled()) {
