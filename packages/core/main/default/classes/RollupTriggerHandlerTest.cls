@@ -7,9 +7,12 @@
  */
 @IsTest(testFor='ApexClass:RollupTriggerHandler')
 private class RollupTriggerHandlerTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
     @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
     }
 
     private static Rollup_Definition__c childCount() {

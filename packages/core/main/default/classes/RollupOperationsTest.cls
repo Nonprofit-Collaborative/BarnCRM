@@ -10,9 +10,12 @@
  */
 @IsTest(testFor='ApexClass:RollupPlanner, ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupOperationsTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
     @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
     }
 
     private static final Integer ORGANIZATIONS = 10;

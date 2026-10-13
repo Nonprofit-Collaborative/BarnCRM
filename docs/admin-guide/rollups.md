@@ -123,13 +123,16 @@ button. Clearing the **Active** box is the durable way to say no to a total: an 
 rollup stays inactive across every upgrade, and the values it has already calculated stay
 on the records.
 
-Two settings on the same page change how every rollup behaves:
+Three settings on the same page change how every rollup behaves:
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
   begin. Choose the month your fiscal year starts from the list. Changing it and recalculating is
   all that is needed to correct every year based total in the org.
 - **Default rollup mode** decides how a newly created rollup starts out: **Instantly**,
   **Every night**, or **Both (recommended)**. The next section says what each one means.
+- **When instant totals are calculated** decides when a save updates the totals in
+  **Instantly** and **Both** mode. See [Just after the save, or during
+  it](#just-after-the-save-or-during-it) below.
 
 You need the **Manage BarnCRM Settings** permission to change any of this. Without it,
 the Rollups page still opens and still shows every total and its last calculated time; the
@@ -141,7 +144,7 @@ Every rollup has a mode.
 
 | Mode | What happens |
 |---|---|
-| **Instantly** | A gift saved by a person updates the totals in the same save: when the page refreshes, the household's total giving already includes it. A bulk change (an import, a data loader run, a big update, or anything already running in the background) is put in a queue instead, and the totals catch up within minutes. A change made by a background job is calculated when that job's work ends (BarnCRM's own jobs, such as loading sample data, start the calculation themselves), or by the next queue run or nightly run for a job that is not BarnCRM's. |
+| **Instantly** | A gift saved by a person updates the totals a few seconds after the save: refresh the household a moment later and its total giving already includes it. A bulk change (an import, a data loader run, a big update) goes through the same queue and catches up within minutes. A change made by a background job is calculated when that job's work ends (BarnCRM's own jobs, such as loading sample data, start the calculation themselves), or by the next queue run or nightly run for a job that is not BarnCRM's. |
 | **Every night** | Recalculated in the nightly run at 2:00 AM, and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
 | **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
 
@@ -149,6 +152,25 @@ Every rollup has a mode.
 other BarnCRM records. For a total that counts records from one of your own objects, see
 [Instant totals on your own objects](#instant-totals-on-your-own-objects) below;
 without that, such a total is calculated every night and on demand only.
+
+### Just after the save, or during it
+
+**When instant totals are calculated** has two choices:
+
+- **Just after the save (recommended)**, the default. The save notes which households,
+  people, organizations, appeals, funds and pledges it changed, and returns. BarnCRM
+  recalculates them in the background a few seconds later, usually within a minute. Every
+  save stays fast, and a save can never fail because the rollups ran out of room: with the
+  shipped totals, recalculating a gift's totals takes more than half of what one save is
+  allowed to do.
+- **During the save**. A normal save recalculates its totals before it returns, so the totals
+  are already right when the page refreshes. Each gift save is slower. When a save has too
+  little room left (because your own Flows or triggers on gifts already used most of it), or
+  is a bulk change, its totals are queued instead, just as with the first choice.
+
+Either way the numbers end up the same: every total is recalculated from all of its records,
+never added to. Choose **During the save** only if your team relies on seeing a total change
+the moment a gift is saved and your org has little automation of its own on gifts.
 
 ### How the nightly run works
 
@@ -447,6 +469,12 @@ recalculated once a night, so a record entered this afternoon does not move it u
 tomorrow morning. That is what the last calculated time is there to tell you. If a total
 needs to be right the moment a record is saved, set it to **Instantly** or **Both
 (recommended)**.
+
+**Expecting the total on the page the instant you click Save.** By default, Instantly and
+Both totals are recalculated a few seconds after the save, so the donor's page you are looking
+at may still show the old total. Refresh it a moment later. If your team needs the total in
+the save itself, change **When instant totals are calculated** to **During the save** (see
+[Just after the save, or during it](#just-after-the-save-or-during-it)).
 
 **Expecting an import's totals the moment it finishes.** Totals from a bulk change are
 queued and catch up within minutes, not in the same instant. Give it a few minutes before

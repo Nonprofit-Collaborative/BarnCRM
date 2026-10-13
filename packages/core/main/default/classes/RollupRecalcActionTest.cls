@@ -6,9 +6,12 @@
  */
 @IsTest(testFor='ApexClass:RollupRecalcAction')
 private class RollupRecalcActionTest {
+    /** Totals read right after each save: recalculated in the save (RollupTestSupport). */
     @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
+    static void recalculateInTheSave() {
+        System.runAs(TestUsers.admin()) {
+            RollupTestSupport.recalculateInTheSave();
+        }
     }
 
     private static Rollup_Definition__c childCount() {

@@ -2,8 +2,10 @@
  * The Rollup Queue (canonical model Section 14A) and the one processor that works through it
  * (rollup proposal D4, Part 2 section 4, "Parent queue").
  *
- * A save whose totals are too many to recalculate in the same save, or that is already running in
- * the background, writes the target records here with `add` and returns (R-R4). The processor, a
+ * A save writes the target records its change marked here with `add` and returns (R-R4): every
+ * save by default, and with Rollup Processing set to In the save, a save whose totals are too
+ * many to recalculate in it or that is already running in the background (ADR-NEXT async
+ * rollups). The processor, a
  * Queueable, reads the due entries, merges and sorts their identifiers, recalculates a slice
  * through `RollupEngine`, deletes the entries it finished and runs again while entries remain
  * (R-RQ3). Records the platform refused to save come back as a new entry, tried later each time
