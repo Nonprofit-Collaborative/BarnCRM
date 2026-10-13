@@ -529,7 +529,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Error logging everywhere | Every module writes failures to the shared Error Log instead of failing silently. | Shipped | C-05 |
 | Accessibility | Target is WCAG 2.1 AA with base Lightning components; icon-only buttons carry screen-reader names. A full accessibility pass is planned for v0.11. | Shipped (partial), Planned (audit) | plan 4.14 |
 | Mobile | Quick Gift Entry and household pages work on a phone; a mobile audit is planned for v0.11. | Shipped (partial), Planned (audit) | G-03, plan 6 |
-| Translation-ready | All text in custom labels, English only for now; Spanish is a post-1.0 theme. | Shipped (labels), Planned (localization) | plan 4.14 |
+| Translation-ready | All text in custom labels, English only for now; Spanish is a post-1.0 theme. The v0.11 sweep moves the import wizard's column targets and matching rules into labels and turns sentences built by joining words into one label with placeholders, so a translation can reorder them. | Shipped (labels), Built, not merged (v0.11 sweep, `fix/i18n-1`), Planned (localization) | plan 4.14 |
 | Multi-currency | Not supported in v1; Health Check warns when present. BarnCRM's own rollup engine already totals in the record's currency. | Planned (post-1.0) | plan 4.2, 6.1 |
 | Professional Edition | Not a target. | Not planned | plan 11.2 item 11 |
 | Open source license | Apache 2.0. | Shipped | ADR-0008 |

@@ -31,6 +31,7 @@ import SEARCH_LABEL from '@salesforce/label/c.Core_Access_SearchLabel';
 import SEARCH_NO_RESULTS from '@salesforce/label/c.Core_Access_SearchNoResults';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_Access_SearchPlaceholder';
 import SELF_REMOVAL_WARNING from '@salesforce/label/c.Core_Access_SelfRemovalWarning';
+import REMOVE_PERSON from '@salesforce/label/c.Core_Access_RemovePerson';
 import TOAST_ERROR_TITLE from '@salesforce/label/c.Core_Access_ToastErrorTitle';
 import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_Access_ToastSuccessTitle';
 import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
@@ -164,7 +165,7 @@ export default class AccessManager extends LightningElement {
     return this.roles.map((role) => {
       const users = (usersByRole[role.developerName] || []).map((person) => ({
         ...person,
-        removeLabel: `${this.labels.removeButton} ${person.name}`
+        removeLabel: format(REMOVE_PERSON, [person.name])
       }));
       return {
         developerName: role.developerName,

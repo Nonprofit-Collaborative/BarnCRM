@@ -121,14 +121,6 @@
         <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting the household would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
     </labels>
     <labels>
-        <fullName>Core_Households_LatePrefix</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Prefix for a person who has died in a formal greeting</shortDescription>
-        <value>the late</value>
-    </labels>
-    <labels>
         <fullName>Core_Households_ListSeparator</fullName>
         <categories>Households</categories>
         <language>en_US</language>

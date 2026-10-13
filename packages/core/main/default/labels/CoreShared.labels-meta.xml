@@ -141,8 +141,8 @@
         <categories>Core, Error Log</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error log tile new count</shortDescription>
-        <value>new</value>
+        <shortDescription>Error log tile: how many entries are new; {0} is the count</shortDescription>
+        <value>{0} new</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_OpenEntry</fullName>

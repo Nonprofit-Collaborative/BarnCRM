@@ -30,6 +30,8 @@ import OP_IS_NULL from '@salesforce/label/c.Core_RollupFilter_OpIsNull';
 import OP_IS_NOT_NULL from '@salesforce/label/c.Core_RollupFilter_OpIsNotNull';
 import OP_IN from '@salesforce/label/c.Core_RollupFilter_OpIn';
 import OP_NOT_IN from '@salesforce/label/c.Core_RollupFilter_OpNotIn';
+import PHRASE from '@salesforce/label/c.Core_RollupFilter_Phrase';
+import PHRASE_NO_VALUE from '@salesforce/label/c.Core_RollupFilter_PhraseNoValue';
 
 /** The operators of canonical model R-R2, in the order they are offered, with their words. */
 const OPERATOR_WORDS = {
@@ -236,7 +238,7 @@ export default class RollupFilterBuilder extends LightningElement {
     const fieldLabel = field ? field.label : condition.field;
     const words = OPERATOR_WORDS[condition.operator] || condition.operator;
     if (NO_VALUE.has(condition.operator)) {
-      return `${fieldLabel} ${words}`;
+      return format(PHRASE_NO_VALUE, fieldLabel, words);
     }
     const values = (Array.isArray(condition.value) ? condition.value : [condition.value]).map(
       (value) => this.valueLabel(field, value)
@@ -245,7 +247,7 @@ export default class RollupFilterBuilder extends LightningElement {
       values.length > 1
         ? `${values.slice(0, -1).join(', ')} ${OR} ${values[values.length - 1]}`
         : values[0];
-    return `${fieldLabel} ${words} ${joined}`;
+    return format(PHRASE, fieldLabel, words, joined);
   }
 
   valueLabel(field, value) {
