@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Giving_Erase_GiftsKept</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: why gifts are kept</shortDescription>
+        <value>Kept with their amounts and dates, credited to the anonymous record, so totals stay right.</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Erase_ReceiptsKept</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: why receipts are kept</shortDescription>
+        <value>Kept as tax records. Their PDF documents still print the donor&apos;s name and address: delete them by hand once your rules allow it.</value>
+    </labels>
+</CustomLabels>

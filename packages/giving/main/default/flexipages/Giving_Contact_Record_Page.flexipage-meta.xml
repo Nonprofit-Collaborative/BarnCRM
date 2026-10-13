@@ -349,6 +349,16 @@
               <value>Contact.New_Gift</value>
             </valueListItems>
             <valueListItems>
+              <value>Contact.Erase_Person</value>
+              <visibilityRule>
+                <criteria>
+                  <leftValue>{!$Permission.CustomPermission.Erase_People}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>true</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
               <value>Delete</value>
             </valueListItems>
           </valueList>
