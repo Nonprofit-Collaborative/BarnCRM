@@ -901,13 +901,14 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 
 ### v0.7 keys
 
-Added by Find (C-34, Section 29D) and bulk update (C-35, Section 29E). Shown in the console's
-Import section.
+Added by Find (C-34, Section 29D), bulk update (C-35, Section 29E) and bulk delete (C-37,
+Section 29E, R-BD2). Shown in the console's Import section.
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
+| `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
 
 ### v0.8 keys
 
@@ -1977,8 +1978,9 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
 | Match Only | boolean | yes (defaults false) | When true, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15). |
-| Operation | picklist(Import, Update) | yes (defaults Import) | What kind of data job this is: a file import, or a bulk update (R-BU1). Empty on a batch created before v0.7, which reads as Import. |
-| Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); empty for an import. |
+| Operation | picklist(Import, Update, Delete) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1) or a bulk delete (R-BD1). Empty on a batch created before v0.7, which reads as Import. |
+| Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
+| Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 
 ### Relationships
 
@@ -2286,8 +2288,9 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
 | Match Only | `Match_Only__c` | Checkbox (default false) |
-| Operation | `Operation__c` | Picklist: Import, Update (default Import) |
+| Operation | `Operation__c` | Picklist: Import, Update, Delete (default Import) |
 | Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
+| Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -2529,7 +2532,8 @@ a date as `YYYY-MM-DD`), so a value put back is the value that was there.
       "reason": "Changed since the import." },
     { "action": "Failed", "object": "Contact", "id": "003...",
       "reason": "The platform's own message, for example a validation rule's." },
-    { "action": "Created", "object": "Program_Session__c", "id": "a01...", "row": 14 }
+    { "action": "Created", "object": "Program_Session__c", "id": "a01...", "row": 14 },
+    { "action": "Deleted", "object": "Contact", "id": "003...", "label": "Ana Ramirez" }
   ]
 }
 ```
@@ -2544,7 +2548,10 @@ Created, at most 100 to a page so an undo deletes one page inside one transactio
 the undo reads them as R-IB9 says. A bulk update (R-BU3) journals, for each record it saved,
 the fields whose value changed, before and after, and for each record the platform refused, a
 Failed entry with the reason; a record that already held the new values is not saved and not
-journaled. An undo journals the
+journaled. A bulk delete (R-BD3) journals a Deleted entry (object, ID, the record's name) for
+each record it deleted, and a Failed entry for each record the platform refused; its undo
+journals a NotRestored entry, with no field, for each record it could not bring back. An undo
+journals the
 records it kept and the values it did not put back, each with its reason; the records it
 deleted are counted in the Run Log rather than listed, because the recycle bin lists them.
 
@@ -6052,7 +6059,8 @@ third-party code (the same reasoning as ADR-0049).
 ### Definition
 
 Up to five changes to every record a Find query returns (plan Section 4.9, feature C-35): set
-a field to a value, clear it, or copy another field of the same record into it. A bulk update
+a field to a value, clear it, copy another field of the same record into it, or change its own
+value with transform steps (C-37, R-BU7). A bulk update
 adds no object of its own: it is a data job (Section 16) with Operation Update, journaled in
 the import journal (Section 17A) and undone as an import is (ADR-0047; builder decisions in
 ADR-0077, `0077-bulk-update-runs-as-the-user-from-a-find-query.md`).
@@ -6070,7 +6078,9 @@ the query document (R-SQ1), the changes and the count the person confirmed:
   "changes": [
     { "field": "MailingCity", "action": "set", "value": "Portland" },
     { "field": "Preferred_Email__c", "action": "copy", "source": "Work_Email__c" },
-    { "field": "Title", "action": "clear" }
+    { "field": "Title", "action": "clear" },
+    { "field": "MailingStreet", "action": "transform",
+      "transforms": [ { "op": "replace", "text": "St.", "replaceWith": "Street" } ] }
   ],
   "confirmedCount": 37
 }
@@ -6128,11 +6138,82 @@ holds the value the bulk update wrote; anything else is journaled as not put bac
 permission and, because every bulk update starts from a Find query, `Find_And_Export_Records`
 (R-SQ5). Neither grants record access.
 
+**R-BU7 Change with steps.** A change whose action is `transform` carries `transforms`, a list
+of steps in the transform document of R-IT15 (ADR-0081), and changes each record's own value.
+For each record the job reads the target's value as text and applies the steps with
+`DataTransform.apply`; an `append` step names fields of the same record by API name, each a
+field of the query's object the person may read, read with the record and passed to the engine
+by `DataTransform.key(apiName)`. The result is saved as the field's type: blank clears the
+field (refused for that record when the field is required), a checkbox reads `true`, `yes` or
+`1` as true, a number drops everything but digits, the point and the minus sign, a date reads
+`YYYY-MM-DD`, and a text field takes the text as it is. A result the field cannot take (too
+long, not a number or date, a value a restricted picklist lacks) is not shortened or guessed:
+that record is journaled as Failed with the reason, and the rest still save. A change with
+steps is checked when it is previewed and when the job starts: it is refused when it has no
+step, when `DataTransform.problems` names any, when an `append` names a field the person may
+not read, or when the target is a lookup. Comparison is exact (`equals`), so a step that only
+changes capitals still writes and journals the record. The preview shows each sampled record's
+own result, and the reason in place of a result the field cannot take.
+
+### Bulk delete (C-37)
+
+Deletes every record a Find query returns (plan Section 4.9; owner decision 2026-09-23; builder
+decisions in ADR-NEXT, `NEXT-bulk-delete-from-a-find-query-with-undelete.md`). Like a bulk
+update, it is a data job with no rows of its own.
+
+**R-BD1 A data job with Operation Delete.** A bulk delete is an `Import_Batch__c` with
+Operation Delete, no template, no file and no staged rows. Its Bulk Update Definition holds the
+query document and the confirmed count: `{ "version": 1, "query": { ... }, "confirmedCount":
+112 }`. The record set comes only from the query document, compiled by `QueryCompiler` as the
+person (R-SQ2).
+
+**R-BD2 Counted, confirmed, and a ceiling.** As R-BU2, with `Bulk_Delete_Run_Limit__c` (default
+10,000, held between 1 and 48,000). The preview also names, from describe, the kinds of child
+record the platform deletes with each record (child relationships marked cascade delete whose
+object the person may read). The Undo Deadline is stamped at the start as the earlier of the
+import undo window (R-IB7) and 15 days, the time the platform keeps a deleted record in the
+Recycle Bin.
+
+**R-BD3 Only records that still match, as the person.** The job reads at most the confirmed
+number of records, in Id order, in user mode. Each chunk reads its records again with the
+query's filter; a record that no longer matches is left alone and counted in the Run Log. Each
+chunk deletes with `Database.delete(records, false, AccessLevel.USER_MODE)`, so access,
+automation and locks apply and one refusal does not stop the rest. Rows Deleted counts the
+records deleted and Rows Rejected those the platform refused. Each chunk writes one commit
+journal page: a Deleted entry for each deleted record and a Failed entry for each refusal
+(R-IJ2, R-IJ3). Child records the platform deleted with a parent are not journaled: they come
+back when their parent is undeleted.
+
+**R-BD4 What a bulk delete never deletes.** The object must pass `DataProtectedFields`'
+object rule (R-IT14: not the package's bookkeeping, a module's protected object, household
+membership rows, a custom setting, a setup object, or an object that is never loaded), and
+describe must say the person may delete its records and that the platform can undelete them
+(`isDeletable`, `isUndeletable`). Locks on another module's records refuse the delete through
+their own triggers, and the record is journaled as Failed.
+
+**R-BD5 Undo is undelete.** Counted and confirmed, once, within the Undo Deadline, with the
+same guards as the import undo (R-IB8: Undoing latches the job, and an undo that stops can be
+run again). The undo reads the commit journal pages, one page a chunk, and for each Deleted
+entry finds the record in the Recycle Bin (read with `ALL ROWS` in system mode, by the Id the
+journal holds): a record still deleted is undeleted with `Database.undelete(ids, false,
+AccessLevel.USER_MODE)`; a record no longer in the Recycle Bin is counted as purged; a record
+somebody already restored is left alone. Each record not brought back is journaled as
+NotRestored with the reason, and the Run Log says how many were restored, purged and refused.
+
+**R-BD6 Permission.** Every bulk delete action requires the `Bulk_Delete_Records` custom
+permission and `Find_And_Export_Records`. `Bulk_Delete_Records` is in its own permission set
+only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
+
 ### Salesforce implementation
 
-- **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`) and
-  `Import_Journal__c` (Sections 16 and 17A).
-- **Settings key:** `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys).
+- **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`,
+  `Rows_Deleted__c`) and `Import_Journal__c` (Sections 16 and 17A).
+- **Settings keys:** `Bulk_Update_Run_Limit__c` and `Bulk_Delete_Run_Limit__c` (Section 12, v0.7
+  keys).
+- **Bulk delete services:** `BulkDeleteService` (check, preview, start, undo),
+  `BulkDeleteBatch` (the job), `BulkDeleteUndoBatch` (the undelete), `BulkDeleteController`;
+  component `bulkDelete`, opened from Find's results, and `bulkDeleteHistory` on the Bulk Update
+  tab. Custom permission `Bulk_Delete_Records`, permission set `BarnCRM_Bulk_Delete`.
 - **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
   `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
   `BulkUpdateBatch` (the job), `BulkUpdateController`; `QueryCompiler` gains the count and the
@@ -6451,6 +6532,7 @@ mirrors the primary member).
 | post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
 | v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
+| 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-NEXT, `NEXT-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 
 ---
 ## 32. Entity ownership by package

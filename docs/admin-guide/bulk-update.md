@@ -9,6 +9,9 @@ one go. For each field you choose one of:
 - **Clear**: the field is emptied.
 - **Copy from another field**: each record gets the value of another field on the same record,
   for example Work Email copied into Preferred Email.
+- **Change with steps**: each record's own value is changed by a short list of steps, the same
+  steps an import uses to tidy a column: find and replace, remove extra spaces, capitals, a
+  value when empty, adding other fields of the same record, and reading a date (section 6).
 
 Before anything changes, BarnCRM counts the records that match and shows the first five, each
 with the value before and the value after. You type that number to confirm. The update then
@@ -105,17 +108,49 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   kept, on purpose, because putting back the old value would silently overwrite their
   correction.
 
-## 6. What bulk update does not do (yet)
+## 6. Changing values with steps
 
-Formulas ("set Preferred Name to First Name plus Last Name") and find and replace within a
-value are planned for a later release (C-37), and so is bulk delete, with its own permission.
+**Change with steps** changes each record's own value rather than giving every record the same
+one. Choose the field, choose **Change with steps**, then **Add a step** (up to ten). Steps run
+in the order listed:
+
+| Step | What it does | Example |
+|---|---|---|
+| **Remove extra spaces** | Removes spaces at the start and end, and turns several in a row into one. | `  Ana   Ramirez ` becomes `Ana Ramirez` |
+| **All capitals** | Writes every letter as a capital. | `ca` becomes `CA` |
+| **All lower case** | Writes every letter small. | `ANA@EXAMPLE.ORG` becomes `ana@example.org` |
+| **Capitalize each word** | A capital at the start of each word, the rest small. | `springfield` becomes `Springfield` |
+| **Find and replace** | Replaces text you type with other text. Tick **Whole value only** to replace only a value that is exactly that text, and **Match capitals** to tell `st.` from `St.`. | `St.` becomes `Street` |
+| **Value when empty** | Gives an empty field a value. | empty becomes `Unknown` |
+| **Add other fields** | Adds the values of other fields of the same record after this one, with a separator you choose (a space unless you type another). An empty one is left out. | First Name with Last Name becomes `Ana Ramirez` |
+| **Read as a date** | Reads a date written month first, day first or year first and writes it the way Salesforce reads it. | day first: `31/12/2025` becomes `2025-12-31` |
+
+The steps work on the value as text, and the result is then saved as the field's type: a
+number field takes `1,250.00` as 1250, a checkbox takes `true`, `yes` or `1` as ticked, and a
+date field takes `2025-12-31`. A step never runs code and never reads another record.
+
+- **The preview shows each record's own result.** The five records in the preview show the
+  value before and after the steps, so you can see the change before you confirm.
+- **A result the field cannot take is refused for that record only.** A result longer than a
+  text field allows, a number field result that is not a number, or a value a restricted
+  picklist does not list is not saved; the record is listed with the reason, and the rest still
+  save. The preview says so for the records it shows.
+- **An empty result clears the field**, as **Clear** would, unless the field is required, in
+  which case that record is refused.
+- **Text is compared exactly.** A step that only changes capitals (`springfield` to
+  `Springfield`) still changes the record, and the undo puts the old capitals back.
+- **Change with steps** is offered for text, email, phone, URL, picklist, number, date, date and
+  time, and checkbox fields. Lookups are set or copied, not changed with steps.
+
+Deleting the records a query returns is a separate tool with its own permission: see
+[Bulk delete](bulk-delete.md).
 
 ## Field reference
 
 | Where | Field | What it holds |
 |---|---|---|
-| Import (data job) | Operation | Import for a file import, Update for a bulk update. |
-| Import (data job) | Bulk Update Definition | The query, the changes and the confirmed count a bulk update ran with. Written only by bulk update. |
+| Import (data job) | Operation | Import for a file import, Update for a bulk update, Delete for a bulk delete. |
+| Import (data job) | Bulk Update Definition | The query, the changes (with any steps) and the confirmed count a bulk update ran with; for a bulk delete, the query and the confirmed count. Written only by bulk update and bulk delete. |
 | Import (data job) | Row Count | How many records matched when the bulk update started. |
 | Import (data job) | Rows Updated | How many records the bulk update saved. |
 | Import (data job) | Rows Matched | How many records already held the new values and were not saved. |
