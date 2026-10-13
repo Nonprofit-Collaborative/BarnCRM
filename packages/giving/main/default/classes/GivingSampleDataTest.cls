@@ -314,6 +314,21 @@ private class GivingSampleDataTest {
     }
 
     @IsTest
+    static void namesTheQueueableCoreWaitsOn() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Set<String> names = new GivingSampleData().loadJobClassNames();
+            String full = GivingSampleDataQueueable.class.getName();
+            String bare = full.contains('.') ? full.substringAfter('.') : full;
+
+            Assert.areEqual(
+                new Set<String>{ bare },
+                names,
+                'Core waits on the class that runs every Giving stage, named as AsyncApexJob names it'
+            );
+        }
+    }
+
+    @IsTest
     static void testNoSampleGiftCarriesAReceiptNumber() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePeople();

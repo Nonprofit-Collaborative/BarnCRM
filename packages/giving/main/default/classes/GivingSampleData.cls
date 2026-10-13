@@ -78,6 +78,14 @@ public with sharing class GivingSampleData implements SampleDataModule {
         return GivingSampleDataLoader.removeAll();
     }
 
+    /**
+     * Every stage of the Giving load runs as this one queueable, so Core can wait for it. The
+     * name as AsyncApexJob reports it, which never carries the namespace.
+     */
+    public Set<String> loadJobClassNames() {
+        return new Set<String>{ 'GivingSampleDataQueueable' };
+    }
+
     /** The Giving sample data JSON body, from the injected override or the static resource. */
     public static String getSampleDataJson() {
         if (jsonOverride != null) {

@@ -4,16 +4,32 @@
  */
 public with sharing class SampleDataSelector {
     /**
-     * The queueable classes that make up the sample data load chain. The Giving stages are
-     * named as strings like the rest: Core cannot compile against a module package
-     * (ADR-0009), and a name that resolves to nothing simply never matches a running job.
+     * The queueable classes that make up Core's part of the sample data load chain. Each
+     * installed module names its own stages (`SampleDataModule.loadJobClassNames`), so Core
+     * never names a module's classes (ADR-0009, ADMIN-25).
      */
     private static final Set<String> LOAD_JOB_CLASS_NAMES = new Set<String>{
         'SampleDataLoadQueueable',
         'SampleDataContactQueueable',
-        'SampleDataConnectionQueueable',
-        'GivingSampleDataQueueable'
+        'SampleDataConnectionQueueable'
     };
+
+    /** Core's stages and every installed module's, by class name. */
+    @TestVisible
+    private static Set<String> loadJobClassNames() {
+        Set<String> names = new Set<String>(LOAD_JOB_CLASS_NAMES);
+        for (SampleDataModule module : SampleDataModules.installed()) {
+            try {
+                Set<String> moduleNames = module.loadJobClassNames();
+                if (moduleNames != null) {
+                    names.addAll(moduleNames);
+                }
+            } catch (Exception e) {
+                ErrorLogger.log(e, 'Sample data');
+            }
+        }
+        return names;
+    }
 
     /** AsyncApexJob statuses that mean a job has not finished yet. */
     private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
@@ -182,7 +198,7 @@ public with sharing class SampleDataSelector {
      * and load and remove can refuse to run against an in-flight chain.
      */
     public Boolean hasRunningLoadJob() {
-        Set<String> classNames = LOAD_JOB_CLASS_NAMES;
+        Set<String> classNames = loadJobClassNames();
         Set<String> runningStatuses = RUNNING_JOB_STATUSES;
         return ![
                 SELECT Id

@@ -181,6 +181,10 @@ private class SampleDataLoaderTest {
             loaded = 0;
             return removed;
         }
+
+        public Set<String> loadJobClassNames() {
+            return new Set<String>();
+        }
     }
 
     @IsTest

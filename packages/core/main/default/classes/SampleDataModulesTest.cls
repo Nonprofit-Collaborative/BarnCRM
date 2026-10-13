@@ -41,6 +41,31 @@ private class SampleDataModulesTest {
             loaded = 0;
             return removed;
         }
+
+        public Set<String> loadJobClassNames() {
+            return new Set<String>{ name + 'Queueable' };
+        }
+    }
+
+    @IsTest
+    static void aModuleNamesItsOwnLoadStagesForTheRunningCheck() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{
+                new StubModule('Gifts', 0)
+            };
+
+            Set<String> names = SampleDataSelector.loadJobClassNames();
+
+            Assert.isTrue(names.contains('SampleDataLoadQueueable'), 'Core names its own stages');
+            Assert.isTrue(
+                names.contains('GiftsQueueable'),
+                'And a module names its own, so Core never has to: ' + names
+            );
+            Assert.isFalse(
+                new SampleDataSelector().hasRunningLoadJob(),
+                'Nothing is running, whoever named the stages'
+            );
+        }
     }
 
     @IsTest

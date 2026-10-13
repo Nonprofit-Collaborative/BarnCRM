@@ -5,7 +5,7 @@
  * Core cannot compile against Giving, Volunteers or any other module (ADR-0009), so it
  * cannot insert a gift or count one. It does not need to: a module that ships sample data
  * implements this interface, Core finds the class by name at runtime the way the trigger
- * dispatcher finds a handler (ADR-0017), and asks it these five questions.
+ * dispatcher finds a handler (ADR-0017), and asks it these six questions.
  *
  * The contract each implementation has to keep:
  *
@@ -33,4 +33,10 @@ public interface SampleDataModule {
 
     /** Deletes every record this module's sample loader created, and returns how many. */
     Integer removeAll();
+
+    /**
+     * The names of the queueable classes in this module's load chain, so Core can tell the
+     * whole load is still running without naming a module's classes itself (ADMIN-25).
+     */
+    Set<String> loadJobClassNames();
 }
