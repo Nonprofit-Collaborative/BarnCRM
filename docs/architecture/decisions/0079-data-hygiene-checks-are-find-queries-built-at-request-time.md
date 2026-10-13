@@ -86,3 +86,4 @@ belongs to C-28. Four questions needed an answer:
 - The count and the Find list agree for the same person. Two people may see different counts.
 - Adding a check is one method in `DataHygieneService`, its labels and its admin guide row.
 - `findRecords` reading `c__savedQueryId` is a recorded follow-up (after C-35 merges).
+  Status note 2026-10-13: landed; Find opens and runs the saved query from the page state.

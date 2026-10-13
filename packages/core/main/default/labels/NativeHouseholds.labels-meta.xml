@@ -40,4 +40,20 @@
         <shortDescription>Health Check: detail for the native household collision warning, with the count</shortDescription>
         <value>{0} Accounts are a BarnCRM household and a Salesforce Nonprofit Cloud household at the same time. BarnCRM leaves each one's name, greetings, and address alone rather than guess which model should win. Review these Accounts and settle each on one household model.</value>
     </labels>
+    <labels>
+        <fullName>Core_HouseholdMerge_ErrorNativeHousehold</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Household merge refused: one is also a Nonprofit Cloud household</shortDescription>
+        <value>One of these households is also a Salesforce Nonprofit Cloud household, so BarnCRM does not merge it. Merging would delete or move its Nonprofit Cloud household group. Combine them with Nonprofit Cloud's own tools instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_NativeHouseholdsListed</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Data hygiene note: Nonprofit Cloud households can be listed here</shortDescription>
+        <value>This org has Salesforce Nonprofit Cloud households. One that is also a BarnCRM household keeps its members in Nonprofit Cloud, so it can be listed here. Do not delete it: that would delete its Nonprofit Cloud household group too.</value>
+    </labels>
 </CustomLabels>

@@ -512,6 +512,11 @@ public with sharing class HouseholdMergeService {
                 throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNotHousehold);
             }
         }
+        // A household that is also a Nonprofit Cloud household is not BarnCRM's to merge: the
+        // merge deletes one Account, and its native household group would go with it (ADR-0036).
+        if (!HouseholdSelector.accountsWithNativeHouseholdGroups(result.keySet()).isEmpty()) {
+            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNativeHousehold);
+        }
         return result;
     }
 

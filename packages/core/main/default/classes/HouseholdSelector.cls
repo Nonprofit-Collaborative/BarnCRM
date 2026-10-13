@@ -52,6 +52,13 @@ public with sharing class HouseholdSelector {
     @TestVisible
     private static Set<Id> accountsWithNativeDependentsOverride;
 
+    /**
+     * Set only by tests, so the duplicate scan and the household merge can be shown refusing a
+     * Nonprofit Cloud household on an org where the native object does not exist.
+     */
+    @TestVisible
+    private static Set<Id> accountsWithNativeHouseholdGroupsOverride;
+
     @NamespaceAccessible
     public static List<Contact> getContactsByHouseholdIds(Set<Id> householdIds) {
         if (householdIds == null || householdIds.isEmpty()) {
@@ -314,6 +321,41 @@ public with sharing class HouseholdSelector {
             return new Set<Id>();
         }
         return getAccountsWithNativeDependents(accountIds);
+    }
+
+    /**
+     * Of these Accounts, the ones that carry a native Nonprofit Cloud household group: what the
+     * duplicate scan, the Duplicates panel and the household merge ask before proposing or
+     * merging a household (ADR-0036 applied to merges). A merge deletes one Account, and a group
+     * whose master-detail parent it is would go with it or be moved onto the other, and that
+     * group is not BarnCRM's to change.
+     *
+     * Native membership rows are deliberately not asked about, unlike
+     * `getAccountsWithNativeDependents`: with Contacts to Multiple Accounts on, every household
+     * with a member has direct native membership rows, so asking would refuse every merge.
+     *
+     * The same probe as the delete guard, with the same answer when it cannot run: every
+     * account given is treated as carrying a group, so nothing is merged on a guess.
+     */
+    @NamespaceAccessible
+    public static Set<Id> accountsWithNativeHouseholdGroups(Set<Id> accountIds) {
+        if (accountsWithNativeHouseholdGroupsOverride != null) {
+            return accountsWithNativeHouseholdGroupsOverride;
+        }
+        Set<Id> grouped = new Set<Id>();
+        if (accountIds == null || accountIds.isEmpty()) {
+            return grouped;
+        }
+        if (OrgShapeDetector.detect().hasNativeHouseholdGroups != true) {
+            return grouped;
+        }
+        addNativeDependents(
+            grouped,
+            NATIVE_HOUSEHOLD_GROUP,
+            NATIVE_HOUSEHOLD_GROUP_QUERY,
+            accountIds
+        );
+        return grouped;
     }
 
     /**

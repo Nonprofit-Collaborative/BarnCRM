@@ -253,6 +253,35 @@ describe('c-duplicate-review', () => {
     });
   });
 
+  it('shows the preview of the latest choice when an earlier one answers last', async () => {
+    const element = await mount(viewWith({ suggestions: [HOUSEHOLD_PAIR] }));
+    previewMerge.mockResolvedValueOnce({ fields: [] });
+    q(element, 'merge-button').click();
+    await flush();
+    let answerSlow;
+    previewMerge.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answerSlow = resolve;
+      })
+    );
+    previewMerge.mockResolvedValueOnce({
+      fields: [{ fieldName: 'Phone', label: 'Phone', survivorValue: 'B', inConflict: true }]
+    });
+    const choice = q(element, 'keep-choice');
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: HOUSEHOLD_B } }));
+    choice.dispatchEvent(new CustomEvent('change', { detail: { value: HOUSEHOLD_A } }));
+    await flush();
+    answerSlow({ fields: [] });
+    await flush();
+    expect(qa(element, 'conflict')).toHaveLength(1);
+  });
+
+  it('offers no second scan while one is running', async () => {
+    const element = await mount(viewWith({ scanRunning: true }));
+    expect(q(element, 'scan-button').disabled).toBe(true);
+    expect(q(element, 'scan-running')).not.toBeNull();
+  });
+
   it('opens the dismiss box as a labelled region and moves focus to its heading', async () => {
     const element = await mount(viewWith({ suggestions: [PEOPLE_PAIR] }));
     q(element, 'dismiss-button').click();

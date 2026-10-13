@@ -191,7 +191,9 @@ public with sharing class DuplicateService {
 
     /**
      * Only pairs BarnCRM can act on (R-DP2): a pair of accounts is kept only when both are
-     * households. People pairs pass through untouched.
+     * households and neither is also a Nonprofit Cloud household (ADR-0036), and a pair of
+     * people only when neither is the contact half of a person account, which the platform
+     * cannot merge with a contact.
      */
     public static List<Pair> actionablePairs(List<Pair> pairs) {
         List<Pair> result = new List<Pair>();
@@ -199,21 +201,26 @@ public with sharing class DuplicateService {
             return result;
         }
         Set<Id> accountIds = new Set<Id>();
+        Set<Id> contactIds = new Set<Id>();
         for (Pair pair : pairs) {
             if (pair.left.getSObjectType() == Account.SObjectType) {
                 accountIds.add(pair.left);
                 accountIds.add(pair.right);
+            } else if (pair.left.getSObjectType() == Contact.SObjectType) {
+                contactIds.add(pair.left);
+                contactIds.add(pair.right);
             }
         }
         Set<Id> households = accountIds.isEmpty()
             ? new Set<Id>()
-            : DuplicateSelector.householdIds(accountIds);
+            : new Set<Id>(DuplicateSelector.householdIds(accountIds));
+        households.removeAll(HouseholdSelector.accountsWithNativeHouseholdGroups(households));
+        Set<Id> personContacts = DuplicateSelector.personContactIds(contactIds);
         for (Pair pair : pairs) {
-            Boolean isAccountPair = pair.left.getSObjectType() == Account.SObjectType;
-            if (
-                !isAccountPair ||
-                (households.contains(pair.left) && households.contains(pair.right))
-            ) {
+            Boolean keep = pair.left.getSObjectType() == Account.SObjectType
+                ? households.contains(pair.left) && households.contains(pair.right)
+                : !personContacts.contains(pair.left) && !personContacts.contains(pair.right);
+            if (keep) {
                 result.add(pair);
             }
         }

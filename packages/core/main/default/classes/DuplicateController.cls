@@ -24,7 +24,6 @@ public with sharing class DuplicateController {
      * records this person cannot see) are filtered out, so that fifty shown are fifty usable.
      */
     private static final Integer MAX_READ = 500;
-    private static final Set<String> FINISHED = new Set<String>{ 'Completed', 'Failed', 'Aborted' };
 
     /** One record in a suggestion, as the panel shows it. */
     public class RecordView {
@@ -105,13 +104,19 @@ public with sharing class DuplicateController {
 
     /**
      * Starts a scan of the records already in the org. Refused when no duplicate rule is
-     * active, because the scan would then report a clean org rather than an unchecked one.
+     * active, because the scan would then report a clean org rather than an unchecked one, and
+     * while another scan is waiting or running, because both would write the same pairs.
      */
     @AuraEnabled
     public static DuplicateView startScan() {
         try {
             requirePermission();
             requireSuggestionAccess();
+            if (DuplicateSelector.scanRunning(SCAN_CLASS)) {
+                throw new DuplicateService.DuplicateException(
+                    Label.Core_Duplicates_ErrorScanRunning
+                );
+            }
             if (DuplicateScanBatch.start() == null) {
                 throw new DuplicateService.DuplicateException(
                     Label.Core_Duplicates_ErrorNoActiveRule
@@ -207,10 +212,9 @@ public with sharing class DuplicateController {
             if (job.CompletedDate != null && view.lastScanFinished == null) {
                 view.lastScanFinished = job.CompletedDate;
             }
-            if (!FINISHED.contains(job.Status)) {
-                view.scanRunning = true;
-            }
         }
+        // Another administrator's scan counts too, which only a system mode read can see.
+        view.scanRunning = DuplicateSelector.scanRunning(SCAN_CLASS);
         view.canReviewSuggestions = canReviewSuggestions();
         if (!view.canReviewSuggestions) {
             return view;
@@ -246,17 +250,33 @@ public with sharing class DuplicateController {
      * The suggestions, with their records named. A suggestion naming a record the person
      * cannot see, a deleted record, an organization or anything but a person or a household is
      * left out rather than shown with a hole in it: half a pair is nothing to decide about.
+     *
+     * A suggestion whose every pair somebody dismissed is left out too (R-DP5). A duplicate rule
+     * that reports on save writes the pair again each time one of the two is saved past its
+     * alert, and "this pair will not be suggested again" has to hold for those sets as well.
      */
     private static List<SuggestionView> suggestions(List<DuplicateRecordSet> sets) {
         Set<Id> recordIds = new Set<Id>();
+        Map<Id, Set<String>> keysBySet = new Map<Id, Set<String>>();
+        Set<String> allKeys = new Set<String>();
         for (DuplicateRecordSet found : sets) {
+            List<Id> inSet = new List<Id>();
             for (DuplicateRecordItem item : found.DuplicateRecordItems) {
                 recordIds.add(item.RecordId);
+                inSet.add(item.RecordId);
             }
+            Set<String> keys = DuplicateService.pairKeysAmong(inSet);
+            keysBySet.put(found.Id, keys);
+            allKeys.addAll(keys);
         }
+        Set<String> dismissed = DuplicateSelector.dismissedKeys(allKeys);
         Map<Id, RecordView> byRecord = describeRecords(recordIds);
         List<SuggestionView> result = new List<SuggestionView>();
         for (DuplicateRecordSet found : sets) {
+            Set<String> keys = keysBySet.get(found.Id);
+            if (!keys.isEmpty() && dismissed.containsAll(keys)) {
+                continue;
+            }
             SuggestionView view = new SuggestionView();
             view.setId = found.Id;
             view.foundAt = found.CreatedDate;
@@ -281,6 +301,12 @@ public with sharing class DuplicateController {
         return result;
     }
 
+    /**
+     * The records the panel can show, by identifier. A household that is also a Nonprofit
+     * Cloud household and the contact half of a person account are left out, as the scan
+     * leaves them out (`DuplicateService.actionablePairs`), so a set the platform wrote on save
+     * about one of them is not offered either.
+     */
     private static Map<Id, RecordView> describeRecords(Set<Id> recordIds) {
         Map<Id, RecordView> result = new Map<Id, RecordView>();
         Set<Id> accountIds = new Set<Id>();
@@ -292,6 +318,8 @@ public with sharing class DuplicateController {
                 contactIds.add(recordId);
             }
         }
+        accountIds.removeAll(HouseholdSelector.accountsWithNativeHouseholdGroups(accountIds));
+        contactIds.removeAll(DuplicateSelector.personContactIds(contactIds));
         for (Account household : DuplicateSelector.householdsByIds(accountIds)) {
             result.put(
                 household.Id,
