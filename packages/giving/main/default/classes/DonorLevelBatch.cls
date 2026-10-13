@@ -16,18 +16,29 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
     private static final String ACCOUNTS = 'Account';
     @TestVisible
     private static final String CONTACTS = 'Contact';
+    /** The settings console section the Donor Levels page is in. */
+    private static final String GIVING_SECTION = 'Giving';
 
     private final String scopeObject;
     private Integer moved = 0;
+    /** Who pressed Recalculate now, told when the run ends; null for the nightly run (Q-04). */
+    private Id notifyUserId;
 
     /** A run that starts with accounts and chains to contacts. */
     public DonorLevelBatch() {
-        this(ACCOUNTS);
+        this(ACCOUNTS, JobNotifier.starter(), 0);
     }
 
     @TestVisible
     private DonorLevelBatch(String scopeObject) {
+        this(scopeObject, JobNotifier.starter(), 0);
+    }
+
+    /** A pass that carries who to tell and what the passes before it moved. */
+    private DonorLevelBatch(String scopeObject, Id notifyUserId, Integer moved) {
         this.scopeObject = scopeObject;
+        this.notifyUserId = notifyUserId;
+        this.moved = moved;
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
@@ -52,7 +63,7 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
         try {
             if (ACCOUNTS.equals(scopeObject)) {
                 if (!Test.isRunningTest()) {
-                    Database.executeBatch(new DonorLevelBatch(CONTACTS), 200);
+                    Database.executeBatch(new DonorLevelBatch(CONTACTS, notifyUserId, moved), 200);
                 }
                 return;
             }
@@ -60,6 +71,17 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
         } catch (Exception finishFailure) {
             ErrorLogger.log(finishFailure, 'DonorLevelBatch.finish');
         }
+        // The contacts pass is the end of the run, so the one notification goes from there.
+        JobNotifier.aboutSettings(
+            notifyUserId,
+            Label.Giving_JobNotice_DonorLevels,
+            false,
+            String.format(
+                Label.Giving_JobNotice_DonorLevelsBody,
+                new List<Object>{ moved.format() }
+            ),
+            GIVING_SECTION
+        );
     }
 
     /** How many donors this run moved between levels, for a test or a caller that wants to know. */
