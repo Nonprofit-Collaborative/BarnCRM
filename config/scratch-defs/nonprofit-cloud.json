@@ -2,7 +2,13 @@
   "orgName": "BarnCRM Nonprofit Cloud",
   "edition": "Enterprise",
   "hasSampleData": false,
-  "features": ["PersonAccounts", "EnableSetPasswordInApi", "NonprofitCloud"],
+  "features": [
+    "PersonAccounts",
+    "ContactsToMultipleAccounts",
+    "Fundraising",
+    "ProgramManagement",
+    "EnableSetPasswordInApi"
+  ],
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
@@ -11,6 +17,15 @@
       "sessionSettings": {
         "forceRelogin": false
       }
+    },
+    "accountSettings": {
+      "enableRelateContactToMultipleAccounts": true
+    },
+    "industriesSettings": {
+      "enableFundraising": true,
+      "enableGiftEntryGrid": true,
+      "enableGroupMembershipPref": true,
+      "enableBenefitManagementPreference": true
     }
   }
 }

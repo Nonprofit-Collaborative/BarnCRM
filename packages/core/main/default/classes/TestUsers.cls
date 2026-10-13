@@ -131,6 +131,29 @@ public class TestUsers {
      * @return the permission sets to assign
      */
     private static List<PermissionSet> packagedPermissionSets(List<String> names) {
+        Map<String, PermissionSet> byName = permissionSetsByName(names);
+        for (String name : names) {
+            Assert.isTrue(
+                byName.containsKey(name),
+                'This org does not have the packaged permission set ' +
+                    name +
+                    ', so the test user cannot be given it. Deploy the package metadata into ' +
+                    'the org before running the tests.'
+            );
+        }
+        return byName.values();
+    }
+
+    /**
+     * The permission sets with these bare API names, one per name, preferring the one in this
+     * package's namespace (NamespaceUtil.prefix()) when a subscriber org also has its own set of
+     * the same name. A name the org does not have is simply absent from the map.
+     *
+     * @param names the bare API names asked for
+     * @return the chosen permission set per name
+     */
+    @NamespaceAccessible
+    public static Map<String, PermissionSet> permissionSetsByName(List<String> names) {
         String namespace = NamespaceUtil.prefix().removeEnd('__');
         Map<String, PermissionSet> byName = new Map<String, PermissionSet>();
         for (PermissionSet candidate : [
@@ -146,16 +169,7 @@ public class TestUsers {
                 byName.put(candidate.Name, candidate);
             }
         }
-        for (String name : names) {
-            Assert.isTrue(
-                byName.containsKey(name),
-                'This org does not have the packaged permission set ' +
-                    name +
-                    ', so the test user cannot be given it. Deploy the package metadata into ' +
-                    'the org before running the tests.'
-            );
-        }
-        return byName.values();
+        return byName;
     }
 
     private static String keyHash(String key) {
