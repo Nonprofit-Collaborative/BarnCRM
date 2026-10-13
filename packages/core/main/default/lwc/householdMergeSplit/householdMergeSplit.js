@@ -1,5 +1,8 @@
 import { LightningElement, api, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { CloseActionScreenEvent } from 'lightning/actions';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { openInWorkspace, refreshEnclosingTab } from 'c/workspaceTabs';
 import { getRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import searchHouseholds from '@salesforce/apex/HouseholdMergeController.searchHouseholds';
@@ -102,6 +105,8 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   splitSearchTerm = '';
   splitSearchedOnce = false;
   confirmingSplit = false;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   @wire(getRecord, { recordId: '$recordId', fields: [RECORD_TYPE_FIELD] })
   wiredAccount({ data, error }) {
@@ -291,7 +296,7 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
           ? `${MERGE_SUCCESS} ${CUSTOM_NAME_KEPT}`
           : MERGE_SUCCESS;
         this.toast(message, 'success');
-        this.goTo(result.survivorId);
+        return this.finish(result.survivorId);
       })
       .catch((error) => {
         this.confirmingMerge = false;
@@ -368,7 +373,7 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
         this.confirmingSplit = false;
         this.errorMessage = undefined;
         this.toast(SPLIT_SUCCESS, 'success');
-        this.goTo(destinationId);
+        return this.finish(destinationId);
       })
       .catch((error) => {
         this.confirmingSplit = false;
@@ -392,6 +397,22 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
         result.location || ''
       )
     }));
+  }
+
+  /**
+   * After a merge or split. In a console the household's tab is refreshed in place, since
+   * the action changed it, and a split's other household opens beside it as a subtab.
+   * Everywhere else the page goes to the household the action ended on, as it always did.
+   */
+  async finish(recordId) {
+    if (!(await refreshEnclosingTab(this))) {
+      this.goTo(recordId);
+      return;
+    }
+    this.dispatchEvent(new CloseActionScreenEvent());
+    if (recordId !== this.recordId && !(await openInWorkspace(this, { recordId }))) {
+      this.goTo(recordId);
+    }
   }
 
   goTo(recordId) {

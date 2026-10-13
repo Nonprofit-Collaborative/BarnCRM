@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import RollupBuilder from 'c/rollupBuilder';
 import getModel from '@salesforce/apex/RollupBuilderController.getModel';
 import getDraft from '@salesforce/apex/RollupBuilderController.getDraft';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getModel',
@@ -15,6 +16,9 @@ jest.mock('@salesforce/apex/RollupBuilderController.getDraft', () => ({ default:
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_RollupBuilder_CopyOf', () => ({ default: 'Copy of {0}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 // The nested components are replaced by stubs so this test sees only the Builder's own work.
@@ -87,5 +91,36 @@ describe('c-rollup-builder', () => {
     expect(wizard(element)).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toBe('Saved.');
     expect(list(element).refresh).toHaveBeenCalled();
+  });
+
+  it('leaves the tab alone outside a console', async () => {
+    getDraft.mockResolvedValue({ recordId: 'a01', name: 'Household total giving' });
+    const element = build();
+    list(element).dispatchEvent(new CustomEvent('edit', { detail: { recordId: 'a01' } }));
+    await flush();
+
+    expect(setTabLabel).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the rollup being edited, and back after save', async () => {
+    getDraft.mockResolvedValue({ recordId: 'a01', name: 'Household total giving' });
+    const element = build();
+    EnclosingTabId.emit('tab0');
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_RollupBuilder_Title');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'utility:builder', {
+      iconAlt: 'c.Core_RollupBuilder_Title'
+    });
+
+    list(element).dispatchEvent(new CustomEvent('edit', { detail: { recordId: 'a01' } }));
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith(
+      'tab0',
+      'c.Core_RollupBuilder_Title: Household total giving'
+    );
+
+    wizard(element).dispatchEvent(new CustomEvent('saved', { detail: { notice: 'Saved.' } }));
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_RollupBuilder_Title');
   });
 });

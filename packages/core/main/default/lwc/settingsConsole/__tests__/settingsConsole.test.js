@@ -4,6 +4,11 @@ import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getRecentChanges from '@salesforce/apex/SettingsController.getRecentChanges';
 import * as navigation from 'lightning/navigation';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/SettingsController.getConsoleModel', () => ({ default: jest.fn() }), {
   virtual: true
@@ -259,6 +264,32 @@ describe('c-settings-console', () => {
     const combobox = element.shadowRoot.querySelector('lightning-combobox');
     expect(combobox).not.toBeNull();
     expect(combobox.value).toBe('Standalone');
+  });
+
+  it('leaves the tab alone outside a console', async () => {
+    build();
+    await settle();
+
+    expect(setTabLabel).not.toHaveBeenCalled();
+    expect(setTabIcon).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the section on screen', async () => {
+    const element = build();
+    EnclosingTabId.emit('tab0');
+    await settle();
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Settings_Title: Households');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'standard:settings', {
+      iconAlt: 'c.Core_Settings_Title: Households'
+    });
+
+    element.shadowRoot
+      .querySelector('c-settings-search')
+      .dispatchEvent(new CustomEvent('settingselect', { detail: { section: 'General' } }));
+    await settle();
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Settings_Title: General');
   });
 
   it('opens the section a setup step asked for', async () => {

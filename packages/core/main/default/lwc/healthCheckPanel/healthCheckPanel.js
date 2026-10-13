@@ -1,5 +1,7 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRecommendedMode';
@@ -70,6 +72,8 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
   fixOutcome;
   focusConfirmOnRender = false;
   returnFocusTo;
+
+  @wire(EnclosingTabId) enclosingTabId;
 
   labels = {
     confirmHeading: CONFIRM_HEADING,
@@ -293,6 +297,14 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
   }
 
   /** The finding a Fix button belongs to, so the confirm box can repeat what it says. */
+  /** In a console a record a finding names opens as a subtab, so the report stays open. */
+  handleFindingLink(event) {
+    const url = event.currentTarget.getAttribute('href');
+    followLinkInWorkspace(this, event, { url }, () =>
+      this[NavigationMixin.Navigate]({ type: 'standard__webPage', attributes: { url } })
+    );
+  }
+
   findingFor(key) {
     const findings = (this.report && this.report.findings) || [];
     return findings.find((finding) => finding.key === key);

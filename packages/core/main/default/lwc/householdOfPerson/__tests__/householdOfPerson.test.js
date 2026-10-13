@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import HouseholdOfPerson from 'c/householdOfPerson';
 import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
+import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 
 jest.mock(
   '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson',
@@ -109,5 +110,60 @@ describe('c-household-of-person', () => {
     const alert = element.shadowRoot.querySelector('[role="alert"]');
     expect(alert.textContent).toBe('c.Core_HouseholdPanel_OfPersonLoadFailed');
     expect(element.shadowRoot.querySelector('.empty-message')).toBeNull();
+  });
+});
+
+describe('c-household-of-person in a console', () => {
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  function click(link, init = {}) {
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, ...init });
+    link.dispatchEvent(event);
+    return event;
+  }
+
+  it('lets the browser follow the link outside a console', async () => {
+    const element = build();
+    getHouseholdsForPerson.emit([GARCIA]);
+    await flush();
+
+    const event = click(element.shadowRoot.querySelector('.household-link'));
+    await flush();
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
+  });
+
+  it('opens the household as a subtab beside the person', async () => {
+    getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+    const element = build();
+    getHouseholdsForPerson.emit([GARCIA]);
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    const event = click(element.shadowRoot.querySelector('.household-link'));
+    await flush();
+    await flush();
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(openSubtab).toHaveBeenCalledWith('tab0', { recordId: HOUSEHOLD_ID, focus: true });
+  });
+
+  it('leaves a click for a new browser tab to the browser', async () => {
+    const element = build();
+    getHouseholdsForPerson.emit([GARCIA]);
+    EnclosingTabId.emit('tab0');
+    await flush();
+
+    const event = click(element.shadowRoot.querySelector('.household-link'), { metaKey: true });
+    await flush();
+
+    expect(event.defaultPrevented).toBe(false);
+    expect(openSubtab).not.toHaveBeenCalled();
   });
 });

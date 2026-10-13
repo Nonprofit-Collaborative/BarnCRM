@@ -10,6 +10,11 @@ import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import getBulkPage from '@salesforce/apex/BulkUpdateController.getPage';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import * as navigation from 'lightning/navigation';
 import { TextEncoder as NodeTextEncoder } from 'util';
@@ -191,6 +196,22 @@ describe('c-find-records', () => {
     });
     expect(one(element, 'soql').value).toBe('SELECT Id, Name FROM Gift__c LIMIT 200');
     expect(element.shadowRoot.querySelector('c-filter-builder').objectApiName).toBe('Gift__c');
+    // Outside a console the tab is left as it is.
+    expect(setTabLabel).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the object being searched', async () => {
+    const element = await render();
+    EnclosingTabId.emit('tab0');
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Find_Title');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'utility:search', {
+      iconAlt: 'c.Core_Find_Title'
+    });
+
+    await choose(one(element, 'object'), 'Gift__c');
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Find_Title: Gift');
   });
 
   it('adds a related record so its fields can be columns, and shows them in the results', async () => {

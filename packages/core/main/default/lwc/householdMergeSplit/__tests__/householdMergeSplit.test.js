@@ -10,6 +10,24 @@ import getPreview from '@salesforce/apex/HouseholdMergeController.preview';
 import mergeHouseholds from '@salesforce/apex/HouseholdMergeController.mergeHouseholds';
 import splitHousehold from '@salesforce/apex/HouseholdMergeController.splitHousehold';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
+import { EnclosingTabId, getTabInfo, openSubtab, refreshTab } from 'lightning/platformWorkspaceApi';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/HouseholdMergeController.canEdit',
@@ -466,5 +484,95 @@ describe('c-household-merge-split', () => {
       'Lee Household'
     );
     expect(element.shadowRoot.querySelector('.split-button').disabled).toBe(false);
+  });
+
+  describe('when the action finishes', () => {
+    async function settle() {
+      for (let i = 0; i < 8; i++) {
+        // eslint-disable-next-line no-await-in-loop
+        await flush();
+      }
+    }
+
+    async function merge(element) {
+      element.shadowRoot.querySelector('.search-button').dispatchEvent(new CustomEvent('click'));
+      await settle();
+      element.shadowRoot.querySelector('.pick-button').dispatchEvent(new CustomEvent('click'));
+      await settle();
+      element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
+      await flush();
+      element.shadowRoot
+        .querySelector('.merge-confirm-button')
+        .dispatchEvent(new CustomEvent('click'));
+      await settle();
+    }
+
+    async function split(element) {
+      const checkboxes = element.shadowRoot.querySelectorAll('.member-checkbox');
+      checkboxes[1].checked = true;
+      checkboxes[1].dispatchEvent(new CustomEvent('change'));
+      await flush();
+      element.shadowRoot.querySelector('.split-button').dispatchEvent(new CustomEvent('click'));
+      await flush();
+      element.shadowRoot
+        .querySelector('.split-confirm-button')
+        .dispatchEvent(new CustomEvent('click'));
+      await settle();
+    }
+
+    beforeEach(() => {
+      searchHouseholds.mockResolvedValue(SEARCH_RESULTS);
+      getPreview.mockResolvedValue(PREVIEW);
+      mergeHouseholds.mockResolvedValue({ survivorId: HOUSEHOLD_ID, customNameKept: false });
+      splitHousehold.mockResolvedValue(TARGET_HOUSEHOLD_ID);
+    });
+
+    it('goes to the merged household outside a console', async () => {
+      const element = await openOn('Household', true);
+      await merge(element);
+
+      expect(refreshTab).not.toHaveBeenCalled();
+      expect(mockNavigate).toHaveBeenCalledWith({
+        type: 'standard__recordPage',
+        attributes: { recordId: HOUSEHOLD_ID, objectApiName: 'Account', actionName: 'view' }
+      });
+    });
+
+    it('refreshes the household tab after a merge in a console', async () => {
+      const element = await openOn('Household', true);
+      EnclosingTabId.emit('tab0');
+      const closeHandler = jest.fn();
+      element.addEventListener('lightning__closeactionscreen', closeHandler);
+      await merge(element);
+
+      expect(refreshTab).toHaveBeenCalledWith('tab0', { includeAllSubtabs: false });
+      expect(closeHandler).toHaveBeenCalled();
+      expect(openSubtab).not.toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('goes to the other household outside a console after a split', async () => {
+      const element = await openOn('Household', true);
+      await split(element);
+
+      expect(mockNavigate).toHaveBeenCalledWith({
+        type: 'standard__recordPage',
+        attributes: { recordId: TARGET_HOUSEHOLD_ID, objectApiName: 'Account', actionName: 'view' }
+      });
+    });
+
+    it('refreshes the tab and opens the other household as a subtab after a split in a console', async () => {
+      getTabInfo.mockResolvedValueOnce({ tabId: 'tab0', isSubtab: false });
+      const element = await openOn('Household', true);
+      EnclosingTabId.emit('tab0');
+      await split(element);
+
+      expect(refreshTab).toHaveBeenCalledWith('tab0', { includeAllSubtabs: false });
+      expect(openSubtab).toHaveBeenCalledWith('tab0', {
+        recordId: TARGET_HOUSEHOLD_ID,
+        focus: true
+      });
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 });

@@ -22,8 +22,12 @@ import COLUMN_BY from '@salesforce/label/c.Core_Settings_ColumnChangedBy';
 import COLUMN_AT from '@salesforce/label/c.Core_Settings_ColumnChangedAt';
 import NOT_INSTALLED from '@salesforce/label/c.Core_Settings_ComponentNotInstalled';
 import OPEN_SECTION from '@salesforce/label/c.Core_Settings_OpenSectionButton';
+import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { labelTab } from 'c/workspaceTabs';
 
 const RECENT_LIMIT = 10;
+const TAB_ICON = 'standard:settings';
 
 /** A Record Type List value, stored as developer names separated by commas, as a list. */
 function splitList(text) {
@@ -121,6 +125,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
   loading = true;
   componentTypes = {};
   requestedSection;
+  enclosingTabId;
 
   @wire(CurrentPageReference)
   handlePageReference(pageReference) {
@@ -132,8 +137,26 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     }
   }
 
+  /** In a console the tab is named for the section on screen. */
+  @wire(EnclosingTabId)
+  wiredTabId(tabId) {
+    this.enclosingTabId = tabId;
+    this.nameTab();
+  }
+
   connectedCallback() {
     this.load();
+  }
+
+  renderedCallback() {
+    this.nameTab();
+  }
+
+  nameTab() {
+    const label = this.selectedSection
+      ? TAB_LABEL.replace('{0}', TITLE).replace('{1}', this.selectedSection)
+      : TITLE;
+    labelTab(this, label, TAB_ICON);
   }
 
   get navigationItems() {

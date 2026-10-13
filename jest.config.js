@@ -12,7 +12,11 @@ module.exports = {
     // mocks, so a test that mocks it (setupStepFields) lost to the unmocked stub whenever a test
     // rendering that component without the mock (setupAssistant) ran first in the same worker.
     '^lightning/navigation$':
-      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/navigation/navigation.js'
+      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/navigation/navigation.js',
+    // Same reason: c/workspaceTabs and the components that use it must share one stub, so a
+    // test that emits a tab id or checks openSubtab sees the module the component imported.
+    '^lightning/platformWorkspaceApi$':
+      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/platformWorkspaceApi/platformWorkspaceApi.js'
   },
   // No LWC components exist yet in any package; allow jest to pass cleanly until they do.
   passWithNoTests: true

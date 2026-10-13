@@ -19,6 +19,11 @@ import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
+import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+
+jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/ImportController.canImport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -247,6 +252,24 @@ describe('the import wizard', () => {
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(rows).toHaveLength(3);
     expect(rows[0].textContent).toContain('Last Name');
+    // Outside a console the tab is left as it is.
+    expect(setTabLabel).not.toHaveBeenCalled();
+  });
+
+  it('names the console tab for the file being imported', async () => {
+    const element = render();
+    EnclosingTabId.emit('tab0');
+    await flush();
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel');
+    expect(setTabIcon).toHaveBeenCalledWith('tab0', 'standard:file', {
+      iconAlt: 'c.Core_Import_TabLabel'
+    });
+
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+
+    expect(setTabLabel).toHaveBeenLastCalledWith('tab0', 'c.Core_Import_TabLabel: donors.csv');
   });
 
   it('shows the first values of each column beside the choice', async () => {

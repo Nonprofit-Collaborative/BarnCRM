@@ -257,6 +257,14 @@
         <value>Results</value>
     </labels>
     <labels>
+        <fullName>Core_Import_TabLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: console tab name, before the file name</shortDescription>
+        <value>Import</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_NextButton</fullName>
         <categories>Import</categories>
         <language>en_US</language>

@@ -1,5 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
+import { labelTab } from 'c/workspaceTabs';
 import listObjects from '@salesforce/apex/FindController.listObjects';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
@@ -16,6 +18,7 @@ import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import { toCsv, fileName } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Core_Find_Title';
+import TAB_LABEL from '@salesforce/label/c.Core_Console_TabLabel';
 import INTRO from '@salesforce/label/c.Core_Find_Intro';
 import OBJECT from '@salesforce/label/c.Core_Find_Object';
 import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
@@ -186,6 +189,24 @@ export default class FindRecords extends LightningElement {
   draftValues = [];
   tableErrors;
   requestedSavedQueryId;
+  enclosingTabId;
+
+  /** In a console the tab is named for the object being searched. */
+  @wire(EnclosingTabId)
+  wiredTabId(tabId) {
+    this.enclosingTabId = tabId;
+    this.nameTab();
+  }
+
+  renderedCallback() {
+    this.nameTab();
+  }
+
+  nameTab() {
+    const object = this.objectOptions.find((option) => option.value === this.objectApiName);
+    const label = object ? TAB_LABEL.replace('{0}', TITLE).replace('{1}', object.label) : TITLE;
+    labelTab(this, label, 'utility:search');
+  }
 
   /** Another page (Data Hygiene, C-28) can link to Find with a saved query to open and run. */
   @wire(CurrentPageReference)

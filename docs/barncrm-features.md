@@ -228,6 +228,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Clearer screens | Minor | Save buttons disable while saving, spinners say what they wait for, and errors use plain words. | Shipped | C-01 |
 | Plainer wording | Minor | Import buttons read Preview, Import these rows and Download rejected rows; schedule times name the time zone; errors point to the Error Log; warning icons are announced to screen readers. | Shipped | UX review |
 | Activity actions on the fallback layout | Minor | The packaged account layout includes Log a Call, New Task and New Event, so its activity panel can create activities. | Shipped | C-08 |
+| Console tabs | Minor | In a console app, records opened from BarnCRM pages open as subtabs of the tab you are in; Settings, Import, Find and Rollup Builder name their tab for what is on screen; a household merge or split refreshes the household's tab. Outside a console nothing changes. | Built, not merged (feature/q-07-workspace-api) | Q-07 |
 
 ---
 
