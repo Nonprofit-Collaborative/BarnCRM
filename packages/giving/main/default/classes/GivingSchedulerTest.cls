@@ -4,6 +4,11 @@
  */
 @IsTest
 private class GivingSchedulerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void schedulesAllThreeNightlyJobs() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

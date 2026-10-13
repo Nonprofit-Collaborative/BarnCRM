@@ -19,6 +19,11 @@
  */
 @IsTest
 private class ReceiptFileAccessTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final Integer YEAR = 2026;
 
     /**

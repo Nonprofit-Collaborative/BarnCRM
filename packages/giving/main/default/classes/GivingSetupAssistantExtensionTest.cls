@@ -10,6 +10,11 @@
  */
 @IsTest
 private class GivingSetupAssistantExtensionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static List<Object> asList(List<SetupAssistantService.Step> steps) {
         return (List<Object>) JSON.deserializeUntyped(JSON.serialize(steps));
     }

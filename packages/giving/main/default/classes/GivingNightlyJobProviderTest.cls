@@ -5,6 +5,11 @@
  */
 @IsTest
 private class GivingNightlyJobProviderTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Integer givingTriggerCount() {
         return [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'];
     }

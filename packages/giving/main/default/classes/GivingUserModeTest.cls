@@ -22,6 +22,11 @@
  */
 @IsTest
 private class GivingUserModeTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String ROLE_INFLUENCER = 'Influencer';
     private static final String TRIBUTE_IN_HONOR_OF = 'In honor of';
 

@@ -3,6 +3,11 @@
  */
 @IsTest
 private class RecognitionControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void listsTheCreditsOnAGift() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

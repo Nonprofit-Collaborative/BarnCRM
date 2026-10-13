@@ -7,6 +7,11 @@
  */
 @IsTest
 private class ReceiptRendererFactoryTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String PROBE_CLASS = 'ReceiptTestDataFactory.ConstructionProbe';
 
     /** The setting as an org default, written the way the settings console writes it. */

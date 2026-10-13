@@ -4,6 +4,11 @@
  */
 @IsTest
 private class ConnectPostInstallTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static List<Automation_Setting__c> campaignSyncSwitch() {
         return [
             SELECT Id, Enabled__c

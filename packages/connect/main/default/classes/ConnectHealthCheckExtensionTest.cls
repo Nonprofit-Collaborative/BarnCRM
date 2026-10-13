@@ -5,6 +5,11 @@
  */
 @IsTest
 private class ConnectHealthCheckExtensionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static void choose(String direction) {
         Connect_Settings__c settings = Connect_Settings__c.getOrgDefaults();
         settings.Opportunity_Mirror_Direction__c = direction;

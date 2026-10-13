@@ -5,6 +5,11 @@
  */
 @IsTest
 private class ConnectSyncTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String CONTEXT = 'Connect sync test';
     private static final String ONE = 'Could not copy "{0}": {1}';
     private static final String MANY = 'Could not copy {0} records ({1}): {2}';

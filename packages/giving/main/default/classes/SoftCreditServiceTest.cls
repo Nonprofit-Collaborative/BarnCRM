@@ -4,6 +4,11 @@
  */
 @IsTest
 private class SoftCreditServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void creditsTheOtherHouseholdMemberInContactMode() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

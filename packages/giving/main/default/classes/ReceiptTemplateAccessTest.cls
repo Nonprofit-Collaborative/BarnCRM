@@ -11,6 +11,11 @@
  */
 @IsTest
 private class ReceiptTemplateAccessTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void theReceiptsPageReadsTheLettersAndWritesNothing() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

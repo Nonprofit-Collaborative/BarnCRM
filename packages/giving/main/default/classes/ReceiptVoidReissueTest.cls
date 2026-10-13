@@ -7,6 +7,11 @@
  */
 @IsTest
 private class ReceiptVoidReissueTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     /**
      * An issued receipt's number, amount and stored file are all exactly as they were after the
      * receipt is voided, and the void says why and when.

@@ -4,6 +4,11 @@
  */
 @IsTest
 private class ReceiptGenerationFailureSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     @IsTest
     static void anOrgWithNoFailedRunsCountsZero() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {

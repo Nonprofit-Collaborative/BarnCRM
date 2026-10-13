@@ -3,6 +3,11 @@
  */
 @IsTest
 private class GiftImportReferencesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static GiftImportRow row(Map<String, String> gift, Map<String, String> allocation) {
         Map<String, String> values = new Map<String, String>{
             'Amount__c' => '100',

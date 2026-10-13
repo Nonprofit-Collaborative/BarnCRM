@@ -10,6 +10,11 @@
  */
 @IsTest
 private class GivingSampleDataTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String PERSON_KEY = 'H001-1';
     private static final String SECOND_PERSON_KEY = 'H002-1';
     private static final String ORGANIZATION_KEY = 'O001';
