@@ -335,7 +335,10 @@ public with sharing class SettingsService {
         if (type == null) {
             return chosen;
         }
-        for (Schema.RecordTypeInfo info : type.getDescribe().getRecordTypeInfos()) {
+        for (
+            Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getRecordTypeInfos()
+        ) {
             if (info.isActive() && !info.isMaster()) {
                 chosen.add(info);
             }
@@ -516,8 +519,14 @@ public with sharing class SettingsService {
         return typesByName.get(cacheKey);
     }
 
+    /** The global describe, read once per transaction: it is the costliest describe there is. */
+    private static Map<String, Schema.SObjectType> globalDescribe;
+
     private static Schema.SObjectType describeTypeByName(String name) {
-        Map<String, Schema.SObjectType> globals = Schema.getGlobalDescribe();
+        if (globalDescribe == null) {
+            globalDescribe = Schema.getGlobalDescribe();
+        }
+        Map<String, Schema.SObjectType> globals = globalDescribe;
         Schema.SObjectType type = globals.get(name);
         if (type != null) {
             return type;
@@ -531,11 +540,22 @@ public with sharing class SettingsService {
         return null;
     }
 
+    /** The settings objects the definitions name, and the rows they were built from. */
+    private static Set<String> registeredNames;
+    private static List<Setting_Definition__mdt> registeredFrom;
+
+    /** Built once per list of definitions, not once per console row. */
     private static Set<String> registeredObjects() {
+        List<Setting_Definition__mdt> rows = SettingDefinitionSelector.getAll();
+        if (registeredNames != null && registeredFrom === rows) {
+            return registeredNames;
+        }
         Set<String> names = new Set<String>();
-        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+        for (Setting_Definition__mdt definition : rows) {
             names.add(objectName(definition.Settings_Object__c).toLowerCase());
         }
+        registeredNames = names;
+        registeredFrom = rows;
         return names;
     }
 

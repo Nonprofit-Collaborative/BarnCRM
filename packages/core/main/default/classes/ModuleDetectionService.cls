@@ -78,10 +78,15 @@ public with sharing class ModuleDetectionService {
      * appeal object is not mistaken for Giving.
      */
     public static Boolean isGivingPresent() {
+        return givingPresent(announcedModules());
+    }
+
+    /** The same, for a caller that has already read the announced modules. */
+    private static Boolean givingPresent(Set<String> announced) {
         if (givingPresentOverride != null) {
             return givingPresentOverride;
         }
-        if (announcedModules().contains(MODULE_GIVING.toLowerCase())) {
+        if (announced.contains(MODULE_GIVING.toLowerCase())) {
             return true;
         }
         return objectExists(GIVING_FUND_OBJECT) && objectExists(GIVING_APPEAL_OBJECT);
@@ -120,7 +125,7 @@ public with sharing class ModuleDetectionService {
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
         Boolean givingPresent =
-            isGivingPresent() || announced.contains(MODULE_GIVING.toLowerCase());
+            givingPresent(announced) || announced.contains(MODULE_GIVING.toLowerCase());
         Boolean offerAll = givingPresent || chosenSuite() == SUITE_IMPACT;
         List<ModuleInfo> all = new List<ModuleInfo>{
             module(MODULE_CORE, true, 'core'),
@@ -170,20 +175,11 @@ public with sharing class ModuleDetectionService {
     /**
      * The API name an object actually has in this org, matching the unqualified name so that
      * the same probe works before and after a namespace is assigned (Decision D-01), or null
-     * when no object matches.
+     * when no object matches. Looked up through `SettingsService.typeByName`, which reads the
+     * global describe once per transaction and remembers each answer.
      */
     public static String resolveObject(String unqualifiedName) {
-        String wanted = unqualifiedName.toLowerCase();
-        Map<String, Schema.SObjectType> describes = Schema.getGlobalDescribe();
-        if (describes.containsKey(wanted)) {
-            return describes.get(wanted).getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-        }
-        String suffix = '__' + wanted;
-        for (String name : describes.keySet()) {
-            if (name.endsWith(suffix)) {
-                return describes.get(name).getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-            }
-        }
-        return null;
+        Schema.SObjectType type = SettingsService.typeByName(unqualifiedName);
+        return type == null ? null : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
     }
 }
