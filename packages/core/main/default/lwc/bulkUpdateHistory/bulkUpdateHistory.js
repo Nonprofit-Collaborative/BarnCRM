@@ -24,7 +24,8 @@ function format(template, ...values) {
 /**
  * The Bulk Update tab (C-35, admin guide bulk-update.md): recent bulk updates with what each
  * did, and their undo, confirmed by typing the number of records it puts back (canonical model
- * R-BU5). A bulk update itself is started from Find, by the bulkUpdate panel.
+ * R-BU5). Renders nothing for a person without the bulk update permissions, since the tab is
+ * shared with bulk delete. A bulk update itself is started from Find, by the bulkUpdate panel.
  */
 export default class BulkUpdateHistory extends LightningElement {
   labels = {
@@ -41,6 +42,7 @@ export default class BulkUpdateHistory extends LightningElement {
     loading: LOADING
   };
 
+  allowed = false;
   jobs = [];
   undoTarget;
   undoText = '';
@@ -54,7 +56,9 @@ export default class BulkUpdateHistory extends LightningElement {
 
   async load() {
     await this.work(async () => {
-      this.jobs = (await getPage()).jobs || [];
+      const page = await getPage();
+      this.allowed = Boolean(page && page.allowed);
+      this.jobs = (page && page.jobs) || [];
     });
   }
 

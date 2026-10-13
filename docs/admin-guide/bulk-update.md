@@ -37,6 +37,7 @@ run log starting "Edited in Find", with the same undo.
    let a staff member bulk update without making them an admin, assign them the **BarnCRM Bulk
    Update** and **BarnCRM Find and Export** permission sets (Setup, Users, choose the person,
    Permission Set Assignments). Neither grants access to any record or field.
+   A person without both sees nothing of bulk update on the **Bulk Update** tab: no list, no error.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk update run limit**
    (default 48,000). A bulk update that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just
