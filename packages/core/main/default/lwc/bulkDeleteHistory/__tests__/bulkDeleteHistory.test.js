@@ -118,4 +118,20 @@ describe('c-bulk-delete-history', () => {
     await flush();
     expect(one(element, 'error-message').textContent).toBe('You confirmed 200 records.');
   });
+
+  it('lists the person own jobs, and everyone else too for someone allowed who asks', async () => {
+    getPage.mockResolvedValue({ allowed: true, canSeeEveryone: false, jobs: [] });
+    let element = await render();
+    expect(getPage).toHaveBeenCalledWith({ everyone: false });
+    expect(element.shadowRoot.querySelector('[data-id="everyone"]')).toBeNull();
+    document.body.removeChild(element);
+
+    getPage.mockResolvedValue({ allowed: true, canSeeEveryone: true, jobs: [] });
+    element = await render();
+    const everyone = element.shadowRoot.querySelector('[data-id="everyone"]');
+    everyone.checked = true;
+    everyone.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(getPage).toHaveBeenLastCalledWith({ everyone: true });
+  });
 });

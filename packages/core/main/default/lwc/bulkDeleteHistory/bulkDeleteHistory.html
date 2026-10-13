@@ -6,6 +6,16 @@
                 <template if:true={busy}>
                     <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
                 </template>
+                <template if:true={canSeeEveryone}>
+                    <lightning-input
+                        type="checkbox"
+                        data-id="everyone"
+                        class="slds-var-m-bottom_x-small"
+                        label={labels.everyone}
+                        checked={everyone}
+                        onchange={handleEveryone}
+                    ></lightning-input>
+                </template>
                 <template if:true={hasError}>
                     <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
                         <span data-id="error-message">{errorMessage}</span>

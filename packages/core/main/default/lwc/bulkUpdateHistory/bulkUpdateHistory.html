@@ -51,6 +51,16 @@
                 </template>
 
                 <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.recent}</h2>
+                <template if:true={canSeeEveryone}>
+                    <lightning-input
+                        type="checkbox"
+                        data-id="everyone"
+                        class="slds-var-m-bottom_x-small"
+                        label={labels.everyone}
+                        checked={everyone}
+                        onchange={handleEveryone}
+                    ></lightning-input>
+                </template>
                 <template if:true={hasJobs}>
                     <ul class="slds-has-dividers_bottom-space">
                         <template for:each={jobRows} for:item="row">

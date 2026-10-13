@@ -15,7 +15,8 @@ one go. For each field you choose one of:
 
 Before anything changes, BarnCRM counts the records that match and shows the first five, each
 with the value before and the value after. You type that number to confirm. The update then
-runs in the background, in chunks of up to 200 records, and the page shows its progress.
+runs in the background, in chunks of up to 200 records (the **Bulk chunk size** setting), and
+the page shows its progress.
 
 Every change is recorded in the import journal, so for as long as an import can be undone (30
 days unless your administrator changed it) you can undo a bulk update: each value goes back to
@@ -64,7 +65,8 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
    each failure. The job's run log, on the Import record, also says how many no longer matched
    the query.
 7. To undo it, open the **Bulk Update** tab. Find the job under **Recent bulk updates**, press
-   **Undo**, check the number, and confirm.
+   **Undo**, check the number, and confirm. The list shows your own bulk updates. Someone who
+   manages BarnCRM Settings can tick **Show everyone's jobs** to see and undo anyone's.
 
 ## 4. What can and cannot be changed
 
@@ -117,7 +119,8 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   your access to the object or a field is taken away while it runs; the run log says why, and
   the records it had not reached are left as they were. When Salesforce stopped part of the
   job, the run log also says how many of the confirmed records were not reached; run a new
-  bulk update over them, in smaller parts if automation on them is heavy.
+  bulk update over them, in smaller parts if automation on them is heavy, or lower **Bulk
+  chunk size** in BarnCRM Settings (Import) so each chunk saves fewer records.
 - **"The old and new values of this record are too long to keep for an undo."** A very long
   text value (tens of thousands of characters) cannot be kept for an undo, so that record is
   left as it was rather than changed without one. Change it on the record itself.
@@ -174,3 +177,4 @@ Deleting the records a query returns is a separate tool with its own permission:
 | Import (data job) | Rows Matched | How many records already held the new values and were not saved. |
 | Import (data job) | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk update run limit | The most records one bulk update may change. Default 48,000, at most 48,000. |
+| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a bulk update or bulk delete handles. Default and highest 200, lowest 10; a job keeps the size it started with. |

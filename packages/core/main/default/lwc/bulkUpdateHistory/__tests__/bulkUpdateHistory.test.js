@@ -137,4 +137,20 @@ describe('c-bulk-update-history', () => {
     expect(getPage).toHaveBeenCalledTimes(2);
     expect(element.shadowRoot.querySelectorAll('[data-id="job-row"]')).toHaveLength(1);
   });
+
+  it('lists the person own jobs, and everyone else too for someone allowed who asks', async () => {
+    getPage.mockResolvedValue({ allowed: true, canSeeEveryone: false, jobs: [] });
+    let element = await render();
+    expect(getPage).toHaveBeenCalledWith({ everyone: false });
+    expect(element.shadowRoot.querySelector('[data-id="everyone"]')).toBeNull();
+    document.body.removeChild(element);
+
+    getPage.mockResolvedValue({ allowed: true, canSeeEveryone: true, jobs: [] });
+    element = await render();
+    const everyone = element.shadowRoot.querySelector('[data-id="everyone"]');
+    everyone.checked = true;
+    everyone.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(getPage).toHaveBeenLastCalledWith({ everyone: true });
+  });
 });

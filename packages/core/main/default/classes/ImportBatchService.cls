@@ -442,28 +442,53 @@ public with sharing class ImportBatchService {
      */
     @NamespaceAccessible
     public static Boolean isRunning(Import_Batch__c batch) {
-        if (
-            batch == null ||
-            !(STATUS_DRY_RUN.equals(batch.Status__c) || STATUS_COMMITTING.equals(batch.Status__c))
-        ) {
+        if (!mayBeRunning(batch)) {
+            return false;
+        }
+        return isRunning(batch, jobRunningForTest != null ? null : asyncJobOf(batch));
+    }
+
+    /**
+     * As `isRunning`, from the batch's job already read with `asyncJobOf`, so a caller that
+     * also shows the job's progress reads it once.
+     */
+    @NamespaceAccessible
+    public static Boolean isRunning(Import_Batch__c batch, AsyncApexJob job) {
+        if (!mayBeRunning(batch)) {
             return false;
         }
         if (jobRunningForTest != null) {
             return jobRunningForTest;
         }
-        if (String.isBlank(batch.Job_Id__c)) {
-            return false;
+        return job != null && RUNNING_JOB_STATUSES.contains(job.Status);
+    }
+
+    /**
+     * The batch's dry run or commit job, with its status and progress, or null when its status
+     * says it is not running or it has no job on record. Read in system mode: the job may be
+     * another user's.
+     */
+    @NamespaceAccessible
+    public static AsyncApexJob asyncJobOf(Import_Batch__c batch) {
+        if (!mayBeRunning(batch) || String.isBlank(batch.Job_Id__c)) {
+            return null;
         }
         Id jobId = batch.Job_Id__c;
-        Set<String> running = RUNNING_JOB_STATUSES;
-        return ![
-                SELECT Id
-                FROM AsyncApexJob
-                WHERE Id = :jobId AND Status IN :running
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ]
-            .isEmpty();
+        for (AsyncApexJob job : [
+            SELECT Id, Status, JobItemsProcessed, TotalJobItems
+            FROM AsyncApexJob
+            WHERE Id = :jobId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ]) {
+            return job;
+        }
+        return null;
+    }
+
+    private static Boolean mayBeRunning(Import_Batch__c batch) {
+        return batch != null &&
+            (STATUS_DRY_RUN.equals(batch.Status__c) || STATUS_COMMITTING.equals(batch.Status__c));
     }
 
     /** When the batch's job ended, or null when it has not or is no longer on record. */

@@ -185,4 +185,52 @@ private class ImportJournalServiceTest {
             );
         }
     }
+
+    /**
+     * Refusals journaled after many pages of saved records are still found, a few pages at a
+     * time, and counting reads the same way (FINDB-17).
+     */
+    @IsTest
+    static void theFirstRefusalsAreFoundPastTheFirstPagesAFewPagesAtATime() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = newBatch();
+            ImportJournalService.maxEntriesPerPage = 10;
+            ImportJournalService.pagesPerRead = 4;
+            List<Map<String, Object>> entries = new List<Map<String, Object>>();
+            for (Integer row = 0; row < 250; row++) {
+                entries.add(anUpdate(row));
+            }
+            Id someone = Contact.SObjectType.getDescribe().getKeyPrefix() + '000000000001AAA';
+            for (Integer index = 0; index < 30; index++) {
+                entries.add(ImportJournalService.failed('Contact', someone, 'Refused ' + index));
+            }
+            Assert.isTrue(
+                ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
+            );
+
+            Test.startTest();
+            List<Map<String, Object>> first = ImportJournalService.firstWithAction(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT,
+                ImportJournalService.ACTION_FAILED,
+                20
+            );
+            Integer failed = ImportJournalService.actionCount(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT,
+                ImportJournalService.ACTION_FAILED
+            );
+            Integer updated = ImportJournalService.actionCount(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT,
+                ImportJournalService.ACTION_UPDATED
+            );
+            Test.stopTest();
+
+            Assert.areEqual(20, first.size(), 'Twenty shown, from page 26 on');
+            Assert.areEqual('Refused 0', first[0].get('reason'), 'In the order written');
+            Assert.areEqual(30, failed, 'Every refusal counted');
+            Assert.areEqual(250, updated, 'Every saved record counted');
+        }
+    }
 }

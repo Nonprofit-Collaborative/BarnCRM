@@ -66,7 +66,7 @@ private class BulkUpdateControllerTest {
             );
             System.runAs(david) {
                 System.Assert.isFalse(FindController.getPage().canBulkUpdate, 'Not offered');
-                BulkUpdateController.BulkUpdatePage page = BulkUpdateController.getPage();
+                BulkUpdateController.BulkUpdatePage page = BulkUpdateController.getPage(false);
                 System.Assert.isFalse(page.allowed, 'Find alone does not open bulk update');
                 System.Assert.isTrue(page.jobs.isEmpty(), 'The tab lists nothing for them');
                 try {
@@ -82,7 +82,10 @@ private class BulkUpdateControllerTest {
             }
             System.runAs(maria()) {
                 System.Assert.isTrue(FindController.getPage().canBulkUpdate, 'Offered to an admin');
-                System.Assert.isTrue(BulkUpdateController.getPage().allowed, 'Listed for an admin');
+                System.Assert.isTrue(
+                    BulkUpdateController.getPage(false).allowed,
+                    'Listed for an admin'
+                );
             }
 
         }
@@ -92,11 +95,18 @@ private class BulkUpdateControllerTest {
     static void thePermissionSetsAloneReadAJobAndItsRefusals() {
         System.runAs(TestUsers.admin()) {
             makeVolunteers(1);
-            Import_Batch__c job = BulkUpdateService.createJob(
-                BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
-                1,
-                1
+            User bea = TestDataFactory.createUser(
+                'Bea',
+                new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
             );
+            Import_Batch__c job;
+            System.runAs(bea) {
+                job = BulkUpdateService.createJob(
+                    BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
+                    1,
+                    1
+                );
+            }
             Contact person = [SELECT Id FROM Contact LIMIT 1];
             ImportJournalService.write(
                 job.Id,
@@ -111,14 +121,14 @@ private class BulkUpdateControllerTest {
                 Completed_At__c = Datetime.now(),
                 Rows_Rejected__c = 1
             );
-            User bea = TestDataFactory.createUser(
-                'Bea',
-                new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
-            );
 
             BulkUpdateController.JobView view;
             System.runAs(bea) {
-                System.Assert.areEqual(1, BulkUpdateController.getPage().jobs.size(), 'Listed');
+                System.Assert.areEqual(
+                    1,
+                    BulkUpdateController.getPage(false).jobs.size(),
+                    'Listed'
+                );
                 view = BulkUpdateController.getJob(job.Id);
             }
             System.Assert.areEqual(1, view.failed, 'The refusal is counted');

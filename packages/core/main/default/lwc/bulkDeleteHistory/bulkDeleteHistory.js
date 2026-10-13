@@ -14,6 +14,7 @@ import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
 import CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
 import CANCEL from '@salesforce/label/c.Core_BulkUpdate_Cancel';
 import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
+import EVERYONE from '@salesforce/label/c.Core_BulkUpdate_EveryonesJobs';
 
 function format(template, ...values) {
   return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
@@ -35,10 +36,14 @@ export default class BulkDeleteHistory extends LightningElement {
     undoUntil: UNDO_UNTIL,
     confirm: CONFIRM,
     cancel: CANCEL,
-    loading: LOADING
+    loading: LOADING,
+    everyone: EVERYONE
   };
 
   allowed = false;
+  /** Whether the person may list everyone's jobs, and whether they asked to. */
+  canSeeEveryone = false;
+  everyone = false;
   jobs = [];
   undoTarget;
   undoText = '';
@@ -52,10 +57,16 @@ export default class BulkDeleteHistory extends LightningElement {
 
   async load() {
     await this.work(async () => {
-      const page = await getPage();
+      const page = await getPage({ everyone: this.everyone });
       this.allowed = Boolean(page && page.allowed);
+      this.canSeeEveryone = Boolean(page && page.canSeeEveryone);
       this.jobs = (page && page.jobs) || [];
     });
+  }
+
+  handleEveryone(event) {
+    this.everyone = event.target.checked;
+    this.load();
   }
 
   get hasError() {

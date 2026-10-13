@@ -433,6 +433,14 @@
         <value>Recent bulk updates</value>
     </labels>
     <labels>
+        <fullName>Core_BulkUpdate_EveryonesJobs</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Checkbox, for someone who manages settings, that lists every person's bulk jobs.</shortDescription>
+        <value>Show everyone's jobs</value>
+    </labels>
+    <labels>
         <fullName>Core_BulkUpdate_NoJobs</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>
