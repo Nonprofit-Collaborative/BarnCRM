@@ -163,6 +163,110 @@ private class MergeSettlementTest {
     }
 
     @IsTest
+    static void aHouseholdMergeLeavesOnePersonOneMembershipAndTheRightCount() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account kept = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account other = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ kept, other };
+            Contact both = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            Contact onlyOther = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+            insert new List<Contact>{ both, onlyOther };
+            insert new List<Household_Member__c>{
+                new Household_Member__c(
+                    Household__c = kept.Id,
+                    Contact__c = both.Id,
+                    Start_Date__c = Date.today().addDays(-10)
+                ),
+                new Household_Member__c(
+                    Household__c = other.Id,
+                    Contact__c = both.Id,
+                    Is_Primary__c = true,
+                    Start_Date__c = Date.today().addDays(-5)
+                ),
+                new Household_Member__c(
+                    Household__c = other.Id,
+                    Contact__c = onlyOther.Id,
+                    Start_Date__c = Date.today().addDays(-5)
+                )
+            };
+
+            Test.startTest();
+            Database.merge(new Account(Id = kept.Id), other.Id);
+            Test.stopTest();
+
+            List<Household_Member__c> rows = [
+                SELECT Contact__c, Is_Primary__c, Start_Date__c
+                FROM Household_Member__c
+                WHERE Household__c = :kept.Id AND Contact__c = :both.Id
+            ];
+            Assert.areEqual(1, rows.size(), 'The person has one membership in the survivor');
+            Assert.areEqual(
+                Date.today().addDays(-5),
+                rows[0].Start_Date__c,
+                'The primary row is the one kept'
+            );
+            Assert.isTrue(rows[0].Is_Primary__c, 'Primary carries onto the kept row');
+            Assert.areEqual(
+                2,
+                [SELECT Member_Count__c FROM Account WHERE Id = :kept.Id][0].Member_Count__c,
+                'Two people, each counted once'
+            );
+        }
+    }
+
+    @IsTest
+    static void twoHundredHouseholdsEachKeepOneMembershipPerPerson() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            List<Account> households = new List<Account>();
+            for (Integer i = 0; i < 200; i++) {
+                households.add(HouseholdTestDataFactory.newHousehold('Bulk Family ' + i));
+            }
+            insert households;
+            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Bulk');
+            insert people;
+            List<Household_Member__c> rows = new List<Household_Member__c>();
+            for (Integer i = 0; i < 200; i++) {
+                for (Integer copy = 0; copy < 2; copy++) {
+                    rows.add(
+                        new Household_Member__c(
+                            Household__c = households[i].Id,
+                            Contact__c = people[i].Id,
+                            Is_Primary__c = copy == 1,
+                            Start_Date__c = Date.today().addDays(-copy)
+                        )
+                    );
+                }
+            }
+            // Two rows each, as a merge leaves them: the upkeep on the rows is stood down.
+            AutomationControl.bypass('HouseholdMemberTriggerHandler');
+            insert rows;
+            AutomationControl.clearBypass('HouseholdMemberTriggerHandler');
+            Set<Id> householdIds = new Map<Id, Account>(households).keySet();
+
+            Test.startTest();
+            new MergeSettlement(householdIds, new Set<Id>(), new Set<Id>()).execute(null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Household_Member__c WHERE Household__c IN :householdIds],
+                'One membership per person'
+            );
+            Assert.areEqual(
+                200,
+                [
+                    SELECT COUNT()
+                    FROM Household_Member__c
+                    WHERE Household__c IN :householdIds AND Is_Primary__c = TRUE
+                ],
+                'The primary flag survives on each kept row'
+            );
+        }
+    }
+
+    @IsTest
     static void aMergeQueuesOneJobNamingItsSurvivors() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);

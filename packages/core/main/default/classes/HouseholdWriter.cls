@@ -126,6 +126,39 @@ public with sharing class HouseholdWriter {
     }
 
     /**
+     * Settles a household merge's duplicate memberships: the kept rows that take Is Primary,
+     * then the duplicate rows removed. System mode (upkeep, ADR-0021), and a refusal is
+     * logged rather than thrown so one row cannot stop the rest of the settlement.
+     */
+    public static void collapseMemberships(
+        List<Household_Member__c> promoted,
+        List<Household_Member__c> redundant
+    ) {
+        if (promoted != null && !promoted.isEmpty()) {
+            logFailures(
+                Database.update(promoted, false, AccessLevel.SYSTEM_MODE),
+                Label.Core_Households_ErrorContextMergeSettle
+            );
+        }
+        if (redundant != null && !redundant.isEmpty()) {
+            for (
+                Database.DeleteResult result : Database.delete(
+                    redundant,
+                    false,
+                    AccessLevel.SYSTEM_MODE
+                )
+            ) {
+                if (!result.isSuccess()) {
+                    log(
+                        firstMessage(result.getErrors()),
+                        Label.Core_Households_ErrorContextMergeSettle
+                    );
+                }
+            }
+        }
+    }
+
+    /**
      * Removes households the package created that have been left with no members. This one
      * runs with the user's own access, and a refusal is logged rather than thrown, so that
      * tidying up never fails somebody's save.

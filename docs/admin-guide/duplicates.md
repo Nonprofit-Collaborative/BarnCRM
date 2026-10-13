@@ -103,7 +103,7 @@ the members, recalculates the totals and renames the household, and lets you cho
 keep. If two households are merged with Salesforce's own account merge anyway, BarnCRM recounts
 and renames the kept household, settles its primary member and keeps one default address within
 a minute or so, in the background, because Salesforce does not let anything change the records
-while it is merging them. It cannot ask which name or members to keep, which is why the
+while it is merging them. If a person was in both households, they are left with one membership in the kept household (the primary one, or else the earlier start), so they are counted once. It cannot ask which name or members to keep, which is why the
 household record page does not offer that merge.
 
 **A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of

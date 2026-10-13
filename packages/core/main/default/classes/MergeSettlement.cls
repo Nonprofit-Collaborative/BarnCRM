@@ -7,6 +7,8 @@
  * and this job, run just after the save as RollupService.runForSurvivors runs the totals,
  * does what the children's own triggers would have done:
  *
+ * - a person who was in both merged households is left with one membership in the survivor,
+ *   which keeps Is Primary if either row had it (junction mode);
  * - a household that took in another household's members is recounted, renamed and given
  *   its primary again (never tidied away: it is the record the merge kept);
  * - a survivor that arrived with two default addresses keeps one (R-AD2);
@@ -72,6 +74,11 @@ public with sharing class MergeSettlement implements Queueable {
     }
 
     public void execute(QueueableContext context) {
+        try {
+            HouseholdService.collapseDuplicateMemberships(householdIds);
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, Label.Core_Households_ErrorContextMergeSettle);
+        }
         try {
             HouseholdService.afterMembershipChange(householdIds, false);
         } catch (Exception failed) {
