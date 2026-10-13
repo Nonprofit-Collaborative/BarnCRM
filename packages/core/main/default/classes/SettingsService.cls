@@ -20,8 +20,6 @@ public with sharing class SettingsService {
         )
         .getLocalName();
 
-    private static final String CACHE_PARTITION = 'local.BarnCRMSettings';
-    private static final String CACHE_KEY = 'orgDefaults';
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
     public static final String RECORD = 'Record';
@@ -62,22 +60,16 @@ public with sharing class SettingsService {
     }
 
     /**
-     * The org-level Core settings record, from the static cache, then the org cache, then the
-     * platform. Never null: an org that has never saved gets an empty record carrying the
-     * shipped defaults (see `SHIPPED_DEFAULTS`).
+     * The org-level Core settings record, from the static cache, then the platform. Never null:
+     * an org that has never saved gets an empty record carrying the shipped defaults (see
+     * `SHIPPED_DEFAULTS`). `getOrgDefaults()` costs no query: the platform serves custom
+     * settings from its own cache across transactions and refreshes it when a save commits.
      */
     @NamespaceAccessible
     public static BarnCRM_Settings__c getSettings() {
-        if (cachedSettings != null) {
-            return cachedSettings;
+        if (cachedSettings == null) {
+            cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
         }
-        BarnCRM_Settings__c fromCache = readCache();
-        if (fromCache != null) {
-            cachedSettings = fromCache;
-            return cachedSettings;
-        }
-        cachedSettings = withShippedDefaults(BarnCRM_Settings__c.getOrgDefaults());
-        writeCache(cachedSettings);
         return cachedSettings;
     }
 
@@ -505,31 +497,28 @@ public with sharing class SettingsService {
         return NamespaceUtil.objectType(apiName);
     }
 
+    /**
+     * The settings objects the shipped rows name. Read from the short fields, which costs no
+     * query, because a module's save asks this every time it reads one of its settings.
+     */
     private static Set<String> registeredObjects() {
         Set<String> names = new Set<String>();
-        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
+        for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAllShortFields()) {
             names.add(objectName(definition.Settings_Object__c).toLowerCase());
         }
         return names;
     }
 
     /**
-     * Forgets the cached settings, so the next read comes from the platform. Every writer of a
-     * settings object, in any package, calls this after it writes.
+     * Forgets the cached settings, so the next read in this transaction comes from the platform.
+     * Every writer of a settings object, in any package, calls this after it writes. Nothing is
+     * cached across transactions here: the platform's own custom settings cache already serves
+     * `getOrgDefaults()` without a query (ADR-NEXT).
      */
     @NamespaceAccessible
     public static void clearCaches() {
         cachedSettings = null;
         cachedOrgDefaults.clear();
-        Cache.OrgPartition partition = partition();
-        if (partition == null) {
-            return;
-        }
-        try {
-            partition.remove(CACHE_KEY);
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'BarnCRM Settings cache');
-        }
     }
 
     /** The shipped rows for one settings object, by the key each one edits. */
@@ -677,38 +666,6 @@ public with sharing class SettingsService {
             return ((Datetime) value).formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'');
         }
         return String.valueOf(value);
-    }
-
-    private static Cache.OrgPartition partition() {
-        try {
-            return Cache.Org.getPartition(CACHE_PARTITION);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static BarnCRM_Settings__c readCache() {
-        Cache.OrgPartition partition = partition();
-        if (partition == null) {
-            return null;
-        }
-        try {
-            return (BarnCRM_Settings__c) partition.get(CACHE_KEY);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static void writeCache(BarnCRM_Settings__c record) {
-        Cache.OrgPartition partition = partition();
-        if (partition == null || record == null) {
-            return;
-        }
-        try {
-            partition.put(CACHE_KEY, record);
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'BarnCRM Settings cache');
-        }
     }
 
     @NamespaceAccessible

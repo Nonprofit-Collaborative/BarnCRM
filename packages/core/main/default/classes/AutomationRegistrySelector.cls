@@ -19,6 +19,14 @@ public with sharing class AutomationRegistrySelector {
 
     private static Map<String, List<Automation_Registry__mdt>> byObjectName;
 
+    /** The registry as the framework reads it, once per transaction. */
+    private static List<Automation_Registry__mdt> forFramework;
+
+    /**
+     * Every registry row with its full description, for the code that copies a row into an
+     * automation switch (AutomationControl.ensureDefaults). This is a counted query: a custom
+     * metadata query that selects a long text area field counts against the SOQL limit.
+     */
     public static List<Automation_Registry__mdt> selectAll() {
         if (registryOverride != null) {
             return registryOverride;
@@ -42,6 +50,24 @@ public with sharing class AutomationRegistrySelector {
     }
 
     /**
+     * Every registry row for the trigger framework: the dispatcher and the module switch. Read
+     * with `getAll()`, which costs no query (it is served from the platform's own metadata
+     * cache, across transactions) and returns a long text area cut to 255 characters, which the
+     * framework never reads. A query here selected the description and so cost one counted SOQL
+     * in every transaction that fired a BarnCRM trigger (ADR-NEXT).
+     * The rows come back unordered: `selectForObject` sorts them.
+     */
+    public static List<Automation_Registry__mdt> selectForFramework() {
+        if (registryOverride != null) {
+            return registryOverride;
+        }
+        if (forFramework == null) {
+            forFramework = Automation_Registry__mdt.getAll().values();
+        }
+        return forFramework;
+    }
+
+    /**
      * The automations registered against one object, in the order they run. Read once per
      * transaction however many times a trigger fires.
      */
@@ -50,7 +76,7 @@ public with sharing class AutomationRegistrySelector {
             return new List<Automation_Registry__mdt>();
         }
         if (byObjectName == null) {
-            byObjectName = groupByObjectName(selectAll());
+            byObjectName = groupByObjectName(selectForFramework());
         }
         List<Automation_Registry__mdt> forObject = byObjectName.get(objectApiName.toLowerCase());
         return forObject == null ? new List<Automation_Registry__mdt>() : forObject;
@@ -58,6 +84,7 @@ public with sharing class AutomationRegistrySelector {
 
     public static void clearCache() {
         byObjectName = null;
+        forFramework = null;
     }
 
     private static Map<String, List<Automation_Registry__mdt>> groupByObjectName(

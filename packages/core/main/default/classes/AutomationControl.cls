@@ -421,7 +421,7 @@ public with sharing class AutomationControl {
         if (modulesOff.isEmpty()) {
             return;
         }
-        for (Automation_Registry__mdt entry : shippedRegistry()) {
+        for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForFramework()) {
             if (
                 String.isNotBlank(entry.Module__c) &&
                 String.isNotBlank(entry.DeveloperName) &&

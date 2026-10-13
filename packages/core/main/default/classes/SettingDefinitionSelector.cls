@@ -50,4 +50,19 @@ public with sharing class SettingDefinitionSelector {
         ];
         return cachedRows;
     }
+
+    /**
+     * The same rows, unordered, with every long text area (Description, Picklist Values) cut to
+     * 255 characters, for a reader that needs only the short fields. `getAll()` above selects
+     * long text, and a custom metadata query that does so counts against the SOQL limit; this
+     * read costs no query at all, because the platform serves it from its own metadata cache
+     * across transactions (ADR-NEXT). A module's gift save that reads
+     * one of its settings checks the object here.
+     */
+    public static List<Setting_Definition__mdt> getAllShortFields() {
+        if (stubbedRows != null) {
+            return stubbedRows;
+        }
+        return Setting_Definition__mdt.getAll().values();
+    }
 }

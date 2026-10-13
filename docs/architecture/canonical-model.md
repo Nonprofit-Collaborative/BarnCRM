@@ -939,9 +939,11 @@ subscriber Setup as editable configuration) and hierarchical, so the org-level v
 are what packaged code reads.
 **R-N2 Written from the app.** Values are written synchronously by Apex from the
 settings console, never by asking the admin to open Setup (plan Section 2.3).
-**R-N3 Cache invalidation.** Values are cached in Platform Cache and the cache is
-invalidated on write, so a change takes effect on the next transaction and never appears
-stale beyond ten seconds (C-03 acceptance criterion).
+**R-N3 Cache invalidation.** Values are read with `getOrgDefaults()`, which the platform
+serves from its own custom settings cache and refreshes when a save commits, and are held in
+a per-transaction static that every write clears. So a change takes effect on the next
+transaction and never appears stale beyond ten seconds (C-03 acceptance criterion). Core
+ships no Platform Cache partition (ADR-NEXT).
 **R-N4 Audited.** Every write produces a Setting Change record (Section 11).
 **R-N5 Extension procedure.** A feature that needs a new key adds a row to the table
 above in the same pull request that adds the field, with its default and its one-line
