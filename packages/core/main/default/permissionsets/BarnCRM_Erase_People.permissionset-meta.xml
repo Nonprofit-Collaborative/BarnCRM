@@ -6,6 +6,10 @@
     Erase a person on request (right to be forgotten). Not undoable. In no role. Grants read on
     Erasure records and no record access: the erasure runs with the user's own access.
   </description>
+  <classAccesses>
+    <apexClass>PersonErasureController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
     <name>Erase_People</name>
