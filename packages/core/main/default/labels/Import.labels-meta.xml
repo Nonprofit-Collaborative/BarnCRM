@@ -517,7 +517,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import results: the rejected-rows table shows only its first rows</shortDescription>
+        <shortDescription>Import results: rejected rows table; {0} rows shown, {1} rows rejected</shortDescription>
         <value>Showing the first {0} of {1} rejected rows. Select Download exceptions to get all of them.</value>
     </labels>
     <labels>
@@ -525,7 +525,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import: the exceptions file holds fewer rows than were rejected</shortDescription>
+        <shortDescription>Import exceptions file capped; {0} rows in the file, {1} rows rejected</shortDescription>
         <value>The exceptions file holds the first {0} of {1} rejected rows, the most one download can read. Fix and import those rows, then preview the file again to get the rest.</value>
     </labels>
     <labels>

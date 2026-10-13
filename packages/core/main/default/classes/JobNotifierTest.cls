@@ -7,8 +7,13 @@
  * what was handed to the platform. These tests have not been executed: no org in this
  * environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:JobNotifier')
 private class JobNotifierTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** Saves the org's settings with notifications on or off. */
     private static void notifications(Boolean turnedOn) {
         insert new BarnCRM_Settings__c(

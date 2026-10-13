@@ -44,6 +44,11 @@ private class RollupChangesCoverageTest {
         return ids == null ? new Set<Id>() : ids;
     }
 
+    /** A definition that writes to this target entity, as `RollupChanges.Marked` reads it. */
+    private static Rollup_Definition__c targeting(String targetObject) {
+        return new Rollup_Definition__c(Target_Object__c = targetObject);
+    }
+
     @IsTest
     static void markedKeepsOnlyRealIdsUnderALowerCasedTarget() {
         System.runAs(TestUsers.admin()) {
@@ -54,18 +59,18 @@ private class RollupChangesCoverageTest {
             Assert.areEqual(0, collected.size(), 'And the count is zero');
 
             collected.add(null, new Set<Id>{ first });
-            collected.add('  ', new Set<Id>{ first });
-            collected.add('Account', null);
-            collected.add('Account', new Set<Id>{ null });
+            collected.add(targeting('  '), new Set<Id>{ first });
+            collected.add(targeting('Account'), null);
+            collected.add(targeting('Account'), new Set<Id>{ null });
             Assert.isTrue(
                 collected.isEmpty(),
-                'A blank target, no ids, or a null id marks nothing'
+                'No definition, a blank target, no ids, or a null id marks nothing'
             );
 
-            collected.add('ACCOUNT', new Set<Id>{ first, null });
+            collected.add(targeting('ACCOUNT'), new Set<Id>{ first, null });
             RollupChanges.Marked other = new RollupChanges.Marked();
-            other.add('account', new Set<Id>{ first, second });
-            other.add('Contact', new Set<Id>{ FakeIds.of(Contact.SObjectType, 1) });
+            other.add(targeting('account'), new Set<Id>{ first, second });
+            other.add(targeting('Contact'), new Set<Id>{ FakeIds.of(Contact.SObjectType, 1) });
             collected.addAll(other);
 
             Assert.areEqual(

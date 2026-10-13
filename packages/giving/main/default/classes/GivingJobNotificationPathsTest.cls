@@ -7,7 +7,9 @@
  * Asserts on `JobNotifier.sentNotices()`, because a sent notification cannot be read back. These
  * tests have not been executed: no org in this environment.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:DonorLevelBatch, ApexClass:AcknowledgmentBatch, ApexClass:ReceiptStatementBatch'
+)
 private class GivingJobNotificationPathsTest {
     private static final Integer YEAR = 2025;
 

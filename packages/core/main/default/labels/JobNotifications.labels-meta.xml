@@ -125,7 +125,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: import counts {0} to {3}</shortDescription>
+        <shortDescription>Import notice; {0} created, {1} updated, {2} matched, {3} rejected</shortDescription>
         <value>{0} created, {1} updated, {2} matched, {3} rejected. Open the import for the run log.</value>
     </labels>
     <labels>
@@ -133,7 +133,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: import undo counts {0} to {2}</shortDescription>
+        <shortDescription>Import undo notice; {0} deleted, {1} kept, {2} values put back</shortDescription>
         <value>{0} records deleted, {1} kept, {2} values put back. Open the job for the run log.</value>
     </labels>
     <labels>
@@ -141,7 +141,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: bulk update counts {0} to {3}</shortDescription>
+        <shortDescription>Bulk update notice; {0} updated, {1} right, {2} unmatched, {3} failed</shortDescription>
         <value>{0} updated, {1} already right, {2} no longer matched, {3} could not be saved. Open the bulk update for the run log.</value>
     </labels>
     <labels>
@@ -149,7 +149,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: bulk delete counts {0} to {2}</shortDescription>
+        <shortDescription>Bulk delete notice; {0} deleted, {1} unmatched, {2} failed</shortDescription>
         <value>{0} deleted, {1} no longer matched, {2} could not be deleted. Open the bulk delete for the run log.</value>
     </labels>
     <labels>
@@ -157,7 +157,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: bulk delete undo counts {0} to {3}</shortDescription>
+        <shortDescription>Undo notice; {0} restored, {1} emptied, {2} already back, {3} failed</shortDescription>
         <value>{0} restored, {1} already emptied from the Recycle Bin, {2} already back, {3} could not be restored. Open the bulk delete for the run log.</value>
     </labels>
     <labels>
@@ -165,7 +165,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: sample data counts {0} to {2}</shortDescription>
+        <shortDescription>Sample data notice; {0} households, {1} people, {2} organizations</shortDescription>
         <value>{0} households, {1} people and {2} organizations are ready to explore.</value>
     </labels>
     <labels>
@@ -181,7 +181,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: rollup run counts {0} to {2}</shortDescription>
+        <shortDescription>Rollup run notice; {0} records updated, {1} not saved, {2} batches stopped</shortDescription>
         <value>{0} records' totals updated. {1} could not be saved and {2} batches stopped; those are tried again automatically.</value>
     </labels>
     <labels>
@@ -189,7 +189,7 @@
         <categories>Job Notifications</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Job notification body: household recompute counts {0} to {2}</shortDescription>
+        <shortDescription>Household recompute notice; {0} read, {1} renamed, {2} left alone</shortDescription>
         <value>{0} households read, {1} renamed, {2} left alone because Nonprofit Cloud manages them.</value>
     </labels>
 </CustomLabels>

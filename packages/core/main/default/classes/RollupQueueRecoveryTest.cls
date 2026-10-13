@@ -7,8 +7,15 @@
  * Core holds no giving objects, so people (Contact) are counted on their organization
  * (`AccountId`).
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:RollupQueue, ApexClass:RollupService, ApexClass:RollupAttentionController, ApexClass:HealthCheckSettingsChecks'
+)
 private class RollupQueueRecoveryTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c staffCount() {
         return new Rollup_Definition__c(
             Name = 'Staff count',

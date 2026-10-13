@@ -7,8 +7,15 @@
  * `JobNotifier.sent`, because a sent notification cannot be read back. These tests have not been
  * executed: no org in this environment.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:JobNotifier, ApexClass:ImportBatchService, ApexClass:ImportUndoService, ApexClass:BulkUpdateBatch, ApexClass:BulkDeleteUndoBatch, ApexClass:SeasonalAddressBatch, ApexClass:HouseholdNamingBatch, ApexClass:RollupFullRecalcBatch'
+)
 private class JobNotificationPathsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static void notifications(Boolean turnedOn) {
         insert new BarnCRM_Settings__c(
             SetupOwnerId = UserInfo.getOrganizationId(),

@@ -6,8 +6,13 @@
  * Core holds no giving objects, so people (Contact, registered for real time by
  * `Core_Rollups_Contact`) are counted on their organization (`AccountId`).
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupService, ApexClass:RollupQueue')
 private class RollupBackgroundTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final Integer EMPLOYER_COUNT = 10;
 
     private static Rollup_Definition__c staffCount() {

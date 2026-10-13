@@ -11,7 +11,7 @@
  * recalculates them just after the save. That is the budget pinned here. Recalculating in the
  * save costs several times as much, which `inTheSaveCostsMoreThanTheBudget` shows.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupService, ApexClass:RollupQueue')
 private class GiftSaveRollupCostTest {
     /**
      * The most queries the rollups may add to a save when they are recalculated just after it:

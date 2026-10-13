@@ -8,8 +8,13 @@
  * an every night count of its people. A contact save may move only the first. The other two
  * write Annual Revenue, which starts at 999: had either run, it would hold its count instead.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupChanges, ApexClass:RollupService, ApexClass:RollupQueue')
 private class RollupMarkedDefinitionsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final Integer ORGANIZATIONS = 10;
     private static final Integer PEOPLE = 200;
     private static final Decimal UNTOUCHED = 999;
