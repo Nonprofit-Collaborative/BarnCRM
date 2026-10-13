@@ -92,6 +92,51 @@ private class QueryCompilerTest {
         }
     }
 
+    /**
+     * The escaped % and _ of a "contains" value match only themselves in the database, not
+     * any text and any one character.
+     */
+    @IsTest
+    static void containsMatchesPercentAndUnderscoreLiterally() {
+        System.runAs(TestUsers.admin()) {
+            List<Error_Log__c> logs = new List<Error_Log__c>();
+            for (
+                String context : new List<String>{ 'Save 50%_off', 'Save 50 xoff', 'Save 50%xoff' }
+            ) {
+                logs.add(
+                    new Error_Log__c(
+                        Timestamp__c = System.now(),
+                        Context__c = context,
+                        Message__c = 'A test entry.',
+                        Severity__c = 'Error',
+                        Status__c = 'New'
+                    )
+                );
+            }
+            insert logs;
+            String containsFilter = JSON.serialize(
+                new Map<String, Object>{
+                    'version' => 1,
+                    'conditions' => new List<Object>{
+                        new Map<String, Object>{
+                            'id' => 1,
+                            'field' => 'Context__c',
+                            'operator' => 'contains',
+                            'value' => '50%_'
+                        }
+                    }
+                }
+            );
+
+            List<SObject> rows = QueryCompiler.run(
+                QueryCompiler.compile(query(containsFilter, null, 200))
+            );
+
+            System.Assert.areEqual(1, rows.size(), 'Only the literal match: ' + rows);
+            System.Assert.areEqual('Save 50%_off', rows[0].get('Context__c'));
+        }
+    }
+
     @IsTest
     static void exportPagesInIdOrderAfterTheLastIdRead() {
         System.runAs(TestUsers.admin()) {

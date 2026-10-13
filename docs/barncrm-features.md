@@ -127,9 +127,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Your own fields in the wizard | Minor | The wizard offers the org's own custom fields as mapping targets. | Shipped | C-32 |
 | Import undo keeps households with gifts | Minor | Undoing an import keeps a household that gifts or pledges are credited to, and journals why. | Shipped | C-19, ADR-0070 (D-20) |
 | Find conditions | Minor | Conditions on the object's fields and related records, relative dates such as "in the last 30 days", and custom condition logic. | Shipped | C-34 |
-| Saved and shared queries | Minor | Save a Find query under a name to run again, and share it read only with everyone who uses Find. | Shipped | C-34 |
+| Saved and shared queries | Minor | Save a Find query under a name to run again, and share it read only with everyone who uses Find; Save as keeps the new copy open even when another query has the same name. | Shipped; fix built, not merged (`fix/find-1`) | C-34 |
 | Find export | Minor | Exports every matching record (not only the rows on screen) to CSV, up to an export row limit set in the app; results follow each person's own access. | Shipped | C-34 |
-| Advanced Find | Minor | Typed queries checked through the same builder, child records, aggregates, XLSX export and inline edit. | Shipped | C-36, ADR-0078 |
+| Advanced Find | Minor | Typed queries checked through the same builder, child records, aggregates (grouped only by fields Salesforce can group, dates shown as dates), XLSX export (cells cut at Excel's 32,767 characters) and inline edit; the platform's share, history and feed tables are not offered. | Shipped; fix built, not merged (`fix/find-1`) | C-36, ADR-0078 |
 | Data transforms and duplicate-rule matching (part 1) | Minor | Import column changes (a declarative step list, no code evaluation) previewed before and after, a shared DataTransform engine for bulk update, and matching through the org's active duplicate rules with the template's several-matches policy. | Shipped (part 1); bulk update steps and bulk delete shipped (#219) | C-37, ADR-0081 |
 | Scheduled imports and external sources | Minor | Loads from SFTP, cloud storage or other systems on a schedule, committing only within admin-set limits. | Planned (1.x) | C-38 |
 

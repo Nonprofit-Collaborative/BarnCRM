@@ -16,16 +16,6 @@ public with sharing class FindController {
     public static final Integer DEFAULT_EXPORT_LIMIT = 50000;
     public static final Integer MAX_EXPORT_LIMIT = 500000;
     private static final Integer MAX_SAVED_QUERIES = 500;
-    private static final Set<String> SYSTEM_SUFFIXES = new Set<String>{
-        '__mdt',
-        '__e',
-        '__share',
-        '__history',
-        '__feed',
-        '__changeevent',
-        '__x',
-        '__b'
-    };
 
     /** One choice in a list. */
     public class Option {
@@ -69,6 +59,9 @@ public with sharing class FindController {
         /** Whether the person may also bulk delete the results (C-37, R-BD6). */
         @AuraEnabled
         public Boolean canBulkDelete;
+        /** The query a save wrote, so the page keeps that one open; empty otherwise. */
+        @AuraEnabled
+        public String savedId;
     }
 
     /** The rows a query returned and the SOQL it ran, for display only. */
@@ -244,7 +237,10 @@ public with sharing class FindController {
                 Database.update(query, AccessLevel.USER_MODE);
             }
             SavedQuerySharingWriter.setShared(new Map<Id, Boolean>{ query.Id => shared == true });
-            return currentPage();
+            FindPage page = currentPage();
+            // Names are not unique, so the page is told which query was written.
+            page.savedId = query.Id;
+            return page;
         } catch (Exception caught) {
             throw asUserError(caught, 'Save a Find query');
         }
@@ -330,21 +326,9 @@ public with sharing class FindController {
     }
 
     private static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
-        if (
-            !objectDescribe.isAccessible() ||
-            !objectDescribe.isQueryable() ||
-            objectDescribe.isCustomSetting() ||
-            objectDescribe.isDeprecatedAndHidden()
-        ) {
-            return false;
-        }
-        String name = objectDescribe.getName().toLowerCase();
-        for (String suffix : SYSTEM_SUFFIXES) {
-            if (name.endsWith(suffix)) {
-                return false;
-            }
-        }
-        return true;
+        return objectDescribe.isAccessible() &&
+            objectDescribe.isQueryable() &&
+            !QueryFieldCatalog.isSystemObject(objectDescribe);
     }
 
     private static void requirePermission() {

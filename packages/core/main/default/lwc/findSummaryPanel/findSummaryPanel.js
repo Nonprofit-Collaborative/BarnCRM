@@ -103,7 +103,9 @@ export default class FindSummaryPanel extends LightningElement {
     return this.fields
       .filter(
         (field) =>
-          NUMBER_TYPES.has(field.dataType) || (this.fn !== 'sum' && DATE_TYPES.has(field.dataType))
+          field.aggregatable !== false &&
+          (NUMBER_TYPES.has(field.dataType) ||
+            (this.fn !== 'sum' && DATE_TYPES.has(field.dataType)))
       )
       .map((field) => ({ label: field.label, value: field.apiName }));
   }
@@ -112,7 +114,12 @@ export default class FindSummaryPanel extends LightningElement {
     return [
       { label: NO_GROUP, value: '' },
       ...this.fields
-        .filter((field) => field.filterable && !NOT_GROUPABLE.has(field.dataType))
+        // The describe says which fields SOQL groups by (not currency, number or long text);
+        // the type list stays for a field described without that answer.
+        .filter(
+          (field) =>
+            field.groupable !== false && field.filterable && !NOT_GROUPABLE.has(field.dataType)
+        )
         .map((field) => ({ label: field.label, value: field.apiName }))
     ];
   }

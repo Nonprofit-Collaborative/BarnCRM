@@ -118,6 +118,29 @@ private class QueryFieldCatalogTest {
         }
     }
 
+    /** One rule for the platform's own tables, standard and custom, and for settings. */
+    @IsTest
+    static void tellsThePlatformsOwnTablesFromRecords() {
+        System.runAs(TestUsers.admin()) {
+            System.Assert.isFalse(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.Account),
+                'Account holds records'
+            );
+            System.Assert.isFalse(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.Affiliation__c),
+                'A package object holds records'
+            );
+            System.Assert.isTrue(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.AccountShare),
+                'A standard share table'
+            );
+            System.Assert.isTrue(
+                QueryFieldCatalog.isSystemObject(Schema.SObjectType.BarnCRM_Settings__c),
+                'A custom setting'
+            );
+        }
+    }
+
     private static QueryFieldCatalog.FieldInfo field(
         QueryFieldCatalog.ObjectInfo info,
         String apiNameSuffix

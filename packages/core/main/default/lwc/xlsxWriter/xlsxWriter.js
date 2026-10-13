@@ -11,6 +11,8 @@
 
 const DAY_MS = 86400000;
 const EXCEL_EPOCH = Date.UTC(1899, 11, 30);
+/** The most characters one Excel cell holds. */
+export const MAX_CELL_TEXT = 32767;
 // Characters XML 1.0 cannot hold at all; a value that has them loses only them.
 // eslint-disable-next-line no-control-regex
 const NOT_XML = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g;
@@ -73,8 +75,22 @@ function escapeXml(text) {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * Text cut to what one Excel cell holds; a longer cell makes Excel report the workbook as
+ * damaged. A character made of two code units is never split.
+ */
+function fitCell(text) {
+  const value = String(text);
+  if (value.length <= MAX_CELL_TEXT) {
+    return value;
+  }
+  const cut = value.slice(0, MAX_CELL_TEXT);
+  const last = cut.charCodeAt(cut.length - 1);
+  return last >= 0xd800 && last <= 0xdbff ? cut.slice(0, -1) : cut;
+}
+
 function textCell(reference, text, style) {
-  return `<c r="${reference}" t="inlineStr"${style ? ` s="${style}"` : ''}><is><t xml:space="preserve">${escapeXml(text)}</t></is></c>`;
+  return `<c r="${reference}" t="inlineStr"${style ? ` s="${style}"` : ''}><is><t xml:space="preserve">${escapeXml(fitCell(text))}</t></is></c>`;
 }
 
 function cell(reference, value, type) {

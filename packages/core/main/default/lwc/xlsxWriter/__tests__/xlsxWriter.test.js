@@ -4,6 +4,7 @@ import {
   CELL_TYPES,
   columnName,
   crc32,
+  MAX_CELL_TEXT,
   sheetXml,
   toSerial,
   writeXlsx,
@@ -64,6 +65,25 @@ describe('c/xlsxWriter', () => {
     expect(xml).toContain('<c r="A2" t="inlineStr"><is><t xml:space="preserve">=1+1</t>');
     expect(xml).toContain('<c r="A5" t="inlineStr"><is><t xml:space="preserve">@SUM(A1)</t>');
     expect(xml).toContain('<c r="A3" t="inlineStr"><is><t xml:space="preserve">+1</t>');
+  });
+
+  it('cuts text to what one Excel cell holds, never splitting a character', () => {
+    const cellText = (xml, reference) =>
+      xml
+        .split(`<c r="${reference}" t="inlineStr"><is><t xml:space="preserve">`)[1]
+        .split('</t>')[0];
+    const long = 'x'.repeat(MAX_CELL_TEXT + 100);
+    // An emoji (two code units) straddling the limit is dropped whole.
+    const straddling = `${'y'.repeat(MAX_CELL_TEXT - 1)}\u{1F600}z`;
+    const xml = sheetXml(COLUMNS, [
+      [long, null, null, null],
+      [straddling, null, null, null],
+      ['short', null, null, null]
+    ]);
+    expect(MAX_CELL_TEXT).toBe(32767);
+    expect(cellText(xml, 'A2')).toHaveLength(MAX_CELL_TEXT);
+    expect(cellText(xml, 'A3')).toBe('y'.repeat(MAX_CELL_TEXT - 1));
+    expect(cellText(xml, 'A4')).toBe('short');
   });
 
   it('writes a workbook the import reader reads back, deflated and stored', async () => {

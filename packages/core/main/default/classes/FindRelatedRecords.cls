@@ -17,14 +17,6 @@ public with sharing class FindRelatedRecords {
     private static final Pattern FIELD_PATH = Pattern.compile(
         '^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
     );
-    private static final Set<String> SYSTEM_SUFFIXES = new Set<String>{
-        'share',
-        'history',
-        'feed',
-        'changeevent',
-        '__mdt',
-        '__e'
-    };
 
     /** One kind of related record, as Find offers it. */
     public class ChildOption {
@@ -215,16 +207,9 @@ public with sharing class FindRelatedRecords {
         if (
             !child.isAccessible() ||
             !child.isQueryable() ||
-            child.isCustomSetting() ||
-            child.isDeprecatedAndHidden()
+            QueryFieldCatalog.isSystemObject(child)
         ) {
             return null;
-        }
-        String lowerName = child.getName().toLowerCase();
-        for (String suffix : SYSTEM_SUFFIXES) {
-            if (lowerName.endsWith(suffix)) {
-                return null;
-            }
         }
         return child;
     }

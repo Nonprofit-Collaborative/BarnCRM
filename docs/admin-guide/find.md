@@ -147,8 +147,9 @@ Press **Summarize** to count or total the matching records instead of listing th
 
 1. Choose **Count of records**, **Total of**, **Lowest** or **Highest**, and for the last three
    the number or date field to measure.
-2. Optional: choose **Group by**, a field such as **Status** or **Gift Date** (or a related
-   record's field, such as **Household > Billing City**). Leave it empty for one line.
+2. Optional: choose **Group by**, a field of the query's object such as **Status** or
+   **Gift Date**. Only fields Salesforce can group by are offered, so currency, number and
+   long text fields are not. Leave it empty for one line.
 3. Press **Summarize**. A table shows one line per group, with the blank group shown as
    "(blank)".
 
@@ -189,7 +190,9 @@ a message pointing at the words it could not read. Use **Summarize** for totals.
 **Export to Excel** reads the same rows as **Export to CSV**, up to the same export row limit,
 and downloads an Excel workbook with one sheet, a header row of column labels, numbers as
 numbers and dates as dates. A very large export can take a while to build in the browser; for
-more than a few tens of thousands of rows, CSV is faster.
+more than a few tens of thousands of rows, CSV is faster. One Excel cell holds at most 32,767
+characters, so a longer text value is cut to that length in the workbook; export to CSV to
+keep it whole.
 
 ### 7.6 Editing in the table
 

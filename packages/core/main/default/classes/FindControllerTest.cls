@@ -115,6 +115,7 @@ private class FindControllerTest {
                 'The object is copied from the document'
             );
             String recordId = saved.savedQueries[0].recordId;
+            System.Assert.areEqual(recordId, saved.savedId, 'The page names the query it wrote');
 
             System.runAs(david) {
                 System.Assert.isTrue(
@@ -246,8 +247,13 @@ private class FindControllerTest {
                         name.endsWith('barncrm_settings__c'),
                         'Settings are not offered'
                     );
-                    System.Assert.isFalse(name.endsWith('__share'), 'Share tables are not offered');
+                    System.Assert.isFalse(name.endsWith('share'), 'Share tables are not offered');
+                    System.Assert.isFalse(name.endsWith('history'), 'History tables neither');
+                    System.Assert.isFalse(name.endsWith('feed'), 'Feeds neither');
                 }
+                // The standard ones too, which an administrator can query.
+                System.Assert.isFalse(names.contains('accountshare'), 'AccountShare');
+                System.Assert.isFalse(names.contains('accounthistory'), 'AccountHistory');
                 System.Assert.areEqual(
                     FindController.DEFAULT_EXPORT_LIMIT,
                     FindController.getPage().exportLimit,
