@@ -277,9 +277,13 @@ first name only, fail this way. Map the full name column to **Full name** and Ba
 splits it, or split the column in your spreadsheet.
 
 **The import finished but some rows failed.** That is by design: one bad row does not
-throw away the rest of the file. The failed rows are counted as rejected, each carries the
-reason, and none of them wrote anything. Fix those rows in your spreadsheet, save them as
-a smaller file, and import that file on its own.
+throw away the rest of the file. The failed rows are counted as rejected and each carries the
+reason. A row rejected before anything was saved (a missing last name, more than one match, a
+value a field cannot take) wrote nothing, not even the organization it names; the preview
+shows the same. A row whose save failed part way (a duplicate rule that blocks the second
+person, say) keeps what was already saved, and the row's Contact and Organization fields point
+at it, so a second import matches it instead of creating it again. Fix those rows in your
+spreadsheet, save them as a smaller file, and import that file on its own.
 
 **Rows rejected with "The people on this row were saved, but its ... columns were not
 loaded".** A module (Giving, for a gift file) failed while loading its columns for part of

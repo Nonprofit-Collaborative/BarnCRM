@@ -2169,6 +2169,9 @@ starts, the batch records the template (its mapping, values for every row, match
 person mode) as Template Snapshot, every chunk of that dry run and the commit after it run
 under the snapshot, and an edit to the template since changes the next dry run and not the
 commit. A batch with no snapshot (one previewed before this rule) runs under the template.
+A row is checked in full (its people matched and validated) before any record it names is
+created, so a row rejected for its person creates no organization, in the dry run as in the
+commit; a row whose save fails part way keeps what was saved and points at it.
 
 **R-IB2 Chunked and asynchronous.** Rows are processed in chunks of Chunk Size in Batch
 Apex, with progress visible on the batch record, so a file of hundreds of thousands of
@@ -6835,6 +6838,7 @@ mirrors the primary member).
 | post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-3). No object or field added. R-IB1: a row's organization is created only after its people are matched and validated, so a rejected row creates nothing and the dry run counts what the commit does; a rejected row points at what it saved. |
 
 ---
 ## 32. Entity ownership by package
