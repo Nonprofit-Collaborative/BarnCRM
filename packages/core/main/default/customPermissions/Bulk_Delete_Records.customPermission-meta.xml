@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Lets a user delete the records a Find query returns, and undo it from the Recycle Bin. Needs
+    Find and Export Records too. In no role. Grants no record access; records are deleted with
+    the user's own access.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Bulk Delete Records</label>
+</CustomPermission>

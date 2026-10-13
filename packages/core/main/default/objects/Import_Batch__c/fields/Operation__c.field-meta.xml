@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Operation__c</fullName>
-  <description>What kind of data job this is: a file import, or a bulk update of the records a Find query returned (canonical model R-BU1). Empty reads as Import.</description>
-  <inlineHelpText>Import loads a file. Update changes the records a Find query returned.</inlineHelpText>
+  <description>What kind of data job this is: a file import, a bulk update or a bulk delete of the records a Find query returned (canonical model R-BU1, R-BD1). Empty reads as Import.</description>
+  <inlineHelpText>Import loads a file. Update changes, and Delete deletes, the records a Find query returned.</inlineHelpText>
   <label>Operation</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
@@ -20,6 +20,11 @@
         <fullName>Update</fullName>
         <default>false</default>
         <label>Update</label>
+      </value>
+      <value>
+        <fullName>Delete</fullName>
+        <default>false</default>
+        <label>Delete</label>
       </value>
     </valueSetDefinition>
   </valueSet>

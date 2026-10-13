@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_BulkDelete_ErrorObject</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the query's object cannot be bulk deleted, and why.</shortDescription>
+        <value>{0} cannot be bulk deleted: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ReasonNoDelete</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason: the person may not delete records of this object.</shortDescription>
+        <value>your access does not let you delete them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ReasonNoUndelete</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason: these records cannot come back from the Recycle Bin.</shortDescription>
+        <value>Salesforce cannot bring them back from the Recycle Bin, so the delete could not be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorNothingMatches</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: no records match the query.</shortDescription>
+        <value>No records match this query, so there is nothing to delete.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorOverLimit</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more records match than the bulk delete run limit.</shortDescription>
+        <value>More than {0} records match, the run limit for one bulk delete. Narrow the query, or run it in parts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorMoreThanConfirmed</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more records match now than were confirmed.</shortDescription>
+        <value>More records match now than the {0} you confirmed. Nothing was deleted. Preview again and confirm the new number.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogStarted</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: who started a bulk delete, when, and the counts.</shortDescription>
+        <value>{0} started a bulk delete on {1}: {2} {3} matched; {4} confirmed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogStopped</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: the bulk delete stopped before deleting anything.</shortDescription>
+        <value>Stopped before deleting anything: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogFinished</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: what a bulk delete did.</shortDescription>
+        <value>Finished: {0} deleted, {1} no longer matched, {2} refused.</value>
+    </labels>
+</CustomLabels>

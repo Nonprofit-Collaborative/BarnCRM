@@ -102,6 +102,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Import_Batch__c.Rows_Deleted__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Import_Batch__c.Rows_Matched__c</field>
     <readable>true</readable>
   </fieldPermissions>
