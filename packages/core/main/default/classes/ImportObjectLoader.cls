@@ -14,11 +14,19 @@
  * platform's upsert, so a dry run can say which rows create and the journal holds each value
  * before. Each record a commit creates is journaled on a Created page, since an arbitrary object
  * has no batch tag, and undo deletes it from there.
+ *
+ * With a Related Object (R-IT17; ADR-NEXT `NEXT-load-related-records.md`) each row may also
+ * create a related record pointing at its parent. The first row of a key is the parent row;
+ * later rows of the key only add related records. Parents are saved before related records,
+ * and a related row of a failed parent is rejected.
  */
 @NamespaceAccessible
 public with sharing class ImportObjectLoader {
     /** Prefixes a record key before its digest, apart from people and organizations. */
     private static final String RECORD_DIGEST = 'record:';
+
+    /** Prefixes a parent row's key when its parent failed, for later rows of the key (R-IT17). */
+    private static final String FAILED_DIGEST = 'parentfailed:';
 
     /** How many records one read of stored values takes, a chunk's worth and more. */
     private static final Integer READ_LIMIT = 10000;
@@ -40,6 +48,16 @@ public with sharing class ImportObjectLoader {
         Boolean creates = false;
         Boolean changes = false;
         String error;
+        /** The row's Related values as the mapping gives them (R-IT17), or null. */
+        Map<String, String> relatedGiven;
+        /** True for the first row of its key, which loads the parent (R-IT17). */
+        Boolean leads = false;
+        /** A later row of a key whose parent row is in this chunk: that row's item. */
+        Item leader;
+        /** A later row of a key whose parent row was in an earlier chunk. */
+        Boolean follows = false;
+        /** The row's related record, or null when the row has none. */
+        Item related;
 
         Item(Import_Row__c row, Map<String, String> given) {
             this.row = row;
@@ -82,7 +100,7 @@ public with sharing class ImportObjectLoader {
         Boolean dryRun
     ) {
         ImportRowProcessor.Outcome outcome = new ImportRowProcessor.Outcome();
-        List<Item> items = read(batch, mapping, rows);
+        List<Item> items = read(batch, mapping, rows, ImportObjectSchema.loadsRelated(template));
         String refused = ImportObjectSchema.refusal(template, mapping);
         if (refused != null) {
             // Nothing can load: every row says why, in words the administrator can act on.
@@ -95,29 +113,42 @@ public with sharing class ImportObjectLoader {
         Schema.SObjectType type = ImportObjectSchema.typeOf(template);
         String operation = ImportObjectSchema.operationOf(template);
         Boolean mostRecent = ImportTemplateService.usesMostRecent(template);
-        Map<String, Plan> plans = plan(type, mapping, items, outcome);
-        readValues(items, plans);
+        Boolean related = ImportObjectSchema.loadsRelated(template);
+        // With related records only a key's first row loads the parent (R-IT17).
+        List<Item> parents = related ? groupByKey(batch, template, type, operation, items) : items;
+        Map<String, Plan> plans = plan(
+            type,
+            mapping,
+            parents,
+            outcome,
+            ImportMapping.ENTITY_RECORD
+        );
+        readValues(parents, plans);
         resolveLookups(
-            items,
+            parents,
             plans,
             ImportObjectSchema.leavesLookupEmpty(template),
             mostRecent,
             outcome
         );
-        findRecords(batch, template, type, operation, items, plans);
-        for (Item item : items) {
+        findRecords(batch, template, type, operation, parents, plans);
+        for (Item item : parents) {
             if (item.error == null && item.creates && batch.Match_Only__c == true) {
                 // A file that only matches creates nothing (R-IB15).
                 item.error = Label.Core_Import_ErrorMatchOnlyWouldCreate;
             }
         }
-        decide(type, items, plans, outcome);
+        decide(type, parents, plans, outcome);
         List<Map<String, Object>> created = new List<Map<String, Object>>();
         if (!dryRun) {
-            save(type, items, outcome, created);
+            save(type, parents, outcome, created);
+        }
+        List<Map<String, Object>> relatedCreated = new List<Map<String, Object>>();
+        if (related) {
+            loadRelated(batch, template, mapping, items, dryRun, outcome, relatedCreated);
         }
         writeBack(items, outcome);
-        if (!dryRun && !journal(batch.Id, outcome.journal, created)) {
+        if (!dryRun && !journal(batch.Id, outcome.journal, created, relatedCreated)) {
             outcome.notes.add(Label.Core_Import_LogJournalFailed);
         }
         return outcome;
@@ -127,19 +158,22 @@ public with sharing class ImportObjectLoader {
     private static List<Item> read(
         Import_Batch__c batch,
         ImportMapping mapping,
-        List<Import_Row__c> rows
+        List<Import_Row__c> rows,
+        Boolean related
     ) {
         List<Item> items = new List<Item>();
         Decimal pass = ImportRowSelector.passOf(batch);
         for (Import_Row__c row : rows) {
             ImportRowProcessor.startPass(row, pass);
-            Item item = new Item(
+            Map<String, Map<String, String>> byEntity = ImportRowProcessor.valuesByEntity(
                 row,
-                ImportRowProcessor.valuesByEntity(row, mapping).get(ImportMapping.ENTITY_RECORD)
+                mapping
             );
+            Item item = new Item(row, byEntity.get(ImportMapping.ENTITY_RECORD));
+            item.relatedGiven = related ? byEntity.get(ImportMapping.ENTITY_RELATED) : null;
             if (String.isBlank(row.Raw_Values_JSON__c)) {
                 item.error = Label.Core_Import_ErrorRowUnreadable;
-            } else if (!hasAnyValue(item.held)) {
+            } else if (!hasAnyValue(item.held) && !hasAnyValue(item.relatedGiven)) {
                 item.error = Label.Core_Import_ErrorRowEmpty;
             }
             items.add(item);
@@ -147,11 +181,16 @@ public with sharing class ImportObjectLoader {
         return items;
     }
 
-    /** Writes the update entries on Commit pages and the creations on Created pages (R-IJ3). */
+    /**
+     * Writes the update entries on Commit pages and the creations on Created pages (R-IJ3).
+     * Related records go on pages written after their parents', so the undo, which reads the
+     * newest page first, deletes them before the parents they point at (R-IT17).
+     */
     private static Boolean journal(
         Id batchId,
         List<Map<String, Object>> updates,
-        List<Map<String, Object>> created
+        List<Map<String, Object>> created,
+        List<Map<String, Object>> relatedCreated
     ) {
         Boolean updatesWritten = ImportJournalService.write(
             batchId,
@@ -163,7 +202,12 @@ public with sharing class ImportObjectLoader {
             ImportJournalService.PHASE_CREATED,
             created
         );
-        return updatesWritten && createdWritten;
+        Boolean relatedWritten = ImportJournalService.write(
+            batchId,
+            ImportJournalService.PHASE_CREATED,
+            relatedCreated
+        );
+        return updatesWritten && createdWritten && relatedWritten;
     }
 
     /**
@@ -176,10 +220,11 @@ public with sharing class ImportObjectLoader {
         Schema.SObjectType type,
         ImportMapping mapping,
         List<Item> items,
-        ImportRowProcessor.Outcome outcome
+        ImportRowProcessor.Outcome outcome,
+        String entity
     ) {
         Map<String, Plan> plans = new Map<String, Plan>();
-        Map<String, String> lookupFields = mapping.lookupFieldsByAttribute();
+        Map<String, String> lookupFields = mapping.lookupFieldsByAttribute(entity);
         Set<String> attributes = new Set<String>();
         for (Item item : items) {
             attributes.addAll(item.held.keySet());
@@ -498,7 +543,10 @@ public with sharing class ImportObjectLoader {
                 keyOf(item, type, operation, keyField);
             }
         }
-        rejectRepeats(batch, items);
+        if (!ImportObjectSchema.loadsRelated(template)) {
+            // With related records a repeated key is a later row of its parent (groupByKey).
+            rejectRepeats(batch, items);
+        }
         if (operation != ImportObjectSchema.OPERATION_UPDATE) {
             matchKeys(items, type, keyField, ImportTemplateService.usesMostRecent(template));
         }
@@ -714,7 +762,9 @@ public with sharing class ImportObjectLoader {
                             new List<String>{ field.getLabel() }
                         )
                     );
-                } else if (item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))) {
+                } else if (
+                    item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))
+                ) {
                     kept.put(name, item.values.get(name));
                 }
             }
@@ -763,7 +813,11 @@ public with sharing class ImportObjectLoader {
             if (created[i].isSuccess()) {
                 item.recordId = created[i].getId();
                 createdEntries.add(
-                    ImportJournalService.created(objectName, item.recordId, ImportValues.rowNumber(item.row))
+                    ImportJournalService.created(
+                        objectName,
+                        item.recordId,
+                        ImportValues.rowNumber(item.row)
+                    )
                 );
             } else {
                 item.error = ImportRowProcessor.message(created[i]);
@@ -794,6 +848,216 @@ public with sharing class ImportObjectLoader {
         }
     }
 
+    // -------------------------------------------------------------------------------------
+    // Related records (R-IT17)
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Returns the chunk's parent rows: the first row of each key in the pass. A later row of a
+     * key points at its parent row's item when that row is in this chunk, or follows one from
+     * an earlier chunk, known by the digest that row wrote; a key whose parent row failed
+     * rejects the row. A row without a key is rejected by `keyOf`.
+     */
+    private static List<Item> groupByKey(
+        Import_Batch__c batch,
+        Import_Template__c template,
+        Schema.SObjectType type,
+        String operation,
+        List<Item> items
+    ) {
+        String keyField = ImportObjectSchema.keyFieldOf(template);
+        Set<String> digests = new Set<String>();
+        for (Item item : items) {
+            if (item.error == null) {
+                keyOf(item, type, operation, keyField);
+            }
+            if (item.error == null) {
+                digests.add(ImportValues.digest(RECORD_DIGEST, item.key));
+                digests.add(ImportValues.digest(FAILED_DIGEST, item.key));
+            }
+        }
+        Set<String> earlier = digests.isEmpty()
+            ? new Set<String>()
+            : ImportRowSelector.processorDigestsWrittenEarlier(batch, digests);
+        Map<String, Item> leaders = new Map<String, Item>();
+        List<Item> parents = new List<Item>();
+        for (Item item : items) {
+            if (item.error != null) {
+                continue;
+            }
+            if (earlier.contains(ImportValues.digest(FAILED_DIGEST, item.key))) {
+                item.error = Label.Core_Import_ErrorRelatedParentFailed;
+            } else if (earlier.contains(ImportValues.digest(RECORD_DIGEST, item.key))) {
+                item.follows = true;
+            } else if (leaders.containsKey(item.key)) {
+                item.leader = leaders.get(item.key);
+            } else {
+                item.leads = true;
+                leaders.put(item.key, item);
+                parents.add(item);
+            }
+        }
+        return parents;
+    }
+
+    /**
+     * Gives each later row of a key its parent, once the parents are saved: its parent row's
+     * record when that row is in this chunk, or in a commit the record its key finds now when
+     * it was in an earlier chunk, under Several Matches. A failed parent rejects the row. A dry
+     * run needs no ID for a parent an earlier chunk would create.
+     */
+    private static void linkParents(
+        Import_Template__c template,
+        Schema.SObjectType type,
+        List<Item> items,
+        Boolean dryRun
+    ) {
+        String operation = ImportObjectSchema.operationOf(template);
+        List<Item> earlier = new List<Item>();
+        for (Item item : items) {
+            if (item.error != null) {
+                continue;
+            }
+            if (item.leader != null) {
+                item.recordId = item.leader.recordId;
+                if (item.leader.error != null) {
+                    item.error = Label.Core_Import_ErrorRelatedParentFailed;
+                }
+            } else if (
+                item.follows &&
+                !dryRun &&
+                operation != ImportObjectSchema.OPERATION_UPDATE
+            ) {
+                earlier.add(item);
+            }
+        }
+        if (earlier.isEmpty()) {
+            return;
+        }
+        matchKeys(
+            earlier,
+            type,
+            ImportObjectSchema.keyFieldOf(template),
+            ImportTemplateService.usesMostRecent(template)
+        );
+        for (Item item : earlier) {
+            item.creates = false;
+            if (item.error == null && item.recordId == null) {
+                item.error = Label.Core_Import_ErrorRelatedParentFailed;
+            }
+        }
+    }
+
+    /**
+     * Creates each row's related record after the parents are saved, through the same plan,
+     * value reading, lookups and access checks as the parents, with the Related Parent Field
+     * set to the row's parent. A row whose parent failed has its related record rejected and
+     * nothing created; under Match only every related record is rejected, since it would be
+     * created. A dry run decides the same and saves nothing.
+     */
+    private static void loadRelated(
+        Import_Batch__c batch,
+        Import_Template__c template,
+        ImportMapping mapping,
+        List<Item> items,
+        Boolean dryRun,
+        ImportRowProcessor.Outcome outcome,
+        List<Map<String, Object>> createdEntries
+    ) {
+        Schema.SObjectType type = ImportObjectSchema.typeOf(template);
+        Schema.SObjectType relatedType = ImportObjectSchema.relatedTypeOf(template);
+        String parentField = ImportObjectSchema.relatedParentField(
+            type,
+            relatedType,
+            template.Related_Parent_Field__c
+        );
+        linkParents(template, type, items, dryRun);
+        List<Item> children = new List<Item>();
+        for (Item item : items) {
+            if (hasAnyValue(item.relatedGiven)) {
+                item.related = new Item(item.row, item.relatedGiven);
+                item.related.creates = true;
+                children.add(item.related);
+            }
+        }
+        if (children.isEmpty()) {
+            return;
+        }
+        Map<String, Plan> plans = plan(
+            relatedType,
+            mapping,
+            children,
+            outcome,
+            ImportMapping.ENTITY_RELATED
+        );
+        for (String attribute : new List<String>(plans.keySet())) {
+            Schema.DescribeFieldResult field = plans.get(attribute).field;
+            if (field.getName() == parentField) {
+                plans.remove(attribute);
+                outcome.notes.add(
+                    String.format(
+                        Label.Core_Import_LogRelatedParentFieldSkipped,
+                        new List<String>{ field.getLabel() }
+                    )
+                );
+            }
+        }
+        readValues(children, plans);
+        resolveLookups(
+            children,
+            plans,
+            ImportObjectSchema.leavesLookupEmpty(template),
+            ImportTemplateService.usesMostRecent(template),
+            outcome
+        );
+        for (Item item : items) {
+            Item child = item.related;
+            if (child == null || child.error != null) {
+                continue;
+            }
+            if (item.error != null || (!dryRun && item.recordId == null)) {
+                child.error = Label.Core_Import_ErrorRelatedParentFailed;
+            } else if (batch.Match_Only__c == true) {
+                child.error = Label.Core_Import_ErrorMatchOnlyWouldCreate;
+            }
+        }
+        decide(relatedType, children, plans, outcome);
+        for (Item item : items) {
+            if (item.related != null && item.related.error == null && item.recordId != null) {
+                item.related.values.put(parentField, item.recordId);
+            }
+        }
+        if (!dryRun) {
+            save(relatedType, children, outcome, createdEntries);
+        }
+    }
+
+    /**
+     * The run log's line on related records (R-IT17): how many were created, or would be, and
+     * how many were not. Empty for an import without them. Read from the rows, so a resumed run
+     * still reports the truth.
+     */
+    @NamespaceAccessible
+    public static List<String> relatedLines(Id batchId, Boolean dryRun) {
+        Map<String, Integer> counts = ImportBatchSelector.countRelatedByStatus(batchId);
+        if (counts.isEmpty()) {
+            return new List<String>();
+        }
+        Integer created = counts.get(ImportRowProcessor.STATUS_CREATED);
+        Integer rejected = counts.get(ImportRowProcessor.STATUS_REJECTED);
+        return new List<String>{
+            String.format(
+                dryRun == true
+                    ? Label.Core_Import_LogRelatedDryRun
+                    : Label.Core_Import_LogRelatedCommit,
+                new List<String>{
+                    String.valueOf(created == null ? 0 : created),
+                    String.valueOf(rejected == null ? 0 : rejected)
+                }
+            )
+        };
+    }
+
     /**
      * Writes each row's outcome back, in system mode (ADR-0021): Rejected with the reason,
      * Created, Updated, or Matched when the record already held every value, with the record it
@@ -803,9 +1067,26 @@ public with sharing class ImportObjectLoader {
         List<Import_Row__c> rows = new List<Import_Row__c>();
         for (Item item : items) {
             Import_Row__c row = item.row;
-            if (item.error != null) {
+            String error = item.error;
+            if (item.related != null) {
+                // The row's related record (R-IT17): a refusal rejects the row, not its parent.
+                row.Related_Status__c = item.related.error == null
+                    ? ImportRowProcessor.STATUS_CREATED
+                    : ImportRowProcessor.STATUS_REJECTED;
+                row.Soft_Credit_Id__c = item.related.error == null &&
+                    item.related.recordId != null
+                    ? String.valueOf(item.related.recordId)
+                    : null;
+                if (error == null && item.related.error != null) {
+                    error = String.format(
+                        Label.Core_Import_ErrorRelatedRecord,
+                        new List<String>{ item.related.error }
+                    );
+                }
+            }
+            if (error != null) {
                 row.Status__c = ImportRowProcessor.STATUS_REJECTED;
-                row.Error_Message__c = item.error.abbreviate(4000);
+                row.Error_Message__c = error.abbreviate(4000);
                 row.Processor_Key__c = null;
                 outcome.rejected++;
             } else if (item.creates) {
@@ -818,10 +1099,18 @@ public with sharing class ImportObjectLoader {
                 row.Status__c = ImportRowProcessor.STATUS_MATCHED;
                 outcome.matched++;
             }
+            // A parent saved for a row whose related record failed stays its resulting record.
             row.Gift_Id__c = item.error == null &&
                 item.recordId != null
                 ? String.valueOf(item.recordId)
                 : null;
+            if (item.leads) {
+                // Later chunks read whether this key's parent was saved (R-IT17).
+                row.Processor_Key__c = ImportValues.digest(
+                    item.error == null ? RECORD_DIGEST : FAILED_DIGEST,
+                    item.key
+                );
+            }
             rows.add(row);
         }
         ImportRowProcessor.saveRows(rows, outcome, 'ImportObjectLoader.writeBack');
@@ -832,6 +1121,9 @@ public with sharing class ImportObjectLoader {
     // -------------------------------------------------------------------------------------
 
     private static Boolean hasAnyValue(Map<String, String> held) {
+        if (held == null) {
+            return false;
+        }
         for (String value : held.values()) {
             if (String.isNotBlank(value)) {
                 return true;

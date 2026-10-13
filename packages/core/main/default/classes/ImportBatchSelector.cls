@@ -60,13 +60,27 @@ public with sharing class ImportBatchSelector {
      */
     @NamespaceAccessible
     public static Map<String, Integer> countRowsByStatus(Id batchId) {
+        return countRowsBy(batchId, 'Status__c');
+    }
+
+    /** The same for what the rows' related records did (R-IT17), for the run log. */
+    @NamespaceAccessible
+    public static Map<String, Integer> countRelatedByStatus(Id batchId) {
+        return countRowsBy(batchId, 'Related_Status__c');
+    }
+
+    /** The field is one of the two above, never a caller's text. */
+    private static Map<String, Integer> countRowsBy(Id batchId, String field) {
         Map<String, Integer> result = new Map<String, Integer>();
         if (batchId == null) {
             return result;
         }
         List<AggregateResult> grouped = Database.queryWithBinds(
-            'SELECT Status__c status, COUNT(Id) total FROM Import_Row__c ' +
-            'WHERE Import_Batch__c = :batchId GROUP BY Status__c',
+            'SELECT ' +
+                field +
+                ' status, COUNT(Id) total FROM Import_Row__c ' +
+                'WHERE Import_Batch__c = :batchId GROUP BY ' +
+                field,
             new Map<String, Object>{ 'batchId' => batchId },
             AccessLevel.SYSTEM_MODE
         );
