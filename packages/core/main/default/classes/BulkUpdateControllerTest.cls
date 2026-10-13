@@ -206,4 +206,43 @@ private class BulkUpdateControllerTest {
             System.Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
         }
     }
+
+    /** Aborted after its chunk ran: the finish never counted what it saved. */
+    @IsTest
+    static void anAbortedJobAsksForTheNumberItSavedAndUndoesIt() {
+        System.runAs(TestUsers.admin()) {
+            ImportEntityProcessors.noneForTest = true;
+            makeVolunteers(200);
+            User maria = maria();
+            Id jobId;
+            System.runAs(maria) {
+                jobId = BulkUpdateService.createJob(
+                        BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
+                        200,
+                        200
+                    )
+                    .Id;
+                BulkUpdateBatch job = new BulkUpdateBatch(jobId);
+                List<SObject> scope = new List<SObject>();
+                Database.QueryLocatorIterator records = job.start(null).iterator();
+                while (records.hasNext()) {
+                    scope.add(records.next());
+                }
+                job.execute(null, scope);
+            }
+
+            Test.startTest();
+            System.runAs(maria) {
+                BulkUpdateController.JobView aborted = BulkUpdateController.getJob(jobId);
+                System.Assert.areEqual(ImportBatchService.STATUS_FAILED, aborted.status);
+                System.Assert.areEqual(0, aborted.updated, 'Never counted');
+                System.Assert.isTrue(aborted.canUndo, 'Undo is still offered');
+                System.Assert.areEqual(200, aborted.updatesToUndo, 'Counted from the journal');
+                BulkUpdateController.undo(jobId, aborted.updatesToUndo);
+            }
+            Test.stopTest();
+
+            System.Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
+        }
+    }
 }

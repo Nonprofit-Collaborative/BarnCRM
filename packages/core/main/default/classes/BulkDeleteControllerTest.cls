@@ -127,6 +127,40 @@ private class BulkDeleteControllerTest {
         }
     }
 
+    /** Aborted after its chunk ran: the finish never counted what it deleted. */
+    @IsTest
+    static void anAbortedJobOffersUndoForWhatItDeleted() {
+        System.runAs(TestUsers.admin()) {
+            makeVolunteers(200);
+            System.runAs(deleter()) {
+                Import_Batch__c created = BulkDeleteService.createJob(
+                    BulkDeleteService.plan(VOLUNTEERS),
+                    200,
+                    200
+                );
+                BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
+                List<SObject> scope = new List<SObject>();
+                Database.QueryLocatorIterator records = job.start(null).iterator();
+                while (records.hasNext()) {
+                    scope.add(records.next());
+                }
+                job.execute(null, scope);
+
+                BulkDeleteController.JobView aborted = BulkDeleteController.getJob(created.Id);
+                System.Assert.areEqual(ImportBatchService.STATUS_FAILED, aborted.status);
+                System.Assert.areEqual(0, aborted.deleted, 'Never counted');
+                System.Assert.isTrue(aborted.canUndo, 'Undo is still offered');
+                System.Assert.areEqual(200, aborted.recordsToUndo, 'Counted from the journal');
+
+                Test.startTest();
+                BulkDeleteController.JobView undoing = BulkDeleteController.undo(created.Id, 200);
+                Test.stopTest();
+                System.Assert.areEqual(ImportBatchService.STATUS_UNDOING, undoing.status);
+            }
+            System.Assert.areEqual(200, [SELECT COUNT() FROM Contact], 'Brought back');
+        }
+    }
+
     @IsTest
     static void aJobThatIsNotABulkDeleteIsNotFound() {
         System.runAs(TestUsers.admin()) {

@@ -260,6 +260,13 @@ public with sharing class BulkUpdateController {
         view.running = ImportBatchService.STATUS_COMMITTING.equals(view.status);
         view.canUndo = String.isBlank(ImportUndoService.refusal(job));
         view.updatesToUndo = view.updated;
+        // A job aborted, or stopped before its finish counted, saved records it never counted:
+        // the undo's own count (from the journal) is the number to confirm.
+        if (view.canUndo && view.updated == 0) {
+            ImportUndoService.Preview undoPreview = ImportUndoService.preview(job.Id);
+            view.canUndo = undoPreview.allowed;
+            view.updatesToUndo = undoPreview.updates;
+        }
         view.objectLabel = objectLabel(job.Operation_JSON__c);
         if (detail && view.running && String.isNotBlank(job.Job_Id__c)) {
             Id asyncJobId = job.Job_Id__c;

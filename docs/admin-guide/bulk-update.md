@@ -109,6 +109,9 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 - **The undo did not put everything back.** A value somebody changed after the bulk update is
   kept, on purpose, because putting back the old value would silently overwrite their
   correction.
+- **The job was stopped part way.** A job stopped in Setup, or by Salesforce, saved the records
+  of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** asks you to
+  confirm the number of values those chunks saved, then puts them back.
 
 ## 6. Changing values with steps
 
@@ -128,8 +131,11 @@ in the order listed:
 | **Read as a date** | Reads a date written month first, day first or year first and writes it the way Salesforce reads it. | day first: `31/12/2025` becomes `2025-12-31` |
 
 The steps work on the value as text, and the result is then saved as the field's type: a
-number field takes `1,250.00` as 1250, a checkbox takes `true`, `yes` or `1` as ticked, and a
-date field takes `2025-12-31`. A step never runs code and never reads another record.
+number field takes `1,250.00` as 1250 (a whole-number field refuses `12.5` rather than drop the
+point), a checkbox takes `true`, `yes` or `1` as ticked, and a date field takes `2025-12-31`. A
+step reads a date as `2025-12-31` and a date and time as `2025-12-31 09:30:00` in your own time
+zone, so a step that changes nothing leaves the value as it was. A step never runs code and
+never reads another record.
 
 - **The preview shows each record's own result.** The five records in the preview show the
   value before and after the steps, so you can see the change before you confirm.

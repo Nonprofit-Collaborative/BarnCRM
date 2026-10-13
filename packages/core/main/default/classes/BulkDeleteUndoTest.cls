@@ -142,6 +142,69 @@ private class BulkDeleteUndoTest {
         }
     }
 
+    /**
+     * With Delete Empty Households on, deleting each household's only member also deletes the
+     * household. The undo brings the households back first, so the people return into them.
+     */
+    @IsTest
+    static void householdsTidiedAwayByTheDeleteComeBackWithTheirPeople() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            List<Account> households = new List<Account>();
+            for (Integer index = 0; index < 200; index++) {
+                households.add(HouseholdTestDataFactory.newHousehold('Tidied ' + index));
+            }
+            insert households;
+            List<Contact> people = new List<Contact>();
+            for (Integer index = 0; index < 200; index++) {
+                people.add(
+                    new Contact(
+                        AccountId = households[index].Id,
+                        LastName = 'Tidied ' + index,
+                        Title = 'Volunteer'
+                    )
+                );
+            }
+            insert people;
+            Id jobId;
+            System.runAs(deleter()) {
+                Import_Batch__c created = BulkDeleteService.createJob(
+                    BulkDeleteService.plan(VOLUNTEERS),
+                    200,
+                    200
+                );
+                jobId = created.Id;
+                BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
+                List<SObject> scope = new List<SObject>();
+                Database.QueryLocatorIterator records = job.start(null).iterator();
+                while (records.hasNext()) {
+                    scope.add(records.next());
+                }
+                job.execute(null, scope);
+                job.finish(null);
+            }
+            System.Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id IN :households],
+                'The emptied households were tidied away'
+            );
+
+            Test.startTest();
+            System.runAs(deleter()) {
+                BulkDeleteService.undo(jobId, 200);
+            }
+            Test.stopTest();
+
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE AccountId IN :households],
+                reread(jobId).Run_Log__c
+            );
+            System.Assert.areEqual(200, [SELECT COUNT() FROM Account WHERE Id IN :households]);
+        }
+    }
+
     @IsTest
     static void refusesAWrongCountASecondUndoAndAClosedWindow() {
         System.runAs(TestUsers.admin()) {

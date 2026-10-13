@@ -24,6 +24,8 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
     private Integer alreadyBack = 0;
     private Integer refused = 0;
     private Boolean failed = false;
+    /** When the bulk delete started: households binned since then may be its side effect. */
+    private Datetime startedAt;
 
     /**
      * Set only by tests: the error count a job reports when the platform stopped a chunk, which
@@ -41,6 +43,15 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = jobId;
         String phase = ImportJournalService.PHASE_COMMIT;
+        for (Import_Batch__c job : [
+            SELECT Started_At__c
+            FROM Import_Batch__c
+            WHERE Id = :owner
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ]) {
+            startedAt = job.Started_At__c;
+        }
         return Database.getQueryLocator(
             [
                 SELECT Id, Entries_JSON__c
@@ -79,8 +90,73 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
             }
             idsByType.get(type).add(recordId);
         }
+        restoreTidiedHouseholds(idsByType);
         for (Schema.SObjectType type : idsByType.keySet()) {
             restore(type, idsByType.get(type), journal);
+        }
+    }
+
+    /**
+     * Brings back, before the people, the households that automation deleted because this job
+     * left them empty (Delete Empty Households, R-H11). Those deletes are not the job's own, so
+     * they are not in the journal, but a person cannot come back into a household that is still
+     * in the Recycle Bin: in contact mode the person's account is that household, and in
+     * junction mode the person's memberships name it.
+     *
+     * Only a household (record type Household) deleted since the job started is restored, so a
+     * household somebody deleted before it on purpose stays deleted. Restored as the person; a
+     * refusal shows up as the person's own refusal, which is journaled.
+     */
+    private void restoreTidiedHouseholds(Map<Schema.SObjectType, List<Id>> idsByType) {
+        Id householdType = HouseholdService.householdRecordTypeId();
+        if (householdType == null || startedAt == null) {
+            return;
+        }
+        List<Id> contactIds = idsByType.containsKey(Contact.SObjectType)
+            ? idsByType.get(Contact.SObjectType)
+            : new List<Id>();
+        List<Id> accountIds = idsByType.containsKey(Account.SObjectType)
+            ? idsByType.get(Account.SObjectType)
+            : new List<Id>();
+        if (contactIds.isEmpty() && accountIds.isEmpty()) {
+            return;
+        }
+        Set<Id> households = new Set<Id>();
+        for (Contact person : [
+            SELECT AccountId
+            FROM Contact
+            WHERE Id IN :contactIds AND AccountId != NULL
+            WITH SYSTEM_MODE
+            ALL ROWS
+        ]) {
+            households.add(person.AccountId);
+        }
+        for (Household_Member__c membership : [
+            SELECT Household__c
+            FROM Household_Member__c
+            WHERE (Contact__c IN :contactIds OR Account__c IN :accountIds) AND Household__c != NULL
+            WITH SYSTEM_MODE
+            ALL ROWS
+        ]) {
+            households.add(membership.Household__c);
+        }
+        if (households.isEmpty()) {
+            return;
+        }
+        Datetime since = startedAt;
+        List<Account> binned = [
+            SELECT Id
+            FROM Account
+            WHERE
+                Id IN :households
+                AND IsDeleted = TRUE
+                AND RecordTypeId = :householdType
+                AND SystemModstamp >= :since
+            WITH SYSTEM_MODE
+            ALL ROWS
+        ];
+        if (!binned.isEmpty()) {
+            Database.undelete(binned, false, AccessLevel.USER_MODE);
         }
     }
 
