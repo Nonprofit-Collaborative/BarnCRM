@@ -35,8 +35,10 @@ builder and checks it exactly as if it had been built by hand.
 1. Find needs the **Find and Export Records** permission. The **BarnCRM Admin** role has it.
    To let a staff member find and export without making them an admin, assign them the
    **BarnCRM Find and Export** permission set (Setup, Users, Permission Sets), alone or
-   alongside their usual role. The permission opens the tool and nothing else: it never
-   grants access to a record or field the person could not already see.
+   alongside their usual role. The permission opens the tool: it never grants access to a
+   record or field of your data the person could not already see. The set also lets the
+   person read data jobs (imports, bulk updates and bulk deletes) and the undo journal behind
+   them, which bulk update and bulk delete need.
 2. Open the **Find** tab in the BarnCRM app.
 3. Optional: open **BarnCRM Settings**, choose **Import**, and set **Export row limit**
    (default 50,000). An export stops at this many rows and says so.
