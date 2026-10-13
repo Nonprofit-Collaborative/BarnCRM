@@ -699,7 +699,9 @@ public with sharing class ImportObjectLoader {
                             new List<String>{ field.getLabel() }
                         )
                     );
-                } else if (item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))) {
+                } else if (
+                    item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))
+                ) {
                     kept.put(name, item.values.get(name));
                 }
             }
@@ -748,7 +750,11 @@ public with sharing class ImportObjectLoader {
             if (created[i].isSuccess()) {
                 item.recordId = created[i].getId();
                 createdEntries.add(
-                    ImportJournalService.created(objectName, item.recordId, ImportValues.rowNumber(item.row))
+                    ImportJournalService.created(
+                        objectName,
+                        item.recordId,
+                        ImportValues.rowNumber(item.row)
+                    )
                 );
             } else {
                 item.error = ImportRowProcessor.message(created[i]);
