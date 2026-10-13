@@ -193,22 +193,6 @@
         <value>To bring these records back, use Undo under Recent bulk deletes on the Bulk Update tab.</value>
     </labels>
     <labels>
-        <fullName>Core_BulkDelete_Recent</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk Update tab: heading over recent bulk deletes.</shortDescription>
-        <value>Recent bulk deletes</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkDelete_NoJobs</fullName>
-        <categories>BulkDelete</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Bulk Update tab: no bulk deletes yet.</shortDescription>
-        <value>No bulk deletes yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkDelete_UndoConfirm</fullName>
         <categories>BulkDelete</categories>
         <language>en_US</language>

@@ -417,22 +417,6 @@
         <value>Records that failed, and why</value>
     </labels>
     <labels>
-        <fullName>Core_BulkUpdate_Recent</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Heading over recent bulk updates.</shortDescription>
-        <value>Recent bulk updates</value>
-    </labels>
-    <labels>
-        <fullName>Core_BulkUpdate_NoJobs</fullName>
-        <categories>BulkUpdate</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when there is no bulk update yet.</shortDescription>
-        <value>No bulk updates yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_BulkUpdate_Refresh</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>

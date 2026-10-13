@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DataJobs_Heading</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: heading of the list of every kind of job</shortDescription>
+        <value>Data jobs</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_Empty</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: nothing to list</shortDescription>
+        <value>No data jobs to show yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_Show</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: label of the kind filter</shortDescription>
+        <value>Show</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_ShowAll</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: filter option for every kind</shortDescription>
+        <value>All</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_ShowImports</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: filter option for imports</shortDescription>
+        <value>Imports</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_ShowUpdates</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: filter option for bulk updates</shortDescription>
+        <value>Bulk updates</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_ShowDeletes</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: filter option for bulk deletes</shortDescription>
+        <value>Bulk deletes</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_KindImport</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: the kind of a job that imported a file</shortDescription>
+        <value>Import</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_KindUpdate</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: the kind of a bulk update job</shortDescription>
+        <value>Bulk update</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_KindDelete</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: the kind of a bulk delete job</shortDescription>
+        <value>Bulk delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_ImportSummary</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: an import's counts; {0} rows to {4} rejected</shortDescription>
+        <value>{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataJobs_Started</fullName>
+        <categories>DataJobs</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data job history: before the time a job started</shortDescription>
+        <value>Started</value>
+    </labels>
+</CustomLabels>

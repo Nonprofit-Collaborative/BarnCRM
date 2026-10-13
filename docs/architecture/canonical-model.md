@@ -2363,8 +2363,8 @@ choice belongs to the file, not the template, and is set again for each upload.
 - **Service:** `ImportBatchService`, `ImportBatchSelector`, `ImportProcessorBatch`,
   `ImportUndoService` and `ImportUndoBatch` (R-IB7 to R-IB9), `ImportController` (the one
   Aura-enabled entry point the import screens call), LWC `importWizard`, `importResults`,
-  `importHistory` (recent imports and their undo). The import history lists imports only; bulk
-  updates are listed by their own page (Section 29E).
+  `dataJobHistory` (recent data jobs and their undo; on the Import page it lists imports only,
+  and bulk updates and deletes are listed on the Bulk Update page, Section 29E).
 
 ---
 
@@ -2635,7 +2635,7 @@ By, Started At and Completed At.
 
 - **Service:** `ImportJournalService` (writes and reads pages), `ImportRowProcessor` (writes
   the commit phase), `ImportObjectLoader` (writes the commit and created phases of a one-object
-  import), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
+  import), `ImportUndoBatch` (writes the undo phase), LWC `dataJobHistory`.
 
 ---
 
@@ -6269,7 +6269,7 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
   keys).
 - **Bulk delete services:** `BulkDeleteService` (check, preview, start, undo),
   `BulkDeleteBatch` (the job), `BulkDeleteUndoBatch` (the undelete), `BulkDeleteController`;
-  component `bulkDelete`, opened from Find's results, and `bulkDeleteHistory` on the Bulk Update
+  component `bulkDelete`, opened from Find's results, and `dataJobHistory` on the Bulk Update
   tab. Custom permission `Bulk_Delete_Records`, permission set `BarnCRM_Bulk_Delete`.
 - **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
   `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
