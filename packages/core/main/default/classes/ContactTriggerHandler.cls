@@ -179,7 +179,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
             }
         }
         for (Household_Member__c row : removed) {
-            Id personId = row.Contact__c != null ? row.Contact__c : row.Account__c;
+            Id personId = HouseholdService.personOf(row);
             if (mergedIds.contains(personId)) {
                 add(result, row.Household__c);
             }

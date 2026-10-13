@@ -3,4 +3,23 @@
  * what the admin reads in the Error Log is the same sentence the screen shows.
  */
 public with sharing class HouseholdException extends Exception {
+    /**
+     * What a household screen is told. A HouseholdException already says in plain words what
+     * went wrong and what to do, so its message goes through as it is. Anything else is a
+     * platform failure whose wording is for an administrator reading the Error Log, not for
+     * the person at the screen: the whole exception is logged and the screen gets the
+     * generic message.
+     */
+    public static AuraHandledException forScreen(Exception e, String context, Id recordId) {
+        String message;
+        if (e instanceof HouseholdException) {
+            message = e.getMessage();
+        } else {
+            ErrorLogger.log(e, context, recordId);
+            message = Label.Core_Households_ErrorUnexpected;
+        }
+        AuraHandledException error = new AuraHandledException(message);
+        error.setMessage(message);
+        return error;
+    }
 }

@@ -105,10 +105,6 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * People with the record type of the account they belong to, so that a caller can tell
-     * a household from an organization without a second query.
-     */
-    /**
      * The household's contacts as a screen may see them: object access checked, and every
      * field the running user cannot read stripped out (ADR-0021).
      */
@@ -163,6 +159,10 @@ public with sharing class HouseholdSelector {
         return (List<Household_Member__c>) readableRecords(records, describe);
     }
 
+    /**
+     * People with the record type of the account they belong to, so that a caller can tell
+     * a household from an organization without a second query.
+     */
     @NamespaceAccessible
     public static List<Contact> getContactsWithHouseholds(Set<Id> contactIds) {
         if (contactIds == null || contactIds.isEmpty()) {
@@ -270,31 +270,6 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * Adds the accounts that have at least one row of this object hanging off them. An object
-     * the org does not have adds nothing, because an object that is not there is not a
-     * dependency.
-     *
-     * Existence is the only question asked. Whether the running user may read the object is
-     * deliberately not asked, because the query runs in system mode and the answer must
-     * describe the org rather than the reader. Gating this on the reader's own access would
-     * reintroduce the exact failure the guard exists to prevent: an administrator without the
-     * Group Membership permission set would find the probe skipped, the household would read
-     * as safe, and the cascade would happen anyway.
-     *
-     * One residual risk stays, and it is worth naming rather than hiding. Schema.getGlobalDescribe
-     * is itself filtered by the running user's permission set licences, so an object the user is
-     * not licensed for can be absent from the map even though the org has it. Apex offers no
-     * unfiltered alternative here short of querying EntityDefinition, which would have to match
-     * with LIKE rather than an equality filter to be permission neutral. If a native household is
-     * ever destroyed despite this guard, that is the first thing to check.
-     *
-     * A probe that fails for any other reason is treated as though every account given were
-     * dependent. Not being able to answer is not the same as answering no, and the cost of
-     * the two mistakes is not the same: refusing to delete leaves a tidy-up undone and says
-     * so in the log, while deleting on a probe that never ran destroys the native household
-     * this guard was added to protect.
-     */
-    /**
      * Of these Accounts, the ones that already carry a native Nonprofit Cloud household
      * group or native membership rows: the single predicate every mutual exclusion guard
      * asks (product-plan Section 11.2 item 9), built on `getAccountsWithNativeDependents`
@@ -354,6 +329,31 @@ public with sharing class HouseholdSelector {
         }
     }
 
+    /**
+     * Adds the accounts that have at least one row of this object hanging off them. An object
+     * the org does not have adds nothing, because an object that is not there is not a
+     * dependency.
+     *
+     * Existence is the only question asked. Whether the running user may read the object is
+     * deliberately not asked, because the query runs in system mode and the answer must
+     * describe the org rather than the reader. Gating this on the reader's own access would
+     * reintroduce the exact failure the guard exists to prevent: an administrator without the
+     * Group Membership permission set would find the probe skipped, the household would read
+     * as safe, and the cascade would happen anyway.
+     *
+     * One residual risk stays, and it is worth naming rather than hiding. Schema.getGlobalDescribe
+     * is itself filtered by the running user's permission set licences, so an object the user is
+     * not licensed for can be absent from the map even though the org has it. Apex offers no
+     * unfiltered alternative here short of querying EntityDefinition, which would have to match
+     * with LIKE rather than an equality filter to be permission neutral. If a native household is
+     * ever destroyed despite this guard, that is the first thing to check.
+     *
+     * A probe that fails for any other reason is treated as though every account given were
+     * dependent. Not being able to answer is not the same as answering no, and the cost of
+     * the two mistakes is not the same: refusing to delete leaves a tidy-up undone and says
+     * so in the log, while deleting on a probe that never ran destroys the native household
+     * this guard was added to protect.
+     */
     private static void addNativeDependents(
         Set<Id> dependent,
         String objectName,
