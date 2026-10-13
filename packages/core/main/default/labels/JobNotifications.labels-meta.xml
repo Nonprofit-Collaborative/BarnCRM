@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_JobNotice_Finished</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification title: {0} job name finished</shortDescription>
+        <value>{0} finished</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_Stopped</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification title: {0} job name stopped</shortDescription>
+        <value>{0} did not finish</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_Import</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of an import</shortDescription>
+        <value>Import</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_ImportPreview</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of an import preview</shortDescription>
+        <value>Import preview</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_ImportUndo</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of an import undo</shortDescription>
+        <value>Import undo</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkUpdate</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a bulk update</shortDescription>
+        <value>Bulk update</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkUpdateUndo</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a bulk update undo</shortDescription>
+        <value>Bulk update undo</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkDelete</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a bulk delete</shortDescription>
+        <value>Bulk delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkDeleteUndo</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a bulk delete undo</shortDescription>
+        <value>Bulk delete undo</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_SampleData</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of the sample data load</shortDescription>
+        <value>Sample data load</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_Rollups</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a rollup recalculation</shortDescription>
+        <value>Rollup recalculation</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_FieldUtilization</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of the field utilization count</shortDescription>
+        <value>Field utilization count</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_SeasonalAddress</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of the seasonal address swap</shortDescription>
+        <value>Seasonal address swap</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_DuplicateScan</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a duplicate scan</shortDescription>
+        <value>Duplicate scan</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_HouseholdNaming</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of the household name recompute</shortDescription>
+        <value>Household name recompute</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_ImportBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: import counts {0} to {3}</shortDescription>
+        <value>{0} created, {1} updated, {2} matched, {3} rejected. Open the import for the run log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_ImportUndoBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: import undo counts {0} to {2}</shortDescription>
+        <value>{0} records deleted, {1} kept, {2} values put back. Open the job for the run log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkUpdateBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: bulk update counts {0} to {3}</shortDescription>
+        <value>{0} updated, {1} already right, {2} no longer matched, {3} could not be saved. Open the bulk update for the run log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkDeleteBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: bulk delete counts {0} to {2}</shortDescription>
+        <value>{0} deleted, {1} no longer matched, {2} could not be deleted. Open the bulk delete for the run log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_BulkDeleteUndoBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: bulk delete undo counts {0} to {3}</shortDescription>
+        <value>{0} restored, {1} already emptied from the Recycle Bin, {2} already back, {3} could not be restored. Open the bulk delete for the run log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_SampleDataBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: sample data counts {0} to {2}</shortDescription>
+        <value>{0} households, {1} people and {2} organizations are ready to explore.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_SampleDataStoppedBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: sample data load stopped</shortDescription>
+        <value>The sample data load stopped part way. The Error Log says why. Remove what loaded, then load it again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_RollupsBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: rollup run counts {0} to {2}</shortDescription>
+        <value>{0} records' totals updated. {1} could not be saved and {2} batches stopped; those are tried again automatically.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_HouseholdNamingBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: household recompute counts {0} to {2}</shortDescription>
+        <value>{0} households read, {1} renamed, {2} left alone because Nonprofit Cloud manages them.</value>
+    </labels>
+</CustomLabels>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Tell people when their long jobs finish</label>
+  <protected>true</protected>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Checkbox</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value
+      xsi:type="xsd:string"
+    >When someone starts a long job by hand, such as an import, a bulk update or delete, an undo, the sample data load or a rollup recalculation, BarnCRM sends them a notification under the bell when it finishes or stops, with the counts and a link to the job. Scheduled nightly and weekly runs never send one. Clear this to stop the notifications for everyone; the jobs run and record their results exactly as before.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">job-notifications.md</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">General</value>
+  </values>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Job_Notifications__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">7</value>
+  </values>
+</CustomMetadata>

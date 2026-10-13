@@ -931,6 +931,16 @@ scheduling its job from the console (ADR-0038), so it has no on and off key.
 | `Field_Utilization_Last_Run__c` | datetime | empty | When the last field utilization count finished. Written by the job. |
 | `Field_Utilization_Last_Run_Summary__c` | text (255) | empty | What the last count did, in one sentence: fields and objects counted, fields that could not be counted, objects skipped as too large. Written by the job. |
 
+### Job notification key
+
+Added by the Core quality pass (Q-04). The notification itself is the platform's custom
+notification, type `BarnCRM_Job_Finished`, sent by `JobNotifier`; nothing about it is stored on
+a BarnCRM record.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Job_Notifications__c` | boolean | true | Whether the person who starts a long job by hand (import and its undo, bulk update, bulk delete and their undos, sample data load, rollup recalculation, field utilization count, seasonal address swap, duplicate scan, household name recompute) gets one notification when the job finishes or stops. Scheduled runs never notify. Applied in Apex by `SettingsService` (ADR-0035). |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -6586,6 +6596,7 @@ mirrors the primary member).
 | post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
 | v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
+| post-1.0 | 2026-10-13 | Core quality pass Q-04, job notifications. No object added. `BarnCRM_Settings__c` gains `Job_Notifications__c` (Section 12, job notification key), shipped on and registered in `SettingsService.SHIPPED_DEFAULTS` (ADR-0035). The notification is the platform custom notification type `BarnCRM_Job_Finished`. |
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |

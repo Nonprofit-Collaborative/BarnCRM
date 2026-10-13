@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Job_Notifications__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description>Whether the person who starts a long BarnCRM job gets a notification when it finishes or stops (Q-04). On by default.</description>
+  <inlineHelpText>Tell people when their long jobs finish.</inlineHelpText>
+  <label>Job Notifications</label>
+  <type>Checkbox</type>
+</CustomField>

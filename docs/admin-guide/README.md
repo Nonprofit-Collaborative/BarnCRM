@@ -156,6 +156,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core | 1.x (built ahead) |
 | C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
 | Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
+| Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core | Core quality pass |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module | v0.6 |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core | v0.9 |
 | ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core | v0.6 |
