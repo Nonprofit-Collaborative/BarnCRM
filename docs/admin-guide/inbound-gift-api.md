@@ -38,10 +38,9 @@ the processor's support team.
 2. **Give it the Inbound Gift API permission set, and nothing else from BarnCRM.** It
    holds exactly what recording a gift needs: reading people, organizations, funds, appeals
    and acknowledgment rules; creating gifts, their fund allocations and the household soft
-   credits Giving adds; the web address; and the **Record Inbound Gift** action that flows
-   and AI assistants call. It cannot edit or delete a donor, edit or delete a gift, change a
-   fund, or read the Error Log, so a leaked key can do little more than send gifts. Assign
-   it in Setup: no BarnCRM role includes a module's permission sets.
+   credits Giving adds; and the web address. It cannot edit or delete a donor, edit or
+   delete a gift, change a fund, or read the Error Log, so a leaked key can do little more
+   than send gifts. Assign it in Setup: no BarnCRM role includes a module's permission sets.
 3. **Let it see your donors.** It finds a donor only among the people and organizations it
    can see. If contacts and accounts are private in your organization, share them with it
    (see "The integration user cannot see the donors" below).

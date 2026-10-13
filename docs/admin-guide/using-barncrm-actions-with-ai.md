@@ -39,10 +39,11 @@ in Salesforce Setup, because agents and MCP servers belong to Salesforce, not to
    agent user more than it needs.
 2. **Give that user what the action needs.** Recording a gift needs the same access as
    entering one by hand: the **Giving Staff** permission set covers the records involved. The
-   user also needs access to the action itself, which comes with Connect's **Inbound Gift
-   API** permission set. Assign it only to the users who may record gifts through an
-   assistant; no BarnCRM role includes it, and neither does any read-only set, so no one gets
-   the action without your decision.
+   user also needs access to the action itself: assign Connect's **Record Inbound Gift
+   Action** permission set (Setup, Users, choose the person, Permission Set Assignments). It
+   runs that one action and grants nothing else. Assign it only to the users who may record
+   gifts through an assistant; no BarnCRM role includes it, so no one gets the action without
+   your decision.
 3. **Add the action to your assistant.**
    - *Agentforce:* in Agent Builder, add a new action to a topic, choose **Apex** as the
      reference action type, and pick **Record Inbound Gift**. Its instructions and the
@@ -105,8 +106,8 @@ can edit. It shows the one thing that matters most: asking twice records the gif
 
 ## Common mistakes
 
-**The assistant does not offer the action.** Its user is missing the **Inbound Gift API**
-permission set, or the action was not added to the agent's topic or the MCP server. Check
+**The assistant does not offer the action.** Its user is missing the **Record Inbound Gift
+Action** permission set, or the action was not added to the agent's topic or the MCP server. Check
 step 2 and step 3 above.
 
 **`donor_not_found` for someone you know is there.** The assistant's user cannot see that

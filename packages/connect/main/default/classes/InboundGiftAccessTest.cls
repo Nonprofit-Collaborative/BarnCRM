@@ -197,30 +197,24 @@ private class InboundGiftAccessTest {
     }
 
     @IsTest
-    static void thePermissionSetOpensTheFlowActionAndTheEndpoint() {
+    static void theActionSetOpensOnlyTheFlowAction() {
         System.runAs(TestUsers.admin()) {
-            Set<String> granted = new Set<String>();
-            for (SetupEntityAccess access : [
+            List<SetupEntityAccess> grants = [
                 SELECT SetupEntityId
                 FROM SetupEntityAccess
-                WHERE Parent.Name = 'Inbound_Gift_API' AND SetupEntityType = 'ApexClass'
-                WITH SYSTEM_MODE
-            ]) {
-                granted.add(access.SetupEntityId);
-            }
-            List<ApexClass> actions = [
-                SELECT Id, Name
-                FROM ApexClass
-                WHERE Name IN ('InboundGiftAction', 'InboundGiftResource')
+                WHERE Parent.Name = 'Record_Inbound_Gift_Action' AND SetupEntityType = 'ApexClass'
                 WITH SYSTEM_MODE
             ];
-            Assert.areEqual(2, actions.size(), 'Both entry points are in the org');
-            for (ApexClass action : actions) {
-                Assert.isTrue(
-                    granted.contains(action.Id),
-                    'Inbound Gift API gives access to ' + action.Name
-                );
-            }
+            List<ApexClass> action = [
+                SELECT Id
+                FROM ApexClass
+                WHERE Name = 'InboundGiftAction'
+                WITH SYSTEM_MODE
+            ];
+
+            Assert.areEqual(1, action.size(), 'The action class is in the org');
+            Assert.areEqual(1, grants.size(), 'The set opens one class and nothing else');
+            Assert.areEqual(action[0].Id, grants[0].SetupEntityId, 'That class is the action');
         }
     }
 }

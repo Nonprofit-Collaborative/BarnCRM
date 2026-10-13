@@ -7,10 +7,6 @@
     allocations and household soft credits; read acknowledgment rules.
   </description>
   <classAccesses>
-    <apexClass>InboundGiftAction</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>InboundGiftResource</apexClass>
     <enabled>true</enabled>
   </classAccesses>

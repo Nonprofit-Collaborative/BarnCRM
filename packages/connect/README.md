@@ -26,7 +26,8 @@ Built so far (iteration 0.6):
   `InboundGiftService`, which checks each gift through `InboundGiftRequest`. `InboundGift` and
   `InboundGiftResult` are the request and result.
   These four are the package's only `global` classes and are permanent (ADR-0051). Contract:
-  `docs/api/inbound-gift-api.md`. Permission set: `Inbound_Gift_API`.
+  `docs/api/inbound-gift-api.md`. Permission sets: `Inbound_Gift_API` (the endpoint and every
+  record grant) and `Record_Inbound_Gift_Action` (the action's class only).
 - **Accounting export (X-04).** See `docs/admin-guide/accounting-export.md`.
 - **Campaign sync (X-02).** The `Campaign_Sync` automation on Appeal (`CampaignSyncTriggerHandler`
   over `CampaignSyncService`) copies each appeal to a Campaign before it is saved, and stores
