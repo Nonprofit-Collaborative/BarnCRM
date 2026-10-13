@@ -50,7 +50,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
     public override void beforeInsert() {
         HouseholdService.refuseHandSetPrimaryContacts((List<Account>) newRecords(), null);
         nameNewHouseholds((List<Account>) newRecords());
-        PreferredEmailService.applyToPersonRecords((List<Account>) newRecords());
     }
 
     public override void beforeUpdate() {
@@ -59,7 +58,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
             (Map<Id, Account>) oldRecordsById()
         );
         nameNewHouseholds((List<Account>) newRecords());
-        PreferredEmailService.applyToPersonRecords((List<Account>) newRecords());
     }
 
     public override void afterInsert() {
