@@ -10,6 +10,8 @@ import removeRoleApex from '@salesforce/apex/AccessController.removeRole';
 
 import ADD_BUTTON from '@salesforce/label/c.Core_Access_AddButton';
 import ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AssignSuccess';
+import AUTOMATIC_ACCESS_HELP from '@salesforce/label/c.Core_Access_AutomaticAccessHelp';
+import AUTOMATIC_ACCESS_LINK from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_Access_CancelButton';
 import CONFIRM_ADD_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmAddMessage';
 import CONFIRM_ADD_TITLE from '@salesforce/label/c.Core_Access_ConfirmAddTitle';
@@ -39,6 +41,9 @@ import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
 
 const ADMIN_ROLE = 'BarnCRM_Admin_Group';
 const SETUP_USERS_PAGE = '/lightning/setup/ManageUsers/home';
+// User access policies cannot be created from a package, so this opens the guide with the exact definitions (ADR-NEXT).
+const AUTOMATIC_ACCESS_GUIDE =
+  'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/automatic-access.md';
 const MINIMUM_SEARCH_LENGTH = 2;
 
 /**
@@ -71,6 +76,8 @@ function format(template, values) {
 export default class AccessManager extends LightningElement {
   labels = {
     addButton: ADD_BUTTON,
+    automaticAccessHelp: AUTOMATIC_ACCESS_HELP,
+    automaticAccessLink: AUTOMATIC_ACCESS_LINK,
     cancelButton: CANCEL_BUTTON,
     confirmAddTitle: CONFIRM_ADD_TITLE,
     confirmRemoveTitle: CONFIRM_REMOVE_TITLE,
@@ -92,6 +99,7 @@ export default class AccessManager extends LightningElement {
   };
 
   setupUsersPage = SETUP_USERS_PAGE;
+  automaticAccessGuide = AUTOMATIC_ACCESS_GUIDE;
 
   @track roles = [];
   @track assignments = [];

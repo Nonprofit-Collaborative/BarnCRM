@@ -25,6 +25,14 @@
         <value>Address, as you want it printed</value>
     </labels>
     <labels>
+        <fullName>Core_SetupAssistant_AutomaticAccessLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: link to the guide for giving new users a role automatically</shortDescription>
+        <value>Set up automatic access</value>
+    </labels>
+    <labels>
         <fullName>Core_SetupAssistant_BackButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>

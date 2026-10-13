@@ -17,6 +17,22 @@
         <value>{0} now has the {1} role.</value>
     </labels>
     <labels>
+        <fullName>Core_Access_AutomaticAccessHelp</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: text before the link to the automatic access guide</shortDescription>
+        <value>Add people often? A user access policy, created once in Setup, can give each new user a role for you.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AutomaticAccessLink</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: link that opens the automatic access guide page</shortDescription>
+        <value>Set up automatic access</value>
+    </labels>
+    <labels>
         <fullName>Core_Access_CancelButton</fullName>
         <categories>Access</categories>
         <language>en_US</language>

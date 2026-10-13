@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <types>
+    <members>BarnCRM_Admins_Get_Giving_Admin</members>
+    <members>BarnCRM_Fundraising_Staff_Get_Giving_Staff</members>
+    <members>BarnCRM_Read_Only_Gets_Giving_Read_Only</members>
+    <name>UserAccessPolicy</name>
+  </types>
+  <version>67.0</version>
+</Package>

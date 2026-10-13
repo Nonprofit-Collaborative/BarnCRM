@@ -18,7 +18,9 @@ the module's admin set (for Giving, **Giving Admin**) only to you, the person wh
 on. Anyone else with a role sees households and people but nothing the module adds until a
 Salesforce administrator assigns the
 module's permission set in Setup alongside the role. That is the one place BarnCRM still sends
-you to Setup for access, and it is a gap rather than a design.
+you to Setup for access, and it is a gap rather than a design. Until then, a Salesforce user
+access policy can add the module's permission set for you: see
+[Automatic access](automatic-access.md).
 
 BarnCRM Core ships four roles. The Fundraising Staff role comes with the Giving module,
 so it is listed only where Giving is installed, which makes five:
@@ -120,6 +122,11 @@ new tab. The address it opens is:
 
 Create the user with a Salesforce Platform or Salesforce license, save, then come back to
 Access and search for their name.
+
+If you add people often, you can skip the second step: a Salesforce user access policy can
+give every new user with your staff profile a BarnCRM role the moment the user is created.
+The **Set up automatic access** link at the bottom of the Access page opens
+[Automatic access](automatic-access.md), which has the exact policy to create in Setup.
 
 ## Common mistakes
 

@@ -316,6 +316,19 @@ describe('c-setup-assistant', () => {
     expect(completeStep).toHaveBeenCalledWith({ stepKey: 'access' });
   });
 
+  it('links the access step to the automatic access guide, in a new tab', async () => {
+    getState.mockResolvedValue(
+      state({ completedKeys: ['coexistence', 'naming', 'moduledefaults'] })
+    );
+    const element = build();
+    await settle();
+
+    const link = element.shadowRoot.querySelector('[data-id="automatic-access-link"]');
+    expect(link.href).toContain('docs/admin-guide/automatic-access.md');
+    expect(link.target).toBe('_blank');
+    expect(link.textContent).toBe('c.Core_SetupAssistant_AutomaticAccessLink');
+  });
+
   it('offers each role by its label, not its developer name', async () => {
     getState.mockResolvedValue(
       state({ completedKeys: ['coexistence', 'naming', 'moduledefaults'] })
