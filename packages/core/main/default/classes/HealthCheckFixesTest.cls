@@ -11,6 +11,11 @@
  */
 @IsTest
 private class HealthCheckFixesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String TEST_JOB_NAME = 'BarnCRM Rollups (HealthCheckFixesTest)';
 
     private static Rollup_Definition_Default__mdt memberCountDefault(String mode) {

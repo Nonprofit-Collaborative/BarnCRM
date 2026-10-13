@@ -6,6 +6,11 @@
  */
 @IsTest
 private class CorePostInstallTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String ROLLUP_CONTEXT = 'CorePostInstall.ensureRollupDefaults';
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
     private static final String RETRY_CONTEXT = 'CorePostInstallRetryQueueable.execute';

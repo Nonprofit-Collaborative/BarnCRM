@@ -5,6 +5,11 @@
  */
 @IsTest
 private class DataTransformTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static DataTransform.Step step(String op) {
         return new DataTransform.Step(op);
     }

@@ -11,6 +11,11 @@
  */
 @IsTest
 private class ImportPersonAccountTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 

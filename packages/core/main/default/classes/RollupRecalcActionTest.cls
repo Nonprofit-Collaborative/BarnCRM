@@ -6,6 +6,11 @@
  */
 @IsTest
 private class RollupRecalcActionTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c childCount() {
         return new Rollup_Definition__c(
             Name = 'Child organization count',

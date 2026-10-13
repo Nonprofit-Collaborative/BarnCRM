@@ -6,6 +6,11 @@
  */
 @IsTest
 private class AffiliationDomainTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void refusesAnAffiliationWithNoPerson() {
         System.runAs(TestUsers.admin()) {

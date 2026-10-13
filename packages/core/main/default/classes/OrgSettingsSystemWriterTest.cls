@@ -1,5 +1,10 @@
 @IsTest
 private class OrgSettingsSystemWriterTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static BarnCRM_Settings__c stored() {
         List<BarnCRM_Settings__c> rows = [
             SELECT

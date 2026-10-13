@@ -4,6 +4,11 @@
  */
 @IsTest
 private class CustomMetadataDeployCallbackTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final Id JOB = FakeIds.ofPrefix('0Af', 2);
 
     /** The platform's context cannot be built with a job Id, so the test supplies one. */

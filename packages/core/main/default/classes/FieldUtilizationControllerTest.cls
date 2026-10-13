@@ -4,6 +4,11 @@
  */
 @IsTest
 private class FieldUtilizationControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String DISMISSAL = Duplicate_Dismissal__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         )

@@ -8,6 +8,11 @@
  */
 @IsTest
 private class AutomationControlTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String NAMING = 'Household_Naming';
     private static final String HOUSEHOLDS = 'Household_Creation';
     private static final String LOCK = 'Gift_Receipt_Lock';

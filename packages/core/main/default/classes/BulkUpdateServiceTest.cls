@@ -7,6 +7,11 @@
  */
 @IsTest
 private class BulkUpdateServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(String title) {
         return JSON.serialize(
             new Map<String, Object>{

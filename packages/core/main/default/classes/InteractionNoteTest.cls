@@ -12,6 +12,11 @@
  */
 @IsTest
 private class InteractionNoteTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     // Notes are saved `as system`: access to Task and its Type comes from the user's profile,
     // not from a BarnCRM permission set (admin guide, "Who can log one"), and a scratch org's
     // administrator profile may hide Type. API 67.0 runs plain DML in user mode.

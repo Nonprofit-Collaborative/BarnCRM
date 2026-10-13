@@ -3,6 +3,11 @@
  */
 @IsTest
 private class HouseholdNamingServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String NAME_PATTERN = 'The {LastName} Family';
     private static final String FORMAL_PATTERN = '{Salutation} {FirstName} {LastName}';
     private static final String INFORMAL_PATTERN = '{FirstName}';

@@ -8,6 +8,11 @@
  */
 @IsTest
 private class RelationshipServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void createsTheOtherSideWhenARelationshipIsSaved() {
         System.runAs(TestUsers.admin()) {

@@ -5,6 +5,11 @@
  */
 @IsTest
 private class PersonRecordSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void nothingIsReadWhenTheOrgDoesNotStorePeopleAsAccounts() {
         System.runAs(TestUsers.admin()) {

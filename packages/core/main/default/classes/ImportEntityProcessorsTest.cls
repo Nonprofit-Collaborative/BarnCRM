@@ -5,6 +5,11 @@
  */
 @IsTest
 private class ImportEntityProcessorsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Integer logged() {
         Test.getEventBus().deliver();
         return [

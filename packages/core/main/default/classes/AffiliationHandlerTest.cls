@@ -9,6 +9,11 @@
  */
 @IsTest
 private class AffiliationHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String MAINTENANCE = 'Affiliation_Primary';
     private static final String VALIDATION = 'Affiliation_Validation';
 

@@ -7,6 +7,11 @@
  */
 @IsTest
 private class CoexistenceServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void modeIsNullUntilSomebodyConfirmsOne() {
         System.runAs(TestUsers.admin()) {

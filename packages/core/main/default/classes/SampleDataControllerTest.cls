@@ -10,6 +10,11 @@
  */
 @IsTest
 private class SampleDataControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWithInstalledModules();
+    }
+
     private static String buildJson(Integer householdCount, Integer membersPerHousehold) {
         List<Object> households = new List<Object>();
         Integer memberNumber = 1;

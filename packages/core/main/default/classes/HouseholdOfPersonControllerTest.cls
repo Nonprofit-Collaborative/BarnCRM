@@ -6,6 +6,11 @@
  */
 @IsTest
 private class HouseholdOfPersonControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aContactPointsAtItsHouseholdInTheSimpleWay() {
         System.runAs(TestUsers.admin()) {

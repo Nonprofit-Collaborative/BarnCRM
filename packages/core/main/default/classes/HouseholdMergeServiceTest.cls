@@ -4,6 +4,11 @@
  */
 @IsTest
 private class HouseholdMergeServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     // ------------------------------------------------------------------ preview
 
     @IsTest

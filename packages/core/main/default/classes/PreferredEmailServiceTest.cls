@@ -3,6 +3,11 @@
  */
 @IsTest
 private class PreferredEmailServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String PERSONAL = 'maria.garcia@example.org';
     private static final String WORK = 'mgarcia@springfieldfoodbank.example.org';
 

@@ -5,6 +5,11 @@
  */
 @IsTest
 private class SetupAssistantExtensionsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aClassThatIsNotInTheOrgIsNoExtension() {
         System.runAs(TestUsers.admin()) {

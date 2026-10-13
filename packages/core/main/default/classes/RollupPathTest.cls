@@ -5,6 +5,11 @@
  */
 @IsTest
 private class RollupPathTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void oneReferenceAttributeIsOneHop() {
         System.runAs(TestUsers.admin()) {

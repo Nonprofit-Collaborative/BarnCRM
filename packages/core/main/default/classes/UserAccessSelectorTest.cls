@@ -7,6 +7,11 @@
  */
 @IsTest
 private class UserAccessSelectorTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void noGroupNamesMeansNobody() {
         System.runAs(TestUsers.admin()) {

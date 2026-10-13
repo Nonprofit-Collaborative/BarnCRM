@@ -7,6 +7,11 @@
  */
 @IsTest
 private class RelationshipDomainTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void refusesARelationshipBetweenSomeoneAndThemselves() {
         System.runAs(TestUsers.admin()) {

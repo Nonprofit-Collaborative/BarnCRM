@@ -9,6 +9,11 @@
  */
 @IsTest
 private class RelationshipHandlerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String MAINTENANCE = 'Relationship_Reciprocal';
     private static final String VALIDATION = 'Relationship_Validation';
 

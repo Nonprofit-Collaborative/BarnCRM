@@ -9,6 +9,11 @@
  */
 @IsTest
 private class ErrorLoggerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private class SampleException extends Exception {
     }
 

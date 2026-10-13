@@ -5,6 +5,11 @@
  */
 @IsTest
 private class RollupDateWindowTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void fiscalYearWindowsResolveAgainstOrgFiscalSettings() {
         System.runAs(TestUsers.admin()) {

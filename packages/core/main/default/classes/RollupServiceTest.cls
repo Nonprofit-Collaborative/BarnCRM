@@ -7,6 +7,11 @@
  */
 @IsTest
 private class RollupServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c memberCount(String mode, Boolean active) {
         return new Rollup_Definition__c(
             Name = 'Household member count',

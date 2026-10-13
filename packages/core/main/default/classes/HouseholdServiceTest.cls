@@ -4,6 +4,11 @@
  */
 @IsTest
 private class HouseholdServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void aNewPersonWithNoHouseholdGetsOne() {
         System.runAs(TestUsers.admin()) {

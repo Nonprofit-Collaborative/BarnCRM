@@ -5,6 +5,11 @@
  */
 @IsTest
 private class RollupControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Rollup_Definition__c definition() {
         return new Rollup_Definition__c(
             Name = 'Household member count',

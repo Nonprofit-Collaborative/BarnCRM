@@ -7,6 +7,11 @@
  */
 @IsTest
 private class TriggerDispatcherTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String HANDLER_NAME = 'Test_Recording_Handler';
 
     private class RecordingHandler extends TriggerHandler {

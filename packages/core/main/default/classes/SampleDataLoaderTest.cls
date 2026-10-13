@@ -10,6 +10,11 @@
  */
 @IsTest
 private class SampleDataLoaderTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWithInstalledModules();
+    }
+
     /**
      * Builds a minimal but structurally faithful sample data JSON string: householdCount
      * households, each with membersPerHousehold members, plus one organization. When

@@ -5,6 +5,11 @@
  */
 @IsTest
 private class QueryFieldCatalogTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void describesAnObjectWithItsFieldsSortedByLabel() {
         System.runAs(TestUsers.admin()) {

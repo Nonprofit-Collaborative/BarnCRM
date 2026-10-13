@@ -6,6 +6,11 @@
  */
 @IsTest
 private class FindSummaryTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static String query(Map<String, Object> aggregate) {
         return JSON.serialize(
             new Map<String, Object>{

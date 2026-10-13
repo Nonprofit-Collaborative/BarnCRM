@@ -3,6 +3,11 @@
  */
 @IsTest
 private class HouseholdNamingBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void everyHouseholdIsRenamedExceptTheOnesWordedByHand() {
         System.runAs(TestUsers.admin()) {

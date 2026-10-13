@@ -7,6 +7,11 @@
  */
 @IsTest
 private class CustomMetadataManagerServiceTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String TYPE_NAME = 'Relationship_Type__mdt';
     private static final Id FAKE_JOB = FakeIds.ofPrefix('0Af', 1);
 

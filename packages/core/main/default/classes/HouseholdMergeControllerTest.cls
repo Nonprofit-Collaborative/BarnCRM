@@ -3,6 +3,11 @@
  */
 @IsTest
 private class HouseholdMergeControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void theSearchOffersHouseholdsAndNotOrganizations() {
         System.runAs(TestUsers.admin()) {

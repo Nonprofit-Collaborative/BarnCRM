@@ -4,6 +4,11 @@
  */
 @IsTest
 private class AccessControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String PROGRAM_ROLE = 'Program_Staff';
 
     /**

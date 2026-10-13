@@ -7,6 +7,11 @@
  */
 @IsTest
 private class FindRelatedRecordsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String UNDO_ONLY = '{"version": 1, "conditions": [{"id": 1, "field": "Phase__c", "operator": "equals", "value": "Undo"}]}';
 
     private static String query(List<Object> related, List<Object> children) {

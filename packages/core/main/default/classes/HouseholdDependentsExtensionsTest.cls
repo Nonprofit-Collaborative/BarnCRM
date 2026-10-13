@@ -6,6 +6,11 @@
  */
 @IsTest
 private class HouseholdDependentsExtensionsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String GIVING = 'GivingHouseholdDependentsExtension';
 
     /** Answers that every household in `credited` still has records credited to it. */
