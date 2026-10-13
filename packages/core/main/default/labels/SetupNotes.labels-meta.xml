@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_SetupNote_Bulk_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Import: what to change for bulk changes</shortDescription>
+        <value>To let someone who is not a BarnCRM Admin bulk update, or anyone bulk delete, assign BarnCRM Bulk Update or BarnCRM Bulk Delete, with BarnCRM Find and Export.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Bulk_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Import: Setup path for bulk permissions</shortDescription>
+        <value>Setup, Users, the person, Permission Set Assignments</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Bulk_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Import: why bulk permissions need Setup</shortDescription>
+        <value>These permission sets are in no role on purpose (bulk delete not even in BarnCRM Admin), so nobody has them until you decide.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Done</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings setup note: the prerequisite is already done</shortDescription>
+        <value>Done</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Duplicates_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Households: what to change for duplicates</shortDescription>
+        <value>To review duplicates, assign BarnCRM Duplicate Review to the people who will do it, and keep the standard duplicate rules active.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Duplicates_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Households: Setup path for duplicates</shortDescription>
+        <value>Setup, Users, Permission Set Assignments; Setup, Duplicate Rules</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Duplicates_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Households: why duplicates need Setup</shortDescription>
+        <value>Salesforce shows possible duplicates only to users with a Sales Cloud or Service Cloud license, and a scan applies only active duplicate rules.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Email_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Error Log: what to change for email</shortDescription>
+        <value>Let this org send email, so the error digest can be delivered.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Email_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Error Log: Setup path for email</shortDescription>
+        <value>Setup, Deliverability, Access level: All email</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Email_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Error Log: why email needs Setup</shortDescription>
+        <value>When Deliverability is set to system email only or no access, Salesforce sends no digest, and only Setup can change it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_FiscalYear_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: what to change for the fiscal year</shortDescription>
+        <value>Start the fiscal year in Setup in the same month as Fiscal year start month in this section.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_FiscalYear_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: Setup path for the fiscal year</shortDescription>
+        <value>Setup, Company Settings, Fiscal Year</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_FiscalYear_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: why the fiscal years must match</shortDescription>
+        <value>Salesforce reports, including the retention reports, read the fiscal year in Setup, and BarnCRM totals read the one here. If the months differ, they disagree about what counts as this year.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Heading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings setup note: heading above what to change in Setup</shortDescription>
+        <value>Needs a change in Setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Metadata_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: what to change for Custom Metadata</shortDescription>
+        <value>To save Custom Metadata entries here, assign BarnCRM Metadata Admin to yourself and turn on Deploy Metadata from Non-Certified Package Versions via Apex.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Metadata_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: Setup path for Custom Metadata</shortDescription>
+        <value>Setup, Users, your name, Permission Set Assignments; then Setup, Apex Settings</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Metadata_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, General: why Custom Metadata needs Setup</shortDescription>
+        <value>Saving an entry changes the org's metadata. Salesforce lets an installed package do that only with this switch on, and only Setup can turn it on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_NotDone</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings setup note: the prerequisite is not done yet</shortDescription>
+        <value>Not done yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_RollupField_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Rollups: what to change for a new rollup</shortDescription>
+        <value>Create the field a new rollup writes its total to before you build the rollup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_RollupField_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Rollups: Setup path for a new field</shortDescription>
+        <value>Setup, Object Manager, the object, Fields &amp; Relationships, New</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_RollupField_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Rollups: why rollup fields need Setup</shortDescription>
+        <value>The Rollup Builder picks a field that already exists. Creating a field changes the org's data model, which only Setup does.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Users_What</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Access: what to change for new people</shortDescription>
+        <value>Create a person's Salesforce user before giving them a role here, and assign a module's own permission set (Giving Staff, for example) there too.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Users_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Access: Setup path for users</shortDescription>
+        <value>Setup, Users</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Users_Why</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup note, Access: why users need Setup</shortDescription>
+        <value>A user takes a Salesforce license, so only Setup can create one. A role here carries what Core provides, not what a module adds.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SetupNote_Where</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings setup note: prefix before the Setup path</shortDescription>
+        <value>Where in Setup:</value>
+    </labels>
+</CustomLabels>

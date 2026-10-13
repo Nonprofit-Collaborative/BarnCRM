@@ -183,6 +183,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Manage settings permission | Minor | Only holders of the manage-settings permission can change settings; everyone else sees a read-only view with a notice. | Shipped | C-03 |
 | Settings change history | Minor | "Recent changes" records each changed setting with old value, new value, who and when; unchanged saves write nothing. | Shipped | C-03 |
 | Settings search | Minor | Search box finds any setting by name, description or section and jumps to it. | Shipped | C-03 |
+| Setup prerequisite notes | Minor | A settings section that depends on a change only Setup can make (fiscal year, Custom Metadata deploy switch, duplicate review, rollup target fields, email deliverability, new users, bulk permission sets) says what, why and where at its top, and shows Done or Not done yet where BarnCRM can read it (fiscal year, email deliverability). | Built, not merged (`feature/settings-setup-prereqs`) | C-03, owner decision 2026-10-13 |
 | Setup progress remembered | Minor | The assistant reopens on the step you reached and collapses to a "Setup complete" tile that can be reopened. | Shipped | C-12 |
 | Organization identity step | Minor | Records the organization's name, tax ID, address and logo in the assistant (used by receipts). | Shipped | C-12 |
 | Modules step | Minor | Shows each package as present or not installed, with links to what it does. | Shipped | C-12 |

@@ -1,0 +1,28 @@
+<template>
+    <template for:each={notes} for:item="note">
+        <div
+            key={note.key}
+            class="slds-scoped-notification slds-scoped-notification_light slds-media slds-media_top slds-var-m-bottom_small"
+            role="status"
+            data-key={note.key}
+        >
+            <div class="slds-media__figure">
+                <lightning-icon
+                    icon-name={note.iconName}
+                    variant={note.iconVariant}
+                    size="small"
+                    alternative-text={note.statusText}
+                ></lightning-icon>
+            </div>
+            <div class="slds-media__body">
+                <p class="slds-text-title_bold">{labels.heading}</p>
+                <p>{note.what}</p>
+                <p class="slds-text-color_weak">{note.why}</p>
+                <p>{labels.where} {note.where}</p>
+                <template lwc:if={note.hasStatus}>
+                    <p class="slds-text-title_bold" data-id="status">{note.statusText}</p>
+                </template>
+            </div>
+        </div>
+    </template>
+</template>
