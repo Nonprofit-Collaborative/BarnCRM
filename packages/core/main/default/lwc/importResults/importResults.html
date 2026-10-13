@@ -68,6 +68,11 @@
             {labels.rejectedHeading}
         </h3>
         <template lwc:if={hasRejectedRows}>
+            <template lwc:if={rejectedShownNote}>
+                <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="rejected-shown">
+                    {rejectedShownNote}
+                </p>
+            </template>
             <div class="slds-scrollable_x">
                 <table class="slds-table slds-table_bordered slds-table_cell-buffer">
                     <thead>

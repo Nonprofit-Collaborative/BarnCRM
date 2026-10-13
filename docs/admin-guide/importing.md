@@ -78,8 +78,12 @@ or six rows.
    refused while they do not match.
 6. Select **Preview**. Nothing is written. When it finishes you see four counts, "would
    create", "would update", "would match and change nothing", and "would be rejected",
-   and a table of the rejected rows with the reason for each one. Select **Download
-   exceptions** to get those rows back as a CSV you can fix in your spreadsheet. A new
+   and a table of the rejected rows with the reason for each one (the first 200; when there
+   are more, the screen says how many it shows). Select **Download exceptions** to get every
+   rejected row back as a CSV you can fix in your spreadsheet, up to 100,000 rows in one
+   download. The file opens cleanly in Excel: accented names keep their accents, and a value
+   that starts with =, +, - or @ gets a leading apostrophe so the spreadsheet never runs it
+   as a formula (a plain negative number such as -25.00 is left as it is). A new
    person or organization that appears on several rows is counted once as "would create";
    their later rows count as matching them, which is what the import will do. A person on
    twelve rows of the file becomes one person with one household, not twelve.

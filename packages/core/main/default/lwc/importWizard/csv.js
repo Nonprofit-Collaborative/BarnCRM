@@ -102,20 +102,6 @@ export function toRecords(rows) {
   return { headers, records };
 }
 
-/** Turns rows back into CSV text, which is how the exceptions file is built. */
-export function toCsv(headers, records) {
-  const lines = [headers.map(quote).join(',')];
-  records.forEach((record) => {
-    lines.push(headers.map((heading) => quote(record[heading])).join(','));
-  });
-  return lines.join('\r\n');
-}
-
-function quote(value) {
-  const text = value === undefined || value === null ? '' : String(value);
-  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-
 function isBlankRow(row) {
   return row.every((cell) => (cell || '').trim().length === 0);
 }

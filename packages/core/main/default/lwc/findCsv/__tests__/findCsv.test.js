@@ -29,6 +29,13 @@ describe('c/findCsv', () => {
     expect(cell(-5)).toBe('-5');
   });
 
+  it('leaves text that is only a negative number alone', () => {
+    expect(cell('-25.00')).toBe('-25.00');
+    expect(cell('-7')).toBe('-7');
+    expect(cell('-7e3')).toBe("'-7e3");
+    expect(cell('-1-1')).toBe("'-1-1");
+  });
+
   it('writes a byte-order mark, a header of labels and one line per row', () => {
     const csv = toCsv(
       [

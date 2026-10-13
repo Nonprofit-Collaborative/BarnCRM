@@ -9,7 +9,7 @@ import stageRows from '@salesforce/apex/ImportController.stageRows';
 import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
-import getRows from '@salesforce/apex/ImportController.getRows';
+import getRowPage from '@salesforce/apex/ImportController.getRowPage';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
 import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
@@ -50,7 +50,7 @@ jest.mock('@salesforce/apex/ImportController.getBatch', () => ({ default: jest.f
 jest.mock('@salesforce/apex/ImportController.saveRecurring', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/ImportController.getRows', () => ({ default: jest.fn() }), {
+jest.mock('@salesforce/apex/ImportController.getRowPage', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getEntityTargets', () => ({ default: jest.fn() }), {
@@ -104,6 +104,8 @@ const DRY_RUN_BATCH = {
   runLog: 'Dry run. Nothing was written.'
 };
 
+const EMPTY_PAGE = { cursor: null, rows: [], nextIndex: 0, total: 0, hasMore: false };
+
 const FILE_TEXT = 'Last Name,Email,Notes\nRamirez,ana@example.org,vip\nOkafor,ben@example.org,';
 
 /**
@@ -155,7 +157,7 @@ describe('the import wizard', () => {
     startDryRun.mockResolvedValue(DRY_RUN_BATCH);
     startCommit.mockResolvedValue({ ...DRY_RUN_BATCH, status: 'Complete', isDryRun: false });
     getBatch.mockResolvedValue(DRY_RUN_BATCH);
-    getRows.mockResolvedValue([]);
+    getRowPage.mockResolvedValue(EMPTY_PAGE);
     getEntityTargets.mockResolvedValue([]);
     getMatchFields.mockResolvedValue({ contact: [], account: [] });
     getChangedValues.mockResolvedValue([]);
@@ -870,6 +872,117 @@ describe('the import wizard', () => {
       jest.useRealTimers();
     }
   });
+
+  describe('the exceptions file', () => {
+    const RealBlob = global.Blob;
+    let written;
+
+    /** A cursor of `total` rejected rows, served from whatever start index is asked for. */
+    function serveRejected(total) {
+      getRowPage.mockImplementation(({ cursor, startIndex, pageSize }) => {
+        const rows = [];
+        for (let i = startIndex; i < Math.min(startIndex + pageSize, total); i++) {
+          rows.push({
+            id: `r${i}`,
+            rowNumber: i + 2,
+            status: 'Rejected',
+            errorMessage: 'Last name is missing.',
+            values: JSON.stringify({
+              'Last Name': i === 0 ? '=HYPERLINK("x")' : `Person ${i}`,
+              Email: '',
+              Notes: i === 1 ? '-25.00' : 'n'
+            })
+          });
+        }
+        const nextIndex = startIndex + rows.length;
+        return Promise.resolve({
+          cursor: cursor || { token: 'cursor-1' },
+          rows,
+          nextIndex,
+          total,
+          hasMore: nextIndex < total
+        });
+      });
+    }
+
+    beforeEach(() => {
+      written = undefined;
+      global.Blob = function CapturingBlob(parts, options) {
+        written = parts.join('');
+        return new RealBlob(parts, options);
+      };
+      global.URL.createObjectURL = jest.fn(() => 'blob:exceptions');
+      global.URL.revokeObjectURL = jest.fn();
+      jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+      jest.useFakeTimers({ doNotFake: ['setTimeout', 'nextTick', 'queueMicrotask'] });
+    });
+
+    afterEach(() => {
+      global.Blob = RealBlob;
+      HTMLAnchorElement.prototype.click.mockRestore();
+      jest.useRealTimers();
+    });
+
+    async function toFinishedDryRun(rejected) {
+      getBatch.mockResolvedValue({ ...DRY_RUN_BATCH, rejected });
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      jest.advanceTimersByTime(3000);
+      await flush();
+      return element;
+    }
+
+    it('holds every rejected row, read page by page through one cursor', async () => {
+      serveRejected(1250);
+      const element = await toFinishedDryRun(1250);
+      const results = element.shadowRoot.querySelector('[data-id="results"]');
+      expect(results.rejectedRows).toHaveLength(200);
+      getRowPage.mockClear();
+
+      click(element, 'download');
+      await flush();
+
+      // A fresh cursor, then the same one handed back from where each page ended.
+      expect(getRowPage.mock.calls.map(([args]) => [args.startIndex, args.cursor])).toEqual([
+        [0, null],
+        [500, { token: 'cursor-1' }],
+        [1000, { token: 'cursor-1' }]
+      ]);
+      const lines = written.split('\r\n').filter((line) => line.length > 0);
+      expect(lines).toHaveLength(1251);
+      expect(lines[0]).toBe('﻿Row,Last Name,Email,Notes,Reason');
+      // The shared writer defuses a formula and leaves a negative amount alone.
+      expect(lines[1]).toBe('2,"\'=HYPERLINK(""x"")",,n,Last name is missing.');
+      expect(lines[2]).toBe('3,Person 1,,-25.00,Last name is missing.');
+      expect(lines[1250].startsWith('1251,Person 1249,')).toBe(true);
+      expect(global.URL.createObjectURL).toHaveBeenCalledTimes(1);
+      expect(element.shadowRoot.querySelector('[data-id="message"]')).toBeNull();
+    });
+
+    it('says so when the file holds fewer rows than were rejected', async () => {
+      serveRejected(3);
+      const element = await toFinishedDryRun(5);
+      click(element, 'download');
+      await flush();
+      expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(4);
+      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+        'c.Core_Import_ExceptionsCapped'
+      );
+    });
+
+    it('reports a failed read in words and saves no file', async () => {
+      serveRejected(2);
+      const element = await toFinishedDryRun(2);
+      getRowPage.mockRejectedValue({ body: { message: 'Cursor expired.' } });
+      click(element, 'download');
+      await flush();
+      expect(written).toBeUndefined();
+      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+        'Cursor expired.'
+      );
+    });
+  });
 });
 
 describe('the import wizard loading one object', () => {
@@ -920,7 +1033,7 @@ describe('the import wizard loading one object', () => {
     stageRows.mockResolvedValue(2);
     startDryRun.mockResolvedValue(DRY_RUN_BATCH);
     getBatch.mockResolvedValue(DRY_RUN_BATCH);
-    getRows.mockResolvedValue([]);
+    getRowPage.mockResolvedValue(EMPTY_PAGE);
   });
 
   afterEach(() => {

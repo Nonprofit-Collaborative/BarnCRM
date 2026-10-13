@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
-import { parseCsv, toRecords, toCsv } from './csv';
+import { parseCsv, toRecords } from './csv';
+import { toCsv } from 'c/findCsv';
 import { isXlsx, readXlsx, XLSX_ERRORS } from './xlsx';
 
 import canImport from '@salesforce/apex/ImportController.canImport';
@@ -11,7 +12,7 @@ import stageRows from '@salesforce/apex/ImportController.stageRows';
 import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
-import getRows from '@salesforce/apex/ImportController.getRows';
+import getRowPage from '@salesforce/apex/ImportController.getRowPage';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
 import getEntityTargets from '@salesforce/apex/ImportController.getEntityTargets';
 import getMatchFields from '@salesforce/apex/ImportController.getMatchFields';
@@ -33,6 +34,7 @@ import dryRunButton from '@salesforce/label/c.Core_Import_DryRunButton';
 import commitButton from '@salesforce/label/c.Core_Import_CommitButton';
 import startOverButton from '@salesforce/label/c.Core_Import_StartOverButton';
 import downloadExceptionsButton from '@salesforce/label/c.Core_Import_DownloadExceptionsButton';
+import exceptionsCapped from '@salesforce/label/c.Core_Import_ExceptionsCapped';
 import uploadLabel from '@salesforce/label/c.Core_Import_UploadLabel';
 import uploadHint from '@salesforce/label/c.Core_Import_UploadHint';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
@@ -106,6 +108,12 @@ import { INSERT, UPDATE, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
 const CHANGE_SAMPLE_ROWS = 5;
+
+/** How many rejected rows the results table shows; the exceptions file holds them all. */
+const TABLE_PAGE_ROWS = 200;
+
+/** Rows per server call while the exceptions file is read (a cursor page holds up to 2,000). */
+const DOWNLOAD_PAGE_ROWS = 500;
 
 /** Fills a label's {0} with a value. */
 function format(label, value) {
@@ -1191,11 +1199,15 @@ export default class ImportWizard extends LightningElement {
       this.batch = await getBatch({ batchId: this.batch.id });
       if (this.batch && this.batch.isFinished) {
         this.stopPolling();
-        this.rejectedRows = await getRows({
+        // The table shows the first page; the exceptions file reads them all.
+        const firstPage = await getRowPage({
           batchId: this.batch.id,
           status: 'Rejected',
-          offsetRows: 0
+          cursor: null,
+          startIndex: 0,
+          pageSize: TABLE_PAGE_ROWS
         });
+        this.rejectedRows = (firstPage && firstPage.rows) || [];
         // A dry run shows each value a column's changes changed, before and after (R-IT15).
         this.changedValues = this.batch.isDryRun
           ? (await getChangedValues({ batchId: this.batch.id })) || []
@@ -1208,24 +1220,72 @@ export default class ImportWizard extends LightningElement {
   }
 
   /**
-   * Hands the rejected rows back as a CSV the administrator can fix in a spreadsheet, with
-   * the reason on each one so the fix is obvious.
+   * Hands every rejected row back as a CSV the administrator can fix in a spreadsheet, with
+   * the reason on each one so the fix is obvious. The rows are read page by page through one
+   * server cursor, so the file holds all of them, not just the table's first page.
    */
-  handleDownloadExceptions() {
-    const headers = ['Row'].concat(this.headers).concat(['Reason']);
-    const records = this.rejectedRows.map((row) => {
+  async handleDownloadExceptions() {
+    if (!this.batch) {
+      return;
+    }
+    this.message = undefined;
+    this.loading = true;
+    try {
+      const rows = [];
+      let page = await getRowPage({
+        batchId: this.batch.id,
+        status: 'Rejected',
+        cursor: null,
+        startIndex: 0,
+        pageSize: DOWNLOAD_PAGE_ROWS
+      });
+      rows.push(...page.rows);
+      while (page.hasMore && page.rows.length > 0) {
+        // Sequential on purpose: each page starts where the last one ended.
+        // eslint-disable-next-line no-await-in-loop
+        page = await getRowPage({
+          batchId: this.batch.id,
+          status: 'Rejected',
+          cursor: page.cursor,
+          startIndex: page.nextIndex,
+          pageSize: DOWNLOAD_PAGE_ROWS
+        });
+        rows.push(...page.rows);
+      }
+      this.saveExceptions(rows);
+      const rejected = this.batch.rejected || 0;
+      if (rows.length < rejected) {
+        this.message = exceptionsCapped
+          .replace('{0}', rows.length.toLocaleString())
+          .replace('{1}', rejected.toLocaleString());
+      }
+    } catch (error) {
+      this.message = this.errorText(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  /** Writes the rows as CSV (c/findCsv: byte-order mark, formula guard) and saves the file. */
+  saveExceptions(rows) {
+    // Keys by position, so a column name with a dot or a space still finds its value.
+    const columns = [{ label: 'Row', path: 'row' }]
+      .concat(this.headers.map((heading, index) => ({ label: heading, path: `c${index}` })))
+      .concat([{ label: 'Reason', path: 'reason' }]);
+    const records = rows.map((row) => {
       const values = row.values ? JSON.parse(row.values) : {};
-      const record = { Row: row.rowNumber, Reason: row.errorMessage };
-      this.headers.forEach((heading) => {
-        record[heading] = values[heading] || '';
+      const record = { row: row.rowNumber, reason: row.errorMessage };
+      this.headers.forEach((heading, index) => {
+        record[`c${index}`] = values[heading] || '';
       });
       return record;
     });
-    const text = toCsv(headers, records);
+    const blob = new Blob([toCsv(columns, records)], { type: 'text/csv;charset=utf-8' });
     const link = document.createElement('a');
-    link.href = `data:text/csv;charset=utf-8,${encodeURIComponent(text)}`;
+    link.href = URL.createObjectURL(blob);
     link.download = `${this.batch ? this.batch.name : 'import'}-exceptions.csv`;
     link.click();
+    URL.revokeObjectURL(link.href);
   }
 
   handleStartOver() {
