@@ -1,5 +1,5 @@
 /**
- * Org Optimizer's Storage and limits section (ADR-NEXT org-optimizer-and-data-manager-pages,
+ * Org Optimizer's Storage and limits section (ADR-0103 org-optimizer-and-data-manager-pages,
  * admin guide org-optimizer.md): how much of the org's data and file storage and daily limits
  * are used, read from `OrgLimits` (no callout, no Tooling API), and how many records BarnCRM's
  * own bookkeeping objects hold, which is what BarnCRM itself adds to data storage.

@@ -1,4 +1,4 @@
-# ADR-NEXT: Org Optimizer and Data Manager pages
+# ADR-0103: Org Optimizer and Data Manager pages
 
 **Status:** Accepted (owner decisions, Brandon, 2026-10-13)
 **Date:** 2026-10-13
@@ -8,8 +8,8 @@ only inside Org Optimizer; duplicate review moves to Org Optimizer with a link l
 Settings; Import is reached from Data Manager and keeps the tab label "Import"; Import and Bulk
 Update leave the app navigation and Find stays; unused-setup checks are for administrators
 only. Builds on ADR-0079 (data hygiene checks), ADR-0047 (data jobs), ADR-0077 and ADR-0091
-(bulk update and delete), ADR-0020 (module pages reached by navigation), ADR-NEXT
-`NEXT-field-utilization-on-demand.md` and ADR-NEXT `NEXT-barncrm-app-is-a-console-app.md`.
+(bulk update and delete), ADR-0020 (module pages reached by navigation), ADR-0101
+`0101-field-utilization-on-demand.md` and ADR-0102 `0102-barncrm-app-is-a-console-app.md`.
 Admin guide `org-optimizer.md`, `data-manager.md`.
 
 ## Context

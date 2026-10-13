@@ -119,7 +119,7 @@ function newestFirst(left, right) {
 
 /**
  * Every data job in one list: imports, bulk updates and bulk deletes, newest first, with the
- * undo of each (ADR-NEXT org-optimizer-and-data-manager-pages, admin guide data-manager.md).
+ * undo of each (ADR-0103 org-optimizer-and-data-manager-pages, admin guide data-manager.md).
  *
  * Each kind is read from its own controller, which keeps its own permission check, and only
  * for a holder of that tool's custom permission (whose permission set also grants the

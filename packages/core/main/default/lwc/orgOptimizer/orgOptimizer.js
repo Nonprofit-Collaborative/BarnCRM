@@ -26,7 +26,7 @@ import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthChec
 const OVERVIEW_TAB = 'overview';
 
 /**
- * The Org Optimizer page (ADR-NEXT org-optimizer-and-data-manager-pages, admin guide
+ * The Org Optimizer page (ADR-0103 org-optimizer-and-data-manager-pages, admin guide
  * org-optimizer.md): one vertical tab per section. A section's component is created only when
  * its tab is first opened, and Health Check only on Run Health Check, so opening the page runs
  * no check (core review ADMIN-7). Data quality needs Find and Export Records; the other

@@ -1,6 +1,6 @@
 /**
  * The Get Data Job Status action (Q-14): where an import, bulk update or bulk delete has got
- * to, for a Flow or for a customer's own AI agent. BarnCRM ships no AI (ADR-NEXT,
+ * to, for a Flow or for a customer's own AI agent. BarnCRM ships no AI (ADR-0104,
  * agent-ready Core actions).
  *
  * It adds no rule of its own: it reads the job the way the import results screen does

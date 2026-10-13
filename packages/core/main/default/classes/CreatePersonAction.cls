@@ -1,7 +1,7 @@
 /**
  * The Create Person action (Q-14): adds a new person, either to a household that already
  * exists or with a household of their own, for a Flow or for a customer's own AI agent.
- * BarnCRM ships no AI (ADR-NEXT, agent-ready Core actions).
+ * BarnCRM ships no AI (ADR-0104, agent-ready Core actions).
  *
  * It adds no rule of its own. The person is an ordinary contact saved with the running
  * user's own access, so the org's duplicate, validation and sharing rules apply exactly as

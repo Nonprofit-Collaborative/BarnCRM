@@ -1,7 +1,7 @@
 # Org Optimizer
 
 **Package:** Core
-**Decision:** ADR-NEXT `NEXT-org-optimizer-and-data-manager-pages.md`
+**Decision:** ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`
 
 ## 1. What it does
 

@@ -32,7 +32,7 @@ import WEEKLY_EXPORT from '@salesforce/label/c.Core_DataManager_WeeklyExport';
 import RECYCLE_BIN from '@salesforce/label/c.Core_DataManager_RecycleBin';
 import DATA_IMPORT_WIZARD from '@salesforce/label/c.Core_DataManager_DataImportWizard';
 
-/** The tabs the cards open, by API name (ADR-NEXT org-optimizer-and-data-manager-pages). */
+/** The tabs the cards open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
 const TABS = {
   import: 'Import',
   find: 'Find',

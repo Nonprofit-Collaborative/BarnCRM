@@ -1,4 +1,4 @@
-# ADR-NEXT: Core ships four agent-ready Flow actions, and no agent metadata
+# ADR-0104: Core ships four agent-ready Flow actions, and no agent metadata
 
 **Status:** Accepted
 **Date:** 2026-10-13

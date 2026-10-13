@@ -111,10 +111,10 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0100](0100-rollup-queue-ready-event-from-queueable-jobs.md) | A platform event starts the Rollup Queue after a save inside a Queueable | Accepted (builder decision) |
 | [0101](0101-field-utilization-on-demand.md) | Field utilization runs on demand in Org Optimizer (supersedes ADR-0086 in part) | Accepted (owner decision) |
 | [0102](0102-barncrm-app-is-a-console-app.md) | The BarnCRM app is a Lightning console app with a packaged logo | Accepted (owner request) |
-| [NEXT](NEXT-org-optimizer-and-data-manager-pages.md) | Org Optimizer and Data Manager pages | Accepted (owner decisions) |
-| [NEXT](NEXT-agent-ready-core-actions.md) | Core ships four agent-ready Flow actions, and no agent metadata | Accepted (builder decision, Q-14 approved by the owner) |
-| [NEXT](NEXT-health-check-reschedules-jobs-of-deactivated-owners.md) | Health Check reschedules jobs whose owner was deactivated (amends ADR-0048, extends ADR-0075) | Accepted (builder decision) |
-| [NEXT](NEXT-health-check-on-home-shows-the-last-result.md) | Health Check on Home shows the last result, with Run now | Accepted (owner approved) |
+| [0103](0103-org-optimizer-and-data-manager-pages.md) | Org Optimizer and Data Manager pages | Accepted (owner decisions) |
+| [0104](0104-agent-ready-core-actions.md) | Core ships four agent-ready Flow actions, and no agent metadata | Accepted (builder decision, Q-14 approved by the owner) |
+| [0105](0105-health-check-reschedules-jobs-of-deactivated-owners.md) | Health Check reschedules jobs whose owner was deactivated (amends ADR-0048, extends ADR-0075) | Accepted (builder decision) |
+| [0106](0106-health-check-on-home-shows-the-last-result.md) | Health Check on Home shows the last result, with Run now | Accepted (owner approved) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

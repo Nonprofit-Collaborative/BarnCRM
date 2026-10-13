@@ -1,4 +1,4 @@
-# ADR-NEXT: Health Check on Home shows the last result, with Run now
+# ADR-0106: Health Check on Home shows the last result, with Run now
 
 **Status:** Accepted (owner approved, Brandon, 2026-10-13; builder decision on the shape)
 **Date:** 2026-10-13

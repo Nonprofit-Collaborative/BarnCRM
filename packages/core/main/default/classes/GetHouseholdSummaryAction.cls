@@ -1,7 +1,7 @@
 /**
  * The Get Household Summary action (Q-14): a household's name, greetings, primary contact,
  * mailing address and members, for a Flow or for a customer's own AI agent. BarnCRM ships
- * no AI (ADR-NEXT, agent-ready Core actions).
+ * no AI (ADR-0104, agent-ready Core actions).
  *
  * It adds no rule of its own. A person is resolved to their household by
  * HouseholdService.getHouseholdIdsFor and the members are read by

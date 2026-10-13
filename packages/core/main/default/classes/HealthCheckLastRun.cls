@@ -1,6 +1,6 @@
 /**
  * The last full Health Check result, kept so BarnCRM Home can show it instead of running every
- * check on each load (ADMIN-7, ADR-NEXT health-check-on-home-shows-the-last-result).
+ * check on each load (ADMIN-7, ADR-0106 health-check-on-home-shows-the-last-result).
  *
  * The one place that records and reads it. A page that wants "last result plus Run now" sets
  * the panel's lastResultFirst property; nothing else needs to know how the result is kept.

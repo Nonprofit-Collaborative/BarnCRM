@@ -1,4 +1,4 @@
-# ADR-NEXT: Health Check reschedules jobs whose owner was deactivated
+# ADR-0105: Health Check reschedules jobs whose owner was deactivated
 
 **Status:** Accepted (in the owner-approved admin fix batch, 2026-10-13; builder decision on the shape)
 **Date:** 2026-10-13

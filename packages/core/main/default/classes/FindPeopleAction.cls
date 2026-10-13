@@ -1,7 +1,7 @@
 /**
  * The Find People action (Q-14): finds people by name or email address and says which
  * household each belongs to, for a Flow or for a customer's own AI agent (Agentforce, or a
- * Hosted MCP server). BarnCRM ships no AI; the decision is ADR-NEXT (agent-ready Core
+ * Hosted MCP server). BarnCRM ships no AI; the decision is ADR-0104 (agent-ready Core
  * actions) and the setup is in docs/admin-guide/using-barncrm-actions-with-ai.md.
  *
  * It adds no rule of its own. It reads contacts with the running user's own access, maps a

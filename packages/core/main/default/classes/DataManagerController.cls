@@ -1,5 +1,5 @@
 /**
- * The Data Manager tab's import mappings card (ADR-NEXT org-optimizer-and-data-manager-pages,
+ * The Data Manager tab's import mappings card (ADR-0103 org-optimizer-and-data-manager-pages,
  * admin guide data-manager.md).
  *
  * The rest of the page needs no Apex of its own: its tool cards are gated by custom permission
