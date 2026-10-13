@@ -259,6 +259,29 @@ private class AccessControllerTest {
     }
 
     @IsTest
+    static void searchUsersIsRefusedWithoutThePermission() {
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            insertUser('Davidcontroller', 'Okafor');
+            AccessController.AccessResult result;
+
+            Test.startTest();
+            System.runAs(david) {
+                result = AccessController.searchUsers('Davidcontroller');
+            }
+            Test.stopTest();
+
+            Assert.isFalse(result.success, 'David may not look colleagues up.');
+            Assert.areEqual(
+                AccessController.ERROR_NO_PERMISSION,
+                result.errorCode,
+                'The page needs a code it can branch on.'
+            );
+            Assert.areEqual(0, result.users.size(), 'No names or email addresses come back.');
+        }
+    }
+
+    @IsTest
     static void searchUsersReturnsNothingForABlankTerm() {
         System.runAs(TestUsers.admin()) {
             AccessController.AccessResult result;

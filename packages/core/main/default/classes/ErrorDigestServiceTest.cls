@@ -18,7 +18,7 @@ private class ErrorDigestServiceTest {
             Context__c = source,
             Message__c = 'The Garcia household could not be renamed.',
             Technical_Detail__c = 'DmlException: FIELD_CUSTOM_VALIDATION_EXCEPTION',
-            Record_Reference__c = '001000000000001AAA',
+            Record_Reference__c = FakeIds.of(Account.SObjectType, 1),
             Severity__c = severity,
             Status__c = status
         );
@@ -94,7 +94,10 @@ private class ErrorDigestServiceTest {
             Assert.isFalse(body.contains(logs[5].Id), 'A resolved entry is not listed.');
             Assert.isFalse(body.contains('Garcia'), 'The message is never copied.');
             Assert.isFalse(body.contains('DmlException'), 'Nor the technical detail.');
-            Assert.isFalse(body.contains('001000000000001AAA'), 'Nor the record it names.');
+            Assert.isFalse(
+                body.contains(FakeIds.of(Account.SObjectType, 1)),
+                'Nor the record it names.'
+            );
 
             BarnCRM_Settings__c after = settings();
             Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'The window moved on.');

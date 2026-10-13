@@ -83,6 +83,13 @@ public with sharing class AccessController {
         if (String.isBlank(term)) {
             return result;
         }
+        if (!result.canManage) {
+            // Only someone who may give roles needs to look people up by name and email.
+            result.success = false;
+            result.errorCode = ERROR_NO_PERMISSION;
+            result.message = Label.Core_Access_ErrorNoPermission;
+            return result;
+        }
         try {
             result.users = AccessService.searchUsers(term);
         } catch (AccessService.AccessException e) {

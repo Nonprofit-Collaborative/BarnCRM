@@ -160,6 +160,7 @@ public with sharing class ReceiptTemplateService {
      * as formatted text rather than as a page of its own.
      */
     public static String preview(String receiptType, String body) {
+        requireManagePermission();
         if (String.isBlank(body)) {
             throw new ReceiptTemplateException(Label.Giving_Receipt_EmptyTemplate);
         }

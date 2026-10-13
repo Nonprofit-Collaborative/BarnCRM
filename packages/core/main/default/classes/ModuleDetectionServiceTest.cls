@@ -154,7 +154,7 @@ private class ModuleDetectionServiceTest {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
             ModuleDetectionService.installVersionIds = new Map<String, String>{
-                'Giving' => '04t000000000001AAA',
+                'Giving' => FakeIds.ofPrefix('04t', 1),
                 'Volunteers' => 'not a version id'
             };
             chooseSuite(ModuleDetectionService.SUITE_IMPACT);
@@ -195,7 +195,7 @@ private class ModuleDetectionServiceTest {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
             ModuleDetectionService.installVersionIds = new Map<String, String>{
-                'Giving' => '04t000000000001AAA'
+                'Giving' => FakeIds.ofPrefix('04t', 1)
             };
 
             Test.startTest();

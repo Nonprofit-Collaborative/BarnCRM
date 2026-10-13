@@ -587,7 +587,7 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Error_Log__c.Technical_Detail__c</field>
-    <readable>true</readable>
+    <readable>false</readable>
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
