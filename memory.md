@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-67).
+Last refreshed from BMemory 2026-10-13 (through D-70).
 
 ## Decision log (plan Section 12)
 
@@ -65,7 +65,7 @@ Last refreshed from BMemory 2026-10-13 (through D-67).
 | D-55 | 2026-10-13 | Shipped import templates added at install and on upgrade (closes Section 11.2 item 14) |
 | D-56 | 2026-10-13 | Org gates may batch several PRs into one combined org run and deploy only changed metadata; every test that would have run still runs |
 | D-57 | 2026-10-13 | Console app: on oi-test, oi-pa and barn-core Claude deletes and redeploys the app; on barn-npc and mwdbdevsb the owner switches Navigation Style to Console in App Manager |
-| D-58 | 2026-10-13 | Logo: red barn icon, header #B3261E, approved |
+| D-58 | 2026-10-13 | Logo: barn icon approved, in blue (similar to the Blue Bottle Coffee logo blue; exact value set on feature/console-app-icon), replacing red #B3261E |
 | D-59 | 2026-10-13 | Console tab icons: keep the page icons set by Q-07 |
 | D-60 | 2026-10-13 | Q-11: no Platform Cache for now; revisit after security review |
 | D-61 | 2026-10-13 | Q-09: user access policies documented with samples, not packaged |
@@ -75,6 +75,9 @@ Last refreshed from BMemory 2026-10-13 (through D-67).
 | D-65 | 2026-10-13 | Coverage gate measures BarnCRM classes at 75% total and per class (not org-wide); the 23 low classes held at current figures until tests lift them |
 | D-66 | 2026-10-13 | Q-05: confirm buttons Cancel then action; message-only toasts show the text as the bold main line; Health Check finding title not bold in the confirm |
 | D-67 | 2026-10-13 | Q-04: job finish notifications on by default |
+| D-68 | 2026-10-13 | The four Q-14 agent-ready actions get access through packaged permission sets and/or groups, not a manual Setup step |
+| D-69 | 2026-10-13 | Q-14 scope: the four action classes are global (permanent once managed); no Update Person action (standard Update Record covers it); starting or committing imports from an assistant is out of scope |
+| D-70 | 2026-10-13 | Record cards (Addresses, Affiliations, Relationships) that refuse a change for lack of access show a friendly message and write no Error Log entry; real failures still logged (Q-06) |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
