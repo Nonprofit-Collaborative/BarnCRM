@@ -97,6 +97,8 @@ public with sharing class OrgOptimizerSetupController {
         for (Check check : checks()) {
             result.findings.add(run(check, binds));
         }
+        result.findings.add(OrgOptimizerObjectChecks.nearFieldLimit());
+        result.findings.add(OrgOptimizerObjectChecks.unusedRecordTypes());
         return result;
     }
 

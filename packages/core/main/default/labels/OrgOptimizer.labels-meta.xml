@@ -352,4 +352,44 @@
         <shortDescription>Org Optimizer: link to the Setup page for a check</shortDescription>
         <value>Open in Setup</value>
     </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckFieldLimit</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title, objects near their custom field limit</shortDescription>
+        <value>Objects near their custom field limit</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_CheckRecordTypes</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: check title, record types unused or inactive</shortDescription>
+        <value>Record types no record uses, or inactive</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_FieldLimitExample</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: {0} object, {1} custom fields, {2} the limit</shortDescription>
+        <value>{0}: {1} of {2} custom fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_RecordTypeInactive</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: {0} object, {1} an inactive record type</shortDescription>
+        <value>{0}: {1} (inactive)</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_RecordTypeUnused</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: {0} object, {1} a record type no record uses</shortDescription>
+        <value>{0}: {1} (no records)</value>
+    </labels>
 </CustomLabels>

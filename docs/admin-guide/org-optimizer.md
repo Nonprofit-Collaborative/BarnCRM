@@ -20,7 +20,7 @@ opens quickly however large your database is.
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you press **Run Health Check**. See [Health Check](health-check.md). | Administrators |
 | **Errors** | How many Error Log entries nobody has read, the most recent ones, **Mark acknowledged**, and a link to the full Error Log. See [Error Log](error-log.md). | Administrators |
 | **Storage and limits** | How much of your org's data and file storage, daily API requests, background jobs and single emails are used, and how many records BarnCRM keeps for imports, undo, errors and saved field counts, at about 2 KB a record. Read only. | Administrators |
-| **Unused setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, and scheduled jobs owned by inactive users. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
+| **Unused setup** | Setup nobody seems to use: active users who have not logged in for 90 days, permission sets nobody is assigned, reports not run for 365 days, email templates never used, flows left inactive, scheduled jobs owned by inactive users, objects near their custom field limit, and record types no record uses. Each line gives a count, up to five names and **Open in Setup**. Read only: you decide what to remove, in Setup. See section 5. | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. A section you cannot use is not shown.
@@ -85,6 +85,8 @@ Each count stops at 1,000 and then says **More than 1000**.
 | Email templates never used | Templates that have never been sent and are more than 90 days old. | Templates from installed packages, and new ones. |
 | Inactive flows | Flows with no active version, last changed more than 90 days ago. | Flows from installed packages, and recent work. |
 | Scheduled jobs owned by inactive users | Scheduled jobs still waiting to run whose owner is no longer active. These may stop working. | Finished and deleted jobs. |
+| Objects near their custom field limit | Account, Contact and BarnCRM's own objects with 80% or more of the custom fields your edition allows (100 on Professional, 500 on Enterprise and Developer, 800 on Unlimited and Performance, 500 when the edition is not known). Each example says how many of how many. | Fields from installed packages, which do not count against the limit, and every other object. |
+| Record types no record uses, or inactive | Record types on Account, Contact and BarnCRM's own objects that are inactive, or that no record you can see uses. At most 50 active record types are looked at. | Record types on other objects. |
 
 Two thresholds are settings, under **General** in **BarnCRM Settings**: **Days before a user
 is unused** (90 unless you change it; 30 to 365) and **Days before a report is unused** (365;
