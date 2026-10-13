@@ -1335,6 +1335,16 @@ combination that keeps the numbers visibly right (Principle 2). Real-time needs 
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
 
+One exception to "in the same save": a merge (of people, Section 29A, or of households,
+R-H13).
+The platform refuses a trigger's write to a record while it is in a merge, so the
+survivors' real-time totals are recalculated just after the merge is saved, by a small
+queued job (`SurvivorRecalculation` in `RollupService`) that runs only the real-time
+definitions targeting the merged entity. When there are more than 50 survivors, or the save
+cannot queue another job, the survivors go to the Rollup Queue (Section 14A) instead, and a
+survivor the platform still refuses in the job is queued to be tried again
+(ADR-NEXT, `NEXT-merge-survivors-recalculated-after-the-merge.md`).
+
 **R-R5 Freshness.** Last Calculated on the definition answers "when was this number last
 calculated" for the admin looking at the rollup list. The record page answer comes from
 one last-calculated attribute per target entity, not one per target attribute; the
@@ -6578,6 +6588,7 @@ mirrors the primary member).
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-NEXT, `NEXT-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
+| v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-NEXT, `NEXT-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 
 ---
 ## 32. Entity ownership by package
