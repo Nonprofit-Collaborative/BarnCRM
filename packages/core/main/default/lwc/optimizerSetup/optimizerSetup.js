@@ -9,6 +9,8 @@ import CHECK_REPORTS from '@salesforce/label/c.Core_OrgOptimizer_CheckStaleRepor
 import CHECK_TEMPLATES from '@salesforce/label/c.Core_OrgOptimizer_CheckUnusedEmailTemplates';
 import CHECK_FLOWS from '@salesforce/label/c.Core_OrgOptimizer_CheckInactiveFlows';
 import CHECK_JOBS from '@salesforce/label/c.Core_OrgOptimizer_CheckJobsOfInactiveUsers';
+import CHECK_FIELD_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_CheckFieldLimit';
+import CHECK_RECORD_TYPES from '@salesforce/label/c.Core_OrgOptimizer_CheckRecordTypes';
 import COULD_NOT_CHECK from '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_OrgOptimizer_OpenInSetup';
 import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
@@ -67,6 +69,10 @@ export default class OptimizerSetup extends LightningElement {
         return CHECK_FLOWS;
       case 'jobsOfInactiveUsers':
         return CHECK_JOBS;
+      case 'objectsNearFieldLimit':
+        return CHECK_FIELD_LIMIT;
+      case 'unusedRecordTypes':
+        return CHECK_RECORD_TYPES;
       default:
         return key;
     }

@@ -11,7 +11,9 @@ private class OrgOptimizerSetupControllerTest {
         'staleReports',
         'unusedEmailTemplates',
         'inactiveFlows',
-        'jobsOfInactiveUsers'
+        'jobsOfInactiveUsers',
+        'objectsNearFieldLimit',
+        'unusedRecordTypes'
     };
 
     private static Map<String, OrgOptimizerSetupController.Finding> byKey(
