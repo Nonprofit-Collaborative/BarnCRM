@@ -9,18 +9,6 @@
  */
 public with sharing class RelationshipSelector {
     /**
-     * The fields every relationship read selects, one list for both reads here. Held as text
-     * because the queries are built from it; every name is a literal, so nothing
-     * user-supplied reaches a query.
-     */
-    private static final String FIELDS =
-        'Id, Name, Contact__c, Contact__r.Name, Person_Account__c, Person_Account__r.Name, ' +
-        'Related_Contact__c, Related_Contact__r.Name, Related_Person_Account__c, ' +
-        'Related_Person_Account__r.Name, Type__c, Reciprocal_Type__c, Status__c, Start_Date__c, ' +
-        'End_Date__c, Description__c, Reciprocal_Relationship__c, Is_Reciprocal_Managed__c, ' +
-        'CreatedDate';
-
-    /**
      * Custom metadata cannot be inserted by a test, so tests put in-memory rows here and
      * every read in the package sees them.
      */
@@ -36,14 +24,33 @@ public with sharing class RelationshipSelector {
         if (personIds == null || personIds.isEmpty()) {
             return new List<Relationship__c>();
         }
-        return (List<Relationship__c>) Database.queryWithBinds(
-            'SELECT ' +
-                FIELDS +
-                ' FROM Relationship__c WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds' +
-                ' ORDER BY Status__c, CreatedDate DESC LIMIT 10000',
-            new Map<String, Object>{ 'personIds' => personIds },
-            AccessLevel.USER_MODE
-        );
+        return [
+            SELECT
+                Id,
+                Name,
+                Contact__c,
+                Contact__r.Name,
+                Person_Account__c,
+                Person_Account__r.Name,
+                Related_Contact__c,
+                Related_Contact__r.Name,
+                Related_Person_Account__c,
+                Related_Person_Account__r.Name,
+                Type__c,
+                Reciprocal_Type__c,
+                Status__c,
+                Start_Date__c,
+                End_Date__c,
+                Description__c,
+                Reciprocal_Relationship__c,
+                Is_Reciprocal_Managed__c,
+                CreatedDate
+            FROM Relationship__c
+            WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
+            WITH USER_MODE
+            ORDER BY Status__c, CreatedDate DESC
+            LIMIT 10000
+        ];
     }
 
     /** The given relationships, with every field the service and the card read. */
@@ -51,14 +58,32 @@ public with sharing class RelationshipSelector {
         if (relationshipIds == null || relationshipIds.isEmpty()) {
             return new List<Relationship__c>();
         }
-        return (List<Relationship__c>) Database.queryWithBinds(
-            'SELECT ' +
-                FIELDS +
-                ' FROM Relationship__c WHERE Id IN :relationshipIds' +
-                ' LIMIT 10000',
-            new Map<String, Object>{ 'relationshipIds' => relationshipIds },
-            AccessLevel.USER_MODE
-        );
+        return [
+            SELECT
+                Id,
+                Name,
+                Contact__c,
+                Contact__r.Name,
+                Person_Account__c,
+                Person_Account__r.Name,
+                Related_Contact__c,
+                Related_Contact__r.Name,
+                Related_Person_Account__c,
+                Related_Person_Account__r.Name,
+                Type__c,
+                Reciprocal_Type__c,
+                Status__c,
+                Start_Date__c,
+                End_Date__c,
+                Description__c,
+                Reciprocal_Relationship__c,
+                Is_Reciprocal_Managed__c,
+                CreatedDate
+            FROM Relationship__c
+            WHERE Id IN :relationshipIds
+            WITH USER_MODE
+            LIMIT 10000
+        ];
     }
 
     /**
