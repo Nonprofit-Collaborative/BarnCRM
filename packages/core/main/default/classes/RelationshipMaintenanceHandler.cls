@@ -49,10 +49,15 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
     }
 
     public override void afterUndelete() {
-        ensure(
-            (List<Relationship__c>) newRecords(),
-            'RelationshipMaintenanceHandler.afterUndelete'
-        );
+        List<Relationship__c> restored = (List<Relationship__c>) newRecords();
+        if (restored == null || restored.isEmpty()) {
+            return;
+        }
+        try {
+            RelationshipService.restoreReciprocals(restored);
+        } catch (Exception thrown) {
+            report(thrown, restored, 'RelationshipMaintenanceHandler.afterUndelete');
+        }
     }
 
     private void ensure(List<Relationship__c> records, String context) {

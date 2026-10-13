@@ -106,16 +106,34 @@ public with sharing class RelationshipService {
      * Gives every relationship that should have another side one: by pairing it with a record
      * that already is that side, or by creating it.
      *
-     * Called after insert, after undelete, and from the update path for a relationship that
-     * has just become managed or has just been given the second person it was missing.
+     * Called after insert, and from the update path for a relationship that has just become
+     * managed or has just been given the second person it was missing.
      */
     public static void ensureReciprocals(List<Relationship__c> records) {
+        ensure(records, false);
+    }
+
+    /**
+     * The same after a restore from the recycle bin, with one difference: an other side that
+     * was deleted along with this record, and is still in the recycle bin, is brought back and
+     * paired rather than built again (PEOPLE-21). Restoring one side and then the other, or
+     * both at once, therefore always ends with the one pair there was before the delete.
+     */
+    public static void restoreReciprocals(List<Relationship__c> records) {
+        ensure(records, true);
+    }
+
+    private static void ensure(List<Relationship__c> records, Boolean fromRecycleBin) {
         if (records == null || records.isEmpty() || !isAutoReciprocalOn()) {
             return;
         }
+        Map<Id, Id> formerPartnerById = new Map<Id, Id>();
+        List<Relationship__c> candidates = fromRecycleBin
+            ? withLostPartnersCleared(records, formerPartnerById)
+            : records;
         List<Relationship__c> eligible = new List<Relationship__c>();
         Set<Id> otherPeople = new Set<Id>();
-        for (Relationship__c record : records) {
+        for (Relationship__c record : candidates) {
             if (!needsOtherSide(record)) {
                 continue;
             }
@@ -137,8 +155,12 @@ public with sharing class RelationshipService {
             eligible,
             takenKeys
         );
+        Map<String, List<Relationship__c>> deletedByKey = fromRecycleBin
+            ? deletedCandidates(otherPeople)
+            : new Map<String, List<Relationship__c>>();
         Set<Id> pairedInThisRun = new Set<Id>();
         Map<Id, Relationship__c> updates = new Map<Id, Relationship__c>();
+        List<Relationship__c> toRestore = new List<Relationship__c>();
         List<Relationship__c> toCreate = new List<Relationship__c>();
         List<Relationship__c> creators = new List<Relationship__c>();
 
@@ -170,11 +192,41 @@ public with sharing class RelationshipService {
                 // left without a mirror of its own rather than given a duplicate.
                 continue;
             }
+            Relationship__c deletedPartner = takeDeletedPartner(
+                deletedByKey,
+                mirrorKey,
+                record,
+                formerPartnerById.get(record.Id)
+            );
+            if (deletedPartner != null) {
+                toRestore.add(new Relationship__c(Id = deletedPartner.Id));
+                updates.put(
+                    record.Id,
+                    new Relationship__c(
+                        Id = record.Id,
+                        Reciprocal_Relationship__c = deletedPartner.Id
+                    )
+                );
+                updates.put(
+                    deletedPartner.Id,
+                    new Relationship__c(
+                        Id = deletedPartner.Id,
+                        Reciprocal_Relationship__c = record.Id
+                    )
+                );
+                continue;
+            }
             toCreate.add(mirrorOf(record));
             creators.add(record);
         }
 
-        withoutReentry(new List<Relationship__c>(updates.values()), toCreate, creators, null);
+        withoutReentry(
+            toRestore,
+            new List<Relationship__c>(updates.values()),
+            toCreate,
+            creators,
+            null
+        );
     }
 
     /**
@@ -307,7 +359,22 @@ public with sharing class RelationshipService {
         List<Relationship__c> creators,
         List<Relationship__c> deletes
     ) {
+        withoutReentry(null, updates, inserts, creators, deletes);
+    }
+
+    /**
+     * The same, with other sides to bring back from the recycle bin first, so that the pairing
+     * updates that follow find them live.
+     */
+    private static void withoutReentry(
+        List<Relationship__c> restores,
+        List<Relationship__c> updates,
+        List<Relationship__c> inserts,
+        List<Relationship__c> creators,
+        List<Relationship__c> deletes
+    ) {
         Boolean hasWork =
+            (restores != null && !restores.isEmpty()) ||
             (updates != null && !updates.isEmpty()) ||
             (inserts != null && !inserts.isEmpty()) ||
             (deletes != null && !deletes.isEmpty());
@@ -317,6 +384,7 @@ public with sharing class RelationshipService {
         AutomationControl.bypass(AUTOMATION_NAME);
         AutomationControl.bypass(VALIDATION_AUTOMATION_NAME);
         try {
+            RelationshipUpkeepWriter.restoreMirrors(restores);
             if (inserts != null && !inserts.isEmpty()) {
                 RelationshipUpkeepWriter.insertMirrors(inserts);
                 List<Relationship__c> backPointers = new List<Relationship__c>();
@@ -390,6 +458,96 @@ public with sharing class RelationshipService {
             }
         }
         return byKey;
+    }
+
+    /**
+     * Managed relationships in the recycle bin described from the people on the far side,
+     * grouped by how each identifies itself. These are the other sides a restore may bring
+     * back.
+     */
+    private static Map<String, List<Relationship__c>> deletedCandidates(Set<Id> otherPeople) {
+        Map<String, List<Relationship__c>> byKey = new Map<String, List<Relationship__c>>();
+        for (
+            Relationship__c candidate : RelationshipUpkeepSelector.selectDeletedByFromPersonIds(
+                otherPeople
+            )
+        ) {
+            String key = ownSideKey(candidate);
+            if (key == null) {
+                continue;
+            }
+            if (!byKey.containsKey(key)) {
+                byKey.put(key, new List<Relationship__c>());
+            }
+            byKey.get(key).add(candidate);
+        }
+        return byKey;
+    }
+
+    /**
+     * Restored records as the pairing should see them. A restored record may still point at an
+     * other side that is in the recycle bin; the pointer is no pairing at all, so the record
+     * is handed on as a copy with it cleared, and the old pointer is kept in formerPartnerById
+     * so that exactly that other side is the one brought back. A pointer at a live record is
+     * left alone: that pair is already whole.
+     */
+    private static List<Relationship__c> withLostPartnersCleared(
+        List<Relationship__c> records,
+        Map<Id, Id> formerPartnerById
+    ) {
+        Set<Id> partnerIds = new Set<Id>();
+        for (Relationship__c record : records) {
+            if (record.Reciprocal_Relationship__c != null) {
+                partnerIds.add(record.Reciprocal_Relationship__c);
+            }
+        }
+        if (partnerIds.isEmpty()) {
+            return records;
+        }
+        Set<Id> live = new Map<Id, Relationship__c>(
+                RelationshipUpkeepSelector.selectByIds(partnerIds)
+            )
+            .keySet();
+        List<Relationship__c> result = new List<Relationship__c>();
+        for (Relationship__c record : records) {
+            Id partnerId = record.Reciprocal_Relationship__c;
+            if (partnerId == null || live.contains(partnerId)) {
+                result.add(record);
+                continue;
+            }
+            // A copy, because a record in an after context is read only.
+            Relationship__c cleared = record.clone(true, true, true, true);
+            cleared.Reciprocal_Relationship__c = null;
+            formerPartnerById.put(record.Id, partnerId);
+            result.add(cleared);
+        }
+        return result;
+    }
+
+    /**
+     * The deleted other side to bring back for this record, removed from the pool so no two
+     * records take the same one. The one this record pointed at, or one that still points at
+     * this record, wins; otherwise the most recently deleted, which is the order the pool is
+     * read in.
+     */
+    private static Relationship__c takeDeletedPartner(
+        Map<String, List<Relationship__c>> deletedByKey,
+        String mirrorKey,
+        Relationship__c record,
+        Id formerPartnerId
+    ) {
+        List<Relationship__c> pool = mirrorKey == null ? null : deletedByKey.get(mirrorKey);
+        if (pool == null || pool.isEmpty()) {
+            return null;
+        }
+        Integer chosen = 0;
+        for (Integer i = 0; i < pool.size(); i++) {
+            if (pool[i].Id == formerPartnerId || pool[i].Reciprocal_Relationship__c == record.Id) {
+                chosen = i;
+                break;
+            }
+        }
+        return pool.remove(chosen);
     }
 
     /** How this record identifies itself: this person, that person, this type. */

@@ -5248,7 +5248,9 @@ with anything: the two people the other way round, of exactly the reciprocal typ
 Reciprocal Relationship set. Finding one, it pairs the two records instead of creating a
 third. This is what makes an import that already carried both sides, and a restore from
 the recycle bin that brought both sides back, settle into one pair rather than into
-duplicates.
+duplicates. A restore that brings back only one side first looks in the recycle bin for the
+other side deleted with it and restores that record, so restoring one side, then the other,
+or both at once, always ends with the original pair.
 
 **R-RL5 Status follows the dates.** Setting End Date sets Status to Former on both sides.
 Clearing it returns both to Current. Status is never left disagreeing with the dates.

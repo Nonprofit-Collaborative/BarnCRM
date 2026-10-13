@@ -81,4 +81,36 @@ public without sharing class RelationshipUpkeepSelector {
             LIMIT 10000
         ];
     }
+
+    /**
+     * Managed relationships in the recycle bin described from one of these people, most
+     * recently deleted first: the other sides a restore may bring back (PEOPLE-21). ALL ROWS
+     * is what reaches the recycle bin; the IsDeleted filter keeps live records out.
+     */
+    public static List<Relationship__c> selectDeletedByFromPersonIds(Set<Id> personIds) {
+        if (personIds == null || personIds.isEmpty()) {
+            return new List<Relationship__c>();
+        }
+        return [
+            SELECT
+                Id,
+                Contact__c,
+                Person_Account__c,
+                Related_Contact__c,
+                Related_Person_Account__c,
+                Type__c,
+                Reciprocal_Relationship__c,
+                Is_Reciprocal_Managed__c
+            FROM Relationship__c
+            WHERE
+                (Contact__c IN :personIds
+                OR Person_Account__c IN :personIds)
+                AND IsDeleted = TRUE
+                AND Is_Reciprocal_Managed__c = TRUE
+            WITH SYSTEM_MODE
+            ORDER BY SystemModstamp DESC
+            LIMIT 10000
+            ALL ROWS
+        ];
+    }
 }
