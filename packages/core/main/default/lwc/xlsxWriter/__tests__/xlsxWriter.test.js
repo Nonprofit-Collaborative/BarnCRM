@@ -54,6 +54,18 @@ describe('c/xlsxWriter', () => {
     expect(sheetXml(COLUMNS, [['a\u0001b', null, '', undefined]])).toContain('>ab<');
   });
 
+  it('writes text that looks like a formula as an inline string, never a formula', () => {
+    const risky = ['=1+1', '+1', '-1', '@SUM(A1)', '\tx', '\rx'];
+    const xml = sheetXml(
+      COLUMNS,
+      risky.map((text) => [text, null, null, null])
+    );
+    expect(xml).not.toContain('<f>');
+    expect(xml).toContain('<c r="A2" t="inlineStr"><is><t xml:space="preserve">=1+1</t>');
+    expect(xml).toContain('<c r="A5" t="inlineStr"><is><t xml:space="preserve">@SUM(A1)</t>');
+    expect(xml).toContain('<c r="A3" t="inlineStr"><is><t xml:space="preserve">+1</t>');
+  });
+
   it('writes a workbook the import reader reads back, deflated and stored', async () => {
     const rows = [];
     for (let index = 0; index < 200; index++) {
