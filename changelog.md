@@ -8,6 +8,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- BMemory plan updated with owner decisions D-40 to D-47 (commits 441b2368, e745eb40, 7fd7ee13, 90ebde29, d7e8ae77, 8deee1ee, b8672288, d3f03933, 0bae13aa, 176eb4d4): Error Log 180-day and staged import row 90-day retention, adjustable; minimum and maximum on every number setting; affiliations stay out of Core imports; new import templates added on upgrade; "What's new" refreshed from release notes each release; 9 console-only components hidden from App Builder; Fundraising Staff includes Giving Staff (closes 11.2 item 12); "Data Jobs" in Title Case; `BarnPA` snapshot from `oi-pa` approved (Q-12); unfinished Core work, duplicate rule matching first, finished before version 1, with an inventory under way and the Find, bulk update and duplicates fix batch in progress (Section 6.0). C-38 row cites D-39. Mirrored into `docs/product-plan.md`, `roadmap.md` and `memory.md` (branch `docs/q-pass-plan`).
 - Q-01 to Q-14 started: the 14 recommended platform features, built in parallel as part of the Core quality pass, each on `feature/q-NN-<slug>` (D-39).
 - BMemory plan updated (commits ba5273a1, 4e5a5ffb): Section 6.0 lists Q-01 to Q-14 and the in-flight Core quality pass work, and C-38 is on hold until Brandon is ready to start the next version; decision D-39 recorded. `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed from it (branch `docs/q-pass-plan`).
 

@@ -14,6 +14,8 @@ Status as of 2026-10-13 (main at PR #222, squash 55e6b3d9). #219 landed batches 
    - Field utilization on demand from its own tab (D-37, `feature/field-utilization-on-demand`).
    - Test self-containment (`fix/tests-self-contained`).
    - Rollup S9 after a clean engine comparison run (`feature/rollup-s9-remove-vendored`, not landed); S14 only if the scale test needs it; S15 to S17 spike.
+   - Inventory of unfinished Core work, under way (D-47): duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38).
+   - Find, bulk update and duplicates fix batch, in progress.
 2. On hold: C-38 scheduled imports and connections, until Brandon is ready to start the next version (D-39).
 3. After the Core quality pass: the non-core modules, in plan Section 6 order.
 4. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
@@ -32,7 +34,7 @@ Status as of 2026-10-13 (main at PR #222, squash 55e6b3d9). #219 landed batches 
 | Q-09 | User Access Policies | Started 2026-10-13 |
 | Q-10 | In-App Guidance | Started 2026-10-13 |
 | Q-11 | Platform Cache | Started 2026-10-13 |
-| Q-12 | Scratch org snapshots | Started 2026-10-13 |
+| Q-12 | Scratch org snapshots (Dev Hub snapshot `BarnPA` from `oi-pa` approved, D-46) | Started 2026-10-13 |
 | Q-13 | ApexGuru and Scale Center | Started 2026-10-13 |
 | Q-14 | Agentforce-ready invocable actions (optional; approved) | Started 2026-10-13 |
 
@@ -72,7 +74,7 @@ Status as of 2026-10-13 (main at PR #222, squash 55e6b3d9). #219 landed batches 
 | CMDT Manager (plan 6.1 item 9) | D-25 | Landing (ADR-0085) |
 | Field utilization (plan 6.1 item 10) | D-26, D-37 | In main (ADR-0086); on-demand rework from its own tab on `feature/field-utilization-on-demand` (D-37); `NightlyJobs` registration dropped |
 | Tests run as permission-set users | D-33 | Landing; proof run without BarnCRM permission sets, then drop the assignment from `run-org-tests.sh` |
-| "Data jobs" relabel | ADR-0047 | Not done |
+| "Data Jobs" relabel (Title Case) | ADR-0047, D-45 | Not done |
 | Namespace registration, first package version | D-01, ADR-0001 | Deferred |
 
 ## Post-1.0 (plan 6.1, parked)
