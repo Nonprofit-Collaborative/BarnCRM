@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Start any data task (import, find, bulk update, bulk delete, Org Optimizer), see the import
+    mappings, and every data job with its undo.
+  </description>
+  <flexiPage>Data_Manager</flexiPage>
+  <label>Data Manager</label>
+  <motif>Custom55: Books</motif>
+</CustomTab>

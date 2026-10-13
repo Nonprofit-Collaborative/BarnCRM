@@ -19,9 +19,10 @@ removed and the values it changed are put back (section 5).
 
 ## 2. How to turn it on
 
-Nothing to turn on. The **Import** tab is in the BarnCRM app for anyone with the
-**Manage BarnCRM Settings** permission. If you do not see the tab, ask whoever set up
-your org to give you the BarnCRM Admin role on the **Access** page.
+Nothing to turn on. The **Import** tab is for anyone with the **Manage BarnCRM Settings**
+permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Import a file**
+(see [Data Manager](data-manager.md)). If you do not see the card, ask whoever set up your org
+to give you the BarnCRM Admin role on the **Access** page.
 
 Every import, bulk update ([Bulk update](bulk-update.md)) and bulk delete
 ([Bulk delete](bulk-delete.md)) is saved as one **Data Job** record, with its counts, run log

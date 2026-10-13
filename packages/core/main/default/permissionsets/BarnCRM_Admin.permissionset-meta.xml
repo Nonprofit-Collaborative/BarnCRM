@@ -60,6 +60,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>DataManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DuplicateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -1636,6 +1640,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Bulk_Update</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Data_Manager</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

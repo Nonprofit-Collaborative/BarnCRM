@@ -1,0 +1,57 @@
+<template>
+    <lightning-card title={labels.title} icon-name="standard:data_integration_hub">
+        <p class="slds-var-p-horizontal_medium">{labels.intro}</p>
+    </lightning-card>
+
+    <lightning-card title={labels.toolsHeading} class="slds-var-m-top_small">
+        <div class="slds-var-p-horizontal_medium slds-grid slds-wrap slds-gutters_small">
+            <template for:each={tools} for:item="tool">
+                <div key={tool.key} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-p-bottom_small" data-id={tool.key}>
+                    <article class="slds-box slds-box_small">
+                        <h3 class="slds-text-heading_small">{tool.title}</h3>
+                        <p class="slds-var-m-vertical_x-small slds-text-body_small">{tool.text}</p>
+                        <lightning-button label={labels.open} data-tab={tool.tab} data-id={tool.key} onclick={handleOpen}></lightning-button>
+                    </article>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+
+    <template lwc:if={isAdmin}>
+        <lightning-card title={labels.mappingsHeading} class="slds-var-m-top_small">
+            <div class="slds-var-p-horizontal_medium">
+                <template lwc:if={mappingsError}>
+                    <p role="alert" class="slds-text-color_error" data-id="mappings-error">{mappingsError}</p>
+                </template>
+                <template lwc:elseif={hasMappings}>
+                    <lightning-datatable
+                        key-field="id"
+                        data={mappings}
+                        columns={mappingColumns}
+                        hide-checkbox-column
+                        data-id="mappings"
+                    ></lightning-datatable>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-body_small" data-id="mappings-empty">{labels.mappingsEmpty}</p>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+
+    <div class="slds-var-m-top_small">
+        <c-data-job-history></c-data-job-history>
+    </div>
+
+    <template lwc:if={isAdmin}>
+        <lightning-card title={labels.salesforceHeading} class="slds-var-m-top_small">
+            <ul class="slds-var-p-horizontal_medium" data-id="salesforce-links">
+                <template for:each={salesforceLinks} for:item="link">
+                    <li key={link.key} class="slds-var-p-bottom_x-small">
+                        <a href={link.url} target="_blank">{link.label}</a>
+                    </li>
+                </template>
+            </ul>
+        </lightning-card>
+    </template>
+</template>

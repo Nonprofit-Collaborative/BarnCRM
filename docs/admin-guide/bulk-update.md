@@ -27,7 +27,7 @@ record, as they do on any save. A record that is refused is listed with the reas
 still save.
 
 Values you change by editing Find's results table ([Find](find.md), section 7.6) are saved
-the same way, and each save is listed with the bulk updates on the **Bulk Update** tab, its
+the same way, and each save is listed with the bulk updates under **Data jobs** on the **Data Manager** tab, its
 run log starting "Edited in Find", with the same undo.
 
 ## 2. How to turn it on
@@ -37,7 +37,8 @@ run log starting "Edited in Find", with the same undo.
    let a staff member bulk update without making them an admin, assign them the **BarnCRM Bulk
    Update** and **BarnCRM Find and Export** permission sets (Setup, Users, choose the person,
    Permission Set Assignments). Neither grants access to any record or field.
-   A person without both sees nothing of bulk update on the **Bulk Update** tab: no list, no error.
+   A person without both sees no bulk updates under **Data jobs** on the **Data Manager** tab,
+   and no error.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk update run limit**
    (default 48,000). A bulk update that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just
@@ -63,7 +64,7 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
    were updated, how many already held the new value and how many failed, with the reason for
    each failure. The job's run log, on the Data Job record, also says how many no longer matched
    the query.
-7. To undo it, open the **Bulk Update** tab. Find the job under **Data jobs** (choose **Bulk
+7. To undo it, open the **Data Manager** tab. Find the job under **Data jobs** (choose **Bulk
    updates** in **Show** to list only those), press **Undo**, type the number, and confirm.
 
 ## 4. What can and cannot be changed

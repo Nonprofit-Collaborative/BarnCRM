@@ -56,9 +56,10 @@ side in tabs across the top.
 
   If that link is blank (for example an address that belongs to a person, not a household),
   the record opens in its own tab instead.
-- **Pages such as Find, Import and BarnCRM Settings open as tabs too.** Choose them from the
-  navigation menu (the arrow next to the app name). Addresses, Relationships, Affiliations and
-  Household Members are at the end of that menu.
+- **Pages such as Find, Data Manager and BarnCRM Settings open as tabs too.** Choose them from
+  the navigation menu (the arrow next to the app name). Addresses, Relationships, Affiliations
+  and Household Members are at the end of that menu. Import and Bulk Update are not in the
+  menu: open them from **Data Manager** (see [Data Manager](data-manager.md)).
 - **Close a tab** with its **x**, or right-click tabs to close several. Your open tabs are
   still there when you come back.
 - **On a phone**, the Salesforce mobile app shows BarnCRM as an ordinary app without tabs.
