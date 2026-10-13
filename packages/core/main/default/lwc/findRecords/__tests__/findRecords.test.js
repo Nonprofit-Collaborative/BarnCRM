@@ -305,6 +305,36 @@ describe('c-find-records', () => {
     expect(one(element, 'notice-message').textContent).toBe('c.Core_Find_SavedNotice');
   });
 
+  it('keeps open the query a Save as wrote, even when another has the same name', async () => {
+    const twoOfTheSameName = {
+      ...PAGE,
+      savedQueries: [
+        { recordId: 'a0X000000000AAAAAA', name: 'Mine', mine: true, queryJson: '{}' },
+        { recordId: 'a0X000000000BBBBBB', name: 'Mine', mine: true, queryJson: '{}' }
+      ]
+    };
+    saveQuery
+      .mockResolvedValueOnce({ ...twoOfTheSameName, savedId: 'a0X000000000BBBBBB' })
+      .mockResolvedValueOnce({ ...twoOfTheSameName, savedId: 'a0X000000000BBBBBB' });
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    const name = one(element, 'query-name');
+    name.value = 'Mine';
+    name.dispatchEvent(new CustomEvent('change'));
+    await flush();
+
+    one(element, 'save-as').click();
+    await flush();
+    await flush();
+    one(element, 'save').click();
+    await flush();
+    await flush();
+
+    expect(saveQuery).toHaveBeenCalledTimes(2);
+    expect(saveQuery.mock.calls[0][0].recordId).toBeNull();
+    expect(saveQuery.mock.calls[1][0].recordId).toBe('a0X000000000BBBBBB');
+  });
+
   it('opens a query someone shared, read only, with its related columns and conditions', async () => {
     const element = await render();
     await flush();

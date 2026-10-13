@@ -16,15 +16,32 @@ jest.mock('@salesforce/label/c.Core_Find_Blank', () => ({ default: '(blank)' }),
 const GIFT = {
   apiName: 'Gift__c',
   fields: [
-    { apiName: 'Amount__c', label: 'Amount', dataType: 'currency', filterable: true },
-    { apiName: 'Gift_Date__c', label: 'Gift Date', dataType: 'date', filterable: true },
+    {
+      apiName: 'Amount__c',
+      label: 'Amount',
+      dataType: 'currency',
+      filterable: true,
+      groupable: false,
+      aggregatable: true
+    },
+    {
+      apiName: 'Gift_Date__c',
+      label: 'Gift Date',
+      dataType: 'date',
+      filterable: true,
+      groupable: true,
+      aggregatable: true
+    },
     {
       apiName: 'Status__c',
       label: 'Status',
       dataType: 'picklist',
       filterable: true,
+      groupable: true,
+      aggregatable: false,
       picklistValues: []
     },
+    { apiName: 'Formula_Total__c', label: 'Formula', dataType: 'double', aggregatable: false },
     { apiName: 'Notes__c', label: 'Notes', dataType: 'textarea', filterable: false }
   ]
 };
@@ -78,7 +95,9 @@ describe('c-find-summary-panel', () => {
     const groups = element.shadowRoot
       .querySelector('[data-id="group-by"]')
       .options.map((option) => option.value);
-    expect(groups).toEqual(['', 'Amount__c', 'Gift_Date__c', 'Status__c']);
+    // A currency field cannot be grouped by, and a field the describe says cannot be totalled
+    // is not offered to measure.
+    expect(groups).toEqual(['', 'Gift_Date__c', 'Status__c']);
   });
 
   it('sends the query with the summary and shows one line per group', async () => {

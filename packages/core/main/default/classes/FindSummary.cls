@@ -124,7 +124,7 @@ public with sharing class FindSummary {
             }
             SummaryLine line = new SummaryLine();
             Object grouped = groupPath == null ? null : row.get('grp');
-            line.groupValue = grouped == null ? null : String.valueOf(grouped);
+            line.groupValue = groupText(groupField, grouped);
             line.groupLabel = line.groupValue == null
                 ? null
                 : (labelByValue.containsKey(line.groupValue)
@@ -134,6 +134,21 @@ public with sharing class FindSummary {
             result.lines.add(line);
         }
         return result;
+    }
+
+    /**
+     * A group's value as text. A date is cast first: an untyped date written as text gains a
+     * time of day ("2026-01-05 00:00:00"), the trap FilterValueBinder notes too.
+     */
+    @TestVisible
+    private static String groupText(Schema.DescribeFieldResult field, Object grouped) {
+        if (grouped == null) {
+            return null;
+        }
+        if (field != null && field.getType() == Schema.DisplayType.DATE) {
+            return String.valueOf((Date) grouped);
+        }
+        return String.valueOf(grouped);
     }
 
     /** The field a sum, lowest or highest measures, or a refusal naming it. */

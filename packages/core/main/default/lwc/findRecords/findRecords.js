@@ -721,7 +721,10 @@ export default class FindRecords extends LightningElement {
         // Each page starts after the last Id of the one before, so pages are read in turn.
         // eslint-disable-next-line no-await-in-loop
         const result = await exportPage({ queryJson, afterId });
-        rows = rows.concat(result.rows);
+        // Appended in place: copying every row read so far for each page grows as its square.
+        for (const row of result.rows) {
+          rows.push(row);
+        }
         afterId = result.lastId;
         done = result.done;
         this.noticeMessage = format(EXPORTING, String(rows.length));
@@ -789,7 +792,12 @@ export default class FindRecords extends LightningElement {
       const saved = this.page.savedQueries.find(
         (query) => query.mine && query.name === this.queryName.trim()
       );
-      this.openQueryId = saved ? saved.recordId : this.openQueryId;
+      // Names are not unique: the Id the save wrote decides which query stays open.
+      if (this.page.savedId) {
+        this.openQueryId = this.page.savedId;
+      } else if (saved) {
+        this.openQueryId = saved.recordId;
+      }
       this.noticeMessage = format(SAVED_NOTICE, this.queryName.trim());
     });
   }

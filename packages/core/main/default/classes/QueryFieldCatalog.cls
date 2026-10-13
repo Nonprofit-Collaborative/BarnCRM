@@ -25,7 +25,41 @@ public with sharing class QueryFieldCatalog {
         Schema.DisplayType.ANYTYPE
     };
 
+    /**
+     * Name endings of the platform's own tables: sharing, field history, feeds, change events
+     * (standard ones such as AccountShare as well as custom ones), metadata types, platform
+     * events, external and big objects.
+     */
+    private static final Set<String> SYSTEM_SUFFIXES = new Set<String>{
+        'share',
+        'history',
+        'feed',
+        'changeevent',
+        '__mdt',
+        '__e',
+        '__x',
+        '__b'
+    };
+
     private static final Pattern NAME = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*$');
+
+    /**
+     * Whether an object is one of the platform's own tables or settings rather than records
+     * people keep, so Find offers it neither as a query's object nor as related records. One
+     * rule for both lists.
+     */
+    public static Boolean isSystemObject(Schema.DescribeSObjectResult described) {
+        if (described.isCustomSetting() || described.isDeprecatedAndHidden()) {
+            return true;
+        }
+        String lowerName = described.getName().toLowerCase();
+        for (String suffix : SYSTEM_SUFFIXES) {
+            if (lowerName.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /** One field, as the builder offers it. */
     public class FieldInfo {
@@ -40,6 +74,12 @@ public with sharing class QueryFieldCatalog {
         public Boolean filterable;
         @AuraEnabled
         public Boolean sortable;
+        /** Whether a summary may group by the field (SOQL GROUP BY). */
+        @AuraEnabled
+        public Boolean groupable;
+        /** Whether a summary may total, or take the lowest or highest of, the field. */
+        @AuraEnabled
+        public Boolean aggregatable;
         /** The parent object of a lookup with exactly one parent type; empty otherwise. */
         @AuraEnabled
         public String referenceTo;
@@ -184,6 +224,8 @@ public with sharing class QueryFieldCatalog {
         info.dataType = String.valueOf(fieldDescribe.getType()).toLowerCase();
         info.filterable = fieldDescribe.isFilterable();
         info.sortable = fieldDescribe.isSortable();
+        info.groupable = fieldDescribe.isGroupable();
+        info.aggregatable = fieldDescribe.isAggregatable();
         List<Schema.SObjectType> parents = fieldDescribe.getReferenceTo();
         if (parents.size() == 1 && fieldDescribe.getRelationshipName() != null) {
             info.referenceTo = parents[0].getDescribe().getName();
