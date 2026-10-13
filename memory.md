@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-77).
+Last refreshed from BMemory 2026-10-13 (through D-81).
 
 ## Decision log (plan Section 12)
 
@@ -85,6 +85,10 @@ Last refreshed from BMemory 2026-10-13 (through D-77).
 | D-75 | 2026-10-13 | The Bulk Update and Bulk Delete sets' 31 shared grants move into BarnCRM Find and Export (PLATFORM-17) |
 | D-76 | 2026-10-13 | All BarnCRM triggers declare all seven contexts, with a CI check, after PR #229 merges (PLATFORM-18) |
 | D-77 | 2026-10-13 | The unused label Giving_SoftCredit_Duplicate is deleted as a leftover |
+| D-78 | 2026-10-13 | Error_Log__c sharing stays Read/Write (all sets have View All; only Admin can edit; Read would break Mark as seen on others' entries) |
+| D-79 | 2026-10-13 | Stored household names use the org default language for joining words ("and", list separator, "the late"), not the saving user's language |
+| D-80 | 2026-10-13 | Plan corrections applied (closes Section 11.2 item 27): v0.3 row without NPSP import templates (v0.5); one test org, not four org shapes; TestDataFactory is @NamespaceAccessible (ADR-0017); X-07 at v0.6; D-14 cites ADR-0053 and ADR-0054; C-25 note says built, in main; 11.3 item 6 release note done (v0.7-draft-advanced-find.md); v0.11 accessibility, mobile and translation built, not merged (PRs #273 to #276), device mobile run open. Section 4.1 Nonprofit Hub entry still open |
+| D-81 | 2026-09-23, numbered 2026-10-13 | Suites and packaging: Impact Suite (Core plus Giving, other modules offered) and Community Suite (Core alone); one install to start, guided installs after; Core neutral; unlocked now, managed at listing |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
