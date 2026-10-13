@@ -343,7 +343,11 @@ public with sharing class ImportBatchService {
         if (dryRun && hasCommitted(batch)) {
             throw new ImportException(Label.Core_Import_ErrorDryRunAfterCommit);
         }
-        Import_Template__c template = ImportTemplateSelector.selectById(batch.Import_Template__c);
+        // A dry run reads the template as it stands and records it; the commit runs under what
+        // its dry run recorded, whatever has been edited since (R-IB1).
+        Import_Template__c template = dryRun
+            ? ImportTemplateSelector.selectById(batch.Import_Template__c)
+            : templateFor(batch);
         if (template == null) {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
@@ -396,17 +400,37 @@ public with sharing class ImportBatchService {
             scopeSize(batch.Chunk_Size__c)
         );
         Database.update(passStamp(batch), AccessLevel.USER_MODE);
-        // The pass number and job are the package's bookkeeping, read only in every permission
-        // set, so they are written in system mode (ADR-0021).
-        Database.update(
-            new Import_Batch__c(
-                Id = batch.Id,
-                Pass_Number__c = batch.Pass_Number__c,
-                Job_Id__c = batch.Job_Id__c
-            ),
-            AccessLevel.SYSTEM_MODE
+        // The pass number, job and template snapshot are the package's bookkeeping, read only
+        // in every permission set, so they are written in system mode (ADR-0021).
+        Import_Batch__c bookkeeping = new Import_Batch__c(
+            Id = batch.Id,
+            Pass_Number__c = batch.Pass_Number__c,
+            Job_Id__c = batch.Job_Id__c
         );
+        if (dryRun) {
+            bookkeeping.Template_Snapshot_JSON__c = JSON.serialize(template);
+        }
+        Database.update(bookkeeping, AccessLevel.SYSTEM_MODE);
         return batch.Job_Id__c;
+    }
+
+    /**
+     * The template a batch runs under (R-IB1): the copy its last dry run recorded when it has
+     * one, otherwise the template as it stands (a batch previewed before the copy was kept).
+     * Null when the template itself is gone, so a deleted template still stops the run.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c templateFor(Import_Batch__c batch) {
+        Import_Template__c current = batch == null
+            ? null
+            : ImportTemplateSelector.selectById(batch.Import_Template__c);
+        if (current == null) {
+            return null;
+        }
+        String snapshot = ImportBatchSelector.selectTemplateSnapshot(batch.Id);
+        return String.isBlank(snapshot)
+            ? current
+            : (Import_Template__c) JSON.deserialize(snapshot, Import_Template__c.class);
     }
 
     /** Only what starting a pass changes and the person starting it may edit, saved as them. */

@@ -86,7 +86,9 @@ or six rows.
 7. If the preview is wrong, fix the file or the mapping and preview again. Nothing you
    have done so far has changed a record.
 8. When the preview is right, select **Import these rows**. Processing runs in the background and
-   the screen updates as it goes.
+   the screen updates as it goes. The import does what the preview showed: it uses the columns,
+   values and matching choices the preview ran with, even if you or someone else has changed
+   the template since. A change to the template counts from the next preview.
 9. The results screen shows the same four counts for what actually happened, the run log,
    and links to the records. Select **View rows** to see every row and what became of it.
 

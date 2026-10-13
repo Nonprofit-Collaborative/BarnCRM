@@ -735,9 +735,8 @@ public with sharing class ImportController {
         try {
             List<ChangedValue> result = new List<ChangedValue>();
             Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
-            Import_Template__c template = batch == null
-                ? null
-                : ImportTemplateSelector.selectById(batch.Import_Template__c);
+            // The template the dry run ran under, so the changes shown are the ones it made.
+            Import_Template__c template = ImportBatchService.templateFor(batch);
             if (template == null) {
                 return result;
             }

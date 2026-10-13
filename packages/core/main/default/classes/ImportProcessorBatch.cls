@@ -78,9 +78,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         Savepoint beforeChunk = Database.setSavepoint();
         try {
             Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
-            Import_Template__c template = ImportTemplateSelector.selectById(
-                batch == null ? null : batch.Import_Template__c
-            );
+            // The template as the dry run started with it, not as edited since (R-IB1).
+            Import_Template__c template = ImportBatchService.templateFor(batch);
             pass = batch == null ? null : batch.Pass_Number__c;
             if (batch == null || template == null) {
                 throw new ImportException(Label.Core_Import_ErrorTemplateGone);

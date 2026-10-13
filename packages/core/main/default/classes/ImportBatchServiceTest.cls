@@ -198,6 +198,81 @@ private class ImportBatchServiceTest {
         }
     }
 
+    /**
+     * The commit runs under the template its dry run started with (R-IB1): a column set to
+     * Do not load and a rule changed after the preview change nothing in the commit, until the
+     * next preview. Two hundred rows, a full default chunk.
+     */
+    @IsTest
+    static void aCommitRunsUnderTheTemplateItsDryRunRecorded() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = newTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                values.add(
+                    ImportTestDataFactory.donorRow('Ana' + i, 'Ramirez', 'ana' + i + '@example.org', null)
+                );
+            }
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            ImportBatchService.startDryRun(batch.Id);
+            Test.stopTest();
+
+            String snapshot = ImportBatchSelector.selectTemplateSnapshot(batch.Id);
+            Assert.isTrue(
+                snapshot.contains('Contact1.MailingCity'),
+                'The dry run recorded the template it ran with.'
+            );
+            // Edited after the preview: City no longer loaded, and a different rule.
+            ImportMapping edited = new ImportMapping();
+            edited.columns.add(new ImportMapping.Column('First Name', 'Contact1.FirstName'));
+            edited.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
+            edited.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
+            template.Column_Mapping_JSON__c = edited.serialize();
+            template.Matching_Rule__c = ImportTemplateService.normalizedRule(
+                ImportTemplateService.RULE_NAME_POSTAL
+            );
+            update template;
+
+            Import_Template__c ran = ImportBatchService.templateFor(
+                ImportBatchSelector.selectById(batch.Id)
+            );
+            Assert.isTrue(
+                ran.Column_Mapping_JSON__c.contains('Contact1.MailingCity'),
+                'The commit reads the recorded mapping, not the edited one.'
+            );
+            Assert.areEqual(
+                ImportTemplateService.normalizedRule(ImportTemplateService.RULE_EMAIL),
+                ran.Matching_Rule__c,
+                'And the recorded rule.'
+            );
+            ImportProcessorBatch committing = new ImportProcessorBatch(batch.Id, false);
+            committing.execute(null, ImportTestDataFactory.reload(batch.Id));
+
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE MailingCity = 'Portland'],
+                'Every person got the city the preview showed.'
+            );
+        }
+    }
+
+    /** A batch previewed before the copy was kept runs under the template as it stands. */
+    @IsTest
+    static void aBatchWithNoRecordedTemplateRunsUnderTheTemplate() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = newTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            Test.startTest();
+            Import_Template__c ran = ImportBatchService.templateFor(batch);
+            Test.stopTest();
+            Assert.areEqual(template.Id, ran.Id, 'The template itself.');
+            Assert.areEqual(template.Column_Mapping_JSON__c, ran.Column_Mapping_JSON__c);
+        }
+    }
+
     @IsTest
     static void refusesAMappingThatIdentifiesNobody() {
         System.runAs(TestUsers.admin()) {
