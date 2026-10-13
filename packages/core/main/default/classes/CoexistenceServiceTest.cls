@@ -5,7 +5,7 @@
  * proposal, the confirmation, the refusal to overwrite a choice already made, and who is
  * allowed to make one.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CoexistenceService')
 private class CoexistenceServiceTest {
     @IsTest
     static void modeIsNullUntilSomebodyConfirmsOne() {

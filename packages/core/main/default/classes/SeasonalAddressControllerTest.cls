@@ -5,7 +5,7 @@
  * The permission is the point of most of these. The run itself reads and writes in system mode
  * (ADR-0027), so the check here is where the authorization for that actually happens.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SeasonalAddressController')
 private class SeasonalAddressControllerTest {
     /**
      * The permission has to be committed before the test methods run, which is what @TestSetup

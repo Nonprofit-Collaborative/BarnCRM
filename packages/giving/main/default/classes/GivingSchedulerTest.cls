@@ -2,7 +2,7 @@
  * Tests for the three nightly jobs and for the schedule an administrator starts from the
  * Nightly Jobs page of the settings console (ADR-0038).
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingScheduler')
 private class GivingSchedulerTest {
     @IsTest
     static void schedulesAllThreeNightlyJobs() {

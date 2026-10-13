@@ -2,7 +2,7 @@
  * Household upkeep in the flexible membership mode: every path a membership can take.
  * Canonical model R-H11 and R-H12, plan Section 9.4.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMemberTriggerHandler')
 private class HouseholdMemberTriggerHandlerTest {
     private static Account household;
     private static Contact john;

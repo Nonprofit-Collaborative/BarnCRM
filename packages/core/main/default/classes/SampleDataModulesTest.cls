@@ -6,7 +6,7 @@
  * assert what Core does with them: it starts the first one, it starts the one after a named
  * module, and it asks each of them for its own count and its own removal.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataModules')
 private class SampleDataModulesTest {
     private class StubModule implements SampleDataModule {
         private final String name;

@@ -4,7 +4,7 @@
  * that household membership follows too, and that no household is tidied away by a merge,
  * because what was credited to it would lose its household.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ContactTriggerHandler')
 private class ContactMergeTest {
     private static Id householdOf(Id contactId) {
         return [SELECT AccountId FROM Contact WHERE Id = :contactId].AccountId;

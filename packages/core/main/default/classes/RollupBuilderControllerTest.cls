@@ -3,7 +3,7 @@
  * so organizations count their child organizations (`ParentId`) into Account fields BarnCRM ships,
  * which the BarnCRM Admin permission set lets Maria edit.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupBuilderController')
 private class RollupBuilderControllerTest {
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });

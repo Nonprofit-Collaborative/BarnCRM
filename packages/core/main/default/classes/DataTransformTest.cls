@@ -3,7 +3,7 @@
  * step is refused on save and skipped on read, nothing is read as a pattern, and a large
  * file's worth of values changes inside one transaction.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataTransform')
 private class DataTransformTest {
     private static DataTransform.Step step(String op) {
         return new DataTransform.Step(op);

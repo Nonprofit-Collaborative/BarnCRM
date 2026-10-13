@@ -4,7 +4,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FindSummary')
 private class FindSummaryTest {
     private static String query(Map<String, Object> aggregate) {
         return JSON.serialize(

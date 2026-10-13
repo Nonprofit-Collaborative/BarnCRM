@@ -10,7 +10,7 @@
  * It runs the real engine over the real shipped definitions rather than definitions the test
  * builds, because the thing under test is the filter document those rows carry.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupService, ApexClass:GiftService')
 private class GiftRollupRefundTest {
     private static final String KEY_TOTAL = 'Contact_Total_Giving';
     private static final String KEY_COUNT = 'Contact_Gift_Count';

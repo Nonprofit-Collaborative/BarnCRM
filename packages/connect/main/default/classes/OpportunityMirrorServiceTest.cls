@@ -7,7 +7,7 @@
  * Opportunity does not exist; on such an org every test checks that the mirror did nothing and
  * stops (R-OM1).
  */
-@IsTest
+@IsTest(testFor='ApexClass:OpportunityMirrorService')
 private class OpportunityMirrorServiceTest {
     private static final String LOG_CONTEXT = 'Opportunity mirror';
     // detection-only: read by name so this class compiles where Opportunity does not exist

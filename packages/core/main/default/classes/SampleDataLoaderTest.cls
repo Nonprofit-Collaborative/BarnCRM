@@ -8,7 +8,7 @@
  * context runs only the first enqueued job. One test still enqueues the first queueable
  * inside Test.startTest and Test.stopTest and asserts stage one's effects only.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataLoader')
 private class SampleDataLoaderTest {
     /**
      * Builds a minimal but structurally faithful sample data JSON string: householdCount

@@ -4,7 +4,7 @@
  * recently changed (R-IT9), organizations have a rule of their own and are searched only among
  * organizations (R-IT2), and a chosen matching field must be one describe offers (R-IT8).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportMatcher, ApexClass:ImportTemplateService')
 private class ImportMatchingRulesTest {
     @TestSetup
     static void setUp() {

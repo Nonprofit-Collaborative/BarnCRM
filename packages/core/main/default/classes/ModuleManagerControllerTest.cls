@@ -1,7 +1,7 @@
 /**
  * The Module Manager's Apex surface: Maria reads and switches, David only reads (C-24).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ModuleManagerController')
 private class ModuleManagerControllerTest {
     @TestSetup
     static void grantPermission() {

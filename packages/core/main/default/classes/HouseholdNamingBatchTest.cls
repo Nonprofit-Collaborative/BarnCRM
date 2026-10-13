@@ -1,7 +1,7 @@
 /**
  * The recompute Maria starts after she changes a naming pattern.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdNamingBatch')
 private class HouseholdNamingBatchTest {
     @IsTest
     static void everyHouseholdIsRenamedExceptTheOnesWordedByHand() {

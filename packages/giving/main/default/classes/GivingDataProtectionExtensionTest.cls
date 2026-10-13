@@ -3,7 +3,7 @@
  * extension seam, and its everyday records are not (canonical model R-IT14).
  */
 // runs-as: deploying user (pure logic: resolves the extension seam and reads describe, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:GivingDataProtectionExtension')
 private class GivingDataProtectionExtensionTest {
     @IsTest
     static void receiptsAndTheAcknowledgmentLedgerAreProtected() {

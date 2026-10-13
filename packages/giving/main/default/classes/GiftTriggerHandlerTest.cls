@@ -3,7 +3,7 @@
  * arrives by itself, a gift with no date is today's gift, a receipted gift stops changing, and
  * a gift with no designation still lands in a fund.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftTriggerHandler')
 private class GiftTriggerHandlerTest {
     @TestSetup
     static void makeData() {

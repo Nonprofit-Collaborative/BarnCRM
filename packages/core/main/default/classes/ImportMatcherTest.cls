@@ -2,7 +2,7 @@
  * Matching: each rule finds what it should, is bulk (one query per key set), and answers
  * "nothing" rather than throwing where the org cannot support the rule.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportMatcher')
 private class ImportMatcherTest {
     @TestSetup
     static void setUp() {

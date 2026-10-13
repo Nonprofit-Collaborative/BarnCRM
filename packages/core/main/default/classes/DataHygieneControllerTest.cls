@@ -5,7 +5,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataHygieneController')
 private class DataHygieneControllerTest {
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });

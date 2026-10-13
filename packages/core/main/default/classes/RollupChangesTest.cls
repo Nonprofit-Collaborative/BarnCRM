@@ -4,7 +4,7 @@
  * (`ParentId`) and affiliations up to an organization or a person's household; the giving cases
  * are in Giving's regression suite.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupChanges')
 private class RollupChangesTest {
     private static Account organization(String name) {
         return new Account(

@@ -2,7 +2,7 @@
  * Automatic household soft credits, in both membership modes, at bulk, and through every path a
  * gift can take (feature G-08).
  */
-@IsTest
+@IsTest(testFor='ApexClass:SoftCreditService')
 private class SoftCreditServiceTest {
     @IsTest
     static void creditsTheOtherHouseholdMemberInContactMode() {

@@ -10,7 +10,7 @@
  * the one afternoon Maria is given the override permission in Setup to correct a receipt that
  * was issued against the wrong donor, and finds that BarnCRM wrote down what she did.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftReceiptLockHandler')
 private class GiftReceiptLockHandlerTest {
     private static final String OVERRIDE_PERMISSION = 'Override_Receipt_Lock';
     private static final String RECEIPT_NUMBER = 'R-2026-000042';

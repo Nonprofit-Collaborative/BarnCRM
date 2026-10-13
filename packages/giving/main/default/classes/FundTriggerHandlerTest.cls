@@ -2,7 +2,7 @@
  * At most one fund is the default, and Maria never has to remember to untick the old one
  * (R-F1).
  */
-@IsTest
+@IsTest(testFor='ApexClass:FundTriggerHandler')
 private class FundTriggerHandlerTest {
     @IsTest
     static void markingANewDefaultClearsTheOldOne() {

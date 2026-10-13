@@ -13,7 +13,7 @@
  * up too. The stricter promise, totals right before the save returns, is
  * `theTotalsAreRightInTheSameTransaction` below, on the instant path.
  */
-@IsTest
+@IsTest(critical=true)
 private class GiftRealTimeRollupTest {
     private static final Set<String> GIVING_SOURCES = new Set<String>{
         'Gift__c',

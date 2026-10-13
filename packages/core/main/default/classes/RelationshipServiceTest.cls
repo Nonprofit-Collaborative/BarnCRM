@@ -6,7 +6,7 @@
  * assertion here is unverified. They are written to the same standard as if they had run, and
  * the first person with a scratch org should run them before trusting the feature.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RelationshipService')
 private class RelationshipServiceTest {
     @IsTest
     static void createsTheOtherSideWhenARelationshipIsSaved() {

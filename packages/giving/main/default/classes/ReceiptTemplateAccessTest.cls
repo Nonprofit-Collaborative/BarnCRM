@@ -9,7 +9,7 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptTemplateService, ApexClass:ReceiptController')
 private class ReceiptTemplateAccessTest {
     @IsTest
     static void theReceiptsPageReadsTheLettersAndWritesNothing() {

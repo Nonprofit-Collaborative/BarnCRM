@@ -3,7 +3,7 @@
  * platform calls duplicates is the org's own rules' business, so only one test touches the
  * matcher, and it says what it expects under whichever rules the org has switched on.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DuplicateService')
 private class DuplicateServiceTest {
     private static Id fakeContactId(Integer n) {
         return Id.valueOf('003' + String.valueOf(n).leftPad(12, '0'));

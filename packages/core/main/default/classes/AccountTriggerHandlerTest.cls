@@ -1,7 +1,7 @@
 /**
  * The household upkeep that happens when a household itself is saved or changed.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AccountTriggerHandler')
 private class AccountTriggerHandlerTest {
     @IsTest
     static void aHouseholdSavedWithNoNameGetsAPlaceholder() {

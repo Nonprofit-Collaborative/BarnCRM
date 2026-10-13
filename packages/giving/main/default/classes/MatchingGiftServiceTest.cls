@@ -1,7 +1,7 @@
 /**
  * Linking an employer's gift to the employee's gift that earned it (feature G-10).
  */
-@IsTest
+@IsTest(testFor='ApexClass:MatchingGiftService')
 private class MatchingGiftServiceTest {
     @IsTest
     static void linksBothSidesAndCreditsTheEmployee() {

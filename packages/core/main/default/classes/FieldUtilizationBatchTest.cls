@@ -6,7 +6,7 @@
  * counts and writes prove what that permission set grants. Duplicate Dismissal has a single
  * countable field, so a run over it fits one test chunk whatever the org's other fields are.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FieldUtilizationBatch')
 private class FieldUtilizationBatchTest {
     private static final String DISMISSAL = Duplicate_Dismissal__c.SObjectType.getDescribe(
             SObjectDescribeOptions.DEFERRED

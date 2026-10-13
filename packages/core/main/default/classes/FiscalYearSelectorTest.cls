@@ -5,7 +5,7 @@
  * real and injected everywhere else. The BarnCRM side is deliberately the same call the
  * rollup engine makes, which is what the mismatch finding depends on.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FiscalYearSelector')
 private class FiscalYearSelectorTest {
     @IsTest
     static void theOrgFiscalYearIsAMonthThePlatformKnows() {

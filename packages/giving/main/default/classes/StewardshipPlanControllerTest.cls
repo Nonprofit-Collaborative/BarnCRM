@@ -4,7 +4,7 @@
  * These tests have not been executed against an org: none was reachable from the environment they
  * were written in. They are written to the rules in canonical model Sections 25I to 25K.
  */
-@IsTest
+@IsTest(testFor='ApexClass:StewardshipPlanController')
 private class StewardshipPlanControllerTest {
     private static Stewardship_Plan_Template__c template(String name, String key, Boolean active) {
         Stewardship_Plan_Template__c created = new Stewardship_Plan_Template__c(

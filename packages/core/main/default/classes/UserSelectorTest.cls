@@ -1,7 +1,7 @@
 /**
  * Tests for UserSelector: the search box behind "Find a person" on the Access page.
  */
-@IsTest
+@IsTest(testFor='ApexClass:UserSelector')
 private class UserSelectorTest {
     /**
      * Inserts one active user.

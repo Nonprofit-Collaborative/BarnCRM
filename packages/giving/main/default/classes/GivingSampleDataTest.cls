@@ -8,7 +8,7 @@
  * are created here the way Core's loader creates them: flagged as sample data and carrying
  * the generator key the payload names them by.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingSampleData')
 private class GivingSampleDataTest {
     private static final String PERSON_KEY = 'H001-1';
     private static final String SECOND_PERSON_KEY = 'H002-1';

@@ -3,7 +3,7 @@
  * on get their Campaigns in one run, and the second pass puts a child under a parent whose
  * Campaign was made after it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CampaignSyncBatch')
 private class CampaignSyncBatchTest {
     @TestSetup
     static void setup() {

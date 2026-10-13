@@ -1,7 +1,7 @@
 /**
  * The household upkeep that happens when a person is saved, changed, deleted, or restored.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ContactTriggerHandler')
 private class ContactTriggerHandlerTest {
     @IsTest
     static void changingASurnameRenamesTheHousehold() {

@@ -3,7 +3,7 @@
  * The posting rules themselves are tested in `GiftBatchServiceTest`; this class covers what the
  * grid sends and what it is sent back.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftBatchController')
 private class GiftBatchControllerTest {
     private static User david() {
         return TestDataFactory.createUser(

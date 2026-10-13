@@ -3,7 +3,7 @@
  * (R-IT2, R-IT8, R-IT9): a file value fills only a row's blanks, beats the template's default,
  * cannot make every row one person, and the wizard's choices are saved on the template.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportMapping, ApexClass:ImportController')
 private class ImportFileValuesTest {
     @TestSetup
     static void setUp() {

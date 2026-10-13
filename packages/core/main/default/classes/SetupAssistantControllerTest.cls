@@ -9,7 +9,7 @@
  * The permission the assistant checks is granted in setup, so the saving tests assert the
  * saving path itself, and David's refusal is asserted once, under `System.runAs`.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SetupAssistantController')
 private class SetupAssistantControllerTest {
     @TestSetup
     static void grantPermission() {

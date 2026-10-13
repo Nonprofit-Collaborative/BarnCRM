@@ -4,7 +4,7 @@
  * the Core_SampleData_ErrorInvalidData label rather than a null dereference deeper in.
  */
 // runs-as: deploying user (pure logic: parses a sample data payload, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataSet')
 private class SampleDataSetTest {
     private static Map<String, Object> validMember() {
         Map<String, Object> member = new Map<String, Object>();

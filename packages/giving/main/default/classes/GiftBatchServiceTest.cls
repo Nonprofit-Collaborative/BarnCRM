@@ -5,7 +5,7 @@
  * The Tuesday mail: a check from Ana Garcia, a check from the Riverside Foundation, and a
  * deposit slip that says how much they came to.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftBatchService')
 private class GiftBatchServiceTest {
     private static User david() {
         return TestDataFactory.createUser(

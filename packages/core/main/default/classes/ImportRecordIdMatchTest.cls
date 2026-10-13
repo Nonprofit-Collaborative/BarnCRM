@@ -5,7 +5,7 @@
  * or is not found rejects the row and creates nothing (R-IT10), and a file marked Match only
  * rejects every row that matches nobody (R-IB15).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor, ApexClass:ImportMapping')
 private class ImportRecordIdMatchTest {
     @TestSetup
     static void setUp() {

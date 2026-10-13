@@ -5,7 +5,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkDeleteController')
 private class BulkDeleteControllerTest {
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{

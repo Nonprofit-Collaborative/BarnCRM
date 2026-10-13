@@ -3,7 +3,7 @@
  * user write access to it. The write therefore runs in system mode and the Manage BarnCRM
  * Settings custom permission is the gate. These tests hold that gate honest.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SettingsWriter')
 private class SettingsWriterTest {
     @TestSetup
     static void makeData() {

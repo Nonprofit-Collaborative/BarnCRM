@@ -3,7 +3,7 @@
  * the same rows sharing one query, and broken definitions refused one by one (rollup proposal S5).
  */
 // runs-as: deploying user (pure logic: plans rollup definitions built in memory, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:RollupPlanner')
 private class RollupPlannerTest {
     private static Rollup_Definition__c fromChildren(
         String aggregate,

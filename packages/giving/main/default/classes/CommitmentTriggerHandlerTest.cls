@@ -3,7 +3,7 @@
  * derived from the donor, a schedule change rebuilds the unpaid payments, and a commitment
  * or a payment that has been paid cannot be deleted.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CommitmentTriggerHandler')
 private class CommitmentTriggerHandlerTest {
     /**
      * A gift saves only when there is a default fund to allocate it to (R-GA2).

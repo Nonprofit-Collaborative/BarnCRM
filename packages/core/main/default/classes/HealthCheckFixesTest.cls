@@ -9,7 +9,7 @@
  * org it runs in happens to have. Import templates are the one exception: their shipped rows
  * are read as shipped, and Core ships two, which the test says before it relies on them.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckService, ApexClass:HealthCheckController')
 private class HealthCheckFixesTest {
     private static final String TEST_JOB_NAME = 'BarnCRM Rollups (HealthCheckFixesTest)';
 

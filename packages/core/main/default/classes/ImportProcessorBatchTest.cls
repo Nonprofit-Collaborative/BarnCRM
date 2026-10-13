@@ -2,7 +2,7 @@
  * The Batch Apex wrapper: a whole run end to end, and the promise that a chunk which dies
  * does not take the run with it.
  */
-@IsTest
+@IsTest(critical=true)
 private class ImportProcessorBatchTest {
     @TestSetup
     static void setUp() {

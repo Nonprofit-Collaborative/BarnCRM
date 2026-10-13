@@ -3,7 +3,7 @@
  * delete (C-24). No real module is needed: Volunteers is made present by the console row it
  * would ship (ADR-0017), and its automation is a test handler on Contact.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ModuleManagerService')
 private class ModuleManagerServiceTest {
     private static final String MODULE = 'Volunteers';
 

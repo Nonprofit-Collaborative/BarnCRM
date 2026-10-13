@@ -3,7 +3,7 @@
  * that refuses a mapping which identifies nobody.
  */
 // runs-as: deploying user (pure logic: parses and checks a mapping document, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:ImportMapping')
 private class ImportMappingTest {
     @IsTest
     static void parsesAMappingDocument() {

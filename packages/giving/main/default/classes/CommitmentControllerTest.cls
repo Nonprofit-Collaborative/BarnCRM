@@ -1,7 +1,7 @@
 /**
  * Tests for the surface the commitment schedule preview component calls.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CommitmentController')
 private class CommitmentControllerTest {
     private static Contact donor() {
         Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');

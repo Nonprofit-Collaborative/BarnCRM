@@ -17,7 +17,7 @@
  * what the third test asserts about what another user can see is the platform behaviour that a
  * real org has to confirm.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptWriter')
 private class ReceiptFileAccessTest {
     private static final Integer YEAR = 2026;
 

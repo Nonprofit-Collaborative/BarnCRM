@@ -6,7 +6,7 @@
  * Runs as a minimal-profile user holding only BarnCRM Admin, since what describe answers is
  * that user's access.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportObjectSchema')
 private class ImportObjectSchemaTest {
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in

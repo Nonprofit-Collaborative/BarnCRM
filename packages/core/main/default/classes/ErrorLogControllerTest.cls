@@ -2,7 +2,7 @@
  * The Error Log tile: what it counts, what it lists, and what happens when Maria marks an entry
  * as seen.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ErrorLogController')
 private class ErrorLogControllerTest {
     @IsTest
     static void theTileCountsWhatIsWaitingAndListsTheMostRecent() {

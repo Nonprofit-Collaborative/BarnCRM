@@ -7,7 +7,7 @@
  * the DML statement counter, which stays at zero on this path. The invariant being asserted is
  * unchanged: however many failures go in, one call goes out.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ErrorLogger')
 private class ErrorLoggerTest {
     private class SampleException extends Exception {
     }

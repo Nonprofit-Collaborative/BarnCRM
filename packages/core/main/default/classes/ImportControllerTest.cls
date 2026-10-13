@@ -2,7 +2,7 @@
  * The controller: the permission gate on everything that changes anything, and the shapes the
  * two screens are built against.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportController')
 private class ImportControllerTest {
     @TestSetup
     static void setUp() {

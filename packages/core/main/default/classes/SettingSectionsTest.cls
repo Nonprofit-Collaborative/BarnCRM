@@ -1,5 +1,5 @@
 /** One vocabulary of section names, so a setup step and a shipped row can agree on one. */
-@IsTest
+@IsTest(testFor='ApexClass:SettingSections')
 private class SettingSectionsTest {
     @IsTest
     static void namesEverySectionTheConsoleGroupsBy() {

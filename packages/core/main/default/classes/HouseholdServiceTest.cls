@@ -2,7 +2,7 @@
  * Membership in both modes: creation, counting, moving, and tidying up.
  * Canonical model R-H1, R-H2, R-H3, R-H11, R-H12.
  */
-@IsTest
+@IsTest(critical=true)
 private class HouseholdServiceTest {
     @IsTest
     static void aNewPersonWithNoHouseholdGetsOne() {

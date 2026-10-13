@@ -4,7 +4,7 @@
  * Test.stopTest after a retry, so the processor a retry requests never runs and the entries stay
  * where the retry put them.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupAttentionController')
 private class RollupAttentionControllerTest {
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });

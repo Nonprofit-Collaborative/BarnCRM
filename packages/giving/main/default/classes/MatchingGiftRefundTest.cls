@@ -11,7 +11,7 @@
  * Like `SoftCreditRefundTest`, the case that turns on a number a fundraiser reads runs the real
  * refund path and the real shipped rollup rows rather than definitions the test builds.
  */
-@IsTest
+@IsTest(testFor='ApexClass:MatchingGiftService, ApexClass:GiftService')
 private class MatchingGiftRefundTest {
     private static final String KEY_TOTAL = 'Contact_Total_Soft_Credits';
     private static final String KEY_COUNT = 'Contact_Soft_Credit_Count';

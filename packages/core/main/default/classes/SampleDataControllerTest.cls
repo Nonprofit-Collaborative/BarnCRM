@@ -8,7 +8,7 @@
  * permission and the permission set that grants it are owned by another feature, so the
  * running user cannot be assumed to hold it in every org shape.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataController')
 private class SampleDataControllerTest {
     private static String buildJson(Integer householdCount, Integer membersPerHousehold) {
         List<Object> households = new List<Object>();

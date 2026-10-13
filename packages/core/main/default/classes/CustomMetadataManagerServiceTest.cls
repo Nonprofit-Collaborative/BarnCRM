@@ -5,7 +5,7 @@
  * Metadata.Operations cannot deploy in a test, so the deployer is replaced by one that keeps
  * the container it was given; the tests read what would have been deployed.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CustomMetadataManagerService')
 private class CustomMetadataManagerServiceTest {
     private static final String TYPE_NAME = 'Relationship_Type__mdt';
     private static final Id FAKE_JOB = FakeIds.ofPrefix('0Af', 1);

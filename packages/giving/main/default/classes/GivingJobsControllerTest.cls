@@ -4,7 +4,7 @@
  * The three states an administrator can be in are what is asserted here: nothing scheduled,
  * scheduled and running, and a user who may look but not change the schedule.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingJobsController')
 private class GivingJobsControllerTest {
     private static final String PERMISSION_SET = 'GivingNightlyJobsTestAccess';
     private static final String TOP_UP = 'topUp';

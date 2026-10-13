@@ -6,7 +6,7 @@
  * The donors are owned by the integration user, because on an org with private contacts and
  * accounts it finds only donors it can see; the admin guide tells Maria to share them with it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:InboundGift, ApexClass:InboundGiftResource, ApexClass:InboundGiftAction')
 private class InboundGiftAccessTest {
     private static final String EMAIL = 'luis.garcia.access@example.org';
     private static final String BUILDING_CODE = '4100';

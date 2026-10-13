@@ -2,7 +2,7 @@
  * What the household screens ask for: the naming preview, the members panel, the move
  * action, and the recompute.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdController')
 private class HouseholdControllerTest {
     @IsTest
     static void thePreviewShowsFiveSampleHouseholds() {

@@ -4,7 +4,7 @@
  * an upgrade changes nothing, the role follows when the platform has finished preparing it,
  * and nothing here ever breaks an install.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CorePostInstall')
 private class CorePostInstallTest {
     private static final String ROLLUP_CONTEXT = 'CorePostInstall.ensureRollupDefaults';
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';

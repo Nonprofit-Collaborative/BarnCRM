@@ -5,7 +5,7 @@
  * to name an active rule, so a test that needs one stops, with an assertion, in an org that
  * has no active rule for its object.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DuplicateController')
 private class DuplicateControllerTest {
     @TestSetup
     static void grantPermission() {

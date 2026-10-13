@@ -4,7 +4,7 @@
  * Core holds no giving objects, so the run here counts organizations up to their parent account
  * (`ParentId`), as `RollupEngineTest` does.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupScheduler')
 private class RollupSchedulerTest {
     private static Rollup_Definition__c childCount(
         String key,

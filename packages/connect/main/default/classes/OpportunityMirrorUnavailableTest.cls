@@ -5,7 +5,7 @@
  * tests that need Opportunity: gifts save, nothing is linked, nothing is logged, no run starts,
  * and the page says the mirror is unavailable (R-OM1).
  */
-@IsTest
+@IsTest(testFor='ApexClass:OpportunityMirrorService, ApexClass:OpportunityMirrorController')
 private class OpportunityMirrorUnavailableTest {
     private static final Set<String> MIRROR_CONTEXTS = new Set<String>{
         OpportunityMirrorService.CONTEXT,

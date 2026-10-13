@@ -2,7 +2,7 @@
  * Tests for AccessController: what the Access page gets back when Maria uses it, and
  * what David gets back when he opens it without the Manage BarnCRM Settings permission.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AccessController')
 private class AccessControllerTest {
     private static final String PROGRAM_ROLE = 'Program_Staff';
 

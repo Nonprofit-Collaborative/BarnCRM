@@ -2,7 +2,7 @@
  * The import journal: a page per chunk, split rather than shortened, read back as written,
  * and never the reason an import fails (canonical model Section 17A).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportJournalService')
 private class ImportJournalServiceTest {
     private static Import_Batch__c newBatch() {
         TestDataFactory.defaultSettings();

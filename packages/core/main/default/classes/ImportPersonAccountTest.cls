@@ -9,7 +9,7 @@
  * fields are named only as text and read through dynamic SOQL, so this class compiles on
  * that shape too (plan Section 4.2).
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor, ApexClass:ImportMatcher')
 private class ImportPersonAccountTest {
     private static Import_Template__c template;
     private static Import_Batch__c batch;

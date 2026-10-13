@@ -5,7 +5,7 @@
  * registered, so these tests are about a gate, not about a preference: a value that is not one of
  * the two keys ADR-0016 names must be refused **before** any class is resolved or constructed.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptRendererFactory')
 private class ReceiptRendererFactoryTest {
     private static final String PROBE_CLASS = 'ReceiptTestDataFactory.ConstructionProbe';
 

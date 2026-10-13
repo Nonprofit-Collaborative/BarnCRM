@@ -2,7 +2,7 @@
  * The soft credit and tribute an imported gift can carry (R-GI5, R-GI6), and what an undo of
  * a gift import keeps (R-GI9). Run as Maria, who holds the admin permission sets.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftImportCredits')
 private class GiftImportCreditsTest {
     private static Import_Template__c template;
     private static Import_Batch__c batch;

@@ -1,7 +1,7 @@
 /**
  * Tribute rules and the notification record (feature G-09).
  */
-@IsTest
+@IsTest(testFor='ApexClass:TributeService')
 private class TributeServiceTest {
     @IsTest
     static void savesAMemorialWithATypedHonoreeName() {

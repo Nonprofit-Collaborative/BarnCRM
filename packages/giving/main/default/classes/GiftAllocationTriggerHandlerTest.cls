@@ -2,7 +2,7 @@
  * The allocations of a gift always total the gift, whichever way a person tries to change
  * them, and a percent and an amount always agree (R-GA1, R-GA2).
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftAllocationTriggerHandler')
 private class GiftAllocationTriggerHandlerTest {
     @TestSetup
     static void makeData() {

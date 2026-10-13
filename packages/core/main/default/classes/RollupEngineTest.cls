@@ -4,7 +4,7 @@
  * (`ParentId`) and people up to households, which exercises the same code the giving totals run.
  * The giving totals themselves are judged by the regression suite in Giving.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine')
 private class RollupEngineTest {
     private static Id organizationType() {
         return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()

@@ -4,7 +4,7 @@
  * The placement tests work on records in memory, because that is exactly how the trigger handler
  * uses the service: it mutates the record in front of the save rather than writing a second time.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DonorLevelService')
 private class DonorLevelServiceTest {
     private static final String FRIEND = 'Friend';
     private static final String SUSTAINER = 'Sustainer';

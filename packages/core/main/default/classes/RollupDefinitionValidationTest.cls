@@ -5,7 +5,7 @@
  *
  * These tests have not been executed: no Salesforce org exists in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupDefinitionValidationHandler, ApexClass:RollupController')
 private class RollupDefinitionValidationTest {
     private static Rollup_Definition__c definition(
         String key,

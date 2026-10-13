@@ -8,7 +8,7 @@
  * It runs the real engine over the real shipped definitions, because the thing under test is
  * that the survivor's total includes what the merge moved onto it.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupService')
 private class GivingContactMergeTest {
     @IsTest
     static void theSurvivorGetsTheOtherPersonsGiftsCreditsAndTotal() {

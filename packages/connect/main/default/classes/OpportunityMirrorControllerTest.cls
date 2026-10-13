@@ -2,7 +2,7 @@
  * The Opportunity mirror page (X-01, R-OM8, R-OM11): what the reconciliation shows Maria, the
  * refusals given before anything starts, and the nightly schedule.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OpportunityMirrorController')
 private class OpportunityMirrorControllerTest {
     private static final Date FROM_DATE = Date.newInstance(2026, 9, 1);
     private static final Date TO_DATE = Date.newInstance(2026, 9, 30);

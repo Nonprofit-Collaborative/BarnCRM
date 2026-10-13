@@ -2,7 +2,7 @@
  * The Posting card on a gift's page (G-20, ADR-0053): what it says about a gift, and the unpost
  * it carries for Jen.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GiftPostingController')
 private class GiftPostingControllerTest {
     private static User jen() {
         return TestDataFactory.createUser(

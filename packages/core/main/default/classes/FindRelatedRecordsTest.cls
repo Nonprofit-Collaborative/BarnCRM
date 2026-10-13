@@ -5,7 +5,7 @@
  *
  * No org has run these yet; they are written against the behaviour the classes document.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FindRelatedRecords')
 private class FindRelatedRecordsTest {
     private static final String UNDO_ONLY = '{"version": 1, "conditions": [{"id": 1, "field": "Phase__c", "operator": "equals", "value": "Undo"}]}';
 

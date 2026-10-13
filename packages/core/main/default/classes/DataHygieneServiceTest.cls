@@ -6,7 +6,7 @@
  * No org has run these yet; they are written against the behaviour the classes document. Every
  * test states its membership mode and an org shape, so none depends on Person Accounts.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataHygieneService')
 private class DataHygieneServiceTest {
     private static User maria() {
         return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });

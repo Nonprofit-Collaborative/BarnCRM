@@ -3,7 +3,7 @@
  * Core holds no giving objects, so the totals here roll organizations up to their parent account
  * (`ParentId`), which runs the same engine the giving totals do.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupQueue')
 private class RollupQueueTest {
     private static Id organizationType() {
         return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()

@@ -4,7 +4,7 @@
  * key alone finds a person only when the row gives no first name; otherwise the person is
  * created, never taken for somebody else and renamed, even where one record holds the key.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportMatcher')
 private class ImportFirstNameMatchTest {
     @TestSetup
     static void setUp() {

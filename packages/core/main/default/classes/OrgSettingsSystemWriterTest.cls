@@ -1,4 +1,4 @@
-@IsTest
+@IsTest(testFor='ApexClass:OrgSettingsSystemWriter')
 private class OrgSettingsSystemWriterTest {
     private static BarnCRM_Settings__c stored() {
         List<BarnCRM_Settings__c> rows = [

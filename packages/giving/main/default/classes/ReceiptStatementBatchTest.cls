@@ -1,7 +1,7 @@
 /**
  * The year end run: one statement per donor, resumable, and reconciled when it closes.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ReceiptStatementBatch')
 private class ReceiptStatementBatchTest {
     private static final Integer YEAR = 2026;
 

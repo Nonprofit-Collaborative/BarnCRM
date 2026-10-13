@@ -3,7 +3,7 @@
  * rule refuses, the fields the package or the platform keeps, every Rollup Definition target,
  * and a household's name.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataProtectedFields')
 private class DataProtectedFieldsTest {
     private static String refusal(Schema.SObjectType type) {
         return DataProtectedFields.objectRefusal(type);

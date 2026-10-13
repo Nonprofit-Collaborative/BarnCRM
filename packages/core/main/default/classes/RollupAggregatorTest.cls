@@ -3,7 +3,7 @@
  * pass is tested end to end by `RollupEngineTest`.
  */
 // runs-as: deploying user (pure logic: tallies values in memory, no DML or SOQL)
-@IsTest
+@IsTest(testFor='ApexClass:RollupAggregator')
 private class RollupAggregatorTest {
     @IsTest
     static void laterAlternativesCountOnlyWhereEarlierOnesAreBlank() {

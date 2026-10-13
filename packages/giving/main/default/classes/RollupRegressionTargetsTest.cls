@@ -17,7 +17,7 @@
  * Slice S5 switched on the target filter and record freshness tests, and slice S7 the definition
  * freshness test, on BarnCRM's own engine, which slice S8 made the only one.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RollupEngine, ApexClass:RollupService')
 private class RollupRegressionTargetsTest {
     private static final Set<String> TOTAL_GIVING_KEYS = new Set<String>{
         GivingRollupTestData.HOUSEHOLD_TOTAL,

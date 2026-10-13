@@ -4,7 +4,7 @@
  * NOT EXECUTED. No Salesforce org exists in the environment these were written in, so every
  * assertion here is unverified.
  */
-@IsTest
+@IsTest(testFor='ApexClass:AffiliationDomain')
 private class AffiliationDomainTest {
     @IsTest
     static void refusesAnAffiliationWithNoPerson() {

@@ -2,7 +2,7 @@
  * The Campaign sync page (X-02, R-CS6): what it tells Maria, and the refusals Sync all appeals
  * gives before anything starts.
  */
-@IsTest
+@IsTest(testFor='ApexClass:CampaignSyncController')
 private class CampaignSyncControllerTest {
     private static void switchOn(Boolean enabled) {
         Connect_Settings__c settings = Connect_Settings__c.getOrgDefaults();

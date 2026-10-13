@@ -6,7 +6,7 @@
  * changes it, a person stored as an account is named by their person contact, and a hand
  * edit is refused. In contact mode the field stays the mark people set.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HouseholdMergeService, ApexClass:HouseholdService')
 private class HouseholdPrimaryContactTest {
     private static Account household(String name) {
         Account record = HouseholdTestDataFactory.newHousehold(name);

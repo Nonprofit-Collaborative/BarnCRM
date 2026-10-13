@@ -9,7 +9,7 @@
  * every org shape. Every test runs as a minimal-profile user holding only BarnCRM Admin, since
  * every read and save is in that user's own mode.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportObjectLoader')
 private class ImportObjectLoaderTest {
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in

@@ -1,5 +1,5 @@
 /** The address panel's server side: reading a record's addresses and changing which one is used. */
-@IsTest
+@IsTest(testFor='ApexClass:AddressController')
 private class AddressControllerTest {
     private static final String HOME_STREET = '812 Willow Lane';
     private static final String WINTER_STREET = '4120 East Camelback Road';

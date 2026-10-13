@@ -1,7 +1,7 @@
 /**
  * Tests for PermissionSetAssignmentSelector: who holds a role, and how many people do.
  */
-@IsTest
+@IsTest(testFor='ApexClass:PermissionSetAssignmentSelector')
 private class PermissionSetAssignmentSelectorTest {
     private static final String PROGRAM_ROLE = 'Program_Staff';
 
