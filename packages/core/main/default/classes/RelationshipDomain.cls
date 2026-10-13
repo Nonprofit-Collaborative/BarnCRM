@@ -34,7 +34,21 @@ public with sharing class RelationshipDomain {
             return;
         }
         for (Relationship__c record : records) {
-            record.Reciprocal_Type__c = RelationshipService.reciprocalOf(record.Type__c);
+            Relationship__c previous = previousById == null
+                ? null
+                : (Relationship__c) previousById.get(record.Id);
+            // Worked out when there is none yet or the type changed, and otherwise left as
+            // it is. A one-way mapping (Employer contact to Colleague) gives the other side a
+            // reciprocal the mapping would not give back, and recomputing it on every edit of
+            // that side would quietly retype the original.
+            Boolean typeChanged =
+                previous != null &&
+                (record.Type__c == null
+                    ? previous.Type__c != null
+                    : !record.Type__c.equals(previous.Type__c));
+            if (String.isBlank(record.Reciprocal_Type__c) || typeChanged) {
+                record.Reciprocal_Type__c = RelationshipService.reciprocalOf(record.Type__c);
+            }
             if (String.isBlank(record.Status__c)) {
                 record.Status__c = STATUS_CURRENT;
             }
@@ -42,9 +56,6 @@ public with sharing class RelationshipDomain {
                 record.Status__c = STATUS_FORMER;
                 continue;
             }
-            Relationship__c previous = previousById == null
-                ? null
-                : (Relationship__c) previousById.get(record.Id);
             if (previous != null && previous.End_Date__c != null) {
                 record.Status__c = STATUS_CURRENT;
             }

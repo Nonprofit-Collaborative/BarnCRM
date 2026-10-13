@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import AffiliationPanel from 'c/affiliationPanel';
 import getAffiliations from '@salesforce/apex/AffiliationController.getAffiliations';
 import makePrimary from '@salesforce/apex/AffiliationController.makePrimary';
+import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 
 jest.mock(
   '@salesforce/apex/AffiliationController.getAffiliations',
@@ -15,6 +16,15 @@ jest.mock(
 jest.mock('@salesforce/apex/AffiliationController.makePrimary', () => ({ default: jest.fn() }), {
   virtual: true
 });
+
+jest.mock(
+  '@salesforce/apex/AffiliationController.getCardContext',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn() }), { virtual: true });
 
@@ -161,6 +171,7 @@ describe('c-affiliation-panel', () => {
   it('fills in the person lookup on a person record and the organization lookup on an organization', async () => {
     const asContact = build('Contact');
     getAffiliations.emit([]);
+    getCardContext.emit({ ownerField: 'Contact__c', otherEndField: 'Organization__c' });
     await flush();
     asContact.shadowRoot.querySelector('[data-id="add-affiliation"]').click();
     await flush();
@@ -171,8 +182,11 @@ describe('c-affiliation-panel', () => {
     expect(fields[0]).toBe('Contact__c');
     expect(fields[1]).toBe('Organization__c');
 
+    // An organization with no affiliations yet: the server still says it is one, and the
+    // other end is a contact in an org that stores people as contacts.
     const asOrganization = build('Account');
-    getAffiliations.emit([FROM_THE_ORGANIZATION]);
+    getAffiliations.emit([]);
+    getCardContext.emit({ ownerField: 'Organization__c', otherEndField: 'Contact__c' });
     await flush();
     asOrganization.shadowRoot.querySelector('[data-id="add-affiliation"]').click();
     await flush();
@@ -180,6 +194,21 @@ describe('c-affiliation-panel', () => {
     fields = Array.from(asOrganization.shadowRoot.querySelectorAll('lightning-input-field')).map(
       (node) => node.fieldName
     );
+    expect(fields[0]).toBe('Organization__c');
+    expect(fields[1]).toBe('Contact__c');
+  });
+
+  it('fills in the person account lookups the server names in a person account org', async () => {
+    const asOrganization = build('Account');
+    getAffiliations.emit([FROM_THE_ORGANIZATION]);
+    getCardContext.emit({ ownerField: 'Organization__c', otherEndField: 'Person_Account__c' });
+    await flush();
+    asOrganization.shadowRoot.querySelector('[data-id="add-affiliation"]').click();
+    await flush();
+
+    const fields = Array.from(
+      asOrganization.shadowRoot.querySelectorAll('lightning-input-field')
+    ).map((node) => node.fieldName);
     expect(fields[0]).toBe('Organization__c');
     expect(fields[1]).toBe('Person_Account__c');
   });

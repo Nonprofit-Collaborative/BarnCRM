@@ -4,6 +4,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import getAffiliations from '@salesforce/apex/AffiliationController.getAffiliations';
 import makePrimary from '@salesforce/apex/AffiliationController.makePrimary';
+import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 
 import PANEL_TITLE from '@salesforce/label/c.Core_Affiliation_PanelTitle';
 import ADD_BUTTON from '@salesforce/label/c.Core_Affiliation_AddButton';
@@ -81,26 +82,29 @@ export default class AffiliationPanel extends LightningElement {
     return !this.hasAffiliations && !this.errorMessage;
   }
 
+  /**
+   * Which lookups a new affiliation fills in, decided by the server from the record itself:
+   * an organization with no affiliations yet is still an organization.
+   */
+  @wire(getCardContext, { recordId: '$recordId' })
+  cardContext;
+
   /** The lookup a new affiliation fills in for the record the card sits on. */
   get ownerFieldName() {
-    if (this.objectApiName === 'Contact') {
-      return 'Contact__c';
+    const context = this.cardContext && this.cardContext.data;
+    if (context) {
+      return context.ownerField;
     }
-    return this.isOrganizationRecord ? 'Organization__c' : 'Person_Account__c';
+    return this.objectApiName === 'Contact' ? 'Contact__c' : 'Organization__c';
   }
 
   /** The lookup for the other end of a new affiliation. */
   get otherEndFieldName() {
-    return this.ownerFieldName === 'Organization__c' ? 'Person_Account__c' : 'Organization__c';
-  }
-
-  /**
-   * Whether the record this card sits on is being read as an organization. Everything already
-   * on file is the evidence: if any affiliation names this record as its organization, this is
-   * an organization's card.
-   */
-  get isOrganizationRecord() {
-    return this.affiliations.some((affiliation) => affiliation.readFromOrganization);
+    const context = this.cardContext && this.cardContext.data;
+    if (context) {
+      return context.otherEndField;
+    }
+    return this.ownerFieldName === 'Organization__c' ? 'Contact__c' : 'Organization__c';
   }
 
   decorate(affiliation) {
