@@ -82,18 +82,12 @@ if ! bash scripts/org/deploy-packages.sh "$ALIAS"; then
   exit 1
 fi
 
-# A real install gives the installing administrator the admin roles, and the tests run as
-# that user in user mode, so they need the same roles here. "Duplicate" means the role is
-# already assigned, which is the normal case after the first run.
-for ps in BarnCRM_Admin Giving_Admin; do
-  sf org assign permset --name "$ps" --target-org "$ALIAS" --json > "${TMPDIR:-/tmp}/assign.json" || true
-  if jq -e '.result.failures[]? | select(.message | test("Duplicate") | not)' \
-    "${TMPDIR:-/tmp}/assign.json" > /dev/null; then
-    cat "${TMPDIR:-/tmp}/assign.json" >&2
-    post_status failure "Could not assign ${ps} on ${ALIAS}, so no test ran"
-    exit 1
-  fi
-done
+# WHY NO PERMISSION SET IS ASSIGNED. Every test runs inside System.runAs as a user that
+# TestUsers creates with the permission sets it needs (check-tests-run-as.py enforces it), so
+# the user running this script needs none of the BarnCRM, Giving or Connect permission sets.
+# The gate used to assign BarnCRM_Admin and Giving_Admin first, which hid any test that still
+# leaned on the running user's access; a subscriber or another administrator holds none of
+# them. Running without them makes the gate prove the suite is self-contained.
 
 # Run the test classes this commit holds, not every test class in the org. The test org is
 # shared: another branch's deploy can leave its own test classes there, and its permission sets

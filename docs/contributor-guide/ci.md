@@ -368,8 +368,9 @@ That last one is posted from your machine, not by a GitHub runner:
 scripts/org/run-org-tests.sh <org alias>
 ```
 
-It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, assigns
-`BarnCRM_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
+It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, runs every
+Apex test class in that commit's source (assigning no permission set to you first: see "Tests
+run as a user they create" below), and
 posts `Org tests (local)` on that commit: success only when every test passed, failure
 otherwise. It names the test classes rather than running every test in the org, because the
 test org is shared: another branch's deploy can leave its own test classes behind, and those
@@ -439,7 +440,7 @@ your own org for speed; the script is the final full run before merge, not the i
 From API version 67.0 a query or DML statement with no access mode runs in user mode, and
 that includes the plain `insert` and `[SELECT ...]` in a test class. A test that runs as
 whoever deploys or runs it passes only where that person already holds the BarnCRM
-permission sets. The gate above assigns them, so the gate alone never showed the problem; a
+permission sets. The gate above used to assign them, so the gate alone never showed the problem; a
 check-only deploy to a real sandbox, as an administrator without them, failed 565 of 1008
 Core tests ("fields being inaccessible", "No such column", "Record Type ID: this ID value
 isn't valid for the user", "You need the Manage BarnCRM Settings permission"). A subscriber
