@@ -9,6 +9,15 @@
         </template>
         <template lwc:if={attention}>
             <p data-id="waiting">{attention.waiting}</p>
+            <template lwc:if={canStart}>
+                <lightning-button
+                    class="slds-var-m-top_xx-small"
+                    data-id="start-now"
+                    label={labels.startNow}
+                    disabled={busy}
+                    onclick={handleStartNow}
+                ></lightning-button>
+            </template>
             <template lwc:if={showNightlyOff}>
                 <p class="slds-text-color_error" data-id="nightly-off">{labels.nightlyOff}</p>
             </template>

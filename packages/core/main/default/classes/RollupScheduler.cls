@@ -24,8 +24,13 @@ public with sharing class RollupScheduler implements Schedulable {
     /** Two in the morning, which is after the day's data entry and before the day's reporting. */
     private static final String NIGHTLY_CRON = '0 0 2 * * ?';
 
+    /**
+     * The nightly run, and a processor for Rollup Queue entries no save started one for
+     * (ROLLUPS-7), so a queued total never waits longer than a night.
+     */
     public void execute(SchedulableContext context) {
         RollupService.startNightlyRun();
+        RollupQueue.processPending();
     }
 
     /** Starts the nightly run, or does nothing when it is already scheduled. */

@@ -193,9 +193,34 @@ public without sharing class RollupQueue implements Queueable {
         }
         if (!failed.isEmpty()) {
             Database.update(failed, AccessLevel.SYSTEM_MODE);
+        }
+        // Retry also starts entries still Pending that no processor is coming for.
+        processPending();
+        return failed.size();
+    }
+
+    /**
+     * Starts a processor when Pending entries wait and none is queued (ROLLUPS-7). A save that
+     * could not queue a job (its allowance used, or automation paused) leaves its entries for the
+     * next save that does; the nightly run, the end of a pause and Retry call this so they never
+     * wait for one.
+     *
+     * @return true when Pending entries were found
+     */
+    public static Boolean processPending() {
+        Boolean pending =
+            [
+                SELECT Id
+                FROM Rollup_Queue__c
+                WHERE Status__c = :STATUS_PENDING
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ]
+            .size() > 0;
+        if (pending) {
             requestProcessor();
         }
-        return failed.size();
+        return pending;
     }
 
     private static void insertEntries(List<Rollup_Queue__c> entries) {
@@ -272,7 +297,9 @@ public without sharing class RollupQueue implements Queueable {
             );
         }
         drain.finished = true;
-        chainIfMoreDue(this.sliceSize);
+        // A run that finished doubles a halved slice back towards the default (ROLLUPS-11), so
+        // one heavy record does not leave the rest of the backlog draining one at a time.
+        chainIfMoreDue(Math.min(defaultSliceSize, this.sliceSize * 2));
     }
 
     /** What one run takes: the identifiers by target entity, and what becomes of each entry. */

@@ -46,8 +46,32 @@ public with sharing class RollupSelector {
         ];
     }
 
-    /** Every definition, read as the package, for the engine. */
+    /**
+     * The engine's read of every definition, kept for the rest of the transaction (ROLLUPS-5):
+     * one gift save used to read the definitions about six times, once per target entity and
+     * once per trigger. Every save or delete of a definition clears it (`RollupDefinitionTrigger`,
+     * whatever automation is switched off), so a definition saved earlier in a transaction is
+     * the one a later record save in it runs.
+     */
+    private static List<Rollup_Definition__c> cachedAll;
+
+    /** Forgets the cached definitions; the next engine read queries them again. */
+    public static void clearCache() {
+        cachedAll = null;
+    }
+
+    /**
+     * Every definition, read as the package, for the engine. Read once per transaction; each
+     * caller gets its own list, and no caller changes the records in it.
+     */
     public static List<Rollup_Definition__c> selectAll() {
+        if (cachedAll == null) {
+            cachedAll = queryAll();
+        }
+        return cachedAll.clone();
+    }
+
+    private static List<Rollup_Definition__c> queryAll() {
         return [
             SELECT
                 Id,

@@ -848,4 +848,44 @@
         <shortDescription>Fix button for the stopped digest finding.</shortDescription>
         <value>Open Error Log settings</value>
     </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueFailedTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: queued totals failed five times.</shortDescription>
+        <value>Some totals could not be saved</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueFailedDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: queued totals failed. {0} is the count.</shortDescription>
+        <value>{0} queued total updates failed five times and wait for you. The Error Log says why, often a validation rule or a record someone was editing. Fix the cause, then click Retry in Needs attention.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueStuckTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: queued totals have waited too long.</shortDescription>
+        <value>Totals are waiting longer than they should</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueStuckDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: queued totals waited. {0} count, {1} minutes.</shortDescription>
+        <value>{0} queued total updates have waited more than {1} minutes. They usually finish within a minute of the save. Click Start now in Needs attention to recalculate them now; the nightly run also picks them up.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RollupQueueFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fix button for the rollup queue findings.</shortDescription>
+        <value>Open Needs attention</value>
+    </labels>
 </CustomLabels>

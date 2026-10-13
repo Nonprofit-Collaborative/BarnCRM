@@ -896,4 +896,20 @@
         <shortDescription>Needs attention: no full run yet</shortDescription>
         <value>No full run yet.</value>
     </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_StartNow</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: button that starts the waiting records now</shortDescription>
+        <value>Start now</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_Started</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Needs attention: the waiting records were started</shortDescription>
+        <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
+    </labels>
 </CustomLabels>
