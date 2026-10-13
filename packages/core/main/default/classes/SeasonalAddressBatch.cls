@@ -48,7 +48,7 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
         try {
             Set<Id> ownerIds = new Set<Id>();
             for (Address__c address : scope) {
-                Id ownerId = SeasonalAddressService.ownerIdOf(address);
+                Id ownerId = AddressService.ownerIdOf(address);
                 if (ownerId != null) {
                     ownerIds.add(ownerId);
                 }

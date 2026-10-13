@@ -586,7 +586,8 @@ public with sharing class ImportRowProcessor {
                 Id recordType = recordTypeById.get(parsed);
                 Boolean rightKind = which == 0
                     ? recordType != null && recordType == organizationType
-                    : !personAccounts || personRecordTypeIds().contains(recordType);
+                    : !personAccounts ||
+                      OrgShapeDetector.personRecordTypeIds().contains(recordType);
                 if (!rightKind) {
                     item.error = wrongKind(which, given);
                 } else if (which == 0) {
@@ -1086,14 +1087,17 @@ public with sharing class ImportRowProcessor {
     ) {
         if (ImportTemplateService.RULE_EMAIL.equals(rule)) {
             return personAccounts
-                ? ImportMatcher.personAccountsByEmail(emailKeys, personRecordTypeIds())
+                ? ImportMatcher.personAccountsByEmail(
+                      emailKeys,
+                      OrgShapeDetector.personRecordTypeIds()
+                  )
                 : ImportMatcher.contactsByEmail(emailKeys);
         }
         if (ImportTemplateService.RULE_NAME_POSTAL.equals(rule)) {
             return personAccounts
                 ? ImportMatcher.personAccountsByNameAndPostalCode(
                       namePostalKeys,
-                      personRecordTypeIds()
+                      OrgShapeDetector.personRecordTypeIds()
                   )
                 : ImportMatcher.contactsByNameAndPostalCode(namePostalKeys);
         }
@@ -1102,7 +1106,7 @@ public with sharing class ImportRowProcessor {
             personAccounts ? Account.SObjectType : Contact.SObjectType,
             personMatchField,
             externalIds,
-            personAccounts ? personRecordTypeIds() : null
+            personAccounts ? OrgShapeDetector.personRecordTypeIds() : null
         );
     }
 
@@ -2396,7 +2400,7 @@ public with sharing class ImportRowProcessor {
         }
         List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
             probes,
-            personAccounts ? personRecordTypeIds() : null
+            personAccounts ? OrgShapeDetector.personRecordTypeIds() : null
         );
         if (found == null) {
             outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
@@ -2774,10 +2778,6 @@ public with sharing class ImportRowProcessor {
             .getRecordTypeInfosByDeveloperName()
             .get(developerName);
         return info == null || !info.isAvailable() ? null : info.getRecordTypeId();
-    }
-
-    private static Set<Id> personRecordTypeIds() {
-        return OrgShapeDetector.detect().personAccountRecordTypeIds;
     }
 
     /** A person type the running user can create with, never merely the first in the org. */

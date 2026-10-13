@@ -255,15 +255,10 @@ public with sharing class CoexistenceService {
      * type. Zero in any org without Person Accounts, because there is no such record type.
      */
     public static Integer countPeopleStoredAsAccounts() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        if (
-            shape == null ||
-            shape.personAccountRecordTypeIds == null ||
-            shape.personAccountRecordTypeIds.isEmpty()
-        ) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        if (personTypes.isEmpty()) {
             return 0;
         }
-        Set<Id> personTypes = shape.personAccountRecordTypeIds;
         return [SELECT COUNT() FROM Account WHERE RecordTypeId IN :personTypes WITH SYSTEM_MODE];
     }
 

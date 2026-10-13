@@ -67,9 +67,7 @@ public with sharing class AddressController {
             throw messageFor(Label.Core_Address_NotFound);
         }
         Address__c address = found[0];
-        Id ownerId = address.Account__c != null
-            ? address.Account__c
-            : (address.Contact__c != null ? address.Contact__c : address.Person_Account__c);
+        Id ownerId = AddressService.ownerIdOf(address);
         if (ownerId == null) {
             throw messageFor(Label.Core_Address_OwnerRequired);
         }
@@ -98,7 +96,7 @@ public with sharing class AddressController {
             view.postalCode = address.Postal_Code__c;
             view.country = address.Country__c;
             view.isDefault = address.Is_Default__c == true;
-            view.isSeasonal = address.Type__c == 'Seasonal';
+            view.isSeasonal = address.Type__c == AddressService.TYPE_SEASONAL;
             view.seasonalStart = monthAndDay(
                 address.Seasonal_Start_Month__c,
                 address.Seasonal_Start_Day__c

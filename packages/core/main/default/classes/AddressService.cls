@@ -28,7 +28,7 @@ public with sharing class AddressService {
 
     private static final String TYPE_HOME = 'Home';
     private static final String TYPE_WORK = 'Work';
-    private static final String TYPE_SEASONAL = 'Seasonal';
+    public static final String TYPE_SEASONAL = 'Seasonal';
 
     private static final String RECORD_TYPE_HOUSEHOLD = 'Household';
     private static final String RECORD_TYPE_ORGANIZATION = 'Organization';
@@ -223,7 +223,11 @@ public with sharing class AddressService {
         return defaults;
     }
 
-    private static Id ownerIdOf(Address__c address) {
+    /** The owner of an address: its household or organization, or the person it belongs to. */
+    public static Id ownerIdOf(Address__c address) {
+        if (address == null) {
+            return null;
+        }
         if (address.Account__c != null) {
             return address.Account__c;
         }
@@ -517,12 +521,9 @@ public with sharing class AddressService {
                 SObjectDescribeOptions.DEFERRED
             )
             .getRecordTypeInfosById();
-        Set<Id> personAccountRecordTypeIds = OrgShapeDetector.detect().personAccountRecordTypeIds;
+        Set<Id> personRecordTypeIds = OrgShapeDetector.personRecordTypeIds();
         for (Account account : accounts) {
-            if (
-                personAccountRecordTypeIds != null &&
-                personAccountRecordTypeIds.contains(account.RecordTypeId)
-            ) {
+            if (personRecordTypeIds.contains(account.RecordTypeId)) {
                 continue;
             }
             String developerName = account.RecordTypeId == null ||

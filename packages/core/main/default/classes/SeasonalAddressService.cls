@@ -17,9 +17,6 @@
  * the job as from a person pressing "Set as default" on the record.
  */
 public with sharing class SeasonalAddressService {
-    @TestVisible
-    private static final String TYPE_SEASONAL = 'Seasonal';
-
     private static final String LOG_CONTEXT = 'Seasonal address swap';
 
     /**
@@ -128,7 +125,8 @@ public with sharing class SeasonalAddressService {
                     new Address__c(
                         Id = currentDefault.Id,
                         Is_Default__c = false,
-                        Replaced_By_Seasonal__c = currentDefault.Type__c != TYPE_SEASONAL
+                        Replaced_By_Seasonal__c = currentDefault.Type__c !=
+                            AddressService.TYPE_SEASONAL
                     )
                 );
             }
@@ -147,7 +145,7 @@ public with sharing class SeasonalAddressService {
             return plan;
         }
 
-        if (currentDefault.Type__c != TYPE_SEASONAL) {
+        if (currentDefault.Type__c != AddressService.TYPE_SEASONAL) {
             // The address in use is an ordinary one and no season is running, so the job has
             // nothing to move. It clears the mark if the address is still carrying one, which
             // happens when somebody set this address back as the default by hand during a
@@ -269,24 +267,10 @@ public with sharing class SeasonalAddressService {
 
     // ------------------------------------------------------------------ internals
 
-    /** The owner of an address: its household or organization, or the person it belongs to. */
-    public static Id ownerIdOf(Address__c address) {
-        if (address == null) {
-            return null;
-        }
-        if (address.Account__c != null) {
-            return address.Account__c;
-        }
-        if (address.Contact__c != null) {
-            return address.Contact__c;
-        }
-        return address.Person_Account__c;
-    }
-
     private static Map<Id, List<Address__c>> groupByOwner(List<Address__c> addresses) {
         Map<Id, List<Address__c>> byOwner = new Map<Id, List<Address__c>>();
         for (Address__c address : addresses) {
-            Id ownerId = ownerIdOf(address);
+            Id ownerId = AddressService.ownerIdOf(address);
             if (ownerId == null) {
                 continue;
             }
@@ -310,7 +294,7 @@ public with sharing class SeasonalAddressService {
         Address__c marked = null;
         Address__c newestOrdinary = null;
         for (Address__c address : ownerAddresses) {
-            if (address.Id == leavingId || address.Type__c == TYPE_SEASONAL) {
+            if (address.Id == leavingId || address.Type__c == AddressService.TYPE_SEASONAL) {
                 continue;
             }
             if (address.Replaced_By_Seasonal__c == true && isNewer(address, marked)) {

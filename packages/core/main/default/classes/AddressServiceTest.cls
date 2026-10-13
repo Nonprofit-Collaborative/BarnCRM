@@ -552,4 +552,21 @@ private class AddressServiceTest {
             );
         }
     }
+
+    @IsTest
+    static void ownerIdOfPrefersAccountThenContactThenPerson() {
+        // runs-as: deploying user (pure function over in-memory records, no data access)
+        Id accountId = Id.valueOf('001000000000001');
+        Id contactId = Id.valueOf('003000000000001');
+        Assert.isNull(AddressService.ownerIdOf(null));
+        Assert.areEqual(
+            accountId,
+            AddressService.ownerIdOf(new Address__c(Account__c = accountId, Contact__c = contactId))
+        );
+        Assert.areEqual(
+            contactId,
+            AddressService.ownerIdOf(new Address__c(Contact__c = contactId))
+        );
+        Assert.isNull(AddressService.ownerIdOf(new Address__c()));
+    }
 }

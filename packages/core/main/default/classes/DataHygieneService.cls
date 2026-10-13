@@ -335,7 +335,7 @@ public with sharing class DataHygieneService {
      * counts them (ADR-0048), each read capped.
      */
     private static Integer countJunctionPeopleWithoutHousehold() {
-        Set<Id> personTypes = personRecordTypeIds();
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
         Set<Id> excluded = new Set<Id>(personTypes);
         Id householdType = HouseholdService.householdRecordTypeId();
         if (householdType != null) {
@@ -352,14 +352,6 @@ public with sharing class DataHygieneService {
             );
         }
         return found;
-    }
-
-    private static Set<Id> personRecordTypeIds() {
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        return shape == null ||
-            shape.personAccountRecordTypeIds == null
-            ? new Set<Id>()
-            : shape.personAccountRecordTypeIds;
     }
 
     private static String title(String key) {
