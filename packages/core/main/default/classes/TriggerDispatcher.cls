@@ -9,8 +9,8 @@
  *
  * The dispatcher reads the shipped registry for that object, in execution order, and runs each
  * handler it names (ADR-0017). A module ships its handler class and its registry record and
- * never edits another feature's trigger. The `run(TriggerHandler)` overload stays for tests and
- * for an object with exactly one handler.
+ * never edits another feature's trigger. The `run(TriggerHandler, Context)` overload runs one
+ * handler with no registry row, for tests.
  *
  * Before it invokes anything, the dispatcher asks three questions in order: is this handler
  * bypassed for this transaction, is all automation paused for the org, and is this automation
@@ -107,14 +107,6 @@ public with sharing class TriggerDispatcher {
                 run(handler, context, entry.DeveloperName, entry.Always_Runs__c == true);
             }
         }
-    }
-
-    @NamespaceAccessible
-    public static void run(TriggerHandler handler) {
-        if (!Trigger.isExecuting) {
-            return;
-        }
-        run(handler, currentContext());
     }
 
     @NamespaceAccessible

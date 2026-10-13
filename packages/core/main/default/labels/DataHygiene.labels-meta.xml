@@ -49,14 +49,6 @@
         <value>Open in Find</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_OpenInFindNamed</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Accessible name of the Open in Find button, {0} is the check.</shortDescription>
-        <value>Open {0} in Find</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_RecordsFound</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>

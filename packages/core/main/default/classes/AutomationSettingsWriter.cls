@@ -26,10 +26,17 @@
  * itself authorizes.
  */
 public without sharing class AutomationSettingsWriter {
-    public static void savePausedUntil(Datetime pausedUntil) {
+    /**
+     * Saves the pause end over `stored`, the record the caller already read and locked with
+     * `OrgSettingsSystemWriter.lockStored()` to decide what to save (null when the org has none),
+     * so the row is read under lock once, not twice.
+     */
+    public static void savePausedUntil(BarnCRM_Settings__c stored, Datetime pausedUntil) {
         // Through the shared writer: a pause is often the first thing saved after install, and
         // that first save must keep the shipped defaults (OrgSettingsSystemWriter).
-        OrgSettingsSystemWriter.save(
+        OrgSettingsSystemWriter.saveOver(
+            BarnCRM_Settings__c.SObjectType,
+            stored,
             new Map<Schema.SObjectField, Object>{
                 BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil
             }
