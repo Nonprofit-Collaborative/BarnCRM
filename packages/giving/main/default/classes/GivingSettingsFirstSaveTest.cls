@@ -188,6 +188,34 @@ private class GivingSettingsFirstSaveTest {
     }
 
     /**
+     * Before the first save the console reads the shipped values, so a feature that is in
+     * effect never shows as off (ADMIN-4).
+     */
+    @IsTest
+    static void theConsoleReadsTheShippedDefaultsBeforeTheFirstSave() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
+
+            Test.startTest();
+            Object autoApply = SettingsService.getValue(
+                'Giving_Settings__c',
+                'Auto_Apply_Gifts_To_Installments__c'
+            );
+            Object softCredits = SettingsService.getValue(
+                'Giving_Settings__c',
+                'Automatic_Household_Soft_Credits__c'
+            );
+            Object logo = SettingsService.getValue('Giving_Settings__c', 'Receipt_Print_Logo__c');
+            Test.stopTest();
+
+            Assert.areEqual(true, autoApply, 'Applying gifts to installments reads as on');
+            Assert.areEqual(true, softCredits, 'Household soft credits read as on');
+            Assert.areEqual(true, logo, 'The receipt logo reads as on');
+            assertNoRecordYet();
+        }
+    }
+
+    /**
      * From the first save on, the stored value governs, including a deliberate off, and a run
      * record writes only its own keys.
      */

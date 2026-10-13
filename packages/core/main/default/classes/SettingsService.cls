@@ -338,7 +338,9 @@ public with sharing class SettingsService {
 
     /**
      * The org-level record of the given settings object, never null, read once per transaction
-     * per object so a console holding many modules' settings does not query per row.
+     * per object so a console holding many modules' settings does not query per row. A never
+     * saved object reads as its first save would store it, so a checkbox that ships on reads
+     * as on (ADMIN-4).
      */
     private static SObject orgDefault(Schema.SObjectType type) {
         if (isCoreSettings(type)) {
@@ -349,7 +351,7 @@ public with sharing class SettingsService {
             return cachedOrgDefaults.get(name);
         }
         SObject record = SettingsRecordSelector.getOrgDefault(type);
-        SObject resolved = record == null ? type.newSObject() : record;
+        SObject resolved = record == null ? firstSaveRecord(type) : record;
         cachedOrgDefaults.put(name, resolved);
         return resolved;
     }

@@ -51,7 +51,9 @@ cleans up her data, and check what removing a module would cost.
    (for Giving, the Giving Admin permission set) if you did not have it.
 5. On the **Giving** row, click **What an uninstall deletes**. A short report lists each kind
    of record the module owns and how many of each your org has, for example `Gift: 1,204`.
-   A count of `50,000+` means at least that many. Read it, then click **Open Installed
+   A count with a `+`, for example `2,300+`, means at least that many: Salesforce lets one
+   page read only 50,000 records in total, so the report shares that between the kinds of
+   record and stops counting a large one early. Read it, then click **Open Installed
    Packages** to uninstall in Salesforce Setup, where Salesforce asks you to confirm.
 
 Turning a module off does not hide its tabs: Salesforce does not let an app change tab

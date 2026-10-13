@@ -26,6 +26,17 @@ public with sharing class ModuleManagerService {
     private static Integer countCap = 50000;
 
     /**
+     * Every counted row counts toward the transaction's query row limit, shared by all the
+     * objects counted, so each count gets a share of what is left (ADMIN-2). Tests lower it.
+     */
+    @TestVisible
+    private static Integer rowLimit = Limits.getLimitQueryRows();
+
+    /** Rows kept back for the rest of the transaction. */
+    @TestVisible
+    private static Integer rowMargin = 500;
+
+    /**
      * detection-only: the objects each module owns, which its uninstall deletes. Names only,
      * resolved by describe, never referenced statically (ADR-0009).
      * `scripts/ci/check-module-objects.py` fails when a list and the module's objects disagree.
@@ -191,25 +202,33 @@ public with sharing class ModuleManagerService {
         List<RecordCount> lines = new List<RecordCount>();
         List<String> objects = ownedObjects.get(row.name);
         Map<String, Schema.SObjectType> describes = Schema.getGlobalDescribe();
-        Map<String, Object> binds = new Map<String, Object>{ 'cap' => countCap + 1 };
+        List<String> apiNames = new List<String>();
         for (String unqualified : objects == null ? new List<String>() : objects) {
             String apiName = ModuleDetectionService.resolveObject(unqualified);
-            if (apiName == null) {
-                continue;
+            if (apiName != null) {
+                apiNames.add(apiName);
+                RecordCount line = new RecordCount();
+                line.objectLabel = describes.get(apiName)
+                    .getDescribe(SObjectDescribeOptions.DEFERRED)
+                    .getLabelPlural();
+                lines.add(line);
             }
+        }
+        // Each object gets an equal share of the rows still left, so no count can use up the
+        // room the next one needs, and what a small object leaves unused passes to the rest.
+        // A count that stops at its share reads "N or more".
+        for (Integer i = 0; i < lines.size(); i++) {
+            RecordCount line = lines[i];
+            Integer room = (rowLimit - Limits.getQueryRows() - rowMargin) / (lines.size() - i);
+            Integer cap = Math.max(0, Math.min(countCap, room - 1));
             // The name comes from describe, never from the caller, and is escaped as well.
             Integer found = Database.countQueryWithBinds(
-                'SELECT COUNT() FROM ' + String.escapeSingleQuotes(apiName) + ' LIMIT :cap',
-                binds,
+                'SELECT COUNT() FROM ' + String.escapeSingleQuotes(apiNames[i]) + ' LIMIT :cap',
+                new Map<String, Object>{ 'cap' => cap + 1 },
                 AccessLevel.SYSTEM_MODE
             );
-            RecordCount line = new RecordCount();
-            line.objectLabel = describes.get(apiName)
-                .getDescribe(SObjectDescribeOptions.DEFERRED)
-                .getLabelPlural();
-            line.capped = found > countCap;
-            line.count = Math.min(found, countCap);
-            lines.add(line);
+            line.capped = found > cap;
+            line.count = Math.min(found, cap);
         }
         return lines;
     }

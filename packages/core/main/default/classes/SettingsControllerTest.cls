@@ -108,6 +108,15 @@ private class SettingsControllerTest {
                 model.sections.size(),
                 'Sections with something to show appear; Giving is not installed'
             );
+            // The rows arrive Households first; the console lists sections as
+            // SettingSections.all() does, so it opens on General.
+            Assert.areEqual(
+                SettingSections.GENERAL,
+                model.sections[0].name,
+                'The console opens on General'
+            );
+            Assert.areEqual(SettingSections.HOUSEHOLDS, model.sections[1].name, 'Then Households');
+            Assert.areEqual(SettingSections.AUTOMATION, model.sections[2].name, 'Then Automation');
             Map<String, SettingsController.SectionModel> byName = new Map<String, SettingsController.SectionModel>();
             for (SettingsController.SectionModel section : model.sections) {
                 byName.put(section.name, section);
