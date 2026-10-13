@@ -13,7 +13,7 @@ const DAY_MS = 86400000;
 const EXCEL_EPOCH = Date.UTC(1899, 11, 30);
 // Characters XML 1.0 cannot hold at all; a value that has them loses only them.
 // eslint-disable-next-line no-control-regex
-const NOT_XML = /[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g;
+const NOT_XML = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g;
 
 export const CELL_TYPES = Object.freeze({
   TEXT: 'text',

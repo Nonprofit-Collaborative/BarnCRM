@@ -95,6 +95,18 @@ Salesforce org is needed for this job. Steps:
    `scripts/ci/check-labels.py` does the same for custom labels: a name or short
    description over 80 characters, a value over 1000, or any of them missing, each of
    which only an org would otherwise report.
+   `scripts/ci/check-metadata-lengths.py` (`npm run check:metadata-lengths`) covers the
+   other limits only an org reports: a description over 255 characters on a custom
+   permission, permission set, permission set group, FlexiPage, Lightning web component
+   bundle, tab or app; a field label over 40, inline help over 510, a field or object
+   description over 1000, a custom label value over 1000; two layout actions with the same
+   sort order or name; a record page visibility rule that tests a lookup field itself (the
+   platform refuses EQUAL and NE there, so test a field across it, such as
+   `{!Record.Donor_Account__r.Name}`); and an Apex class, interface or enum named after a reserved Apex type
+   (Page, Package, Type, Object, Limit, Group, Case, Sort, Select, Trigger, System, Schema,
+   Database). Lengths are counted with leading and trailing whitespace trimmed but the line
+   breaks and indentation inside counted, as the platform does, so a description that
+   Prettier wraps across lines needs a few characters of room.
 9. `scripts/ci/check-symlinks.sh`, failing the build if a tracked file is a symlink
    pointing outside the repository or at an absolute path. Such a link resolves on the
    machine that committed it and dangles everywhere else, so every local check passes and
@@ -220,6 +232,7 @@ npm run check:namespace
 npm run check:standard-objects
 npm run check:object-allowlist
 npm run check:custom-metadata
+npm run check:metadata-lengths
 npm run check:symlinks
 npm run check:permission-sets
 npm run check:help-links

@@ -57,6 +57,9 @@ jobs:
       - name: Check custom labels against the platform limits
         run: python3 scripts/ci/check-labels.py
 
+      - name: Check descriptions, field limits, layout actions and Apex type names
+        run: python3 scripts/ci/check-metadata-lengths.py
+
       - name: Check the uninstall report counts every object a module owns
         run: python3 scripts/ci/check-module-objects.py
 
