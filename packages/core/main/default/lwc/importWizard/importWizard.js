@@ -35,6 +35,17 @@ import commitButton from '@salesforce/label/c.Core_Import_CommitButton';
 import startOverButton from '@salesforce/label/c.Core_Import_StartOverButton';
 import downloadExceptionsButton from '@salesforce/label/c.Core_Import_DownloadExceptionsButton';
 import exceptionsCapped from '@salesforce/label/c.Core_Import_ExceptionsCapped';
+import downloadResultsButton from '@salesforce/label/c.Core_Import_DownloadResultsButton';
+import resultsCapped from '@salesforce/label/c.Core_Import_ResultsCapped';
+import resultsRow from '@salesforce/label/c.Core_Import_ResultsRow';
+import resultsOutcome from '@salesforce/label/c.Core_Import_ResultsOutcome';
+import resultsReason from '@salesforce/label/c.Core_Import_ResultsReason';
+import resultsRecordId from '@salesforce/label/c.Core_Import_ResultsRecordId';
+import resultsPersonId from '@salesforce/label/c.Core_Import_ResultsPersonId';
+import resultsSecondPersonId from '@salesforce/label/c.Core_Import_ResultsSecondPersonId';
+import resultsHouseholdId from '@salesforce/label/c.Core_Import_ResultsHouseholdId';
+import resultsOrganizationId from '@salesforce/label/c.Core_Import_ResultsOrganizationId';
+import resultsModuleRecordId from '@salesforce/label/c.Core_Import_ResultsModuleRecordId';
 import uploadLabel from '@salesforce/label/c.Core_Import_UploadLabel';
 import uploadHint from '@salesforce/label/c.Core_Import_UploadHint';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
@@ -299,6 +310,7 @@ export default class ImportWizard extends LightningElement {
     commitButton,
     startOverButton,
     downloadExceptionsButton,
+    downloadResultsButton,
     uploadLabel,
     uploadHint,
     columnHeader,
@@ -1231,31 +1243,7 @@ export default class ImportWizard extends LightningElement {
     this.message = undefined;
     this.loading = true;
     try {
-      const rows = [];
-      let page = await getRowPage({
-        batchId: this.batch.id,
-        status: 'Rejected',
-        cursor: null,
-        startIndex: 0,
-        pageSize: DOWNLOAD_PAGE_ROWS
-      });
-      rows.push(...page.rows);
-      let start = 0;
-      // Only ever forward: a next index that does not move past the last start ends the read,
-      // so a bad position can never re-read the file from the top.
-      while (page.hasMore && page.nextIndex > start) {
-        start = page.nextIndex;
-        // Sequential on purpose: each page starts where the last one ended.
-        // eslint-disable-next-line no-await-in-loop
-        page = await getRowPage({
-          batchId: this.batch.id,
-          status: 'Rejected',
-          cursor: page.cursor,
-          startIndex: page.nextIndex,
-          pageSize: DOWNLOAD_PAGE_ROWS
-        });
-        rows.push(...page.rows);
-      }
+      const rows = await this.readAllRows('Rejected');
       this.saveExceptions(rows);
       const rejected = this.batch.rejected || 0;
       if (rows.length < rejected) {
@@ -1270,24 +1258,136 @@ export default class ImportWizard extends LightningElement {
     }
   }
 
-  /** Writes the rows as CSV (c/findCsv: byte-order mark, formula guard) and saves the file. */
-  saveExceptions(rows) {
-    // Keys by position, so a column name with a dot or a space still finds its value.
-    const columns = [{ label: 'Row', path: 'row' }]
-      .concat(this.headers.map((heading, index) => ({ label: heading, path: `c${index}` })))
-      .concat([{ label: 'Reason', path: 'reason' }]);
-    const records = rows.map((row) => {
-      const values = row.values ? JSON.parse(row.values) : {};
-      const record = { row: row.rowNumber, reason: row.errorMessage };
-      this.headers.forEach((heading, index) => {
-        record[`c${index}`] = values[heading] || '';
-      });
-      return record;
+  /**
+   * Hands every row of the import back as a CSV with what became of it: the outcome, the
+   * records it resulted in, the reason for a rejected row, and the row's own values. This is
+   * the file an administrator reconciles against the source system, or loads the next file
+   * from by record ID.
+   */
+  async handleDownloadResults() {
+    if (!this.batch) {
+      return;
+    }
+    this.message = undefined;
+    this.loading = true;
+    try {
+      const rows = await this.readAllRows(null);
+      this.saveResults(rows);
+      const total = this.batch.rowCount || 0;
+      if (rows.length < total) {
+        this.message = resultsCapped
+          .replace('{0}', rows.length.toLocaleString())
+          .replace('{1}', total.toLocaleString());
+      }
+    } catch (error) {
+      this.message = this.errorText(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  /**
+   * Every row of the batch in file order (only those in the status given, when one is), read
+   * page by page through one server cursor.
+   */
+  async readAllRows(status) {
+    const rows = [];
+    let page = await getRowPage({
+      batchId: this.batch.id,
+      status,
+      cursor: null,
+      startIndex: 0,
+      pageSize: DOWNLOAD_PAGE_ROWS
     });
+    rows.push(...page.rows);
+    let start = 0;
+    // Only ever forward: a next index that does not move past the last start ends the read,
+    // so a bad position can never re-read the file from the top.
+    while (page.hasMore && page.nextIndex > start) {
+      start = page.nextIndex;
+      // Sequential on purpose: each page starts where the last one ended.
+      // eslint-disable-next-line no-await-in-loop
+      page = await getRowPage({
+        batchId: this.batch.id,
+        status,
+        cursor: page.cursor,
+        startIndex: page.nextIndex,
+        pageSize: DOWNLOAD_PAGE_ROWS
+      });
+      rows.push(...page.rows);
+    }
+    return rows;
+  }
+
+  /** Writes the rejected rows as CSV and saves the file. */
+  saveExceptions(rows) {
+    const columns = [{ label: 'Row', path: 'row' }]
+      .concat(this.fileColumns)
+      .concat([{ label: 'Reason', path: 'reason' }]);
+    const records = rows.map((row) => ({
+      ...this.fileValuesOf(row),
+      row: row.rowNumber,
+      reason: row.errorMessage
+    }));
+    this.saveCsv(columns, records, 'exceptions');
+  }
+
+  /**
+   * Writes every row with its outcome and record IDs. A one-object load has one record per
+   * row; a people import names each record a row can resolve to.
+   */
+  saveResults(rows) {
+    const ids = this.loadsOneObject
+      ? [{ label: resultsRecordId, path: 'resultingRecordId' }]
+      : [
+          { label: resultsPersonId, path: 'person1Id' },
+          { label: resultsSecondPersonId, path: 'person2Id' },
+          { label: resultsHouseholdId, path: 'householdId' },
+          { label: resultsOrganizationId, path: 'organizationId' },
+          { label: resultsModuleRecordId, path: 'resultingRecordId' }
+        ];
+    const columns = [
+      { label: resultsRow, path: 'row' },
+      { label: resultsOutcome, path: 'status' }
+    ]
+      .concat(ids)
+      .concat([{ label: resultsReason, path: 'reason' }])
+      .concat(this.fileColumns);
+    const records = rows.map((row) => ({
+      ...this.fileValuesOf(row),
+      row: row.rowNumber,
+      status: row.status,
+      reason: row.errorMessage,
+      person1Id: row.person1Id,
+      person2Id: row.person2Id,
+      householdId: row.householdId,
+      organizationId: row.organizationId,
+      resultingRecordId: row.resultingRecordId
+    }));
+    this.saveCsv(columns, records, 'results');
+  }
+
+  /** The file's own columns, keyed by position so a heading with a dot or a space still reads. */
+  get fileColumns() {
+    return this.headers.map((heading, index) => ({ label: heading, path: `c${index}` }));
+  }
+
+  /** A staged row's own values under the keys fileColumns uses. */
+  fileValuesOf(row) {
+    const values = row.values ? JSON.parse(row.values) : {};
+    const record = {};
+    this.headers.forEach((heading, index) => {
+      record[`c${index}`] = values[heading] || '';
+    });
+    return record;
+  }
+
+  /** Saves CSV (c/findCsv: byte-order mark, formula guard) named after the batch. */
+  saveCsv(columns, records, suffix) {
     const blob = new Blob([toCsv(columns, records)], { type: 'text/csv;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${this.batch ? this.batch.name : 'import'}-exceptions.csv`;
+    link.download = `${this.batch ? this.batch.name : 'import'}-${suffix}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   }

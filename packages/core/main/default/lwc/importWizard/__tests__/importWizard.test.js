@@ -1000,6 +1000,112 @@ describe('the import wizard', () => {
       expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(2);
     });
   });
+
+  describe('the results file', () => {
+    const RealBlob = global.Blob;
+    let written;
+    let fileName;
+
+    /** Every row of the import, each with what became of it. */
+    function serveAll(total) {
+      getRowPage.mockImplementation(({ cursor, startIndex, pageSize, status }) => {
+        const rows = [];
+        for (let i = startIndex; i < Math.min(startIndex + pageSize, total); i++) {
+          const rejected = i === total - 1;
+          rows.push({
+            id: `r${i}`,
+            rowNumber: i + 2,
+            status: rejected ? 'Rejected' : 'Created',
+            errorMessage: rejected ? 'Last name is missing.' : undefined,
+            person1Id: rejected ? undefined : `003${i}`,
+            householdId: rejected ? undefined : `a0H${i}`,
+            resultingRecordId: rejected ? undefined : `a0S${i}`,
+            values: JSON.stringify({ 'Last Name': `Person ${i}`, Email: '', Notes: 'n' })
+          });
+        }
+        const nextIndex = startIndex + rows.length;
+        return Promise.resolve({
+          cursor: cursor || { token: `cursor-${status || 'all'}` },
+          rows,
+          nextIndex,
+          total,
+          hasMore: nextIndex < total
+        });
+      });
+    }
+
+    beforeEach(() => {
+      written = undefined;
+      fileName = undefined;
+      global.Blob = function CapturingBlob(parts, options) {
+        written = parts.join('');
+        return new RealBlob(parts, options);
+      };
+      global.URL.createObjectURL = jest.fn(() => 'blob:results');
+      global.URL.revokeObjectURL = jest.fn();
+      jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function capture() {
+        fileName = this.download;
+      });
+    });
+
+    afterEach(() => {
+      global.Blob = RealBlob;
+      HTMLAnchorElement.prototype.click.mockRestore();
+    });
+
+    async function toCommitted(rowCount) {
+      startCommit.mockResolvedValue({
+        ...DRY_RUN_BATCH,
+        status: 'Complete',
+        isDryRun: false,
+        rowCount
+      });
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      element.shadowRoot.querySelector('[data-id="commit"]').click();
+      await flush();
+      return element;
+    }
+
+    it('holds every row with its outcome, the records it became, and its reason', async () => {
+      serveAll(700);
+      const element = await toCommitted(700);
+      getRowPage.mockClear();
+      click(element, 'download-results');
+      await flush();
+
+      // Every row, not only one status, through one cursor.
+      expect(getRowPage.mock.calls.map(([args]) => [args.status, args.startIndex])).toEqual([
+        [null, 0],
+        [null, 500]
+      ]);
+      const lines = written.split('\r\n').filter((line) => line.length > 0);
+      expect(lines).toHaveLength(701);
+      expect(lines[0]).toBe(
+        '﻿c.Core_Import_ResultsRow,c.Core_Import_ResultsOutcome,' +
+          'c.Core_Import_ResultsPersonId,c.Core_Import_ResultsSecondPersonId,' +
+          'c.Core_Import_ResultsHouseholdId,c.Core_Import_ResultsOrganizationId,' +
+          'c.Core_Import_ResultsModuleRecordId,c.Core_Import_ResultsReason,' +
+          'Last Name,Email,Notes'
+      );
+      expect(lines[1]).toBe('2,Created,0030,,a0H0,,a0S0,,Person 0,,n');
+      expect(lines[700]).toBe('701,Rejected,,,,,,Last name is missing.,Person 699,,n');
+      expect(fileName).toBe('IB-000001-results.csv');
+      expect(element.shadowRoot.querySelector('[data-id="message"]')).toBeNull();
+    });
+
+    it('says so when the file holds fewer rows than the import', async () => {
+      serveAll(3);
+      const element = await toCommitted(5);
+      click(element, 'download-results');
+      await flush();
+      expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(4);
+      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+        'c.Core_Import_ResultsCapped'
+      );
+    });
+  });
 });
 
 describe('the import wizard loading one object', () => {
@@ -1212,5 +1318,62 @@ describe('the import wizard loading one object', () => {
       '[data-id="file-value-row"] lightning-combobox'
     );
     expect(target.options.map((o) => o.value)).toEqual(['Record.Program__c']);
+  });
+
+  it('writes the results file with one record ID per row', async () => {
+    const RealBlob = global.Blob;
+    let written;
+    global.Blob = function CapturingBlob(parts, options) {
+      written = parts.join('');
+      return new RealBlob(parts, options);
+    };
+    global.URL.createObjectURL = jest.fn(() => 'blob:results');
+    global.URL.revokeObjectURL = jest.fn();
+    jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    try {
+      startCommit.mockResolvedValue({ ...DRY_RUN_BATCH, status: 'Complete', isDryRun: false });
+      getRowPage.mockResolvedValue({
+        cursor: { token: 'c' },
+        rows: [
+          {
+            id: 'r0',
+            rowNumber: 2,
+            status: 'Updated',
+            resultingRecordId: 'a0S000000000001',
+            values: JSON.stringify({ 'Session Key': 'S-1', Program: 'Reading', Notes: 'first' })
+          },
+          {
+            id: 'r1',
+            rowNumber: 3,
+            status: 'Rejected',
+            errorMessage: 'No Program is named Math.',
+            values: JSON.stringify({ 'Session Key': 'S-2', Program: 'Math', Notes: '' })
+          }
+        ],
+        nextIndex: 2,
+        total: 2,
+        hasMore: false
+      });
+      const element = await toColumnsStep();
+      click(element, 'next');
+      await flush();
+      click(element, 'dry-run');
+      await flush();
+      element.shadowRoot.querySelector('[data-id="commit"]').click();
+      await flush();
+      click(element, 'download-results');
+      await flush();
+
+      const lines = written.split('\r\n').filter((line) => line.length > 0);
+      expect(lines).toEqual([
+        '﻿c.Core_Import_ResultsRow,c.Core_Import_ResultsOutcome,' +
+          'c.Core_Import_ResultsRecordId,c.Core_Import_ResultsReason,Session Key,Program,Notes',
+        '2,Updated,a0S000000000001,,S-1,Reading,first',
+        '3,Rejected,,No Program is named Math.,S-2,Math,'
+      ]);
+    } finally {
+      global.Blob = RealBlob;
+      HTMLAnchorElement.prototype.click.mockRestore();
+    }
   });
 });

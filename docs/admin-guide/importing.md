@@ -92,7 +92,13 @@ or six rows.
 8. When the preview is right, select **Import these rows**. Processing runs in the background and
    the screen updates as it goes.
 9. The results screen shows the same four counts for what actually happened, the run log,
-   and links to the records. Select **View rows** to see every row and what became of it.
+   and links to the records. Select **Download results** to get every row of the file back as
+   a CSV with what became of it: its outcome (Created, Updated, Matched, Rejected or Skipped),
+   the Salesforce record IDs it resulted in (person, second person, household, organization,
+   and a gift or other record a module loaded), the reason for a rejected row, and the row's
+   own columns. Keep it to reconcile against the system the file came from, or to load the
+   next file by record ID. Like the exceptions file it opens cleanly in Excel and holds up to
+   100,000 rows in one download; for a larger import the screen says how many it holds.
 
 To check the tag, open one of the new households and look at **Created By Import Batch**.
 It links back to the import.
@@ -452,7 +458,9 @@ the same dry run, results, journal and undo as any import.
    Also choose what happens when a lookup finds no record: **Reject the row** (the default) or
    **Leave it empty** and load the rest of the row. When a lookup or an upsert finds more than
    one record, the **When more than one record matches** choice applies, as in section 8.
-6. Select **Dry run**, read the results, and commit.
+6. Select **Dry run**, read the results, and commit. After the import, **Download results**
+   gives every row with its outcome, the record ID it created, updated or matched, and the
+   reason for a rejected row (section 3, step 9).
 
 **Which objects are listed.** Your org's own custom objects, and the standard objects
 Salesforce treats as business records (ones you can find in global search), where you
