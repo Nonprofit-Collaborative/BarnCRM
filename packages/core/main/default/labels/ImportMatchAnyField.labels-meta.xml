@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_ErrorFieldNotSelective</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Load one object: an unindexed match field on a large object</shortDescription>
+        <value>Records cannot be found by {0}: {1} holds more than {2} records, and Salesforce cannot search that many quickly by a field it does not index. Match by the record ID, the name, an email, or a field marked External ID or Unique.</value>
+    </labels>
+</CustomLabels>

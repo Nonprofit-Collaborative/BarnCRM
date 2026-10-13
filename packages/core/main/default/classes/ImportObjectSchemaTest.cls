@@ -207,8 +207,8 @@ private class ImportObjectSchemaTest {
                 'The name field.'
             );
             Assert.isNull(
-                ImportObjectSchema.parentField(Account.SObjectType, 'Phone'),
-                'A field that does not name one record.'
+                ImportObjectSchema.parentField(Account.SObjectType, 'Anniversary__c'),
+                'A field that is not text, an email or a phone.'
             );
         }
     }

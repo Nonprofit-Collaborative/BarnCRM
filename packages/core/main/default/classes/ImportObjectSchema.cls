@@ -17,6 +17,27 @@ public with sharing class ImportObjectSchema {
     @NamespaceAccessible
     public static final String OPERATION_UPSERT = 'Upsert by external ID';
 
+    /**
+     * The most records an object may hold, counted in the user's access, for a field it does not
+     * index to be matched on (R-IT13, the large object guard).
+     */
+    @NamespaceAccessible
+    public static final Integer LARGE_OBJECT_ROWS = 100000;
+
+    /** The guard's ceiling, lowered by a test so it need not make 100,000 records. */
+    @TestVisible
+    private static Integer largeObjectRows = LARGE_OBJECT_ROWS;
+
+    /** Whether each object is over the guard's ceiling, counted once per transaction. */
+    private static Map<Schema.SObjectType, Boolean> large = new Map<Schema.SObjectType, Boolean>();
+
+    /** The field types a row or a lookup may be matched on beyond the record ID (R-IT13). */
+    private static final Set<Schema.DisplayType> MATCH_TYPES = new Set<Schema.DisplayType>{
+        Schema.DisplayType.STRING,
+        Schema.DisplayType.EMAIL,
+        Schema.DisplayType.PHONE
+    };
+
     @NamespaceAccessible
     public static final String LOOKUP_REJECT = 'Reject the row';
     @NamespaceAccessible
@@ -219,10 +240,110 @@ public with sharing class ImportObjectSchema {
     }
 
     /**
+     * The fields rows or lookups may be matched on beyond the record ID (R-IT12, R-IT13): every
+     * text, email or phone field of the object that the user may read and filter on, sorted by
+     * label. The large object guard (`unselective`) decides later whether one may be searched.
+     */
+    @NamespaceAccessible
+    public static List<ImportMapping.Target> matchFields(Schema.SObjectType type) {
+        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+        if (type == null) {
+            return new List<ImportMapping.Target>();
+        }
+        for (Schema.SObjectField token : fieldsOf(type).values()) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            if (
+                MATCH_TYPES.contains(field.getType()) &&
+                field.isAccessible() &&
+                field.isFilterable()
+            ) {
+                byLabel.put(
+                    field.getLabel() + '|' + field.getName(),
+                    new ImportMapping.Target(field.getName(), field.getLabel())
+                );
+            }
+        }
+        return sortedValues(byLabel);
+    }
+
+    /** The field's API name when rows may be matched on it (`matchFields`), or null. */
+    @NamespaceAccessible
+    public static String matchField(Schema.SObjectType type, String fieldName) {
+        if (type == null || String.isBlank(fieldName)) {
+            return null;
+        }
+        for (ImportMapping.Target candidate : matchFields(type)) {
+            if (sameField(candidate.value, fieldName)) {
+                return candidate.value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether the platform indexes this field, so a search by it stays quick on any number of
+     * records (R-IT13): the record ID, the name field, a field marked External ID or Unique, and
+     * a standard Email field. Custom indexes cannot be seen from Apex, so they are not counted.
+     */
+    @NamespaceAccessible
+    public static Boolean isIndexed(Schema.SObjectType type, String fieldName) {
+        if (ID_ATTRIBUTE.equalsIgnoreCase(fieldName)) {
+            return true;
+        }
+        Schema.SObjectField token = fieldNamed(type, fieldName);
+        if (token == null) {
+            return false;
+        }
+        Schema.DescribeFieldResult field = token.getDescribe();
+        return field.isNameField() ||
+            field.isExternalId() ||
+            field.isUnique() ||
+            (!field.isCustom() &&
+            field.getType() == Schema.DisplayType.EMAIL &&
+            field.getName() == 'Email');
+    }
+
+    /**
+     * Why rows cannot be matched on this field of this object, or null (R-IT13, the large object
+     * guard): a field the platform does not index, on an object holding more than
+     * LARGE_OBJECT_ROWS records the user can see, would be searched by reading the whole object,
+     * which is slow and can time out. Counted once per object per transaction, the count capped
+     * one past the ceiling.
+     */
+    @NamespaceAccessible
+    public static String unselective(Schema.SObjectType type, String fieldName) {
+        if (type == null || String.isBlank(fieldName) || isIndexed(type, fieldName)) {
+            return null;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        if (!large.containsKey(type)) {
+            Integer counted = Database.countQueryWithBinds(
+                'SELECT COUNT() FROM ' +
+                    String.escapeSingleQuotes(described.getName()) +
+                    ' LIMIT :cap',
+                new Map<String, Object>{ 'cap' => largeObjectRows + 1 },
+                AccessLevel.USER_MODE
+            );
+            large.put(type, counted > largeObjectRows);
+        }
+        if (!large.get(type)) {
+            return null;
+        }
+        return String.format(
+            Label.Core_Import_ErrorFieldNotSelective,
+            new List<String>{
+                labelOf(type, fieldName),
+                described.getLabelPlural(),
+                largeObjectRows.format()
+            }
+        );
+    }
+
+    /**
      * The fields a lookup column may name its parent by (R-IT13): the record ID, the parent's
-     * name field, and its External ID or Unique fields holding text or an email that the user
-     * may read. A lookup that can point at more than one object is named by record ID only, as
-     * is a field that is not a lookup of this object.
+     * name field, and any text, email or phone field of the parent the user may read and filter
+     * on (`matchFields`). A lookup that can point at more than one object is named by record ID
+     * only, as is a field that is not a lookup of this object.
      */
     @NamespaceAccessible
     public static List<ImportMapping.Target> parentFields(
@@ -243,9 +364,9 @@ public with sharing class ImportObjectSchema {
             result.add(new ImportMapping.Target(name.getName(), name.getLabel()));
             offered.add(name.getName().toLowerCase());
         }
-        for (Schema.DescribeFieldResult field : ImportMatcher.matchableFields(parent)) {
-            if (!offered.contains(field.getName().toLowerCase())) {
-                result.add(new ImportMapping.Target(field.getName(), field.getLabel()));
+        for (ImportMapping.Target field : matchFields(parent)) {
+            if (!offered.contains(field.value.toLowerCase())) {
+                result.add(field);
             }
         }
         return result;
@@ -278,12 +399,7 @@ public with sharing class ImportObjectSchema {
         if (nameField != null && sameField(nameField, fieldName)) {
             return nameField;
         }
-        for (Schema.DescribeFieldResult field : ImportMatcher.matchableFields(parent)) {
-            if (sameField(field.getName(), fieldName)) {
-                return field.getName();
-            }
-        }
-        return null;
+        return matchField(parent, fieldName);
     }
 
     /** The object's name field when the user may read and filter on it, or null. */
@@ -361,9 +477,9 @@ public with sharing class ImportObjectSchema {
     /**
      * Why this template cannot load its rows, or null (R-IT12, R-IT14): an object that is gone
      * or protected, an operation people do not allow, access the operation needs and the user
-     * lacks, no column mapped to the object, the key column an update or an upsert needs, and a
-     * value for every row that names the record. Asked when a template is saved and in every
-     * chunk.
+     * lacks, no column mapped to the object, the key column an update or an upsert needs, a
+     * value for every row that names the record, and a field searched by that the large object
+     * guard refuses (R-IT13). Asked when a run starts and in every chunk.
      */
     @NamespaceAccessible
     public static String refusal(Import_Template__c template, ImportMapping mapping) {
@@ -416,6 +532,27 @@ public with sharing class ImportObjectSchema {
                     key == ID_ATTRIBUTE ? Label.Core_Import_RecordIdOption : labelOf(type, key)
                 }
             );
+        }
+        return slowSearch(type, key, given);
+    }
+
+    /**
+     * The large object guard over every field this template searches by (R-IT13): the field
+     * rows find their record by, and each lookup column's parent field.
+     */
+    private static String slowSearch(Schema.SObjectType type, String key, ImportMapping mapping) {
+        String refused = key == null ? null : unselective(type, key);
+        if (refused != null) {
+            return refused;
+        }
+        Map<String, String> lookups = mapping.lookupFieldsByAttribute();
+        for (String attribute : lookups.keySet()) {
+            Schema.SObjectType parent = parentOf(type, attribute);
+            String field = parentField(parent, lookups.get(attribute));
+            refused = field == null ? null : unselective(parent, field);
+            if (refused != null) {
+                return refused;
+            }
         }
         return null;
     }
