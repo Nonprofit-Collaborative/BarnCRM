@@ -923,7 +923,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 None. ADR-0086 added three (`Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c`,
 `Field_Utilization_Last_Run_Summary__c`); ADR-NEXT `NEXT-field-utilization-on-demand.md`
-removed them when the count moved to its own tab and runs on demand (Section 29F).
+removed them when the count moved to Org Optimizer and runs on demand (Section 29F).
 
 ### Rules
 
@@ -6352,8 +6352,7 @@ current one, with the change in percentage points.
 - **Service:** `FieldUtilizationService` (plan, count, save), `FieldUtilizationSelector`
   (latest saved count), `FieldUtilizationController` (every method requires
   `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component, embedded in Org
-  Optimizer; the app page and tab `Field_Utilization` also host it but are not in the BarnCRM
-  app navigation.
+  Optimizer, its only host (no app page or tab of its own).
 
 ---
 

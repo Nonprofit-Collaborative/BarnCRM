@@ -43,8 +43,8 @@ names should not, because links, permission sets and the console's workspace map
    permission to test).
 4. **Duplicate review leaves the settings console.** The `Duplicate_Review` Setting Definition
    stays, with no component, so the console's existing "navigate away" row opens Org
-   Optimizer (ADR-0020's path). `Field_Utilization` keeps its app page and tab for direct
-   links, out of the navigation and out of every permission set's tab visibility.
+   Optimizer (ADR-0020's path). The `Field_Utilization` app page and tab are removed: Org
+   Optimizer is the component's only host.
 5. **Data Manager is a new tab, not a relabel.** A new app page and tab `Data_Manager` hosts
    `dataManager`: tool cards gated by the same custom permissions as the tools, the import
    mappings, the merged job history and links to Salesforce's own tools. Relabelling
@@ -63,6 +63,15 @@ names should not, because links, permission sets and the console's workspace map
    from Data Manager and from existing links); `Find` and `Data_Hygiene` stay. A tab reached by
    `standard__navItemPage` that is not in the navigation still opens, as a workspace tab in the
    console.
+8. **Admin sections added to the shell.** Each is lazy and needs `Manage_BarnCRM_Settings`,
+   checked again by its controller:
+   - **Errors**: the existing `errorLogTile` (unread count, recent entries, acknowledge).
+   - **Storage and limits**: `OrgOptimizerStorageController` reads `OrgLimits` and counts
+     BarnCRM's own objects in user mode up to a cap. Read only.
+   - **Unused setup**: `OrgOptimizerSetupController` runs capped, dynamic, user-mode queries
+     for users not logged in, unassigned permission sets, unrun reports, unused email
+     templates, inactive flows and jobs owned by inactive users. Read only, admin only (owner
+     decision 2026-10-13); a check that cannot run says so without hiding the others.
 
 ## Alternatives considered
 
