@@ -48,6 +48,10 @@ Relationships appear in two places once you are set up: a **Relationships** card
 person's record, and a **Relationships** tab in the BarnCRM app for reporting and
 list views.
 
+The card reads and removes relationships as the person using it, through Salesforce's own
+record service, so it shows exactly what their object and field access allows, and a
+relationship edited elsewhere on the page shows on the card without a reload.
+
 ### The types you can choose, and what the other side becomes
 
 The list ships ready to use, and none of it depends on anyone's gender.

@@ -7,7 +7,11 @@
       data-id="add-relationship"
     ></lightning-button>
 
-    <div class="slds-var-p-horizontal_medium">
+    <div class="slds-var-p-horizontal_medium slds-is-relative">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
+      </template>
+
       <template lwc:if={errorMessage}>
         <div role="alert" class="slds-text-color_error slds-var-m-bottom_small" data-id="error">
           {errorMessage}
