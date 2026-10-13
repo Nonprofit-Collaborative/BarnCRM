@@ -27,7 +27,15 @@ private class ImportBatchServiceTest {
             Import_Template__c template = newTemplate();
 
             Test.startTest();
-            Import_Batch__c batch = ImportBatchService.create(template.Id, null, 'donors.csv');
+            Import_Batch__c batch = ImportBatchService.create(
+                template.Id,
+                null,
+                'donors.csv',
+                null,
+                null,
+                null,
+                false
+            );
             Test.stopTest();
 
             Assert.areEqual(50, batch.Chunk_Size__c, 'The batch takes the chunk size the org set.');
@@ -103,7 +111,9 @@ private class ImportBatchServiceTest {
             try {
                 ImportBatchService.stageRows(
                     batch.Id,
-                    new List<Map<String, Object>>{ new Map<String, Object>{ 'Email' => 'a@b.org' } },
+                    new List<Map<String, Object>>{
+                        new Map<String, Object>{ 'Email' => 'a@b.org' }
+                    },
                     2
                 );
             } catch (ImportException e) {
@@ -125,9 +135,7 @@ private class ImportBatchServiceTest {
             Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
             List<Map<String, Object>> page = new List<Map<String, Object>>{
                 new Map<String, Object>{ 'Email' => 'a@b.org' },
-                new Map<String, Object>{
-                    'Notes' => 'x'.repeat(ImportBatchService.MAX_ROW_LENGTH)
-                }
+                new Map<String, Object>{ 'Notes' => 'x'.repeat(ImportBatchService.MAX_ROW_LENGTH) }
             };
 
             Test.startTest();
@@ -273,7 +281,12 @@ private class ImportBatchServiceTest {
             List<Map<String, String>> values = new List<Map<String, String>>();
             for (Integer i = 0; i < 200; i++) {
                 values.add(
-                    ImportTestDataFactory.donorRow('Ana' + i, 'Ramirez', 'ana' + i + '@example.org', null)
+                    ImportTestDataFactory.donorRow(
+                        'Ana' + i,
+                        'Ramirez',
+                        'ana' + i + '@example.org',
+                        null
+                    )
                 );
             }
             ImportTestDataFactory.rows(batch, values);
@@ -543,10 +556,12 @@ private class ImportBatchServiceTest {
                 null,
                 'gifts.csv',
                 3,
-                250.5
+                250.5,
+                null,
+                false
             );
             try {
-                ImportBatchService.create(template.Id, null, 'gifts.csv', -1, null);
+                ImportBatchService.create(template.Id, null, 'gifts.csv', -1, null, null, false);
                 Assert.fail('A negative number of rows makes no sense.');
             } catch (ImportException e) {
                 Assert.areEqual(
@@ -579,7 +594,14 @@ private class ImportBatchServiceTest {
             update batch;
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, 75.00);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                true,
+                false,
+                null,
+                75.00,
+                null
+            );
             Test.stopTest();
 
             Assert.isTrue(after.File_Amount__c == 75, 'The amount the run read is kept.');
@@ -606,7 +628,14 @@ private class ImportBatchServiceTest {
             batch.Expected_Count__c = 2;
             batch.Expected_Amount__c = 100;
             update batch;
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, 80);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                true,
+                false,
+                null,
+                80,
+                null
+            );
 
             Test.startTest();
             try {
@@ -644,7 +673,14 @@ private class ImportBatchServiceTest {
             update batch;
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, true, false, null, null);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                true,
+                false,
+                null,
+                null,
+                null
+            );
             Test.stopTest();
 
             Assert.isFalse(
@@ -678,7 +714,9 @@ private class ImportBatchServiceTest {
                 batch.Id,
                 true,
                 false,
-                new List<String>{ 'A line of the run log' }
+                new List<String>{ 'A line of the run log' },
+                null,
+                null
             );
             Test.stopTest();
 
@@ -707,7 +745,14 @@ private class ImportBatchServiceTest {
             );
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, false, false, null);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                false,
+                false,
+                null,
+                null,
+                null
+            );
             Test.stopTest();
 
             Assert.areEqual(ImportBatchService.STATUS_COMPLETE, after.Status__c, 'It completed.');
@@ -740,7 +785,14 @@ private class ImportBatchServiceTest {
             Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
 
             Test.startTest();
-            Import_Batch__c after = ImportBatchService.finish(batch.Id, false, false, null);
+            Import_Batch__c after = ImportBatchService.finish(
+                batch.Id,
+                false,
+                false,
+                null,
+                null,
+                null
+            );
             Test.stopTest();
 
             Assert.isTrue(
@@ -787,7 +839,9 @@ private class ImportBatchServiceTest {
                 batch.Id,
                 false,
                 true,
-                new List<String>{ 'Chunk 1 failed' }
+                new List<String>{ 'Chunk 1 failed' },
+                null,
+                null
             );
             Test.stopTest();
             Assert.areEqual(ImportBatchService.STATUS_FAILED, after.Status__c, 'Marked as failed.');

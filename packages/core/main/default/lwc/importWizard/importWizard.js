@@ -50,6 +50,8 @@ import noHeaderRow from '@salesforce/label/c.Core_Import_NoHeaderRow';
 import xlsxUnreadable from '@salesforce/label/c.Core_Import_XlsxUnreadable';
 import xlsxUnsupportedBrowser from '@salesforce/label/c.Core_Import_XlsxUnsupportedBrowser';
 import xlsxTooLarge from '@salesforce/label/c.Core_Import_XlsxTooLarge';
+import originalTooLargeToKeep from '@salesforce/label/c.Core_Import_OriginalTooLargeToKeep';
+import originalNotKept from '@salesforce/label/c.Core_Import_OriginalNotKept';
 import recurringLabel from '@salesforce/label/c.Core_Import_RecurringLabel';
 import recurringHelp from '@salesforce/label/c.Core_Import_RecurringHelp';
 import sourceNameLabel from '@salesforce/label/c.Core_Import_SourceNameLabel';
@@ -123,43 +125,14 @@ const POLL_INTERVAL_MS = 3000;
 const STAGE_PAGE_SIZE = 500;
 /**
  * The largest file kept as a Salesforce File. A bigger file still imports; only the copy of
- * the original is skipped, because sending it would risk the request's heap.
+ * the original is skipped, because sending it would risk the request's heap: it travels as
+ * base64, a third larger, and is decoded on the server, against a 6 MB heap.
  */
-const MAX_STORED_FILE_BYTES = 4000000;
+const MAX_STORED_FILE_BYTES = 2500000;
 /** How many values of each column the picker shows, so the choice can be checked by eye. */
 const SAMPLE_VALUES = 3;
 
 const IGNORE = 'Ignore';
-
-/** What a column can be mapped to. Kept in step with ImportColumnLibrary. */
-const TARGETS = [
-  { value: 'Contact1.Salutation', label: 'Person: title' },
-  { value: 'Contact1.FirstName', label: 'Person: first name' },
-  { value: 'Contact1.LastName', label: 'Person: last name' },
-  { value: 'Contact1.FullName', label: 'Person: full name in one column' },
-  { value: 'Contact1.Email', label: 'Person: email' },
-  { value: 'Contact1.Phone', label: 'Person: phone' },
-  { value: 'Contact1.Title', label: 'Person: job title' },
-  { value: 'Contact1.MailingStreet', label: 'Person: street' },
-  { value: 'Contact1.MailingCity', label: 'Person: city' },
-  { value: 'Contact1.MailingState', label: 'Person: state or province' },
-  { value: 'Contact1.MailingPostalCode', label: 'Person: postal code' },
-  { value: 'Contact1.MailingCountry', label: 'Person: country' },
-  { value: 'Contact2.FirstName', label: 'Second person: first name' },
-  { value: 'Contact2.LastName', label: 'Second person: last name' },
-  { value: 'Contact2.FullName', label: 'Second person: full name in one column' },
-  { value: 'Contact2.Email', label: 'Second person: email' },
-  { value: 'Contact2.Phone', label: 'Second person: phone' },
-  { value: 'Household.Name', label: 'Household: name' },
-  { value: 'Organization.Name', label: 'Organization: name' },
-  { value: 'Organization.Phone', label: 'Organization: phone' },
-  { value: 'Organization.Website', label: 'Organization: website' },
-  { value: 'Organization.BillingStreet', label: 'Organization: street' },
-  { value: 'Organization.BillingCity', label: 'Organization: city' },
-  { value: 'Organization.BillingState', label: 'Organization: state or province' },
-  { value: 'Organization.BillingPostalCode', label: 'Organization: postal code' },
-  { value: 'Organization.BillingCountry', label: 'Organization: country' }
-];
 
 /**
  * The row entities a module outside Core loads (R-IR6). Their columns are offered only from
@@ -253,7 +226,13 @@ export default class ImportWizard extends LightningElement {
    * The fields matching accepts, per object (R-IT8), and the fields of people and
    * organizations a column can be mapped to besides the fixed list (R-IT11).
    */
-  matchFields = { contact: [], account: [], personFields: [], organizationFields: [] };
+  matchFields = {
+    contact: [],
+    account: [],
+    fixedTargets: [],
+    personFields: [],
+    organizationFields: []
+  };
   /** Whether this file only matches and creates nobody (R-IB15). */
   matchOnly = false;
   /** Whether the org's duplicate rules are asked too, as the mapping holds it (R-IT16). */
@@ -346,6 +325,7 @@ export default class ImportWizard extends LightningElement {
         this.matchFields = {
           contact: (fields && fields.contact) || [],
           account: (fields && fields.account) || [],
+          fixedTargets: (fields && fields.fixedTargets) || [],
           personFields: (fields && fields.personFields) || [],
           organizationFields: (fields && fields.organizationFields) || [],
           contactRules: fields ? fields.contactRules : undefined,
@@ -631,7 +611,7 @@ export default class ImportWizard extends LightningElement {
       );
     }
     const all = [{ label: doNotLoad, value: IGNORE }]
-      .concat(TARGETS)
+      .concat(this.matchFields.fixedTargets)
       .concat(RECORD_ID_TARGETS)
       .concat(this.matchFieldTargets)
       .concat(this.ownFieldTargets)
@@ -1131,7 +1111,12 @@ export default class ImportWizard extends LightningElement {
 
   async storeOriginal() {
     const file = this.pendingFile;
-    if (!file || file.size > MAX_STORED_FILE_BYTES) {
+    this.storeFileError = undefined;
+    if (!file) {
+      return null;
+    }
+    if (file.size > MAX_STORED_FILE_BYTES) {
+      this.storeFileError = originalTooLargeToKeep;
       return null;
     }
     try {
@@ -1139,7 +1124,7 @@ export default class ImportWizard extends LightningElement {
     } catch (storeError) {
       // Keeping a copy of the file is not worth failing an import over: the import goes
       // ahead and the batch simply has no link back to the original.
-      this.storeFileError = this.errorText(storeError);
+      this.storeFileError = format(originalNotKept, this.errorText(storeError));
       return null;
     }
   }

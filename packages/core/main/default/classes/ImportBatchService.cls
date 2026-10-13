@@ -52,57 +52,11 @@ public with sharing class ImportBatchService {
     /**
      * Creates the batch record for one upload. The file has already been stored as a
      * Salesforce File by the component, and its identifier is kept so the original can be
-     * downloaded again.
-     */
-    @NamespaceAccessible
-    public static Import_Batch__c create(Id templateId, String fileId, String fileName) {
-        return create(templateId, fileId, fileName, null, null);
-    }
-
-    /**
-     * Creates the batch for one upload with its control totals (R-IB10): how many rows the
-     * file should hold and what its gift amounts should add up to. Either may be null, which
-     * means that total is not checked.
-     */
-    @NamespaceAccessible
-    public static Import_Batch__c create(
-        Id templateId,
-        String fileId,
-        String fileName,
-        Integer expectedCount,
-        Decimal expectedAmount
-    ) {
-        return create(templateId, fileId, fileName, expectedCount, expectedAmount, null);
-    }
-
-    /**
-     * Creates the batch for one upload with its control totals and the values every row of
-     * the file takes where it has none of its own (R-IB14). A value that would make every row
-     * one person is refused, saying which.
-     */
-    @NamespaceAccessible
-    public static Import_Batch__c create(
-        Id templateId,
-        String fileId,
-        String fileName,
-        Integer expectedCount,
-        Decimal expectedAmount,
-        List<ImportMapping.Assignment> fileValues
-    ) {
-        return create(
-            templateId,
-            fileId,
-            fileName,
-            expectedCount,
-            expectedAmount,
-            fileValues,
-            false
-        );
-    }
-
-    /**
-     * Creates the batch for one upload as above, marked Match only when the file is to update
-     * records the org already has and create none (R-IB15).
+     * downloaded again. The control totals (R-IB10) are how many rows the file should hold and
+     * what its gift amounts should add up to; either may be null, meaning it is not checked.
+     * The file values are what every row takes where it has none of its own (R-IB14); a value
+     * that would make every row one person is refused, saying which. Match only marks a file
+     * that updates records the org already has and creates none (R-IB15).
      */
     @NamespaceAccessible
     public static Import_Batch__c create(
@@ -582,37 +536,11 @@ public with sharing class ImportBatchService {
     /**
      * Closes a run: counts read back from the rows, the status the run ended in, and the run
      * log. Called from the batch's finish, where the running user may be anyone, so the write
-     * is in system mode (ADR-0021) over fields the package owns.
-     */
-    @NamespaceAccessible
-    public static Import_Batch__c finish(
-        Id batchId,
-        Boolean dryRun,
-        Boolean failed,
-        List<String> logLines
-    ) {
-        return finish(batchId, dryRun, failed, logLines, null);
-    }
-
-    /**
-     * Closes a run as above, recording the total of the gift amounts the entity processor read
-     * and checking the control totals against the file (R-IB10).
-     */
-    @NamespaceAccessible
-    public static Import_Batch__c finish(
-        Id batchId,
-        Boolean dryRun,
-        Boolean failed,
-        List<String> logLines,
-        Decimal fileAmount
-    ) {
-        return finish(batchId, dryRun, failed, logLines, fileAmount, null);
-    }
-
-    /**
-     * Closes a run as above. A dry run also records the settings the entity processor ran
-     * under, replacing the last dry run's, and the commit is held to them (R-IB11). A commit
-     * leaves them as its dry run recorded them.
+     * is in system mode (ADR-0021) over fields the package owns. Records the total of the gift
+     * amounts the entity processor read and checks the control totals against it (R-IB10). A
+     * dry run also records the settings the entity processor ran under, replacing the last dry
+     * run's, and the commit is held to them (R-IB11); a commit leaves them as its dry run
+     * recorded them.
      */
     @NamespaceAccessible
     public static Import_Batch__c finish(

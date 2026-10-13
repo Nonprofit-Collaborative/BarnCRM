@@ -2017,7 +2017,7 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 |---|---|---|---|
 | Name | text | computed | The batch's identifier, assigned automatically. |
 | Import Template | reference(Import Template) | yes | The mapping this batch was read with. |
-| File Reference | text | yes | The identifier of the uploaded file stored as a Salesforce File, so the original can be downloaded again. |
+| File Reference | text | yes | The identifier of the uploaded file stored as a Salesforce File, so the original can be downloaded again. Empty when the file was over 2.5 MB or could not be saved; the import still runs. |
 | File Name | text | yes | The name of the file as the admin uploaded it. |
 | Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Complete, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. |
 | Is Dry Run | boolean | yes (defaults true) | Whether this pass only previewed what would happen; a committed batch has run at least one dry run first. |
@@ -6621,6 +6621,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-3). No object or field added. R-IB1: a row's organization is created only after its people are matched and validated, so a rejected row creates nothing and the dry run counts what the commit does; a rejected row points at what it saved. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-10, owner decision). No object or field added. R-AF5 states how a people import creates or matches the first person's affiliation with the row's organization, journaled as Created for undo; R-IR6: Core resolves the `Affiliation` entity. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-22, IMPORT-23). No object or field added. The wizard's fixed columns are served by the server with labels, adding Affiliation: role; File Reference is empty for a file over 2.5 MB. |
 
 ---
 ## 32. Entity ownership by package

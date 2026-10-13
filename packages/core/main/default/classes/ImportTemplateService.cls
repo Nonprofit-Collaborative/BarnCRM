@@ -65,10 +65,14 @@ public with sharing class ImportTemplateService {
      */
     @NamespaceAccessible
     public static Import_Template__c saveMatching(Id templateId, MatchingChoices choices) {
-        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
-        if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
-        }
+        Import_Template__c template = existing(templateId);
+        applyMatching(template, choices);
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** Sets a template's matching choices as `saveMatching` saves them, without saving. */
+    private static void applyMatching(Import_Template__c template, MatchingChoices choices) {
         MatchingChoices given = choices == null ? new MatchingChoices() : choices;
         template.Matching_Rule__c = normalizedRule(given.personRule);
         template.Organization_Matching_Rule__c = normalizedOrganizationRule(given.organizationRule);
@@ -82,8 +86,6 @@ public with sharing class ImportTemplateService {
             )
             ? checkedField(Account.SObjectType, given.organizationMatchField)
             : null;
-        Database.update(template, AccessLevel.USER_MODE);
-        return template;
     }
 
     /**
@@ -158,10 +160,14 @@ public with sharing class ImportTemplateService {
      */
     @NamespaceAccessible
     public static Import_Template__c saveLoad(Id templateId, LoadChoices choices) {
-        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
-        if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
-        }
+        Import_Template__c template = existing(templateId);
+        applyLoad(template, choices);
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** Sets a one-object template's load choices as `saveLoad` saves them, without saving. */
+    private static void applyLoad(Import_Template__c template, LoadChoices choices) {
         LoadChoices given = choices == null ? new LoadChoices() : choices;
         Schema.SObjectType type = ImportObjectSchema.typeOf(template);
         template.Load_Operation__c = given.operation;
@@ -190,8 +196,6 @@ public with sharing class ImportTemplateService {
             ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
             : ImportObjectSchema.LOOKUP_REJECT;
         template.Several_Matches__c = normalizedSeveralMatches(given.severalMatches);
-        Database.update(template, AccessLevel.USER_MODE);
-        return template;
     }
 
     /** A chosen matching field as describe names it, or null for none; refused when not offered. */
@@ -329,10 +333,18 @@ public with sharing class ImportTemplateService {
         String mappingDocument,
         String matchingRule
     ) {
-        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
-        if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
-        }
+        Import_Template__c template = existing(templateId);
+        applyMapping(template, mappingDocument, matchingRule);
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** Sets a template's mapping as `saveMapping` saves it, refusing as it does, without saving. */
+    private static void applyMapping(
+        Import_Template__c template,
+        String mappingDocument,
+        String matchingRule
+    ) {
         ImportMapping mapping = ImportMapping.parse(mappingDocument);
         // A one-object template names no person; its own refusals are asked when its dry run
         // starts, once its load choices are saved too (R-IT12).
@@ -346,8 +358,6 @@ public with sharing class ImportTemplateService {
         }
         template.Column_Mapping_JSON__c = mapping.serialize();
         template.Matching_Rule__c = normalizedRule(matchingRule);
-        Database.update(template, AccessLevel.USER_MODE);
-        return template;
     }
 
     /** The payment matching behaviours a template can hold (R-IT7, R-DM5). */
@@ -371,10 +381,19 @@ public with sharing class ImportTemplateService {
         Integer windowDays,
         Decimal tolerance
     ) {
-        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
-        if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
-        }
+        Import_Template__c template = existing(templateId);
+        applyPaymentMatching(template, behaviour, windowDays, tolerance);
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** Sets a template's payment matching as `savePaymentMatching` saves it, without saving. */
+    private static void applyPaymentMatching(
+        Import_Template__c template,
+        String behaviour,
+        Integer windowDays,
+        Decimal tolerance
+    ) {
         String chosen = null;
         for (String value : PAYMENT_MATCHING_VALUES) {
             if (String.isNotBlank(behaviour) && value.equalsIgnoreCase(behaviour.trim())) {
@@ -394,7 +413,66 @@ public with sharing class ImportTemplateService {
         template.Payment_Matching__c = chosen;
         template.Match_Date_Window_Days__c = windowDays;
         template.Match_Amount_Tolerance__c = tolerance == null ? null : tolerance.setScale(2);
+    }
+
+    /**
+     * Everything the wizard saves on a template when a file is previewed: the mapping and person
+     * rule always, and payment matching, load and matching choices when it sent them.
+     */
+    @NamespaceAccessible
+    public class UploadChoices {
+        @NamespaceAccessible
+        public String mappingDocument;
+        @NamespaceAccessible
+        public String matchingRule;
+        /** True when the wizard showed the payment matching choices, which are then saved. */
+        @NamespaceAccessible
+        public Boolean savePaymentMatching;
+        @NamespaceAccessible
+        public String paymentMatching;
+        @NamespaceAccessible
+        public Integer matchDateWindowDays;
+        @NamespaceAccessible
+        public Decimal matchAmountTolerance;
+        @NamespaceAccessible
+        public LoadChoices load;
+        @NamespaceAccessible
+        public MatchingChoices matching;
+    }
+
+    /**
+     * Saves what the wizard settled on for one upload in one read and one write, refusing as
+     * each separate save would. The person rule in the matching choices is the mapping's.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c saveUpload(Id templateId, UploadChoices choices) {
+        Import_Template__c template = existing(templateId);
+        applyMapping(template, choices.mappingDocument, choices.matchingRule);
+        if (choices.savePaymentMatching == true) {
+            applyPaymentMatching(
+                template,
+                choices.paymentMatching,
+                choices.matchDateWindowDays,
+                choices.matchAmountTolerance
+            );
+        }
+        if (choices.load != null) {
+            applyLoad(template, choices.load);
+        }
+        if (choices.matching != null) {
+            choices.matching.personRule = choices.matchingRule;
+            applyMatching(template, choices.matching);
+        }
         Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** The template, refused with the usual message when it is gone. */
+    private static Import_Template__c existing(Id templateId) {
+        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+        if (template == null) {
+            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+        }
         return template;
     }
 

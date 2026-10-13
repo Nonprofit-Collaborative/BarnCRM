@@ -74,6 +74,88 @@ public with sharing class ImportFieldCatalog {
         'ispersonaccount'
     };
 
+    /**
+     * The fixed columns the wizard always offers for a people file, in the order it lists them:
+     * the attributes the column library suggests (ImportColumnLibrary), named with labels so
+     * they translate. The org's own fields come after them, from `personFields` and
+     * `organizationFields`.
+     */
+    public static List<ImportMapping.Target> fixedTargets() {
+        String person = Label.Core_Import_TargetFirstPersonField;
+        String second = Label.Core_Import_TargetSecondPersonField;
+        String household = Label.Core_Import_TargetHouseholdField;
+        String organization = Label.Core_Import_TargetOrganizationField;
+        String affiliation = Label.Core_Import_TargetAffiliationField;
+        List<ImportMapping.Target> targets = new List<ImportMapping.Target>{
+            target('Contact1.Salutation', person, Label.Core_Import_TargetAttributeTitle),
+            target('Contact1.FirstName', person, Label.Core_Import_TargetAttributeFirstName),
+            target('Contact1.LastName', person, Label.Core_Import_TargetAttributeLastName),
+            target('Contact1.FullName', person, Label.Core_Import_TargetAttributeFullName),
+            target('Contact1.Email', person, Label.Core_Import_TargetAttributeEmail),
+            target('Contact1.Phone', person, Label.Core_Import_TargetAttributePhone),
+            target('Contact1.Title', person, Label.Core_Import_TargetAttributeJobTitle),
+            target('Contact1.MailingStreet', person, Label.Core_Import_TargetAttributeStreet),
+            target('Contact1.MailingCity', person, Label.Core_Import_TargetAttributeCity),
+            target('Contact1.MailingState', person, Label.Core_Import_TargetAttributeState),
+            target(
+                'Contact1.MailingPostalCode',
+                person,
+                Label.Core_Import_TargetAttributePostalCode
+            ),
+            target('Contact1.MailingCountry', person, Label.Core_Import_TargetAttributeCountry),
+            target('Contact2.FirstName', second, Label.Core_Import_TargetAttributeFirstName),
+            target('Contact2.LastName', second, Label.Core_Import_TargetAttributeLastName),
+            target('Contact2.FullName', second, Label.Core_Import_TargetAttributeFullName),
+            target('Contact2.Email', second, Label.Core_Import_TargetAttributeEmail),
+            target('Contact2.Phone', second, Label.Core_Import_TargetAttributePhone),
+            target('Household.Name', household, Label.Core_Import_TargetAttributeName),
+            target('Organization.Name', organization, Label.Core_Import_TargetAttributeName),
+            target('Organization.Phone', organization, Label.Core_Import_TargetAttributePhone),
+            target('Organization.Website', organization, Label.Core_Import_TargetAttributeWebsite),
+            target(
+                'Organization.BillingStreet',
+                organization,
+                Label.Core_Import_TargetAttributeStreet
+            ),
+            target('Organization.BillingCity', organization, Label.Core_Import_TargetAttributeCity),
+            target(
+                'Organization.BillingState',
+                organization,
+                Label.Core_Import_TargetAttributeState
+            ),
+            target(
+                'Organization.BillingPostalCode',
+                organization,
+                Label.Core_Import_TargetAttributePostalCode
+            ),
+            target(
+                'Organization.BillingCountry',
+                organization,
+                Label.Core_Import_TargetAttributeCountry
+            )
+        };
+        // The role of the affiliation a row's person and organization make (R-AF5), offered
+        // when the user may set it.
+        Schema.DescribeFieldResult role = Affiliation__c.Role__c.getDescribe();
+        if (role.isAccessible() && role.isCreateable()) {
+            targets.add(
+                target(
+                    ImportMapping.ENTITY_AFFILIATION + '.' + role.getName(),
+                    affiliation,
+                    Label.Core_Import_TargetAttributeRole
+                )
+            );
+        }
+        return targets;
+    }
+
+    private static ImportMapping.Target target(String value, String entityLabel, String attribute) {
+        return new ImportMapping.Target(
+            value,
+            String.format(entityLabel, new List<String>{ attribute })
+        );
+    }
+
     /** A person's fields, in contact terms whatever the person mode (R-IT3). */
     public static List<ImportMapping.Target> personFields() {
         return offered(Contact.SObjectType, new Set<String>());
