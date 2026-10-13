@@ -1763,7 +1763,9 @@ household automation writes), and not a field the fixed column list already offe
 it lists Contact fields in contact terms, which R-IT3 translates in Person Accounts mode; for
 organizations it lists Account fields that are not person account fields. Values are written
 as the other attributes are (R-IB12): read as the field's type the one way every import reads
-it (ISO or the user's locale for dates and date times, numbers with separators, times), never
+it (ISO or the user's locale for dates and date times, numbers as spreadsheets export them
+in the user's locale, with currency symbols or codes, grouping marks and a minus sign or
+accounting brackets for a negative, refusing a value whose decimal mark cannot be told, times), never
 clearing a stored value with a blank, and a field the user may not write is skipped and named in
 the run log. A value the field cannot take (unreadable, or text longer than the field) rejects
 the row with the field and value named, as a one-object load does (R-IT12). A matched record
@@ -6632,6 +6634,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-22, IMPORT-23). No object or field added. The wizard's fixed columns are served by the server with labels, adding Affiliation: role; File Reference is empty for a file over 2.5 MB. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-19, D-41). No object or field added. R-IT4: shipped import templates are added on install and on every upgrade by each package's post-install script. |
 | v0.6 | 2026-10-13 | Core quality pass, import (D-40). No object added. `BarnCRM_Settings__c` gains `Import_Row_Retention_Days__c` (v0.7 keys table, Import section). R-IR5: staged rows are deleted nightly once their batch finished more than that many days ago, and a batch without its rows cannot run again. |
+| v0.6 | 2026-10-13 | Core quality pass, import (number reading). No object or field added. R-IT11: numbers are read as spreadsheets export them in the user's locale (currency symbols and codes, grouping marks, accounting brackets); a value whose decimal mark cannot be told is refused. |
 
 ---
 ## 32. Entity ownership by package

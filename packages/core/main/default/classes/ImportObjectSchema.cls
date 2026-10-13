@@ -501,8 +501,9 @@ public with sharing class ImportObjectSchema {
 
     /**
      * A value as its field's type. A date is read as ISO 8601 (2026-10-12) or in the running
-     * user's locale; a date and time as ISO 8601 or in the locale; numbers without spaces,
-     * thousands separators or a currency or percent sign; a checkbox as `checkbox` reads it.
+     * user's locale; a date and time as ISO 8601 or in the locale; a number as
+     * `ImportValues.number` reads it, so "$1,250.00", "1 250,50" in a locale that writes it so
+     * and "(45.00)" load; a checkbox as `checkbox` reads it.
      * Returns null, or throws, when the value cannot be read. Lookups are not read here.
      */
     @NamespaceAccessible
@@ -520,13 +521,18 @@ public with sharing class ImportObjectSchema {
             kind == Schema.DisplayType.DOUBLE ||
             kind == Schema.DisplayType.PERCENT
         ) {
-            return Decimal.valueOf(trimmed.replaceAll('[\\s,$%]', ''));
+            return ImportValues.number(trimmed);
         }
-        if (kind == Schema.DisplayType.INTEGER) {
-            return Integer.valueOf(trimmed.replaceAll('[\\s,]', ''));
-        }
-        if (kind == Schema.DisplayType.LONG) {
-            return Long.valueOf(trimmed.replaceAll('[\\s,]', ''));
+        if (kind == Schema.DisplayType.INTEGER || kind == Schema.DisplayType.LONG) {
+            // A whole number, however it is written; "12.5" is not one.
+            Decimal whole = ImportValues.number(trimmed);
+            if (whole == null || whole != whole.round(System.RoundingMode.DOWN)) {
+                return null;
+            }
+            if (kind == Schema.DisplayType.LONG) {
+                return whole.longValue();
+            }
+            return Math.abs(whole) > 2147483647 ? null : whole.intValue();
         }
         if (kind == Schema.DisplayType.DATE) {
             return dateOf(trimmed);

@@ -396,6 +396,69 @@ private class ImportRowProcessorTest {
     }
 
     /**
+     * Amounts load as spreadsheets export them: currency symbols and codes, grouping in the
+     * user's locale and accounting brackets for a negative. A value that cannot be read
+     * without guessing still rejects its row. Two hundred rows, a full default chunk.
+     */
+    @IsTest
+    static void spreadsheetAmountsLoadAndAnUnreadableOneRejectsItsRow() {
+        System.runAs(TestUsers.admin()) {
+            // Written as the user's locale writes them, so the test holds in any locale.
+            List<String> written = new List<String>{
+                '$' + Decimal.valueOf('1250.5').format(),
+                '€' + Decimal.valueOf('100').format(),
+                '(' +
+                Decimal.valueOf('45.5').format() +
+                ')',
+                'USD ' + Decimal.valueOf('1250000').format()
+            };
+            List<Decimal> expected = new List<Decimal>{ 1250.5, 100, -45.5, 1250000 };
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                Map<String, String> row = ImportTestDataFactory.donorRow(
+                    'Person' + i,
+                    'Surname' + i,
+                    'person' + i + '@example.org',
+                    'Employer ' + i
+                );
+                row.put('Revenue', i == 199 ? '12abc' : written[Math.mod(i, 4)]);
+                values.add(row);
+            }
+            TestDataFactory.defaultSettings();
+            ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
+            mapping.columns.add(new ImportMapping.Column('Revenue', 'Organization.AnnualRevenue'));
+            template = ImportTestDataFactory.template(
+                mapping.serialize(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            batch = ImportTestDataFactory.batch(template);
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(199, outcome.created, 'Every readable row loaded: ' + outcome.notes);
+            Assert.areEqual(1, outcome.rejected, 'The unreadable amount rejects its row.');
+            Map<String, Decimal> revenueByName = new Map<String, Decimal>();
+            for (Account organization : [
+                SELECT Name, AnnualRevenue
+                FROM Account
+                WHERE Name LIKE 'Employer %'
+            ]) {
+                revenueByName.put(organization.Name, organization.AnnualRevenue);
+            }
+            for (Integer i = 0; i < 199; i++) {
+                Assert.isTrue(
+                    revenueByName.get('Employer ' + i) == expected[Math.mod(i, 4)],
+                    'Read as written: ' + written[Math.mod(i, 4)]
+                );
+            }
+            Assert.isFalse(revenueByName.containsKey('Employer 199'), 'Nothing made for it.');
+        }
+    }
+
+    /**
      * A re-import compares as the save would write (IMPORT-8): a date written differently is
      * no change, while a correction of capitals is one, as in Load one object.
      */
