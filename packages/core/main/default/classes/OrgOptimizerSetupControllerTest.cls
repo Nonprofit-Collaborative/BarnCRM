@@ -78,6 +78,36 @@ private class OrgOptimizerSetupControllerTest {
     }
 
     @IsTest
+    static void readsTheThresholdsFromSettingsWithinBounds() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                OrgOptimizerSetupController.DEFAULT_LOGIN_DAYS,
+                OrgOptimizerSetupController.loginDays(),
+                'Empty reads as the default.'
+            );
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Unused_Login_Days__c = 5;
+            settings.Unused_Report_Days__c = 5000;
+            HouseholdTestDataFactory.save(settings);
+            Assert.areEqual(30, OrgOptimizerSetupController.loginDays(), 'Below 30 reads as 30.');
+            Assert.areEqual(
+                1095,
+                OrgOptimizerSetupController.reportDays(),
+                'Above 1095 reads as 1095.'
+            );
+            settings.Unused_Login_Days__c = 120;
+            settings.Unused_Report_Days__c = 200;
+            HouseholdTestDataFactory.save(settings);
+            OrgOptimizerSetupController.permissionOverride = true;
+
+            OrgOptimizerSetupController.Result result = OrgOptimizerSetupController.getFindings();
+
+            Assert.areEqual(120, result.loginDays, 'The page is told the days in use.');
+            Assert.areEqual(200, result.reportDays, 'Both of them.');
+        }
+    }
+
+    @IsTest
     static void refusesAPersonWhoCannotManageSettings() {
         System.runAs(TestUsers.admin()) {
             OrgOptimizerSetupController.permissionOverride = false;

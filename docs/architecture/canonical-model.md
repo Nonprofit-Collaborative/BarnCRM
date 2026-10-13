@@ -934,6 +934,8 @@ range reads as the nearest end.
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Stale_Record_Years__c` | integer | 5 | Years without a change before the Data quality check People not changed lists a person (R-SQ6). From 1 to 20; empty reads as 5. |
+| `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
+| `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
 
 ### Rules
 
