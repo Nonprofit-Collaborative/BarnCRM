@@ -97,7 +97,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Import wizard | Major | Uploads a spreadsheet, suggests column mappings, runs a dry run showing what would be created, updated, matched or rejected, then commits with per-row results. | Shipped | C-14 |
-| Data Jobs tab | Minor | The import tab and its records read **Data Jobs** and **Data Job**, since imports, bulk updates and bulk deletes are all data jobs; API names are unchanged. | Built, not merged (`fix/data-jobs-relabel`) | ADR-0047 |
+| Data Job records | Minor | Import, bulk update and bulk delete records read **Data Job** (plural **Data Jobs**), since all three are data jobs; the tab stays **Import**; API names are unchanged. | Built, not merged (`fix/data-jobs-relabel`) | ADR-0047 |
 | Import undo | Major | Undoes a committed import within a set window: removes what it created and puts back values it changed, keeping anything that has since gained a life of its own. | Shipped | C-19 |
 | Excel workbook import | Major | Reads .xlsx files directly in the browser, no CSV conversion needed. | Shipped | C-19, ADR-0049 |
 | Import matching rules | Major | Separate matching rules for people and for organizations (email, name plus postal code, or an ID field you choose), set per file in the import wizard. | Shipped | C-32 |

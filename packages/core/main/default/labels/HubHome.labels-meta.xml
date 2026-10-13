@@ -109,8 +109,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: link to the Data Jobs tab</shortDescription>
-        <value>Go to Data Jobs</value>
+        <shortDescription>Hub home: link to the Import tab</shortDescription>
+        <value>Go to Import</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_WelcomeMessageReady</fullName>

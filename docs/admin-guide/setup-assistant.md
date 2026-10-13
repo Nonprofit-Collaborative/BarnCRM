@@ -264,10 +264,10 @@ Two buttons, and you may use either, both, or neither:
 - **Load the sample data** puts about two hundred realistic households, people, and
   organizations in your org so you can practise on something that is not your real data.
   You can remove it again from the same panel.
-- **Import a spreadsheet** opens the **Data Jobs** tab, where you upload your file, map your
+- **Import a spreadsheet** opens the Import tab, where you upload your file, map your
   columns, run a preview, and see what would happen before anything is created.
 
-If the **Data Jobs** tab is not in your org yet, the step says so rather than sending you to a
+If the Import tab is not in your org yet, the step says so rather than sending you to a
 page that does not exist, and the same is true of the sample data loader.
 
 **What Maria sees:** both buttons. She loads the sample data, because her real export is

@@ -19,14 +19,14 @@ removed and the values it changed are put back (section 5).
 
 ## 2. How to turn it on
 
-Nothing to turn on. The **Data Jobs** tab is in the BarnCRM app for anyone with the
+Nothing to turn on. The **Import** tab is in the BarnCRM app for anyone with the
 **Manage BarnCRM Settings** permission. If you do not see the tab, ask whoever set up
 your org to give you the BarnCRM Admin role on the **Access** page.
 
-The tab used to be called **Import**. It is **Data Jobs** because every import, bulk update
-([Bulk update](bulk-update.md)) and bulk delete ([Bulk delete](bulk-delete.md)) is saved as one
-**Data Job** record, with its counts, run log and undo deadline. In reports and list views look
-for **Data Jobs**; the object's API name, `Import_Batch__c`, has not changed.
+Every import, bulk update ([Bulk update](bulk-update.md)) and bulk delete
+([Bulk delete](bulk-delete.md)) is saved as one **Data Job** record, with its counts, run log
+and undo deadline. In reports and list views look for **Data Jobs**; the object's API name,
+`Import_Batch__c`, has not changed.
 
 A few things are worth knowing before your first large file:
 
@@ -38,7 +38,7 @@ A few things are worth knowing before your first large file:
 3. **Days an import can be undone** is 30 unless you change it, and can be anything from 1
    to 365. Each import keeps the window it was imported with.
 4. **Import** on the same page has an **Open the import wizard** link, which is the same
-   place the **Data Jobs** tab takes you.
+   place the **Import** tab takes you.
 5. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
@@ -53,7 +53,7 @@ Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-fr
 You need a CSV file or an Excel workbook (.xlsx). A small one is best for the first run: five
 or six rows.
 
-1. Open the **Data Jobs** tab. Select **Generic contact list**, then **Next**.
+1. Open the **Import** tab. Select **Generic contact list**, then **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
    you every column it found, with the first few values from the file underneath each one.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
@@ -166,7 +166,7 @@ It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).
 
-1. Open the **Data Jobs** tab. **Recent imports** lists your last imports, newest first, with
+1. Open the **Import** tab. **Recent imports** lists your last imports, newest first, with
    the date each one can be undone until.
 2. Select **Undo** beside the import. BarnCRM counts what it would remove (people,
    households and organizations, and gifts with Giving) and how many changed values it would put back, and shows
@@ -207,7 +207,7 @@ Some files come back on a schedule: a monthly export from your payment processor
 quarterly list from a partner. Mark the mapping you use for one as recurring and the Hub
 keeps track of it for you.
 
-1. Open the **Data Jobs** tab and choose the mapping.
+1. Open the **Import** tab and choose the mapping.
 2. Select **This file arrives regularly**, and give the source a name you will recognize,
    for example "Monthly processor export". The name is required while the box is ticked.
 3. Select **Next** and import the file as usual.
@@ -433,7 +433,7 @@ own objects, or volunteer hours from a sign-in sheet each describe one kind of r
 one object** loads a file into a single object, including your org's own custom objects, with
 the same dry run, results, journal and undo as any import.
 
-1. Open the **Data Jobs** tab and select **Load one object**.
+1. Open the **Import** tab and select **Load one object**.
 2. Choose the object from the list, give the mapping a name (for example "Program sessions"),
    and select **Create**. The new mapping is chosen for you. Select **Next**.
 3. Upload the file. Each column is matched to the field whose label or API name is its heading;

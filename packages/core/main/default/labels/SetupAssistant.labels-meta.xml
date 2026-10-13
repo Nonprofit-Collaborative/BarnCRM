@@ -118,7 +118,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: notice shown when the Import framework is not in this org yet</shortDescription>
-        <value>Importing a spreadsheet arrives with the Data Jobs tab. Load the sample data for now, or skip this step.</value>
+        <value>Importing a spreadsheet arrives with the Import tab. Load the sample data for now, or skip this step.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_InvalidValueError</fullName>

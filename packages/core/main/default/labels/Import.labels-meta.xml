@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import: the batch record has gone</shortDescription>
-        <value>That import no longer exists. Start again from the Data Jobs tab.</value>
+        <value>That import no longer exists. Start again from the Import tab.</value>
     </labels>
     <labels>
         <fullName>Core_Import_ErrorMappingIdentifiesNobody</fullName>
