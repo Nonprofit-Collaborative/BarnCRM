@@ -54,10 +54,10 @@ names should not, because links, permission sets and the console's workspace map
 6. **One job history.** `dataJobHistory` replaces the three history components. It reads the
    three existing endpoints (`ImportController.getRecentBatches`, `BulkUpdateController.getPage`,
    `BulkDeleteController.getPage`), each only when the person holds that tool's permission,
-   merges them newest first and filters by kind. Undo calls each tool's existing undo, and every
-   undo asks the person to type the number it will act on (the import undo now types the total
-   its preview counted, as bulk update and bulk delete already did). No new object, field or
-   selector.
+   merges them newest first and filters by kind. Undo calls each tool's existing undo with its
+   existing confirmation: the import undo shows its preview counts and a confirm button; bulk
+   update and bulk delete ask the person to type the number the undo acts on. The import view
+   gains its start time so the kinds sort together. No new object, field or selector.
 7. **Navigation.** `Data_Manager` is added to the app's `<tabs>` and `workspaceConfig`;
    `Import` and `Bulk_Update` leave both (metadata and permission set visibility kept, reached
    from Data Manager and from existing links); `Find` and `Data_Hygiene` stay. A tab reached by

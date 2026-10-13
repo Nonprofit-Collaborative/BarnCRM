@@ -57,14 +57,14 @@ Start from the sample data (see [Sample data](sample-data.md)).
 
 ## 4. Undo from the job list
 
-Every kind of job is undone the way its own page describes, and every undo asks you to type a
-number first, so nothing is undone by a stray click:
+Every kind of job is undone the way its own page describes, and every undo asks you to confirm
+first, so nothing is undone by a stray click:
 
-| Job | What Undo does | The number you type |
+| Job | What Undo does | How you confirm |
 |---|---|---|
-| Import | Removes the people, households, organizations (and gifts, with Giving) it created and puts back the values it changed, keeping anything that has since gained a life of its own ([Importing](importing.md), section 5) | Everything it would remove or put back, shown counted by kind |
-| Bulk update | Puts back the values it changed ([Bulk update](bulk-update.md)) | The values it puts back |
-| Bulk delete | Brings the records back from the Recycle Bin ([Bulk delete](bulk-delete.md)) | The records it brings back |
+| Import | Removes the people, households, organizations (and gifts, with Giving) it created and puts back the values it changed, keeping anything that has since gained a life of its own ([Importing](importing.md), section 5) | The box counts what it would remove and put back, by kind; press **Undo this import** |
+| Bulk update | Puts back the values it changed ([Bulk update](bulk-update.md)) | Type the number of values it puts back |
+| Bulk delete | Brings the records back from the Recycle Bin ([Bulk delete](bulk-delete.md)) | Type the number of records it brings back |
 
 **Undo** is shown only while a job can still be undone: before its **Undo until** date, and
 only once. A job that can no longer be undone is still listed, with its counts.
