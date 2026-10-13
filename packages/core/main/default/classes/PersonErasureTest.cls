@@ -333,6 +333,59 @@ private class PersonErasureTest {
     }
 
     @IsTest
+    static void activitiesAndFilesAreCountedForTheAdminToDeleteByHand() {
+        System.runAs(eraser()) {
+            isolate();
+            // Household kept, so no account delete can take activities with it.
+            Contact jordan = coupleInContactMode(false);
+            insert new List<Task>{
+                new Task(WhoId = jordan.Id, Subject = 'Call'),
+                new Task(WhoId = jordan.Id, Subject = 'Thank you note')
+            };
+            insert new Event(
+                WhoId = jordan.Id,
+                Subject = 'Visit',
+                ActivityDateTime = System.now(),
+                DurationInMinutes = 30
+            );
+            insert new ContentVersion(
+                Title = 'Letter',
+                PathOnClient = 'letter.txt',
+                VersionData = Blob.valueOf('Dear Jordan'),
+                FirstPublishLocationId = jordan.Id
+            );
+
+            Map<String, PersonErasure.Change> kept = new Map<String, PersonErasure.Change>();
+            for (PersonErasure.Change change : PersonErasure.preview(jordan.Id).changes) {
+                if (change.action == PersonErasure.KEPT) {
+                    kept.put(change.objectLabel, change);
+                }
+            }
+            String tasks = Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+            String events = Event.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getLabel();
+            Assert.areEqual(2, kept.get(tasks)?.count, 'Both tasks counted');
+            Assert.areEqual(1, kept.get(events)?.count, 'The event counted');
+            Assert.areEqual(1, kept.get(Label.Core_Erase_Files)?.count, 'The file counted');
+            Assert.areEqual(
+                Label.Core_Erase_NoteByHand,
+                kept.get(tasks).note,
+                'Told to act by hand'
+            );
+
+            Test.startTest();
+            PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Task WHERE WhoId = :jordan.Id],
+                'Nothing is erased automatically (R-ER10)'
+            );
+        }
+    }
+
+    @IsTest
     static void withoutThePermissionNothingIsErased() {
         Contact jordan;
         System.runAs(TestUsers.admin()) {

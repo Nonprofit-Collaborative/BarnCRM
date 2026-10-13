@@ -135,9 +135,13 @@ anonymous aggregates like the totals.
 - New: object `Erasure__c` (five fields), custom permission `Erase_People`, permission set
   `BarnCRM_Erase_People`, classes `PersonErasure`, `PersonErasureExtension`,
   `PersonErasureExtensions`, `PersonErasureHistoryCleanup`, one method on `HouseholdService`.
-- An erased contact in contact mode has no account, so Health Check's "people with no household"
-  and the matching data hygiene check count it. Recorded as follow-up work: exclude people with an
-  Erasure record.
-- What this does not reach is listed in the admin guide: activities, files, notes and emails
-  about the person, Chatter feed tracking, reports already exported, backups, other systems, and
+- An erased person has no household on purpose, so Health Check's "people with no household"
+  and the matching data hygiene count leave out every person an Erasure record names (owner
+  decision 2026-10-13, R-ER9).
+- Tasks, events (by Name, Related To and shared activity relations) and files (by
+  ContentDocumentLink) about the person are counted in the preview and listed as kept, for the
+  admin to delete by hand; nothing in them is changed (owner decision 2026-10-13, R-ER10). Their
+  free text can hold anything, so no rule could say which to keep.
+- What this does not reach is listed in the admin guide: notes and emails about the person,
+  Chatter feed tracking, reports already exported, backups, other systems, and
   custom objects of the org's own that hold personal data in their own fields.

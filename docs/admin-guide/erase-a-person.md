@@ -71,12 +71,20 @@ request as ticket PR-2041.
   once you no longer have to keep them. Tribute names typed for the person, the message on a
   tribute of their own gift, and the email address in the acknowledgment ledger are emptied;
   active stewardship plans for them are ended.
-- **Not reached by the erasure**: tasks, events, notes, files and emails about the person;
-  Chatter posts and feed tracking; reports and exports already downloaded; backups; other
-  systems; contact point records (Nonprofit Cloud's email, phone and address records); and
-  records of your organization's own custom objects that hold personal details in their own
-  fields. Review these yourself; the erasure's record page lists none of them.
-- **Health Check** counts an erased contact as a person with no household. That is expected.
+- **Tasks, events and files** about the person are **listed, never erased**. The preview counts
+  them as **Kept**: every task and event that names the person (as its Name, its Related To, or
+  one of the people on a shared activity) and every file attached to the person's record. The
+  count includes ones you cannot open. Delete or edit them by hand, preferably before you
+  erase, while the person's name still shows on the record: open the person's record, then
+  the **Activity** and **Files** related lists. An activity's subject or a file's contents
+  can hold anything, so BarnCRM cannot tell which ones are safe to keep.
+- **Not reached by the erasure**: notes and emails about the person; Chatter posts and feed
+  tracking; reports and exports already downloaded; backups; other systems; contact point
+  records (Nonprofit Cloud's email, phone and address records); and records of your
+  organization's own custom objects that hold personal details in their own fields. Review
+  these yourself; the erasure's record page lists none of them.
+- **Health Check** and the data hygiene console do not count an erased person as a person with
+  no household: erasing them took them out of it on purpose.
 
 ## 5. Common mistakes
 
