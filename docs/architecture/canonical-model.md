@@ -6545,6 +6545,89 @@ Task for this feature beyond the action that creates it.
 
 ---
 
+## 29H. Erasure
+
+### Definition
+
+The record that a person was erased at their request (the right to be forgotten): who erased
+them, when, under which request, and what changed. It never holds an erased value
+(ADR-NEXT, `NEXT-erase-a-person-anonymizes-in-place.md`).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The erasure's identifier, assigned automatically. |
+| Contact | reference(Contact) | conditional | The anonymized person, where people are Contacts. |
+| Person Account | reference(Organization) | conditional | The anonymized person, where people are person Accounts. |
+| Erased Record Id | text | yes | The same person's record Id as text, kept if the record is deleted later. |
+| Request Reference | text | no | The organization's own reference for the request, for example a ticket number. Never a name or an address. |
+| Details | long text | yes | Each record the erasure changed, by object and Id, with what was done and the labels of the fields emptied. |
+
+### Relationships
+
+- **Erasure to the person**, many to one, to exactly one of Contact or Person Account (Section 4
+  "Person references").
+
+### Rules
+
+**R-ER1 Anonymize in place.** Erasing a person empties every field of their record that can be
+empty, except the fields `DataProtectedFields` protects, owner, record type, currency, the
+Individual link, and the fields an installed module keeps (`PersonErasureExtension`). The name
+becomes "Erased person"; opt-out flags are set and other checkboxes go back to their default. The
+record is never deleted, so gifts and totals keep pointing at it.
+
+**R-ER2 Contact points and connections.** The person's own addresses are deleted. Relationships
+on either side and affiliations are ended (End Date today, or the Start Date if later) and lose
+their description; an affiliation also loses its role and primary flag.
+
+**R-ER3 Households.** The person leaves every household: the contact's account is emptied in
+contact mode, and each current membership is ended in junction mode
+(`HouseholdService.endMembershipsFor`). Upkeep then recounts, renames and tidies away as on any
+move (R-H11, R-H12). A household left empty and kept is anonymized as in R-ER1, named "Erased
+household", with Custom Name on and its addresses deleted.
+
+**R-ER4 Platform privacy records.** The linked Individual, where the org has one, is emptied as
+in R-ER1 and marked Forget this Individual. Field history of the person and the Individual is
+deleted after the erasure commits where the user may delete it. Records the erasure deletes are
+emptied from the Recycle Bin.
+
+**R-ER5 As the user, all or nothing.** What to change is read in system mode; every change is
+made in user mode. A record or a field holding a value that the user cannot edit refuses the
+erasure before anything changes, and any refusal during the run takes everything back. The
+Erasure record is written in system mode (ADR-0021) and no packaged permission set may edit or
+delete it.
+
+**R-ER6 Preview.** The preview runs the erasure inside a savepoint and rolls it back, so it lists
+exactly what the erasure would change.
+
+**R-ER7 Who may erase.** Only a user with the custom permission `Erase_People`, who types the
+person's current name to confirm. A person with an Erasure record is not erased again.
+
+**R-ER8 Modules decide about their own records.** Each installed module implementing
+`PersonErasureExtension` changes its own records in the same transaction and reports what it
+changed and kept. A module that is installed but cannot answer refuses the erasure.
+
+### Salesforce implementation
+
+- **Object:** `Erasure__c`, auto-number Name with format `ER-{000000}`, sharing Read, no tab.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Contact | `Contact__c` | Lookup to Contact (clears on delete) |
+| Person Account | `Person_Account__c` | Lookup to Account (clears on delete) |
+| Erased Record Id | `Erased_Record_Id__c` | Text(18) |
+| Request Reference | `Request_Reference__c` | Text(80) |
+| Details | `Details__c` | Long Text Area(131072) |
+
+- **Permission:** custom permission `Erase_People`, in permission set `BarnCRM_Erase_People`
+  only (in no permission set group). `BarnCRM_Admin` and `BarnCRM_Erase_People` read
+  `Erasure__c`; nothing grants edit or delete.
+- **Service:** `PersonErasure`, `PersonErasureExtension`, `PersonErasureExtensions`,
+  `PersonErasureHistoryCleanup`.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -6731,6 +6814,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
 | v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
 | v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
+| post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER8. New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
 
 ---
 ## 32. Entity ownership by package
@@ -6777,6 +6861,7 @@ included; standard objects the packages extend are named by the entity that gove
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Interaction Note (Task, no packaged schema) | Core | v0.9 | 29G |
+| Erasure | Core | not scheduled (owner decision 2026-10-13) | 29H |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |

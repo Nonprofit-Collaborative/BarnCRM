@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Request_Reference__c</fullName>
+  <description>The organization's own reference for the erasure request, typed by the person who erased, for example a ticket number.</description>
+  <inlineHelpText>Your own reference for the request, for example a ticket number. Never a name or an email address.</inlineHelpText>
+  <label>Request Reference</label>
+  <length>80</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

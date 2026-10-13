@@ -155,6 +155,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-34 Find and export | [find.md](find.md) | Core | v0.7 |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core | 1.x (built ahead) |
+| Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) | not scheduled (owner decision 2026-10-13) |
 | C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
 | Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core | Core quality pass |

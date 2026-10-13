@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Details__c</fullName>
+  <description>Each record the erasure changed, by object and Id, with what was done and the labels of the fields emptied. Never a value.</description>
+  <inlineHelpText>What the erasure changed, record by record. It holds no erased value.</inlineHelpText>
+  <label>Details</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>20</visibleLines>
+</CustomField>
