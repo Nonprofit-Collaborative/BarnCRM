@@ -59,8 +59,8 @@ among your contacts works where. Start from the sample data.
    - **Primary**: select it
    - **Start date**: January 1 of last year
    Choose **Save**.
-4. The card shows one line: "Bayview Hardware, Store Manager, Current", with a
-   **Primary** badge on it. Look at the top of Harper's record: **Primary Affiliation** now
+4. The card shows one line: Bayview Hardware, Store Manager, with a **Primary** badge on
+   it. A current affiliation carries no status badge. Look at the top of Harper's record: **Primary Affiliation** now
    reads Bayview Hardware. You did not fill that in.
 5. Open **Bayview Hardware** from the **Organizations** tab. Its **Affiliations** card
    shows Harper Garcia, Store Manager. The same record, read from the organization's side.
@@ -73,8 +73,10 @@ among your contacts works where. Start from the sample data.
    longer primary. **Primary Affiliation** at the top of the record now reads Heritage
    Rotary Club. Only one organization can be primary at a time, and you never have to clear
    the old one.
-7. Edit the Heritage Rotary Club line and set **End date** to last month. Save. The line reads
-   **Former**, the **Primary** badge disappears, and **Primary Affiliation** at the top of
+7. The card has no Edit action, so change an affiliation on its own record: open the App
+   Launcher, search for **Affiliations**, open Harper's Heritage Rotary Club affiliation,
+   and choose **Edit**. Set **End date** to last month and save. Back on Harper's record,
+   the line carries a **Former** badge, the **Primary** badge disappears, and **Primary Affiliation** at the top of
    Harper's record is empty, because a connection that has ended is not the one Harper is
    chiefly associated with. Mark the Bayview Hardware line primary to fill it again.
 8. Check the Households tab. Harper is still in The Garcia Family, exactly where she was.

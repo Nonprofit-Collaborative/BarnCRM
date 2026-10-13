@@ -73,7 +73,9 @@ a member.
 The walkthrough reads the same in the flexible way of belonging, with one difference at
 step 3: the household is not shown in the household field on the person, because in that
 mode membership is a record of its own. Open the household from the **Households** tab, or
-from the Household panel on the person, and everything from step 4 on is identical.
+from the Household panel on the person, and everything from step 4 on is identical. (On a
+person account the panel is there once you add it to the page: see "The Household panel on
+a person" in [Household members](household-members.md).)
 
 One thing the tidy-up will not do: it never deletes a household that something outside
 BarnCRM still points at, even when the setting is on and nobody is left in it. It
