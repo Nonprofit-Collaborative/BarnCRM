@@ -22,6 +22,7 @@ public with sharing class SettingsService {
 
     private static final String SETUP_OWNER = 'setupownerid';
     private static final String PICKLIST = 'Picklist';
+    private static final String NUMBER_TYPE = 'Number';
     public static final String RECORD = 'Record';
     public static final String RECORD_TYPE_LIST = 'RecordTypeList';
 
@@ -269,6 +270,10 @@ public with sharing class SettingsService {
             checkRecordTypes(definition, String.valueOf(newValue));
             return;
         }
+        if (NUMBER_TYPE.equalsIgnoreCase(definition.Data_Type__c)) {
+            checkRange(definition, newValue);
+            return;
+        }
         if (
             !PICKLIST.equalsIgnoreCase(definition.Data_Type__c) ||
             String.isBlank(definition.Picklist_Values__c) ||
@@ -288,6 +293,33 @@ public with sharing class SettingsService {
             }
         }
         throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+    }
+
+    /**
+     * A number row is refused outside the range its definition ships, whoever saves it, so the
+     * console never shows a value as saved that its reader would clamp (ADMIN-27).
+     */
+    private static void checkRange(Setting_Definition__mdt definition, Object newValue) {
+        Decimal candidate;
+        try {
+            candidate = Decimal.valueOf(String.valueOf(newValue));
+        } catch (TypeException notANumber) {
+            throw new SettingsException(System.Label.Core_Settings_InvalidValueError);
+        }
+        Decimal low = definition.Min_Value__c;
+        Decimal high = definition.Max_Value__c;
+        if ((low != null && candidate < low) || (high != null && candidate > high)) {
+            throw new SettingsException(
+                String.format(
+                    System.Label.Core_Settings_NumberOutOfRange,
+                    new List<Object>{
+                        definition.MasterLabel,
+                        low == null ? '' : low.stripTrailingZeros().toPlainString(),
+                        high == null ? '' : high.stripTrailingZeros().toPlainString()
+                    }
+                )
+            );
+        }
     }
 
     /** A Record row holds the Id of a record of its own object, and nothing else (ADR-0074). */

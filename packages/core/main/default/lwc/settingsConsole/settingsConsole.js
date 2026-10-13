@@ -9,6 +9,7 @@ import SAVE_BUTTON from '@salesforce/label/c.Core_Settings_SaveButton';
 import DISCARD_BUTTON from '@salesforce/label/c.Core_Settings_DiscardButton';
 import SAVED_MESSAGE from '@salesforce/label/c.Core_Settings_SavedMessage';
 import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
+import OUT_OF_RANGE from '@salesforce/label/c.Core_Settings_NumberOutOfRangeOnPage';
 import LOAD_ERROR from '@salesforce/label/c.Core_Settings_LoadErrorMessage';
 import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Settings_ReadOnlyNotice';
 import LEARN_MORE from '@salesforce/label/c.Core_Settings_LearnMoreLink';
@@ -82,6 +83,7 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     discard: DISCARD_BUTTON,
     saved: SAVED_MESSAGE,
     saveError: SAVE_ERROR,
+    outOfRange: OUT_OF_RANGE,
     loadError: LOAD_ERROR,
     readOnly: READ_ONLY_NOTICE,
     learnMore: LEARN_MORE,
@@ -347,6 +349,17 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   async handleSave() {
     if (!this.canEdit || !this.isDirty) {
+      return;
+    }
+    // A number outside its range is marked on the box and nothing is sent (ADMIN-27); the
+    // server refuses it too, for anyone who saves another way.
+    const numbers = Array.from(
+      this.template.querySelectorAll('lightning-input[data-kind="Number"]')
+    );
+    const invalid = numbers.filter((input) => input.reportValidity() === false);
+    if (invalid.length > 0) {
+      this.messageIsError = true;
+      this.message = this.labels.outOfRange;
       return;
     }
     const values = { ...this.pending };

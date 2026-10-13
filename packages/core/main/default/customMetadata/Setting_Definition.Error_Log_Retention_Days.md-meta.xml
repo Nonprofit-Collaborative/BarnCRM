@@ -38,4 +38,12 @@
     <field>Sort_Order__c</field>
     <value xsi:type="xsd:double">40</value>
   </values>
+  <values>
+    <field>Min_Value__c</field>
+    <value xsi:type="xsd:double">0</value>
+  </values>
+  <values>
+    <field>Max_Value__c</field>
+    <value xsi:type="xsd:double">3650</value>
+  </values>
 </CustomMetadata>

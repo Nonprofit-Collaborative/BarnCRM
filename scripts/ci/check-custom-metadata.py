@@ -156,6 +156,15 @@ def check_setting_rows(problems):
             )
         if value_of(text, "Data_Type__c") == "Component":
             continue
+        if value_of(text, "Data_Type__c") == "Number" and not (
+            value_of(text, "Min_Value__c") and value_of(text, "Max_Value__c")
+        ):
+            # ADMIN-27: a number with no range is saved as typed and then clamped by whatever
+            # reads it, so the console shows a value that is not in effect.
+            problems.append(
+                f"{record}: is a Number row without both Min_Value__c and Max_Value__c, so "
+                "the console would accept a value BarnCRM does not use"
+            )
         key = value_of(text, "Setting_Key__c")
         if not key:
             problems.append(f"{record}: is not a Component row and names no Setting_Key__c")

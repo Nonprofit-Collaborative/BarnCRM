@@ -62,6 +62,11 @@ public with sharing class SettingsController {
         /** The object a Record row picks from, with this org's namespace (ADR-0074). */
         @AuraEnabled
         public String objectApiName;
+        /** A Number row's range, which the console marks and the server enforces (ADMIN-27). */
+        @AuraEnabled
+        public Decimal minValue;
+        @AuraEnabled
+        public Decimal maxValue;
     }
 
     public class Option {
@@ -322,6 +327,8 @@ public with sharing class SettingsController {
         setting.label = definition.MasterLabel;
         setting.description = definition.Description__c;
         setting.dataType = definition.Data_Type__c;
+        setting.minValue = definition.Min_Value__c;
+        setting.maxValue = definition.Max_Value__c;
         setting.section = String.isBlank(definition.Section__c) ? '' : definition.Section__c;
         setting.component = definition.Component__c;
         setting.navigationTarget = definition.Navigation_Target__c;

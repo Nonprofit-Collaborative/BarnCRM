@@ -1073,6 +1073,8 @@ settings to the console by shipping rows rather than by editing the console.
 | `Help_Path__c` | text (255) | The admin guide path, relative to `docs/admin-guide/`, behind the row's Learn more link. |
 | `Required_Permission__c` | text (80) | Optional. The API name of a custom permission, without a namespace prefix; when set, the console shows the row only to someone who has it (the name as given, else with the package namespace). For a module page whose controller only a module permission set opens (X-01, ADR-0058). |
 | `Sort_Order__c` | number | The order of this row inside its section. |
+| `Min_Value__c` | number(18, 2) | Number rows only: the lowest value the console accepts. The console marks a lower value before Save, and `SettingsService` refuses it on the server whoever saves it, naming the setting and the range (owner decision 2026-10-13, ADMIN-27). Every shipped Number row sets it. |
+| `Max_Value__c` | number(18, 2) | Number rows only: the highest value accepted, enforced the same way. Every shipped Number row sets it. |
 
 ### Automation Registry
 
@@ -6682,6 +6684,7 @@ mirrors the primary member).
 | post-1.0 | 2026-10-13 | Field utilization on demand (ADR-0101, `0101-field-utilization-on-demand.md`, owner decision). `BarnCRM_Settings__c` loses `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c`. Section 29F: R-FU1 (objects as Find offers them), R-FU5, R-FU7 (on demand, saved by choice, no retention job) and R-FU8 (previous saved count shown) rewritten; `Field_Utilization_Snapshot__c` unchanged. |
 | v0.6 | 2026-10-13 | Health Check on Home shows the last result (ADMIN-7, ADR-NEXT `NEXT-health-check-on-home-shows-the-last-result.md`). No object added. `BarnCRM_Settings__c` gains `Health_Check_Last_Run__c` and `Health_Check_Last_Result__c` (Section 12, Health Check keys). |
 | v0.6 | 2026-10-13 | Error Log retention (owner decision 2026-10-13, ADMIN-26). `BarnCRM_Settings__c` gains `Error_Log_Retention_Days__c` (default 180; Section 12, v0.6 keys). New rule R-E6: the daily Error Log job deletes entries older than that, whatever their status. No object added. |
+| v0.6 | 2026-10-13 | A range on every number setting (owner decision 2026-10-13, ADMIN-27). `Setting_Definition__mdt` gains `Min_Value__c` and `Max_Value__c` (Section 13); every shipped Number row sets both, and the console and `SettingsService` refuse a value outside them. No object added. |
 
 ---
 ## 32. Entity ownership by package

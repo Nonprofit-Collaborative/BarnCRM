@@ -64,6 +64,20 @@ function model(canEdit) {
             value: 'true',
             checked: true,
             options: []
+          },
+          {
+            key: 'Import_Chunk_Size__c',
+            label: 'Rows per import chunk',
+            description: 'How many rows an import processes at a time.',
+            dataType: 'Number',
+            section: 'Households',
+            component: null,
+            helpUrl: null,
+            value: '200',
+            checked: false,
+            options: [],
+            minValue: 1,
+            maxValue: 2000
           }
         ]
       },
@@ -196,7 +210,7 @@ describe('c-settings-console', () => {
     expect(navItems).toHaveLength(5);
 
     const inputs = element.shadowRoot.querySelectorAll('lightning-input');
-    expect(inputs).toHaveLength(2);
+    expect(inputs).toHaveLength(3);
     expect(inputs[0].value).toBe('The {LastName} Family');
     expect(inputs[1].checked).toBe(true);
 
@@ -343,7 +357,7 @@ describe('c-settings-console', () => {
     await settle();
 
     const groups = element.shadowRoot.querySelectorAll('div[role="group"]');
-    expect(groups).toHaveLength(2);
+    expect(groups).toHaveLength(3);
     const describedBy = groups[0].getAttribute('aria-describedby');
     expect(describedBy).toBeTruthy();
     const description = element.shadowRoot.querySelector(`[id="${describedBy}"]`);
@@ -409,5 +423,34 @@ describe('c-settings-console', () => {
 
     const message = element.shadowRoot.querySelector('p[role="status"]');
     expect(message.textContent).toContain('Core_Settings_LoadErrorMessage');
+  });
+
+  it('gives a number its range, and sends nothing while a number is outside it (ADMIN-27)', async () => {
+    const element = build();
+    await settle();
+
+    const input = element.shadowRoot.querySelector('lightning-input[data-kind="Number"]');
+    expect(input.min).toBe(1);
+    expect(input.max).toBe(2000);
+
+    input.value = '5000';
+    input.dispatchEvent(new CustomEvent('change'));
+    input.reportValidity = jest.fn(() => false);
+    await settle();
+
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(input.reportValidity).toHaveBeenCalled();
+    expect(saveSettings).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('p[role="status"]').textContent).toContain(
+      'Core_Settings_NumberOutOfRangeOnPage'
+    );
+
+    input.reportValidity = jest.fn(() => true);
+    element.shadowRoot.querySelectorAll('lightning-button')[0].click();
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({ values: { Import_Chunk_Size__c: '5000' } });
   });
 });
