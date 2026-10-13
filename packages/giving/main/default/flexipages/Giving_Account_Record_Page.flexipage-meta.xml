@@ -440,10 +440,6 @@
           <value>Household_Gifts__r</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
           <name>relatedListDisplayType</name>
           <value>ADVGRID</value>
         </componentInstanceProperties>
@@ -498,10 +494,6 @@
         <componentInstanceProperties>
           <name>relatedListApiName</name>
           <value>Gifts__r</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>relatedListDisplayType</name>
@@ -560,10 +552,6 @@
           <value>Household_Commitments__r</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
           <name>relatedListDisplayType</name>
           <value>ADVGRID</value>
         </componentInstanceProperties>
@@ -620,10 +608,6 @@
           <value>Commitments__r</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
           <name>relatedListDisplayType</name>
           <value>ADVGRID</value>
         </componentInstanceProperties>
@@ -678,10 +662,6 @@
         <componentInstanceProperties>
           <name>relatedListApiName</name>
           <value>Soft_Credits__r</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>relatedListDisplayType</name>
