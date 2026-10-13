@@ -34,7 +34,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Household model | Major | Groups the people you treat as one donor or customer into a household record, created automatically for every new person. | Shipped | C-01 |
-| Two ways of belonging to a household | Major | Supports a simple model (a person belongs to one household) and a flexible model (membership is its own record, so a person can be in several households, with role, primary flag and dates). | Shipped | C-01, C-22 |
+| Two ways of belonging to a household | Major | Supports a simple model (a person belongs to one household) and a flexible model (membership is its own record, so a person can be in several households, with role, primary flag and dates). A membership names exactly one person, and a second current membership of one person in one household is refused. | Shipped | C-01, C-22 |
 | Household names and greetings | Major | Writes and keeps current a household name, a formal greeting and an informal greeting from patterns you set, with a live preview. | Shipped | C-02 |
 | Household merge and split | Major | Merges two households into one or moves people out into a new or existing household from buttons on the household page, recalculating totals. | Shipped | C-09 |
 | Merge and split finish in place | Minor | Merge and split confirm in a platform dialog; afterwards the action window closes and the household page and members panel refresh without a reload. | Built, not merged (feature/q-05-modern-dialogs-1) | C-09, Q-05 |
