@@ -72,4 +72,44 @@
         <shortDescription>Import run log: how many related records the dry run would create and would not</shortDescription>
         <value>Related records: {0} would be created, {1} would not.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_RelatedFieldLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: a related record's field in the column picker</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the related records picker</shortDescription>
+        <value>Related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedNone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: no related records</shortDescription>
+        <value>None</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what related records do</shortDescription>
+        <value>Each row can also create a record that points at its parent, such as a session of a program. Rows with the same value in the field rows are matched by share one parent. Then map the related columns on the columns step.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RelatedInsertHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: why Insert offers no related records</shortDescription>
+        <value>To load related records, choose Upsert by external ID or one of the updates, so rows can name their parent by a key.</value>
+    </labels>
 </CustomLabels>

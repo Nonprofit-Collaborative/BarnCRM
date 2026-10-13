@@ -72,6 +72,9 @@ public with sharing class ImportController {
         public String loadMatchField;
         @AuraEnabled
         public String lookupNotFound;
+        /** The related records each row also creates, `Object.Field`, or null (R-IT17). */
+        @AuraEnabled
+        public String related;
     }
 
     /** One field a column of a one-object template can be mapped to (R-IT12). */
@@ -365,28 +368,94 @@ public with sharing class ImportController {
             Schema.SObjectType type = ImportObjectSchema.typeOf(
                 ImportTemplateSelector.selectById(templateId)
             );
-            List<FieldChoice> result = new List<FieldChoice>();
-            if (type == null) {
-                return result;
-            }
-            for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
-                FieldChoice choice = new FieldChoice();
-                choice.value = ImportMapping.ENTITY_RECORD + '.' + target.value;
-                choice.label = target.label;
-                Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
-                if (
-                    token != null &&
-                    token.getDescribe().getType() == Schema.DisplayType.REFERENCE
-                ) {
-                    choice.isLookup = true;
-                    choice.lookupFields = ImportObjectSchema.parentFields(type, target.value);
-                }
-                result.add(choice);
-            }
-            return result;
+            return fieldChoices(type, ImportMapping.ENTITY_RECORD, null, null);
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getObjectFields');
         }
+    }
+
+    /** The related records this one-object template's object offers, `Object.Field` (R-IT17). */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getRelatedOptions(String templateId) {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.relatedOptions(
+                ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
+            );
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getRelatedOptions');
+        }
+    }
+
+    /**
+     * The fields a column can fill on the related record chosen as `Object.Field` (R-IT17):
+     * `Related.<field>`, labelled with the object's name, without the record ID and the field
+     * the load fills with the parent. Nothing when the choice does not point at the object.
+     */
+    @AuraEnabled
+    public static List<FieldChoice> getRelatedFields(String templateId, String related) {
+        try {
+            enforcePermission();
+            Schema.SObjectType type = ImportObjectSchema.typeOf(
+                ImportTemplateSelector.selectById(templateId)
+            );
+            String chosen = related == null ? '' : related;
+            Schema.SObjectType relatedType = ImportObjectSchema.typeNamed(
+                chosen.substringBefore('.')
+            );
+            String parentField = ImportObjectSchema.relatedParentField(
+                type,
+                relatedType,
+                chosen.substringAfter('.')
+            );
+            return parentField == null
+                ? new List<FieldChoice>()
+                : fieldChoices(relatedType, ImportMapping.ENTITY_RELATED, parentField, related);
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getRelatedFields');
+        }
+    }
+
+    /**
+     * Each field of this object a column may fill, as `<entity>.<field>`, with its lookup's
+     * parent fields. For the related entity, the record ID and the parent field are left out
+     * and each label starts with the object's.
+     */
+    private static List<FieldChoice> fieldChoices(
+        Schema.SObjectType type,
+        String entity,
+        String parentField,
+        String related
+    ) {
+        List<FieldChoice> result = new List<FieldChoice>();
+        if (type == null) {
+            return result;
+        }
+        String objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+        for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
+            if (
+                related != null &&
+                (target.value == ImportObjectSchema.ID_ATTRIBUTE ||
+                target.value == parentField)
+            ) {
+                continue;
+            }
+            FieldChoice choice = new FieldChoice();
+            choice.value = entity + '.' + target.value;
+            choice.label = related == null
+                ? target.label
+                : String.format(
+                      Label.Core_Import_RelatedFieldLabel,
+                      new List<String>{ objectLabel, target.label }
+                  );
+            Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
+            if (token != null && token.getDescribe().getType() == Schema.DisplayType.REFERENCE) {
+                choice.isLookup = true;
+                choice.lookupFields = ImportObjectSchema.parentFields(type, target.value);
+            }
+            result.add(choice);
+        }
+        return result;
     }
 
     /** The external ID fields an upsert of this template's object can match on (R-IT12). */
@@ -434,6 +503,9 @@ public with sharing class ImportController {
         view.lookupNotFound = ImportObjectSchema.leavesLookupEmpty(template)
             ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
             : ImportObjectSchema.LOOKUP_REJECT;
+        view.related = ImportObjectSchema.loadsRelated(template)
+            ? template.Related_Object__c + '.' + template.Related_Parent_Field__c
+            : null;
     }
 
     /** The parent field a saved column names its parent by, for the column with this source. */

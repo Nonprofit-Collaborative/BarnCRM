@@ -98,7 +98,7 @@ describe('what each row of a one-object mapping does', () => {
     );
   });
 
-  it('reports every change with all three choices', async () => {
+  it('reports every change with all four choices', async () => {
     const element = render({ operation: 'Upsert by external ID', matchField: 'Pair_Key__c' });
     const changes = [];
     element.addEventListener('change', (event) => changes.push(event.detail));
@@ -113,10 +113,42 @@ describe('what each row of a one-object mapping does', () => {
       {
         operation: 'Upsert by external ID',
         matchField: 'Pair_Key__c',
-        lookupNotFound: 'Leave it empty'
+        lookupNotFound: 'Leave it empty',
+        related: ''
       },
-      { operation: 'Insert', matchField: 'Pair_Key__c', lookupNotFound: 'Reject the row' }
+      {
+        operation: 'Insert',
+        matchField: 'Pair_Key__c',
+        lookupNotFound: 'Reject the row',
+        related: ''
+      }
     ]);
+  });
+
+  it('offers related records under a key, and says why not under Insert', async () => {
+    const element = render({
+      relatedOptions: [{ value: 'Session__c.Program__c', label: 'Session (Program)' }]
+    });
+    const changes = [];
+    element.addEventListener('change', (event) => changes.push(event.detail));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="related"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="related-insert-help"]').textContent).toBe(
+      'c.Core_Import_RelatedInsertHelp'
+    );
+
+    element.operation = 'Upsert by external ID';
+    await flush();
+    const related = element.shadowRoot.querySelector('[data-id="related"]');
+    expect(related.options).toEqual([
+      { label: 'c.Core_Import_RelatedNone', value: '' },
+      { label: 'Session (Program)', value: 'Session__c.Program__c' }
+    ]);
+    related.dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'Session__c.Program__c' } })
+    );
+    expect(changes[0].related).toBe('Session__c.Program__c');
+    expect(element.shadowRoot.querySelector('[data-id="related-insert-help"]')).toBeNull();
   });
 
   it('explains what leaving a missing lookup empty risks', async () => {

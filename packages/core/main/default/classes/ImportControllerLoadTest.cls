@@ -119,6 +119,70 @@ private class ImportControllerLoadTest {
     }
 
     @IsTest
+    static void theWizardIsOfferedRelatedRecordsAndTheirFieldsAndShownTheChoice() {
+        System.runAs(TestUsers.admin()) {
+            ImportController.permissionOverride = true;
+            System.runAs(admin()) {
+                Import_Template__c orgs = ImportTemplateService.createObjectTemplate(
+                    'Organizations',
+                    'Account'
+                );
+                ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
+                choices.operation = ImportObjectSchema.OPERATION_UPDATE;
+                choices.related = 'Affiliation__c.Organization__c';
+                ImportTemplateService.saveLoad(orgs.Id, choices);
+
+                Test.startTest();
+                List<ImportMapping.Target> options = ImportController.getRelatedOptions(orgs.Id);
+                List<ImportController.FieldChoice> fields = ImportController.getRelatedFields(
+                    orgs.Id,
+                    'Affiliation__c.Organization__c'
+                );
+                List<ImportController.FieldChoice> none = ImportController.getRelatedFields(
+                    orgs.Id,
+                    'Affiliation__c.Contact__c'
+                );
+                ImportController.TemplateView shown;
+                for (ImportController.TemplateView view : ImportController.getTemplates()) {
+                    shown = view.id == orgs.Id ? view : shown;
+                }
+                Test.stopTest();
+
+                Set<String> offered = new Set<String>();
+                for (ImportMapping.Target option : options) {
+                    offered.add(option.value);
+                }
+                Assert.isTrue(offered.contains('Affiliation__c.Organization__c'), 'Offered.');
+                Map<String, ImportController.FieldChoice> byValue = new Map<String, ImportController.FieldChoice>();
+                for (ImportController.FieldChoice field : fields) {
+                    byValue.put(field.value, field);
+                }
+                Assert.isTrue(byValue.containsKey('Related.Role__c'), 'Its fields: ' + byValue);
+                Assert.isTrue(byValue.get('Related.Contact__c').isLookup, 'With its lookups.');
+                Assert.isFalse(byValue.containsKey('Related.Id'), 'Never the record ID.');
+                Assert.isFalse(
+                    byValue.containsKey('Related.Organization__c'),
+                    'Nor the field the load fills with the parent.'
+                );
+                Assert.isTrue(
+                    byValue.get('Related.Role__c')
+                        .label.startsWith(
+                            Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                                .getLabel()
+                        ),
+                    'Named with the related object.'
+                );
+                Assert.isTrue(none.isEmpty(), 'Nothing for a field pointing elsewhere.');
+                Assert.areEqual(
+                    'Affiliation__c.Organization__c',
+                    shown.related,
+                    'The saved choice is shown.'
+                );
+            }
+        }
+    }
+
+    @IsTest
     static void theSuggestionUsesTheObjectsFieldsAndKeepsSavedLookupChoices() {
         System.runAs(TestUsers.admin()) {
             ImportController.permissionOverride = true;

@@ -17,6 +17,10 @@ import rejectOption from '@salesforce/label/c.Core_Import_LookupRejectOption';
 import leaveEmptyOption from '@salesforce/label/c.Core_Import_LookupLeaveEmptyOption';
 import rejectHelp from '@salesforce/label/c.Core_Import_LookupRejectHelp';
 import leaveEmptyHelp from '@salesforce/label/c.Core_Import_LookupLeaveEmptyHelp';
+import relatedLabel from '@salesforce/label/c.Core_Import_RelatedLabel';
+import relatedNone from '@salesforce/label/c.Core_Import_RelatedNone';
+import relatedHelp from '@salesforce/label/c.Core_Import_RelatedHelp';
+import relatedInsertHelp from '@salesforce/label/c.Core_Import_RelatedInsertHelp';
 
 /** The values Import_Template__c.Load_Operation__c and Lookup_Not_Found__c hold. */
 export const INSERT = 'Insert';
@@ -37,9 +41,10 @@ const OPERATIONS = [
  * What a mapping that loads one object does with each row (canonical model R-IT12, R-IT13):
  * insert, update by record ID, update by a field the user chooses, or upsert by an external ID
  * field, with what each choice risks, the field an update or upsert matches on, and what a row
- * does when a lookup finds no record.
+ * does when a lookup finds no record, and the related records each row also creates (R-IT17),
+ * offered under every operation but Insert, which has no parent key.
  * Presentational: the wizard owns the values and hears every change through a `change` event
- * whose detail is `{ operation, matchField, lookupNotFound }`.
+ * whose detail is `{ operation, matchField, lookupNotFound, related }`.
  * See docs/admin-guide/importing.md, section 9.
  */
 export default class ImportLoadOptions extends LightningElement {
@@ -52,8 +57,34 @@ export default class ImportLoadOptions extends LightningElement {
   @api keyFields = [];
   /** The object's text, email and phone fields an update can match on: `{ label, value }`. */
   @api rowMatchFields = [];
+  /** The related records chosen, `Object.Field`, or empty for none. */
+  @api related = '';
+  /** The related records the object offers: `{ label, value }`. */
+  @api relatedOptions = [];
 
-  labels = { operationLabel, matchFieldLabel, notFoundLabel };
+  labels = {
+    operationLabel,
+    matchFieldLabel,
+    notFoundLabel,
+    relatedLabel,
+    relatedHelp,
+    relatedInsertHelp
+  };
+
+  /** Related records need a parent key, which Insert does not have. */
+  get offersRelated() {
+    return this.operation !== INSERT;
+  }
+
+  get relatedChoices() {
+    return [{ label: relatedNone, value: '' }].concat(
+      (this.relatedOptions || []).map((each) => ({ label: each.label, value: each.value }))
+    );
+  }
+
+  handleRelatedChange(event) {
+    this.announce({ related: event.detail.value });
+  }
 
   get operationOptions() {
     const allowed = this.operations && this.operations.length > 0 ? this.operations : null;
@@ -119,6 +150,7 @@ export default class ImportLoadOptions extends LightningElement {
       operation: this.operation,
       matchField: this.matchField,
       lookupNotFound: this.lookupNotFound,
+      related: this.related || '',
       ...change
     };
     this.dispatchEvent(new CustomEvent('change', { detail }));

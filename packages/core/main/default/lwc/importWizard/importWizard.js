@@ -20,6 +20,8 @@ import createObjectTemplate from '@salesforce/apex/ImportController.createObject
 import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 import getRowMatchFields from '@salesforce/apex/ImportController.getRowMatchFields';
+import getRelatedOptions from '@salesforce/apex/ImportController.getRelatedOptions';
+import getRelatedFields from '@salesforce/apex/ImportController.getRelatedFields';
 
 import cardTitle from '@salesforce/label/c.Core_Import_CardTitle';
 import stepTemplate from '@salesforce/label/c.Core_Import_StepTemplate';
@@ -273,6 +275,10 @@ export default class ImportWizard extends LightningElement {
   loadOperation = INSERT;
   loadMatchField = '';
   lookupNotFound = LOOKUP_REJECT;
+  /** Related records each row also creates (R-IT17): `Object.Field`, and what is offered. */
+  loadRelated = '';
+  relatedOptions = [];
+  relatedFields = [];
   /** The new one-object mapping being made on the first step. */
   choosingObject = false;
   loadableObjects = [];
@@ -407,6 +413,9 @@ export default class ImportWizard extends LightningElement {
     this.loadOperation = (template && template.loadOperation) || INSERT;
     this.loadMatchField = (template && template.loadMatchField) || '';
     this.lookupNotFound = (template && template.lookupNotFound) || LOOKUP_REJECT;
+    this.loadRelated = (template && template.related) || '';
+    this.relatedOptions = [];
+    this.relatedFields = [];
     this.objectFields = [];
     this.keyFields = [];
     this.rowMatchFields = [];
@@ -587,14 +596,17 @@ export default class ImportWizard extends LightningElement {
   async buildColumns(file) {
     if (this.loadsOneObject && this.objectFields.length === 0) {
       // The object's fields and keys, from the running user's describe (R-IT12).
-      const [fields, keys, matchable] = await Promise.all([
+      const [fields, keys, matchable, related] = await Promise.all([
         getObjectFields({ templateId: this.templateId }),
         getKeyFields({ templateId: this.templateId }),
-        getRowMatchFields({ templateId: this.templateId })
+        getRowMatchFields({ templateId: this.templateId }),
+        getRelatedOptions({ templateId: this.templateId })
       ]);
       this.objectFields = fields || [];
       this.keyFields = keys || [];
       this.rowMatchFields = matchable || [];
+      this.relatedOptions = related || [];
+      await this.loadRelatedFields();
     }
     const suggested = await suggestMapping({ templateId: this.templateId, headers: this.headers });
     const targets = {};
@@ -632,7 +644,7 @@ export default class ImportWizard extends LightningElement {
     if (this.loadsOneObject) {
       // The object's own fields, from describe (R-IT12).
       return [{ label: doNotLoad, value: IGNORE }].concat(
-        this.objectFields.map((field) => ({ label: field.label, value: field.value }))
+        this.loadFields.map((field) => ({ label: field.label, value: field.value }))
       );
     }
     const all = [{ label: doNotLoad, value: IGNORE }]
@@ -779,6 +791,9 @@ export default class ImportWizard extends LightningElement {
         lookupNotFound: this.lookupNotFound,
         severalMatches: this.severalMatches
       };
+      if (this.loadsRelated) {
+        options.load.related = this.loadRelated;
+      }
     }
     if (this.showExpectedAmount) {
       // Shown only where a module loads gifts, and saved on the template only then (R-IT7).
@@ -815,7 +830,7 @@ export default class ImportWizard extends LightningElement {
   get columnRows() {
     return this.columns.map((column) => {
       const field = this.loadsOneObject
-        ? this.objectFields.find((each) => each.value === column.target)
+        ? this.loadFields.find((each) => each.value === column.target)
         : undefined;
       const isLookup = Boolean(field && field.isLookup);
       const changeCount = (column.transforms || []).length;
@@ -921,6 +936,35 @@ export default class ImportWizard extends LightningElement {
     this.loadOperation = event.detail.operation;
     this.loadMatchField = event.detail.matchField || '';
     this.lookupNotFound = event.detail.lookupNotFound;
+    const related = event.detail.related || '';
+    if (related !== this.loadRelated) {
+      this.loadRelated = related;
+      this.loadRelatedFields();
+    }
+  }
+
+  /** Whether each row also creates a related record: one chosen, under a parent key (R-IT17). */
+  get loadsRelated() {
+    return Boolean(this.loadRelated) && this.loadOperation !== INSERT;
+  }
+
+  /** The fields a one-object column can fill: the object's, then the related record's. */
+  get loadFields() {
+    return this.objectFields.concat(this.loadsRelated ? this.relatedFields : []);
+  }
+
+  /** The related record's fields, labelled with its object, or none (R-IT17). */
+  async loadRelatedFields() {
+    const related = this.loadRelated;
+    let fields = [];
+    try {
+      fields = related ? await getRelatedFields({ templateId: this.templateId, related }) : [];
+    } catch (error) {
+      this.message = this.errorText(error);
+    }
+    if (related === this.loadRelated) {
+      this.relatedFields = fields || [];
+    }
   }
 
   get mapsSomebody() {
