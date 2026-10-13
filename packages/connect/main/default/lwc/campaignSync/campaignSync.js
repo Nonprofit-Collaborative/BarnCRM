@@ -12,12 +12,18 @@ import noManagePermission from '@salesforce/label/c.Connect_CampaignSync_NoManag
 import syncAllLabel from '@salesforce/label/c.Connect_CampaignSync_SyncAll';
 import running from '@salesforce/label/c.Connect_CampaignSync_Running';
 import errorFailed from '@salesforce/label/c.Connect_CampaignSync_ErrorFailed';
+import noteWhat from '@salesforce/label/c.Connect_SetupNote_CampaignSync_What';
+import noteWhy from '@salesforce/label/c.Connect_SetupNote_CampaignSync_Why';
+import noteWhere from '@salesforce/label/c.Connect_SetupNote_CampaignSync_Where';
 
 /**
  * The Campaign sync page (feature X-02). The controller decides what the org and the person
  * allow and refuses in words; the page shows the state, the counts, and the one button.
  */
 export default class CampaignSync extends LightningElement {
+  /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
+  setupNotes = [{ key: 'campaignAccess', what: noteWhat, why: noteWhy, where: noteWhere }];
+
   labels = {
     title,
     intro,

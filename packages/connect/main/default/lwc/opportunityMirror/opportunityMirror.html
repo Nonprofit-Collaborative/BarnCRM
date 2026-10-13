@@ -5,6 +5,7 @@
                 <lightning-spinner alternative-text={labels.loading} size="small" data-id="spinner"></lightning-spinner>
             </template>
             <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
+            <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
             <template lwc:if={unavailableShown}>
                 <p class="slds-var-m-bottom_medium" role="status" data-id="unavailable">
                     {labels.unavailable}

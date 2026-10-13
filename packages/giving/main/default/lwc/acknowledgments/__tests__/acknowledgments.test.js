@@ -189,6 +189,21 @@ describe('c-acknowledgments', () => {
     jest.clearAllMocks();
   });
 
+  it('shows what Setup needs: the From address, email deliverability and templates', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    const notes = element.shadowRoot.querySelector('c-settings-setup-notes');
+    expect(notes.notes.map((note) => note.key)).toEqual([
+      'fromAddress',
+      'emailDeliverability',
+      'templates'
+    ]);
+    expect(notes.notes[0].what).toBe('c.Giving_SetupNote_FromAddress_What');
+    expect(notes.notes[1].check).toBe('emailDeliverability');
+  });
+
   it('counts the queue by what each waiting gift would actually get', async () => {
     const element = createComponent();
     getPage.emit(PAGE);

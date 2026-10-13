@@ -59,12 +59,30 @@ const NOTES = {
   import: [{ key: 'bulk', what: BULK_WHAT, why: BULK_WHY, where: BULK_WHERE }]
 };
 
+/**
+ * Two ways in. The console passes `section`, and the notes come from the Core list above. A
+ * module's own settings page passes `notes` instead: a list of { key, what, why, where, met },
+ * each text from the module's own labels, and `met` true or false when the page can tell, or
+ * `check` naming a SettingsController.getSetupChecks key (left out, the note is the
+ * instruction alone). `notes`, when set, wins over `section`.
+ */
 export default class SettingsSetupNotes extends LightningElement {
   labels = { heading: HEADING, where: WHERE };
 
+  _notes;
   _section;
   checks = {};
   checksRequested = false;
+
+  @api
+  get notes() {
+    return this._notes;
+  }
+
+  set notes(value) {
+    this._notes = value;
+    this.loadChecksIfNeeded();
+  }
 
   @api
   get section() {
@@ -73,18 +91,19 @@ export default class SettingsSetupNotes extends LightningElement {
 
   set section(value) {
     this._section = value;
-    if (this.entries.some((entry) => entry.check)) {
-      this.loadChecks();
-    }
+    this.loadChecksIfNeeded();
   }
 
   get entries() {
+    if (Array.isArray(this._notes)) {
+      return this._notes;
+    }
     return NOTES[String(this._section || '').toLowerCase()] || [];
   }
 
-  get notes() {
+  get shownNotes() {
     return this.entries.map((entry) => {
-      const met = entry.check ? this.checks[entry.check] : undefined;
+      const met = entry.check ? this.checks[entry.check] : entry.met;
       const hasStatus = met === true || met === false;
       let iconName = 'utility:info';
       let iconVariant;
@@ -100,6 +119,12 @@ export default class SettingsSetupNotes extends LightningElement {
         iconVariant
       };
     });
+  }
+
+  loadChecksIfNeeded() {
+    if (this.entries.some((entry) => entry.check)) {
+      this.loadChecks();
+    }
   }
 
   /** Asked once per page: the answers change only when someone changes Setup and reloads. */

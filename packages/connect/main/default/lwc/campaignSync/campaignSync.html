@@ -2,6 +2,7 @@
     <lightning-card title={labels.title} icon-name="standard:campaign">
         <div class="slds-var-p-horizontal_medium">
             <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
+            <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
             <template lwc:if={unavailableShown}>
                 <p class="slds-var-m-bottom_medium" role="status" data-id="unavailable">
                     {labels.unavailable}

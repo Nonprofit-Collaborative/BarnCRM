@@ -173,24 +173,24 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup note, Access: what to change for new people</shortDescription>
-        <value>Create a person's Salesforce user before giving them a role here, and assign a module's own permission set (Giving Staff, for example) there too.</value>
+        <shortDescription>Setup note, Access: what to change for module access</shortDescription>
+        <value>Assign a module's own permission set (Giving Staff, for example) to people who need that module, alongside their role here.</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Users_Where</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup note, Access: Setup path for users</shortDescription>
-        <value>Setup, Users</value>
+        <shortDescription>Setup note, Access: Setup path for module permission sets</shortDescription>
+        <value>Setup, Users, the person, Permission Set Assignments</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Users_Why</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup note, Access: why users need Setup</shortDescription>
-        <value>A user takes a Salesforce license, so only Setup can create one. A role here carries what Core provides, not what a module adds.</value>
+        <shortDescription>Setup note, Access: why module permission sets need Setup</shortDescription>
+        <value>A role here carries what Core provides, not what a module adds, and a module's permission set can be assigned only in Setup for now.</value>
     </labels>
     <labels>
         <fullName>Core_SetupNote_Where</fullName>

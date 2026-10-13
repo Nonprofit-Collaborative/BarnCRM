@@ -61,6 +61,15 @@ import COLUMN_ERRORS from '@salesforce/label/c.Giving_Acknowledgments_ColumnErro
 import COLUMN_FINISHED from '@salesforce/label/c.Giving_Acknowledgments_ColumnFinished';
 import DOWNLOAD_FILE from '@salesforce/label/c.Giving_Acknowledgments_DownloadFile';
 import ANY_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_AnyAmount';
+import FROM_WHAT from '@salesforce/label/c.Giving_SetupNote_FromAddress_What';
+import FROM_WHY from '@salesforce/label/c.Giving_SetupNote_FromAddress_Why';
+import FROM_WHERE from '@salesforce/label/c.Giving_SetupNote_FromAddress_Where';
+import EMAIL_WHAT from '@salesforce/label/c.Giving_SetupNote_Email_What';
+import EMAIL_WHY from '@salesforce/label/c.Giving_SetupNote_Email_Why';
+import EMAIL_WHERE from '@salesforce/label/c.Giving_SetupNote_Email_Where';
+import TEMPLATES_WHAT from '@salesforce/label/c.Giving_SetupNote_Templates_What';
+import TEMPLATES_WHY from '@salesforce/label/c.Giving_SetupNote_Templates_Why';
+import TEMPLATES_WHERE from '@salesforce/label/c.Giving_SetupNote_Templates_Where';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
@@ -77,6 +86,19 @@ const CHANNEL_EMAIL = 'Email';
  * `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`).
  */
 export default class Acknowledgments extends NavigationMixin(LightningElement) {
+  /** What this page needs from Setup, shown by Core's settingsSetupNotes. */
+  setupNotes = [
+    { key: 'fromAddress', what: FROM_WHAT, why: FROM_WHY, where: FROM_WHERE },
+    {
+      key: 'emailDeliverability',
+      what: EMAIL_WHAT,
+      why: EMAIL_WHY,
+      where: EMAIL_WHERE,
+      check: 'emailDeliverability'
+    },
+    { key: 'templates', what: TEMPLATES_WHAT, why: TEMPLATES_WHY, where: TEMPLATES_WHERE }
+  ];
+
   labels = {
     title: TITLE,
     intro: INTRO,

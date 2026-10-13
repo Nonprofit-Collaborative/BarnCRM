@@ -102,11 +102,25 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 | Households | To review duplicates: assign **BarnCRM Duplicate Review** to people with a Sales Cloud or Service Cloud license, and keep the standard duplicate rules active (Setup, Duplicate Rules) | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
-| Access | Create the person's Salesforce user first, and assign a module's own permission set, such as Giving Staff (Setup, Users) | No |
+| Access | Assign a module's own permission set, such as Giving Staff, alongside the role (Setup, Users, Permission Set Assignments). Creating the user is the **Create a user in Setup** link on the page itself | No |
 | Import | To let someone who is not a BarnCRM Admin bulk update, or anyone bulk delete: assign **BarnCRM Bulk Update** or **BarnCRM Bulk Delete**, with **BarnCRM Find and Export** (Setup, Users, Permission Set Assignments) | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.
+
+A module's own settings page, reached from its section here, carries its notes in the same
+form at the top of that page:
+
+| Page | What to change in Setup | Checked by BarnCRM |
+|---|---|---|
+| Giving, Acknowledgments | Add and verify the shared From address (Setup, Organization-Wide Addresses) | No |
+| Giving, Acknowledgments | Allow the org to send email (Setup, Deliverability, Access level: All email) | Yes |
+| Giving, Acknowledgments | Write or change the thank you wording in an email template (Setup, Classic Email Templates, folder BarnCRM Acknowledgments) | No |
+| Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app (Setup, Lightning App Builder, Activation) | No |
+| Receipts | Assign **Giving Staff**, **Giving Admin** or **Giving Read Only** (Setup, Users, Permission Set Assignments) | No |
+| Giving, Campaign sync (Connect) | **Campaign Sync** for you; **Marketing User** and Campaign create and edit for the people who create appeals | No |
+| Giving, Opportunity mirror (Connect) | **Opportunity Mirror** for you; Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | No |
+| Giving, Accounting export (Connect) | **Accounting Export** with a Giving permission set that shows gifts, for the person who runs it | No |
 
 ## Common mistakes
 

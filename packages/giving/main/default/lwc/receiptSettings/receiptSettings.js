@@ -52,6 +52,12 @@ import STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_StartedTitle';
 import STARTED_MESSAGE from '@salesforce/label/c.Giving_Receipt_StartedMessage';
 import NOT_STARTED_TITLE from '@salesforce/label/c.Giving_Receipt_NotStartedTitle';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
+import PAGES_WHAT from '@salesforce/label/c.Giving_SetupNote_RecordPages_What';
+import PAGES_WHY from '@salesforce/label/c.Giving_SetupNote_RecordPages_Why';
+import PAGES_WHERE from '@salesforce/label/c.Giving_SetupNote_RecordPages_Where';
+import ACCESS_WHAT from '@salesforce/label/c.Giving_SetupNote_Access_What';
+import ACCESS_WHY from '@salesforce/label/c.Giving_SetupNote_Access_Why';
+import ACCESS_WHERE from '@salesforce/label/c.Giving_SetupNote_Access_Where';
 
 const TOKENS = [
   '{{OrganizationName}}',
@@ -88,6 +94,12 @@ const FORMATS = ['bold', 'italic', 'underline', 'list', 'indent', 'align', 'link
  * looking rather than typing them in twice.
  */
 export default class ReceiptSettings extends LightningElement {
+  /** What Giving needs from Setup, shown by Core's settingsSetupNotes. */
+  setupNotes = [
+    { key: 'recordPages', what: PAGES_WHAT, why: PAGES_WHY, where: PAGES_WHERE },
+    { key: 'givingAccess', what: ACCESS_WHAT, why: ACCESS_WHY, where: ACCESS_WHERE }
+  ];
+
   labels = {
     templatesTab: TEMPLATES_TAB,
     statementsTab: STATEMENTS_TAB,
