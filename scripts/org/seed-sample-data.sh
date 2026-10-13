@@ -5,9 +5,10 @@
 # connections and affiliations, and the Giving gifts where Giving is installed) into the
 # target org and waits for it to actually finish.
 #
-# SampleDataLoader.load() runs as a chain of queueable jobs (SampleDataLoadQueueable for
-# the accounts, then SampleDataContactQueueable once per chunk of contacts), so the Apex
-# call returns as soon as the first job is queued, not once loading is done. Stage one
+# SampleDataLoader.load() runs as Batch Apex (SampleDataStageBatch, one stage per execute:
+# the accounts, each chunk of contacts, the connections, then each module's stages in a
+# batch of their own), so the Apex call returns as soon as the batch is queued, not once
+# loading is done. Stage one
 # inserts all 200 households in a single DML, so counting households proves nothing about
 # the contacts. This polls both the contact count (target read from the generated JSON)
 # and AsyncApexJob, and reports success only when every contact is in and no load job is
@@ -63,14 +64,15 @@ count_query() {
   "
 }
 
-echo "Starting the sample data load in ${ALIAS} (runs in the background as a queueable chain)..."
+echo "Starting the sample data load in ${ALIAS} (runs in the background as Batch Apex)..."
 sf apex run --target-org "$ALIAS" --file "$APEX_FILE"
 
 echo "Waiting for ${EXPECTED_CONTACTS} sample contacts and for the load jobs to finish (up to ${MAX_WAIT_SECONDS}s)..."
 
-# Every stage of the chain, Core's and Giving's: waiting only on the contact stages would
-# report success while the connections and the gifts were still being written.
-RUNNING_JOB_QUERY="SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name IN ('SampleDataLoadQueueable', 'SampleDataContactQueueable', 'SampleDataConnectionQueueable', 'GivingSampleDataQueueable') AND Status IN ('Queued', 'Preparing', 'Processing', 'Holding')"
+# Every stage, Core's and Giving's, runs in SampleDataStageBatch, and each batch queues the
+# next before it ends: waiting only on the contact stages would report success while the
+# connections and the gifts were still being written.
+RUNNING_JOB_QUERY="SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataStageBatch' AND JobType = 'BatchApex' AND Status IN ('Queued', 'Preparing', 'Processing', 'Holding')"
 
 ELAPSED=0
 while [[ "$ELAPSED" -lt "$MAX_WAIT_SECONDS" ]]; do

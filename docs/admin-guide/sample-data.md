@@ -59,7 +59,12 @@ has to stay removable.
 3. Read the warning, then select **Load sample data**.
 4. Confirm in the dialog. Loading runs in the background; the card shows progress and
    updates automatically until it finishes. With Giving installed there are several
-   thousand records to write, so allow a few minutes rather than one.
+   thousand records to write, so allow a few minutes rather than one. The load runs as
+   background batch jobs (Setup > Apex Jobs lists them as SampleDataStageBatch), one step
+   at a time, so it finishes in any org, Developer Edition, trial and scratch orgs included.
+   If a step stops on an error, the load stops there: the card shows what did load, the
+   error is in the [Error Log](error-log.md), and **Remove sample data** clears it for
+   another try.
 5. With Giving installed: when it says **Loaded**, open **BarnCRM Settings > Rollups** and
    select **Recalculate**. Giving totals (total giving, this year, largest gift, fund and appeal
    totals) are worked out by the nightly rollup run rather than as each gift is saved, so

@@ -57,16 +57,11 @@ public with sharing class GivingSampleData implements SampleDataModule {
     }
 
     /**
-     * Starts the Giving load. Core calls this from the last stage of its own chain, so the
+     * Starts the Giving load. Core calls this when its own load has finished, so the
      * households and people every gift points at already exist.
      */
     public void enqueueLoad() {
-        System.enqueueJob(
-            new GivingSampleDataQueueable(
-                GivingSampleDataQueueable.STAGE_REFERENCE_DATA,
-                new Map<String, Id>()
-            )
-        );
+        SampleDataStageBatch.start(new GivingSampleDataStages());
     }
 
     /**

@@ -9,9 +9,12 @@
  *
  * The contract each implementation has to keep:
  *
- * - `enqueueLoad` starts an asynchronous chain and returns; it never inserts the whole set
- *   in the calling transaction, because the Core chain that calls it has already spent
- *   part of that transaction's limits.
+ * - `enqueueLoad` starts the module's load asynchronously and returns; it never inserts the
+ *   whole set in the calling transaction, because the Core batch that calls it has already
+ *   spent part of that transaction's limits. Start it with SampleDataStageBatch.start over
+ *   the module's SampleDataStages, not a chain of queueables, which stops after five jobs in
+ *   Developer Edition, trial and scratch orgs. Its finish() calls
+ *   SampleDataModules.startAfter with the module's name.
  * - `removeAll` runs synchronously inside Core's remove transaction, before Core deletes
  *   the households and people the module's records point at, and deletes only records the
  *   module's own loader created.

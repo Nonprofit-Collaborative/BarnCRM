@@ -4,15 +4,11 @@
  */
 public with sharing class SampleDataSelector {
     /**
-     * The queueable classes that make up the sample data load chain. The Giving stages are
-     * named as strings like the rest: Core cannot compile against a module package
-     * (ADR-0009), and a name that resolves to nothing simply never matches a running job.
+     * The batch class that runs every sample data load, Core's and each module's (a module's
+     * stages run in Core's SampleDataStageBatch too), so one name covers the whole load.
      */
     private static final Set<String> LOAD_JOB_CLASS_NAMES = new Set<String>{
-        'SampleDataLoadQueueable',
-        'SampleDataContactQueueable',
-        'SampleDataConnectionQueueable',
-        'GivingSampleDataQueueable'
+        'SampleDataStageBatch'
     };
 
     /** AsyncApexJob statuses that mean a job has not finished yet. */

@@ -1,32 +1,48 @@
 /**
- * Stage one of the C-10 sample data load, and the home of both load stages so each can
- * be exercised on its own.
+ * Core's C-10 sample data load, as the stages SampleDataStageBatch runs one per transaction:
  *
- * Stage one inserts every household and organization Account with Sample_Data__c true,
- * then enqueues SampleDataContactQueueable for the first contact chunk. Stage two
- * inserts up to SampleDataLoader.CONTACT_CHUNK_SIZE contacts at a time and joins each
- * chunk to its households through HouseholdService, so that inserting several hundred
- * contacts (each running through the household naming and greeting triggers) never risks
- * the CPU limit of one transaction.
+ * - stage 0 inserts every household and organization Account with Sample_Data__c true;
+ * - stages 1 to chunkCount insert up to SampleDataLoader.CONTACT_CHUNK_SIZE contacts each and
+ *   join each chunk to its households through HouseholdService, so that inserting several
+ *   hundred contacts (each running through the household naming and greeting triggers) never
+ *   risks the CPU limit of one transaction;
+ * - the last stage loads the connections and affiliations (SampleDataConnections).
  *
- * Both stages are static and take an already parsed SampleDataSet, so tests call them
- * directly and assert chunk boundaries without relying on queueable chaining, which an
- * Apex test context refuses (SampleDataLoader.mayQueueNextStage).
+ * finish() then starts the first module sample set, because by then every household, person
+ * and organization a module's records point at exists.
+ *
+ * Only the household key to Id map is kept between stages. The payload itself is re-read from
+ * the static resource in each stage, so a several hundred kilobyte JSON body is never
+ * serialized into the batch state. The stage bodies are static and take a parsed
+ * SampleDataSet, so tests call them directly and assert chunk boundaries.
  */
-public with sharing class SampleDataLoadQueueable implements Queueable {
-    public void execute(QueueableContext context) {
-        try {
-            SampleDataSet data = SampleDataSet.parse(SampleDataLoader.getSampleDataJson());
-            loadHouseholdsAndOrganizations(data);
-            if (data.chunkCount() > 0 && SampleDataLoader.mayQueueNextStage()) {
-                System.enqueueJob(new SampleDataContactQueueable(data.householdIdsByKey, 0));
-            }
-        } catch (Exception e) {
-            // Logged here because nothing else sees an async failure; the synchronous
-            // entry points leave logging to SampleDataController.
-            ErrorLogger.log(e, 'SampleDataLoadQueueable');
-            throw e;
+public with sharing class SampleDataLoadStages implements SampleDataStages {
+    private Map<String, Id> householdIdsByKey = new Map<String, Id>();
+
+    public String name() {
+        return 'SampleDataLoadStages';
+    }
+
+    /** The accounts stage, one stage per contact chunk, and the connections stage. */
+    public Integer stageCount() {
+        return SampleDataSet.parse(SampleDataLoader.getSampleDataJson()).chunkCount() + 2;
+    }
+
+    public void runStage(Integer stage) {
+        SampleDataSet data = SampleDataSet.parse(SampleDataLoader.getSampleDataJson());
+        if (stage == 0) {
+            householdIdsByKey = loadHouseholdsAndOrganizations(data);
+        } else if (stage <= data.chunkCount()) {
+            data.householdIdsByKey = householdIdsByKey;
+            loadContactChunk(data, stage - 1);
+        } else {
+            SampleDataConnections.loadConnections(data);
         }
+    }
+
+    /** Every person now exists, so the module sample sets that point at them can load. */
+    public void finish() {
+        SampleDataModules.startFirst();
     }
 
     /**
