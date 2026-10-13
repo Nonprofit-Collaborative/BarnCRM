@@ -25,11 +25,31 @@ public with sharing class RollupScheduler implements Schedulable {
     private static final String NIGHTLY_CRON = '0 0 2 * * ?';
 
     /**
+     * True for the one run Recalculate all sets up for tonight, which covers every definition;
+     * the nightly job covers Scheduled and Both only. Null on a job scheduled before this field.
+     */
+    private Boolean everyDefinition = false;
+
+    /** The nightly job. */
+    public RollupScheduler() {
+        this(false);
+    }
+
+    /** The nightly job, or with `everyDefinition` the one run Recalculate all sets up tonight. */
+    public RollupScheduler(Boolean everyDefinition) {
+        this.everyDefinition = everyDefinition == true;
+    }
+
+    /**
      * The nightly run, and a processor for Rollup Queue entries no save started one for
      * (ROLLUPS-7), so a queued total never waits longer than a night.
      */
     public void execute(SchedulableContext context) {
-        RollupService.startNightlyRun();
+        if (this.everyDefinition == true) {
+            RollupService.startFullRunOfEveryDefinition();
+        } else {
+            RollupService.startNightlyRun();
+        }
         RollupQueue.processPending();
     }
 
@@ -57,8 +77,9 @@ public with sharing class RollupScheduler implements Schedulable {
 
     /**
      * Sets up one run for the coming 2:00 AM in the running user's time zone, for Recalculate
-     * all when the nightly run is not scheduled (slice S12). The job carries the night's date
-     * in its name, so asking twice sets up one run.
+     * all when the nightly run is not scheduled (slice S12). Like Recalculate all, it covers
+     * every active definition. The job carries the night's date in its name, so asking twice
+     * sets up one run.
      */
     public static Id scheduleTonight() {
         Date night = Integer.valueOf(Datetime.now().format('H')) < 2
@@ -70,7 +91,7 @@ public with sharing class RollupScheduler implements Schedulable {
             return existing;
         }
         String cron = '0 0 2 ' + night.day() + ' ' + night.month() + ' ? ' + night.year();
-        return System.schedule(name, cron, new RollupScheduler());
+        return System.schedule(name, cron, new RollupScheduler(true));
     }
 
     /** True when the nightly run is scheduled. */

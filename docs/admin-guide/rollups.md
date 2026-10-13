@@ -353,12 +353,21 @@ Under the list, **Needs attention** shows what the engine has not finished:
 
 ### Recalculate all, now or tonight
 
+**Recalculate all** rebuilds every active rollup, whatever its mode: **Instantly** totals as
+well as **Every night** and **Both** ones. The nightly run covers only **Every night** and
+**Both**, because each save already keeps an **Instantly** total right; **Recalculate all** is
+for when you want every total rebuilt from scratch, for example after loading data with
+automation paused.
+
 Before **Recalculate all** starts, the Builder says how many records it will go through and
-roughly how long that takes, for example "About 41,200 records, roughly 25 minutes." During
-working hours (8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it
-tonight instead, because a long run competes with people saving records. **Run tonight**
-does nothing extra when the nightly run is scheduled, since it already recalculates every
-total at 2:00 AM; otherwise it sets up a single run for 2:00 AM tonight.
+roughly how long that takes, for example "About 41,200 records, roughly 25 minutes." The count
+includes the records of every active rollup, **Instantly** ones too. During working hours
+(8 AM to 6 PM, Monday to Friday, in your time zone) it suggests running it tonight instead,
+because a long run competes with people saving records. When the nightly run is not
+scheduled, **Run tonight** sets up a single run of every active rollup for 2:00 AM tonight.
+When it is scheduled, **Run tonight** adds nothing: the nightly run already recalculates the
+**Every night** and **Both** totals at 2:00 AM, and a second run at the same moment would
+only be turned away. To rebuild the **Instantly** totals as well, choose **Start now**.
 
 ## Instant totals on your own objects
 
@@ -456,7 +465,7 @@ need the Giving module; with Core alone, do them on a rollup you have added.
    visibly right.
 4. Click **Recalculate** on that row. The page says "Recalculation started" and the row's
    last calculated time moves to a moment ago when the run finishes. **Recalculate all**
-   at the top does the same for every scheduled rollup at once.
+   at the top does the same for every active rollup at once, **Instantly** ones included.
 5. Open any household record. Its giving totals now match what you just recalculated. If
    any of them changed, the **Rollups last calculated** field on the record shows the time
    of that run; if none did, it keeps its earlier time, because the run found nothing to
