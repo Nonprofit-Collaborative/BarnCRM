@@ -169,6 +169,14 @@
         <value>{0} would not accept the value &quot;{1}&quot;. Those values were skipped.</value>
     </labels>
     <labels>
+        <fullName>Core_Import_LogCheckboxValueUnreadable</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: a checkbox value that is neither yes nor no</shortDescription>
+        <value>Row {0}: &quot;{2}&quot; in the {1} column is not a yes or no value, so that checkbox was left as it was. The rest of the row was used. Correct the cell and import again.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_LogNoExternalIdField</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -705,30 +713,6 @@
         <value>Recent imports</value>
     </labels>
     <labels>
-        <fullName>Core_Import_HistoryEmpty</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: nothing imported yet</shortDescription>
-        <value>Nothing has been imported yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_HistoryUndoUntil</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: before the undo deadline</shortDescription>
-        <value>Can be undone until</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UndoButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: the undo button</shortDescription>
-        <value>Undo</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_UndoConfirmHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -775,14 +759,6 @@
         <protected>false</protected>
         <shortDescription>Import history: the button that starts the undo</shortDescription>
         <value>Undo this import</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_UndoCancelButton</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import history: leave the undo</shortDescription>
-        <value>Cancel</value>
     </labels>
     <labels>
         <fullName>Core_Import_UndoStarted</fullName>

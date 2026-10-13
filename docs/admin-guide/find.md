@@ -204,7 +204,7 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
   run, as on any save. A record that is refused is marked in the table with the reason; the
   rest still save.
 - Each save is recorded like a bulk update. It appears on the **Bulk Update** tab under
-  **Recent bulk updates**, and can be undone there within the same window as an import. The
+  **Data jobs**, and can be undone there within the same window as an import. The
   undo puts back each value nobody has changed since.
 
 ## 8. What Find does not do (yet)

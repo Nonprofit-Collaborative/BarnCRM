@@ -307,6 +307,32 @@ private class ImportControllerTest {
     }
 
     @IsTest
+    static void listsRecentImportsWithTheirStartTime() {
+        System.runAs(TestUsers.admin()) {
+            ImportController.permissionOverride = true;
+            Import_Template__c template = ImportTestDataFactory.template(
+                ImportTestDataFactory.donorMapping(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            Datetime started = Datetime.now().addMinutes(-10);
+            batch.Started_At__c = started;
+            update batch;
+            ImportController.permissionOverride = false;
+
+            Test.startTest();
+            List<ImportController.BatchView> recent = ImportController.getRecentBatches(5);
+            Test.stopTest();
+
+            Assert.areEqual(
+                started,
+                recent[0].startedAt,
+                'The job history sorts imports among bulk jobs by when each started.'
+            );
+        }
+    }
+
+    @IsTest
     static void keepsTheUploadedFileWhenOneIsSent() {
         System.runAs(TestUsers.admin()) {
             System.runAs(importer()) {

@@ -53,7 +53,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 5. The progress bar shows the chunks done. When it finishes, the panel says how many records
    were deleted, how many no longer matched the query and how many were refused, with the
    reason for each refusal.
-6. To undo it, find the job under **Recent bulk deletes** on the **Bulk Update** tab, press
+6. To undo it, find the job under **Data jobs** on the **Bulk Update** tab, press
    **Undo**, type the number, and confirm. The records come back from the Recycle Bin.
 
 ## 4. What can and cannot be deleted

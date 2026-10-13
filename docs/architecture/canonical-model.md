@@ -1763,6 +1763,11 @@ it lists Contact fields in contact terms, which R-IT3 translates in Person Accou
 organizations it lists Account fields that are not person account fields. Values are written
 as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
 value with a blank, and a field the user may not write is skipped and named in the run log.
+A checkbox reads `true`, `yes`, `y`, `1`, `x`, `checked`, `on` or `t` as ticked and `false`,
+`no`, `n`, `0`, `off` or `f` as cleared, ignoring case and surrounding spaces; one reading
+serves every import, people and one-object alike. Any other value is never read as cleared: a
+people import skips that field on that row, notes the row, the column and the value in the run
+log, and loads the rest of the row (a one-object load rejects the row, R-IT12).
 
 **R-IT12 A template that loads one object.** A template with a Target Object loads each row
 as one record of that object (ADR-0080, `0080-import-load-one-object.md`), through the same
@@ -1784,7 +1789,7 @@ The loader reads the existing records itself, in user mode, and never calls the 
 upsert, so the dry run decides exactly as the commit will and the journal holds each value
 before. An update writes only the values that differ from the record's, and a row that changes
 nothing is Matched. A value its field cannot take (a date or number that cannot be read, a
-checkbox value that is neither yes nor no, text longer than the field) rejects the row, naming
+checkbox value that is neither ticked nor cleared under R-IT11, text longer than the field) rejects the row, naming
 the field and the value, because a row is one record. A row naming the same record as an
 earlier row of the file (the same ID or upsert value) is rejected wherever the file's chunks
 fall, through a digest in its Processor Key (Section 17). Under Match only (R-IB15) a row that
@@ -2358,8 +2363,8 @@ choice belongs to the file, not the template, and is set again for each upload.
 - **Service:** `ImportBatchService`, `ImportBatchSelector`, `ImportProcessorBatch`,
   `ImportUndoService` and `ImportUndoBatch` (R-IB7 to R-IB9), `ImportController` (the one
   Aura-enabled entry point the import screens call), LWC `importWizard`, `importResults`,
-  `importHistory` (recent imports and their undo). The import history lists imports only; bulk
-  updates are listed by their own page (Section 29E).
+  `dataJobHistory` (recent data jobs and their undo; on the Import page it lists imports only,
+  and bulk updates and deletes are listed on the Bulk Update page, Section 29E).
 
 ---
 
@@ -2630,7 +2635,7 @@ By, Started At and Completed At.
 
 - **Service:** `ImportJournalService` (writes and reads pages), `ImportRowProcessor` (writes
   the commit phase), `ImportObjectLoader` (writes the commit and created phases of a one-object
-  import), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
+  import), `ImportUndoBatch` (writes the undo phase), LWC `dataJobHistory`.
 
 ---
 
@@ -6264,7 +6269,7 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
   keys).
 - **Bulk delete services:** `BulkDeleteService` (check, preview, start, undo),
   `BulkDeleteBatch` (the job), `BulkDeleteUndoBatch` (the undelete), `BulkDeleteController`;
-  component `bulkDelete`, opened from Find's results, and `bulkDeleteHistory` on the Bulk Update
+  component `bulkDelete`, opened from Find's results, and `dataJobHistory` on the Bulk Update
   tab. Custom permission `Bulk_Delete_Records`, permission set `BarnCRM_Bulk_Delete`.
 - **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
   `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),

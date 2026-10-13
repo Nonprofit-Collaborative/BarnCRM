@@ -32,7 +32,7 @@ function format(template, ...values) {
  *
  * Find opens it over the query it just ran (`queryJson`). The page sends only the query document
  * and the confirmed count; BulkDeleteController checks both as the person (canonical model R-BD1
- * to R-BD6). Undo is on the Bulk Update tab (bulkDeleteHistory).
+ * to R-BD6). Undo is on the Bulk Update tab (dataJobHistory).
  */
 export default class BulkDelete extends LightningElement {
   @api queryJson;

@@ -69,6 +69,7 @@ CI enforces what it can; reviewers enforce the rest.
 - Every SOQL query lives in a Selector; business logic lives in a `*Service`; cross-package calls go through `global` service interfaces only.
 - User-facing text comes from Custom Labels, never from string literals in code or markup.
 - LWC: no third-party JavaScript except vetted static resources (SheetJS for import parsing is the only pre-approved one; anything else needs a recorded decision). Jest tests for every component with logic.
+- LWC styling is SLDS 2 (Cosmos theme): base components and SLDS utility classes first; any component CSS uses SLDS 2 global styling hooks (`--slds-g-*`) only, never hard-coded colors, spacing, font sizes, shadows or radii, `--lwc-*` tokens, or overrides of `slds-*` classes. `npm run lint:slds` enforces it in CI.
 - Apex test coverage target is 90 percent per package. The platform minimum of 75 percent is not the target.
 - Salesforce Code Analyzer (PMD, ESLint, retire-js, Graph Engine for FLS and CRUD) must pass with zero high or critical findings.
 

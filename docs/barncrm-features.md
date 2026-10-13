@@ -91,6 +91,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
 | Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Shipped | C-28 |
+| Org Optimizer | Major | The Data Hygiene tab becomes Org Optimizer: one page with lazily loaded sections for data quality, duplicates, field utilization and Health Check (run on demand), each shown only to people who may use it. Duplicate review moves here from BarnCRM Settings, which keeps a link. | Planned (`docs/org-optimizer-data-manager`) | ADR-NEXT org-optimizer-and-data-manager-pages |
 
 ### 1.5 Import and Data Management
 
@@ -105,6 +106,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Bulk update | Major | Sets, clears or copies up to five fields on the records a Find query returns, with a count preview, journal and undo. | Shipped | C-35 |
 | Bulk update with steps | Minor | Changes each record's own value in a bulk update with the import's transform steps (find and replace, tidy text, add other fields, read a date), previewed before and after. | Shipped (#219) | C-37, ADR-0081 |
 | Bulk delete | Major | Deletes the records a Find query returns, behind its own permission set and a per-job run limit, with a count preview, cascade warning, typed confirmation, journal and undelete from the Recycle Bin. | Shipped (#219) | C-37, ADR-0091 (`0091-bulk-delete-from-a-find-query-with-undelete.md`) |
+| Data Manager | Major | A Data Manager tab with a card for each data tool the person may use (import, find, bulk update, bulk delete, Org Optimizer), the import mappings, every data job in one list, and links to Salesforce's own export and Recycle Bin. Import and Bulk Update leave the app navigation and open from here. | Planned (`docs/org-optimizer-data-manager`) | ADR-NEXT org-optimizer-and-data-manager-pages |
+| Data job history | Minor | One list of imports, bulk updates and bulk deletes, newest first, filtered by kind, with counts, undo deadline and each tool's own Undo confirmation; replaces the three separate history lists on the Import and Bulk Update tabs. | Built, not merged (`feature/data-job-history`) | ADR-NEXT org-optimizer-and-data-manager-pages |
 | Shipped mappings | Minor | Generic donor list and generic gift list mappings that upgrades never overwrite once edited. | Shipped | C-14 |
 | Two people on one row | Minor | A row naming two people creates one household with both in it, in either membership model. | Shipped | C-14 |
 | Import tagging | Minor | Every record an import creates is tagged with the import it came from. | Shipped | C-14 |
@@ -116,6 +119,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Do not load" remembered | Minor | A column set to Do not load stays that way on the next upload. | Shipped | C-14 |
 | Duplicate-safe new donors | Minor | A new donor appearing on several rows is created once, and the dry run counts them once. | Shipped | C-19 |
 | Person account import | Minor | Imports email, address, opt-outs, birthdate and title onto person accounts and re-finds them on a second load. | Shipped | C-14 |
+| Checkbox values in imports | Minor | Reads yes, y, x, checked, on and their opposites in any case as ticked or cleared; any other value leaves the box as it was and is named by row, column and value in the run log. | Built, not merged (`fix/import-unrecognized-checkbox`) | C-14, R-IT11 |
 | First-name matching guard | Minor | A row whose first name differs from the only match at the same key creates a new person instead of renaming the existing one. | Shipped | C-14 (plan 11.2 item 17) |
 | Neutral import wizard | Minor | Without Giving installed, the wizard offers no gift columns, and the gift templates live in Giving. | Shipped | C-29 |
 | Match by an ID field you choose | Minor | Pick which external ID field a file matches on, for people and for organizations. | Shipped | C-32 |

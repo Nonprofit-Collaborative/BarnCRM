@@ -501,8 +501,8 @@ public with sharing class ImportObjectSchema {
     /**
      * A value as its field's type. A date is read as ISO 8601 (2026-10-12) or in the running
      * user's locale; a date and time as ISO 8601 or in the locale; numbers without spaces,
-     * thousands separators or a currency or percent sign; a checkbox from yes, no, true, false,
-     * 1 or 0. Returns null, or throws, when the value cannot be read. Lookups are not read here.
+     * thousands separators or a currency or percent sign; a checkbox as `checkbox` reads it.
+     * Returns null, or throws, when the value cannot be read. Lookups are not read here.
      */
     @NamespaceAccessible
     public static Object typed(String value, Schema.DescribeFieldResult field) {
@@ -539,12 +539,40 @@ public with sharing class ImportObjectSchema {
         return null;
     }
 
-    private static Boolean checkbox(String value) {
-        String lower = value.toLowerCase();
-        if (new Set<String>{ 'true', 'yes', 'y', '1' }.contains(lower)) {
+    /** The spellings a file uses for a ticked checkbox, lower case (canonical model R-IT11). */
+    private static final Set<String> CHECKED = new Set<String>{
+        'true',
+        'yes',
+        'y',
+        '1',
+        'x',
+        'checked',
+        'on',
+        't'
+    };
+
+    /** The spellings a file uses for a cleared checkbox, lower case (canonical model R-IT11). */
+    private static final Set<String> CLEARED = new Set<String>{
+        'false',
+        'no',
+        'n',
+        '0',
+        'off',
+        'f'
+    };
+
+    /**
+     * A checkbox value as every import reads it (R-IT11): true or false, ignoring case and
+     * surrounding spaces, or null for a blank value or one that is neither, which is never read
+     * as cleared. The people import and the one-object load share this one reading.
+     */
+    @NamespaceAccessible
+    public static Boolean checkbox(String value) {
+        String lower = value == null ? '' : value.trim().toLowerCase();
+        if (CHECKED.contains(lower)) {
             return true;
         }
-        if (new Set<String>{ 'false', 'no', 'n', '0' }.contains(lower)) {
+        if (CLEARED.contains(lower)) {
             return false;
         }
         return null;
