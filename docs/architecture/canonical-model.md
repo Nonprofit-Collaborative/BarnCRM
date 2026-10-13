@@ -6030,7 +6030,21 @@ written in, for display only; no SOQL text is ever accepted (ADR-0047).
 **R-SQ3 Export.** An export reads the same document in pages ordered by Id (the document's
 own order is ignored for paging), at most 2,000 rows a page, and stops at Export Row Limit
 (`Find_Export_Row_Limit__c`). The file is CSV, UTF-8 with a byte-order mark, built in the
-browser.
+browser. The browser's stop is a convenience, not a control: the pages are served to anyone
+with Find, in their own access. Only an export to Files (R-SQ12) enforces the limit on the
+server.
+
+**R-SQ12 Export to Files** (C-36; ADR-NEXT, `NEXT-find-export-to-files.md`). A Batch Apex job
+run as the person reads the document's filter in Id order in user mode, at most Export Row
+Limit rows (the query's LIMIT, so the server never reads more), with the document's own
+columns and none of its `related` entries. It writes the rows as R-SQ3's CSV (same cell rules,
+header of the column labels the page sent, values as the page shows them: dates `yyyy-MM-dd`,
+date and times in ISO 8601 UTC) into `ContentVersion` files owned by the person, a new file
+every 50,000 rows or about 4 million characters, each with the header row, titled
+`<Object>-<date>-<job>-part-<n>`. Nothing else is stored: the page finds the files by the
+person's own files whose title carries the job, and polls the job's `AsyncApexJob`. When the
+job ends it tells the person (Q-04 `JobNotifier`), opening the first file. A query that fails
+to compile is refused before the job starts. Permission: `Find_And_Export_Records` (R-SQ5).
 
 **R-SQ4 Sharing.** Saved Query is Private. Sharing is an Apex managed share with the reason
 Shared With Find Users, to the org's All Internal Users group, granting Read. Only the owner

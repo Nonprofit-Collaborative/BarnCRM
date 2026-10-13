@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Find_ExportFilesNotFound</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Export to Files: no such export of yours</shortDescription>
+        <value>This export to Files was not found. Only the person who started an export can follow it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_FindExport</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of a Find export to Files</shortDescription>
+        <value>Export to Files</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_FindExportBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: export outcome. {0} rows, {1} files.</shortDescription>
+        <value>{0} rows written to {1} CSV files in your Files. Open to see the first file.</value>
+    </labels>
+</CustomLabels>

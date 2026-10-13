@@ -158,6 +158,20 @@ public with sharing class QueryCompiler {
     }
 
     /**
+     * An export to Files (R-SQ12): the document's filter and columns, without its related lists,
+     * in Id order, at most `rowLimit` rows, so the server never reads past the export limit.
+     */
+    public static Compiled compileServerExport(String queryJson, Integer rowLimit) {
+        QueryDocument document = parse(queryJson);
+        document.children.clear();
+        Compiled compiled = selectAndWhere(document, null, null);
+        compiled.binds.put('exportLimit', rowLimit);
+        compiled.soql += ' ORDER BY Id LIMIT :exportLimit';
+        compiled.display += ' ORDER BY Id LIMIT ' + rowLimit;
+        return compiled;
+    }
+
+    /**
      * The document's filter over other fields of its object, for bulk update (C-35, R-BU1): the
      * document's own columns, order and row count are ignored. With `onlyIds`, only those
      * records; the caller adds any order and row count.

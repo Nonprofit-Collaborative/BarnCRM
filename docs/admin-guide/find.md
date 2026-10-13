@@ -110,8 +110,9 @@ a value; the operators offered depend on the field:
 - **Fewer rows than a colleague sees.** Find uses each person's own access and sharing. This
   is deliberate; it is not a fault.
 - **The export stopped early.** It reached the export row limit. Narrow the conditions, or ask
-  an admin to raise **Export row limit**. Exports above a few hundred thousand rows belong in
-  Data Loader.
+  an admin to raise **Export row limit** (at most 500,000). For a large export, use **Export to
+  Files** (section 7.5a), which does not depend on your browser. Exports above 500,000 rows
+  belong in Data Loader.
 - **Contains on a number.** Numbers offer comparisons, not contains. Use "is at least" and
   "is at most" together for a range.
 - **A date field shows the right day in the table but a condition seems a day off.** Date and
@@ -191,6 +192,32 @@ and downloads an Excel workbook with one sheet, a header row of column labels, n
 numbers and dates as dates. A very large export can take a while to build in the browser; for
 more than a few tens of thousands of rows, CSV is faster.
 
+### 7.5a Export to Files
+
+**Export to Files** runs the export on the Salesforce server instead of in your browser, for
+exports too large for a browser tab to hold (a mailing list of a few hundred thousand donors,
+for example). You can close the page while it runs.
+
+1. Run the query and press **Export to Files**. The export starts in the background and the
+   page shows its progress.
+2. It reads every row the query matches, up to the **Export row limit**, in record ID order,
+   with your own access, and writes them as CSV in the same format as **Export to CSV**. Columns
+   of related records listed under a row (section 7.1's related lists) are not included.
+3. A large export is split into several files of up to 50,000 rows each, every one with the
+   header row, named for the object, the date and the part, for example
+   `Contact-2026-10-13-a1b2c3-part-2.csv`. They are saved to your Salesforce Files (**Files**,
+   **Owned by Me**); nobody else can see them unless you share them.
+4. When it finishes, the page lists the files with a link to each, and BarnCRM sends you a
+   notification (the bell) that opens the first file, if job notifications are on.
+
+The files count against your org's file storage. Delete them from Files once you have
+downloaded them.
+
+**The export row limit is enforced on the server** for an export to Files: it never writes
+more rows than the limit, whoever asks. For **Export to CSV** and **Export to Excel** the limit
+is where your browser stops reading; treat it as a convenience, not a control on what people
+with Find can read, which is always only what their own access allows.
+
 ### 7.6 Editing in the table
 
 If you hold the **Bulk Update Records** permission as well as Find's, the columns you may edit
@@ -209,8 +236,8 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 
 ## 8. What Find does not do (yet)
 
-Exports run on the server, for more rows than a browser can hold, are planned for a later
-release (C-36). Totals are a summary table, not a chart. To change many records to the same
+An export to Files runs once, when you press it: scheduled or recurring exports and sending a
+file elsewhere are planned for a later release (C-38). Totals are a summary table, not a chart. To change many records to the same
 value at once, run a query and press **Bulk update**, shown to people who also hold the Bulk
 Update Records permission. See [Bulk update](bulk-update.md). To delete every record a query
 returns, press **Bulk delete**, shown only to people who hold the Bulk Delete Records
