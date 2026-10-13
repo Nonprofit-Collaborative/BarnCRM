@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DataManager_Title</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: page title</shortDescription>
+        <value>Data Manager</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_Intro</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: one line under the title</shortDescription>
+        <value>Start a data task, or see and undo what changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ToolsHeading</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: heading over the tool cards</shortDescription>
+        <value>Start a task</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ImportTitle</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: card that opens the Import tab</shortDescription>
+        <value>Import a file</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ImportText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: what the import card does</shortDescription>
+        <value>Load people, organizations, gifts or one kind of record from a spreadsheet, with a preview first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_FindTitle</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: card that opens Find</shortDescription>
+        <value>Find and export records</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_FindText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: what the Find card does</shortDescription>
+        <value>Find exactly the records you need, save the query, and export them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_UpdateTitle</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: card for bulk update</shortDescription>
+        <value>Change many records</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_UpdateText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: how to start a bulk update</shortDescription>
+        <value>Run a query in Find, then press Bulk update.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DeleteTitle</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: card for bulk delete</shortDescription>
+        <value>Delete many records</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DeleteText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: how to start a bulk delete</shortDescription>
+        <value>Run a query in Find, then press Bulk delete.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_OptimizerTitle</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: card that opens Org Optimizer</shortDescription>
+        <value>Tidy and check your data</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_OptimizerText</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: what the Org Optimizer card does</shortDescription>
+        <value>Open Org Optimizer to see which records and settings need attention.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_Open</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: button on each tool card</shortDescription>
+        <value>Open</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_MappingsHeading</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: heading of the import mappings card</shortDescription>
+        <value>Import mappings</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_MappingsEmpty</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: no import mappings</shortDescription>
+        <value>No import mappings yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ColumnName</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: mappings column, the mapping name</shortDescription>
+        <value>Mapping</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ColumnLoads</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: mappings column, what it loads</shortDescription>
+        <value>Loads</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ColumnSource</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: mappings column, the recurring source name</shortDescription>
+        <value>Arrives regularly as</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_ColumnLastLoaded</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: mappings column, the last import date</shortDescription>
+        <value>Last loaded</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_LoadsPeople</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: what a people mapping loads</shortDescription>
+        <value>People and organizations</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_SalesforceHeading</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: heading of the Salesforce tools card</shortDescription>
+        <value>Salesforce's own tools</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_WeeklyExport</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: link to Weekly Data Export in Setup</shortDescription>
+        <value>Weekly Data Export (your backup)</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_RecycleBin</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: link to the Recycle Bin</shortDescription>
+        <value>Recycle Bin</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataManager_DataImportWizard</fullName>
+        <categories>DataManager</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Manager: link to the Data Import Wizard in Setup</shortDescription>
+        <value>Data Import Wizard (records BarnCRM does not load)</value>
+    </labels>
+</CustomLabels>

@@ -203,7 +203,7 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 - Each save runs with your access, and your organization's validation rules and automation
   run, as on any save. A record that is refused is marked in the table with the reason; the
   rest still save.
-- Each save is recorded like a bulk update. It appears on the **Bulk Update** tab under
+- Each save is recorded like a bulk update. It appears on the **Data Manager** tab under
   **Data jobs**, and can be undone there within the same window as an import. The
   undo puts back each value nobody has changed since.
 

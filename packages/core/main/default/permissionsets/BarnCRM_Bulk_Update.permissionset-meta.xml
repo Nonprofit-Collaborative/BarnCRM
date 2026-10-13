@@ -15,6 +15,10 @@
     <apexClass>BulkUpdateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>DataManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
     <name>Bulk_Update_Records</name>
@@ -188,6 +192,10 @@
   </objectPermissions>
   <tabSettings>
     <tab>Bulk_Update</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Data_Manager</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

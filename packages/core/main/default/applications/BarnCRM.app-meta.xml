@@ -53,9 +53,8 @@
   <tabs>Households</tabs>
   <tabs>standard-Contact</tabs>
   <tabs>Organizations</tabs>
-  <tabs>Import</tabs>
+  <tabs>Data_Manager</tabs>
   <tabs>Find</tabs>
-  <tabs>Bulk_Update</tabs>
   <tabs>Data_Hygiene</tabs>
   <tabs>BarnCRM_Settings</tabs>
   <tabs>Rollup_Builder</tabs>
@@ -79,13 +78,10 @@
       <tab>Organizations</tab>
     </mappings>
     <mappings>
-      <tab>Import</tab>
+      <tab>Data_Manager</tab>
     </mappings>
     <mappings>
       <tab>Find</tab>
-    </mappings>
-    <mappings>
-      <tab>Bulk_Update</tab>
     </mappings>
     <mappings>
       <tab>Data_Hygiene</tab>
