@@ -25,6 +25,8 @@ public with sharing class BulkDeleteService {
     /** Query rows left free for the reads around a count. */
     private static final Integer COUNT_MARGIN = 100;
     private static final Integer DEFINITION_VERSION = 1;
+    /** The most journal pages a fallback count reads (the journal's own read limit). */
+    private static final Integer MAX_JOURNAL_PAGES = 200;
 
     /** Raised for anything the person can fix; the message is for them. */
     public class BulkDeleteException extends Exception {
@@ -316,6 +318,112 @@ public with sharing class BulkDeleteService {
         );
         Database.insert(job, AccessLevel.SYSTEM_MODE);
         return job;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Undo
+    // -------------------------------------------------------------------------------------
+
+    /** What an undo of a bulk delete would bring back. */
+    public class UndoPreview {
+        @AuraEnabled
+        public Boolean allowed = false;
+        @AuraEnabled
+        public String reason;
+        /** The records the job deleted: the number the person confirms. */
+        @AuraEnabled
+        public Integer records = 0;
+    }
+
+    /**
+     * Whether a bulk delete can be undone now and how many records it deleted (R-BD5), with the
+     * import undo's guards: once, within the Undo Deadline, not while it runs.
+     */
+    public static UndoPreview undoPreview(Id jobId) {
+        UndoPreview view = new UndoPreview();
+        Import_Batch__c job = jobById(jobId);
+        if (job != null && !OPERATION_DELETE.equals(job.Operation__c)) {
+            job = null;
+        }
+        view.reason = job == null
+            ? System.Label.Core_BulkDelete_ErrorNotBulkDelete
+            : ImportUndoService.refusal(job);
+        if (job == null) {
+            return view;
+        }
+        view.records = job.Rows_Deleted__c == null ? 0 : job.Rows_Deleted__c.intValue();
+        // A job the platform stopped before its finish counted keeps the journal's count.
+        if (view.records == 0) {
+            view.records = deletedEntries(job.Id);
+        }
+        if (String.isBlank(view.reason) && view.records == 0) {
+            view.reason = System.Label.Core_BulkDelete_UndoNothing;
+        }
+        view.allowed = String.isBlank(view.reason);
+        return view;
+    }
+
+    /**
+     * Starts the undo after checking every guard again and that the number of records is the
+     * number the person was shown; takes the once-only latch first (R-BD5).
+     */
+    public static Id undo(Id jobId, Integer confirmedRecords) {
+        UndoPreview view = undoPreview(jobId);
+        if (!view.allowed) {
+            throw new BulkDeleteException(view.reason);
+        }
+        if (confirmedRecords != view.records) {
+            throw new BulkDeleteException(
+                String.format(
+                    System.Label.Core_BulkDelete_UndoCountChanged,
+                    new List<Object>{
+                        String.valueOf(confirmedRecords == null ? 0 : confirmedRecords),
+                        String.valueOf(view.records)
+                    }
+                )
+            );
+        }
+        ImportUndoService.latch(jobId);
+        return Database.executeBatch(new BulkDeleteUndoBatch(jobId, view.records), 1);
+    }
+
+    /** A data job by Id, with the fields the undo guards read, in system mode (ADR-0021). */
+    private static Import_Batch__c jobById(Id jobId) {
+        List<Import_Batch__c> found = [
+            SELECT
+                Id,
+                Status__c,
+                Is_Dry_Run__c,
+                Undo_Deadline__c,
+                Completed_At__c,
+                Job_Id__c,
+                Operation__c,
+                Rows_Deleted__c
+            FROM Import_Batch__c
+            WHERE Id = :jobId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        return found.isEmpty() ? null : found[0];
+    }
+
+    /** How many Deleted entries a job's commit journal holds. */
+    private static Integer deletedEntries(Id jobId) {
+        Integer total = 0;
+        for (
+            Import_Journal__c page : ImportJournalService.pages(
+                jobId,
+                ImportJournalService.PHASE_COMMIT,
+                MAX_JOURNAL_PAGES
+            )
+        ) {
+            for (Map<String, Object> entry : ImportJournalService.entries(page)) {
+                if (ImportJournalService.ACTION_DELETED.equals(entry.get('action'))) {
+                    total++;
+                }
+            }
+        }
+        return total;
     }
 
     /** The undo deadline of a bulk delete started at `startedAt` (R-BD2). */

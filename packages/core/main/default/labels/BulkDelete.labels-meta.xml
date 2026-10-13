@@ -72,4 +72,44 @@
         <shortDescription>Run log: what a bulk delete did.</shortDescription>
         <value>Finished: {0} deleted, {1} no longer matched, {2} refused.</value>
     </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorNotBulkDelete</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the bulk delete asked for cannot be found.</shortDescription>
+        <value>This bulk delete could not be found. Refresh the page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoNothing</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the bulk delete deleted nothing to bring back.</shortDescription>
+        <value>This bulk delete deleted nothing, so there is nothing to bring back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoCountChanged</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the confirmed count is not what the job deleted.</shortDescription>
+        <value>You confirmed {0} records, but this bulk delete deleted {1}. Nothing was brought back. Look at the count and confirm again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoPurged</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Journal: a deleted record is no longer in the Recycle Bin.</shortDescription>
+        <value>No longer in the Recycle Bin, so it cannot be brought back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogUndone</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: who undid a bulk delete, when, and what came back.</shortDescription>
+        <value>{0} undid this bulk delete on {1}: of {6} deleted, {2} brought back, {3} no longer in the Recycle Bin, {4} already restored, {5} refused.</value>
+    </labels>
 </CustomLabels>
