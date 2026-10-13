@@ -1,4 +1,4 @@
-# ADR-NEXT: Bulk delete runs from a Find query, as the user, and is undone by undelete
+# ADR-0091: Bulk delete runs from a Find query, as the user, and is undone by undelete
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-12

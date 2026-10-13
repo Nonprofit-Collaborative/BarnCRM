@@ -1343,7 +1343,7 @@ queued job (`SurvivorRecalculation` in `RollupService`) that runs only the real-
 definitions targeting the merged entity. When there are more than 50 survivors, or the save
 cannot queue another job, the survivors go to the Rollup Queue (Section 14A) instead, and a
 survivor the platform still refuses in the job is queued to be tried again
-(ADR-NEXT, `NEXT-merge-survivors-recalculated-after-the-merge.md`).
+(ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`).
 
 **R-R5 Freshness.** Last Calculated on the definition answers "when was this number last
 calculated" for the admin looking at the rollup list. The record page answer comes from
@@ -6210,7 +6210,7 @@ own result, and the reason in place of a result the field cannot take.
 ### Bulk delete (C-37)
 
 Deletes every record a Find query returns (plan Section 4.9; owner decision 2026-09-23; builder
-decisions in ADR-NEXT, `NEXT-bulk-delete-from-a-find-query-with-undelete.md`). Like a bulk
+decisions in ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`). Like a bulk
 update, it is a data job with no rows of its own.
 
 **R-BD1 A data job with Operation Delete.** A bulk delete is an `Import_Batch__c` with
@@ -6587,8 +6587,8 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
 | v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
-| 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-NEXT, `NEXT-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
-| v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-NEXT, `NEXT-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
+| v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 
 ---
 ## 32. Entity ownership by package

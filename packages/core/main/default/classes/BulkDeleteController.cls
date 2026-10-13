@@ -1,6 +1,6 @@
 /**
  * What the bulk delete panel and its list on the Bulk Update tab read and write (C-37,
- * canonical model R-BD1 to R-BD6, ADR-NEXT).
+ * canonical model R-BD1 to R-BD6, ADR-0091).
  *
  * Every method requires the Bulk Delete Records custom permission and, because every bulk
  * delete starts from a Find query, Find and Export Records (R-BD6). Neither grants record

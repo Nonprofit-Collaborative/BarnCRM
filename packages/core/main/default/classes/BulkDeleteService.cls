@@ -1,6 +1,6 @@
 /**
- * Bulk delete (C-37, canonical model Section 29E, R-BD1 to R-BD6, ADR-NEXT
- * `NEXT-bulk-delete-from-a-find-query-with-undelete.md`): every record a Find query returns,
+ * Bulk delete (C-37, canonical model Section 29E, R-BD1 to R-BD6, ADR-0091
+ * `0091-bulk-delete-from-a-find-query-with-undelete.md`): every record a Find query returns,
  * checked and counted as the person before anything is deleted.
  *
  * Everything the person sends is checked here, as them: the query document through

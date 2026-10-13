@@ -1,4 +1,4 @@
-# ADR-NEXT: Merge survivors' real-time totals are recalculated just after the merge
+# ADR-0092: Merge survivors' real-time totals are recalculated just after the merge
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-13
