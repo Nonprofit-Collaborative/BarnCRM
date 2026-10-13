@@ -32,6 +32,17 @@ Last refreshed from BMemory 2026-10-12.
 | D-22 | 2026-10-12 | New ADRs accepted: migration kit, Flow templates, suite choice first, Module Manager, interaction notes as Tasks, settings record pickers, Health Check schedules nightly jobs |
 | D-23 | 2026-10-12 | Platform capabilities: keep LWC, audit API 67.0 access modes, Apex Cursors, GraphQL in new screens, AI-ready action descriptions, cheap portability steps; avoid Data 360, Heroku AppLink, Functions and similar |
 | D-24 | 2026-10-12 | Telemetry (C-26) deferred indefinitely: no AppExchange for now; if listed later, prefer AppExchange App Analytics |
+| D-25 | 2026-10-12 | CMDT Manager: only the org's own relationship types editable; a BarnCRM Settings (General) section, not a tab; permission set without Customize Application or Modify Metadata (ADR-0085) |
+| D-26 | 2026-10-12 | Field utilization ships in Core: weekly user-mode count Sundays 04:00, 13 months kept, Account, Contact and custom objects only (ADR-0086) |
+| D-27 | 2026-10-12 | Typed Find queries parsed in the browser into the query document; the server never takes SOQL text (C-36, ADR-0078) |
+| D-28 | 2026-10-12 | Column changes as a declarative transform document; import matching through the org's duplicate rules (C-37 part 1, ADR-0081) |
+| D-29 | 2026-10-12 | Health Check keeps its orphan findings alongside the Data Hygiene tab (C-28) |
+| D-30 | 2026-10-12 | Nightly rollup run skipped and logged when a Recalculate all is already running (rollup S8) |
+| D-31 | 2026-10-12 | Rollup operations: count distinct its own operation, delimiter picklist, Any and None read no field, count distinct into plain numbers only, unfit target refused |
+| D-32 | 2026-10-12 | Rollup Builder estimate uses 1,650 records a minute until measured; S14 only if the scale test needs it |
+| D-33 | 2026-10-12 | Tests run as a permission-set user (`TestUsers`, on the running user's profile), checked by `check-tests-run-as.py` |
+
+D-25 to D-33 were accepted under the owner's standing instruction "proceed as recommended" (2026-10-12); the owner may amend them.
 
 ## Open questions still open (plan Section 11.2)
 
@@ -50,13 +61,14 @@ Last refreshed from BMemory 2026-10-12.
 
 ## Parking lot (plan Section 11.3)
 
-Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap, 5 small review items and 6 BarnCRM rename are built on open PRs (see `roadmap.md`); 2 (log unrecognized checkbox values in imports) has no branch yet.
+Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap and 6 BarnCRM rename merged with #181; 5 small review items landing (#203 in #217); 2 (log unrecognized checkbox values in imports) has no branch yet. Work items from the 2026-10-12 landing (plan 11.3): rollup S9 after a clean comparison run; C-35 adopts the C-37 transforms, then bulk delete; "Data jobs" relabel; `FieldUtilizationJob` in `NightlyJobs`; test self-containment follow-ups; version for `v1.x-draft-advanced-find.md`; ADR-0088 still Proposed; org checks during the `barn-npc` deploy; `mwdbdevsb` real validation on hold.
 
 ## Working agreements (owner instructions)
 
 - Merge authority (2026-09-23): squash-merge without asking when every required check (Static checks, DCO sign-off, Org tests (local)) is green on the head, threads are resolved and nothing is open; hold and ask on an owner question, a failing or skipped check, or a design doubt. Report merges afterwards.
-- Test orgs (2026-09-23, 2026-09-24, 2026-10-12): only `oi-test`, `oi-pa` and `barn-core`; any other org needs approval; recreating `oi-pa` on expiry is pre-approved; agents share each org through a lock, one deploy or test run at a time.
-- Sandbox `mwdbdevsb` (2026-10-12): real built-out org; never the default; check-only first; ask before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only.
+- Test orgs (2026-09-23, 2026-09-24, 2026-10-12): only `oi-test`, `oi-pa`, `barn-core` and `barn-npc` (Nonprofit Cloud trial, never default; deploy approved once the landing batches, Builder and test self-containment merge); any other org needs approval; recreating `oi-pa` on expiry is pre-approved; agents share each org through a lock, one deploy or test run at a time.
+- Sandbox `mwdbdevsb` (2026-10-12): real built-out org; never the default; check-only first; ask before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only. Real deploy on hold ("Wait until the other tasks are completed then deploy to barn-npc").
+- Standing instruction (2026-10-12): "PR, merge, and continue building all the core functionality until it's ready for the test deploy to barn-npc"; decisions inside that work are taken as recommended and recorded (D-25 to D-33).
 - Gate from a clean worktree (2026-09-24): run `scripts/org/run-org-tests.sh` only from a dedicated detached worktree at the pushed head.
 - Naming (2026-10-12): short prefix is "barn-" (for example `barn-core`), never "bc-".
 - Synced folder: never `git add -A`; stage by path; check for ` 2.` files before pushing.
