@@ -943,7 +943,7 @@ settings console, never by asking the admin to open Setup (plan Section 2.3).
 serves from its own custom settings cache and refreshes when a save commits, and are held in
 a per-transaction static that every write clears. So a change takes effect on the next
 transaction and never appears stale beyond ten seconds (C-03 acceptance criterion). Core
-ships no Platform Cache partition (ADR-NEXT).
+ships no Platform Cache partition (ADR-0094).
 **R-N4 Audited.** Every write produces a Setting Change record (Section 11).
 **R-N5 Extension procedure.** A feature that needs a new key adds a row to the table
 above in the same pull request that adds the field, with its default and its one-line
@@ -5530,7 +5530,7 @@ be explained.
   `Seasonal_Address_Last_Run_Summary__c` (Section 12).
 - **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
   Addresses card reads and saves through Lightning Data Service, with no controller,
-  ADR-NEXT record reads through Lightning Data Service); and for the seasonal swap
+  ADR-0093 record reads through Lightning Data Service); and for the seasonal swap
   `SeasonalAddressService`,
   `SeasonalAddressSelector`, `SeasonalAddressWriter`, `SeasonalAddressBatch`,
   `SeasonalAddressScheduler`, `SeasonalAddressController`.

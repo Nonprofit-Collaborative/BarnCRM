@@ -1,4 +1,4 @@
-# ADR-NEXT: Configuration reads use the platform's own caches; Core ships no Platform Cache partition
+# ADR-0094: Configuration reads use the platform's own caches; Core ships no Platform Cache partition
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-13

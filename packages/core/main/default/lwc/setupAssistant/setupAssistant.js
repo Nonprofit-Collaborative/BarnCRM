@@ -43,7 +43,7 @@ import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionBut
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 
 const CREATE_USER_URL = '/lightning/setup/ManageUsers/home';
-// User access policies are created in Setup, not by a package (ADR-NEXT), so the step links to the guide.
+// User access policies are created in Setup, not by a package (ADR-0095), so the step links to the guide.
 const AUTOMATIC_ACCESS_GUIDE =
   'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/automatic-access.md';
 // The tabs the assistant opens, by page reference rather than by URL, so the links keep

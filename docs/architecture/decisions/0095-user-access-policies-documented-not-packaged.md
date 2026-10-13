@@ -1,4 +1,4 @@
-# ADR-NEXT: User access policies are documented definitions, not packaged components
+# ADR-0095: User access policies are documented definitions, not packaged components
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

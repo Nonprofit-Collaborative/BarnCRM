@@ -1,4 +1,4 @@
-# ADR-NEXT: First-visit tips are packaged In-App Guidance prompts, single step, managed in Setup
+# ADR-0096: First-visit tips are packaged In-App Guidance prompts, single step, managed in Setup
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

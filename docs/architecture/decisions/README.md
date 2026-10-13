@@ -101,11 +101,11 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0090](0090-flow-templates-which-automations-get-one.md) | Flow templates: which automations get one, how they are named, and what they leave out (applies ADR-0040) | Accepted (builder decision) |
 | [0091](0091-bulk-delete-from-a-find-query-with-undelete.md) | Bulk delete runs from a Find query, as the user, and is undone by undelete | Accepted |
 | [0092](0092-merge-survivors-recalculated-after-the-merge.md) | Merge survivors' real-time totals are recalculated just after the merge | Accepted (builder decision) |
-| [NEXT](NEXT-record-reads-through-lightning-data-service.md) | Simple record reads in LWCs go through Lightning Data Service, not Apex | Proposed (builder decision) |
-| [NEXT](NEXT-no-platform-cache-partition.md) | Configuration reads use the platform's own caches; Core ships no Platform Cache partition (amends ADR-0006 decision 1) | Accepted (builder decision) |
-| [NEXT](NEXT-user-access-policies-documented-not-packaged.md) | User access policies are documented definitions, not packaged components | Proposed (builder decision) |
-| [NEXT](NEXT-in-app-guidance-prompts.md) | First-visit tips are packaged In-App Guidance prompts, single step, managed in Setup | Proposed (builder decision) |
-| [NEXT](NEXT-record-pages-own-their-actions-and-lists.md) | Every packaged record page places its own actions, and Giving's own pages their own related lists (amends ADR-0043) | Accepted (builder decision) |
+| [0093](0093-record-reads-through-lightning-data-service.md) | Simple record reads in LWCs go through Lightning Data Service, not Apex | Proposed (builder decision) |
+| [0094](0094-no-platform-cache-partition.md) | Configuration reads use the platform's own caches; Core ships no Platform Cache partition (amends ADR-0006 decision 1) | Accepted (builder decision) |
+| [0095](0095-user-access-policies-documented-not-packaged.md) | User access policies are documented definitions, not packaged components | Proposed (builder decision) |
+| [0096](0096-in-app-guidance-prompts.md) | First-visit tips are packaged In-App Guidance prompts, single step, managed in Setup | Proposed (builder decision) |
+| [0097](0097-record-pages-own-their-actions-and-lists.md) | Every packaged record page places its own actions, and Giving's own pages their own related lists (amends ADR-0043) | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

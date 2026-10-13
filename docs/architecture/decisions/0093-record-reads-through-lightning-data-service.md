@@ -1,4 +1,4 @@
-# ADR-NEXT: Simple record reads in LWCs go through Lightning Data Service, not Apex
+# ADR-0093: Simple record reads in LWCs go through Lightning Data Service, not Apex
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

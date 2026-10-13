@@ -1,4 +1,4 @@
-# ADR-NEXT: Every packaged record page places its own actions, and Giving's own pages their own related lists
+# ADR-0097: Every packaged record page places its own actions, and Giving's own pages their own related lists
 
 **Status:** Accepted (builder decision, Core quality pass Q-08); amends the related-lists
 rule of ADR-0043 for record pages of objects the shipping package owns

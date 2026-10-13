@@ -21,7 +21,7 @@ object references: those live only in the Connect module, behind dynamic Apex.
   **No Platform Cache.** Settings and the shipped custom metadata are read through the
   platform's own caches (`getOrgDefaults()` and custom metadata `getAll()`), which cost no
   query and are refreshed when a save commits, plus a per-transaction static cache that every
-  write clears. Core ships no cache partition and needs no cache allocation (ADR-NEXT). A
+  write clears. Core ships no cache partition and needs no cache allocation (ADR-0094). A
   `BarnCRMSettings` partition created for an earlier version is no longer used and can be
   deleted.
 - **Trigger framework**: one trigger per object, bypassable handlers, a pause-all switch.

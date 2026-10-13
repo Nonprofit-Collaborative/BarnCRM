@@ -513,7 +513,7 @@ public with sharing class SettingsService {
      * Forgets the cached settings, so the next read in this transaction comes from the platform.
      * Every writer of a settings object, in any package, calls this after it writes. Nothing is
      * cached across transactions here: the platform's own custom settings cache already serves
-     * `getOrgDefaults()` without a query (ADR-NEXT).
+     * `getOrgDefaults()` without a query (ADR-0094).
      */
     @NamespaceAccessible
     public static void clearCaches() {

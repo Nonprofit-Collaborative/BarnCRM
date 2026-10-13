@@ -96,7 +96,7 @@ public with sharing class SettingsController {
     }
 
     // Not cacheable: the console calls it again after a save, and a cached answer would show
-    // the values from before the save (ADR-NEXT, record reads through Lightning Data Service).
+    // the values from before the save (ADR-0093, record reads through Lightning Data Service).
     @AuraEnabled
     public static ConsoleModel getConsoleModel() {
         try {

@@ -2,7 +2,7 @@
  * The configuration every save reads costs no SOQL query, because the platform already caches
  * it across transactions: the automation registry and the Setting Definition rows through
  * custom metadata `getAll()`, and Core's settings through `getOrgDefaults()`. That is why Core
- * ships no Platform Cache partition (ADR-NEXT). These tests read with
+ * ships no Platform Cache partition (ADR-0094). These tests read with
  * no test override, so they see the shipped rows and measure the real cost.
  */
 @IsTest

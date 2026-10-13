@@ -54,7 +54,7 @@ public with sharing class AutomationRegistrySelector {
      * with `getAll()`, which costs no query (it is served from the platform's own metadata
      * cache, across transactions) and returns a long text area cut to 255 characters, which the
      * framework never reads. A query here selected the description and so cost one counted SOQL
-     * in every transaction that fired a BarnCRM trigger (ADR-NEXT).
+     * in every transaction that fired a BarnCRM trigger (ADR-0094).
      * The rows come back unordered: `selectForObject` sorts them.
      */
     public static List<Automation_Registry__mdt> selectForFramework() {

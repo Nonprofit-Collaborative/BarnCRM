@@ -41,7 +41,7 @@ import USERS_IN_ROLE from '@salesforce/label/c.Core_Access_UsersInRole';
 
 const ADMIN_ROLE = 'BarnCRM_Admin_Group';
 const SETUP_USERS_PAGE = '/lightning/setup/ManageUsers/home';
-// User access policies cannot be created from a package, so this opens the guide with the exact definitions (ADR-NEXT).
+// User access policies cannot be created from a package, so this opens the guide with the exact definitions (ADR-0095).
 const AUTOMATIC_ACCESS_GUIDE =
   'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/docs/admin-guide/automatic-access.md';
 const MINIMUM_SEARCH_LENGTH = 2;

@@ -19,7 +19,7 @@ that way, was refused; duplicateReview's, 251, deployed):
 - record page visibility rules: none tests a lookup field itself (the platform refuses EQUAL
   and NE on a reference field; test a field across it, such as Donor_Account__r.Name)
 - dynamic related list columns: one field per valueListItems, never several in one value
-- in-app guidance prompts (ADR-NEXT, in-app guidance): title and header 36, dismiss button 15,
+- in-app guidance prompts (ADR-0096, in-app guidance): title and header 36, dismiss button 15,
   action button 25, description 255, label 80; single step only (a walkthrough needs a licence);
   no deprecated app namespace fields; the app and the app page tab each names exist in the repo
   (a released prompt cannot be removed from the package, so a wrong target ships for good)
