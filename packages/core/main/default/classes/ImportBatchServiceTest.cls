@@ -103,7 +103,9 @@ private class ImportBatchServiceTest {
             try {
                 ImportBatchService.stageRows(
                     batch.Id,
-                    new List<Map<String, Object>>{ new Map<String, Object>{ 'Email' => 'a@b.org' } },
+                    new List<Map<String, Object>>{
+                        new Map<String, Object>{ 'Email' => 'a@b.org' }
+                    },
                     2
                 );
             } catch (ImportException e) {
@@ -125,9 +127,7 @@ private class ImportBatchServiceTest {
             Import_Batch__c batch = ImportTestDataFactory.batch(newTemplate());
             List<Map<String, Object>> page = new List<Map<String, Object>>{
                 new Map<String, Object>{ 'Email' => 'a@b.org' },
-                new Map<String, Object>{
-                    'Notes' => 'x'.repeat(ImportBatchService.MAX_ROW_LENGTH)
-                }
+                new Map<String, Object>{ 'Notes' => 'x'.repeat(ImportBatchService.MAX_ROW_LENGTH) }
             };
 
             Test.startTest();

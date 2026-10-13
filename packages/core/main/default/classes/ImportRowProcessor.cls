@@ -2629,8 +2629,7 @@ public with sharing class ImportRowProcessor {
         // Either person decides: a row may give only a second person, and an Account Id in a
         // Contact lookup fails the row's save.
         Id either = item.person1Id != null ? item.person1Id : item.person2Id;
-        Boolean personAccountRow =
-            either != null && either.getSObjectType() == Account.SObjectType;
+        Boolean personAccountRow = either != null && either.getSObjectType() == Account.SObjectType;
         if (personAccountRow) {
             row.Person_1_Account__c = item.person1Id;
             row.Person_2_Account__c = item.person2Id;
