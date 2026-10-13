@@ -273,7 +273,12 @@ private class ImportBatchServiceTest {
             List<Map<String, String>> values = new List<Map<String, String>>();
             for (Integer i = 0; i < 200; i++) {
                 values.add(
-                    ImportTestDataFactory.donorRow('Ana' + i, 'Ramirez', 'ana' + i + '@example.org', null)
+                    ImportTestDataFactory.donorRow(
+                        'Ana' + i,
+                        'Ramirez',
+                        'ana' + i + '@example.org',
+                        null
+                    )
                 );
             }
             ImportTestDataFactory.rows(batch, values);
