@@ -8,9 +8,29 @@
  * A pattern is a sentence with blanks in it. The blanks are {FirstName}, {LastName} and
  * {Salutation}. The {!Token} spelling is accepted as an alias so that a pattern copied
  * from a formula keeps working.
+ *
+ * The words BarnCRM adds to a stored name or greeting ("and", the list separator, "the late",
+ * "Household", the placeholder name) are custom labels read in the org's default language,
+ * not the language of whoever saved (owner decision, 2026-10-13): otherwise the same household
+ * would be renamed into another language each time someone else saved it. See storedLabel.
  */
 @NamespaceAccessible
 public with sharing class HouseholdNamingService {
+    /** The package namespace, or empty while it is deferred; derived, never hard-coded. */
+    private static final String LABEL_NAMESPACE = HouseholdNamingService.class
+            .getName()
+            .contains('.')
+        ? HouseholdNamingService.class.getName().substringBefore('.')
+        : '';
+
+    /**
+     * Injected by the tests, which cannot add a translation: label values by language and
+     * name ("de|Core_Households_Conjunction"). When set, a key it lacks reads as a missing
+     * translation.
+     */
+    @TestVisible
+    private static Map<String, String> translationsForTest;
+
     private static final String TOKEN_FIRST_NAME = '{FirstName}';
     private static final String TOKEN_LAST_NAME = '{LastName}';
     private static final String TOKEN_SALUTATION = '{Salutation}';
@@ -49,7 +69,9 @@ public with sharing class HouseholdNamingService {
         if (surnames.size() > 1) {
             // Differing surnames read badly through a pattern, so they are listed instead:
             // "Garcia and Lee Household", "Garcia, Lee, and Smith Household".
-            return joinNames(surnames) + ' ' + Label.Core_Households_NameSuffix;
+            return joinNames(surnames) +
+                ' ' +
+                storedLabel('Core_Households_NameSuffix', Label.Core_Households_NameSuffix);
         }
         String normalized = normalize(usable);
         Boolean perPerson =
@@ -116,7 +138,8 @@ public with sharing class HouseholdNamingService {
             }
             if (person.isDeceased == true) {
                 // One label holding the whole phrase, so a translation can put the name first.
-                part = Label.Core_Households_LateName.replace('{0}', part);
+                part = storedLabel('Core_Households_LateName', Label.Core_Households_LateName)
+                    .replace('{0}', part);
             }
             parts.add(part);
         }
@@ -156,7 +179,7 @@ public with sharing class HouseholdNamingService {
         String salutations =
             first.salutation +
             ' ' +
-            Label.Core_Households_Conjunction +
+            storedLabel('Core_Households_Conjunction', Label.Core_Households_Conjunction) +
             ' ' +
             second.salutation;
         // A formal greeting uses the name on the record, not the name a person prefers.
@@ -211,7 +234,10 @@ public with sharing class HouseholdNamingService {
                 }
                 String name = computeName(members, namePattern, includeDeceased);
                 if (String.isBlank(name)) {
-                    name = Label.Core_Households_NamePlaceholder;
+                    name = storedLabel(
+                        'Core_Households_NamePlaceholder',
+                        Label.Core_Households_NamePlaceholder
+                    );
                 }
                 String formal = computeFormalGreeting(members, formalPattern, includeDeceased);
                 String informal = computeInformalGreeting(members, informalPattern);
@@ -316,6 +342,37 @@ public with sharing class HouseholdNamingService {
         return result;
     }
 
+    /**
+     * A label that ends up in a stored name or greeting, in the org's default language. Falls
+     * back to the label as the running user reads it when the org language cannot be read or
+     * the platform cannot give the label in it.
+     *
+     * @param name the label's API name, without a namespace
+     * @param fallback the same label read the ordinary way (Label.X)
+     * @return the label's value
+     */
+    @NamespaceAccessible
+    public static String storedLabel(String name, String fallback) {
+        String language = OrgLanguageSelector.defaultLanguage();
+        if (String.isBlank(language)) {
+            return fallback;
+        }
+        try {
+            if (translationsForTest != null) {
+                String key = language + '|' + name;
+                return translationsForTest.containsKey(key)
+                    ? translationsForTest.get(key)
+                    : fallback;
+            }
+            String value = System.Label.get(LABEL_NAMESPACE, name, language);
+            return String.isBlank(value) ? fallback : value;
+        } catch (Exception unavailable) {
+            // Deliberate: a label the platform cannot give in the org language (for example an
+            // unknown language key) is not worth failing a save over; the ordinary label is used.
+            return fallback;
+        }
+    }
+
     private static String joinNames(List<String> parts) {
         if (parts.isEmpty()) {
             return null;
@@ -323,7 +380,10 @@ public with sharing class HouseholdNamingService {
         if (parts.size() == 1) {
             return parts[0];
         }
-        String conjunction = Label.Core_Households_Conjunction;
+        String conjunction = storedLabel(
+            'Core_Households_Conjunction',
+            Label.Core_Households_Conjunction
+        );
         if (parts.size() == 2) {
             return parts[0] + ' ' + conjunction + ' ' + parts[1];
         }
@@ -331,7 +391,8 @@ public with sharing class HouseholdNamingService {
         for (Integer i = 0; i < parts.size() - 1; i++) {
             leading.add(parts[i]);
         }
-        String separator = Label.Core_Households_ListSeparator + ' ';
+        String separator =
+            storedLabel('Core_Households_ListSeparator', Label.Core_Households_ListSeparator) + ' ';
         return String.join(leading, separator) +
             separator +
             conjunction +
