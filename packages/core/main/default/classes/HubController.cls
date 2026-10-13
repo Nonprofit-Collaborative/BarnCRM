@@ -119,7 +119,9 @@ public with sharing class HubController {
             model.seasonalAddressLastRun = SeasonalAddressService.lastRun();
             model.seasonalAddressLastRunSummary = SeasonalAddressService.lastRunSummary();
             model.seasonalAddressScheduled = SeasonalAddressScheduler.isScheduled();
-            model.seasonalAddressStale = SeasonalAddressService.isStale();
+            model.seasonalAddressStale = SeasonalAddressService.isStale(
+                model.seasonalAddressScheduled
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             model.seasonalAddressScheduled = false;

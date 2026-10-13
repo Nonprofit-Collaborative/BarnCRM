@@ -117,6 +117,13 @@ public with sharing class AffiliationDomain {
             if (key == null) {
                 continue;
             }
+            if (overlapInputsUnchanged(record, key, previousById)) {
+                // Nothing the rule reads changed (Make primary, a description), so an overlap
+                // that was already there is not this edit's to refuse (PEOPLE-23). It still
+                // counts against the other rows in this save.
+                addTo(inThisSave, key, record);
+                continue;
+            }
             Affiliation__c clash = firstOverlap(existingByKey.get(key), record);
             if (clash != null) {
                 record.addError(overlapMessage(clash));
@@ -128,6 +135,22 @@ public with sharing class AffiliationDomain {
             }
             addTo(inThisSave, key, record);
         }
+    }
+
+    /** True for an edit that changed neither the person, the organization, the role nor a date. */
+    private static Boolean overlapInputsUnchanged(
+        Affiliation__c record,
+        String key,
+        Map<Id, SObject> previousById
+    ) {
+        if (previousById == null || record.Id == null) {
+            return false;
+        }
+        Affiliation__c previous = (Affiliation__c) previousById.get(record.Id);
+        return previous != null &&
+            key == roleKey(previous) &&
+            record.Start_Date__c == previous.Start_Date__c &&
+            record.End_Date__c == previous.End_Date__c;
     }
 
     private static void addTo(

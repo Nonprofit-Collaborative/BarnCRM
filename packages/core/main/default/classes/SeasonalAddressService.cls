@@ -260,7 +260,12 @@ public with sharing class SeasonalAddressService {
      * which is a different sentence with a different button under it.
      */
     public static Boolean isStale() {
-        if (!SeasonalAddressScheduler.isScheduled()) {
+        return isStale(SeasonalAddressScheduler.isScheduled());
+    }
+
+    /** The same, for a caller that has already asked whether the job is scheduled. */
+    public static Boolean isStale(Boolean scheduled) {
+        if (scheduled != true) {
             return false;
         }
         Datetime latest = lastRun();

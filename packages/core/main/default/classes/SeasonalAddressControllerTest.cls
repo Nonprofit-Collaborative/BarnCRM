@@ -86,6 +86,24 @@ private class SeasonalAddressControllerTest {
         }
     }
 
+    /** PEOPLE-37: the view asks about the job twice, not seven times. */
+    @IsTest
+    static void theViewOfAScheduledSwapCostsTwoQueries() {
+        System.runAs(TestUsers.admin()) {
+            SeasonalAddressScheduler.start();
+
+            Test.startTest();
+            Integer before = Limits.getQueries();
+            SeasonalAddressController.SwapView view = SeasonalAddressController.getSwap();
+            Integer used = Limits.getQueries() - before;
+            Test.stopTest();
+
+            Assert.isTrue(view.scheduled, 'Scheduled');
+            Assert.isNotNull(view.nextRunAt, 'With its next run');
+            Assert.isTrue(used <= 2, 'Whether it is scheduled, and when it runs next: ' + used);
+        }
+    }
+
     @IsTest
     static void runningTheSwapNowSwapsTheHouseholdWithoutWaitingForTonight() {
         System.runAs(TestUsers.admin()) {

@@ -51,38 +51,11 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 
     /** When the nightly swap is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
-        Id jobId = scheduledJobId();
-        if (jobId == null) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT NextFireTime
-            FROM CronTrigger
-            WHERE Id = :jobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].NextFireTime;
+        return ScheduledJobSelector.nextFireTime(JOB_NAME);
     }
 
+    /** The trigger behind the nightly swap: one query, through the shared selector (PEOPLE-37). */
     private static Id scheduledJobId() {
-        List<CronJobDetail> details = [
-            SELECT Id
-            FROM CronJobDetail
-            WHERE Name = :JOB_NAME AND JobType = '7'
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        if (details.isEmpty()) {
-            return null;
-        }
-        List<CronTrigger> triggers = [
-            SELECT Id
-            FROM CronTrigger
-            WHERE CronJobDetailId = :details[0].Id
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return triggers.isEmpty() ? null : triggers[0].Id;
+        return ScheduledJobSelector.triggerIdByName(JOB_NAME);
     }
 }

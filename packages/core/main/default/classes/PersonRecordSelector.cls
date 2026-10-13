@@ -85,11 +85,22 @@ public with sharing class PersonRecordSelector {
         if (personRecordOverride != null) {
             return personRecordOverride;
         }
-        if (!Schema.SObjectType.Account.fields.getMap().containsKey(PERSON_MARKER_FIELD)) {
+        if (!accountHasPersonMarker()) {
             return false;
         }
         Object value = record.getPopulatedFieldsAsMap().get(PERSON_MARKER_FIELD);
         return value != null && String.isNotBlank(String.valueOf(value));
+    }
+
+    private static Boolean cachedAccountHasPersonMarker;
+
+    /** One field describe per transaction, not one per record asked about (PEOPLE-40). */
+    private static Boolean accountHasPersonMarker() {
+        if (cachedAccountHasPersonMarker == null) {
+            cachedAccountHasPersonMarker = Schema.SObjectType.Account.fields.getMap()
+                .containsKey(PERSON_MARKER_FIELD);
+        }
+        return cachedAccountHasPersonMarker;
     }
 
     /**

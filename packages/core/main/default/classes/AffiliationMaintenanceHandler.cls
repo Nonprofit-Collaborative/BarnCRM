@@ -27,12 +27,36 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
         );
     }
 
+    /**
+     * Only the rows whose change can move who is primary: the flag, the status or dates that
+     * decide eligibility, or either end. A role or description edit settles nothing (PEOPLE-39).
+     */
     public override void afterUpdate() {
-        refresh(
-            (List<Affiliation__c>) newRecords(),
-            (List<Affiliation__c>) oldRecords(),
-            'AffiliationMaintenanceHandler.afterUpdate'
-        );
+        List<Affiliation__c> changed = new List<Affiliation__c>();
+        List<Affiliation__c> before = new List<Affiliation__c>();
+        Map<Id, SObject> previousById = oldRecordsById();
+        for (Affiliation__c record : (List<Affiliation__c>) newRecords()) {
+            Affiliation__c previous = previousById == null
+                ? null
+                : (Affiliation__c) previousById.get(record.Id);
+            if (previous == null || mayMovePrimary(record, previous)) {
+                changed.add(record);
+                if (previous != null) {
+                    before.add(previous);
+                }
+            }
+        }
+        refresh(changed, before, 'AffiliationMaintenanceHandler.afterUpdate');
+    }
+
+    private static Boolean mayMovePrimary(Affiliation__c record, Affiliation__c previous) {
+        return record.Is_Primary__c != previous.Is_Primary__c ||
+            record.Status__c != previous.Status__c ||
+            record.Start_Date__c != previous.Start_Date__c ||
+            record.End_Date__c != previous.End_Date__c ||
+            record.Contact__c != previous.Contact__c ||
+            record.Person_Account__c != previous.Person_Account__c ||
+            record.Organization__c != previous.Organization__c;
     }
 
     public override void afterDelete() {

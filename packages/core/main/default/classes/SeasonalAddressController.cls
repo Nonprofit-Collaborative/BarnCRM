@@ -76,7 +76,7 @@ public with sharing class SeasonalAddressController {
         view.nextRunAt = SeasonalAddressScheduler.nextRunAt();
         view.lastRun = SeasonalAddressService.lastRun();
         view.lastRunSummary = SeasonalAddressService.lastRunSummary();
-        view.stale = SeasonalAddressService.isStale();
+        view.stale = SeasonalAddressService.isStale(view.scheduled);
         return view;
     }
 

@@ -56,9 +56,15 @@ public with sharing class AffiliationController {
                 AffiliationSelector.selectByPersonIds(new Set<Id>{ ownerId }),
                 false
             );
-            views.addAll(
-                toViews(AffiliationSelector.selectByOrganizationIds(new Set<Id>{ ownerId }), true)
-            );
+            // A contact is never the organization end, so its card asks only once (PEOPLE-40).
+            if (ownerId.getSObjectType() != Contact.SObjectType) {
+                views.addAll(
+                    toViews(
+                        AffiliationSelector.selectByOrganizationIds(new Set<Id>{ ownerId }),
+                        true
+                    )
+                );
+            }
             return views;
         } catch (Exception e) {
             ErrorLogger.log(e, 'AffiliationController.getAffiliations');
