@@ -28,8 +28,8 @@ public without sharing class RollupChanges {
 
     /**
      * Target records marked for recalculation, by target entity, and the definitions that marked
-     * them: a save recalculates only those (ADR-NEXT
-     * `NEXT-rollups-recalculate-only-what-a-save-changed.md`).
+     * them: a save recalculates only those (ADR-0099
+     * `0099-rollups-recalculate-only-what-a-save-changed.md`).
      */
     public class Marked {
         public Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();

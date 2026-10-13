@@ -1342,8 +1342,8 @@ recalculating is enough to correct every fiscal rollup in the org.
 change. By default a save marks the target records (R-R11), writes them to the Rollup Queue
 (Section 14A) and returns, and the queue recalculates them just after the save, usually within
 a minute; a bulk change (an import, a data loader run, a large update) goes the same way and
-finishes within minutes (ADR-NEXT
-`NEXT-real-time-rollups-recalculated-just-after-the-save.md`). With
+finishes within minutes (ADR-0098
+`0098-real-time-rollups-recalculated-just-after-the-save.md`). With
 `Rollup_Processing__c` set to In_Save (Section 12), a normal save recalculates in the same save
 instead, when the queries it is planned to spend fit what the transaction has left; a bulk
 change, a save already running in the background, or one without the room is queued. Scheduled (shown as Every night)
@@ -1432,8 +1432,8 @@ marks the old target, including when a parent record is deleted and its source r
 with it, which fires no trigger on them (deleting a gift removes its allocations, so the
 gift's delete marks their funds); an undelete marks the target again. A person who changes
 household marks both households, in both membership modes. A save recalculates only the
-definitions that marked a target, never every definition on its entity (ADR-NEXT
-`NEXT-rollups-recalculate-only-what-a-save-changed.md`); a full run calculates every
+definitions that marked a target, never every definition on its entity (ADR-0099
+`0099-rollups-recalculate-only-what-a-save-changed.md`); a full run calculates every
 definition it covers. The definitions one calculation runs on one target entity are
 calculated together, one write per target record, and a value that did not change is not
 written.
@@ -6632,7 +6632,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Rollup Queue and Queueable jobs (rollup comparison run on `oi-test`). No object or field added. R-RQ3: a save inside a Queueable leaves the processor to a later save, to the job's own chain end (`RollupService.startQueuedRecalculation`) or to the nightly run, because taking the job's one chained job stopped the sample data load with "Too many queueable jobs added to the queue: 2". |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 | v0.11 | 2026-10-13 | Security checklist follow-up. No object or field added. R-E4: BarnCRM Staff and BarnCRM Read Only keep Create on Error Log Event and lose Read, which only subscribing needs; BarnCRM Admin keeps both. |
-| v0.6 | 2026-10-13 | Real-time rollups recalculated just after the save (ADR-NEXT, `NEXT-real-time-rollups-recalculated-just-after-the-save.md`, Core quality pass Q-01). BarnCRM Settings gains `Rollup_Processing__c` (Section 12, Background or In_Save, default Background). R-R4: by default a save queues its marked targets and the Rollup Queue recalculates them just after the save; In_Save keeps recalculation in the save when the planned queries fit. R-RQ3: the nightly run, the end of a pause, Retry and Start now start a processor for Pending entries no save started one for. R-RQ4: Health Check reports Failed entries and Pending entries older than an hour. No object added. |
+| v0.6 | 2026-10-13 | Real-time rollups recalculated just after the save (ADR-0098, `0098-real-time-rollups-recalculated-just-after-the-save.md`, Core quality pass Q-01). BarnCRM Settings gains `Rollup_Processing__c` (Section 12, Background or In_Save, default Background). R-R4: by default a save queues its marked targets and the Rollup Queue recalculates them just after the save; In_Save keeps recalculation in the save when the planned queries fit. R-RQ3: the nightly run, the end of a pause, Retry and Start now start a processor for Pending entries no save started one for. R-RQ4: Health Check reports Failed entries and Pending entries older than an hour. No object added. |
 
 ---
 ## 32. Entity ownership by package

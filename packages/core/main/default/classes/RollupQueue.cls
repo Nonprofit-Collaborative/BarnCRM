@@ -4,7 +4,7 @@
  *
  * A save writes the target records its change marked here with `add` and returns (R-R4): every
  * save by default, and with Rollup Processing set to In the save, a save whose totals are too
- * many to recalculate in it or that is already running in the background (ADR-NEXT async
+ * many to recalculate in it or that is already running in the background (ADR-0098 async
  * rollups). The processor, a
  * Queueable, reads the due entries, merges and sorts their identifiers, recalculates a slice
  * through `RollupEngine`, deletes the entries it finished and runs again while entries remain
@@ -87,7 +87,7 @@ public without sharing class RollupQueue implements Queueable {
 
     /**
      * As above, naming the definitions to recalculate for each target entity's records, so the
-     * processor runs only those (ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`).
+     * processor runs only those (ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`).
      *
      * @param idsByTarget the target records, by target entity API name
      * @param definitionIdsByTarget the definitions, by the same names; a missing or empty set

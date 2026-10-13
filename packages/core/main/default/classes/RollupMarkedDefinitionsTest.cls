@@ -1,6 +1,6 @@
 /**
- * A save recalculates only the rollups its change can affect (ADR-NEXT
- * `NEXT-rollups-recalculate-only-what-a-save-changed.md`, rollup review ROLLUPS-4), in the save
+ * A save recalculates only the rollups its change can affect (ADR-0099
+ * `0099-rollups-recalculate-only-what-a-save-changed.md`, rollup review ROLLUPS-4), in the save
  * and in the Rollup Queue.
  *
  * Three definitions write each organization: a staff count from its people (Contact, real

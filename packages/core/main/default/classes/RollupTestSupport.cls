@@ -1,5 +1,5 @@
 /**
- * Test setup for the rollup timing setting (ADR-NEXT async rollups).
+ * Test setup for the rollup timing setting (ADR-0098 async rollups).
  *
  * By default a save queues its real-time totals and the Rollup Queue recalculates them just
  * after the save, so a test reads them after `Test.stopTest`. The tests that check what the
@@ -10,7 +10,7 @@
  */
 @IsTest
 public class RollupTestSupport {
-    /** Real-time totals are recalculated in the save, as before ADR-NEXT. */
+    /** Real-time totals are recalculated in the save, as before ADR-0098. */
     public static void recalculateInTheSave() {
         SettingsService.saveSystemValue(
             RollupService.PROCESSING_SETTING,

@@ -120,7 +120,7 @@ public with sharing class HealthCheckSettingsChecks {
     }
 
     /**
-     * Totals the Rollup Queue could not finish (ADR-NEXT async rollups): records whose
+     * Totals the Rollup Queue could not finish (ADR-0098 async rollups): records whose
      * recalculation failed five times, or entries waiting longer than an hour, which means no
      * processor is running for them. The errors themselves are in the Error Log.
      */

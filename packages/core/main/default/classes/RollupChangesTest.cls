@@ -69,7 +69,7 @@ private class RollupChangesTest {
     }
 
     /**
-     * ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`: a save names the
+     * ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`: a save names the
      * definitions that marked each target, so only those are recalculated.
      */
     @IsTest

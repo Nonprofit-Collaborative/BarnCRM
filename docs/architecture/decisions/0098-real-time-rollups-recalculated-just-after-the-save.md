@@ -1,4 +1,4 @@
-# ADR-NEXT: Real-time rollups are recalculated just after the save, by default
+# ADR-0098: Real-time rollups are recalculated just after the save, by default
 
 **Status:** Proposed (builder decision, Core quality pass item Q-01)
 **Date:** 2026-10-13

@@ -1,4 +1,4 @@
-# ADR-NEXT: A save recalculates only the rollups its change can affect
+# ADR-0099: A save recalculates only the rollups its change can affect
 
 **Status:** Accepted (owner decision D-48, Brandon, 2026-10-13: "rollups run only what changed")
 **Date:** 2026-10-13
@@ -18,7 +18,7 @@ With the shipped definitions a gift save therefore also re-ran the commitment an
 totals on the donor's account and contact (about 11 of the 36 aggregate queries), and a soft
 credit save re-ran every gift and commitment total (about 24 of 32). Every night definitions
 (Scheduled) also ran in each save, though their mode says they wait for the nightly run.
-Since the async rollups ADR (`NEXT-real-time-rollups-recalculated-just-after-the-save.md`) the
+Since the async rollups ADR (`0098-real-time-rollups-recalculated-just-after-the-save.md`) the
 Rollup Queue does this work by default, so the waste moved from the save to the processor: the
 same queries, in a job whose slice of 200 records fails sooner the more it runs.
 

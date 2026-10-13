@@ -1,5 +1,5 @@
 /**
- * Real-time totals recalculated just after the save, the default (ADR-NEXT async rollups,
+ * Real-time totals recalculated just after the save, the default (ADR-0098 async rollups,
  * canonical model R-R4): the save marks and queues, the Rollup Queue recalculates, and the
  * totals end up exactly what recalculating in the save gives.
  *

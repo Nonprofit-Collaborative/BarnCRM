@@ -1,6 +1,6 @@
 /**
  * What the rollups cost a gift save and a soft credit save, in queries, with the shipped
- * rollups installed (ADR-NEXT async rollups, rollup review ROLLUPS-10).
+ * rollups installed (ADR-0098 async rollups, rollup review ROLLUPS-10).
  *
  * The cost is measured as the difference between two saves in one transaction: one with every
  * rollup automation bypassed, one with them running. Everything else the save runs is the same
@@ -190,7 +190,7 @@ private class GiftSaveRollupCostTest {
     }
 
     /**
-     * ROLLUPS-4 (ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`): in the save,
+     * ROLLUPS-4 (ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`): in the save,
      * a soft credit save runs only the soft credit totals, so it spends at most the marking
      * budget plus what those definitions are planned to cost. Before, it also ran every gift
      * and pledge total on the donor's account and contact, about 24 queries more.
@@ -262,7 +262,7 @@ private class GiftSaveRollupCostTest {
     }
 
     /**
-     * The same gift save with the totals recalculated in the save, as before ADR-NEXT: the
+     * The same gift save with the totals recalculated in the save, as before ADR-0098: the
      * "before" number. There is no warm-up save here, because the recalculation in the save
      * needs the room a fresh transaction has (`RollupService.canRecalculateNow`), so the
      * bypassed save also pays for the shared caches and the difference is, if anything, low.

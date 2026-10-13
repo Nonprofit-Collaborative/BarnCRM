@@ -9,7 +9,7 @@
  *   which target records the save marks (R-R11). By default they are written to the Rollup Queue
  *   and recalculated just after the save, so the save itself only marks and queues; an org that
  *   sets Rollup Processing to In the save recalculates a normal save's totals in it, and a bulk
- *   or background save still queues (R-R4, Section 14A, ADR-NEXT async rollups).
+ *   or background save still queues (R-R4, Section 14A, ADR-0098 async rollups).
  * - **Scheduled.** `RollupScheduler` calls `startNightlyRun` for the definitions in Scheduled or
  *   Both mode, which is the nightly reconciliation R-R4 describes: `RollupFullRecalcBatch`.
  * - **On demand.** `recalculate` runs one definition over every record now, which is what the
@@ -66,13 +66,13 @@ public with sharing class RollupService {
     @TestVisible
     private static Integer instantLimit = 50;
 
-    /** The setting that says when real-time totals are recalculated (R-R4, ADR-NEXT). */
+    /** The setting that says when real-time totals are recalculated (R-R4, ADR-0098). */
     @NamespaceAccessible
     public static final String PROCESSING_SETTING = 'Rollup_Processing__c';
     /** Queued and recalculated just after the save: the default. */
     @NamespaceAccessible
     public static final String PROCESSING_BACKGROUND = 'Background';
-    /** Recalculated in the save itself when it is small enough, as before ADR-NEXT. */
+    /** Recalculated in the save itself when it is small enough, as before ADR-0098. */
     @NamespaceAccessible
     public static final String PROCESSING_IN_SAVE = 'In_Save';
 
@@ -364,7 +364,7 @@ public with sharing class RollupService {
 
     /**
      * The definitions that marked each target entity's records, which are the ones recalculated
-     * (ADR-NEXT `NEXT-rollups-recalculate-only-what-a-save-changed.md`): a gift save does not
+     * (ADR-0099 `0099-rollups-recalculate-only-what-a-save-changed.md`): a gift save does not
      * run the soft credit totals on the donor. When one of them has no record id to name it,
      * every active definition on the entity runs, as before.
      */
@@ -411,7 +411,7 @@ public with sharing class RollupService {
 
     /**
      * R-R4: by default every save queues the records it marked, and the Rollup Queue
-     * recalculates them just after the save (ADR-NEXT async rollups), so a save pays for marking
+     * recalculates them just after the save (ADR-0098 async rollups), so a save pays for marking
      * and one insert, never for the aggregate queries. With Rollup Processing set to In the
      * save, a normal save that marks a few records recalculates them in the same save when the
      * transaction has room for it; a bulk change, a save already running in the background, or

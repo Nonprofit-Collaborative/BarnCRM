@@ -87,7 +87,7 @@ public with sharing class RollupAttentionController {
     }
 
     /**
-     * Recalculates the waiting records now (ADR-NEXT async rollups): starts a queue processor
+     * Recalculates the waiting records now (ADR-0098 async rollups): starts a queue processor
      * when none is coming for them, for example after a save that could not start one. The
      * records are recalculated within a minute, in the background.
      *
