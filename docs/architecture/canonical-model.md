@@ -631,8 +631,9 @@ undone, an Error Log row included. So an entry is not written directly. It is pu
 an **Error Log Event**, which the platform delivers whether or not the transaction commits,
 and a subscriber writes the row. A direct write remains only as the fallback for when
 publishing itself fails. Publishing is governed by Create on the event, so all three
-packaged permission sets grant Read and Create on **Error Log Event**, Read Only
-included. A user holding none of them falls back to the direct write, and for that user
+packaged permission sets grant Create on **Error Log Event**, Read Only included. Read on
+the event is needed only to subscribe to it from outside Apex, so only BarnCRM Admin holds
+it. A user holding none of the three falls back to the direct write, and for that user
 the entry survives only when the transaction commits.
 **R-E5 The digest counts; it never quotes.** The error digest is one email per recipient
 about the entries created since the window the last digest covered that are still New:
@@ -6589,6 +6590,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.11 | 2026-10-13 | Security checklist follow-up. No object or field added. R-E4: BarnCRM Staff and BarnCRM Read Only keep Create on Error Log Event and lose Read, which only subscribing needs; BarnCRM Admin keeps both. |
 
 ---
 ## 32. Entity ownership by package
