@@ -10,7 +10,9 @@ description under it, and there is a search box for when you
 remember the word but not the section.
 
 You never need Salesforce Setup for a normal day. When something genuinely can only be
-done in Setup, the setup checklist on the Hub home page sends you there with instructions.
+done in Setup, the setup checklist on the Hub home page sends you there with instructions,
+and the section of this page that depends on it says so at the top (see "When a section
+needs a change in Setup" below).
 
 ## How to turn it on
 
@@ -76,6 +78,35 @@ at something, you choose it:
 
 The description of each setting is read out by a screen reader together with the control,
 so every setting is explained the same way however you use the page.
+
+## When a section needs a change in Setup
+
+BarnCRM avoids Salesforce Setup wherever it can. A few features still depend on something only
+Setup can change, usually because Salesforce keeps that switch for itself. When a section has
+one, a note at the top of the section says, before any setting:
+
+- **what** to change in Setup,
+- **why** BarnCRM needs it, in one sentence,
+- **where** it is, as a path in plain words, for example "Setup, Company Settings, Fiscal
+  Year".
+
+Where BarnCRM can read the answer without any extra permission, the note also says whether it
+is already done: **Done** with a green tick, or **Not done yet** with a warning icon. Otherwise
+the note is an instruction only, and it stays there after you make the change, because BarnCRM
+cannot tell. Nothing on the note changes your org: you make the change in Setup yourself.
+
+| Section | What to change in Setup | Checked by BarnCRM |
+|---|---|---|
+| General | Make the Setup fiscal year start in the same month as **Fiscal year start month** (Setup, Company Settings, Fiscal Year) | Yes |
+| General | To save Custom Metadata entries in an installed package: assign **BarnCRM Metadata Admin** and turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings) | No |
+| Households | To review duplicates: assign **BarnCRM Duplicate Review** to people with a Sales Cloud or Service Cloud license, and keep the standard duplicate rules active (Setup, Duplicate Rules) | No: the Duplicates panel shows each rule as On or Off |
+| Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
+| Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
+| Access | Create the person's Salesforce user first, and assign a module's own permission set, such as Giving Staff (Setup, Users) | No |
+| Import | To let someone who is not a BarnCRM Admin bulk update, or anyone bulk delete: assign **BarnCRM Bulk Update** or **BarnCRM Bulk Delete**, with **BarnCRM Find and Export** (Setup, Users, Permission Set Assignments) | No |
+
+If the check cannot be read (for example, your Salesforce did not answer), the note shows the
+instruction without Done or Not done yet.
 
 ## Common mistakes
 

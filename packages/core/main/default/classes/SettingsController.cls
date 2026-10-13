@@ -10,6 +10,15 @@ public with sharing class SettingsController {
     private static final String TYPE_CHECKBOX = 'Checkbox';
     private static final String TYPE_PICKLIST = 'Picklist';
     private static final String ERROR_CONTEXT = 'BarnCRM Settings console';
+    /** The Setup prerequisites the console can check, by the key settingsSetupNotes reads. */
+    @TestVisible
+    private static final String CHECK_FISCAL_YEAR = 'fiscalYear';
+    @TestVisible
+    private static final String CHECK_EMAIL = 'emailDeliverability';
+
+    /** Injected by the tests: Deliverability cannot be changed from Apex. */
+    @TestVisible
+    private static Boolean emailAllowedOverride;
 
     public class ConsoleModel {
         @AuraEnabled
@@ -378,6 +387,52 @@ public with sharing class SettingsController {
             }
         }
         return kept;
+    }
+
+    /**
+     * Whether each Setup prerequisite a console section can check is already met: true or
+     * false, and absent when it could not be read, so the note shows its instruction only.
+     * Reads only what every user can read (the org's fiscal year, whether the org may send
+     * email) and changes nothing. Not cacheable: an admin fixes Setup, then reloads.
+     */
+    @AuraEnabled
+    public static Map<String, Boolean> getSetupChecks() {
+        Map<String, Boolean> checks = new Map<String, Boolean>();
+        try {
+            Integer orgMonth = FiscalYearSelector.orgFiscalYearStartMonth();
+            if (orgMonth != null) {
+                checks.put(
+                    CHECK_FISCAL_YEAR,
+                    orgMonth == FiscalYearSelector.settingsFiscalYearStartMonth()
+                );
+            }
+        } catch (Exception unreadable) {
+            checks.remove(CHECK_FISCAL_YEAR);
+        }
+        Boolean emailAllowed = orgMaySendEmail();
+        if (emailAllowed != null) {
+            checks.put(CHECK_EMAIL, emailAllowed);
+        }
+        return checks;
+    }
+
+    /**
+     * Salesforce refuses to reserve email capacity when Deliverability is not set to All
+     * email, which is the one reading of that setting Apex has. Null when the answer is
+     * something else (a daily limit reached says nothing about the setting).
+     */
+    private static Boolean orgMaySendEmail() {
+        if (emailAllowedOverride != null) {
+            return emailAllowedOverride;
+        }
+        try {
+            Messaging.reserveSingleEmailCapacity(1);
+            return true;
+        } catch (NoAccessException blocked) {
+            return false;
+        } catch (Exception unknown) {
+            return null;
+        }
     }
 
     private static AuraHandledException asAuraException(String message) {

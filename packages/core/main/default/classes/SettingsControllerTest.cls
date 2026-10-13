@@ -455,4 +455,49 @@ private class SettingsControllerTest {
             Assert.isNotNull(rows[1].options[0].value, 'Each choice stores its developer name');
         }
     }
+
+    @IsTest
+    static void setupChecksSayWhetherEachPrerequisiteIsMet() {
+        System.runAs(TestUsers.admin()) {
+            Integer barnMonth = FiscalYearSelector.settingsFiscalYearStartMonth();
+            FiscalYearSelector.orgStartMonthOverridden = true;
+            FiscalYearSelector.orgStartMonthOverride = barnMonth;
+            SettingsController.emailAllowedOverride = true;
+            Map<String, Boolean> met = SettingsController.getSetupChecks();
+
+            FiscalYearSelector.orgStartMonthOverride = Math.mod(barnMonth, 12) + 1;
+            SettingsController.emailAllowedOverride = false;
+            Map<String, Boolean> unmet = SettingsController.getSetupChecks();
+
+            Assert.isTrue(met.get(SettingsController.CHECK_FISCAL_YEAR), 'Same month is done');
+            Assert.isTrue(met.get(SettingsController.CHECK_EMAIL), 'Email allowed is done');
+            Assert.isFalse(unmet.get(SettingsController.CHECK_FISCAL_YEAR), 'Months differ');
+            Assert.isFalse(unmet.get(SettingsController.CHECK_EMAIL), 'Email blocked');
+        }
+    }
+
+    @IsTest
+    static void aSetupCheckThatCannotBeReadIsLeftOut() {
+        System.runAs(TestUsers.admin()) {
+            FiscalYearSelector.orgStartMonthOverridden = true;
+            FiscalYearSelector.orgStartMonthOverride = null;
+            SettingsController.emailAllowedOverride = true;
+            Map<String, Boolean> checks = SettingsController.getSetupChecks();
+
+            Assert.isFalse(
+                checks.containsKey(SettingsController.CHECK_FISCAL_YEAR),
+                'An unreadable fiscal year is no answer, so the note shows its instruction only'
+            );
+            Assert.isTrue(
+                checks.containsKey(SettingsController.CHECK_EMAIL),
+                'The other check still answers'
+            );
+
+            SettingsController.emailAllowedOverride = null;
+            Assert.isNotNull(
+                SettingsController.getSetupChecks(),
+                'Asking this org itself whether it may send email never fails the page'
+            );
+        }
+    }
 }

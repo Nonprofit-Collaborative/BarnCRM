@@ -17,6 +17,11 @@ jest.mock('@salesforce/apex/SettingsController.getRecentChanges', () => ({ defau
 jest.mock('@salesforce/apex/SettingsController.search', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/SettingsController.getSetupChecks',
+  () => ({ default: jest.fn().mockResolvedValue({}) }),
+  { virtual: true }
+);
 
 // Reached through the module namespace rather than by name: a wire adapter may only be named
 // in a @wire decorator, and a test drives it through the stub's emit.
@@ -269,6 +274,18 @@ describe('c-settings-console', () => {
     const combobox = element.shadowRoot.querySelector('lightning-combobox');
     expect(combobox).not.toBeNull();
     expect(combobox.value).toBe('Standalone');
+  });
+
+  it('puts the Setup note of the open section at the top of it', async () => {
+    const element = build();
+    await settle();
+
+    const notes = element.shadowRoot.querySelector('c-settings-setup-notes');
+    expect(notes.section).toBe('Households');
+
+    openSection('General');
+    await settle();
+    expect(notes.section).toBe('General');
   });
 
   it('offers a module its own page instead of trying to render it', async () => {

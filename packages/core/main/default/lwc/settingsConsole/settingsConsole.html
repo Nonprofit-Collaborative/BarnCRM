@@ -35,6 +35,8 @@
                 </div>
 
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-4">
+                    <c-settings-setup-notes section={selectedSection}></c-settings-setup-notes>
+
                     <template lwc:if={sectionIsEmpty}>
                         <p class="slds-text-color_weak">{labels.emptySection}</p>
                     </template>
