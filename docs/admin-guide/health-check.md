@@ -108,6 +108,7 @@ Nothing is broken today.
 | Settings | Whether the error digest is scheduled but has not run for more than two days, which usually means the person who scheduled it was deactivated. |
 | Settings | Whether anybody is in no household while every new person is meant to get one. |
 | Settings | Whether any household has nobody in it. |
+| Settings | Whether any relationship has no person on one side, or any affiliation has no person, because the person was deleted. |
 | Settings | Whether the fiscal year in Setup is the same month as the fiscal year start month in BarnCRM Settings. |
 | Settings | With Giving: whether receipts have been voided with the reason "Generation failed", which is a receipt run that did not finish. |
 | Settings | Whether any of the totals BarnCRM ships are missing from the Rollups page. |
@@ -203,6 +204,17 @@ two household checks are shown only to them too, for the reason given above.
 
 If one check cannot run, the rest still run. The check that failed appears as its own finding
 saying so, and the details are written to the Error Log.
+
+## Relationships and affiliations with no person
+
+When a person is deleted (not merged), the relationships that named them are left with nobody on that side, and their affiliations are left with no person. Merging two people moves these records to the kept person, so they are only left blank by a delete. Health Check finds them and links the first five; it never changes or deletes them.
+
+| Finding | Who is counted | What to do |
+|---|---|---|
+| **Relationships have no person on one side** (amber) | Every relationship with no contact and no person account on either side. These cannot be edited until the missing person is chosen again. | Open each linked relationship and choose the missing person, or delete the relationship. |
+| **Affiliations have no person** (amber) | Every affiliation with no contact and no person account. They show as an unnamed person. | Open each linked affiliation and choose the person, or delete the affiliation. |
+
+Each finding counts up to 1,000 and then says **More than 1,000**. Both are shown only to people with the Manage BarnCRM Settings permission.
 
 ## Common mistakes
 

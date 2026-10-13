@@ -485,6 +485,18 @@ public with sharing class HealthCheckService {
             );
             steps.add(
                 new CheckStep(
+                    'relationships_without_person',
+                    new HealthCheckHouseholdChecks.RelationshipsWithoutPersonCheck()
+                )
+            );
+            steps.add(
+                new CheckStep(
+                    'affiliations_without_person',
+                    new HealthCheckHouseholdChecks.AffiliationsWithoutPersonCheck()
+                )
+            );
+            steps.add(
+                new CheckStep(
                     'shipped_rollups',
                     new HealthCheckSettingsChecks.ShippedRollupsCheck()
                 )

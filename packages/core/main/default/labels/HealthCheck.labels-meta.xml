@@ -952,4 +952,36 @@
         <shortDescription>Button that runs every check where the panel showed the last result.</shortDescription>
         <value>Run now</value>
     </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RelationshipsNoPersonTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title: relationships with no person on a side. {0} count or more than.</shortDescription>
+        <value>{0} relationships have no person on one side</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RelationshipsNoPersonDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Detail: relationships left with no person after a delete.</shortDescription>
+        <value>The person on one side of these relationships was deleted, so the relationship no longer connects two people, and it cannot be edited until a person is chosen again. Open each one and choose the missing person, or delete the relationship. Health Check finds these and does not change them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_AffiliationsNoPersonTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title: affiliations with no person. {0} count or more than.</shortDescription>
+        <value>{0} affiliations have no person</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_AffiliationsNoPersonDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Detail: affiliations left with no person after a delete.</shortDescription>
+        <value>The person in these affiliations was deleted, so they show as an unnamed person. Open each one and choose the person, or delete the affiliation. Health Check finds these and does not change them.</value>
+    </labels>
 </CustomLabels>
