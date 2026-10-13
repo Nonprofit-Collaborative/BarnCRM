@@ -228,6 +228,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Clearer screens | Minor | Save buttons disable while saving, spinners say what they wait for, and errors use plain words. | Shipped | C-01 |
 | Plainer wording | Minor | Import buttons read Preview, Import these rows and Download rejected rows; schedule times name the time zone; errors point to the Error Log; warning icons are announced to screen readers. | Shipped | UX review |
 | Activity actions on the fallback layout | Minor | The packaged account layout includes Log a Call, New Task and New Event, so its activity panel can create activities. | Shipped | C-08 |
+| Cards read through the platform | Minor | The Addresses, Affiliations and Relationships cards read and save through Lightning Data Service: they show a loading state instead of "none on file" while they load, pick up edits made elsewhere on the page, refresh the record's own fields after Set as default or Make primary, and show picklist values in the reader's language. Settings pages reopen on what was last saved, and the import wizard opens with one wait instead of three. | Built, not merged (`feature/q-06-lds-graphql-1` to `-4`) | Q-06, ADR-NEXT (record reads through Lightning Data Service) |
 
 ---
 

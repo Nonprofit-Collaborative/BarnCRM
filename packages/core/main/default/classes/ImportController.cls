@@ -227,7 +227,7 @@ public with sharing class ImportController {
      * where none is installed, and the wizard then offers the gift columns as kept with the
      * row and not loaded.
      */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<ImportMapping.Target> getEntityTargets() {
         try {
             enforcePermission();
@@ -288,7 +288,7 @@ public with sharing class ImportController {
      * may read. With them, the fields of people and organizations a column can be mapped to
      * besides the fixed list (R-IT11).
      */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static MatchFieldsView getMatchFields() {
         try {
             enforcePermission();
@@ -317,7 +317,7 @@ public with sharing class ImportController {
     }
 
     /** The objects a template may load (R-IT14), by label. */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<ImportMapping.Target> getLoadableObjects() {
         try {
             enforcePermission();
@@ -358,7 +358,7 @@ public with sharing class ImportController {
      * first, then the fields the user may write, and for each lookup the fields it can name its
      * parent by (R-IT13).
      */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<FieldChoice> getObjectFields(String templateId) {
         try {
             enforcePermission();
@@ -390,7 +390,7 @@ public with sharing class ImportController {
     }
 
     /** The external ID fields an upsert of this template's object can match on (R-IT12). */
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<ImportMapping.Target> getKeyFields(String templateId) {
         try {
             enforcePermission();

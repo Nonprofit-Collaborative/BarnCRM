@@ -94,9 +94,10 @@ public with sharing class HouseholdController {
 
     /**
      * The patterns this org has saved, so that the settings page opens on the admin's own
-     * wording rather than on the shipped defaults.
+     * wording rather than on the shipped defaults. Not cacheable: a page reopened after a save
+     * must start from what was saved, or saving again would write the older patterns back.
      */
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static NamingSettings getNamingSettings() {
         try {
             BarnCRM_Settings__c settings = SettingsService.getSettings();

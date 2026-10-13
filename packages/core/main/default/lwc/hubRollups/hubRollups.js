@@ -18,6 +18,8 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
   lastCalculated;
   stale = false;
   errorMessage;
+  // "Never calculated" shows once the model has arrived, not while it is still loading.
+  loaded = false;
 
   @wire(getHomeModel)
   wiredModel({ data, error }) {
@@ -25,6 +27,7 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
       this.lastCalculated = data.rollupsLastCalculated;
       this.stale = Boolean(data.rollupsStale);
       this.errorMessage = undefined;
+      this.loaded = true;
     } else if (error) {
       this.errorMessage = LOAD_ERROR;
     }

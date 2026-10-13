@@ -177,6 +177,15 @@ describe('the import wizard', () => {
     ]);
   });
 
+  it('asks for the templates, columns and match fields together, not one after another', async () => {
+    getTemplates.mockReturnValue(new Promise(() => {}));
+    render();
+    await flush();
+    expect(getTemplates).toHaveBeenCalledTimes(1);
+    expect(getEntityTargets).toHaveBeenCalledTimes(1);
+    expect(getMatchFields).toHaveBeenCalledTimes(1);
+  });
+
   it('tells a user without the permission who to ask', async () => {
     canImport.mockResolvedValue(false);
     const element = render();

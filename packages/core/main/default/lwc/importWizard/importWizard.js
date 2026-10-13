@@ -340,9 +340,14 @@ export default class ImportWizard extends LightningElement {
     try {
       this.permitted = await canImport();
       if (this.permitted) {
-        this.templates = await getTemplates();
-        this.entityTargets = (await getEntityTargets()) || [];
-        const fields = await getMatchFields();
+        // Independent reads: one round trip of waiting, not three.
+        const [templates, entityTargets, fields] = await Promise.all([
+          getTemplates(),
+          getEntityTargets(),
+          getMatchFields()
+        ]);
+        this.templates = templates;
+        this.entityTargets = entityTargets || [];
         this.matchFields = {
           contact: (fields && fields.contact) || [],
           account: (fields && fields.account) || [],

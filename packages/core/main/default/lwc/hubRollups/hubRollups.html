@@ -16,7 +16,7 @@
                     ></lightning-formatted-date-time>
                 </p>
             </template>
-            <template lwc:else>
+            <template lwc:elseif={loaded}>
                 <p data-id="rollups-never">{labels.never}</p>
             </template>
             <template lwc:if={stale}>
