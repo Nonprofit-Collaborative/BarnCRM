@@ -329,7 +329,8 @@ public with sharing class FindController {
         return found[0];
     }
 
-    private static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
+    /** Whether an object is offered for querying; field utilization offers objects by it too. */
+    public static Boolean isOffered(Schema.DescribeSObjectResult objectDescribe) {
         if (
             !objectDescribe.isAccessible() ||
             !objectDescribe.isQueryable() ||

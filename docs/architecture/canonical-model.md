@@ -921,15 +921,9 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 ### Field utilization keys
 
-Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-0086
-`0086-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
-scheduling its job from the console (ADR-0038), so it has no on and off key.
-
-| Key | Type | Default | Definition |
-|---|---|---|---|
-| `Field_Utilization_Objects__c` | text (255) | empty | The API names of the objects the field utilization count covers, separated by commas, each checked against describe when saved and again when counted. Empty counts nothing. Written from the Field Utilization page only, with Manage BarnCRM Settings, and audited. |
-| `Field_Utilization_Last_Run__c` | datetime | empty | When the last field utilization count finished. Written by the job. |
-| `Field_Utilization_Last_Run_Summary__c` | text (255) | empty | What the last count did, in one sentence: fields and objects counted, fields that could not be counted, objects skipped as too large. Written by the job. |
+None. ADR-0086 added three (`Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c`,
+`Field_Utilization_Last_Run_Summary__c`); ADR-NEXT `NEXT-field-utilization-on-demand.md`
+removed them when the count moved to its own tab and runs on demand (Section 29F).
 
 ### Rules
 
@@ -6282,10 +6276,11 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
 ### Definition
 
 One count of how many records hold a value in one field, for one object and one record type,
-taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-0086
-`0086-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
-a run is the set of rows sharing it, and a trend is the same object, field and record type
-across runs. Neutral: it names no nonprofit concept and is in Core.
+counted on the Field Utilization tab and saved there with "Save these counts" (plan Section 6.1
+item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`, ADR-NEXT
+`NEXT-field-utilization-on-demand.md`). Every row of one save carries the same Taken At, so a
+saved count is the set of rows sharing it, and a trend is the same object, field and record type
+across saves. Neutral: it names no nonprofit concept and is in Core.
 
 ### Attributes
 
@@ -6300,36 +6295,41 @@ across runs. Neutral: it names no nonprofit concept and is in Core.
 | Record Count | number | yes | Records in this group that were looked at. |
 | Fill Rate | percent | computed | Filled Count divided by Record Count. |
 | Sampled | boolean | yes | True when the count covers a sample of recent records rather than all of them. |
-| Taken At | datetime | yes | When the run started. |
+| Taken At | datetime | yes | When the counts were saved. |
 
 ### Rules
 
-**R-FU1 Describe only.** Objects come from the saved list `Field_Utilization_Objects__c`,
-each kept only when the global describe has it and it is queryable and accessible; fields come
-from that object's describe. No typed text reaches a query.
+**R-FU1 Describe only.** The object picker lists the objects Find offers (accessible, queryable,
+not a custom setting, deprecated, share, history, feed, change event, metadata, event, external
+or big object), minus this object; every call checks the chosen name against the global describe
+again. Fields come from that object's describe. No typed text reaches a query.
 **R-FU2 What is counted.** A field is counted when the runner can read it and either create or
 edit it, and it is not a formula, roll-up, auto number, checkbox, compound (address or
 location) or non-nillable field.
-**R-FU3 User mode.** Every count, read and write is in user mode, so a run counts the records
-its runner can see. Written into the page and the admin guide.
+**R-FU3 User mode.** Every count, read and write is in user mode, so a count covers the records
+the person on the page can see. Written into the page and the admin guide.
 **R-FU4 Count, else sample.** A filterable field is counted with one `COUNT(field)` query
 grouped by record type, one query row per group. A field that is not filterable, or whose
 count is refused, is counted on the 200 most recently modified records and its rows are
-Sampled.
-**R-FU5 Size limit.** An object holding more than 1,000,000 records is skipped and named in the
-run summary.
+Sampled. A field whose sample also fails is listed on the page as not counted.
+**R-FU5 Size limit.** An object holding more than 1,000,000 records is not counted; the page
+says so.
 **R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
-**R-FU7 Retention.** Rows are never edited. Each run's finish deletes rows whose Taken At is more
-than 13 months old.
-**R-FU8 Visible last run.** Each run records when it finished and a one sentence summary on
-`BarnCRM_Settings__c`, including a run that counted nothing.
+**R-FU7 On demand, saved by choice.** Counting runs synchronously from the page, 40 fields per
+call (10 when the object holds more than 100,000 records); each call reads the record totals
+again. Nothing is stored until the person chooses "Save these counts"; the save checks each
+row's object, field and record type against describe and caps Filled Count at Record Count.
+Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
+standard delete.
+**R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
+current one, with the change in percentage points.
 
 ### Salesforce implementation
 
 - **Object** `Field_Utilization_Snapshot__c`, auto number Name `FUS-{000000}`, public read only
   sharing, reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it:
-  Read, Create, Delete, View All and Modify All (the last so a user-mode retention delete
-  reaches another administrator's rows).
+  Read, Create, Delete, View All and Modify All (the last so an administrator's user-mode
+  delete reaches another administrator's rows).
 
 | Attribute | API name | Type | Notes |
 |---|---|---|---|
@@ -6343,10 +6343,10 @@ than 13 months old.
 | Sampled | `Sampled__c` | Checkbox | Default false. |
 | Taken At | `Taken_At__c` | DateTime | |
 
-- **Service:** `FieldUtilizationService` (plan and count), `FieldUtilizationBatch` (25 fields
-  per chunk), `FieldUtilizationScheduler` (weekly, Sundays 04:00), `FieldUtilizationSelector`,
-  `FieldUtilizationController`. The page is the `fieldUtilization` panel on the Field
-  Utilization page of BarnCRM Settings.
+- **Service:** `FieldUtilizationService` (plan, count, save), `FieldUtilizationSelector`
+  (latest saved count), `FieldUtilizationController` (every method requires
+  `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component on the app page and
+  tab `Field_Utilization` in the BarnCRM app, granted by `BarnCRM_Admin`.
 
 ---
 
@@ -6589,6 +6589,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| post-1.0 | 2026-10-13 | Field utilization on demand (ADR-NEXT, `NEXT-field-utilization-on-demand.md`, owner decision). `BarnCRM_Settings__c` loses `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c`. Section 29F: R-FU1 (objects as Find offers them), R-FU5, R-FU7 (on demand, saved by choice, no retention job) and R-FU8 (previous saved count shown) rewritten; `Field_Utilization_Snapshot__c` unchanged. |
 
 ---
 ## 32. Entity ownership by package
@@ -6631,7 +6632,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
 | Saved Query | Core | v0.7 | 29D |
-| Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29F, 12 |
+| Field Utilization Snapshot | Core | not scheduled (plan Section 6.1 item 10) | 29F |
 | What's New Seen | Core | v0.6 | 12A |
 | Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
 | Interaction Note (Task, no packaged schema) | Core | v0.9 | 29G |

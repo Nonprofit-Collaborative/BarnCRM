@@ -1,22 +1,29 @@
 /**
- * Counts how many records hold a value in each field, per object and record type (plan
- * Section 6.1 item 10, canonical model Section 29F, ADR-0086 field-utilization-ships-in-core).
+ * Counts how many records hold a value in each field of one object, by record type (plan
+ * Section 6.1 item 10, canonical model Section 29F, ADR-0086 field-utilization-ships-in-core,
+ * ADR-NEXT field-utilization-on-demand).
  *
- * Every query and write is in user mode (R-FU3): a run counts what its runner can see. Object
- * and field names come only from describe (R-FU1), so no text a person typed reaches a query.
- * A field is counted with one `COUNT(field)` query grouped by record type, which the platform
- * charges as one query row per group however large the object is (R-FU4).
+ * Every query and write is in user mode (R-FU3): a count covers what the person on the page can
+ * see. Object and field names come only from describe (R-FU1), so no text a person typed
+ * reaches a query. A field is counted with one `COUNT(field)` query grouped by record type,
+ * which the platform charges as one query row per group however large the object is (R-FU4).
  */
 public with sharing class FieldUtilizationService {
     /** How many recent records a field that cannot be counted is sampled on (R-FU4). */
     public static final Integer SAMPLE_SIZE = 200;
 
-    /** How many months of snapshots are kept (R-FU7). */
-    public static final Integer RETENTION_MONTHS = 13;
+    /** Fields one count call may ask for: one query each, plus a sample when refused (R-FU7). */
+    public static final Integer CHUNK_SIZE = 40;
 
-    /** An object holding more records than this is skipped (R-FU5). */
+    /** Fields per call on an object above LARGE_OBJECT_ROWS, so one call stays short (R-FU7). */
+    public static final Integer LARGE_CHUNK_SIZE = 10;
+
+    /** Above this many records an object is counted in the smaller chunks. */
+    public static final Integer LARGE_OBJECT_ROWS = 100000;
+
+    /** An object holding more records than this is not counted (R-FU5). */
     @TestVisible
-    private static Integer largeObjectRows = 1000000;
+    private static Integer sizeLimit = 1000000;
 
     /** The record type key for records with none, and for objects without record types. */
     public static final String NO_RECORD_TYPE = '';
@@ -30,40 +37,26 @@ public with sharing class FieldUtilizationService {
         Schema.DisplayType.ID
     };
 
-    /** One field of one object to count: one batch item. */
-    public class Item {
-        public String objectName;
-        public String fieldName;
-        public String fieldLabel;
-        public Boolean sample;
+    /** The record limit above which an object is not counted (R-FU5). */
+    public static Integer largeObjectLimit() {
+        return sizeLimit;
     }
 
-    /** What a run will count, read once at its start. */
-    public class Plan {
-        public List<Item> items = new List<Item>();
-        /** Object name to record type developer name to record count. */
-        public Map<String, Map<String, Integer>> totals = new Map<String, Map<String, Integer>>();
-        /** Labels of objects skipped as too large. */
-        public List<String> skipped = new List<String>();
-    }
-
-    /** The saved objects that can still be counted, as describe names them. */
-    public static List<String> trackedObjects() {
-        String saved = SettingsService.getSettings().Field_Utilization_Objects__c;
-        List<String> names = new List<String>();
-        if (String.isBlank(saved)) {
-            return names;
-        }
-        for (String name : saved.split(',')) {
-            Schema.DescribeSObjectResult described = countable(name);
-            if (described != null) {
-                names.add(described.getName());
+    /** Every object the person may count, by the rule Find offers objects by (R-FU1). */
+    public static List<Schema.DescribeSObjectResult> offeredObjects() {
+        List<Schema.DescribeSObjectResult> offered = new List<Schema.DescribeSObjectResult>();
+        for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
+            Schema.DescribeSObjectResult described = type.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            );
+            if (isCountable(described)) {
+                offered.add(described);
             }
         }
-        return names;
+        return offered;
     }
 
-    /** The describe of an object the runner may count, or null when there is no such object. */
+    /** The describe of an object the person may count, or null when there is no such object. */
     public static Schema.DescribeSObjectResult countable(String objectName) {
         if (String.isBlank(objectName)) {
             return null;
@@ -77,12 +70,7 @@ public with sharing class FieldUtilizationService {
         } catch (System.InvalidParameterValueException unknown) {
             return null;
         }
-        Boolean usable =
-            described.isQueryable() &&
-            described.isAccessible() &&
-            !described.isCustomSetting() &&
-            described.getSObjectType() != Field_Utilization_Snapshot__c.SObjectType;
-        return usable ? described : null;
+        return isCountable(described) ? described : null;
     }
 
     /** The fields a person can fill in and the runner can read, by API name (R-FU2). */
@@ -110,65 +98,64 @@ public with sharing class FieldUtilizationService {
         return fields;
     }
 
-    /**
-     * Reads each object's record count by record type and lists the fields to count. An object
-     * with no records adds no item; one over the size limit is skipped by label (R-FU5).
-     */
-    public static Plan plan(List<String> objectNames, Set<String> onlyFields) {
-        Plan planned = new Plan();
-        for (String objectName : objectNames) {
-            Schema.DescribeSObjectResult described = countable(objectName);
-            if (described == null) {
-                continue;
-            }
-            Map<String, Integer> totals = totalsByRecordType(described);
-            Integer all = 0;
-            for (Integer count : totals.values()) {
-                all += count;
-            }
-            if (all > largeObjectRows) {
-                planned.skipped.add(described.getLabel());
-                continue;
-            }
-            if (all == 0) {
-                continue;
-            }
-            planned.totals.put(described.getName(), totals);
-            for (Schema.DescribeFieldResult field : countableFields(described)) {
-                if (onlyFields != null && !onlyFields.contains(field.getName())) {
-                    continue;
-                }
-                Item item = new Item();
-                item.objectName = described.getName();
-                item.fieldName = field.getName();
-                item.fieldLabel = field.getLabel();
-                item.sample = !field.isFilterable();
-                planned.items.add(item);
-            }
+    /** The countable fields keyed by API name, for checking names a page sent back. */
+    public static Map<String, Schema.DescribeFieldResult> countableFieldsByName(
+        Schema.DescribeSObjectResult described
+    ) {
+        Map<String, Schema.DescribeFieldResult> byName = new Map<String, Schema.DescribeFieldResult>();
+        for (Schema.DescribeFieldResult field : countableFields(described)) {
+            byName.put(field.getName(), field);
         }
-        return planned;
+        return byName;
+    }
+
+    /** The object's record count by record type key, in user mode: one query. */
+    public static Map<String, Integer> totalsByRecordType(Schema.DescribeSObjectResult described) {
+        Map<String, Integer> totals = new Map<String, Integer>();
+        if (!groupsByRecordType(described)) {
+            totals.put(
+                NO_RECORD_TYPE,
+                Database.countQuery(soql('COUNT()', described, ''), AccessLevel.USER_MODE)
+            );
+            return totals;
+        }
+        String query = soql('RecordTypeId, COUNT(Id) n', described, ' GROUP BY RecordTypeId');
+        for (
+            AggregateResult row : (List<AggregateResult>) Database.query(
+                query,
+                AccessLevel.USER_MODE
+            )
+        ) {
+            add(totals, recordTypeKey(described, row.get('RecordTypeId')), (Integer) row.get('n'));
+        }
+        return totals;
+    }
+
+    /** The sum of a totals map. */
+    public static Integer sum(Map<String, Integer> totals) {
+        Integer all = 0;
+        for (Integer count : totals.values()) {
+            all += count == null ? 0 : count;
+        }
+        return all;
     }
 
     /**
      * Counts one field and returns one unsaved snapshot per record type that has records
-     * (R-FU6). A count the platform refuses falls back to the sample (R-FU4).
+     * (R-FU6). A field that cannot be filtered, or whose count is refused, is sampled (R-FU4).
      */
     public static List<Field_Utilization_Snapshot__c> count(
-        Item item,
-        Map<String, Integer> totals,
-        Datetime takenAt
+        Schema.DescribeSObjectResult described,
+        Schema.DescribeFieldResult field,
+        Map<String, Integer> totals
     ) {
-        Schema.DescribeSObjectResult described = countable(item.objectName);
-        List<Field_Utilization_Snapshot__c> rows = new List<Field_Utilization_Snapshot__c>();
-        if (described == null || totals == null) {
-            return rows;
-        }
+        String fieldName = field.getName();
         Map<String, Integer> looked = totals;
         Map<String, Integer> filled;
-        Boolean sampled = item.sample == true;
+        Boolean sampled = !field.isFilterable();
         if (!sampled) {
             try {
-                filled = filledByRecordType(described, item.fieldName);
+                filled = filledByRecordType(described, fieldName);
             } catch (System.QueryException refused) {
                 sampled = true;
             }
@@ -176,8 +163,9 @@ public with sharing class FieldUtilizationService {
         if (sampled) {
             looked = new Map<String, Integer>();
             filled = new Map<String, Integer>();
-            sample(described, item.fieldName, looked, filled);
+            sample(described, fieldName, looked, filled);
         }
+        List<Field_Utilization_Snapshot__c> rows = new List<Field_Utilization_Snapshot__c>();
         for (String recordType : looked.keySet()) {
             Integer recordCount = looked.get(recordType);
             if (recordCount == null || recordCount == 0) {
@@ -185,70 +173,44 @@ public with sharing class FieldUtilizationService {
             }
             Integer filledCount = filled.containsKey(recordType) ? filled.get(recordType) : 0;
             rows.add(
-                new Field_Utilization_Snapshot__c(
-                    Object_Name__c = item.objectName,
-                    Field_Name__c = item.fieldName,
-                    Field_Label__c = item.fieldLabel == null ? null : item.fieldLabel.left(255),
-                    Record_Type__c = String.isBlank(recordType) ? null : recordType,
-                    // Records can change between the plan and the count; never above 100%.
-                    Filled_Count__c = Math.min(filledCount, recordCount),
-                    Record_Count__c = recordCount,
-                    Sampled__c = sampled,
-                    Taken_At__c = takenAt
-                )
+                snapshot(described.getName(), field, recordType, filledCount, recordCount, sampled)
             );
         }
         return rows;
     }
 
-    /** Saves one chunk's snapshots, in user mode. */
-    public static void save(List<Field_Utilization_Snapshot__c> rows) {
-        if (rows != null && !rows.isEmpty()) {
-            Database.insert(rows, AccessLevel.USER_MODE);
-        }
-    }
-
-    /** Deletes snapshots past the retention period, in user mode (R-FU7). */
-    public static Integer purgeOld(Datetime now) {
-        List<Field_Utilization_Snapshot__c> old = FieldUtilizationSelector.takenBefore(
-            now.addMonths(-RETENTION_MONTHS)
-        );
-        if (!old.isEmpty()) {
-            Database.delete(old, AccessLevel.USER_MODE);
-        }
-        return old.size();
-    }
-
-    /** The one sentence a run leaves behind (R-FU8). */
-    public static String summary(
-        Integer fields,
-        Integer objects,
-        Integer failed,
-        List<String> skipped
+    /** One unsaved snapshot; the filled count is kept within the record count (R-FU7). */
+    public static Field_Utilization_Snapshot__c snapshot(
+        String objectName,
+        Schema.DescribeFieldResult field,
+        String recordType,
+        Integer filledCount,
+        Integer recordCount,
+        Boolean sampled
     ) {
-        String text = String.format(
-            System.Label.Core_FieldUtilization_RunSummary,
-            new List<Object>{ fields, objects, failed }
+        Integer total = Math.max(recordCount == null ? 0 : recordCount, 0);
+        Integer filled = Math.max(filledCount == null ? 0 : filledCount, 0);
+        return new Field_Utilization_Snapshot__c(
+            Object_Name__c = objectName,
+            Field_Name__c = field.getName(),
+            Field_Label__c = field.getLabel().left(255),
+            Record_Type__c = String.isBlank(recordType) ? null : recordType,
+            // Records can change between the totals and the count; never above 100%.
+            Filled_Count__c = Math.min(filled, total),
+            Record_Count__c = total,
+            Sampled__c = sampled == true
         );
-        if (skipped != null && !skipped.isEmpty()) {
-            text +=
-                ' ' +
-                String.format(
-                    System.Label.Core_FieldUtilization_RunSkipped,
-                    new List<Object>{ String.join(skipped, ', ') }
-                );
-        }
-        return text.abbreviate(255);
     }
 
-    /** Records when a run finished and what it did, on the org settings (R-FU8). */
-    public static void recordRun(Datetime finishedAt, String summaryText) {
-        OrgSettingsSystemWriter.save(
-            new Map<Schema.SObjectField, Object>{
-                BarnCRM_Settings__c.Field_Utilization_Last_Run__c => finishedAt,
-                BarnCRM_Settings__c.Field_Utilization_Last_Run_Summary__c => summaryText
-            }
-        );
+    /** Saves snapshots with one Taken At, in user mode (R-FU7). */
+    public static void save(List<Field_Utilization_Snapshot__c> rows, Datetime takenAt) {
+        if (rows == null || rows.isEmpty()) {
+            return;
+        }
+        for (Field_Utilization_Snapshot__c row : rows) {
+            row.Taken_At__c = takenAt;
+        }
+        Database.insert(rows, AccessLevel.USER_MODE);
     }
 
     /** True when the object has record types the runner can group by. */
@@ -269,25 +231,9 @@ public with sharing class FieldUtilizationService {
         return info == null || info.isMaster() ? NO_RECORD_TYPE : info.getDeveloperName();
     }
 
-    private static Map<String, Integer> totalsByRecordType(Schema.DescribeSObjectResult described) {
-        Map<String, Integer> totals = new Map<String, Integer>();
-        if (!groupsByRecordType(described)) {
-            totals.put(
-                NO_RECORD_TYPE,
-                Database.countQuery(soql('COUNT()', described, ''), AccessLevel.USER_MODE)
-            );
-            return totals;
-        }
-        String query = soql('RecordTypeId, COUNT(Id) n', described, ' GROUP BY RecordTypeId');
-        for (
-            AggregateResult row : (List<AggregateResult>) Database.query(
-                query,
-                AccessLevel.USER_MODE
-            )
-        ) {
-            add(totals, recordTypeKey(described, row.get('RecordTypeId')), (Integer) row.get('n'));
-        }
-        return totals;
+    private static Boolean isCountable(Schema.DescribeSObjectResult described) {
+        return FindController.isOffered(described) &&
+            described.getSObjectType() != Field_Utilization_Snapshot__c.SObjectType;
     }
 
     private static Map<String, Integer> filledByRecordType(

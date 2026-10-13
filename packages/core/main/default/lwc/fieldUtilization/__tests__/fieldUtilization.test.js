@@ -1,61 +1,49 @@
 import { createElement } from 'lwc';
 import FieldUtilization from 'c/fieldUtilization';
-import getView from '@salesforce/apex/FieldUtilizationController.getView';
-import getResults from '@salesforce/apex/FieldUtilizationController.getResults';
-import saveObjects from '@salesforce/apex/FieldUtilizationController.saveObjects';
-import setSchedule from '@salesforce/apex/FieldUtilizationController.setSchedule';
-import runNow from '@salesforce/apex/FieldUtilizationController.runNow';
+import listObjects from '@salesforce/apex/FieldUtilizationController.listObjects';
+import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
+import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
+import saveCounts from '@salesforce/apex/FieldUtilizationController.saveCounts';
 
 jest.mock(
-  '@salesforce/apex/FieldUtilizationController.getView',
+  '@salesforce/apex/FieldUtilizationController.listObjects',
   () => {
     const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
     return { default: createApexTestWireAdapter(jest.fn()) };
   },
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/apex/FieldUtilizationController.getResults',
-  () => ({ default: jest.fn() }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/apex/FieldUtilizationController.saveObjects',
-  () => ({ default: jest.fn() }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/apex/FieldUtilizationController.setSchedule',
-  () => ({ default: jest.fn() }),
-  {
-    virtual: true
-  }
-);
-jest.mock('@salesforce/apex/FieldUtilizationController.runNow', () => ({ default: jest.fn() }), {
+jest.mock('@salesforce/apex/FieldUtilizationController.getPlan', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_NotScheduled',
-  () => ({ default: 'The weekly count is not scheduled.' }),
+  '@salesforce/apex/FieldUtilizationController.countFields',
+  () => ({ default: jest.fn() }),
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_ScheduleActive',
-  () => ({ default: 'The count runs every Sunday at 4:00 AM.' }),
+  '@salesforce/apex/FieldUtilizationController.saveCounts',
+  () => ({ default: jest.fn() }),
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_RunNowStarted',
-  () => ({ default: 'The count has started.' }),
+  '@salesforce/label/c.Core_FieldUtilization_Progress',
+  () => ({ default: 'Counted {0} of {1} fields.' }),
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_NeverRun',
-  () => ({ default: 'Field use has not been counted yet.' }),
+  '@salesforce/label/c.Core_FieldUtilization_Saved',
+  () => ({ default: 'Saved {0} counts.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_FieldUtilization_TooLarge',
+  () => ({ default: 'More than {0} records.' }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_FieldUtilization_NotCounted',
+  () => ({ default: 'Not counted: {0}' }),
   { virtual: true }
 );
 
@@ -64,65 +52,52 @@ const OPTIONS = [
   { value: 'Contact', label: 'Contact' }
 ];
 
-const NEVER_RUN_VIEW = {
-  canManage: true,
-  scheduled: false,
-  tracked: [],
-  choosable: OPTIONS
-};
+const field = (name) => ({ fieldName: name, fieldLabel: name });
 
-const COUNTED_VIEW = {
-  canManage: true,
-  scheduled: true,
-  nextRunAt: '2026-10-18T08:00:00.000Z',
-  lastRun: '2026-10-11T08:04:00.000Z',
-  lastRunSummary: 'Counted 112 fields on 2 kinds of records. 0 could not be counted.',
-  tracked: ['Account'],
-  choosable: OPTIONS
-};
+const row = (name, filled, percent) => ({
+  key: `${name}|Organization`,
+  fieldName: name,
+  fieldLabel: name,
+  recordType: 'Organization',
+  recordTypeLabel: 'Organization',
+  filled,
+  total: 100,
+  percent,
+  sampled: false
+});
 
-const RESULTS = {
-  takenAt: '2026-10-11T08:00:00.000Z',
+const PLAN = {
+  objectName: 'Account',
+  objectLabel: 'Account',
+  total: 100,
+  tooLarge: false,
+  largeObjectLimit: 1000000,
+  chunkSize: 2,
+  fields: [field('Phone'), field('Website'), field('Fax')],
   previousTakenAt: '2026-10-04T08:00:00.000Z',
-  rows: [
-    {
-      key: 'Phone|Organization',
-      fieldLabel: 'Phone',
-      fieldName: 'Phone',
-      recordType: 'Organization',
-      filled: 80,
-      total: 100,
-      percent: 80.0,
-      change: 5.0,
-      sampled: false
-    },
-    {
-      key: 'Website|Organization',
-      fieldLabel: 'Website',
-      fieldName: 'Website',
-      recordType: 'Organization',
-      filled: 10,
-      total: 100,
-      percent: 10.0,
-      change: null,
-      sampled: false
-    }
-  ]
+  previous: [row('Phone', 75, 75.0)]
 };
 
-const flush = () =>
-  Promise.resolve()
-    .then(() => Promise.resolve())
-    .then(() => Promise.resolve())
-    .then(() => Promise.resolve());
+const flush = async () => {
+  for (let i = 0; i < 8; i++) {
+    // eslint-disable-next-line no-await-in-loop
+    await Promise.resolve();
+  }
+};
 
 function render() {
   const element = createElement('c-field-utilization', { is: FieldUtilization });
   document.body.appendChild(element);
+  listObjects.emit(OPTIONS);
   return element;
 }
 
 const find = (element, id) => element.shadowRoot.querySelector(`[data-id="${id}"]`);
+
+async function choose(element, value) {
+  find(element, 'object').dispatchEvent(new CustomEvent('change', { detail: { value } }));
+  await flush();
+}
 
 describe('c-field-utilization', () => {
   afterEach(() => {
@@ -132,97 +107,102 @@ describe('c-field-utilization', () => {
     jest.clearAllMocks();
   });
 
-  it('says nothing has been counted and the count is off on a new org', async () => {
+  it('offers the objects the controller lists and counts nothing until one is chosen', async () => {
     const element = render();
-    getView.emit(NEVER_RUN_VIEW);
     await flush();
 
-    expect(find(element, 'never-run').textContent).toBe('Field use has not been counted yet.');
-    expect(find(element, 'schedule-message').textContent).toBe(
-      'The weekly count is not scheduled.'
-    );
+    expect(find(element, 'object').options).toEqual(OPTIONS);
+    expect(getPlan).not.toHaveBeenCalled();
+    expect(find(element, 'save').disabled).toBe(true);
     expect(find(element, 'results')).toBeNull();
-    expect(getResults).not.toHaveBeenCalled();
   });
 
-  it('shows the last count and the first tracked object results with their change', async () => {
-    getResults.mockResolvedValue(RESULTS);
+  it('counts the fields in chunks and fills the table with the change since the saved count', async () => {
+    getPlan.mockResolvedValue(PLAN);
+    countFields
+      .mockResolvedValueOnce({
+        rows: [row('Phone', 80, 80.0), row('Website', 10, 10.0)],
+        failed: []
+      })
+      .mockResolvedValueOnce({ rows: [], failed: ['Fax'] });
     const element = render();
-    getView.emit(COUNTED_VIEW);
-    await flush();
+    await choose(element, 'Account');
 
-    expect(find(element, 'last-run-summary').textContent).toContain('Counted 112 fields');
-    expect(getResults).toHaveBeenCalledWith({ objectName: 'Account' });
-    const table = find(element, 'results');
-    expect(table.data).toHaveLength(2);
-    expect(table.data[0].share).toBeCloseTo(0.8);
-    expect(table.data[0].change).toBe(5.0);
+    expect(getPlan).toHaveBeenCalledWith({ objectName: 'Account' });
+    expect(countFields).toHaveBeenNthCalledWith(1, {
+      objectName: 'Account',
+      fieldNames: ['Phone', 'Website']
+    });
+    expect(countFields).toHaveBeenNthCalledWith(2, { objectName: 'Account', fieldNames: ['Fax'] });
+    const rows = find(element, 'results').data;
+    expect(rows).toHaveLength(2);
+    expect(rows[0].share).toBeCloseTo(0.8);
+    expect(rows[0].previousShare).toBeCloseTo(0.75);
+    expect(rows[0].change).toBe(5);
+    expect(rows[1].change).toBeNull();
+    expect(element.shadowRoot.textContent).toContain('Counted 3 of 3 fields.');
+    expect(find(element, 'not-counted').textContent).toContain('Not counted: Fax');
     expect(find(element, 'compared')).not.toBeNull();
+    expect(find(element, 'save').disabled).toBe(false);
   });
 
-  it('sorts the least filled fields first', async () => {
-    getResults.mockResolvedValue(RESULTS);
+  it('says an object over the size limit is not counted, and counts nothing', async () => {
+    getPlan.mockResolvedValue({ ...PLAN, total: 2000000, tooLarge: true, fields: [] });
     const element = render();
-    getView.emit(COUNTED_VIEW);
+    await choose(element, 'Account');
+
+    expect(find(element, 'too-large').textContent).toContain('More than');
+    expect(countFields).not.toHaveBeenCalled();
+  });
+
+  it('saves only the counted values and shows the saved count next', async () => {
+    getPlan.mockResolvedValueOnce({ ...PLAN, chunkSize: 40, previousTakenAt: null, previous: [] });
+    countFields.mockResolvedValue({ rows: [row('Phone', 80, 80.0)], failed: [] });
+    saveCounts.mockResolvedValue(1);
+    const element = render();
+    await choose(element, 'Account');
+    expect(find(element, 'never-saved')).not.toBeNull();
+
+    getPlan.mockResolvedValueOnce({
+      ...PLAN,
+      previousTakenAt: '2026-10-13T08:00:00.000Z',
+      previous: [row('Phone', 80, 80.0)]
+    });
+    find(element, 'save').click();
     await flush();
 
-    const table = find(element, 'results');
-    table.dispatchEvent(
+    expect(saveCounts).toHaveBeenCalledWith({
+      objectName: 'Account',
+      rows: [
+        { fieldName: 'Phone', recordType: 'Organization', filled: 80, total: 100, sampled: false }
+      ]
+    });
+    expect(find(element, 'notice').textContent).toContain('Saved 1 counts.');
+    expect(find(element, 'results').data[0].change).toBe(0);
+  });
+
+  it('sorts by the chosen column', async () => {
+    getPlan.mockResolvedValue({ ...PLAN, chunkSize: 40 });
+    countFields.mockResolvedValue({
+      rows: [row('Phone', 80, 80.0), row('Website', 10, 10.0)],
+      failed: []
+    });
+    const element = render();
+    await choose(element, 'Account');
+
+    find(element, 'results').dispatchEvent(
       new CustomEvent('sort', { detail: { fieldName: 'share', sortDirection: 'asc' } })
     );
     await flush();
 
-    expect(find(element, 'results').data[0].fieldLabel).toBe('Website');
+    expect(find(element, 'results').data.map((r) => r.fieldName)).toEqual(['Website', 'Phone']);
   });
 
-  it('saves the chosen objects', async () => {
-    saveObjects.mockResolvedValue({ ...NEVER_RUN_VIEW, tracked: ['Contact'] });
-    getResults.mockResolvedValue({ rows: [] });
+  it('shows the server message when a count fails', async () => {
+    getPlan.mockRejectedValue({ body: { message: 'You need the permission.' } });
     const element = render();
-    getView.emit(NEVER_RUN_VIEW);
-    await flush();
+    await choose(element, 'Account');
 
-    find(element, 'objects').dispatchEvent(
-      new CustomEvent('change', { detail: { value: ['Contact'] } })
-    );
-    find(element, 'save').click();
-    await flush();
-
-    expect(saveObjects).toHaveBeenCalledWith({ objectNames: ['Contact'] });
-    expect(find(element, 'notice')).not.toBeNull();
-  });
-
-  it('schedules the weekly count and counts now', async () => {
-    setSchedule.mockResolvedValue({ ...NEVER_RUN_VIEW, scheduled: true });
-    runNow.mockResolvedValue({ ...NEVER_RUN_VIEW, scheduled: true });
-    const element = render();
-    getView.emit(NEVER_RUN_VIEW);
-    await flush();
-
-    find(element, 'schedule-button').click();
-    await flush();
-    expect(setSchedule).toHaveBeenCalledWith({ scheduled: true });
-    expect(find(element, 'schedule-message').textContent).toBe(
-      'The count runs every Sunday at 4:00 AM.'
-    );
-
-    find(element, 'run-now').click();
-    await flush();
-    expect(runNow).toHaveBeenCalled();
-    expect(find(element, 'notice').textContent).toBe('The count has started.');
-  });
-
-  it('shows the message the server gives when a change is refused', async () => {
-    runNow.mockRejectedValue({
-      body: { message: 'Choose at least one kind of record to count, then save.' }
-    });
-    const element = render();
-    getView.emit(NEVER_RUN_VIEW);
-    await flush();
-
-    find(element, 'run-now').click();
-    await flush();
-
-    expect(find(element, 'error').textContent).toContain('Choose at least one kind of record');
+    expect(find(element, 'error').textContent).toContain('You need the permission.');
   });
 });

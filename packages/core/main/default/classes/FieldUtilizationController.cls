@@ -1,14 +1,18 @@
 /**
- * The Field Utilization page of the BarnCRM Settings console (canonical model Section 29F).
+ * The Field Utilization tab (canonical model Section 29F, ADR-NEXT
+ * field-utilization-on-demand).
  *
- * It answers whether the weekly count is switched on, when it last ran and what it found, and
- * carries the only ways the list of objects is changed and the count is started. Every change
- * requires `Manage_BarnCRM_Settings`; the counting itself is in user mode (R-FU3).
+ * The page picks an object, reads its plan (record totals, the fields to count and the latest
+ * saved count) in one call, then asks for counts a chunk of fields at a time and fills its table
+ * as each returns. Nothing is stored until the person saves. Every method requires
+ * `Manage_BarnCRM_Settings`; the counting itself is in user mode (R-FU3).
  */
 public with sharing class FieldUtilizationController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
-    private static final String OBJECTS_KEY = 'Field_Utilization_Objects__c';
-    private static final Integer KEY_LENGTH = 255;
+    private static final String PERMISSION = 'Manage_BarnCRM_Settings';
+
+    /** The most snapshot rows one save writes, inside the 10,000 row DML limit. */
+    @TestVisible
+    private static final Integer MAX_SAVE_ROWS = 9000;
 
     /** Raised with a message the page shows as it is. */
     public class FieldUtilizationException extends Exception {
@@ -22,270 +26,308 @@ public with sharing class FieldUtilizationController {
         public String label;
     }
 
-    /** The page, in one round trip. */
-    public class PageView {
-        @AuraEnabled
-        public Boolean canManage;
-        @AuraEnabled
-        public Boolean scheduled;
-        @AuraEnabled
-        public Datetime nextRunAt;
-        @AuraEnabled
-        public Datetime lastRun;
-        @AuraEnabled
-        public String lastRunSummary;
-        @AuraEnabled
-        public List<String> tracked;
-        @AuraEnabled
-        public List<Option> choosable;
-    }
-
-    /** One field and record type from the latest run, with its change since the run before. */
-    public class FieldRow {
-        @AuraEnabled
-        public String key;
-        @AuraEnabled
-        public String fieldLabel;
+    /** One field the page will count. */
+    public class FieldInfo {
         @AuraEnabled
         public String fieldName;
         @AuraEnabled
-        public String recordType;
+        public String fieldLabel;
+    }
+
+    /** One field and record type: counted now, saved earlier, or sent back to be saved. */
+    public class CountRow {
         @AuraEnabled
-        public Integer filled;
+        public String key { get; set; }
+        @AuraEnabled
+        public String fieldName { get; set; }
+        @AuraEnabled
+        public String fieldLabel { get; set; }
+        @AuraEnabled
+        public String recordType { get; set; }
+        @AuraEnabled
+        public String recordTypeLabel { get; set; }
+        @AuraEnabled
+        public Integer filled { get; set; }
+        @AuraEnabled
+        public Integer total { get; set; }
+        @AuraEnabled
+        public Decimal percent { get; set; }
+        @AuraEnabled
+        public Boolean sampled { get; set; }
+    }
+
+    /** What the page needs before it counts. */
+    public class Plan {
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public String objectLabel;
         @AuraEnabled
         public Integer total;
         @AuraEnabled
-        public Decimal percent;
+        public Boolean tooLarge;
         @AuraEnabled
-        public Decimal change;
+        public Integer largeObjectLimit;
         @AuraEnabled
-        public Boolean sampled;
-    }
-
-    /** One object's latest results. */
-    public class Results {
+        public Integer chunkSize;
         @AuraEnabled
-        public Datetime takenAt;
+        public List<FieldInfo> fields = new List<FieldInfo>();
         @AuraEnabled
         public Datetime previousTakenAt;
         @AuraEnabled
-        public List<FieldRow> rows = new List<FieldRow>();
+        public List<CountRow> previous = new List<CountRow>();
     }
 
+    /** One chunk's counts, and the labels of fields that could not be counted at all. */
+    public class Chunk {
+        @AuraEnabled
+        public List<CountRow> rows = new List<CountRow>();
+        @AuraEnabled
+        public List<String> failed = new List<String>();
+    }
+
+    /** Every object the person may count, by label (R-FU1). */
     @AuraEnabled(cacheable=true)
-    public static PageView getView() {
-        try {
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Field utilization page');
-        }
-    }
-
-    /** The latest counts for one object, with the change since the run before (R-FU1 to R-FU8). */
-    @AuraEnabled(cacheable=true)
-    public static Results getResults(String objectName) {
-        try {
-            return resultsFor(objectName);
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Field utilization results');
-        }
-    }
-
-    /** Saves the objects to count. An empty list counts nothing. */
-    @AuraEnabled
-    public static PageView saveObjects(List<String> objectNames) {
+    public static List<Option> listObjects() {
         try {
             requirePermission();
-            List<String> names = new List<String>();
-            for (String name : objectNames == null ? new List<String>() : objectNames) {
-                Schema.DescribeSObjectResult described = FieldUtilizationService.countable(name);
-                if (described == null) {
-                    throw new FieldUtilizationException(
-                        String.format(
-                            System.Label.Core_FieldUtilization_UnknownObject,
-                            new List<Object>{ name }
-                        )
-                    );
+            Map<String, Option> byLabel = new Map<String, Option>();
+            for (
+                Schema.DescribeSObjectResult described : FieldUtilizationService.offeredObjects()
+            ) {
+                Option option = new Option();
+                option.value = described.getName();
+                option.label = described.getLabel();
+                byLabel.put(option.label.toLowerCase() + '\u0000' + option.value, option);
+            }
+            List<String> keys = new List<String>(byLabel.keySet());
+            keys.sort();
+            List<Option> options = new List<Option>();
+            for (String key : keys) {
+                options.add(byLabel.get(key));
+            }
+            return options;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Field utilization object list');
+        }
+    }
+
+    /** The object's totals, fields and latest saved count (R-FU5, R-FU8). */
+    @AuraEnabled
+    public static Plan getPlan(String objectName) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            Plan planned = new Plan();
+            planned.objectName = described.getName();
+            planned.objectLabel = described.getLabel();
+            planned.total = FieldUtilizationService.sum(
+                FieldUtilizationService.totalsByRecordType(described)
+            );
+            planned.largeObjectLimit = FieldUtilizationService.largeObjectLimit();
+            planned.tooLarge = planned.total > planned.largeObjectLimit;
+            planned.chunkSize = planned.total > FieldUtilizationService.LARGE_OBJECT_ROWS
+                ? FieldUtilizationService.LARGE_CHUNK_SIZE
+                : FieldUtilizationService.CHUNK_SIZE;
+            if (!planned.tooLarge && planned.total > 0) {
+                for (
+                    Schema.DescribeFieldResult field : FieldUtilizationService.countableFields(
+                        described
+                    )
+                ) {
+                    FieldInfo info = new FieldInfo();
+                    info.fieldName = field.getName();
+                    info.fieldLabel = field.getLabel();
+                    planned.fields.add(info);
                 }
-                if (!names.contains(described.getName())) {
-                    names.add(described.getName());
+            }
+            planned.previousTakenAt = FieldUtilizationSelector.latestRun(planned.objectName);
+            if (planned.previousTakenAt != null) {
+                RecordTypeLabels labels = new RecordTypeLabels(described);
+                for (
+                    Field_Utilization_Snapshot__c row : FieldUtilizationSelector.rowsAt(
+                        planned.objectName,
+                        planned.previousTakenAt
+                    )
+                ) {
+                    planned.previous.add(toRow(row, labels));
                 }
             }
-            String joined = String.join(names, ',');
-            if (joined.length() > KEY_LENGTH) {
-                throw new FieldUtilizationException(System.Label.Core_FieldUtilization_TooMany);
-            }
-            SettingsService.saveSystemValue(OBJECTS_KEY, String.isBlank(joined) ? null : joined);
-            return currentView();
+            return planned;
         } catch (Exception caught) {
-            throw asUserError(caught, 'Save the field utilization objects');
+            throw asUserError(caught, 'Field utilization plan');
         }
-    }
-
-    /** Starts or stops the weekly count. */
-    @AuraEnabled
-    public static PageView setSchedule(Boolean scheduled) {
-        try {
-            requirePermission();
-            if (scheduled == true) {
-                FieldUtilizationScheduler.start();
-            } else {
-                FieldUtilizationScheduler.stop();
-            }
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Schedule the field utilization count');
-        }
-    }
-
-    /** Counts now. The page refreshes into the new last run once the batch ends. */
-    @AuraEnabled
-    public static PageView runNow() {
-        try {
-            requirePermission();
-            if (FieldUtilizationService.trackedObjects().isEmpty()) {
-                throw new FieldUtilizationException(
-                    System.Label.Core_FieldUtilization_NothingChosen
-                );
-            }
-            FieldUtilizationScheduler.runNow();
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Run the field utilization count now');
-        }
-    }
-
-    private static PageView currentView() {
-        BarnCRM_Settings__c settings = SettingsService.getSettings();
-        PageView view = new PageView();
-        view.canManage = canManage();
-        view.scheduled = FieldUtilizationScheduler.isScheduled();
-        view.nextRunAt = FieldUtilizationScheduler.nextRunAt();
-        view.lastRun = settings.Field_Utilization_Last_Run__c;
-        view.lastRunSummary = settings.Field_Utilization_Last_Run_Summary__c;
-        view.tracked = FieldUtilizationService.trackedObjects();
-        view.choosable = choosable(view.tracked);
-        return view;
     }
 
     /**
-     * Account, Contact and every custom object the viewer can count, by label, plus anything
-     * already tracked. Standard objects beyond these two are not offered: Core names no others.
+     * Counts up to one chunk of the object's fields (R-FU4, R-FU7). The totals are read again
+     * here, so no number the page sent becomes a denominator, and the size limit is enforced
+     * here too (R-FU5). Names that are not countable fields are ignored.
      */
-    private static List<Option> choosable(List<String> tracked) {
-        List<String> names = new List<String>{
-            Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
-            Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-        };
-        names.addAll(tracked);
-        for (String name : Schema.getGlobalDescribe().keySet()) {
-            if (name.endsWith('__c')) {
-                names.add(name);
+    @AuraEnabled
+    public static Chunk countFields(String objectName, List<String> fieldNames) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            Chunk result = new Chunk();
+            if (fieldNames == null || fieldNames.isEmpty()) {
+                return result;
             }
-        }
-        Map<String, Option> byLabel = new Map<String, Option>();
-        for (String name : names) {
-            Schema.DescribeSObjectResult described = FieldUtilizationService.countable(name);
-            if (described == null || !described.isCreateable()) {
-                continue;
+            if (fieldNames.size() > FieldUtilizationService.CHUNK_SIZE) {
+                throw new FieldUtilizationException(
+                    System.Label.Core_FieldUtilization_UnexpectedError
+                );
             }
-            Option option = new Option();
-            option.value = described.getName();
-            option.label = described.getLabel();
-            byLabel.put(option.label + '|' + option.value, option);
+            Map<String, Integer> totals = FieldUtilizationService.totalsByRecordType(described);
+            requireNotTooLarge(FieldUtilizationService.sum(totals));
+            Map<String, Schema.DescribeFieldResult> fields = FieldUtilizationService.countableFieldsByName(
+                described
+            );
+            RecordTypeLabels labels = new RecordTypeLabels(described);
+            Exception firstFailure;
+            for (String fieldName : new Set<String>(fieldNames)) {
+                Schema.DescribeFieldResult field = fields.get(fieldName);
+                if (field == null) {
+                    continue;
+                }
+                try {
+                    for (
+                        Field_Utilization_Snapshot__c row : FieldUtilizationService.count(
+                            described,
+                            field,
+                            totals
+                        )
+                    ) {
+                        result.rows.add(toRow(row, labels));
+                    }
+                } catch (Exception fieldFailure) {
+                    firstFailure = firstFailure == null ? fieldFailure : firstFailure;
+                    result.failed.add(field.getLabel());
+                }
+            }
+            if (firstFailure != null) {
+                ErrorLogger.log(firstFailure, 'Field utilization count: ' + described.getName());
+            }
+            return result;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Field utilization count');
         }
-        List<String> sortKeys = new List<String>(byLabel.keySet());
-        sortKeys.sort();
-        List<Option> options = new List<Option>();
-        for (String sortKey : sortKeys) {
-            options.add(byLabel.get(sortKey));
-        }
-        return options;
     }
 
-    private static Results resultsFor(String objectName) {
-        Results results = new Results();
+    /**
+     * Saves the counts on the page as one set of snapshots (R-FU7). Each row's field and record
+     * type are checked against describe; a row that does not match is left out. Returns how
+     * many rows were saved.
+     */
+    @AuraEnabled
+    public static Integer saveCounts(String objectName, List<CountRow> rows) {
+        try {
+            requirePermission();
+            Schema.DescribeSObjectResult described = requireObject(objectName);
+            List<CountRow> sent = rows == null ? new List<CountRow>() : rows;
+            if (sent.size() > MAX_SAVE_ROWS) {
+                throw new FieldUtilizationException(
+                    String.format(
+                        System.Label.Core_FieldUtilization_TooManyRows,
+                        new List<Object>{ sent.size(), MAX_SAVE_ROWS }
+                    )
+                );
+            }
+            Map<String, Schema.DescribeFieldResult> fields = FieldUtilizationService.countableFieldsByName(
+                described
+            );
+            Map<String, Schema.RecordTypeInfo> recordTypes = described.getRecordTypeInfosByDeveloperName();
+            List<Field_Utilization_Snapshot__c> snapshots = new List<Field_Utilization_Snapshot__c>();
+            for (CountRow row : sent) {
+                Schema.DescribeFieldResult field = row == null ? null : fields.get(row.fieldName);
+                Boolean knownType =
+                    field != null &&
+                    (String.isBlank(row.recordType) || recordTypes.containsKey(row.recordType));
+                if (!knownType || row.total == null || row.total <= 0) {
+                    continue;
+                }
+                snapshots.add(
+                    FieldUtilizationService.snapshot(
+                        described.getName(),
+                        field,
+                        row.recordType,
+                        row.filled,
+                        row.total,
+                        row.sampled
+                    )
+                );
+            }
+            FieldUtilizationService.save(snapshots, System.now());
+            return snapshots.size();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Save field utilization counts');
+        }
+    }
+
+    /** Record type developer names to the labels the page shows, for one object. */
+    private class RecordTypeLabels {
+        private Boolean grouped;
+        private Map<String, Schema.RecordTypeInfo> byName;
+
+        RecordTypeLabels(Schema.DescribeSObjectResult described) {
+            this.grouped = FieldUtilizationService.groupsByRecordType(described);
+            this.byName = described.getRecordTypeInfosByDeveloperName();
+        }
+
+        String labelOf(String developerName) {
+            if (!this.grouped) {
+                return '';
+            }
+            if (String.isBlank(developerName)) {
+                return System.Label.Core_FieldUtilization_NoRecordType;
+            }
+            Schema.RecordTypeInfo info = this.byName.get(developerName);
+            return info == null ? developerName : info.getName();
+        }
+    }
+
+    private static CountRow toRow(Field_Utilization_Snapshot__c snapshot, RecordTypeLabels labels) {
+        CountRow row = new CountRow();
+        row.fieldName = snapshot.Field_Name__c;
+        row.fieldLabel = snapshot.Field_Label__c;
+        row.recordType = snapshot.Record_Type__c == null ? '' : snapshot.Record_Type__c;
+        row.key = row.fieldName + '|' + row.recordType;
+        row.recordTypeLabel = labels.labelOf(snapshot.Record_Type__c);
+        row.filled = snapshot.Filled_Count__c == null ? 0 : snapshot.Filled_Count__c.intValue();
+        row.total = snapshot.Record_Count__c == null ? 0 : snapshot.Record_Count__c.intValue();
+        row.percent = row.total == 0
+            ? null
+            : (Decimal.valueOf(row.filled) * 100).divide(row.total, 1);
+        row.sampled = snapshot.Sampled__c == true;
+        return row;
+    }
+
+    private static Schema.DescribeSObjectResult requireObject(String objectName) {
         Schema.DescribeSObjectResult described = FieldUtilizationService.countable(objectName);
         if (described == null) {
-            return results;
+            throw new FieldUtilizationException(
+                String.format(
+                    System.Label.Core_FieldUtilization_UnknownObject,
+                    new List<Object>{ String.isBlank(objectName) ? '' : objectName }
+                )
+            );
         }
-        String name = described.getName();
-        results.takenAt = FieldUtilizationSelector.latestRun(name);
-        if (results.takenAt == null) {
-            return results;
-        }
-        results.previousTakenAt = FieldUtilizationSelector.runBefore(name, results.takenAt);
-        Set<Datetime> runs = new Set<Datetime>{ results.takenAt };
-        if (results.previousTakenAt != null) {
-            runs.add(results.previousTakenAt);
-        }
-        Map<String, Decimal> previous = new Map<String, Decimal>();
-        List<Field_Utilization_Snapshot__c> latest = new List<Field_Utilization_Snapshot__c>();
-        for (Field_Utilization_Snapshot__c row : FieldUtilizationSelector.rowsAt(name, runs)) {
-            if (row.Taken_At__c == results.takenAt) {
-                latest.add(row);
-            } else {
-                previous.put(keyOf(row), percentOf(row));
-            }
-        }
-        Boolean grouped = FieldUtilizationService.groupsByRecordType(described);
-        Map<String, Schema.RecordTypeInfo> recordTypes = described.getRecordTypeInfosByDeveloperName();
-        for (Field_Utilization_Snapshot__c row : latest) {
-            FieldRow shown = new FieldRow();
-            shown.key = keyOf(row);
-            shown.fieldLabel = row.Field_Label__c;
-            shown.fieldName = row.Field_Name__c;
-            shown.recordType = recordTypeLabel(grouped, recordTypes, row.Record_Type__c);
-            shown.filled = row.Filled_Count__c == null ? 0 : row.Filled_Count__c.intValue();
-            shown.total = row.Record_Count__c == null ? 0 : row.Record_Count__c.intValue();
-            shown.percent = percentOf(row);
-            shown.sampled = row.Sampled__c == true;
-            Decimal before = previous.get(shown.key);
-            shown.change = before == null ||
-                shown.percent == null
-                ? null
-                : (shown.percent - before).setScale(1);
-            results.rows.add(shown);
-        }
-        return results;
+        return described;
     }
 
-    private static String recordTypeLabel(
-        Boolean grouped,
-        Map<String, Schema.RecordTypeInfo> recordTypes,
-        String developerName
-    ) {
-        if (!grouped) {
-            return '';
+    private static void requireNotTooLarge(Integer total) {
+        if (total > FieldUtilizationService.largeObjectLimit()) {
+            throw new FieldUtilizationException(
+                String.format(
+                    System.Label.Core_FieldUtilization_TooLarge,
+                    new List<Object>{ FieldUtilizationService.largeObjectLimit().format() }
+                )
+            );
         }
-        if (String.isBlank(developerName)) {
-            return System.Label.Core_FieldUtilization_NoRecordType;
-        }
-        Schema.RecordTypeInfo info = recordTypes.get(developerName);
-        return info == null ? developerName : info.getName();
-    }
-
-    private static String keyOf(Field_Utilization_Snapshot__c row) {
-        return row.Field_Name__c + '|' + (row.Record_Type__c == null ? '' : row.Record_Type__c);
-    }
-
-    private static Decimal percentOf(Field_Utilization_Snapshot__c row) {
-        if (
-            row.Record_Count__c == null ||
-            row.Record_Count__c == 0 ||
-            row.Filled_Count__c == null
-        ) {
-            return null;
-        }
-        return (row.Filled_Count__c * 100).divide(row.Record_Count__c, 1);
-    }
-
-    private static Boolean canManage() {
-        return FeatureManagement.checkPermission(EDIT_PERMISSION);
     }
 
     private static void requirePermission() {
-        if (!canManage()) {
+        if (!FeatureManagement.checkPermission(PERMISSION)) {
             throw new FieldUtilizationException(
                 System.Label.Core_FieldUtilization_PermissionRequired
             );
