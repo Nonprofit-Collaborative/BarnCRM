@@ -13,6 +13,8 @@ public with sharing class BulkUpdateService {
     public static final String ACTION_SET = 'set';
     public static final String ACTION_CLEAR = 'clear';
     public static final String ACTION_COPY = 'copy';
+    /** Change each record's own value with transform steps (C-37, R-BU7). */
+    public static final String ACTION_TRANSFORM = 'transform';
     public static final Integer MAX_CHANGES = 5;
     /** How many records the preview shows before and after. */
     public static final Integer SAMPLE_SIZE = 5;
@@ -33,11 +35,34 @@ public with sharing class BulkUpdateService {
         public Object value;
         /** The value as the person sent it, kept in the job's definition. */
         public Object rawValue;
+        /** transform: the steps, checked by DataTransform.problems. */
+        public List<DataTransform.Step> steps;
+        /** transform: the fields of the same record its `append` steps name. */
+        public List<Schema.DescribeFieldResult> otherFields = new List<Schema.DescribeFieldResult>();
 
-        /** The value this change gives one record. */
+        /**
+         * The value this change gives one record. A transform's result is typed for the
+         * target; a result the target cannot take is refused for this record alone, with a
+         * `BulkUpdateException` whose message is the reason (R-BU7).
+         */
         public Object newValueFor(SObject record) {
             if (action == ACTION_COPY) {
                 return record.get(source.getName());
+            }
+            if (action == ACTION_TRANSFORM) {
+                Map<String, String> others = new Map<String, String>();
+                for (Schema.DescribeFieldResult other : otherFields) {
+                    others.put(
+                        DataTransform.key(other.getName()),
+                        text(record.get(other.getName()))
+                    );
+                }
+                String result = DataTransform.apply(
+                    steps,
+                    text(record.get(target.getName())),
+                    others
+                );
+                return BulkUpdateFields.fromText(target, result);
             }
             return action == ACTION_CLEAR ? null : value;
         }
@@ -52,6 +77,9 @@ public with sharing class BulkUpdateService {
             }
             if (action == ACTION_COPY) {
                 result.put('source', source.getName());
+            }
+            if (action == ACTION_TRANSFORM) {
+                result.put('transforms', JSON.deserializeUntyped(JSON.serialize(steps, true)));
             }
             return result;
         }
@@ -71,6 +99,9 @@ public with sharing class BulkUpdateService {
                 names.add(change.target.getName());
                 if (change.source != null) {
                     names.add(change.source.getName());
+                }
+                for (Schema.DescribeFieldResult other : change.otherFields) {
+                    names.add(other.getName());
                 }
             }
             return names;
@@ -101,6 +132,9 @@ public with sharing class BulkUpdateService {
         public Object before;
         @AuraEnabled
         public Object after;
+        /** Why this record's field cannot take the changed value, when it cannot (R-BU7). */
+        @AuraEnabled
+        public String problem;
     }
 
     /** One record of the preview's sample. */
@@ -243,7 +277,62 @@ public with sharing class BulkUpdateService {
             change.value = BulkUpdateFields.typed(change.target, change.rawValue);
             return change;
         }
+        if (change.action == ACTION_TRANSFORM) {
+            return withSteps(type, change, raw.get('transforms'));
+        }
         throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_BulkUpdate_ErrorNoChanges);
+    }
+
+    /**
+     * A change with steps (R-BU7): refused when the target cannot be changed with steps, when
+     * there is no step, when DataTransform names a problem (apply would skip such a step
+     * silently), or when an `append` step names a field the person may not read.
+     */
+    private static Change withSteps(Schema.SObjectType type, Change change, Object rawSteps) {
+        String label = change.target.getLabel();
+        if (!BulkUpdateFields.canTransform(change.target)) {
+            throw new BulkUpdateFields.BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorCannotTransform,
+                    new List<Object>{ label }
+                )
+            );
+        }
+        change.steps = rawSteps instanceof List<Object>
+            ? DataTransform.parse(JSON.serialize(rawSteps))
+            : new List<DataTransform.Step>();
+        if (change.steps.isEmpty()) {
+            throw new BulkUpdateFields.BulkUpdateException(
+                String.format(System.Label.Core_BulkUpdate_ErrorNoSteps, new List<Object>{ label })
+            );
+        }
+        List<String> problems = DataTransform.problems(change.steps);
+        if (!problems.isEmpty()) {
+            throw new BulkUpdateFields.BulkUpdateException(
+                String.format(
+                    System.Label.Core_BulkUpdate_ErrorSteps,
+                    new List<Object>{ label, String.join(problems, ' ') }
+                )
+            );
+        }
+        Set<String> named = new Set<String>();
+        for (DataTransform.Step step : change.steps) {
+            if (step.op != DataTransform.OP_APPEND) {
+                continue;
+            }
+            for (String column : step.columns) {
+                Schema.DescribeFieldResult other = BulkUpdateFields.ownField(type, column);
+                if (named.add(other.getName())) {
+                    change.otherFields.add(other);
+                }
+            }
+        }
+        return change;
+    }
+
+    /** A stored value as the text a transform step reads; null stays null. */
+    public static String text(Object value) {
+        return value == null ? null : String.valueOf(value);
     }
 
     // -------------------------------------------------------------------------------------
@@ -289,7 +378,11 @@ public with sharing class BulkUpdateService {
                 FieldChange field = new FieldChange();
                 field.label = change.target.getLabel();
                 field.before = record.get(change.target.getName());
-                field.after = change.newValueFor(record);
+                try {
+                    field.after = change.newValueFor(record);
+                } catch (BulkUpdateFields.BulkUpdateException refused) {
+                    field.problem = refused.getMessage();
+                }
                 shown.changes.add(field);
             }
             result.sample.add(shown);

@@ -298,6 +298,80 @@ public with sharing class BulkUpdateFields {
         }
     }
 
+    /** Whether a target may be changed with transform steps: any writable type but a lookup (R-BU7). */
+    public static Boolean canTransform(Schema.DescribeFieldResult field) {
+        return WRITABLE.contains(field.getType()) &&
+            field.getType() != Schema.DisplayType.REFERENCE;
+    }
+
+    /**
+     * The text a transform produced, as the field's own type, read as an import reads a cell
+     * (R-BU7): blank clears the field (a checkbox reads it as false), a checkbox takes true, yes
+     * or 1, a number keeps only its digits, point and minus sign. Unlike an import, a result the
+     * field cannot take is never shortened or guessed: it is refused, naming the field and the
+     * value, so the record is journaled as Failed rather than saved wrong.
+     */
+    public static Object fromText(Schema.DescribeFieldResult field, String text) {
+        Schema.DisplayType kind = field.getType();
+        if (kind == Schema.DisplayType.BOOLEAN) {
+            String flag = text == null ? '' : text.trim();
+            return 'true'.equalsIgnoreCase(flag) ||
+                'yes'.equalsIgnoreCase(flag) ||
+                '1'.equals(flag);
+        }
+        if (String.isBlank(text)) {
+            if (!field.isNillable()) {
+                throw new BulkUpdateException(
+                    String.format(
+                        System.Label.Core_BulkUpdate_ErrorRequired,
+                        new List<Object>{ field.getLabel() }
+                    )
+                );
+            }
+            return null;
+        }
+        BulkUpdateException refused = new BulkUpdateException(
+            String.format(
+                System.Label.Core_BulkUpdate_ErrorStepResult,
+                new List<Object>{ field.getLabel(), text.abbreviate(80) }
+            )
+        );
+        try {
+            switch on kind {
+                when INTEGER {
+                    return Integer.valueOf(text.replaceAll('[^0-9\\-]', ''));
+                }
+                when DOUBLE, CURRENCY, PERCENT {
+                    return Decimal.valueOf(text.replaceAll('[^0-9\\.\\-]', ''));
+                }
+                when DATE {
+                    Date parsed = Date.valueOf(text.trim());
+                    if (String.valueOf(parsed) != text.trim()) {
+                        throw refused;
+                    }
+                    return parsed;
+                }
+                when DATETIME {
+                    return Datetime.valueOf(text.trim());
+                }
+                when PICKLIST, MULTIPICKLIST {
+                    checkPicklist(field, text, refused);
+                    return text;
+                }
+                when else {
+                    if (field.getLength() > 0 && text.length() > field.getLength()) {
+                        throw refused;
+                    }
+                    return text;
+                }
+            }
+        } catch (BulkUpdateException known) {
+            throw known;
+        } catch (Exception unreadable) {
+            throw refused;
+        }
+    }
+
     /** Why no record of this object may be bulk updated, or null when its records may be. */
     @TestVisible
     private static String objectReason(Schema.DescribeSObjectResult described) {
