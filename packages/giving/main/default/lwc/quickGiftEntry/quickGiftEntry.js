@@ -1,6 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 
 import GIFT_OBJECT from '@salesforce/schema/Gift__c';
 import FUND_OBJECT from '@salesforce/schema/Fund__c';
@@ -476,13 +476,14 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
         name: result.giftName,
         url: `/lightning/r/${GIFT_OBJECT.objectApiName}/${result.giftId}/view`
       };
-      this.dispatchEvent(
-        new ShowToastEvent({
-          title: successTitle,
+      Toast.show(
+        {
+          label: successTitle,
           message: successMessage,
-          messageData: [{ url: this.savedGift.url, label: result.giftName }],
+          messageLinks: [{ url: this.savedGift.url, label: result.giftName }],
           variant: 'success'
-        })
+        },
+        this
       );
       if (startAnother) {
         this.startAnotherGift();

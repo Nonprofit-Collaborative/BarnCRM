@@ -1,4 +1,5 @@
 import { createElement } from 'lwc';
+import Toast from 'lightning/toast';
 import ReceiptActions from 'c/receiptActions';
 import getGiftReceiptState from '@salesforce/apex/ReceiptController.getGiftReceiptState';
 import issueReceipt from '@salesforce/apex/ReceiptController.issue';
@@ -107,8 +108,7 @@ describe('c-receipt-actions', () => {
 
   it('refuses to void without a reason, and does not call the server', async () => {
     const element = build();
-    const toasts = jest.fn();
-    element.addEventListener('lightning__showtoast', toasts);
+    const toasts = jest.spyOn(Toast, 'show');
     getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: true, receipts: [ISSUED] });
     await flush();
 
@@ -117,13 +117,12 @@ describe('c-receipt-actions', () => {
 
     expect(voidAndReissue).not.toHaveBeenCalled();
     expect(toasts).toHaveBeenCalled();
-    expect(toasts.mock.calls[0][0].detail.variant).toBe('warning');
+    expect(toasts.mock.calls[0][0].variant).toBe('warning');
   });
 
   it('issues a receipt when asked, and names it in the success message', async () => {
     const element = build();
-    const toasts = jest.fn();
-    element.addEventListener('lightning__showtoast', toasts);
+    const toasts = jest.spyOn(Toast, 'show');
     getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: false, receipts: [] });
     await flush();
 
@@ -132,7 +131,7 @@ describe('c-receipt-actions', () => {
     await flush();
 
     expect(issueReceipt).toHaveBeenCalledWith({ giftId: GIFT_ID });
-    expect(toasts.mock.calls[0][0].detail.message).toBe('Receipt HFH-2026-000001 has been issued.');
+    expect(toasts.mock.calls[0][0].message).toBe('Receipt HFH-2026-000001 has been issued.');
   });
 
   it('opens the receipt PDF in the standard file preview', async () => {

@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 
 import getAffiliations from '@salesforce/apex/AffiliationController.getAffiliations';
 import makePrimary from '@salesforce/apex/AffiliationController.makePrimary';
@@ -155,6 +155,6 @@ export default class AffiliationPanel extends LightningElement {
   }
 
   notify(message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ message, variant }));
+    Toast.show({ label: message, variant }, this);
   }
 }

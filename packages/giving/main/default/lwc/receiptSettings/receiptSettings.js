@@ -1,5 +1,5 @@
 import { LightningElement, wire } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 import { refreshApex } from '@salesforce/apex';
 import getTemplates from '@salesforce/apex/ReceiptController.getTemplates';
 import getCanManageTemplates from '@salesforce/apex/ReceiptController.getCanManageTemplates';
@@ -313,6 +313,6 @@ export default class ReceiptSettings extends LightningElement {
   }
 
   toast(title, message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    Toast.show({ label: title, message, variant }, this);
   }
 }

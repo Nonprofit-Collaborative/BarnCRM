@@ -1,6 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import openInFind from '@salesforce/apex/DataHygieneController.openInFind';
 
@@ -73,11 +73,9 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
     this.errorMessage = undefined;
     try {
       const target = await openInFind({ checkKey: key });
-      this.dispatchEvent(
-        new ShowToastEvent({
-          title: OPENED_NOTICE.replace('{0}', target.savedQueryName),
-          variant: 'info'
-        })
+      Toast.show(
+        { label: OPENED_NOTICE.replace('{0}', target.savedQueryName), variant: 'info' },
+        this
       );
       this[NavigationMixin.Navigate]({
         type: 'standard__navItemPage',

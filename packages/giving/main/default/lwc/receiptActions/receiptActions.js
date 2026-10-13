@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import Toast from 'lightning/toast';
 import { refreshApex } from '@salesforce/apex';
 import getGiftReceiptState from '@salesforce/apex/ReceiptController.getGiftReceiptState';
 import issueReceipt from '@salesforce/apex/ReceiptController.issue';
@@ -172,6 +172,6 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
   }
 
   toast(title, message, variant) {
-    this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    Toast.show({ label: title, message, variant }, this);
   }
 }
