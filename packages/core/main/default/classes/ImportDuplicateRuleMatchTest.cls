@@ -369,6 +369,63 @@ private class ImportDuplicateRuleMatchTest {
     }
 
     /**
+     * The scan's households pass starts only for a rule that compares organizations and
+     * households; a person account rule alone gives it nothing to ask.
+     */
+    @IsTest
+    static void aPersonAccountRuleAloneStartsNoHouseholdsPass() {
+        System.runAs(TestUsers.admin()) {
+            DuplicateSelector.rulesOverride = new List<DuplicateRule>{
+                rule('Account', DuplicateSelector.PERSON_ACCOUNT_SUBTYPE, true),
+                rule('Contact', null, true)
+            };
+            Set<String> both = new Set<String>{ 'Account', 'Contact' };
+            Assert.areEqual(
+                new Set<String>{ 'Contact' },
+                DuplicateSelector.objectsWithActiveRules(both),
+                'Only the people pass has a rule to run'
+            );
+
+            DuplicateSelector.rulesOverride.add(rule('Account', 'None', true));
+            Assert.areEqual(
+                both,
+                DuplicateSelector.objectsWithActiveRules(both),
+                'An Account rule with no subtype starts the households pass'
+            );
+        }
+    }
+
+    /**
+     * In an org with person accounts a contact the rules match may be the contact half of a
+     * person account, which a contact import never takes as its person. The filter is added
+     * only there, for contacts only.
+     */
+    @IsTest
+    static void aContactMatchIsNeverThePersonHalfOfAnAccount() {
+        System.runAs(TestUsers.admin()) {
+            String plain = ImportDuplicateRuleMatcher.visibleQuery(
+                Contact.SObjectType,
+                false,
+                false
+            );
+            String withPeople = ImportDuplicateRuleMatcher.visibleQuery(
+                Contact.SObjectType,
+                false,
+                true
+            );
+            Assert.isTrue(
+                withPeople.startsWith(plain + ' AND '),
+                'Contacts are filtered where person accounts exist: ' + withPeople
+            );
+            Assert.areEqual(
+                ImportDuplicateRuleMatcher.visibleQuery(Account.SObjectType, true, false),
+                ImportDuplicateRuleMatcher.visibleQuery(Account.SObjectType, true, true),
+                'Accounts are filtered by record type, as before'
+            );
+        }
+    }
+
+    /**
      * Canary: the platform's own matcher finds a person already there through the standard
      * contact rule, which every new org has switched on. Skipped, and says so in the debug
      * log, where that rule is off. The debug line records what one chunk of 200 probes costs
