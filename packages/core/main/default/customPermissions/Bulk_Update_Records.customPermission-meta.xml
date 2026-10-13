@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    Lets a user bulk update: set, clear or copy up to five fields on the records a Find query
-    returns, and undo it. Needs Find and Export Records as well. Grants no access to any record
-    or field; every change is saved with the user's own access.
+    Lets a user set, clear or copy up to five fields on the records a Find query returns, and
+    undo it. Needs Find and Export Records too. Grants no record or field access; changes are
+    saved with the user's own access.
   </description>
   <isLicensed>false</isLicensed>
   <label>Bulk Update Records</label>
