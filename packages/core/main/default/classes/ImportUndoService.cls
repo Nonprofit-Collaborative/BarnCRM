@@ -18,14 +18,6 @@
  */
 @NamespaceAccessible
 public with sharing class ImportUndoService {
-    /** AsyncApexJob statuses that mean a job has not finished yet. */
-    private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
-        'Holding',
-        'Queued',
-        'Preparing',
-        'Processing'
-    };
-
     /** Whether an undo job is queued or running, asked once per transaction. */
     private static Boolean undoJobRunning;
 
@@ -288,7 +280,7 @@ public with sharing class ImportUndoService {
      */
     private static Boolean isUndoJobRunning() {
         if (undoJobRunning == null) {
-            Set<String> running = RUNNING_JOB_STATUSES;
+            Set<String> running = ImportBatchService.RUNNING_JOB_STATUSES;
             Set<String> undoClasses = new Set<String>{ 'ImportUndoBatch', 'BulkDeleteUndoBatch' };
             undoJobRunning = ![
                     SELECT Id

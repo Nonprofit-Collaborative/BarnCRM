@@ -33,7 +33,8 @@ public with sharing class ImportObjectSchema {
     };
 
     /** The field types a file's text is read into; any other is not offered. */
-    private static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
+    @NamespaceAccessible
+    public static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
         Schema.DisplayType.STRING,
         Schema.DisplayType.TEXTAREA,
         Schema.DisplayType.EMAIL,

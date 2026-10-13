@@ -1761,8 +1761,13 @@ bookkeeping fields (the import batch tag, the sample data marks, the household f
 household automation writes), and not a field the fixed column list already offers. For people
 it lists Contact fields in contact terms, which R-IT3 translates in Person Accounts mode; for
 organizations it lists Account fields that are not person account fields. Values are written
-as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
-value with a blank, and a field the user may not write is skipped and named in the run log.
+as the other attributes are (R-IB12): read as the field's type the one way every import reads
+it (ISO or the user's locale for dates and date times, numbers with separators, times), never
+clearing a stored value with a blank, and a field the user may not write is skipped and named in
+the run log. A value the field cannot take (unreadable, or text longer than the field) rejects
+the row with the field and value named, as a one-object load does (R-IT12). A matched record
+counts as changed only where a value differs as the field holds it (numbers as numbers, dates as
+dates) and text exactly: a correction of capitals is a change.
 A checkbox reads `true`, `yes`, `y`, `1`, `x`, `checked`, `on` or `t` as ticked and `false`,
 `no`, `n`, `0`, `off` or `f` as cleared, ignoring case and surrounding spaces; one reading
 serves every import, people and one-object alike. Any other value is never read as cleared: a
@@ -6600,6 +6605,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 
 ---

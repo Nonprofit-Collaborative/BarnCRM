@@ -218,6 +218,7 @@ public with sharing class ImportRowProcessor {
 
         List<Working> working = read(batch, rows, mapping, outcome);
         skipUnreadableCheckboxes(working, checkboxColumns(mapping, personAccounts), outcome);
+        rejectUnreadableValues(working, personAccounts);
         resolveGivenIds(working, personAccounts);
         resolveOrganizations(working, batch, dryRun, outcome);
         resolvePeople(working, rule, batch, personAccounts, dryRun, outcome);
@@ -549,7 +550,7 @@ public with sharing class ImportRowProcessor {
                 if (given == null || item.error != null) {
                     continue;
                 }
-                Id parsed = parsedId(given);
+                Id parsed = ImportValues.idOrNull(given);
                 Schema.SObjectType expected = which == 0 ? Account.SObjectType : personType;
                 if (parsed == null) {
                     item.error = String.format(
@@ -576,7 +577,7 @@ public with sharing class ImportRowProcessor {
                 if (given == null || item.error != null) {
                     continue;
                 }
-                Id parsed = parsedId(given);
+                Id parsed = ImportValues.idOrNull(given);
                 if (!recordTypeById.containsKey(parsed)) {
                     item.error = String.format(
                         Label.Core_Import_ErrorRecordIdNotFound,
@@ -601,15 +602,6 @@ public with sharing class ImportRowProcessor {
                     item.givenPerson2 = true;
                 }
             }
-        }
-    }
-
-    /** A record ID as typed, or null when it is not one. */
-    private static Id parsedId(String given) {
-        try {
-            return Id.valueOf(given);
-        } catch (Exception notAnId) {
-            return null;
         }
     }
 
@@ -832,7 +824,7 @@ public with sharing class ImportRowProcessor {
         Set<String> digests = new Set<String>();
         for (Working item : firstRowByKey.values()) {
             if (item.organizationKey != null) {
-                digests.add(digest(ORGANIZATION_DIGEST, item.organizationKey));
+                digests.add(ImportValues.digest(ORGANIZATION_DIGEST, item.organizationKey));
             }
         }
         Set<String> earlier = digests.isEmpty()
@@ -844,7 +836,7 @@ public with sharing class ImportRowProcessor {
             }
             if (
                 item.organizationKey == null ||
-                !earlier.contains(digest(ORGANIZATION_DIGEST, item.organizationKey))
+                !earlier.contains(ImportValues.digest(ORGANIZATION_DIGEST, item.organizationKey))
             ) {
                 item.createdAnything = true;
             }
@@ -853,7 +845,7 @@ public with sharing class ImportRowProcessor {
             if (item.organizationKey == null) {
                 continue;
             }
-            String digest = digest(ORGANIZATION_DIGEST, item.organizationKey);
+            String digest = ImportValues.digest(ORGANIZATION_DIGEST, item.organizationKey);
             if (!earlier.contains(digest)) {
                 item.row.Organization_Key__c = digest;
             }
@@ -1135,10 +1127,10 @@ public with sharing class ImportRowProcessor {
                 String key = which == 1 ? item.personKey1 : item.personKey2;
                 String named = namedKey(item, which == 1);
                 if (key != null) {
-                    digests.add(digest(PERSON_DIGEST, ImportMatcher.baseKey(key)));
+                    digests.add(ImportValues.digest(PERSON_DIGEST, ImportMatcher.baseKey(key)));
                 }
                 if (named != null) {
-                    digests.add(digest(PERSON_DIGEST, named));
+                    digests.add(ImportValues.digest(PERSON_DIGEST, named));
                 }
             }
         }
@@ -1173,7 +1165,10 @@ public with sharing class ImportRowProcessor {
             }
             String shared = ImportMatcher.baseKey(key);
             String named = namedKey(item, isFirst);
-            Integer heldEarlier = count(earlier, digest(PERSON_DIGEST, shared));
+            // A commit asks nobody earlier, so it digests nothing (R-IB12).
+            Integer heldEarlier = earlier.isEmpty()
+                ? 0
+                : count(earlier, ImportValues.digest(PERSON_DIGEST, shared));
             Integer held =
                 (matches.containsKey(shared) ? (ImportMatcher.isHeldByMany(shared) ? 2 : 1) : 0) +
                 heldEarlier;
@@ -1183,7 +1178,8 @@ public with sharing class ImportRowProcessor {
             Boolean coming =
                 found == null &&
                 named != null &&
-                count(earlier, digest(PERSON_DIGEST, named)) > 0;
+                !earlier.isEmpty() &&
+                count(earlier, ImportValues.digest(PERSON_DIGEST, named)) > 0;
             // A row giving a first name is found by it or created, never given whoever else
             // holds the shared key (R-IB12). A key whose lookup stopped at the row cap may have
             // a holder unseen, so it finds nobody by itself either.
@@ -1273,16 +1269,6 @@ public with sharing class ImportRowProcessor {
             chunk.created.put(key, count(chunk.created, key) + 1);
         }
         return finding;
-    }
-
-    /**
-     * A matching key as sixteen hex digits: the first eight bytes of its MD5 digest, so 64
-     * bits keep two keys well clear of sharing one. It is kept on the row (Person 1 Key,
-     * Person 2 Key, Organization Key), compared only and never shown.
-     */
-    private static String digest(String kind, String key) {
-        return EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueOf(kind + key)))
-            .left(16);
     }
 
     /**
@@ -1501,8 +1487,8 @@ public with sharing class ImportRowProcessor {
         // Under the shared key and under the same narrowed to the first name, so a later row
         // finds them by whichever it holds (R-IB12).
         List<String> finding = keysFinding(item, entity == ImportMapping.ENTITY_CONTACT_1);
-        String shared = digest(PERSON_DIGEST, finding[0]);
-        String named = digest(PERSON_DIGEST, finding[1]);
+        String shared = ImportValues.digest(PERSON_DIGEST, finding[0]);
+        String named = ImportValues.digest(PERSON_DIGEST, finding[1]);
         if (entity == ImportMapping.ENTITY_CONTACT_1) {
             item.row.Person_1_Key__c = shared;
             item.row.Person_1_Name_Key__c = named;
@@ -1852,7 +1838,7 @@ public with sharing class ImportRowProcessor {
                     objectName,
                     records[i],
                     stored.get(records[i].Id),
-                    rowNumber(owners[0].row)
+                    ImportValues.rowNumber(owners[0].row)
                 );
             }
         }
@@ -1892,10 +1878,6 @@ public with sharing class ImportRowProcessor {
         }
     }
 
-    private static Integer rowNumber(Import_Row__c row) {
-        return row == null || row.Row_Number__c == null ? null : row.Row_Number__c.intValue();
-    }
-
     /**
      * The mapped attributes as they currently stand on the matched records. Only the
      * attributes this mapping names are selected, and only those the object actually has, so
@@ -1911,7 +1893,7 @@ public with sharing class ImportRowProcessor {
             return result;
         }
         Schema.SObjectType type = personAccounts ? Account.SObjectType : Contact.SObjectType;
-        Map<String, Schema.SObjectField> fields = fieldsOf(type);
+        Map<String, Schema.SObjectField> fields = ImportObjectSchema.fieldsOf(type);
         Set<String> selected = new Set<String>{ 'Id' };
         for (Working item : working) {
             for (
@@ -1995,8 +1977,10 @@ public with sharing class ImportRowProcessor {
                 }
                 continue;
             }
-            String currentText = current == null ? '' : String.valueOf(current);
-            if (!currentText.equalsIgnoreCase(incoming)) {
+            // Compared as the save would write it, the way Load one object compares (R-IT14):
+            // 100 is the 100.00 stored, a date is a date however written, and a correction
+            // of capitals is a correction.
+            if (!ImportValues.same(current, comparable(stored, lookupKey, incoming))) {
                 result.put(attributeName, incoming);
             }
         }
@@ -2022,7 +2006,7 @@ public with sharing class ImportRowProcessor {
      */
     private static Set<String> notWrittenToPeople(Schema.SObjectType type) {
         Set<String> skipped = new Set<String>();
-        if (type == Account.SObjectType && fieldsOf(type).containsKey('lastname')) {
+        if (type == Account.SObjectType && ImportObjectSchema.fieldsOf(type).containsKey('lastname')) {
             skipped.add('Name');
         }
         return skipped;
@@ -2072,7 +2056,7 @@ public with sharing class ImportRowProcessor {
     private static Map<String, String> storedNames = new Map<String, String>();
 
     private static String personFieldFor(String attributeName) {
-        Map<String, Schema.SObjectField> fields = fieldsOf(Account.SObjectType);
+        Map<String, Schema.SObjectField> fields = ImportObjectSchema.fieldsOf(Account.SObjectType);
         String person = PERSON_FIELD_PREFIX + attributeName;
         if (fields.containsKey(person.toLowerCase())) {
             return fields.get(person.toLowerCase()).getDescribe().getName();
@@ -2089,7 +2073,7 @@ public with sharing class ImportRowProcessor {
     /** Whether a new person saved by this user carries this attribute (R-IB12). */
     private static Boolean writes(String attributeName, Boolean personAccounts) {
         Schema.SObjectType type = personAccounts ? Account.SObjectType : Contact.SObjectType;
-        Schema.SObjectField field = fieldsOf(type)
+        Schema.SObjectField field = ImportObjectSchema.fieldsOf(type)
             .get(storedName(attributeName, personAccounts).toLowerCase());
         return field != null && field.getDescribe().isCreateable();
     }
@@ -2134,7 +2118,7 @@ public with sharing class ImportRowProcessor {
             // naming service leaves it alone from here on.
             names.put(item.row.Household__c, name);
             if (!firstRowByHousehold.containsKey(item.row.Household__c)) {
-                firstRowByHousehold.put(item.row.Household__c, rowNumber(item.row));
+                firstRowByHousehold.put(item.row.Household__c, ImportValues.rowNumber(item.row));
             }
         }
         if (created.isEmpty() && names.isEmpty()) {
@@ -2488,7 +2472,7 @@ public with sharing class ImportRowProcessor {
             ) {
                 owners.add(item);
                 if (dryRun && item.organizationKey != null) {
-                    digests.add(digest(ORGANIZATION_DIGEST, item.organizationKey));
+                    digests.add(ImportValues.digest(ORGANIZATION_DIGEST, item.organizationKey));
                 }
             }
         }
@@ -2500,7 +2484,7 @@ public with sharing class ImportRowProcessor {
         for (Working item : owners) {
             if (
                 item.organizationKey != null &&
-                earlier.contains(digest(ORGANIZATION_DIGEST, item.organizationKey))
+                earlier.contains(ImportValues.digest(ORGANIZATION_DIGEST, item.organizationKey))
             ) {
                 continue;
             }
@@ -2721,7 +2705,7 @@ public with sharing class ImportRowProcessor {
         if (!ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
             attribute = storedName(attribute, personAccounts);
         }
-        return fieldsOf(type).get(attribute.toLowerCase());
+        return ImportObjectSchema.fieldsOf(type).get(attribute.toLowerCase());
     }
 
     /**
@@ -2780,7 +2764,7 @@ public with sharing class ImportRowProcessor {
                     continue;
                 }
                 held.remove(attribute);
-                Integer row = rowNumber(item.row);
+                Integer row = ImportValues.rowNumber(item.row);
                 outcome.notes.add(
                     String.format(
                         Label.Core_Import_LogCheckboxValueUnreadable,
@@ -2811,7 +2795,7 @@ public with sharing class ImportRowProcessor {
         if (held == null || held.isEmpty()) {
             return;
         }
-        Map<String, Schema.SObjectField> fields = fieldsOf(type);
+        Map<String, Schema.SObjectField> fields = ImportObjectSchema.fieldsOf(type);
         for (String attributeName : held.keySet()) {
             if (alreadySet.contains(attributeName)) {
                 continue;
@@ -2859,19 +2843,26 @@ public with sharing class ImportRowProcessor {
         );
     }
 
-    /** Each object's fields, described once per transaction however many rows ask. */
-    private static Map<Schema.SObjectType, Map<String, Schema.SObjectField>> fieldMaps = new Map<Schema.SObjectType, Map<String, Schema.SObjectField>>();
-
-    private static Map<String, Schema.SObjectField> fieldsOf(Schema.SObjectType type) {
-        if (!fieldMaps.containsKey(type)) {
-            fieldMaps.put(type, type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap());
+    /**
+     * An incoming value as its field's type, for comparing with what is stored; the text itself
+     * where the field is text or the value cannot be read, which then reads as a change.
+     */
+    private static Object comparable(SObject stored, String lowerCaseName, String incoming) {
+        Schema.SObjectField field = ImportObjectSchema.fieldsOf(stored.getSObjectType())
+            .get(lowerCaseName);
+        if (field == null) {
+            return incoming;
         }
-        return fieldMaps.get(type);
+        try {
+            return convert(incoming, field.getDescribe());
+        } catch (Exception unreadable) {
+            return incoming;
+        }
     }
 
     /** Whether a stored record's field is a checkbox. */
     private static Boolean isCheckbox(SObject stored, String lowerCaseName) {
-        Schema.SObjectField field = fieldsOf(stored.getSObjectType()).get(lowerCaseName);
+        Schema.SObjectField field = ImportObjectSchema.fieldsOf(stored.getSObjectType()).get(lowerCaseName);
         return field != null && field.getDescribe().getType() == Schema.DisplayType.BOOLEAN;
     }
 
@@ -2883,35 +2874,93 @@ public with sharing class ImportRowProcessor {
         return ImportObjectSchema.checkbox(value);
     }
 
-    /** A column value as the field's type, for the few types a spreadsheet carries. */
+    /**
+     * The field types a value is read into, as Load one object reads them (R-IT12): a checkbox,
+     * a number, a date, a date and time, or a time. Text is written as given; anything else
+     * (a lookup, for one) is written as text and left to the save.
+     */
+    private static final Set<Schema.DisplayType> TYPED = new Set<Schema.DisplayType>{
+        Schema.DisplayType.BOOLEAN,
+        Schema.DisplayType.CURRENCY,
+        Schema.DisplayType.DOUBLE,
+        Schema.DisplayType.PERCENT,
+        Schema.DisplayType.INTEGER,
+        Schema.DisplayType.LONG,
+        Schema.DisplayType.DATE,
+        Schema.DisplayType.DATETIME,
+        Schema.DisplayType.TIME
+    };
+
+    /**
+     * A column value as the field's type, read the one way every import reads it
+     * (`ImportObjectSchema.typed`): locale and ISO dates, numbers with separators, times. Throws
+     * when it cannot be read; `rejectUnreadableValues` has already rejected such a row, so this
+     * only guards the save.
+     */
     private static Object convert(String value, Schema.DescribeFieldResult describe) {
-        Schema.DisplayType kind = describe.getType();
-        if (kind == Schema.DisplayType.BOOLEAN) {
-            Boolean checked = convertCheckbox(value);
-            if (checked == null) {
-                // Never written as cleared: applyValues skips it and names it (R-IT11).
-                throw new ImportException(value);
+        if (!TYPED.contains(describe.getType())) {
+            return value;
+        }
+        Object typed = ImportObjectSchema.typed(value, describe);
+        if (typed == null) {
+            // A checkbox neither ticked nor cleared is never written as cleared (R-IT11).
+            throw new ImportException(value);
+        }
+        return typed;
+    }
+
+    /**
+     * Rejects a row with a value its field cannot take: a date, number or time that cannot be
+     * read, or text longer than the field. The row says which field and value, as Load one
+     * object's rows do (R-IT12), rather than loading without the value and reporting success.
+     * Checkboxes are not judged here: an unreadable one is skipped and named (R-IT11). A field
+     * the user may not write is skipped and named by `noteFieldsWithoutAccess`, not judged.
+     */
+    private static void rejectUnreadableValues(List<Working> working, Boolean personAccounts) {
+        Map<String, Schema.DescribeFieldResult> fields = new Map<String, Schema.DescribeFieldResult>();
+        for (Working item : working) {
+            if (item.error != null) {
+                continue;
             }
-            return checked;
+            for (String entity : item.byEntity.keySet()) {
+                Map<String, String> held = item.byEntity.get(entity);
+                for (String attribute : held.keySet()) {
+                    String value = held.get(attribute);
+                    if (String.isBlank(value)) {
+                        continue;
+                    }
+                    String target = entity + '.' + attribute;
+                    if (!fields.containsKey(target)) {
+                        fields.put(target, judgedField(target, personAccounts));
+                    }
+                    Schema.DescribeFieldResult describe = fields.get(target);
+                    String reason = describe == null
+                        ? null
+                        : ImportObjectSchema.unreadable(value, describe);
+                    if (reason != null) {
+                        item.error = reason;
+                        break;
+                    }
+                }
+                if (item.error != null) {
+                    break;
+                }
+            }
         }
-        if (
-            kind == Schema.DisplayType.CURRENCY ||
-            kind == Schema.DisplayType.DOUBLE ||
-            kind == Schema.DisplayType.PERCENT
-        ) {
-            return Decimal.valueOf(value.replaceAll('[^0-9\\.\\-]', ''));
+    }
+
+    /** The field a target's values are judged against, or null when they are not judged. */
+    private static Schema.DescribeFieldResult judgedField(String target, Boolean personAccounts) {
+        Schema.SObjectField field = writtenField(target, personAccounts);
+        if (field == null) {
+            return null;
         }
-        if (kind == Schema.DisplayType.INTEGER) {
-            return Integer.valueOf(value.replaceAll('[^0-9\\-]', ''));
-        }
-        if (kind == Schema.DisplayType.DATE) {
-            return Date.valueOf(value);
-        }
-        if (kind == Schema.DisplayType.DATETIME) {
-            return Datetime.valueOf(value);
-        }
-        Integer length = describe.getLength();
-        return length > 0 ? value.abbreviate(Math.max(length, 4)) : value;
+        Schema.DescribeFieldResult describe = field.getDescribe();
+        Schema.DisplayType kind = describe.getType();
+        Boolean judged =
+            kind != Schema.DisplayType.BOOLEAN &&
+            (TYPED.contains(kind) || ImportObjectSchema.TEXT_TYPES.contains(kind));
+        return judged && (describe.isCreateable() || describe.isUpdateable()) ? describe : null;
     }
 
     /**

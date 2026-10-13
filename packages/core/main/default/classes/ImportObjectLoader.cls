@@ -23,9 +23,6 @@ public with sharing class ImportObjectLoader {
     /** How many records one read of stored values takes, a chunk's worth and more. */
     private static final Integer READ_LIMIT = 10000;
 
-    /** How many values one lookup query carries. */
-    private static final Integer KEYS_PER_QUERY = 1000;
-
     /** How many records one lookup query reads. */
     private static final Integer ROWS_PER_QUERY = 5000;
 
@@ -373,7 +370,7 @@ public with sharing class ImportObjectLoader {
         // A 15 and an 18 character form of one ID are one record, named by both values.
         Map<Id, List<String>> valuesById = new Map<Id, List<String>>();
         for (String value : values) {
-            Id candidate = idOrNull(value);
+            Id candidate = ImportValues.idOrNull(value);
             if (candidate == null || !allowed.contains(candidate.getSObjectType())) {
                 continue;
             }
@@ -435,7 +432,7 @@ public with sharing class ImportObjectLoader {
         String field = token.getDescribe().getName();
         String objectName = type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
         Map<Id, Datetime> changedAt = new Map<Id, Datetime>();
-        for (List<String> slice : slices(keys)) {
+        for (List<String> slice : ImportValues.slices(keys, ImportValues.KEYS_PER_QUERY)) {
             for (SObject record : findSlice(objectName, field, slice)) {
                 String key = ImportMatcher.nameKey(String.valueOf(record.get(field)));
                 Datetime changed = (Datetime) record.get('LastModifiedDate');
@@ -525,7 +522,7 @@ public with sharing class ImportObjectLoader {
     ) {
         if (operation == ImportObjectSchema.OPERATION_UPDATE) {
             String value = item.held.get(ImportObjectSchema.ID_ATTRIBUTE.toLowerCase());
-            Id candidate = idOrNull(value);
+            Id candidate = ImportValues.idOrNull(value);
             if (candidate == null) {
                 item.error = String.format(
                     Label.Core_Import_ErrorRecordIdInvalid,
@@ -599,7 +596,7 @@ public with sharing class ImportObjectLoader {
         Set<String> digests = new Set<String>();
         for (Item item : items) {
             if (item.error == null && item.key != null) {
-                digests.add(digest(item.key));
+                digests.add(ImportValues.digest(RECORD_DIGEST, item.key));
             }
         }
         if (digests.isEmpty()) {
@@ -611,7 +608,7 @@ public with sharing class ImportObjectLoader {
             if (item.error != null || item.key == null) {
                 continue;
             }
-            String digest = digest(item.key);
+            String digest = ImportValues.digest(RECORD_DIGEST, item.key);
             if (earlier.contains(digest) || inChunk.contains(digest)) {
                 item.error = Label.Core_Import_ErrorRecordRepeated;
                 continue;
@@ -702,7 +699,7 @@ public with sharing class ImportObjectLoader {
                             new List<String>{ field.getLabel() }
                         )
                     );
-                } else if (item.creates || !same(item.stored.get(name), item.values.get(name))) {
+                } else if (item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))) {
                     kept.put(name, item.values.get(name));
                 }
             }
@@ -751,7 +748,7 @@ public with sharing class ImportObjectLoader {
             if (created[i].isSuccess()) {
                 item.recordId = created[i].getId();
                 createdEntries.add(
-                    ImportJournalService.created(objectName, item.recordId, rowNumber(item.row))
+                    ImportJournalService.created(objectName, item.recordId, ImportValues.rowNumber(item.row))
                 );
             } else {
                 item.error = ImportRowProcessor.message(created[i]);
@@ -774,7 +771,7 @@ public with sharing class ImportObjectLoader {
                 ImportJournalService.updated(
                     objectName,
                     item.recordId,
-                    rowNumber(item.row),
+                    ImportValues.rowNumber(item.row),
                     before,
                     item.values
                 )
@@ -828,60 +825,6 @@ public with sharing class ImportObjectLoader {
         return false;
     }
 
-    /**
-     * Whether a stored value equals the one a row would write, as the undo compares them
-     * (R-IJ2): numbers as numbers, IDs in either length, and text exactly, since a correction of
-     * capitals is a correction.
-     */
-    private static Boolean same(Object stored, Object incoming) {
-        if (stored == null || incoming == null) {
-            return stored == null && incoming == null;
-        }
-        if (
-            incoming instanceof Decimal ||
-            incoming instanceof Integer ||
-            incoming instanceof Long
-        ) {
-            return Decimal.valueOf(String.valueOf(stored)) ==
-                Decimal.valueOf(String.valueOf(incoming));
-        }
-        if (incoming instanceof Id) {
-            return idOrNull(String.valueOf(stored)) == incoming;
-        }
-        if (
-            incoming instanceof Date ||
-            incoming instanceof Datetime ||
-            incoming instanceof Time ||
-            incoming instanceof Boolean
-        ) {
-            return stored == incoming;
-        }
-        return String.valueOf(stored).equals(String.valueOf(incoming));
-    }
-
-    private static Id idOrNull(String value) {
-        if (String.isBlank(value)) {
-            return null;
-        }
-        try {
-            return Id.valueOf(value.trim());
-        } catch (Exception notAnId) {
-            return null;
-        }
-    }
-
-    /** A record key as sixteen hex digits, as the people import digests its keys. */
-    private static String digest(String key) {
-        return EncodingUtil.convertToHex(
-                Crypto.generateDigest('MD5', Blob.valueOf(RECORD_DIGEST + key))
-            )
-            .left(16);
-    }
-
-    private static Integer rowNumber(Import_Row__c row) {
-        return row == null || row.Row_Number__c == null ? null : row.Row_Number__c.intValue();
-    }
-
     /** A new record needs create access to the field; a change needs read and edit access. */
     private static Boolean mayWrite(Schema.DescribeFieldResult field, Boolean creates) {
         return creates ? field.isCreateable() : field.isUpdateable() && field.isAccessible();
@@ -892,25 +835,5 @@ public with sharing class ImportObjectLoader {
             Label.Core_Import_LogAttributeNoAccess,
             new List<String>{ field.getLabel() }
         );
-    }
-
-    /** The keys cut into query-sized lists, with blanks dropped. */
-    private static List<List<String>> slices(Set<String> keys) {
-        List<List<String>> result = new List<List<String>>();
-        List<String> current = new List<String>();
-        for (String key : keys) {
-            if (String.isBlank(key)) {
-                continue;
-            }
-            current.add(key);
-            if (current.size() == KEYS_PER_QUERY) {
-                result.add(current);
-                current = new List<String>();
-            }
-        }
-        if (!current.isEmpty()) {
-            result.add(current);
-        }
-        return result;
     }
 }

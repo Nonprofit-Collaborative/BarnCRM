@@ -440,9 +440,18 @@ duplicate rule, so the commit can match a few more rows than the dry run did.
 **Your own fields.** The column list includes the fields your org added to people (contacts)
 and organizations (accounts), and the standard ones not already listed, wherever you may edit
 them. Fields Salesforce calculates (formulas, roll-ups, auto numbers), lookups to other records
-and the fields BarnCRM keeps for itself are not listed. A value is converted to the field's
-type (a date is written 2026-10-12; checkboxes are below), and a value the field cannot take
-is skipped and named in the run log.
+and the fields BarnCRM keeps for itself are not listed. A value is read as the field's type,
+the same way a one-object load reads it (section 9): a date as 2026-10-12 or as your Salesforce
+locale writes dates (4/2/1980 in the United States), a number with or without thousands
+separators and a currency or percent sign, a time as 14:30. A value the field cannot take (a
+date or number that cannot be read, text longer than the field) rejects the row, and the row
+names the field and the value; checkboxes are below. Fix the cell and import the rejected rows
+again.
+
+**What counts as a change.** A matched person or organization is updated only where a value in
+the file differs from what is stored, compared as the field holds it: 100 is the 100.00 already
+there, and 1980-1-5 is the date already stored as 5 January 1980. Capitals count: "treasurer"
+in the record and "Treasurer" in the file is a correction, and the import writes it.
 
 **Checkbox columns.** Capitals and spaces around the value do not matter.
 
@@ -554,7 +563,7 @@ They run before **Values for every row**: a column a change leaves empty is then
 file's value for every row, if you gave one. A change never runs code and never reads a record:
 it only rearranges the text of the row. A date that cannot be read the way you chose is left as
 it was, and the field then refuses it as it would any value it cannot take (a one-object load
-rejects the row; a people load skips the value and names it in the run log).
+and a people load both reject the row).
 
 ## Fields the BarnCRM Admin role can import
 
