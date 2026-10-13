@@ -122,6 +122,12 @@ public with sharing class ImportController {
         /** False when the file does not match the control totals it was given (R-IB10). */
         @AuraEnabled
         public Boolean controlTotalsAgree;
+        /** How many first rows a trial committed, or null (R-IB16). */
+        @AuraEnabled
+        public Integer trialRows;
+        /** How many rows a trial of this file would commit unless the wizard is told otherwise. */
+        @AuraEnabled
+        public Integer defaultTrialRows;
     }
 
     /**
@@ -603,6 +609,21 @@ public with sharing class ImportController {
     }
 
     /**
+     * Commits only the file's first rows after its dry run (R-IB16); startCommit then commits
+     * the rest into the same import. Refused unless the dry run of this batch has completed.
+     */
+    @AuraEnabled
+    public static BatchView startTrial(String batchId, Integer rowCount) {
+        try {
+            enforcePermission();
+            ImportBatchService.startTrial(batchId, rowCount);
+            return getBatch(batchId);
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.startTrial');
+        }
+    }
+
+    /**
      * What undoing an import would remove and put back, and why it cannot be undone when it
      * cannot. Nothing is deleted by it (R-IB8).
      */
@@ -780,6 +801,7 @@ public with sharing class ImportController {
         view.isFinished =
             ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(view.status) ||
             ImportBatchService.STATUS_COMPLETE.equals(view.status) ||
+            ImportBatchService.STATUS_TRIAL_COMPLETE.equals(view.status) ||
             ImportBatchService.STATUS_FAILED.equals(view.status) ||
             ImportBatchService.STATUS_UNDONE.equals(view.status) ||
             ImportBatchService.STATUS_UNDO_FAILED.equals(view.status);
@@ -792,6 +814,8 @@ public with sharing class ImportController {
         view.undoDeadline = batch.Undo_Deadline__c;
         view.canUndo = String.isBlank(ImportUndoService.refusal(batch));
         view.controlTotalsAgree = ImportBatchService.controlTotalsAgree(batch);
+        view.trialRows = intOf(batch.Trial_Rows__c);
+        view.defaultTrialRows = ImportBatchService.trialRows();
         return view;
     }
 

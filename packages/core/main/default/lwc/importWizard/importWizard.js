@@ -10,6 +10,13 @@ import createBatch from '@salesforce/apex/ImportController.createBatch';
 import stageRows from '@salesforce/apex/ImportController.stageRows';
 import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
+import startTrial from '@salesforce/apex/ImportController.startTrial';
+import trialHeading from '@salesforce/label/c.Core_Import_TrialHeading';
+import trialHelp from '@salesforce/label/c.Core_Import_TrialHelp';
+import trialRowsLabel from '@salesforce/label/c.Core_Import_TrialRowsLabel';
+import trialButton from '@salesforce/label/c.Core_Import_TrialButton';
+import remainingButton from '@salesforce/label/c.Core_Import_RemainingButton';
+import trialDone from '@salesforce/label/c.Core_Import_TrialDone';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
 import getRows from '@salesforce/apex/ImportController.getRows';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
@@ -119,6 +126,9 @@ function numberText(value) {
 
 /** How often the wizard asks how a run is going. */
 const POLL_INTERVAL_MS = 3000;
+/** The status of an import whose first rows were tried, and the most a trial takes (R-IB16). */
+const TRIAL_COMPLETE = 'Trial complete';
+const MAX_TRIAL_ROWS = 2000;
 /** How many rows are sent to the server in one request. */
 const STAGE_PAGE_SIZE = 500;
 /**
@@ -276,6 +286,8 @@ export default class ImportWizard extends LightningElement {
   loadableObjects = [];
   newObjectName;
   newTemplateName = '';
+  /** The trial size typed for this file, or empty for the org's setting (R-IB16). */
+  trialRowText = '';
 
   labels = {
     cardTitle,
@@ -333,7 +345,12 @@ export default class ImportWizard extends LightningElement {
     lookupFieldLabel,
     duplicateRulesLabel,
     duplicateRulesHelp,
-    duplicateRulesNone
+    duplicateRulesNone,
+    trialHeading,
+    trialHelp,
+    trialRowsLabel,
+    trialButton,
+    remainingButton
   };
 
   async connectedCallback() {
@@ -1158,10 +1175,31 @@ export default class ImportWizard extends LightningElement {
   }
 
   async handleCommit() {
+    await this.runCommit(() => startCommit({ batchId: this.batch.id }));
+  }
+
+  /** Imports only the file's first rows for real (R-IB16); the rest wait for the results. */
+  async handleTrial() {
+    await this.runCommit(() =>
+      startTrial({ batchId: this.batch.id, rowCount: Number(this.trialRowCount) })
+    );
+  }
+
+  /** Imports the rest of a tried file into the same import (R-IB16). */
+  async handleCommitRemaining() {
+    this.rejectedRows = [];
+    await this.runCommit(() => startCommit({ batchId: this.batch.id }));
+  }
+
+  handleTrialRowsChange(event) {
+    this.trialRowText = event.target.value;
+  }
+
+  async runCommit(start) {
     this.message = undefined;
     this.loading = true;
     try {
-      this.batch = await startCommit({ batchId: this.batch.id });
+      this.batch = await start();
       this.step = 6;
       this.startPolling();
     } catch (error) {
@@ -1169,6 +1207,36 @@ export default class ImportWizard extends LightningElement {
     } finally {
       this.loading = false;
     }
+  }
+
+  /** The trial size: as typed for this file, else the org's setting (R-IB16). */
+  get trialRowCount() {
+    if (this.trialRowText !== '' && this.trialRowText !== undefined) {
+      return this.trialRowText;
+    }
+    return this.batch && this.batch.defaultTrialRows ? String(this.batch.defaultTrialRows) : '';
+  }
+
+  /** A trial is offered on a finished preview that could commit, of a file of several rows. */
+  get showTrialChoice() {
+    return this.isStepPreview && !this.cannotCommit && (this.batch.rowCount || 0) > 1;
+  }
+
+  get cannotTrial() {
+    const rows = Number(this.trialRowCount);
+    return this.loading || !Number.isInteger(rows) || rows < 1 || rows > MAX_TRIAL_ROWS;
+  }
+
+  get isTrialComplete() {
+    return this.isStepResults && Boolean(this.batch) && this.batch.status === TRIAL_COMPLETE;
+  }
+
+  get trialDoneText() {
+    const tried = (this.batch && this.batch.trialRows) || 0;
+    const remaining = Math.max(((this.batch && this.batch.rowCount) || 0) - tried, 0);
+    return trialDone
+      .replace('{0}', tried.toLocaleString())
+      .replace('{1}', remaining.toLocaleString());
   }
 
   startPolling() {
@@ -1245,6 +1313,7 @@ export default class ImportWizard extends LightningElement {
     this.matchOnly = false;
     this.changedValues = [];
     this.editingSource = undefined;
+    this.trialRowText = '';
   }
 
   // ---------------------------------------------------------------------------------------

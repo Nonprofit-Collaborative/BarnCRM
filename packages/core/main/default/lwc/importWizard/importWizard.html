@@ -395,6 +395,44 @@
                         changed-values={changedValues}
                         data-id="results"
                     ></c-import-results>
+                    <template lwc:if={showTrialChoice}>
+                        <div class="slds-box slds-var-m-top_small" data-id="trial">
+                            <h3 class="slds-text-heading_small">{labels.trialHeading}</h3>
+                            <p class="slds-text-body_small slds-var-m-bottom_x-small">
+                                {labels.trialHelp}
+                            </p>
+                            <lightning-input
+                                type="number"
+                                data-id="trial-rows"
+                                label={labels.trialRowsLabel}
+                                value={trialRowCount}
+                                min="1"
+                                max="2000"
+                                step="1"
+                                onchange={handleTrialRowsChange}
+                            ></lightning-input>
+                            <lightning-button
+                                class="slds-var-m-top_x-small"
+                                label={labels.trialButton}
+                                data-id="trial-button"
+                                disabled={cannotTrial}
+                                onclick={handleTrial}
+                            ></lightning-button>
+                        </div>
+                    </template>
+                    <template lwc:if={isTrialComplete}>
+                        <div class="slds-box slds-var-m-top_small" data-id="remaining">
+                            <p class="slds-var-m-bottom_x-small" data-id="trial-done">
+                                {trialDoneText}
+                            </p>
+                            <lightning-button
+                                variant="brand"
+                                label={labels.remainingButton}
+                                data-id="remaining-button"
+                                onclick={handleCommitRemaining}
+                            ></lightning-button>
+                        </div>
+                    </template>
                 </template>
 
                 <div class="slds-var-m-top_medium">

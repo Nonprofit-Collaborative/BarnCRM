@@ -36,6 +36,11 @@
         <label>Committing</label>
       </value>
       <value>
+        <fullName>Trial complete</fullName>
+        <default>false</default>
+        <label>Trial complete</label>
+      </value>
+      <value>
         <fullName>Complete</fullName>
         <default>false</default>
         <label>Complete</label>

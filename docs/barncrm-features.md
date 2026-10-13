@@ -110,6 +110,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Import tagging | Minor | Every record an import creates is tagged with the import it came from. | Shipped | C-14 |
 | Import journal | Minor | Records every value an import changed on existing records, and what each undo kept and why. | Shipped | C-19 |
 | Days an import can be undone setting | Minor | Undo window from 1 to 365 days (default 30); each import keeps the window it was committed with. | Shipped | C-19 |
+| Trial import, then the rest | Minor | After the preview, imports only the first rows for real (25 by default, a BarnCRM Settings Import setting, changeable per file), shows their results, then imports the remaining rows into the same import with one undo for both. | Built, not merged (feature/import-trial-run) | Data tools parity rank 4, R-IB16 |
 | Rows per chunk setting | Minor | Controls how many rows are processed at a time (default 200) for orgs with heavy automation. | Shipped | C-14 |
 | Recurring file tracking | Minor | Mark a mapping as "arrives regularly" and the Hub home shows when each recurring source was last loaded. | Shipped | C-19 |
 | Skipped-field reporting | Minor | The run log names any mapped field the user cannot edit instead of dropping values silently. | Shipped | C-14 |

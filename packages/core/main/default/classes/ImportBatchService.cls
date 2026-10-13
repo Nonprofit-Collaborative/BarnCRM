@@ -29,6 +29,17 @@ public with sharing class ImportBatchService {
     public static final String STATUS_UNDONE = 'Undone';
     @NamespaceAccessible
     public static final String STATUS_UNDO_FAILED = 'Undo failed';
+    /** A trial of the file's first rows has committed; the rest wait (R-IB16). */
+    @NamespaceAccessible
+    public static final String STATUS_TRIAL_COMPLETE = 'Trial complete';
+
+    /** The trial size used when the setting is missing or nonsensical, and its ceiling (R-IB16). */
+    @NamespaceAccessible
+    public static final Integer DEFAULT_TRIAL_ROWS = 25;
+    @NamespaceAccessible
+    public static final Integer MAX_TRIAL_ROWS = 2000;
+    /** A row number past any file's last row. */
+    private static final Decimal NO_ROW_AFTER = 999999999;
 
     /** The chunk size used when the setting is missing or nonsensical. */
     @NamespaceAccessible
@@ -246,6 +257,10 @@ public with sharing class ImportBatchService {
         if (batch == null) {
             throw new ImportException(Label.Core_Import_ErrorBatchGone);
         }
+        if (STATUS_TRIAL_COMPLETE.equals(batch.Status__c)) {
+            // The rest of a file whose first rows were tried (R-IB16).
+            return startRemaining(batch);
+        }
         if (!STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
             throw new ImportException(Label.Core_Import_ErrorDryRunFirst);
         }
@@ -253,6 +268,66 @@ public with sharing class ImportBatchService {
             throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
         }
         return start(batchId, false);
+    }
+
+    /**
+     * Commits only the file's first rows, for real, after a completed dry run (R-IB16). The
+     * batch ends Trial complete; startCommit then commits the rest into the same batch.
+     *
+     * @param rowCount how many of the first rows; held between 1 and MAX_TRIAL_ROWS
+     */
+    @NamespaceAccessible
+    public static Id startTrial(Id batchId, Integer rowCount) {
+        Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
+        if (batch == null) {
+            throw new ImportException(Label.Core_Import_ErrorBatchGone);
+        }
+        if (!STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
+            throw new ImportException(Label.Core_Import_ErrorDryRunFirst);
+        }
+        if (!controlTotalsAgree(batch)) {
+            throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
+        }
+        Integer size = rowCount == null ? trialRows() : clampTrial(rowCount);
+        if (batch.Row_Count__c != null && size >= batch.Row_Count__c) {
+            // A trial as large as the file is the whole import.
+            return start(batchId, false);
+        }
+        return start(batchId, false, size, null);
+    }
+
+    /** The remaining rows of a tried file: those after the trial's last, by the same person. */
+    private static Id startRemaining(Import_Batch__c batch) {
+        if (batch.Committed_By__c != null && batch.Committed_By__c != UserInfo.getUserId()) {
+            // One person's commit, so undo can tell the import's records from anyone else's.
+            throw new ImportException(Label.Core_Import_ErrorRemainingOtherUser);
+        }
+        Decimal boundary = ImportBatchSelector.selectRowNumberAt(
+            batch.Id,
+            batch.Trial_Rows__c == null ? 0 : batch.Trial_Rows__c.intValue()
+        );
+        // No row at the trial's size means the trial held every row: the rest is nothing, and
+        // the run only closes the batch as Complete.
+        return start(batch.Id, false, null, boundary == null ? NO_ROW_AFTER : boundary);
+    }
+
+    /** How many rows a trial imports, from the org's setting unless the wizard gave a number. */
+    @NamespaceAccessible
+    public static Integer trialRows() {
+        Object configured = SettingsService.hasKey('Import_Trial_Rows__c')
+            ? SettingsService.getValue('Import_Trial_Rows__c')
+            : null;
+        try {
+            return clampTrial(
+                configured == null ? null : Decimal.valueOf(String.valueOf(configured)).intValue()
+            );
+        } catch (Exception ignored) {
+            return DEFAULT_TRIAL_ROWS;
+        }
+    }
+
+    private static Integer clampTrial(Integer rows) {
+        return rows == null || rows < 1 ? DEFAULT_TRIAL_ROWS : Math.min(rows, MAX_TRIAL_ROWS);
     }
 
     /**
@@ -324,6 +399,14 @@ public with sharing class ImportBatchService {
     }
 
     private static Id start(Id batchId, Boolean dryRun) {
+        return start(batchId, dryRun, null, null);
+    }
+
+    /**
+     * @param trialRows commit only this many first rows (R-IB16), or null
+     * @param afterRow commit only rows after this row number, the rest of a trial, or null
+     */
+    private static Id start(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
         // Locked, so two starts at once cannot both find no job running (R-IB13).
         List<Import_Batch__c> locked = [
             SELECT Id
@@ -380,9 +463,13 @@ public with sharing class ImportBatchService {
         batch.Pass_Number__c = nextPass(batch);
         batch.Status__c = dryRun ? STATUS_DRY_RUN : STATUS_COMMITTING;
         batch.Is_Dry_Run__c = dryRun;
-        batch.Started_At__c = Datetime.now();
+        // The rest of a trial keeps the trial's start and log: undo reads the whole commit as
+        // from the trial's start to the rest's finish (R-IB16, R-IB9).
+        if (afterRow == null) {
+            batch.Started_At__c = Datetime.now();
+            batch.Run_Log__c = null;
+        }
         batch.Completed_At__c = null;
-        batch.Run_Log__c = null;
         batch.Rows_Created__c = 0;
         batch.Rows_Updated__c = 0;
         batch.Rows_Matched__c = 0;
@@ -396,7 +483,7 @@ public with sharing class ImportBatchService {
         // Enqueued before the write, so the job is recorded with the pass; both roll back
         // together if the write fails.
         batch.Job_Id__c = Database.executeBatch(
-            new ImportProcessorBatch(batch.Id, dryRun),
+            new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow),
             scopeSize(batch.Chunk_Size__c)
         );
         Database.update(passStamp(batch), AccessLevel.USER_MODE);
@@ -409,6 +496,9 @@ public with sharing class ImportBatchService {
         );
         if (dryRun) {
             bookkeeping.Template_Snapshot_JSON__c = JSON.serialize(template);
+        }
+        if (trialRows != null) {
+            bookkeeping.Trial_Rows__c = trialRows;
         }
         Database.update(bookkeeping, AccessLevel.SYSTEM_MODE);
         return batch.Job_Id__c;
@@ -441,7 +531,8 @@ public with sharing class ImportBatchService {
             Is_Dry_Run__c = batch.Is_Dry_Run__c,
             Started_At__c = batch.Started_At__c,
             Completed_At__c = null,
-            Run_Log__c = null,
+            // Null for a new pass; the trial's log for the rest of a trial (R-IB16).
+            Run_Log__c = batch.Run_Log__c,
             Rows_Created__c = 0,
             Rows_Updated__c = 0,
             Rows_Matched__c = 0,
@@ -602,27 +693,56 @@ public with sharing class ImportBatchService {
         Decimal fileAmount,
         String processorSettings
     ) {
+        return finish(batchId, dryRun, failed, logLines, fileAmount, processorSettings, false);
+    }
+
+    /**
+     * Closes a run as above. A trial (R-IB16) counts only the rows it processed and ends Trial
+     * complete. A trial, and the rest after it, keep the file amount the dry run read, since
+     * each reads only part of the file; the rest also keeps the trial's log above its own.
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c finish(
+        Id batchId,
+        Boolean dryRun,
+        Boolean failed,
+        List<String> logLines,
+        Decimal fileAmount,
+        String processorSettings,
+        Boolean trial
+    ) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
             return null;
         }
-        Map<String, Integer> counts = ImportBatchSelector.countRowsByStatus(batchId);
+        Boolean partOfTrial = dryRun != true && (trial == true || batch.Trial_Rows__c != null);
+        Map<String, Integer> counts = trial == true
+            ? ImportBatchSelector.countRowsByStatus(batchId, batch.Pass_Number__c)
+            : ImportBatchSelector.countRowsByStatus(batchId);
         batch.Rows_Created__c = count(counts, ImportRowProcessor.STATUS_CREATED);
         batch.Rows_Updated__c = count(counts, ImportRowProcessor.STATUS_UPDATED);
         batch.Rows_Matched__c = count(counts, ImportRowProcessor.STATUS_MATCHED);
         batch.Rows_Rejected__c = count(counts, ImportRowProcessor.STATUS_REJECTED);
         batch.Completed_At__c = Datetime.now();
-        batch.File_Amount__c = fileAmount == null ? null : fileAmount.setScale(2);
+        if (!partOfTrial) {
+            batch.File_Amount__c = fileAmount == null ? null : fileAmount.setScale(2);
+        }
         if (dryRun == true) {
             batch.Processor_Settings_JSON__c = processorSettings;
         }
-        List<String> lines = logLines == null ? new List<String>() : new List<String>(logLines);
+        List<String> lines = new List<String>();
+        if (partOfTrial && trial != true && String.isNotBlank(batch.Run_Log__c)) {
+            lines.add(batch.Run_Log__c);
+        }
+        lines.addAll(logLines == null ? new List<String>() : logLines);
         lines.addAll(controlTotalLines(batch));
         batch.Run_Log__c = String.join(lines, '\n').abbreviate(32768);
         if (failed == true) {
             batch.Status__c = STATUS_FAILED;
         } else if (dryRun == true) {
             batch.Status__c = STATUS_DRY_RUN_COMPLETE;
+        } else if (trial == true) {
+            batch.Status__c = STATUS_TRIAL_COMPLETE;
         } else {
             batch.Status__c = STATUS_COMPLETE;
         }

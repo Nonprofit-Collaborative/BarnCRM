@@ -32,6 +32,9 @@ A few things are worth knowing before your first large file:
    fires on save.
 3. **Days an import can be undone** is 30 unless you change it, and can be anything from 1
    to 365. Each import keeps the window it was imported with.
+   **Rows in a trial import** is how many of a file's first rows **Try the first rows**
+   imports before the rest (section 3, step 8). It is 25 unless you change it, from 1 to
+   2,000, and the wizard lets you change it for one file.
 4. **Import** on the same page has an **Open the import wizard** link, which is the same
    place the **Import** tab takes you.
 5. With the Giving module installed, the same page has the two payment matching settings
@@ -89,6 +92,16 @@ or six rows.
    the screen updates as it goes. The import does what the preview showed: it uses the columns,
    values and matching choices the preview ran with, even if you or someone else has changed
    the template since. A change to the template counts from the next preview.
+
+   For a large file, try the first rows for real first. The preview writes nothing, so a
+   validation rule, a required field or one of your org's own flows is first met when rows are
+   saved. Under **Try the first rows**, check the number (25 unless your org changed it in
+   BarnCRM Settings, Import section, **Rows in a trial import**; you can change it for this
+   file) and select **Import the first rows**. Only those rows are saved; the results screen
+   shows what became of them. If they are right, select **Import the remaining rows**: the rest
+   of the file goes into the same import, under the same columns and matching choices, and one
+   undo removes both parts. If they are wrong, undo the import (section 5), fix the file or the
+   mapping, and upload it again. An import whose trial has run cannot be previewed again.
 9. The results screen shows the same four counts for what actually happened, the run log,
    and links to the records. Select **View rows** to see every row and what became of it.
 
@@ -190,6 +203,10 @@ What undo will not do, on purpose:
   left as they set it, and listed as not put back.
 - **It does not empty the recycle bin.** Deleted records go to the recycle bin, where you can
   restore them for as long as Salesforce keeps them.
+
+An import that tried its first rows (section 3, step 8) is undone like any other: before the
+remaining rows are imported, undo removes the trial rows' records; after, one undo removes
+both parts.
 
 An undo that stops part way, for example because of a limit error, shows **Undo failed**.
 Select **Undo** again: it finishes the job without repeating what it already did.

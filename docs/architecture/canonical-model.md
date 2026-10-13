@@ -844,6 +844,7 @@ assistant that wrote them (they are Giving keys from v0.6, Section 21A).
 | `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
+| `Import_Trial_Rows__c` | integer | 25 | How many of a file's first rows a trial import commits before the rest (R-IB16); the wizard starts from it and the administrator can change it per file. Held between 1 and 2,000. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
 separated set of keys within 255 characters, which the eight step checklist fits with
@@ -2009,7 +2010,7 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 | Import Template | reference(Import Template) | yes | The mapping this batch was read with. |
 | File Reference | text | yes | The identifier of the uploaded file stored as a Salesforce File, so the original can be downloaded again. |
 | File Name | text | yes | The name of the file as the admin uploaded it. |
-| Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Complete, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. |
+| Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. |
 | Is Dry Run | boolean | yes (defaults true) | Whether this pass only previewed what would happen; a committed batch has run at least one dry run first. |
 | Row Count | integer | computed | How many rows the file contained. |
 | Rows Created | integer | computed | How many rows created at least one new record. |
@@ -2034,6 +2035,7 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 | Operation | picklist(Import, Update, Delete) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1) or a bulk delete (R-BD1). Empty on a batch created before v0.7, which reads as Import. |
 | Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
+| Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
 
 ### Relationships
 
@@ -2307,6 +2309,19 @@ since every row would then be one person; the batch is refused with that reason.
 an organization. The entity processor receives the row's values with the file's values
 applied, as it receives the template's defaults (R-IR6).
 
+**R-IB16 A trial of the first rows, then the rest, in one batch.** After a dry run completes,
+the administrator may commit only the file's first N rows (N from `Import_Trial_Rows__c`,
+default 25, changeable per file, held between 1 and 2,000) for real, so validation rules,
+required fields and the org's own automation are met before the whole file runs. The trial is
+a commit under the dry run's template (R-IB1) over the first N rows in file order; it records N
+as Trial Rows and ends in Trial complete, counting only the rows it processed. From Trial
+complete the administrator may commit the remaining rows (every row after the trial's last) into
+the same batch, under the same template; that commit ends Complete (or Failed) and counts every
+row of the file. A dry run is refused once the trial has committed (R-IB1). Trial complete is
+undoable like Complete, and one undo covers both commits, because both tag and journal under the
+one batch (R-IB3, R-IB8); the undo deadline is stamped again by the second commit (R-IB7). A
+trial that fails ends Failed, can be undone, and offers no remaining rows.
+
 **R-IB15 Match only.** The wizard can mark a file Match only (ADR-0069,
 `0069-import-record-id-matching-and-match-only.md`), for a file meant to update records the org
 already has. A row whose organization or either person matches no record, by its rule or by a
@@ -2324,7 +2339,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Import Template | `Import_Template__c` | Lookup to `Import_Template__c` |
 | File Reference | `File_Id__c` | Text (18) |
 | File Name | `File_Name__c` | Text |
-| Status | `Status__c` | Picklist: Draft, Parsing, Dry run, Dry run complete, Committing, Complete, Failed, Undoing, Undone, Undo failed |
+| Status | `Status__c` | Picklist: Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Failed, Undoing, Undone, Undo failed |
 | Is Dry Run | `Is_Dry_Run__c` | Checkbox |
 | Row Count | `Row_Count__c` | Number |
 | Rows Created | `Rows_Created__c` | Number |
@@ -2349,6 +2364,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Operation | `Operation__c` | Picklist: Import, Update, Delete (default Import) |
 | Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
+| Trial Rows | `Trial_Rows__c` | Number (9, 0) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -6596,6 +6612,7 @@ mirrors the primary member).
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
+| v0.6 | 2026-10-13 | Trial import (data tools parity rank 4). `Import_Batch__c` gains `Trial_Rows__c` and the Status value Trial complete; BarnCRM Settings gains `Import_Trial_Rows__c` (default 25). New rule R-IB16: commit the first N rows, then the remaining rows into the same batch, one undo for both. |
 
 ---
 ## 32. Entity ownership by package
