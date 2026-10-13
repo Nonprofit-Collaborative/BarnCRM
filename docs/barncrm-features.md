@@ -69,7 +69,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Relationships | Major | Records how people are connected (spouse, parent, sibling, friend, colleague) and writes the matching record on the other person automatically. | Shipped | C-15 |
 | Affiliations | Major | Records a person's connection to an organization (employer, board, congregation) with role, dates and one primary. | Shipped | C-16 |
 | Eleven non-gendered relationship types | Minor | Ships types such as Parent and Child, Grandparent and Grandchild, Spouse, Partner, Sibling, Friend and Colleague, none gendered. | Shipped | C-15 |
-| Keep both sides in step setting | Minor | Org-wide or per-record switch for reciprocal relationship upkeep; editing or ending one side changes the other. | Shipped | C-15 |
+| Keep both sides in step setting | Minor | Org-wide or per-record switch for reciprocal relationship upkeep; editing or ending one side changes the other. Restoring either side from the recycle bin brings the other back. | Shipped | C-15 |
 | Primary affiliation on the person | Minor | The person's primary organization is shown on their record; ending that affiliation clears it. | Shipped | C-16 |
 | Overlapping affiliation check | Minor | Refuses a second affiliation with the same organization and role whose dates overlap one on file. | Shipped | C-16 |
 
