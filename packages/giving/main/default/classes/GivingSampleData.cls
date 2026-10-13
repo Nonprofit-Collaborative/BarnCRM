@@ -70,12 +70,12 @@ public with sharing class GivingSampleData implements SampleDataModule {
     }
 
     /**
-     * Deletes every Giving sample record, inside Core's remove transaction. Allocations,
-     * soft credits, tributes and installments are details of a gift or a commitment, so
-     * they go with their master rather than being deleted here.
+     * Deletes the next chunk of Giving sample records, inside one job of Core's remove chain.
+     * Allocations, soft credits, tributes and installments are details of a gift or a
+     * commitment, so they go with their master rather than being deleted here.
      */
-    public Integer removeAll() {
-        return GivingSampleDataLoader.removeAll();
+    public Integer removeNext() {
+        return GivingSampleDataLoader.removeNext();
     }
 
     /** The Giving sample data JSON body, from the injected override or the static resource. */

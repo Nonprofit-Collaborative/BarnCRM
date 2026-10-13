@@ -315,4 +315,37 @@ describe('c-sample-data-manager', () => {
 
     expect(removeSampleData).toHaveBeenCalledTimes(1);
   });
+
+  it('shows Removing and keeps polling until the remove chain is done, then says so', async () => {
+    jest.useFakeTimers();
+    canManageSampleData.mockResolvedValue(true);
+    const removingStatus = { ...LOADED_STATUS, loaded: false, removing: true };
+    getStatus
+      .mockResolvedValueOnce(LOADED_STATUS)
+      .mockResolvedValueOnce(removingStatus)
+      .mockResolvedValue(NOT_LOADED_STATUS);
+    removeSampleData.mockResolvedValue(removingStatus);
+    const toastHandler = jest.fn();
+
+    const element = createManager();
+    element.addEventListener('lightning__showtoast', toastHandler);
+    await flushMicrotasks();
+
+    buttons(element)[REMOVE_BUTTON_INDEX].click();
+    await flushMicrotasks();
+    buttons(element)[CONFIRM_BUTTON_INDEX].click();
+    await flushMicrotasks();
+
+    const badge = element.shadowRoot.querySelector('span[slot="actions"] span');
+    expect(badge.textContent).toBe('c.Core_SampleData_StatusRemoving');
+    expect(buttons(element)[LOAD_BUTTON_INDEX].disabled).toBe(true);
+    expect(toastHandler).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(3000);
+    await flushMicrotasks();
+
+    expect(badge.textContent).toBe('c.Core_SampleData_StatusNotLoaded');
+    expect(toastHandler).toHaveBeenCalledTimes(1);
+    expect(toastHandler.mock.calls[0][0].detail.title).toBe('c.Core_SampleData_RemoveSuccess');
+  });
 });

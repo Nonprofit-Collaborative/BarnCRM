@@ -115,8 +115,9 @@ household records, names, greetings, member counts, and Members panel.
    Settings > Rollups** and select **Recalculate**: the totals are worked out by the rollup
    run rather than as each gift is saved.
 9. Return to **BarnCRM Settings**, **Sample data**, and select **Remove sample data**.
-   Confirm the dialog. The card returns to **Not loaded** and every record the loader
-   created is gone: households, contacts, organizations, connections, affiliations, and the
+   Confirm the dialog. The card shows **Removing** while it deletes the set in chunks of
+   about a hundred records, the same way it loaded, then returns to **Not loaded**. Every
+   record the loader created is gone: households, contacts, organizations, connections, affiliations, and the
    gifts, allocations, soft credits, tributes, funds, appeals, commitments and installments
    too, along with the household member records that joined people to households if your
    org uses the flexible way. Anything you entered yourself is untouched.
@@ -131,11 +132,11 @@ household records, names, greetings, member counts, and Members panel.
   exports, or emails sent while it was present.
 - **Trying to load twice.** Loading again while sample data is already present shows a
   message that it is already loaded. Remove it first if you want a fresh copy. While a
-  load is still running, both **Load sample data** and **Remove sample data** are
-  unavailable: removing halfway through would delete households the loader is still
+  load or a removal is still running, both **Load sample data** and **Remove sample data**
+  are unavailable: removing halfway through would delete households the loader is still
   attaching people to.
 - **Assuming removal is instant.** Removal deletes several thousand records with Giving
-  installed and takes a few seconds; wait for the card to confirm **Not loaded** before
+  installed and takes a minute or two; wait for the card to confirm **Not loaded** before
   assuming it is done.
 - **Expecting the giving totals to appear straight away (with Giving).** The gifts are all there the
   moment the load finishes, but the totals on households, people, funds and appeals are

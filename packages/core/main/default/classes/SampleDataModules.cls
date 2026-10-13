@@ -65,15 +65,18 @@ public with sharing class SampleDataModules {
     }
 
     /**
-     * Deletes every installed module's sample records and returns how many rows went.
-     * Runs before Core deletes its own records, because a module's records point at them.
+     * Deletes the next chunk of the first installed module that still has sample records, and
+     * returns how many rows went: 0 once every module is empty. Core's remove chain calls this
+     * before it deletes its own records, because a module's records point at them.
      */
-    public static Integer removeAll() {
-        Integer removed = 0;
+    public static Integer removeNext() {
         for (SampleDataModule module : installed()) {
-            removed += module.removeAll();
+            Integer removed = module.removeNext();
+            if (removed > 0) {
+                return removed;
+            }
         }
-        return removed;
+        return 0;
     }
 
     /** One count per installed module, for the status card. */

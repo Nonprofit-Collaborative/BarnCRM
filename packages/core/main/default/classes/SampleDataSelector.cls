@@ -182,7 +182,15 @@ public with sharing class SampleDataSelector {
      * and load and remove can refuse to run against an in-flight chain.
      */
     public Boolean hasRunningLoadJob() {
-        Set<String> classNames = LOAD_JOB_CLASS_NAMES;
+        return hasRunningJob(LOAD_JOB_CLASS_NAMES);
+    }
+
+    /** True while a job of the remove chain is still queued or running. */
+    public Boolean hasRunningRemoveJob() {
+        return hasRunningJob(new Set<String>{ 'SampleDataRemoveQueueable' });
+    }
+
+    private Boolean hasRunningJob(Set<String> classNames) {
         Set<String> runningStatuses = RUNNING_JOB_STATUSES;
         return ![
                 SELECT Id

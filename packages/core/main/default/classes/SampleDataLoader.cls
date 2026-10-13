@@ -15,9 +15,11 @@
  * transaction cannot safely insert every household, organization, and contact (the
  * household naming and greeting triggers run on every contact insert), load() only
  * starts the queueable chain and returns immediately; call status() to track progress.
- * remove() runs synchronously; a few hundred deletes are well within limits for one
- * transaction, and it too refuses while a load is running so the chain cannot insert
- * contacts against households that have just been deleted.
+ * remove() is chunked the same way (ADMIN-3): with Giving installed the set holds about 700
+ * gifts, each running its own automation on delete, which one transaction cannot take. It
+ * starts SampleDataRemoveQueueable and returns; each job deletes one chunk. Load and remove
+ * each refuse while either chain runs, so the load cannot insert contacts against
+ * households that have just been deleted.
  *
  * Errors are thrown, not logged here: SampleDataController logs once at the LWC
  * boundary, and the queueables log their own async failures.
@@ -25,6 +27,9 @@
 public with sharing class SampleDataLoader {
     /** Contacts inserted per contact-stage chunk (see SampleDataContactQueueable). */
     public static final Integer CONTACT_CHUNK_SIZE = 100;
+
+    /** Core records deleted per remove job, the same size as a load chunk. */
+    public static final Integer REMOVE_CHUNK_SIZE = 100;
 
     /** Injected by the tests in place of the static resource body. */
     @TestVisible
@@ -36,6 +41,10 @@ public with sharing class SampleDataLoader {
      */
     @TestVisible
     private static Boolean runningJobOverride;
+
+    /** The same, for the remove chain. Null in production. */
+    @TestVisible
+    private static Boolean runningRemoveOverride;
 
     /** One module sample set's own number, as the status card shows it. */
     public class ModuleCount {
@@ -71,6 +80,9 @@ public with sharing class SampleDataLoader {
         public Boolean loaded;
         @AuraEnabled
         public Boolean loading;
+        /** True while the remove chain is still deleting. */
+        @AuraEnabled
+        public Boolean removing = false;
         /**
          * True when this org keeps household membership in household member records. The
          * load works either way; the card uses this to say how the sample people will be
@@ -101,6 +113,9 @@ public with sharing class SampleDataLoader {
         if (hasRunningLoadJob()) {
             throw new SampleDataException(Label.Core_SampleData_LoadInProgress);
         }
+        if (hasRunningRemoveJob()) {
+            throw new SampleDataException(Label.Core_SampleData_RemoveInProgress);
+        }
         SampleDataSelector selector = new SampleDataSelector();
         if (selector.countSampleHouseholds() > 0 || selector.countSampleOrganizations() > 0) {
             throw new SampleDataException(Label.Core_SampleData_AlreadyLoaded);
@@ -122,10 +137,33 @@ public with sharing class SampleDataLoader {
     }
 
     /**
-     * Deletes every record flagged Sample_Data__c, and returns the counts that were
-     * removed: each installed module's own records first (a gift points at a person and a
-     * household), then connections and affiliations, then contacts, then the accounts, so
-     * nothing is ever left pointing at a record that has just gone.
+     * Starts removing every record flagged Sample_Data__c and returns the counts as they
+     * stand, with `removing` set; the card polls status() until the chain is done. Refuses
+     * while a load or another remove is running.
+     */
+    public static Counts remove() {
+        if (hasRunningLoadJob()) {
+            throw new SampleDataException(Label.Core_SampleData_LoadInProgress);
+        }
+        if (hasRunningRemoveJob()) {
+            throw new SampleDataException(Label.Core_SampleData_RemoveInProgress);
+        }
+        Counts result = status();
+        System.enqueueJob(new SampleDataRemoveQueueable());
+        result.loaded = false;
+        result.loading = false;
+        result.removing = true;
+        return result;
+    }
+
+    /**
+     * Deletes the next chunk of sample records and returns true when it deleted anything, so
+     * the remove chain knows to queue another job. The order keeps anything from being left
+     * pointing at a record that has just gone: each installed module's own records first (a
+     * gift points at a person and a household), then connections and affiliations, then
+     * contacts, then the accounts. Every list is read again for each chunk, so a record an
+     * earlier chunk's automation already removed (the other side of a connection, a
+     * household upkeep tidied away) is never asked for a second time.
      *
      * Everything the loader creates is either flagged itself or a detail of something that
      * is, which is what keeps this to "delete only what the loader created". Records an
@@ -134,47 +172,29 @@ public with sharing class SampleDataLoader {
      * In junction mode the membership rows the load created go with the households: the
      * Household field on a household member record is a required lookup that cascades, so
      * deleting a household flagged Sample_Data__c takes its own membership rows with it.
-     * The account ids are read after the contacts are gone, so a household that upkeep has
-     * already tidied away is not asked for a second time.
      */
-    public static Counts remove() {
-        if (hasRunningLoadJob()) {
-            throw new SampleDataException(Label.Core_SampleData_LoadInProgress);
+    public static Boolean removeNextChunk() {
+        if (SampleDataModules.removeNext() > 0) {
+            return true;
         }
         SampleDataSelector selector = new SampleDataSelector();
-        Counts result = new Counts();
-        result.contactCount = selector.countSampleContacts();
-        result.householdCount = selector.countSampleHouseholds();
-        result.organizationCount = selector.countSampleOrganizations();
-        result.relationshipCount = selector.countSampleRelationships();
-        result.affiliationCount = selector.countSampleAffiliations();
-        result.moduleCounts = SampleDataModules.counts();
+        return deleteChunk(selector.getSampleRelationshipIds()) ||
+            deleteChunk(selector.getSampleAffiliationIds()) ||
+            deleteChunk(selector.getSampleContactIds()) ||
+            deleteChunk(selector.getSampleAccountIds());
+    }
 
-        // Modules first: a gift points at a household and a person, and a lookup that is
-        // cleared by a deleted parent would leave the gift behind with nothing on it.
-        SampleDataModules.removeAll();
-
-        List<Id> relationshipIds = selector.getSampleRelationshipIds();
-        if (!relationshipIds.isEmpty()) {
-            Database.delete(relationshipIds, AccessLevel.USER_MODE);
+    /** Deletes up to one chunk of these ids; false when there were none. */
+    private static Boolean deleteChunk(List<Id> ids) {
+        if (ids.isEmpty()) {
+            return false;
         }
-        List<Id> affiliationIds = selector.getSampleAffiliationIds();
-        if (!affiliationIds.isEmpty()) {
-            Database.delete(affiliationIds, AccessLevel.USER_MODE);
+        List<Id> chunk = new List<Id>();
+        for (Integer i = 0; i < ids.size() && i < REMOVE_CHUNK_SIZE; i++) {
+            chunk.add(ids[i]);
         }
-        List<Id> contactIds = selector.getSampleContactIds();
-        if (!contactIds.isEmpty()) {
-            Database.delete(contactIds, AccessLevel.USER_MODE);
-        }
-        List<Id> accountIds = selector.getSampleAccountIds();
-        if (!accountIds.isEmpty()) {
-            Database.delete(accountIds, AccessLevel.USER_MODE);
-        }
-
-        result.loaded = false;
-        result.loading = false;
-        result.junctionMembership = HouseholdService.isJunctionMode();
-        return result;
+        Database.delete(chunk, AccessLevel.USER_MODE);
+        return true;
     }
 
     /**
@@ -204,8 +224,12 @@ public with sharing class SampleDataLoader {
         result.affiliationCount = selector.countSampleAffiliations();
         result.moduleCounts = SampleDataModules.counts();
         result.loading = hasRunningLoadJob();
+        result.removing = hasRunningRemoveJob();
         result.loaded =
-            !result.loading && (result.householdCount > 0 || result.organizationCount > 0);
+            !result.loading &&
+            !result.removing &&
+            (result.householdCount > 0 ||
+            result.organizationCount > 0);
         result.junctionMembership = HouseholdService.isJunctionMode();
         return result;
     }
@@ -216,6 +240,14 @@ public with sharing class SampleDataLoader {
             return runningJobOverride;
         }
         return new SampleDataSelector().hasRunningLoadJob();
+    }
+
+    /** True while a job of the remove chain is queued or running. */
+    public static Boolean hasRunningRemoveJob() {
+        if (runningRemoveOverride != null) {
+            return runningRemoveOverride;
+        }
+        return new SampleDataSelector().hasRunningRemoveJob();
     }
 
     /** The sample data JSON body, from the injected override or the static resource. */

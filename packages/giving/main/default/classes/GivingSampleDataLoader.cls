@@ -26,9 +26,13 @@
 public with sharing class GivingSampleDataLoader {
     private static final String CONTEXT = 'GivingSampleDataLoader';
 
-    /** The registry rows whose delete protection the removal stands down; see removeAll(). */
+    /** The registry rows whose delete protection the removal stands down; see removeNext(). */
     private static final String COMMITMENT_AUTOMATION = 'Commitment_Schedule';
     private static final String INSTALLMENT_AUTOMATION = 'Installment_Protection';
+
+    /** Records deleted per removeNext() call, the size of a load chunk. Tests lower it. */
+    @TestVisible
+    private static Integer removeChunkSize = GivingSampleData.GIFT_CHUNK_SIZE;
 
     /**
      * Stage one: funds, appeals and commitments. Returns the key to Id map the gift stages
@@ -431,11 +435,14 @@ public with sharing class GivingSampleDataLoader {
     }
 
     /**
-     * Deletes every Giving sample record, in dependency order: refunds and write-offs first,
+     * Deletes the next chunk of Giving sample records and returns how many went, 0 once none
+     * are left. Core's remove chain calls it once per job (ADMIN-3), because the whole set's
+     * gift automation is more than one transaction can run. The order is the dependency order,
+     * and each kind is emptied before the next is started: refunds and write-offs first,
      * because a gift that a reversal points at refuses to be deleted (ADR-0010), then the other
      * gifts, because a commitment whose installments have been paid refuses to be deleted while
-     * those gifts are still there, then commitments (their installments go with them), then appeals and
-     * funds, which the gifts pointed at.
+     * those gifts are still there, then commitments (their installments go with them), then
+     * appeals and funds, which the gifts pointed at.
      *
      * The two protection rules are stood down for this transaction. They exist to stop a
      * person deleting giving history by accident (R-IN2, R-CM7), and an installment that a
@@ -444,30 +451,40 @@ public with sharing class GivingSampleDataLoader {
      * bypass is per transaction, so the administrator's own next delete is protected as
      * usual.
      */
-    public static Integer removeAll() {
+    public static Integer removeNext() {
         GivingSampleDataSelector selector = new GivingSampleDataSelector();
-        Integer removed = 0;
         AutomationControl.bypass(COMMITMENT_AUTOMATION);
         AutomationControl.bypass(INSTALLMENT_AUTOMATION);
         try {
-            removed += deleteAll(selector.sampleReversalIds());
-            removed += deleteAll(selector.sampleGiftIds());
-            removed += deleteAll(selector.sampleCommitmentIds());
-            removed += deleteAll(selector.sampleAppealIds());
-            removed += deleteAll(selector.sampleFundIds());
+            Integer removed = deleteChunk(selector.sampleReversalIds());
+            if (removed == 0) {
+                removed = deleteChunk(selector.sampleGiftIds());
+            }
+            if (removed == 0) {
+                removed = deleteChunk(selector.sampleCommitmentIds());
+            }
+            if (removed == 0) {
+                removed = deleteChunk(selector.sampleAppealIds());
+            }
+            if (removed == 0) {
+                removed = deleteChunk(selector.sampleFundIds());
+            }
+            return removed;
         } finally {
             AutomationControl.clearBypass(COMMITMENT_AUTOMATION);
             AutomationControl.clearBypass(INSTALLMENT_AUTOMATION);
         }
-        return removed;
     }
 
-    private static Integer deleteAll(List<Id> ids) {
-        if (ids.isEmpty()) {
-            return 0;
+    private static Integer deleteChunk(List<Id> ids) {
+        List<Id> chunk = new List<Id>();
+        for (Integer i = 0; i < ids.size() && i < removeChunkSize; i++) {
+            chunk.add(ids[i]);
         }
-        Database.delete(ids, AccessLevel.USER_MODE);
-        return ids.size();
+        if (!chunk.isEmpty()) {
+            Database.delete(chunk, AccessLevel.USER_MODE);
+        }
+        return chunk.size();
     }
 
     /** Inserts the records and returns their keys mapped to the identifiers they were given. */

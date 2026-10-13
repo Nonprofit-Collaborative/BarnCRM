@@ -175,12 +175,26 @@ private class SampleDataLoaderTest {
             return;
         }
 
-        public Integer removeAll() {
+        public Integer removeNext() {
             removeCalls++;
             Integer removed = loaded;
             loaded = 0;
             return removed;
         }
+    }
+
+    /**
+     * Starts the remove, then runs every chunk of the chain in this transaction, the way the
+     * chain's jobs run one after another in an org. Returns what remove() answered.
+     */
+    private static SampleDataLoader.Counts removeEverything() {
+        SampleDataLoader.Counts started = SampleDataLoader.remove();
+        Integer chunks = 0;
+        while (SampleDataLoader.removeNextChunk()) {
+            chunks++;
+            System.assert(chunks < 50, 'the remove chain ends');
+        }
+        return started;
     }
 
     @IsTest
@@ -374,7 +388,7 @@ private class SampleDataLoaderTest {
             SettingsService.clearCaches();
             loadEverything(buildJson(2, 2, false));
 
-            SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            SampleDataLoader.Counts removed = removeEverything();
 
             System.assertEquals(2, removed.householdCount, 'both sample households are removed');
             System.assertEquals(4, removed.contactCount, 'every sample person is removed');
@@ -453,11 +467,101 @@ private class SampleDataLoaderTest {
     }
 
     @IsTest
+    static void testRemoveStartsAChainThatDeletesOneChunkPerJob() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            loadEverything(buildJson(1, 1, false));
+
+            Test.startTest();
+            SampleDataLoader.Counts started = SampleDataLoader.remove();
+            Test.stopTest();
+
+            System.assertEquals(true, started.removing, 'the card is told the remove is running');
+            System.assertEquals(false, started.loaded, 'and not to offer Load or Remove meanwhile');
+            System.assertEquals(1, started.householdCount, 'it answers the counts as they stood');
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE],
+                'the first job deleted the first chunk, the people'
+            );
+        }
+    }
+
+    @IsTest
+    static void testRemoveDeletesTwoHundredPeopleInChunks() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            Account sampleOrganization = new Account(Name = 'Sample org', Sample_Data__c = true);
+            insert sampleOrganization;
+            List<Contact> people = new List<Contact>();
+            for (Integer i = 0; i < 200; i++) {
+                people.add(
+                    new Contact(
+                        LastName = 'Sample' + i,
+                        AccountId = sampleOrganization.Id,
+                        Sample_Data__c = true
+                    )
+                );
+            }
+            insert people;
+
+            Test.startTest();
+            Boolean first = SampleDataLoader.removeNextChunk();
+            Integer afterFirst = [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE];
+            Boolean second = SampleDataLoader.removeNextChunk();
+            Integer afterSecond = [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE];
+            Boolean third = SampleDataLoader.removeNextChunk();
+            Boolean fourth = SampleDataLoader.removeNextChunk();
+            Test.stopTest();
+
+            System.assert(first && second && third, 'each chunk reports that it deleted something');
+            System.assertEquals(
+                200 - SampleDataLoader.REMOVE_CHUNK_SIZE,
+                afterFirst,
+                'one chunk deletes one chunk of people'
+            );
+            System.assertEquals(0, afterSecond, 'the second deletes the rest');
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :sampleOrganization.Id],
+                'the accounts go once the people are gone'
+            );
+            System.assertEquals(false, fourth, 'then the chain stops');
+        }
+    }
+
+    @IsTest
+    static void testLoadAndRemoveRefuseWhileARemoveIsRunning() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            loadEverything(buildJson(1, 1, false));
+            SampleDataLoader.runningJobOverride = false;
+            SampleDataLoader.runningRemoveOverride = true;
+
+            String loadMessage;
+            try {
+                SampleDataLoader.load();
+            } catch (SampleDataException e) {
+                loadMessage = e.getMessage();
+            }
+            String removeMessage;
+            try {
+                SampleDataLoader.remove();
+            } catch (SampleDataException e) {
+                removeMessage = e.getMessage();
+            }
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+
+            System.assertEquals(Label.Core_SampleData_RemoveInProgress, loadMessage);
+            System.assertEquals(Label.Core_SampleData_RemoveInProgress, removeMessage);
+            System.assertEquals(true, status.removing, 'status says the remove is running');
+            System.assertEquals(false, status.loaded, 'a set being removed is not loaded');
+        }
+    }
+
+    @IsTest
     static void testRemoveDeletesEverythingFlagged() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(2, 2, false));
 
-            SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            SampleDataLoader.Counts removed = removeEverything();
             System.assertEquals(2, removed.householdCount);
             System.assertEquals(1, removed.organizationCount);
             System.assertEquals(4, removed.contactCount);
@@ -507,7 +611,7 @@ private class SampleDataLoaderTest {
             );
             insert ownAffiliation;
 
-            SampleDataLoader.remove();
+            removeEverything();
 
             System.assertEquals(
                 1,
@@ -633,12 +737,11 @@ private class SampleDataLoaderTest {
             StubModule module = new StubModule(12);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
 
-            SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            SampleDataLoader.Counts removed = removeEverything();
 
-            System.assertEquals(
-                1,
-                module.removeCalls,
-                'the module is asked once to remove its own'
+            System.assert(
+                module.removeCalls > 1,
+                'the module is asked again until it answers that nothing is left'
             );
             System.assertEquals(
                 1,

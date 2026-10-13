@@ -12,9 +12,10 @@
  * - `enqueueLoad` starts an asynchronous chain and returns; it never inserts the whole set
  *   in the calling transaction, because the Core chain that calls it has already spent
  *   part of that transaction's limits.
- * - `removeAll` runs synchronously inside Core's remove transaction, before Core deletes
- *   the households and people the module's records point at, and deletes only records the
- *   module's own loader created.
+ * - `removeNext` deletes one chunk, sized like one of its load chunks, inside a job of
+ *   Core's remove chain, and is called again in the next job until it answers 0. Core
+ *   deletes the households and people the module's records point at only after that. It
+ *   deletes only records the module's own loader created.
  * - `countLoaded` answers cheaply enough to be called from the status card on a poll.
  */
 @NamespaceAccessible
@@ -31,6 +32,9 @@ public interface SampleDataModule {
     /** Starts this module's load chain. Called once, after Core's own records exist. */
     void enqueueLoad();
 
-    /** Deletes every record this module's sample loader created, and returns how many. */
-    Integer removeAll();
+    /**
+     * Deletes the next chunk of the records this module's sample loader created, and returns
+     * how many it deleted: 0 once there are none left.
+     */
+    Integer removeNext();
 }

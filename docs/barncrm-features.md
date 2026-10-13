@@ -189,6 +189,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Installer gets admin access | Minor | The person who installs receives the admin role automatically by a background job after install. | Shipped | C-06 |
 | Sample data | Minor | Loads a realistic demo set (200 households, 440 people, 25 organizations, connections and affiliations) only when an admin asks, and removes it all in one action. | Shipped | C-10 |
 | Neutral sample organizations | Minor | Sample organizations become mostly businesses, schools and clubs, and the guide states sample data is never loaded automatically. | Shipped | C-29 follow-up |
+| Sample data removed in chunks | Minor | Remove sample data runs as a chain of jobs of about 100 records each, like the load, so the full set with Giving's gifts no longer fails on limits; the card shows Removing until it is done. | Built, not merged (fix/admin-3) | C-10 |
 | Package labels renamed to BarnCRM | Minor | Renames the app, settings ("BarnCRM Settings"), roles, folders, templates and API names from the old working title to BarnCRM. | Shipped (PR #181) | plan 11.3 item 6 |
 | Faster, safer settings saves | Minor | A settings save writes only the keys that changed, under a lock, so two admins saving at once do not undo each other. | Shipped | plan 11.3 |
 | What's new after upgrade | Minor | A "What's new" card on the home page summarizes what changed after an upgrade, hidden once read and when nothing is new. | Shipped | C-27, ADR-0087 |

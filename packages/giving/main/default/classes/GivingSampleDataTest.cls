@@ -362,16 +362,31 @@ private class GivingSampleDataTest {
         }
     }
 
+    /** Calls removeNext() until it answers 0, as Core's remove chain does, and sums the rows. */
+    private static Integer removeEverything() {
+        Integer removed = 0;
+        Integer chunk = GivingSampleDataLoader.removeNext();
+        while (chunk > 0) {
+            removed += chunk;
+            chunk = GivingSampleDataLoader.removeNext();
+        }
+        return removed;
+    }
+
     @IsTest
     static void testRemoveDeletesEverySampleRecordAndItsDetails() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             insertSamplePeople();
             loadEverything();
+            // Two at a time, so every kind takes more than one chunk where it has more than two.
+            GivingSampleDataLoader.removeChunkSize = 2;
 
             Test.startTest();
-            Integer removed = GivingSampleDataLoader.removeAll();
+            Integer firstChunk = GivingSampleDataLoader.removeNext();
+            Integer removed = firstChunk + removeEverything();
             Test.stopTest();
 
+            System.assertEquals(2, firstChunk, 'one call deletes one chunk');
             System.assertEquals(
                 10,
                 removed,
@@ -422,7 +437,7 @@ private class GivingSampleDataTest {
             insert ownGift;
 
             Test.startTest();
-            GivingSampleDataLoader.removeAll();
+            removeEverything();
             Test.stopTest();
 
             System.assertEquals(

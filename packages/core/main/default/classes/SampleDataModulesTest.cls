@@ -35,10 +35,11 @@ private class SampleDataModulesTest {
             loadStarted = true;
         }
 
-        public Integer removeAll() {
+        /** Removes in chunks of two, the way a module removes in chunks of its load size. */
+        public Integer removeNext() {
             removeCalls++;
-            Integer removed = loaded;
-            loaded = 0;
+            Integer removed = Math.min(loaded, 2);
+            loaded -= removed;
             return removed;
         }
     }
@@ -140,17 +141,31 @@ private class SampleDataModulesTest {
     }
 
     @IsTest
-    static void testRemoveAllAsksEveryModuleAndSumsWhatWent() {
+    static void testRemoveNextEmptiesEachModuleInTurnOneChunkAtATime() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule first = new StubModule('First', 3);
             StubModule second = new StubModule('Second', 5);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
 
-            Integer removed = SampleDataModules.removeAll();
+            List<Integer> chunks = new List<Integer>();
+            Integer removed = SampleDataModules.removeNext();
+            while (removed > 0) {
+                chunks.add(removed);
+                removed = SampleDataModules.removeNext();
+            }
 
-            System.assertEquals(8, removed, 'the rows both modules removed are counted together');
-            System.assertEquals(1, first.removeCalls, 'each module is asked exactly once');
-            System.assertEquals(1, second.removeCalls, 'each module is asked exactly once');
+            System.assertEquals(
+                new List<Integer>{ 2, 1, 2, 2, 1 },
+                chunks,
+                'one chunk per call, the first module emptied before the second'
+            );
+            System.assertEquals(0, first.loaded, 'the first module is empty');
+            System.assertEquals(0, second.loaded, 'so is the second');
+            System.assertEquals(
+                0,
+                SampleDataModules.removeNext(),
+                'and then there is nothing left'
+            );
         }
     }
 
