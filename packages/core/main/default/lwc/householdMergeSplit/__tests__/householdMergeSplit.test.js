@@ -2,7 +2,9 @@
 // component is driven from a test.
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
+import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import Toast from 'lightning/toast';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import HouseholdMergeSplit from 'c/householdMergeSplit';
 import canEdit from '@salesforce/apex/HouseholdMergeController.canEdit';
 import searchHouseholds from '@salesforce/apex/HouseholdMergeController.searchHouseholds';
@@ -10,6 +12,23 @@ import getPreview from '@salesforce/apex/HouseholdMergeController.preview';
 import mergeHouseholds from '@salesforce/apex/HouseholdMergeController.mergeHouseholds';
 import splitHousehold from '@salesforce/apex/HouseholdMergeController.splitHousehold';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/HouseholdMergeController.canEdit',
@@ -69,6 +88,13 @@ jest.mock(
     default:
       "The name you chose is kept as this household's own name; the naming automation will not change it. Clear Custom Name on the household if you want it to follow the members again."
   }),
+  { virtual: true }
+);
+
+// Stubbed as the "{0} ... {1}" template so a test can check both names reach the confirm dialog.
+jest.mock(
+  '@salesforce/label/c.Core_HouseholdMerge_ConfirmBody',
+  () => ({ default: '{0} will be combined into {1}.' }),
   { virtual: true }
 );
 
@@ -149,7 +175,31 @@ async function openOn(recordType, editable) {
   return element;
 }
 
+async function settle() {
+  for (let i = 0; i < 6; i++) {
+    // eslint-disable-next-line no-await-in-loop
+    await flush();
+  }
+}
+
+/** Searches, picks the other household, then presses Merge and lets the confirm answer. */
+async function mergeFlow(element) {
+  element.shadowRoot.querySelector('.search-button').dispatchEvent(new CustomEvent('click'));
+  await flush();
+  await flush();
+  element.shadowRoot.querySelector('.pick-button').dispatchEvent(new CustomEvent('click'));
+  await flush();
+  await flush();
+  element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
+  await settle();
+}
+
 describe('c-household-merge-split', () => {
+  beforeEach(() => {
+    BarnConfirmModal.open.mockResolvedValue(true);
+    jest.spyOn(Toast, 'show');
+  });
+
   afterEach(() => {
     while (document.body.firstChild) {
       document.body.removeChild(document.body.firstChild);
@@ -257,20 +307,13 @@ describe('c-household-merge-split', () => {
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Victim' } }));
     await flush();
 
-    expect(element.shadowRoot.querySelector('.merge-confirm')).toBeNull();
     element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
+    await settle();
 
-    const confirm = element.shadowRoot.querySelector('.merge-confirm');
-    expect(confirm).not.toBeNull();
-    expect(confirm.querySelector('.confirm-victim').textContent).toBe('Garcia Household');
-    expect(confirm.querySelector('.confirm-survivor').textContent).toBe('The Garcia Family');
-
-    element.shadowRoot
-      .querySelector('.merge-confirm-button')
-      .dispatchEvent(new CustomEvent('click'));
-    await flush();
-
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+    const dialog = BarnConfirmModal.open.mock.calls[0][0];
+    expect(dialog.message).toBe('Garcia Household will be combined into The Garcia Family.');
+    expect(dialog.confirmVariant).toBe('destructive');
     expect(mergeHouseholds).toHaveBeenCalledWith({
       survivorId: HOUSEHOLD_ID,
       victimId: OTHER_HOUSEHOLD_ID,
@@ -278,30 +321,49 @@ describe('c-household-merge-split', () => {
     });
   });
 
+  it('does not merge when the confirmation is cancelled or dismissed', async () => {
+    searchHouseholds.mockResolvedValue(SEARCH_RESULTS);
+    getPreview.mockResolvedValue(PREVIEW);
+    BarnConfirmModal.open.mockResolvedValueOnce(false).mockResolvedValueOnce(undefined);
+    const element = await openOn('Household', true);
+
+    await mergeFlow(element);
+    element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
+    await settle();
+
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(2);
+    expect(mergeHouseholds).not.toHaveBeenCalled();
+  });
+
+  it('closes the quick action and refreshes the household after a merge, without navigating to the page it is on', async () => {
+    searchHouseholds.mockResolvedValue(SEARCH_RESULTS);
+    getPreview.mockResolvedValue(PREVIEW);
+    mergeHouseholds.mockResolvedValue({ survivorId: HOUSEHOLD_ID, customNameKept: false });
+    const element = await openOn('Household', true);
+    const closed = jest.fn();
+    const refreshed = jest.fn();
+    element.addEventListener('lightning__closeactionscreen', closed);
+    element.addEventListener('lightning__refresh', refreshed);
+
+    await mergeFlow(element);
+
+    expect(closed).toHaveBeenCalledTimes(1);
+    expect(refreshed).toHaveBeenCalledTimes(1);
+    expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([{ recordId: HOUSEHOLD_ID }]);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
   it('does not mention Custom Name in the success toast when the survivor keeps an ordinary name', async () => {
     searchHouseholds.mockResolvedValue(SEARCH_RESULTS);
     getPreview.mockResolvedValue(PREVIEW);
     mergeHouseholds.mockResolvedValue({ survivorId: HOUSEHOLD_ID, customNameKept: false });
     const element = await openOn('Household', true);
-    const toastHandler = jest.fn();
-    element.addEventListener('lightning__showtoast', toastHandler);
 
-    element.shadowRoot.querySelector('.search-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    element.shadowRoot.querySelector('.pick-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    element.shadowRoot
-      .querySelector('.merge-confirm-button')
-      .dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
+    await mergeFlow(element);
 
-    expect(toastHandler).toHaveBeenCalledTimes(1);
-    expect(toastHandler.mock.calls[0][0].detail.message).not.toMatch(/Custom Name/);
+    expect(Toast.show).toHaveBeenCalledTimes(1);
+    expect(Toast.show.mock.calls[0][0].variant).toBe('success');
+    expect(Toast.show.mock.calls[0][0].label).not.toMatch(/Custom Name/);
   });
 
   it('tells the person in the success toast when their chosen name is now held as a custom one', async () => {
@@ -309,54 +371,29 @@ describe('c-household-merge-split', () => {
     getPreview.mockResolvedValue(PREVIEW);
     mergeHouseholds.mockResolvedValue({ survivorId: HOUSEHOLD_ID, customNameKept: true });
     const element = await openOn('Household', true);
-    const toastHandler = jest.fn();
-    element.addEventListener('lightning__showtoast', toastHandler);
 
-    element.shadowRoot.querySelector('.search-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    element.shadowRoot.querySelector('.pick-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    element.shadowRoot
-      .querySelector('.merge-confirm-button')
-      .dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
+    await mergeFlow(element);
 
-    expect(toastHandler).toHaveBeenCalledTimes(1);
-    expect(toastHandler.mock.calls[0][0].detail.message).toMatch(/Custom Name/);
+    expect(Toast.show).toHaveBeenCalledTimes(1);
+    expect(Toast.show.mock.calls[0][0].label).toMatch(/Custom Name/);
   });
 
-  it('shows the message when a merge is refused', async () => {
+  it('shows the message when a merge is refused, and leaves the action open', async () => {
     searchHouseholds.mockResolvedValue(SEARCH_RESULTS);
     getPreview.mockResolvedValue(PREVIEW);
     mergeHouseholds.mockRejectedValue({
       body: { message: 'Both records must be households.' }
     });
     const element = await openOn('Household', true);
+    const closed = jest.fn();
+    element.addEventListener('lightning__closeactionscreen', closed);
 
-    element.shadowRoot.querySelector('.search-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    element.shadowRoot.querySelector('.pick-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    element.shadowRoot.querySelector('.merge-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    element.shadowRoot
-      .querySelector('.merge-confirm-button')
-      .dispatchEvent(new CustomEvent('click'));
-    await flush();
-    await flush();
-    await flush();
-    await flush();
+    await mergeFlow(element);
 
     expect(element.shadowRoot.querySelector('[role="alert"]').textContent).toContain(
       'Both records must be households.'
     );
+    expect(closed).not.toHaveBeenCalled();
   });
 
   it('splits the people ticked into a new household', async () => {
@@ -369,20 +406,38 @@ describe('c-household-merge-split', () => {
     checkboxes[1].dispatchEvent(new CustomEvent('change'));
     await flush();
 
+    const closed = jest.fn();
+    element.addEventListener('lightning__closeactionscreen', closed);
     element.shadowRoot.querySelector('.split-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    expect(element.shadowRoot.querySelector('.split-confirm')).not.toBeNull();
+    await settle();
 
-    element.shadowRoot
-      .querySelector('.split-confirm-button')
-      .dispatchEvent(new CustomEvent('click'));
-    await flush();
-
+    expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
     expect(splitHousehold).toHaveBeenCalledWith({
       householdId: HOUSEHOLD_ID,
       personIds: [WEI_ID],
       targetHouseholdId: null
     });
+    // The split-off household is another record, so the person is taken there.
+    expect(closed).toHaveBeenCalledTimes(1);
+    expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([{ recordId: HOUSEHOLD_ID }]);
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__recordPage',
+      attributes: { recordId: TARGET_HOUSEHOLD_ID, objectApiName: 'Account', actionName: 'view' }
+    });
+  });
+
+  it('does not split when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    const element = await openOn('Household', true);
+    const checkboxes = element.shadowRoot.querySelectorAll('.member-checkbox');
+    checkboxes[1].checked = true;
+    checkboxes[1].dispatchEvent(new CustomEvent('change'));
+    await flush();
+
+    element.shadowRoot.querySelector('.split-button').dispatchEvent(new CustomEvent('click'));
+    await settle();
+
+    expect(splitHousehold).not.toHaveBeenCalled();
   });
 
   it('splits into a household that already exists when one is chosen', async () => {
@@ -411,11 +466,7 @@ describe('c-household-merge-split', () => {
     await flush();
 
     element.shadowRoot.querySelector('.split-button').dispatchEvent(new CustomEvent('click'));
-    await flush();
-    element.shadowRoot
-      .querySelector('.split-confirm-button')
-      .dispatchEvent(new CustomEvent('click'));
-    await flush();
+    await settle();
 
     expect(splitHousehold).toHaveBeenCalledWith({
       householdId: HOUSEHOLD_ID,

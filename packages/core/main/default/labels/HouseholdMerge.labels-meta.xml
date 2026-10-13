@@ -257,6 +257,14 @@
         <value>The people you ticked will move out of this household. Both household names and member counts are recalculated for you.</value>
     </labels>
     <labels>
+        <fullName>Core_HouseholdMerge_SplitConfirmHeading</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the dialog shown before a split runs</shortDescription>
+        <value>Split this household?</value>
+    </labels>
+    <labels>
         <fullName>Core_HouseholdMerge_SplitExistingHousehold</fullName>
         <categories>Households</categories>
         <language>en_US</language>
