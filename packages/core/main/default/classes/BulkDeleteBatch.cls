@@ -182,6 +182,20 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
             job.Rows_Deleted__c = deletedRecords;
             job.Rows_Rejected__c = failedRecords;
             Database.update(job, AccessLevel.SYSTEM_MODE);
+            JobNotifier.aboutRecord(
+                UserInfo.getUserId(),
+                System.Label.Core_JobNotice_BulkDelete,
+                failed,
+                String.format(
+                    System.Label.Core_JobNotice_BulkDeleteBody,
+                    new List<Object>{
+                        deletedRecords.format(),
+                        noLongerMatching.format(),
+                        failedRecords.format()
+                    }
+                ),
+                jobId
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkDeleteBatch.finish', jobId);
         }

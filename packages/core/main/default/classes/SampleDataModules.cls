@@ -89,9 +89,14 @@ public with sharing class SampleDataModules {
         return counts;
     }
 
+    /** Starts the module at this place in the load order, or ends the load when none is left. */
     private static void start(Integer index) {
         List<SampleDataModule> modules = installed();
-        if (index < 0 || index >= modules.size()) {
+        if (index >= modules.size()) {
+            SampleDataLoader.notifyLoadFinished();
+            return;
+        }
+        if (index < 0) {
             return;
         }
         modules[index].enqueueLoad();

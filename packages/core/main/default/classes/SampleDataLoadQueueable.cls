@@ -15,6 +15,9 @@
  */
 public with sharing class SampleDataLoadQueueable implements Queueable {
     public void execute(QueueableContext context) {
+        // A stage that throws rolls back everything it did, a notification included, so the
+        // person who loaded the data is told by the finalizer, which runs afterwards (Q-04).
+        System.attachFinalizer(new SampleDataLoadFinalizer());
         try {
             SampleDataSet data = SampleDataSet.parse(SampleDataLoader.getSampleDataJson());
             loadHouseholdsAndOrganizations(data);

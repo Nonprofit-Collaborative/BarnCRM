@@ -225,6 +225,21 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             job.Rows_Matched__c = unchanged;
             job.Rows_Rejected__c = failedRecords;
             Database.update(job, AccessLevel.SYSTEM_MODE);
+            JobNotifier.aboutRecord(
+                UserInfo.getUserId(),
+                System.Label.Core_JobNotice_BulkUpdate,
+                failed,
+                String.format(
+                    System.Label.Core_JobNotice_BulkUpdateBody,
+                    new List<Object>{
+                        updated.format(),
+                        unchanged.format(),
+                        noLongerMatching.format(),
+                        failedRecords.format()
+                    }
+                ),
+                jobId
+            );
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkUpdateBatch.finish', jobId);
         }

@@ -19,6 +19,8 @@ public with sharing class FieldUtilizationBatch implements Database.Batchable<Ob
     private Set<String> objectsCounted = new Set<String>();
     private Integer fieldsCounted = 0;
     private Integer fieldsFailed = 0;
+    /** Who pressed Run now, told when the count ends; null for the weekly run (Q-04). */
+    private Id notifyUserId = JobNotifier.starter();
 
     /** Narrows a test run to the named fields, so a test does not depend on the org's fields. */
     @TestVisible
@@ -91,14 +93,19 @@ public with sharing class FieldUtilizationBatch implements Database.Batchable<Ob
         } catch (Exception purgeFailure) {
             ErrorLogger.log(purgeFailure, LOG_CONTEXT);
         }
-        FieldUtilizationService.recordRun(
-            now,
-            FieldUtilizationService.summary(
-                this.fieldsCounted,
-                this.objectsCounted.size(),
-                this.fieldsFailed,
-                this.skipped
-            )
+        String summary = FieldUtilizationService.summary(
+            this.fieldsCounted,
+            this.objectsCounted.size(),
+            this.fieldsFailed,
+            this.skipped
+        );
+        FieldUtilizationService.recordRun(now, summary);
+        JobNotifier.aboutSettings(
+            this.notifyUserId,
+            System.Label.Core_JobNotice_FieldUtilization,
+            false,
+            summary,
+            JobNotifier.SECTION_HEALTH
         );
     }
 
