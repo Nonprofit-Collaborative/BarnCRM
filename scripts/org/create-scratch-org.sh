@@ -134,6 +134,13 @@ if [[ "$FOUND_PERMSET" -eq 0 ]]; then
   echo "no permission sets yet"
 fi
 
+# Person account shapes: the System Administrator profile is given the person record types,
+# so the tests that need real person accounts run here (PEOPLE-29). PersonAccountTestShape
+# fails those tests in an org where this was not done.
+if [[ "$SHAPE" == "person-accounts" || "$SHAPE" == "nonprofit-cloud" ]]; then
+  scripts/org/grant-person-record-type.sh "$ALIAS"
+fi
+
 # PLATFORM-ONLY VERIFICATION
 #
 # Scratch orgs always provision Sales Cloud objects regardless of the requested edition or

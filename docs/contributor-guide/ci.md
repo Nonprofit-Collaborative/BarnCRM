@@ -366,6 +366,12 @@ gate script works against either: `scripts/org/run-org-tests.sh oi-pa` posts the
 `Org tests (local)` status. No other org is used for testing without the maintainer's
 approval.
 
+Both orgs need the System Administrator profile to hold a person account record type, or the
+tests that create real person accounts fail with `PersonAccountTestShape.NO_PERSON_TYPE_FOR_USER`
+(PEOPLE-29). `create-scratch-org.sh` does this for the `person-accounts` and `nonprofit-cloud`
+shapes; for an org created before that, run `scripts/org/grant-person-record-type.sh <alias>`
+once.
+
 When several people or agents share these orgs, take turns: one deploy or test run per org at
 a time. A deploy from one branch while another branch's tests run leaves the org holding a
 mix of the two.
