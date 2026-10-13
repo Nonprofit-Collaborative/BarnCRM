@@ -123,7 +123,15 @@ public with sharing class RelationshipService {
             return;
         }
 
-        Map<String, Relationship__c> unpairedByKey = unpairedCandidates(otherPeople, eligible);
+        // Every key a record on the far side already has, paired or not, so that two records
+        // whose other sides would be the same (A to B as Colleague and as Employer contact
+        // both have B to A as Colleague) never get a duplicate mirror (R-RL4).
+        Set<String> takenKeys = new Set<String>();
+        Map<String, Relationship__c> unpairedByKey = unpairedCandidates(
+            otherPeople,
+            eligible,
+            takenKeys
+        );
         Set<Id> pairedInThisRun = new Set<Id>();
         Map<Id, Relationship__c> updates = new Map<Id, Relationship__c>();
         List<Relationship__c> toCreate = new List<Relationship__c>();
@@ -149,6 +157,12 @@ public with sharing class RelationshipService {
                     partner.Id,
                     new Relationship__c(Id = partner.Id, Reciprocal_Relationship__c = record.Id)
                 );
+                continue;
+            }
+            String mirrorKey = otherSideKey(record);
+            if (mirrorKey != null && !takenKeys.add(mirrorKey)) {
+                // That other side already exists, paired with another record. This one is
+                // left without a mirror of its own rather than given a duplicate.
                 continue;
             }
             toCreate.add(mirrorOf(record));
@@ -181,9 +195,6 @@ public with sharing class RelationshipService {
             changedIds.add(record.Id);
         }
         for (Relationship__c record : records) {
-            Relationship__c previous = previousById == null
-                ? null
-                : (Relationship__c) previousById.get(record.Id);
             if (record.Is_Reciprocal_Managed__c != true) {
                 continue;
             }
@@ -191,9 +202,11 @@ public with sharing class RelationshipService {
                 toEnsure.add(record);
                 continue;
             }
-            if (previous != null && !mirroredValuesChanged(record, previous)) {
-                continue;
-            }
+            // Every save of a managed side is compared with its other side, not only a save
+            // that changed a mirrored value, so that a pair that has drifted apart (an edit
+            // made while the sync was switched off) is brought back into step by the next
+            // save, as the admin guide promises. alreadyEqual keeps an in-step pair from
+            // being written at all.
             // Both sides of one pair edited in the same save would otherwise write over each
             // other in an order nobody chose. The record with the lower id wins, which is
             // arbitrary but the same every time.
@@ -343,7 +356,8 @@ public with sharing class RelationshipService {
      */
     private static Map<String, Relationship__c> unpairedCandidates(
         Set<Id> otherPeople,
-        List<Relationship__c> eligible
+        List<Relationship__c> eligible,
+        Set<String> takenKeys
     ) {
         Map<String, Relationship__c> byKey = new Map<String, Relationship__c>();
         Set<Id> eligibleIds = new Set<Id>();
@@ -351,6 +365,10 @@ public with sharing class RelationshipService {
             eligibleIds.add(record.Id);
         }
         for (Relationship__c candidate : RelationshipSelector.selectByFromPersonIds(otherPeople)) {
+            String candidateKey = ownSideKey(candidate);
+            if (candidateKey != null && !eligibleIds.contains(candidate.Id)) {
+                takenKeys.add(candidateKey);
+            }
             if (
                 candidate.Reciprocal_Relationship__c != null ||
                 candidate.Is_Reciprocal_Managed__c != true
@@ -385,7 +403,7 @@ public with sharing class RelationshipService {
             record.Related_Contact__c,
             record.Related_Person_Account__c
         );
-        String reciprocal = reciprocalOf(record.Type__c);
+        String reciprocal = otherSideTypeOf(record);
         if (fromKey == null || toKey == null || String.isBlank(reciprocal)) {
             return null;
         }
@@ -408,7 +426,7 @@ public with sharing class RelationshipService {
             Person_Account__c = record.Related_Person_Account__c,
             Related_Contact__c = record.Contact__c,
             Related_Person_Account__c = record.Person_Account__c,
-            Type__c = reciprocalOf(record.Type__c),
+            Type__c = otherSideTypeOf(record),
             Reciprocal_Type__c = record.Type__c,
             Status__c = String.isBlank(record.Status__c) ? STATUS_CURRENT : record.Status__c,
             Start_Date__c = record.Start_Date__c,
@@ -419,18 +437,15 @@ public with sharing class RelationshipService {
         );
     }
 
-    /** Whether anything the other side copies actually moved. */
-    private static Boolean mirroredValuesChanged(Relationship__c record, Relationship__c previous) {
-        return record.Type__c != previous.Type__c ||
-            record.Status__c != previous.Status__c ||
-            record.Start_Date__c != previous.Start_Date__c ||
-            record.End_Date__c != previous.End_Date__c ||
-            record.Description__c != previous.Description__c ||
-            record.Contact__c != previous.Contact__c ||
-            record.Person_Account__c != previous.Person_Account__c ||
-            record.Related_Contact__c != previous.Related_Contact__c ||
-            record.Related_Person_Account__c != previous.Related_Person_Account__c ||
-            record.Is_Reciprocal_Managed__c != previous.Is_Reciprocal_Managed__c;
+    /**
+     * The type the other side carries: this record's own reciprocal when it has one, which
+     * keeps a one-way pair (Employer contact and Colleague) as it was set up, and the mapping
+     * otherwise.
+     */
+    private static String otherSideTypeOf(Relationship__c record) {
+        return String.isNotBlank(record.Reciprocal_Type__c)
+            ? record.Reciprocal_Type__c
+            : reciprocalOf(record.Type__c);
     }
 
     /**

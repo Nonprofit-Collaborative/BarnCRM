@@ -5343,7 +5343,7 @@ a Spouse relationship, and the two mechanisms do not read each other.
 | Related Contact | `Related_Contact__c` | Lookup to Contact |
 | Related Person Account | `Related_Person_Account__c` | Lookup to Account |
 | Type | `Type__c` | Picklist: Spouse, Partner, Parent, Child, Sibling, Grandparent, Grandchild, Friend, Colleague, Employer contact, Other |
-| Reciprocal Type | `Reciprocal_Type__c` | Picklist, same value set as `Type__c` |
+| Reciprocal Type | `Reciprocal_Type__c` | Picklist, same values as `Type__c`, not restricted: BarnCRM always writes it from the relationship type mapping, whose values the custom metadata page checks against `Type__c`, so a custom type added to `Type__c` alone saves |
 | Status | `Status__c` | Picklist: Current, Former |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |

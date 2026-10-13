@@ -35,7 +35,8 @@ entry changes the org's metadata.
 A relationship type also has to be a choice in the **Type** list on a relationship, and
 adding a choice to that list is done in Setup (Object Manager, Relationship, Fields, Type).
 Add the choice there first, then add the type here. The page checks this and tells you if
-the choice is missing.
+the choice is missing. The **Reciprocal Type** field on a relationship needs nothing: BarnCRM
+fills it in from your type, so it accepts any type you have added to **Type**.
 
 ## A five-minute walkthrough
 
