@@ -165,6 +165,37 @@ private class ImportRowRulesTest {
         }
     }
 
+    @IsTest
+    static void theNextFileStartsFromTheSavedChangesToValues() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = clearingTemplate(false);
+            ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
+            DataTransform.Step trim = new DataTransform.Step('trim');
+            saved.columns[1].transforms = new List<DataTransform.Step>{ trim };
+            template.Column_Mapping_JSON__c = saved.serialize();
+            update template;
+
+            ImportMapping next = ImportMapping.parse(
+                ImportController.suggestMapping(template.Id, new List<String>{ 'Id', 'Reason' })
+            );
+            Assert.isTrue(
+                next.columns[0].transforms == null || next.columns[0].transforms.isEmpty()
+            );
+            Assert.areEqual(1, next.columns[1].transforms.size());
+            Assert.areEqual('trim', next.columns[1].transforms[0].op);
+
+            ImportMapping renamed = ImportMapping.parse(
+                ImportController.suggestMapping(template.Id, new List<String>{ 'Id', 'Why' })
+            );
+            for (ImportMapping.Column column : renamed.columns) {
+                Assert.isTrue(
+                    column.transforms == null || column.transforms.isEmpty(),
+                    'A renamed column starts with no changes.'
+                );
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------------------
     // Empty cells that clear (R-IT18)
     // -------------------------------------------------------------------------------------
