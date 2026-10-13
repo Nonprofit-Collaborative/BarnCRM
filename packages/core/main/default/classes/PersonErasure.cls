@@ -81,6 +81,9 @@ public with sharing class PersonErasure {
 
     private static final Integer ACCESS_CHUNK = 200;
 
+    /** Activities and files are counted up to this many of each kind (R-ER10). */
+    private static final Integer ACTIVITY_CAP = 10000;
+
     /** One kind of change to one kind of record. Holds labels and Ids, never a value. */
     @NamespaceAccessible
     public class Change {
@@ -350,6 +353,7 @@ public with sharing class PersonErasure {
             if (individual != null) {
                 noteHistory(individual.getSObjectType(), individual.Id, result);
             }
+            noteActivitiesAndFiles(personId, result);
             HouseholdService.afterMembershipChange(households, true);
             settleHouseholds(households, result);
             for (PersonErasureExtension extension : extensions) {
@@ -567,6 +571,70 @@ public with sharing class PersonErasure {
             result.changes.add(
                 new Change(KEPT, historyLabel, howMany, Label.Core_Erase_NoteHistoryKept)
             );
+        }
+    }
+
+    /**
+     * Tasks, events and files about the person: counted and listed as kept, never changed
+     * (R-ER10). A task or event counts once whether it names the person as its Name, its
+     * Related To, or one of the people a shared activity names. Counted in system mode, like
+     * field history, so the admin learns of ones they cannot open; only counts are shown.
+     */
+    private static void noteActivitiesAndFiles(Id personId, Result result) {
+        Set<Id> people = new Set<Id>{ personId };
+        Set<Id> tasks = new Set<Id>();
+        for (Task task : [
+            SELECT Id
+            FROM Task
+            WHERE WhoId IN :people OR WhatId IN :people
+            WITH SYSTEM_MODE
+            LIMIT :ACTIVITY_CAP
+        ]) {
+            tasks.add(task.Id);
+        }
+        for (TaskRelation relation : [
+            SELECT TaskId
+            FROM TaskRelation
+            WHERE RelationId IN :people
+            WITH SYSTEM_MODE
+            LIMIT :ACTIVITY_CAP
+        ]) {
+            tasks.add(relation.TaskId);
+        }
+        Set<Id> events = new Set<Id>();
+        for (Event event : [
+            SELECT Id
+            FROM Event
+            WHERE WhoId IN :people OR WhatId IN :people
+            WITH SYSTEM_MODE
+            LIMIT :ACTIVITY_CAP
+        ]) {
+            events.add(event.Id);
+        }
+        for (EventRelation relation : [
+            SELECT EventId
+            FROM EventRelation
+            WHERE RelationId IN :people
+            WITH SYSTEM_MODE
+            LIMIT :ACTIVITY_CAP
+        ]) {
+            events.add(relation.EventId);
+        }
+        Integer files = [
+            SELECT COUNT()
+            FROM ContentDocumentLink
+            WHERE LinkedEntityId IN :people
+            WITH SYSTEM_MODE
+            LIMIT :ACTIVITY_CAP
+        ];
+        noteByHand(result, labelOf(Task.SObjectType), tasks.size());
+        noteByHand(result, labelOf(Event.SObjectType), events.size());
+        noteByHand(result, Label.Core_Erase_Files, files);
+    }
+
+    private static void noteByHand(Result result, String objectLabel, Integer howMany) {
+        if (howMany > 0) {
+            result.changes.add(new Change(KEPT, objectLabel, howMany, Label.Core_Erase_NoteByHand));
         }
     }
 

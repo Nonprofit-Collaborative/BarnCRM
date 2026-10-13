@@ -6483,6 +6483,13 @@ person's current name to confirm. A person with an Erasure record is not erased 
 `PersonErasureExtension` changes its own records in the same transaction and reports what it
 changed and kept. A module that is installed but cannot answer refuses the erasure.
 
+**R-ER9 An erased person is not an orphan.** A person an Erasure record names is left out of
+"people with no household" in Health Check and data hygiene, in both membership modes.
+
+**R-ER10 Activities and files are listed, not erased.** Tasks and events naming the person (by
+WhoId, WhatId, TaskRelation or EventRelation) and files linked to the person
+(ContentDocumentLink) are counted and listed as kept, for the admin to delete by hand.
+
 ### Salesforce implementation
 
 - **Object:** `Erasure__c`, auto-number Name with format `ER-{000000}`, sharing Read, no tab.
@@ -6677,7 +6684,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
-| post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER8. New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
+| post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
 
 ---
 ## 32. Entity ownership by package

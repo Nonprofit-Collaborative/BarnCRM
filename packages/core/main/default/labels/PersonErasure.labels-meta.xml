@@ -113,6 +113,22 @@
         <value>Old values of tracked fields are kept. Erasing them needs the Salesforce permission to remove field history.</value>
     </labels>
     <labels>
+        <fullName>Core_Erase_NoteByHand</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: activities and files are not erased</shortDescription>
+        <value>Not erased. Open them from the person&apos;s record and delete or edit what is about this person by hand, before you erase.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Erase_Files</fullName>
+        <categories>Erase</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Erase a person: the files row in the preview</shortDescription>
+        <value>Files</value>
+    </labels>
+    <labels>
         <fullName>Core_Erase_NoteHistoryDeleted</fullName>
         <categories>Erase</categories>
         <language>en_US</language>

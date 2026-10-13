@@ -159,7 +159,60 @@ private class HealthCheckHouseholdChecksTest {
         }
     }
 
+    /** The audit an erasure leaves; written as the erasure writes it (system mode). */
+    private static void recordErasureOf(Id contactId) {
+        Database.insert(
+            new Erasure__c(Contact__c = contactId, Erased_Record_Id__c = contactId),
+            true,
+            AccessLevel.SYSTEM_MODE
+        );
+    }
+
+    @IsTest
+    static void anErasedPersonIsNotAPersonWithNoHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            List<Contact> orphans = insertWithoutAutomaticHouseholds(
+                new List<Contact>{
+                    HouseholdTestDataFactory.newContact('Ann', 'Lee'),
+                    HouseholdTestDataFactory.newContact('Bo', 'Erased')
+                }
+            );
+            recordErasureOf(orphans[1].Id);
+            platformOnlyShape();
+
+            HealthCheckService.Finding finding = runAsMaria(PEOPLE);
+
+            Assert.isNotNull(finding, 'Ann is still reported.');
+            Assert.isTrue(
+                finding.title.startsWith('1 '),
+                'Erasing Bo took him out of his household on purpose (R-ER9). ' + finding.title
+            );
+            Assert.areEqual(1, finding.links.size(), 'Only Ann is linked.');
+            Assert.isTrue(finding.links[0].url.contains(orphans[0].Id), 'And it is Ann.');
+        }
+    }
+
     // ----------------------------------------------------------------------- junction mode
+
+    @IsTest
+    static void junctionModeLeavesOutAnErasedPersonWhoseMembershipEnded() {
+        System.runAs(TestUsers.admin()) {
+            junctionModeKeepingEmptyHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Kept Family');
+            insert household;
+            Contact erased = HouseholdTestDataFactory.newContact('Cy', 'Erased');
+            insertWithoutAutomaticHouseholds(new List<Contact>{ erased });
+            insert membership(erased.Id, household.Id, Date.today());
+            recordErasureOf(erased.Id);
+            platformOnlyShape();
+
+            Assert.isNull(
+                runAsMaria(PEOPLE),
+                'The erasure ended the membership on purpose, so nobody is reported.'
+            );
+        }
+    }
 
     @IsTest
     static void junctionModeCountsPeopleWithNoCurrentMembership() {

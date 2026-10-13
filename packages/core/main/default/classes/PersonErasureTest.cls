@@ -293,13 +293,18 @@ private class PersonErasureTest {
             }
             Assert.isTrue(
                 actions.contains(
-                    PersonErasure.CLEARED + ' ' + Contact.SObjectType.getDescribe().getLabel()
+                    PersonErasure.CLEARED +
+                        ' ' +
+                        Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
                 ),
                 'Lists the person'
             );
             Assert.isTrue(
                 actions.contains(
-                    PersonErasure.DELETED + ' ' + Address__c.SObjectType.getDescribe().getLabel()
+                    PersonErasure.DELETED +
+                        ' ' +
+                        Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                            .getLabel()
                 ),
                 'Lists the address'
             );
@@ -324,6 +329,59 @@ private class PersonErasureTest {
                 'Household still there'
             );
             Assert.areEqual(0, [SELECT COUNT() FROM Erasure__c], 'No audit for a preview');
+        }
+    }
+
+    @IsTest
+    static void activitiesAndFilesAreCountedForTheAdminToDeleteByHand() {
+        System.runAs(eraser()) {
+            isolate();
+            // Household kept, so no account delete can take activities with it.
+            Contact jordan = coupleInContactMode(false);
+            insert new List<Task>{
+                new Task(WhoId = jordan.Id, Subject = 'Call'),
+                new Task(WhoId = jordan.Id, Subject = 'Thank you note')
+            };
+            insert new Event(
+                WhoId = jordan.Id,
+                Subject = 'Visit',
+                ActivityDateTime = System.now(),
+                DurationInMinutes = 30
+            );
+            insert new ContentVersion(
+                Title = 'Letter',
+                PathOnClient = 'letter.txt',
+                VersionData = Blob.valueOf('Dear Jordan'),
+                FirstPublishLocationId = jordan.Id
+            );
+
+            Map<String, PersonErasure.Change> kept = new Map<String, PersonErasure.Change>();
+            for (PersonErasure.Change change : PersonErasure.preview(jordan.Id).changes) {
+                if (change.action == PersonErasure.KEPT) {
+                    kept.put(change.objectLabel, change);
+                }
+            }
+            String tasks = Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+            String events = Event.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getLabel();
+            Assert.areEqual(2, kept.get(tasks)?.count, 'Both tasks counted');
+            Assert.areEqual(1, kept.get(events)?.count, 'The event counted');
+            Assert.areEqual(1, kept.get(Label.Core_Erase_Files)?.count, 'The file counted');
+            Assert.areEqual(
+                Label.Core_Erase_NoteByHand,
+                kept.get(tasks).note,
+                'Told to act by hand'
+            );
+
+            Test.startTest();
+            PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Task WHERE WhoId = :jordan.Id],
+                'Nothing is erased automatically (R-ER10)'
+            );
         }
     }
 
@@ -369,7 +427,10 @@ private class PersonErasureTest {
             } catch (PersonErasure.ErasureException refused) {
                 Assert.isTrue(
                     refused.getMessage()
-                        .contains(Contact.SObjectType.getDescribe().getLabelPlural()),
+                        .contains(
+                            Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                                .getLabelPlural()
+                        ),
                     'Names what is in the way'
                 );
             }
