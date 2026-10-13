@@ -49,14 +49,34 @@ public without sharing class SeasonalAddressSelector {
         if (ownerIds == null || ownerIds.isEmpty()) {
             return new List<Address__c>();
         }
-        return (List<Address__c>) Database.queryWithBinds(
-            'SELECT ' +
-                AddressSelector.FIELDS +
-                ', Replaced_By_Seasonal__c FROM Address__c WHERE Account__c IN :ownerIds' +
-                ' OR Contact__c IN :ownerIds OR Person_Account__c IN :ownerIds' +
-                ' ORDER BY CreatedDate LIMIT 10000',
-            new Map<String, Object>{ 'ownerIds' => ownerIds },
-            AccessLevel.SYSTEM_MODE
-        );
+        return [
+            SELECT
+                Id,
+                Name,
+                Account__c,
+                Contact__c,
+                Person_Account__c,
+                Type__c,
+                Street__c,
+                City__c,
+                State__c,
+                Postal_Code__c,
+                Country__c,
+                Seasonal_Start_Month__c,
+                Seasonal_Start_Day__c,
+                Seasonal_End_Month__c,
+                Seasonal_End_Day__c,
+                Is_Default__c,
+                Replaced_By_Seasonal__c,
+                CreatedDate
+            FROM Address__c
+            WHERE
+                Account__c IN :ownerIds
+                OR Contact__c IN :ownerIds
+                OR Person_Account__c IN :ownerIds
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate
+            LIMIT 10000
+        ];
     }
 }
