@@ -384,8 +384,13 @@ contact mirrors the primary member).
   Account accepts a person contact (verified in a person accounts org on 2026-09-23). The
   person contact is read only through dynamic Apex and only where the org has Person
   Accounts, so the model keeps no dependency on them.
-- With no current primary member, Primary Contact is empty (R-H10). With more than one,
-  which only a data load can produce, the first of them in R-H5 order is mirrored and no
+- With no current primary member, Primary Contact is empty (R-H10).
+- A save of one Household Member record, made by a person, that would make it a second
+  current primary member of its household is refused before the save (label
+  `Core_Households_ErrorSecondPrimary`), pointing to Make primary. A save of more than one
+  record, or one arriving through the APIs, the Bulk API or background Apex, is a load and
+  is not refused (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`): with
+  more than one current primary, the first of them in R-H5 order is mirrored and no
   membership row is changed.
 - `HouseholdService` is the only writer in junction mode. It settles the mirror on every
   membership change (a row added, changed, ended, removed or restored, a person deleted or
@@ -6723,6 +6728,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-13 | Household Member integrity (PEOPLE-25). No object or field added. R-M4 is now enforced by the validation rule `Membership_Names_One_Person` on a save that creates a row or changes who it names. New R-M6: one current membership per person per household, refused before the save by the Household Member trigger (label `Core_Households_ErrorAlreadyCurrentMember`). R-M3's tolerance of two primaries from a data load is unchanged. |
 | v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
 | v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
+| v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
 
 ---
 ## 32. Entity ownership by package
