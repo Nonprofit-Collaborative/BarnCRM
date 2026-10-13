@@ -6276,8 +6276,8 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
 ### Definition
 
 One count of how many records hold a value in one field, for one object and one record type,
-counted on the Field Utilization tab and saved there with "Save these counts" (plan Section 6.1
-item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`, ADR-NEXT
+counted in Org Optimizer's Field utilization section and saved there with "Save these counts"
+(plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`, ADR-NEXT
 `NEXT-field-utilization-on-demand.md`). Every row of one save carries the same Taken At, so a
 saved count is the set of rows sharing it, and a trend is the same object, field and record type
 across saves. Neutral: it names no nonprofit concept and is in Core.
@@ -6345,8 +6345,9 @@ current one, with the change in percentage points.
 
 - **Service:** `FieldUtilizationService` (plan, count, save), `FieldUtilizationSelector`
   (latest saved count), `FieldUtilizationController` (every method requires
-  `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component on the app page and
-  tab `Field_Utilization` in the BarnCRM app, granted by `BarnCRM_Admin`.
+  `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component, embedded in Org
+  Optimizer; the app page and tab `Field_Utilization` also host it but are not in the BarnCRM
+  app navigation.
 
 ---
 

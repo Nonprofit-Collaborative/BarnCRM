@@ -23,8 +23,11 @@ Lightning server call should return in well under two minutes.
 
 ## Decision
 
-1. **A Field Utilization tab.** A Lightning app page (`Field_Utilization`), with its own custom
-   tab in the BarnCRM app, hosts the `fieldUtilization` component. The person picks an object;
+1. **A Field Utilization page, opened from Org Optimizer.** A Lightning app page
+   (`Field_Utilization`) and custom tab host the `fieldUtilization` component. The tab is not in
+   the BarnCRM app navigation and no permission set makes it visible: field utilization lives
+   inside Org Optimizer, which embeds the same component as a section (owner decision,
+   2026-10-13: "Field utilization lives only inside Org Optimizer"). The person picks an object;
    the page lists every countable field of it with its label, API name, record type, filled
    count, record count and percent, sortable. The console panel is removed: the feature has no
    setting left to live in the console.
@@ -52,7 +55,7 @@ Lightning server call should return in well under two minutes.
 7. **No retention job.** Rows are written only when someone chooses to save, so growth is
    small. Old rows are cleared with the product's own Bulk delete (a Find query on Field
    Utilization Snapshots by Taken At) or any standard delete; the admin guide says so.
-8. **Permissions unchanged in substance.** BarnCRM Admin carries the tab, the controller and the
+8. **Permissions unchanged in substance.** BarnCRM Admin carries the controller and the
    snapshot object (Read, Create, Delete, View All, Modify All). Every controller method requires
    `Manage_BarnCRM_Settings`, which BarnCRM Admin carries.
 
@@ -75,8 +78,8 @@ Lightning server call should return in well under two minutes.
   `NightlyJobs` registration, and the labels only the old page used. An org upgraded from a
   build with the weekly job needs those components removed by a destructive deploy, and its
   scheduled job "BarnCRM Field Utilization" aborted.
-- Added: tab and app page `Field_Utilization`, granted to BarnCRM Admin and placed in the
-  BarnCRM app after Data Hygiene.
+- Added: tab and app page `Field_Utilization`, kept out of the BarnCRM app navigation and out
+  of every permission set's tab visibility; the component is reached from Org Optimizer.
 - `FindController.isOffered` becomes public so both pages offer objects by one rule.
 - An object with many fields takes several calls; a 300-field object is eight calls.
 - ADR-0086's revisit of chunk size after the 1M-gift scale test now applies to the 40 and 10

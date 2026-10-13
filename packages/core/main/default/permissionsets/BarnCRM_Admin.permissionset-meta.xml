@@ -1645,10 +1645,6 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Field_Utilization</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
     <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>

@@ -53,7 +53,7 @@ first error.
 | Household naming | **Recompute all households** on the household naming settings (`HouseholdNamingBatch`) | Completes; names match the naming preview for a sample |
 | Duplicate scan | **Scan for duplicates** (`DuplicateScanBatch`) | Completes; no batch reported as not checked; no CPU limit errors on the largest match groups |
 | Donor levels and acknowledgments | `DonorLevelBatch` and `AcknowledgmentBatch`, started from anonymous Apex with `Database.executeBatch` if the scheduler is not due | Complete with no failed batches |
-| Field utilization | Field Utilization tab, choose the gift object and Contact (`FieldUtilizationController`, 10 fields per call above 100,000 records) | Each call returns in under 30 seconds; no limit errors |
+| Field utilization | Org Optimizer, Field utilization section, choose the gift object and Contact (`FieldUtilizationController`, 10 fields per call above 100,000 records) | Each call returns in under 30 seconds; no limit errors |
 | Import | Import wizard with a 250k-row file on tier 2 (a 25k-row file on tier 1), contacts plus gifts | Completes; rows processed per minute recorded; undo of the whole batch (`ImportUndoBatch`) completes |
 | Interactive pages | Open a household with 30 members, a contact with 500 gifts, the Giving dashboard, Find with a broad search | Each page usable in under 5 seconds; no `Too many query rows` error |
 

@@ -8,7 +8,8 @@ filled in. Where a kind of record has record types, such as households and organ
 record type is counted on its own, because a field that matters for organizations may be
 meaningless for households.
 
-The count runs when you ask for it, on the **Field Utilization** tab. Choose **Save these
+The count runs when you ask for it, in the **Field utilization** section of the **Org
+Optimizer** tab. Choose **Save these
 counts** to keep a result; the next time you count, the page shows the saved result next to the
 new one, so you can see the trend: a field that went from 40% to 70% filled since the last saved
 count is being adopted; a field that sits at 0% count after count is a field nobody uses, and a
@@ -20,14 +21,15 @@ It only counts. It never changes a record, a field or a page.
 ## How to turn it on
 
 You need the BarnCRM Admin role (the BarnCRM Admin permission set, which carries the Manage
-BarnCRM Settings permission). It gives you the **Field Utilization** tab in the BarnCRM app.
-Nobody else sees the tab. There is nothing to schedule and no setting to change.
+BarnCRM Settings permission). It shows you the **Field utilization** section of the **Org
+Optimizer** tab in the BarnCRM app. Nobody else sees the section. There is nothing to schedule
+and no setting to change.
 
 ## A five-minute walkthrough
 
 Start from the sample data (see [Sample data](sample-data.md)).
 
-1. In the BarnCRM app, open the **Field Utilization** tab.
+1. In the BarnCRM app, open the **Org Optimizer** tab and choose **Field utilization**.
 2. In **Kind of record**, choose **Account**. The page counts the records, then fills the table
    as it counts the fields, 40 at a time, with a progress bar. When it is done it reads, for
    example, "Counted 56 of 56 fields."
@@ -35,7 +37,7 @@ Start from the sample data (see [Sample data](sample-data.md)).
    Each row shows the field's label and API name, how many records have it filled in, how many
    records there are, and the percentage. Sort by **Filled** to put the least used fields first.
 4. Choose **Save these counts**. The page reads, for example, "Saved 112 counts."
-5. Open any sample organization and fill in its **Website**. Go back to the tab and choose
+5. Open any sample organization and fill in its **Website**. Go back to the section and choose
    **Count again**. The Website row for Organization now shows a higher percentage, **Saved**
    shows the percentage you saved in step 4, and **Change (points)** shows how many percentage
    points it moved since then.
