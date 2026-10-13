@@ -125,12 +125,31 @@ describe('c-household-naming-settings', () => {
     await flush();
 
     expect(saveSettings).toHaveBeenCalledWith({
-      settings: {
+      values: {
         Household_Name_Pattern__c: '{LastName} Household',
         Formal_Greeting_Pattern__c: '{Salutation} {LastName}',
         Informal_Greeting_Pattern__c: '{FirstName}'
       }
     });
+  });
+
+  it('reports Saved only when Apex receives the values parameter', async () => {
+    // Mirrors SettingsController.saveSettings(Map<String, Object> values): any other key
+    // reaches Apex as null and nothing is saved, so this mock refuses it.
+    saveSettings.mockImplementation((params) => {
+      const ok = params && params.values && Object.keys(params).length === 1;
+      return ok ? Promise.resolve() : Promise.reject({ body: { message: 'values was null' } });
+    });
+    const element = build();
+    await flush();
+
+    const handler = jest.fn();
+    element.addEventListener('save', handler);
+    element.shadowRoot.querySelector('.save-button').dispatchEvent(new CustomEvent('click'));
+    await flush();
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
   });
 
   it('disables Save while a save is in progress, so a double click cannot write twice', async () => {
