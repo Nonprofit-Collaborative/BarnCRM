@@ -164,12 +164,12 @@ private class HouseholdPrimaryContactTest {
     @IsTest
     static void aRealPersonAccountIsItsNewHouseholdsPrimaryContact() {
         System.runAs(TestUsers.admin()) {
-            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
-            if (personType == null) {
+            if (PersonAccountTestShape.skipReason() != null) {
                 // Proven on every shape by the test above; this one needs real person accounts,
-                // of a record type the running user is given.
+                // of a record type the running user is given. The reason is checked and logged.
                 return;
             }
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
             BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
                 HouseholdTestDataFactory.MODE_JUNCTION
             );

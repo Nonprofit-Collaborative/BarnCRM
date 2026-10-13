@@ -217,8 +217,8 @@ public with sharing class HouseholdService {
         if (personAccountOverride != null) {
             return personAccountOverride;
         }
-        OrgShapeDetector.OrgShape shape = OrgShapeDetector.detect();
-        return shape != null && shape.hasPersonAccounts == true;
+        // One facet, not the whole shape: this is asked on Account saves (PEOPLE-36).
+        return OrgShapeDetector.hasPersonAccounts();
     }
 
     @NamespaceAccessible
@@ -1547,6 +1547,19 @@ public with sharing class HouseholdService {
         if (found.size() != householdIds.size()) {
             throw new HouseholdException(Label.Core_Households_ErrorMoveNotFound);
         }
+        Map<Id, Id> accountBehindContact = PersonRecordSelector.getAccountsBehindPersonContacts(
+            idsOfType(everybody, Contact.SObjectType)
+        );
+        if (!accountBehindContact.isEmpty()) {
+            // The hidden contact behind a person stored as an account joins as that account,
+            // so the person has one membership, on the side the Account trigger maintains
+            // (PEOPLE-7).
+            personIdsByHouseholdId = withAccountsForPersonContacts(
+                personIdsByHouseholdId,
+                accountBehindContact
+            );
+            everybody = withAccountsForPersonContacts(everybody, accountBehindContact);
+        }
         Set<Id> contactPeople = idsOfType(everybody, Contact.SObjectType);
         Set<Id> accountPeople = idsOfType(everybody, Account.SObjectType);
         if (contactPeople.size() + accountPeople.size() != everybody.size()) {
@@ -1566,6 +1579,36 @@ public with sharing class HouseholdService {
         }
         HOUSEHOLD_ID_BY_PERSON.clear();
         return affected;
+    }
+
+    private static Map<Id, Set<Id>> withAccountsForPersonContacts(
+        Map<Id, Set<Id>> personIdsByHouseholdId,
+        Map<Id, Id> accountBehindContact
+    ) {
+        Map<Id, Set<Id>> result = new Map<Id, Set<Id>>();
+        for (Id householdId : personIdsByHouseholdId.keySet()) {
+            Set<Id> people = personIdsByHouseholdId.get(householdId);
+            result.put(
+                householdId,
+                people == null ? null : withAccountsForPersonContacts(people, accountBehindContact)
+            );
+        }
+        return result;
+    }
+
+    private static Set<Id> withAccountsForPersonContacts(
+        Set<Id> people,
+        Map<Id, Id> accountBehindContact
+    ) {
+        Set<Id> result = new Set<Id>();
+        for (Id personId : people) {
+            result.add(
+                accountBehindContact.containsKey(personId)
+                    ? accountBehindContact.get(personId)
+                    : personId
+            );
+        }
+        return result;
     }
 
     /**

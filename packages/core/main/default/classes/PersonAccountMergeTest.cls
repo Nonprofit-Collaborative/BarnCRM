@@ -111,12 +111,12 @@ private class PersonAccountMergeTest {
     @IsTest
     static void realPersonAccountsKeepTheirHouseholdsAndPrimaryThroughAMerge() {
         System.runAs(TestUsers.admin()) {
-            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
-            if (personType == null) {
+            if (PersonAccountTestShape.skipReason() != null) {
                 // Proven on every shape by the tests above; this one needs real person accounts,
-                // of a record type the running user is given.
+                // of a record type the running user is given. The reason is checked and logged.
                 return;
             }
+            Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
             settingsThatTidyEmptyHouseholds();
             Account ana = (Account) realPerson(personType, 'Ana', 'Okafor');
             Account bea = (Account) realPerson(personType, 'Bea', 'Lindqvist');

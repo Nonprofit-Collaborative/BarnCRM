@@ -57,6 +57,15 @@ public with sharing class PersonRecordSelector {
     @TestVisible
     private static Map<Id, Id> personContactIdOverride;
 
+    private static final String ACCOUNTS_BEHIND_CONTACTS_QUERY = 'SELECT Id, AccountId FROM Contact WHERE Id IN :contactIds AND IsPersonAccount = true LIMIT 10000'; // detection-only: run only after isPersonAccountOrg found person accounts, to map a person contact to its account
+
+    /**
+     * Set only by tests, keyed by contact id: the account a person contact stands behind,
+     * which an org without person accounts cannot hold. Production code never sets it.
+     */
+    @TestVisible
+    private static Map<Id, Id> accountBehindContactOverride;
+
     /**
      * Set only by tests. When it is true every account record is treated as a person, so
      * that the person account paths can be exercised on an org shape that has no person
@@ -237,6 +246,49 @@ public with sharing class PersonRecordSelector {
         Map<String, Object> binds = new Map<String, Object>{ 'personRecordIds' => personRecordIds };
         for (SObject record : Database.queryWithBinds(query, binds, AccessLevel.SYSTEM_MODE)) {
             Object value = record.get(PERSON_CONTACT_FIELD);
+            if (value instanceof Id) {
+                result.put(record.Id, (Id) value);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The reverse of getPersonContactIds: for each contact among `contactIds` that is the
+     * hidden contact behind a person stored as an account, that account. Such a person
+     * belongs to a household by the account side of a membership (canonical model, Household
+     * Member), so a caller handed the contact half joins the account instead. Contacts that
+     * are people in their own right are absent from the answer, and so is everything in an
+     * org that does not store people as accounts.
+     *
+     * Read in system mode: the answer is only a mapping between two ids of the same person,
+     * never shown, and a mapping the caller could not see would put the person in twice.
+     */
+    public static Map<Id, Id> getAccountsBehindPersonContacts(Set<Id> contactIds) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        if (contactIds == null || contactIds.isEmpty()) {
+            return result;
+        }
+        if (accountBehindContactOverride != null) {
+            for (Id contactId : contactIds) {
+                if (accountBehindContactOverride.containsKey(contactId)) {
+                    result.put(contactId, accountBehindContactOverride.get(contactId));
+                }
+            }
+            return result;
+        }
+        if (!HouseholdService.isPersonAccountOrg()) {
+            return result;
+        }
+        Map<String, Object> binds = new Map<String, Object>{ 'contactIds' => contactIds };
+        for (
+            SObject record : Database.queryWithBinds(
+                ACCOUNTS_BEHIND_CONTACTS_QUERY,
+                binds,
+                AccessLevel.SYSTEM_MODE
+            )
+        ) {
+            Object value = record.get('AccountId');
             if (value instanceof Id) {
                 result.put(record.Id, (Id) value);
             }

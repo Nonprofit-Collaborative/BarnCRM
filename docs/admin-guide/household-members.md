@@ -54,7 +54,9 @@ An **Add member** button sits below the list.
 - In the simple way of belonging it opens the same new contact form you would use anywhere
   else in the org, with this household already filled in.
 - In the flexible way of belonging it offers two ways to add someone. **Add someone already
-  in Salesforce** searches by name as you type and lists matches to add with one click. **Or
+  in Salesforce** searches by name as you type and lists matches to add with one click. In
+  an org that stores people as person accounts, each such person is listed once, as their
+  person account, and joins the household that way. **Or
   add someone new** takes a salutation, first name and last name and creates the person as
   it joins them. Either way the list refreshes to show the new member once it is added.
 
