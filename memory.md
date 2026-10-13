@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-70).
+Last refreshed from BMemory 2026-10-13 (through D-77).
 
 ## Decision log (plan Section 12)
 
@@ -78,6 +78,13 @@ Last refreshed from BMemory 2026-10-13 (through D-70).
 | D-68 | 2026-10-13 | The four Q-14 agent-ready actions get access through packaged permission sets and/or groups, not a manual Setup step |
 | D-69 | 2026-10-13 | Q-14 scope: the four action classes are global (permanent once managed); no Update Person action (standard Update Record covers it); starting or committing imports from an assistant is out of scope |
 | D-70 | 2026-10-13 | Record cards (Addresses, Affiliations, Relationships) that refuse a change for lack of access show a friendly message and write no Error Log entry; real failures still logged (Q-06) |
+| D-71 | 2026-10-13 | Rollup totals recalculated just after the save by default (Background), with a "During the save" setting (Q-01, PR #256); modifies ADR-0082 decision 4 via an ADR-NEXT on that branch |
+| D-72 | 2026-10-13 | RollupRecalcAction is global so subscriber Flow Builder can use it (permanent once managed) |
+| D-73 | 2026-10-13 | Giving's Record Inbound Gift action is granted by Giving's packaged permission sets, like D-68 |
+| D-74 | 2026-10-13 | Setup notes for Giving and Connect shown on each module's own page, using Core's note component (keeps ADR-0020) |
+| D-75 | 2026-10-13 | The Bulk Update and Bulk Delete sets' 31 shared grants move into BarnCRM Find and Export (PLATFORM-17) |
+| D-76 | 2026-10-13 | All BarnCRM triggers declare all seven contexts, with a CI check, after PR #229 merges (PLATFORM-18) |
+| D-77 | 2026-10-13 | The unused label Giving_SoftCredit_Duplicate is deleted as a leftover |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
