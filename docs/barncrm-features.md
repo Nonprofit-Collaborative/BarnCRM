@@ -121,6 +121,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Neutral import wizard | Minor | Without Giving installed, the wizard offers no gift columns, and the gift templates live in Giving. | Shipped | C-29 |
 | Match by an ID field you choose | Minor | Pick which external ID field a file matches on, for people and for organizations. | Shipped | C-32 |
 | When a row matches several records | Minor | A setting decides what happens when a row matches more than one record: reject the row (the default) or use the most recently changed record; either way the row is flagged for review. | Shipped | C-32 |
+| Import runs as previewed | Minor | The import uses the template exactly as its preview ran with it; a template edited after the preview changes the next preview, not the import. | Built, not merged (fix/import-2) | C-14 (IMPORT-1) |
 | Values for every row | Minor | Give a value the whole file shares (such as a city missing from every row) once; a row with its own value keeps it. | Shipped | C-32 |
 | Match by Salesforce record ID | Minor | A file that carries Salesforce record IDs matches on them directly. | Shipped | C-32 |
 | Match only | Minor | A file can be set to update records it finds and never create new ones. | Shipped | C-32 |

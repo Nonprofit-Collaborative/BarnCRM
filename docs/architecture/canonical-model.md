@@ -2031,6 +2031,7 @@ v0.5 undoes; a bulk update is committed when it starts and is undone the same wa
 | Expected Amount | decimal | no | The total the administrator expects the file's gift amounts to add up to, a control total checked by the dry run (R-IB10). |
 | File Amount | decimal | computed | The total of the file's gift amounts as the last pass read them, written only when an entity processor reads amounts (R-IB10). |
 | Processor Settings | long text | computed | The settings the entity processor ran the last dry run under, as a document only that processor reads; the commit runs under them (R-IB11). |
+| Template Snapshot | long text | computed | The template as the last dry run started with it; that dry run and the commit run under it (R-IB1). |
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
@@ -2053,7 +2054,11 @@ commit will make. The preview counts and the downloadable exceptions file come f
 Import Row records the dry run wrote. A dry run is refused on a batch that has started a
 commit, or is in any undo status: a dry run over a committed batch would mark it a dry run
 (so it could never be undone), clear its completion time, and a second commit would move its
-undo window.
+undo window. "The same template" means the template as the dry run read it: when a dry run
+starts, the batch records the template (its mapping, values for every row, matching rules and
+person mode) as Template Snapshot, every chunk of that dry run and the commit after it run
+under the snapshot, and an edit to the template since changes the next dry run and not the
+commit. A batch with no snapshot (one previewed before this rule) runs under the template.
 
 **R-IB2 Chunked and asynchronous.** Rows are processed in chunks of Chunk Size in Batch
 Apex, with progress visible on the batch record, so a file of hundreds of thousands of
@@ -2341,6 +2346,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Expected Amount | `Expected_Amount__c` | Currency (16, 2) |
 | File Amount | `File_Amount__c` | Currency (16, 2) |
 | Processor Settings | `Processor_Settings_JSON__c` | Long Text Area (32768) |
+| Template Snapshot | `Template_Snapshot_JSON__c` | Long Text Area (131072) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
@@ -6594,6 +6600,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 
 ---
 ## 32. Entity ownership by package
