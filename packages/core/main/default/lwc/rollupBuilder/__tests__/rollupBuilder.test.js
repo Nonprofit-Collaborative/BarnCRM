@@ -24,6 +24,9 @@ jest.mock('c/rollupDefinitions', () =>
 jest.mock('c/rollupWizard', () =>
   require('../../../../../test/jest-mocks/rollupBuilder/rollupWizard')
 );
+jest.mock('c/rollupNeedsAttention', () =>
+  require('../../../../../test/jest-mocks/rollupBuilder/rollupNeedsAttention')
+);
 
 const MODEL = { canManage: true, multiCurrency: false, targets: [], aggregates: [], modes: [] };
 const flush = () => Promise.resolve().then(() => Promise.resolve());

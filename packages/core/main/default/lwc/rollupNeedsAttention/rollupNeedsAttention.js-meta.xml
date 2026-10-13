@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Rollup Builder's Needs attention list: records waiting, records that could not be saved with Retry, and the nightly run.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

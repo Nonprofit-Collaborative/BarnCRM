@@ -73,6 +73,10 @@ export default class RollupBuilder extends LightningElement {
     if (list) {
       list.refresh();
     }
+    const attention = this.template.querySelector('c-rollup-needs-attention');
+    if (attention) {
+      attention.load();
+    }
   }
 
   handleCancel() {
