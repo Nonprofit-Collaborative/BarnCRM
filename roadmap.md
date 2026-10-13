@@ -2,14 +2,13 @@
 
 Purpose: planned work with status. Mirrors Section 6 of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-10-12 (main at PR #181, squash 87a00cb9). "Built" means built on a branch or open PR, not merged. "Landing" means in landing PR #217 (batch 5, which contains batches 2 to 4, PRs #214 to #216) or #218 (batch 6), being gated.
+Status as of 2026-10-13 (main at PR #219, squash fe05faa3). #219 landed batches 2 to 6, the Rollup Builder, test self-containment, v0.11 hardening, security follow-ups, C-37 part 2 and ADR-0092; PRs #201 to #218 are closed as landed. "Built" means built on a branch or open PR, not merged.
 
 ## Near-term queue
 
-1. Gate and squash-merge #217, then #218; close #214 to #216 and the constituent PRs as landed.
-2. Rollup S9: comparison run (`RollupEngineComparison`, sample data, `oi-test`, from main after the Builder lands), then land `feature/rollup-s9-remove-vendored`.
-3. Deploy to `barn-npc` (approved once the batches, Builder and test self-containment merge), assign BarnCRM permission sets, run tests.
-4. C-35 adopts the C-37 transforms, then C-37 bulk delete. Then C-38 scheduled imports, rollup S14 (only if the scale test needs it), S15 to S17 (S16 coverage confirmed on `barn-npc`), v0.11 hardening.
+1. Rollup S9: comparison run (`RollupEngineComparison`, sample data, `oi-test`, from main), then land `feature/rollup-s9-remove-vendored` (not landed).
+2. Deploy to `barn-npc` (approved now that the batches, Builder and test self-containment are in main), assign BarnCRM permission sets, run tests.
+3. Then C-38 scheduled imports, rollup S14 (unbuilt; only if the scale test needs it), S15 to S17 (S16 coverage confirmed on `barn-npc`).
 5. Telemetry (C-26): deferred indefinitely (D-24, no AppExchange for now).
 6. Real deploy to `mwdbdevsb`: on hold (owner, 2026-10-12).
 
