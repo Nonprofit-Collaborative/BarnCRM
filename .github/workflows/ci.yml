@@ -36,6 +36,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: SLDS 2 lint (styling hooks, retired classes, no hard-coded style values)
+        run: npm run lint:slds
+
       - name: Unit tests with coverage
         run: npm run test:unit:coverage
 

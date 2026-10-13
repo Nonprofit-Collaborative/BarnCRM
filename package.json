@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint \"packages/**/lwc/**/*.js\" --no-error-on-unmatched-pattern",
     "lint:fix": "eslint \"packages/**/lwc/**/*.js\" --fix --no-error-on-unmatched-pattern",
+    "lint:slds": "slds-linter lint packages 2>&1 | tee /dev/stderr | grep 'No SLDS Violations found' > /dev/null",
     "prettier": "prettier --write \"**/*.{cls,trigger,cmp,page,component,xml,json,md,yaml,yml,js}\"",
     "prettier:verify": "prettier --check \"**/*.{cls,trigger,cmp,page,component,xml,json,md,yaml,yml,js}\"",
     "test:unit": "sfdx-lwc-jest",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@lwc/eslint-plugin-lwc": "3.5.0",
     "@prettier/plugin-xml": "3.4.2",
+    "@salesforce-ux/slds-linter": "1.2.1",
     "@salesforce/eslint-config-lwc": "4.1.2",
     "@salesforce/eslint-plugin-lightning": "2.0.0",
     "@salesforce/sfdx-lwc-jest": "7.9.0",
