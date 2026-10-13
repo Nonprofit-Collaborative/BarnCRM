@@ -1,0 +1,26 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "matches": {
+      "title": "Matches",
+      "description": "The people found, sorted by name. Empty when nobody the running user can see matches.",
+      "maxItems": 25,
+      "items": {
+        "lightning:type": "@apexClassType/c__FindPeopleAction$PersonMatch"
+      },
+      "lightning:type": "lightning__listType",
+      "lightning:isPII": true,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "errorMessage": {
+      "title": "Error Message",
+      "description": "Empty when the search ran. Otherwise why it could not run, in plain words to show the user.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Reports the status and row counts of a BarnCRM import, bulk update or bulk delete. With no id, reports the most recent import. Read only: never starts, commits or undoes a job.</description>
+  <invocationTarget>GetDataJobStatusAction</invocationTarget>
+  <invocationTargetType>apex</invocationTargetType>
+  <isConfirmationRequired>false</isConfirmationRequired>
+  <masterLabel>Get Data Job Status</masterLabel>
+</GenAiFunction>

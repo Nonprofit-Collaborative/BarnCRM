@@ -1,0 +1,13 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "jobId": {
+      "title": "Data Job Id",
+      "description": "Optional. The record id of the import, bulk update or bulk delete. Leave empty to get the most recent import the running user can see.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

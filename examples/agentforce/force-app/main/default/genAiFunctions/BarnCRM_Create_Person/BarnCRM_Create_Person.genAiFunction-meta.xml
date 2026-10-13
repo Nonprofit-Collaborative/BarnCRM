@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Creates a new person, added to an existing household or given a household of their own. Use Find People first so you do not create someone who already exists. Never changes or merges existing people.</description>
+  <invocationTarget>CreatePersonAction</invocationTarget>
+  <invocationTargetType>apex</invocationTargetType>
+  <isConfirmationRequired>true</isConfirmationRequired>
+  <masterLabel>Create Person</masterLabel>
+</GenAiFunction>

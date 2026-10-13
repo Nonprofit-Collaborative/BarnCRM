@@ -1,0 +1,30 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "personId": {
+      "title": "Person Id",
+      "description": "The new person's record id. Empty when the person was not created.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": false,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "householdId": {
+      "title": "Household Id",
+      "description": "The record id of the household the person now belongs to. Empty when they are in none.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": false,
+      "copilotAction:isUsedByPlanner": true
+    },
+    "errorMessage": {
+      "title": "Error Message",
+      "description": "Empty when the person was created. Otherwise why not, in plain words to show the user. Nothing was created for this request.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isDisplayable": true,
+      "copilotAction:isUsedByPlanner": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

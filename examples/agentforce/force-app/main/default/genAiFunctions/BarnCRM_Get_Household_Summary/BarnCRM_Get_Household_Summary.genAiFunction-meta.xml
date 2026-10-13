@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>Summarizes a household: its name, greetings, primary contact, mailing address and members with their roles. Give it a household id or a person id. Read only: never changes anything.</description>
+  <invocationTarget>GetHouseholdSummaryAction</invocationTarget>
+  <invocationTargetType>apex</invocationTargetType>
+  <isConfirmationRequired>false</isConfirmationRequired>
+  <masterLabel>Get Household Summary</masterLabel>
+</GenAiFunction>
