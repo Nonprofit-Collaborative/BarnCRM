@@ -26,12 +26,13 @@ SHAPE="${1:-}"
 shift || true
 
 ALIAS=""
-DAYS=30
+DAYS=7
+HUB="${DEV_HUB:-devhub}"
 REPLACE=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --days)
-      DAYS="${2:-30}"
+      DAYS="${2:-7}"
       shift 2
       ;;
     --replace)
@@ -68,7 +69,7 @@ fi
 
 SNAPSHOT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["snapshot"])' "$DEF_FILE")"
 
-STATUS="$(sf org get snapshot --snapshot "$SNAPSHOT" --json 2>/dev/null |
+STATUS="$(sf org get snapshot --snapshot "$SNAPSHOT" --target-dev-hub "$HUB" --json 2>/dev/null |
   python3 -c 'import json,sys; r=json.load(sys.stdin)["result"]; print(r.get("Status","")+" "+r.get("LastClonedDate",""))' 2>/dev/null || true)"
 if [[ "$STATUS" != Active* ]]; then
   echo "Snapshot ${SNAPSHOT} is not Active (${STATUS:-not found}). Create or refresh it with" >&2
@@ -77,7 +78,7 @@ if [[ "$STATUS" != Active* ]]; then
 fi
 
 # Warn when metadata changed after the snapshot was taken.
-SNAP_DATE="$(sf org get snapshot --snapshot "$SNAPSHOT" --json 2>/dev/null |
+SNAP_DATE="$(sf org get snapshot --snapshot "$SNAPSHOT" --target-dev-hub "$HUB" --json 2>/dev/null |
   python3 -c 'import json,sys; print(json.load(sys.stdin)["result"].get("CreatedDate","")[:10])' 2>/dev/null || true)"
 if [[ -n "$SNAP_DATE" ]] && [[ -n "$(git log --since="$SNAP_DATE" --oneline -- packages sfdx-project.json 2>/dev/null | head -1)" ]]; then
   echo "WARNING: packages/ changed since the snapshot was created on ${SNAP_DATE}." >&2
@@ -97,7 +98,7 @@ sf org create scratch \
   --definition-file "$DEF_FILE" \
   --alias "$ALIAS" \
   --duration-days "$DAYS" \
-  --set-default \
+  --target-dev-hub "$HUB" \
   --wait 30
 
 # Permission set assignments belong to the user, and the new org's admin user is a new user, so

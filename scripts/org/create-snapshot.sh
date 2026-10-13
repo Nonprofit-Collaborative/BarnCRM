@@ -26,6 +26,7 @@ NAME="${2:-}"
 [[ -z "$SOURCE" || -z "$NAME" ]] && usage
 shift 2
 
+HUB="${DEV_HUB:-devhub}"
 DESCRIPTION="BarnCRM snapshot of ${SOURCE}, $(date +%Y-%m-%d)"
 WAIT=1
 while [[ $# -gt 0 ]]; do
@@ -50,21 +51,22 @@ if ! [[ "$NAME" =~ ^[A-Za-z0-9]{1,15}$ ]]; then
   exit 1
 fi
 
-if sf org get snapshot --snapshot "$NAME" >/dev/null 2>&1; then
+if sf org get snapshot --snapshot "$NAME" --target-dev-hub "$HUB" >/dev/null 2>&1; then
   echo "== Deleting the existing snapshot ${NAME} (refresh) =="
-  sf org delete snapshot --snapshot "$NAME" --no-prompt
+  sf org delete snapshot --snapshot "$NAME" --target-dev-hub "$HUB" --no-prompt
 fi
 
 echo "== Creating snapshot ${NAME} from ${SOURCE} =="
 sf org create snapshot \
   --source-org "$SOURCE" \
-  --snapshot-name "$NAME" \
+  --name "$NAME" \
+  --target-dev-hub "$HUB" \
   --description "$DESCRIPTION"
 
 if [[ "$WAIT" -eq 1 ]]; then
   echo "== Waiting for ${NAME} to become Active (up to 30 minutes) =="
   for _ in $(seq 1 60); do
-    STATUS="$(sf org get snapshot --snapshot "$NAME" --json 2>/dev/null |
+    STATUS="$(sf org get snapshot --snapshot "$NAME" --target-dev-hub "$HUB" --json 2>/dev/null |
       python3 -c 'import json,sys; print(json.load(sys.stdin)["result"].get("Status",""))' 2>/dev/null || true)"
     echo "Status: ${STATUS:-unknown}"
     if [[ "$STATUS" == "Active" ]]; then

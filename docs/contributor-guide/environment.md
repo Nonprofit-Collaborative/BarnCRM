@@ -94,6 +94,6 @@ are `config/scratch-defs/person-accounts-snapshot.json` (snapshot `BarnPA`) and
 `platform-only-snapshot.json` (snapshot `BarnPlatform`).
 
 - Create or refresh a snapshot from an existing org: `scripts/org/create-snapshot.sh <source-alias> <snapshot-name>`.
-- Create an org from a snapshot: `scripts/org/create-org-from-snapshot.sh <shape> [alias] --days 30`.
+- Create an org from a snapshot: `scripts/org/create-org-from-snapshot.sh <shape> [alias] --days 7`.
 - **Refresh a snapshot after any change under `packages/`.** A snapshot is frozen at the metadata it was taken from; an org made from a stale one lacks later changes. Refresh from an org deployed at current `main`.
 - The Dev Hub needs Scratch Org Snapshots enabled (Setup, Dev Hub). See `docs/contributor-guide/ci.md`, "Scratch org snapshots".

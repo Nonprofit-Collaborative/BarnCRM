@@ -960,8 +960,8 @@ A snapshot cannot be created from an org that is not a scratch org.
 
 ```bash
 scripts/org/create-snapshot.sh oi-pa BarnPA              # snapshot an existing org (refreshes if BarnPA exists)
-scripts/org/create-org-from-snapshot.sh person-accounts oi-pa --days 30 --replace
-scripts/org/create-org-from-snapshot.sh platform-only barn-core --days 30
+scripts/org/create-org-from-snapshot.sh person-accounts oi-pa --days 7 --replace
+scripts/org/create-org-from-snapshot.sh platform-only barn-core --days 7
 sf org list snapshot                                      # status and names
 ```
 
