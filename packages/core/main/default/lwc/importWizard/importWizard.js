@@ -98,6 +98,7 @@ import loadObjectCreateButton from '@salesforce/label/c.Core_Import_LoadObjectCr
 import lookupFieldLabel from '@salesforce/label/c.Core_Import_LookupFieldLabel';
 import changesButton from '@salesforce/label/c.Core_Import_ChangesButton';
 import changesButtonCount from '@salesforce/label/c.Core_Import_ChangesButtonCount';
+import blankClearsLabel from '@salesforce/label/c.Core_Import_BlankClearsLabel';
 import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
@@ -260,6 +261,9 @@ export default class ImportWizard extends LightningElement {
   useDuplicateRules = false;
   /** The column whose changes are being edited, if any (R-IT15). */
   editingSource;
+  /** Skip rows where and One row per, as the mapping holds them (R-IT17). */
+  skipRows = [];
+  uniqueBy = [];
   /** Each changed value of a finished dry run's first rows (R-IT15). */
   changedValues = [];
   /** Values for every row of this file (R-IB14), as typed: { key, target, value }. */
@@ -278,6 +282,7 @@ export default class ImportWizard extends LightningElement {
   newTemplateName = '';
 
   labels = {
+    blankClearsLabel,
     cardTitle,
     stepTemplate,
     stepUpload,
@@ -595,6 +600,7 @@ export default class ImportWizard extends LightningElement {
     const targets = {};
     const lookups = {};
     const changes = {};
+    const clears = {};
     const parsed = JSON.parse(suggested || '{}');
     const offered = new Set(this.targetOptions.map((option) => option.value));
     (parsed.columns || []).forEach((column) => {
@@ -603,13 +609,17 @@ export default class ImportWizard extends LightningElement {
         : IGNORE;
       lookups[column.source] = column.lookupField;
       changes[column.source] = column.transforms || [];
+      clears[column.source] = column.blankClears === true;
     });
+    this.skipRows = parsed.skipRows || [];
+    this.uniqueBy = parsed.uniqueBy || [];
     this.columns = this.headers.map((heading) => ({
       key: heading,
       source: heading,
       target: targets[heading] || IGNORE,
       lookupField: lookups[heading] || LOOKUP_BY_ID,
       transforms: changes[heading] || [],
+      blankClears: clears[heading] || false,
       samples: this.records
         .slice(0, SAMPLE_VALUES)
         .map((record) => record[heading])
@@ -836,9 +846,40 @@ export default class ImportWizard extends LightningElement {
         if (column.transforms && column.transforms.length > 0) {
           mapped.transforms = column.transforms;
         }
+        if (this.loadsOneObject && column.blankClears) {
+          mapped.blankClears = true;
+        }
         return mapped;
       }),
-      defaults: []
+      defaults: [],
+      ...this.rowRules
+    });
+  }
+
+  /** The rows to load, only when set, so a mapping without them reads as before. */
+  get rowRules() {
+    const rules = {};
+    if (this.skipRows && this.skipRows.length > 0) {
+      rules.skipRows = this.skipRows;
+    }
+    if (this.uniqueBy && this.uniqueBy.length > 0) {
+      rules.uniqueBy = this.uniqueBy;
+    }
+    return rules;
+  }
+
+  /** Skip rows where and One row per, from the rows to load panel (R-IT17). */
+  handleRowRulesChange(event) {
+    this.skipRows = event.detail.skipRows;
+    this.uniqueBy = event.detail.uniqueBy;
+  }
+
+  /** Whether an empty cell of a column clears its field (R-IT18). */
+  handleBlankClearsChange(event) {
+    const source = event.target.dataset.source;
+    const blankClears = event.target.checked;
+    this.columns = this.columns.map((column) => {
+      return column.source === source ? { ...column, blankClears } : column;
     });
   }
 

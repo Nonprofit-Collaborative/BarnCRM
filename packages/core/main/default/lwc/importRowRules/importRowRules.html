@@ -1,0 +1,38 @@
+<template>
+    <div class="slds-box slds-var-m-top_small" data-id="row-rules">
+        <h3 class="slds-text-heading_x-small">{labels.heading}</h3>
+        <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.help}</p>
+        <h4 class="slds-text-title">{labels.skipHeading}</h4>
+        <template for:each={rows} for:item="rule">
+            <div key={rule.key} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small" data-id="rule">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <lightning-combobox label={labels.columnLabel} data-key={rule.key} data-name="column" value={rule.column} options={columnOptions} onchange={handleRuleInput}></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <lightning-combobox label={labels.testLabel} data-key={rule.key} data-name="test" value={rule.test} options={testOptions} onchange={handleRuleInput}></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <template lwc:if={rule.needsText}>
+                        <lightning-input label={labels.textLabel} data-key={rule.key} data-name="text" value={rule.text} max-length="255" onchange={handleRuleInput}></lightning-input>
+                    </template>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-align-bottom">
+                    <lightning-button-icon icon-name="utility:delete" alternative-text={labels.removeRule} title={labels.removeRule} data-key={rule.key} data-id="remove-rule" onclick={handleRemove}></lightning-button-icon>
+                </div>
+            </div>
+        </template>
+        <lightning-button label={labels.addRule} data-id="add-rule" disabled={cannotAdd} onclick={handleAdd}></lightning-button>
+        <lightning-dual-listbox
+            class="slds-var-m-top_small"
+            data-id="unique-by"
+            label={labels.uniqueLabel}
+            field-level-help={labels.uniqueHelp}
+            source-label={labels.columnLabel}
+            selected-label={labels.uniqueLabel}
+            options={columnOptions}
+            value={keys}
+            max="5"
+            onchange={handleKeys}
+        ></lightning-dual-listbox>
+    </div>
+</template>

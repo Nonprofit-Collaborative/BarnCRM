@@ -827,6 +827,35 @@ describe('the import wizard', () => {
     ]);
   });
 
+  it('starts from the rows to load the mapping holds and sends the ones settled on', async () => {
+    suggestMapping.mockResolvedValue(
+      JSON.stringify({
+        version: 1,
+        columns: [{ source: 'Last Name', target: 'Contact1.LastName' }],
+        uniqueBy: ['Email']
+      })
+    );
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const panel = element.shadowRoot.querySelector('[data-id="row-rules"]');
+    expect(panel.uniqueBy).toEqual(['Email']);
+    expect(panel.columnNames).toEqual(['Last Name', 'Email', 'Notes']);
+    expect(element.shadowRoot.querySelector('[data-id="blank-clears"]')).toBeNull();
+    const skipRows = [{ column: 'Notes', test: 'contains', text: 'test' }];
+    panel.dispatchEvent(new CustomEvent('change', { detail: { skipRows, uniqueBy: [] } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    const sent = JSON.parse(createBatch.mock.calls[0][0].mappingDocument);
+    expect(sent.skipRows).toEqual(skipRows);
+    expect(sent.uniqueBy).toBeUndefined();
+  });
+
   it('sends the duplicate rules choice, and warns when no rule is switched on', async () => {
     getMatchFields.mockResolvedValue({ contact: [], account: [], contactRules: false });
     const element = await toMatchingStep();
@@ -1034,6 +1063,36 @@ describe('the import wizard loading one object', () => {
       { source: 'Program', target: 'Record.Program__c', lookupField: 'Name' },
       { source: 'Notes', target: 'Ignore' }
     ]);
+  });
+
+  it('sends empty cells clear the field for a one-object column that ticks it', async () => {
+    const element = await toColumnsStep();
+    const boxes = element.shadowRoot.querySelectorAll('[data-id="blank-clears"]');
+    expect(boxes).toHaveLength(3);
+    boxes[0].checked = true;
+    boxes[0].dispatchEvent(new CustomEvent('change'));
+    await flush();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Upsert by external ID',
+          matchField: 'Session_Key__c',
+          lookupNotFound: 'Reject the row'
+        }
+      })
+    );
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    const columns = JSON.parse(createBatch.mock.calls[0][0].mappingDocument).columns;
+    expect(columns[0]).toEqual({
+      source: 'Session Key',
+      target: 'Record.Session_Key__c',
+      blankClears: true
+    });
+    expect(columns[1].blankClears).toBeUndefined();
   });
 
   it('needs a record ID column before an update can dry run', async () => {

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_RowRulesHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: heading of the rows to load</shortDescription>
+        <value>Rows to load</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what the row rules do</shortDescription>
+        <value>Skip rows you do not want, and load only the first row for each key. Rules compare the cells as they are in the file, ignoring capitals and spaces at the ends. A skipped row is listed with its reason, not rejected.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesSkipHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: heading of the skip rules</shortDescription>
+        <value>Skip rows where</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesAddRule</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: add a skip rule</shortDescription>
+        <value>Add a rule</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesRemoveRule</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: remove a skip rule</shortDescription>
+        <value>Remove rule</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesColumn</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the column a rule reads</shortDescription>
+        <value>Column</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesTest</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the test a skip rule makes</shortDescription>
+        <value>Test</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the text a skip rule compares</shortDescription>
+        <value>Text</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesTestEquals</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: skip when the cell equals the text</shortDescription>
+        <value>equals</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesTestContains</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: skip when the cell contains the text</shortDescription>
+        <value>contains</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesTestBlank</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: skip when the cell is empty</shortDescription>
+        <value>is empty</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesUniqueBy</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the key columns for one row per key</shortDescription>
+        <value>One row per</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RowRulesUniqueHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what one row per does</shortDescription>
+        <value>Only the first row with each combination of these columns&apos; values loads. Later rows with the same values are skipped. Up to five columns.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_BlankClearsLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: empty cells clear the field, per column</shortDescription>
+        <value>Empty cells clear the field (update and upsert)</value>
+    </labels>
+</CustomLabels>
