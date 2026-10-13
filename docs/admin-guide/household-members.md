@@ -60,6 +60,8 @@ An **Add member** button sits below the list.
   person account, and joins the household that way. **Or
   add someone new** takes a salutation, first name and last name and creates the person as
   it joins them. Either way the list refreshes to show the new member once it is added.
+  Where your org stores people as accounts (person accounts) and you can create one, the new
+  person is created as a person account; otherwise as a contact.
 
 ### The primary contact in the simple way of belonging
 
@@ -67,6 +69,11 @@ In the simple way (one household per person, the shipped default), the primary c
 the **Primary Contact** field on the household itself. The panel reads that field and badges
 the matching person. **Make primary** writes that field, using your own access to the
 household, so it succeeds exactly when you could have edited the field by hand.
+
+The primary contact has to be in the household. Typing somebody from another household into
+the field is refused with "The Primary Contact has to be somebody in this household."
+Clearing the field is always allowed. A household BarnCRM creates for a new person names that
+person its primary contact.
 
 ### The primary contact in the flexible way of belonging
 
@@ -103,6 +110,9 @@ them:
 
 In the flexible way of belonging a person can be in more than one household (a child of
 divorced parents, for example). The panel then lists each household they belong to.
+Wherever BarnCRM has to pick one household for such a person (totals rolled up to "their
+household", an import, a donation match), it picks the one they are the primary member of,
+and when they are primary in none, the one they joined first.
 
 When the person is not in any household, the panel says **This person is not in a
 household yet**. In the simple way that means the person has no household filled in, or the

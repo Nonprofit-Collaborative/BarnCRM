@@ -151,6 +151,8 @@ no Account creates a Household Account named per the naming rules, in the same
 transaction, and attaches the Contact to it. This is controlled by the
 `Auto_Create_Households__c` setting, default on. Bulk safety is required: 200 Contacts
 inserted in one DML operation create their households without exceeding platform limits.
+The person a household is created for is named its Primary Contact (R-H10), as junction
+mode marks them the primary member.
 
 **R-H2 Automatic creation in junction mode.** In junction mode, saving a new person who
 belongs to no household creates a Household Account named per the naming rules and a
@@ -161,6 +163,11 @@ or, in an org shaped that way, as a person record on Account: both take this pat
 person a Household Member record already joins to a household is left alone. Bulk safety
 is required here too: 200 people inserted in one DML operation get their households and
 their membership records without exceeding platform limits.
+
+A Contact inserted in junction mode with its Account set to a household joins that
+household: one Household Member record is created for it, as an ordinary member, and
+automatic creation then leaves it alone. An Account that is an organization (an employer,
+in this mode) or a native Nonprofit Cloud household gets no membership record.
 
 This rule previously said that a person stored as an account got no household unless a
 second setting asked for it. ADR-0037 retires that setting and records why.
@@ -228,7 +235,10 @@ flags are independent.
 must be a current member of the household. When the primary contact leaves the
 household, the reference is cleared and the next member by ordering is proposed, not
 silently assigned. In contact mode that is the Primary Contact field itself; in junction
-mode it is the membership marked Is Primary, which Primary Contact mirrors (R-M3).
+mode it is the membership marked Is Primary, which Primary Contact mirrors (R-M3). In
+contact mode, setting or changing Primary Contact to a Contact whose Account is not that
+household is refused before save; clearing it, or saving a household whose primary has
+since left, is never refused.
 
 **R-H11 Member count.** Member Count is recomputed on every membership change (insert,
 update, delete, undelete, reparent, merge) and counts current members only. The field
@@ -388,6 +398,12 @@ contact mirrors the primary member).
 - A membership whose End Date is in the future stops being current on that date with no
   save to react to; the mirror follows at that household's next membership change, as
   Member Count does (R-H11).
+- **A person's household** in junction mode, wherever one household has to be named for a
+  person (rollups to the person's household, imports, addresses, donation matching),
+  is the household of their current primary membership, and with none, of their earliest
+  current membership: earliest Start Date, a membership with no Start Date counting as
+  earliest, then the row created first. Where a person is primary in more than one, the
+  earliest of those is the answer. A person with any current membership always has one.
 
 **R-M4 Person representation.** Exactly one of Contact or Account identifies the person:
 Contact where the person is a Contact, the person's own Person Account where Person
@@ -6706,6 +6722,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | A range on every number setting (owner decision 2026-10-13, ADMIN-27). `Setting_Definition__mdt` gains `Min_Value__c` and `Max_Value__c` (Section 13); every shipped Number row sets both, and the console and `SettingsService` refuse a value outside them. No object added. |
 | v0.11 | 2026-10-13 | Household Member integrity (PEOPLE-25). No object or field added. R-M4 is now enforced by the validation rule `Membership_Names_One_Person` on a save that creates a row or changes who it names. New R-M6: one current membership per person per household, refused before the save by the Household Member trigger (label `Core_Households_ErrorAlreadyCurrentMember`). R-M3's tolerance of two primaries from a data load is unchanged. |
 | v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
+| v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
 
 ---
 ## 32. Entity ownership by package

@@ -93,6 +93,11 @@ belonging yet: if you chose the simple way on purpose, because your org has Pers
 switched on but stores everyone as a contact, an install or upgrade leaves your choice
 alone, and Health Check warns you if people stored as accounts appear later.
 
+In the flexible way a contact's account can be an employer, so it is not the household by
+itself. When you save a new contact whose account is a household, though, BarnCRM joins them
+to that household with a membership record, so they are counted and named there and are not
+given a second household. A contact saved against an organization is not joined to it.
+
 Automatic creation is the same setting and the same behavior as anywhere else. When "create
 a household automatically" is on, saving a new person creates their household and the
 membership record that joins them to it, whether that person is a contact or an account.

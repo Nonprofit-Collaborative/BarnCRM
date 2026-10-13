@@ -160,4 +160,12 @@
         <shortDescription>Refuses a hand edit of a household Primary Contact in junction mode</shortDescription>
         <value>In this org a household's Primary Contact follows the member marked primary. To change it, click Make primary on the right person in the household's Household Members panel.</value>
     </labels>
+    <labels>
+        <fullName>Core_Households_PrimaryContactMustBeMember</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refuses a Primary Contact who is not a member of the household</shortDescription>
+        <value>The Primary Contact has to be somebody in this household. Choose one of its members, or move the person into the household first.</value>
+    </labels>
 </CustomLabels>

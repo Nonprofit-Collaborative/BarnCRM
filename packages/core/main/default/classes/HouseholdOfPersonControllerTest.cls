@@ -437,6 +437,94 @@ private class HouseholdOfPersonControllerTest {
         }
     }
 
+    /**
+     * PEOPLE-4. Where the org gives this user a person record type, a new person in the
+     * flexible way of belonging is a person account; otherwise a contact.
+     */
+    @IsTest
+    static void aNewPersonIsAPersonAccountOnlyWhenOneCanBeCreated() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            HouseholdService.personAccountOverride = true;
+            Id creatable = OrgShapeDetector.creatablePersonRecordTypeId();
+
+            SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
+
+            if (creatable == null) {
+                Assert.areEqual(
+                    Contact.SObjectType,
+                    person.getSObjectType(),
+                    'With no person record type to create with, the new person is a contact'
+                );
+            } else {
+                Assert.areEqual(
+                    Account.SObjectType,
+                    person.getSObjectType(),
+                    'With a person record type to create with, the new person is an account'
+                );
+                Assert.areEqual(creatable, person.get('RecordTypeId'), 'It uses that type');
+            }
+            Assert.areEqual('Lee', person.get('LastName'), 'It carries the name entered');
+        }
+    }
+
+    /**
+     * PEOPLE-4. In contact mode a person account cannot belong to a household by reference,
+     * so a new person is a contact there whatever the org shape.
+     */
+    @IsTest
+    static void aNewPersonIsAContactInContactMode() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            HouseholdService.personAccountOverride = true;
+
+            SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
+
+            Assert.areEqual(
+                Contact.SObjectType,
+                person.getSObjectType(),
+                'Contact mode always creates a contact'
+            );
+            Assert.areEqual('Wei', person.get('FirstName'), 'It carries the name entered');
+        }
+    }
+
+    /**
+     * PEOPLE-4, meaningful on a Person Account org only (oi-pa): the new person is a person
+     * account and joins the household through a membership on its account. Ends early where
+     * the org has no person record type this user can create with.
+     */
+    @IsTest
+    static void addingANewPersonInAPersonAccountOrgCreatesAPersonAccount() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Id creatable = HouseholdService.isPersonAccountOrg()
+                ? OrgShapeDetector.creatablePersonRecordTypeId()
+                : null;
+            if (creatable == null) {
+                return;
+            }
+            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert household;
+
+            Test.startTest();
+            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+            Test.stopTest();
+
+            List<Household_Member__c> memberships = [
+                SELECT Account__c, Account__r.RecordTypeId
+                FROM Household_Member__c
+                WHERE Household__c = :household.Id AND End_Date__c = NULL
+            ];
+            Assert.areEqual(1, memberships.size(), 'The new person joined the household once');
+            Assert.areEqual(
+                creatable,
+                memberships[0].Account__r.RecordTypeId,
+                'The member is a person account of the type the user can create'
+            );
+        }
+    }
+
     @IsTest
     static void addingANewPersonWithNoLastNameIsRefused() {
         System.runAs(TestUsers.admin()) {
