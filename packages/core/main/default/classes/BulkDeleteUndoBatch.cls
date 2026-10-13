@@ -127,20 +127,37 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                 restored++;
                 continue;
             }
-            refused++;
             List<String> parts = new List<String>();
+            Boolean emptied = false;
             for (Database.Error error : results[i].getErrors()) {
                 parts.add(error.getMessage());
+                emptied = emptied || isEmptiedFromTheBin(error);
+            }
+            if (emptied) {
+                purged++;
+            } else {
+                refused++;
             }
             journal.add(
                 ImportJournalService.notRestored(
                     objectName,
                     toUndelete[i],
                     null,
-                    String.join(parts, ' ')
+                    emptied ? System.Label.Core_BulkDelete_UndoPurged : String.join(parts, ' ')
                 )
             );
         }
+    }
+
+    /**
+     * A record emptied from the Recycle Bin can still be met by `ALL ROWS` until the platform
+     * finishes the hard delete, and its undelete then fails with UNDELETE_FAILED. That status
+     * also covers other refusals, so the platform's English text decides; in another language
+     * the record is reported as refused with the platform's own words, which is still true.
+     */
+    private static Boolean isEmptiedFromTheBin(Database.Error error) {
+        return error.getStatusCode() == StatusCode.UNDELETE_FAILED &&
+            String.valueOf(error.getMessage()).containsIgnoreCase('not in the recycle bin');
     }
 
     public void finish(Database.BatchableContext context) {

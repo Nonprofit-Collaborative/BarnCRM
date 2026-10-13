@@ -97,7 +97,7 @@ private class BulkDeleteUndoTest {
             Test.startTest();
             System.runAs(deleter()) {
                 BulkDeleteService.UndoPreview preview = BulkDeleteService.undoPreview(jobId);
-                System.Assert.isTrue(preview.allowed, preview.reason);
+                System.Assert.isTrue(preview.allowed, 'Undo is allowed: ' + preview.reason);
                 System.Assert.areEqual(200, preview.records, 'The records it deleted');
                 BulkDeleteService.undo(jobId, preview.records);
                 System.Assert.areEqual(
