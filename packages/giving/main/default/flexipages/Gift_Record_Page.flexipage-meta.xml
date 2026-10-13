@@ -17,7 +17,7 @@
         <identifier>RecordField_DonorContact</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Donor_Account__c}</leftValue>
+            <leftValue>{!Record.Donor_Account__r.Name}</leftValue>
             <operator>EQUAL</operator>
           </criteria>
         </visibilityRule>
@@ -29,7 +29,7 @@
         <identifier>RecordField_DonorAccount</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Donor_Account__c}</leftValue>
+            <leftValue>{!Record.Donor_Account__r.Name}</leftValue>
             <operator>NE</operator>
           </criteria>
         </visibilityRule>
@@ -166,11 +166,11 @@
         <visibilityRule>
           <booleanFilter>1 OR 2</booleanFilter>
           <criteria>
-            <leftValue>{!Record.Matched_Gift__c}</leftValue>
+            <leftValue>{!Record.Matched_Gift__r.Name}</leftValue>
             <operator>NE</operator>
           </criteria>
           <criteria>
-            <leftValue>{!Record.Donor_Account__c}</leftValue>
+            <leftValue>{!Record.Donor_Account__r.Name}</leftValue>
             <operator>NE</operator>
           </criteria>
         </visibilityRule>
@@ -196,7 +196,7 @@
         <identifier>RecordField_OriginalGift</identifier>
         <visibilityRule>
           <criteria>
-            <leftValue>{!Record.Original_Gift__c}</leftValue>
+            <leftValue>{!Record.Original_Gift__r.Name}</leftValue>
             <operator>NE</operator>
           </criteria>
         </visibilityRule>

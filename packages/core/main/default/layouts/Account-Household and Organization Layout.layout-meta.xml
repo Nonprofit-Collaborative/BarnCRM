@@ -98,17 +98,17 @@
     <platformActionListItems>
       <actionName>LogACall</actionName>
       <actionType>QuickAction</actionType>
-      <sortOrder>3</sortOrder>
+      <sortOrder>4</sortOrder>
     </platformActionListItems>
     <platformActionListItems>
       <actionName>NewTask</actionName>
       <actionType>QuickAction</actionType>
-      <sortOrder>4</sortOrder>
+      <sortOrder>5</sortOrder>
     </platformActionListItems>
     <platformActionListItems>
       <actionName>NewEvent</actionName>
       <actionType>QuickAction</actionType>
-      <sortOrder>5</sortOrder>
+      <sortOrder>6</sortOrder>
     </platformActionListItems>
   </platformActionList>
   <relatedLists>
