@@ -376,10 +376,51 @@ scripts/org/run-org-tests.sh <org alias>
 It deploys the commit you have checked out with `scripts/org/deploy-packages.sh`, assigns
 `BarnCRM_Admin` and `Giving_Admin`, runs every Apex test class in that commit's source, and
 posts `Org tests (local)` on that commit: success only when every test passed, failure
-otherwise. It names the test classes rather than running every test in the org, because the
-test org is shared: another branch's deploy can leave its own test classes behind, and those
-would fail on code this commit does not contain.
+otherwise. Its description starts "Full run:". It names the test classes rather than running
+every test in the org, because the test org is shared: another branch's deploy can leave its
+own test classes behind, and those would fail on code this commit does not contain. The
+vendored rollup engine's own tests (531 methods, about 70 seconds) are left out: no BarnCRM
+runtime path calls the engine, ADR-0082 deletes it in slice S9, and they test the upstream
+project. Its classes are still deployed.
 The results are written to `test-results/org-tests.json`, which git ignores.
+
+**Every full run checks code coverage.** The tests are enqueued with coverage on, so the org
+records it, and the run is followed by polling its `AsyncApexJob` every `TEST_POLL_SECONDS`
+(30) for up to `TEST_WAIT_MINUTES` (90). The results are then fetched without coverage, and
+coverage is read separately from the org's per-class totals (`ApexCodeCoverageAggregate`
+through the Tooling API, a few hundred rows). Only Apex in the commit's source counts: not test
+classes, not the vendored engine, not whatever another branch left in the shared org. The run
+fails, with every test passed, when:
+
+- BarnCRM's total coverage is under `COVERAGE_TOTAL_FLOOR` (75%), or
+- a class is under `COVERAGE_CLASS_FLOOR` (75%), unless it is listed in
+  `scripts/org/coverage-floor-exceptions.txt`, in which case it may not fall below the figure
+  recorded there. That list holds the 23 classes that were under 75% when the floor came in
+  (four had no coverage at all). Raise a figure when tests improve it, and remove the line
+  once the class reaches 75%; the run says which ones have.
+
+Per-class figures (covered lines, total lines, percent, floor, result) are written to
+`test-results/coverage.tsv`, and the status description carries the total and the count of
+classes under their floor, for example "Full run: 2700/2700 passed on oi-test, coverage 90%, 0
+class(es) under floor". The org-wide figure (`ApexOrgWideCoverage`) is recorded in that file
+for information only: it counts the vendored engine, whose tests the gate no longer runs, and
+anything other branches left in the org, so it cannot judge one commit.
+
+**The relevant-tests run, for iteration.** `scripts/org/run-org-tests.sh <alias> --relevant`
+(or `ORG_TESTS_MODE=relevant`) does the same staged deploy, then deploys again only the Apex
+the branch changed since its merge base with `origin/main` (`RELEVANT_BASE` to change it), plus
+the `critical=true` test classes, with `sf project deploy start --test-level RunRelevantTests`.
+Salesforce runs the tests in that payload, the tests that depend directly on it, and the
+classes whose `testFor` names something in it (see "Relevant tests" below). `RunRelevantTests`
+exists only for deployments, not for `sf apex run test`, which is why this mode deploys. It
+posts a different status, `Org tests (relevant, local)`, whose description starts "Relevant
+tests only, not the merge gate", and the `main` ruleset does not require it: a relevant run can
+never stand in for the full gate. Results go to `test-results/org-tests-relevant.json`.
+
+The full run stays the merge gate. `RunRelevantTests` is beta, follows direct Apex references
+only, and selects nothing for a change to an object, a flow, a permission set or a label, all
+of which a Core test can fail on. Use the relevant run while a branch is moving and the full
+run on the head you intend to merge.
 
 Three rules make the status worth trusting:
 
@@ -415,14 +456,16 @@ with no test results and its output names `UNKNOWN_EXCEPTION` or a platform or n
 once more. A run with any result, including real failures, is never retried. Deploy stages
 that stall are resubmitted too: see "Stalled deploys" under `org-tests`.
 
-**At about 2,200 tests the sf CLI can run out of memory reading the results.** The Node
-process aborts with `JavaScript heap out of memory` after every stage has deployed. The script
-exports `NODE_OPTIONS=--max-old-space-size=8192` itself (a larger heap you set is kept; other
-`NODE_OPTIONS` flags are preserved). If the CLI still crashes, or returns empty or unreadable
-output, the script prints "sf CLI crashed, rerun", exits 3, does not retry, and posts no
-`Org tests (local)` status (it used to post a failure reading `0 of 0 failed`). Rerun the gate.
-The CLI has no option to omit passing-test detail from the JSON, so the payload is not reduced.
-`deploy-packages.sh` has not shown the crash and is unchanged.
+**At about 2,200 tests the sf CLI used to run out of memory reading the results.** The Node
+process aborted with `JavaScript heap out of memory` after every stage had deployed. The cause
+was the per-test code coverage that `--code-coverage` pulls into the result, not the
+passing-test detail: in a 2,805-test run, coverage was 102 MB of the 313 MB result against
+1.1 MB for the tests themselves. Fetching the results without coverage and reading the
+per-class totals separately (above) removes that payload, so the script no longer raises the
+Node heap to 8 GB. If the CLI still crashes, or returns empty or unreadable output, or the run
+is still going after `TEST_WAIT_MINUTES`, the script prints "sf CLI crashed, rerun", exits 3,
+does not retry, and posts no status (it used to post a failure reading `0 of 0 failed`).
+Rerun the gate.
 
 **One test depends on Salesforce's own duplicate matching.**
 `DuplicateServiceTest.theStandardRuleForPeopleFindsIdenticalTwinsOnce` asks the platform's
@@ -436,8 +479,9 @@ in `sf org list limits`). Several gate runs in a day can use it up, and then eve
 including the gate, fails at once with `UNKNOWN_EXCEPTION` before any test starts.
 `--synchronous` runs of one class still work, one at a time for the whole org.
 
-While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` against
-your own org for speed; the script is the final full run before merge, not the inner loop.
+While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` for one
+class, or the relevant-tests run above for a branch; the full run is the final run before
+merge, not the inner loop.
 
 ### Tests run as a user they create
 
@@ -537,13 +581,15 @@ about one shape and no other.
 The deploy goes in stages through `scripts/org/deploy-packages.sh`: the vendored rollup
 engine, then Core (one stage per object under `packages/core/main/default/objects`, then
 custom metadata, then labels, then static resources with custom permissions, then Apex, then
-everything that wires the two together: permission sets and groups, layouts, flexipages,
+flows, then everything that wires the two together: permission sets and groups, layouts, flexipages,
 applications, tabs, quick actions, Lightning components), then Giving. A failed stage asks the
 org for the component level report, by job id, in human form and then as JSON. After the last
 stage the script runs
 `RollupService.ensureDefaults()` as anonymous Apex, because a source deployment runs no
 post-install script and would otherwise leave the org without the rollup definitions a real
-install creates (ADR-0029).
+install creates (ADR-0029). Before the first stage the script fails if a folder under
+`packages/core/main/default` is named by no stage: Core's flows were never deployed until
+2026-10-13 because no stage named `flows`.
 
 That is not tidiness. The first deploy this project ever attempted sent all 982 components in
 one request and came back with `UNKNOWN_EXCEPTION`, zero components deployed, zero component
@@ -661,6 +707,24 @@ same-content split of a stage that has already failed that way more than once), 
 both this section and that header with the new count before pushing. Guessing a threshold and
 pre-splitting everything to be safe is not the goal: each split should answer a question the
 previous failure actually raised.
+
+**Faster deploys: two switches, off until timed.** The stages cost about 36 requests, each
+followed by the pause: about 9 minutes of sleep per run before any submit or poll time. Both
+faults that drove the splitting were later traced to real defects (the Account to
+`Import_Batch__c` order, now computed, and the unparseable custom metadata resolved on
+2026-09-22), so neither the pause nor the per-object split has evidence behind it any more.
+Two environment variables let a run drop them:
+
+- `STAGE_PAUSE_SECONDS=0` skips the pause between stages.
+- `DATA_MODEL_STAGES=combined` deploys every Core object in one request. If that request fails
+  with component errors, the run stops as usual. If it fails with none (the opaque
+  `UNKNOWN_EXCEPTION`), the script falls back to one object per stage in the same run.
+
+To decide whether either becomes the default, time a deploy on the test org (holding its lock,
+as for any deploy) with each: `time STAGE_PAUSE_SECONDS=0 DATA_MODEL_STAGES=combined scripts/org/deploy-packages.sh <alias>`,
+then the same with the defaults, and note in this section and the script header whether the
+combined request succeeded or fell back, and the minutes saved. Change the defaults only after
+two clean runs.
 
 Two things constrain when it runs, both because there is one org rather than one per run.
 
