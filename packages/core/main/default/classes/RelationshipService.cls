@@ -29,6 +29,11 @@
  * side's two lookups and back again. Nothing branches on whether a person is held as a
  * contact or as an account, so a relationship between two people held as accounts, or between
  * one of each, mirrors through the same code as any other.
+ *
+ * The reads and writes of the other side run in system mode through
+ * `RelationshipUpkeepSelector` and `RelationshipUpkeepWriter` (ADR-0021 category 2, extended by
+ * `NEXT-relationship-mirror-upkeep-in-system-mode.md`): the side the person saved has already
+ * been authorized in user mode, and the other side often belongs to somebody else.
  */
 public with sharing class RelationshipService {
     /** The maintenance registry row this feature ships, and the name its bypass is keyed on. */
@@ -220,7 +225,7 @@ public with sharing class RelationshipService {
         List<Relationship__c> updates = new List<Relationship__c>();
         if (!toPropagate.isEmpty()) {
             Map<Id, Relationship__c> mirrors = new Map<Id, Relationship__c>(
-                RelationshipSelector.selectByIds(mirrorIds)
+                RelationshipUpkeepSelector.selectByIds(mirrorIds)
             );
             for (Relationship__c record : toPropagate) {
                 Relationship__c mirror = mirrors.get(record.Reciprocal_Relationship__c);
@@ -275,7 +280,7 @@ public with sharing class RelationshipService {
         }
         // Read them back first: one of them may already have been deleted by hand in this
         // same transaction, and deleting an id that is gone throws.
-        List<Relationship__c> stillThere = RelationshipSelector.selectByIds(mirrorIds);
+        List<Relationship__c> stillThere = RelationshipUpkeepSelector.selectByIds(mirrorIds);
         if (stillThere.isEmpty()) {
             return;
         }
@@ -369,7 +374,7 @@ public with sharing class RelationshipService {
         AutomationControl.bypass(VALIDATION_AUTOMATION_NAME);
         try {
             if (inserts != null && !inserts.isEmpty()) {
-                Database.insert(inserts, AccessLevel.USER_MODE);
+                RelationshipUpkeepWriter.insertMirrors(inserts);
                 List<Relationship__c> backPointers = new List<Relationship__c>();
                 for (Integer i = 0; i < inserts.size(); i++) {
                     backPointers.add(
@@ -379,13 +384,13 @@ public with sharing class RelationshipService {
                         )
                     );
                 }
-                Database.update(backPointers, AccessLevel.USER_MODE);
+                RelationshipUpkeepWriter.updatePairs(backPointers);
             }
             if (updates != null && !updates.isEmpty()) {
-                Database.update(updates, AccessLevel.USER_MODE);
+                RelationshipUpkeepWriter.updatePairs(updates);
             }
             if (deletes != null && !deletes.isEmpty()) {
-                Database.delete(deletes, AccessLevel.USER_MODE);
+                RelationshipUpkeepWriter.deleteMirrors(deletes);
             }
         } finally {
             AutomationControl.clearBypass(AUTOMATION_NAME);
@@ -420,7 +425,11 @@ public with sharing class RelationshipService {
         for (Relationship__c record : eligible) {
             eligibleIds.add(record.Id);
         }
-        for (Relationship__c candidate : RelationshipSelector.selectByFromPersonIds(otherPeople)) {
+        for (
+            Relationship__c candidate : RelationshipUpkeepSelector.selectByFromPersonIds(
+                otherPeople
+            )
+        ) {
             String candidateKey = ownSideKey(candidate);
             if (candidateKey != null && !eligibleIds.contains(candidate.Id)) {
                 takenKeys.add(candidateKey);
