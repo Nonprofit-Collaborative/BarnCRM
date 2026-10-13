@@ -11,6 +11,8 @@ import setMode from '@salesforce/apex/RollupController.setMode';
 import recalculate from '@salesforce/apex/RollupController.recalculate';
 import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
 import setSchedule from '@salesforce/apex/RollupController.setSchedule';
+import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
+import runTonight from '@salesforce/apex/RollupController.runTonight';
 
 import TITLE from '@salesforce/label/c.Core_Rollups_PageTitle';
 import INTRO from '@salesforce/label/c.Core_Rollups_PageIntro';
@@ -39,6 +41,10 @@ import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_RollupBuilder_Edit';
 import COPY from '@salesforce/label/c.Core_RollupBuilder_Copy';
 import OPEN_BUILDER from '@salesforce/label/c.Core_RollupBuilder_Open';
+import WORKING_HOURS from '@salesforce/label/c.Core_RollupBuilder_EstimateWorkingHours';
+import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
+import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
+import CANCEL from '@salesforce/label/c.Core_RollupBuilder_Cancel';
 
 /**
  * The Rollups page of the BarnCRM Settings console.
@@ -60,6 +66,10 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     edit: EDIT,
     copy: COPY,
     openBuilder: OPEN_BUILDER,
+    workingHours: WORKING_HOURS,
+    startNow: START_NOW,
+    runTonight: RUN_TONIGHT,
+    cancel: CANCEL,
     title: TITLE,
     intro: INTRO,
     columnRollup: COLUMN_ROLLUP,
@@ -89,6 +99,8 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
   noticeMessage;
   busy = false;
   wiredPageResult;
+  /** What Recalculate all will go through, shown before it starts (S12). */
+  estimate;
 
   @wire(getPage)
   wiredPage(result) {
@@ -208,8 +220,46 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     this.runAction(recalculate({ definitionId }), undefined, this.labels.recalculateStarted);
   }
 
+  /** Says how many records and how long first, and offers tonight instead (ADR decision 12). */
   handleRecalculateAll() {
+    this.busy = true;
+    this.errorMessage = undefined;
+    this.noticeMessage = undefined;
+    estimateFullRun()
+      .then((estimate) => {
+        this.estimate = estimate;
+      })
+      .catch((error) => {
+        this.errorMessage = this.messageFrom(error);
+      })
+      .finally(() => {
+        this.busy = false;
+      });
+  }
+
+  handleStartNow() {
+    this.estimate = undefined;
     this.runAction(recalculateAll(), undefined, this.labels.recalculateStarted);
+  }
+
+  handleRunTonight() {
+    this.estimate = undefined;
+    this.busy = true;
+    runTonight()
+      .then((notice) => {
+        this.noticeMessage = notice;
+      })
+      .catch((error) => {
+        this.errorMessage = this.messageFrom(error);
+      })
+      .finally(() => {
+        this.busy = false;
+        this.refreshPage();
+      });
+  }
+
+  handleCancelEstimate() {
+    this.estimate = undefined;
   }
 
   handleSchedule() {

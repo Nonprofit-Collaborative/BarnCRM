@@ -93,6 +93,38 @@
                         ></lightning-button>
                     </template>
                 </div>
+                <template lwc:if={estimate}>
+                    <div class="slds-box slds-var-m-top_small" data-id="estimate">
+                        <p data-id="estimate-summary">{estimate.summary}</p>
+                        <template lwc:if={estimate.workingHours}>
+                            <p class="slds-text-color_error" data-id="working-hours">
+                                {labels.workingHours}
+                            </p>
+                        </template>
+                        <div class="slds-var-m-top_x-small">
+                            <lightning-button
+                                data-id="cancel-estimate"
+                                label={labels.cancel}
+                                onclick={handleCancelEstimate}
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                data-id="start-now"
+                                label={labels.startNow}
+                                disabled={controlsDisabled}
+                                onclick={handleStartNow}
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                variant="brand"
+                                data-id="run-tonight"
+                                label={labels.runTonight}
+                                disabled={controlsDisabled}
+                                onclick={handleRunTonight}
+                            ></lightning-button>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <template if:true={isEmpty}>

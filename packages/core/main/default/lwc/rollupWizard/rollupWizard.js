@@ -3,6 +3,7 @@ import getTargetFields from '@salesforce/apex/RollupBuilderController.getTargetF
 import getSources from '@salesforce/apex/RollupBuilderController.getSources';
 import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
+import preview from '@salesforce/apex/RollupBuilderController.preview';
 
 import STEP_1 from '@salesforce/label/c.Core_RollupBuilder_Step1';
 import STEP_2 from '@salesforce/label/c.Core_RollupBuilder_Step2';
@@ -45,6 +46,7 @@ import ERROR_SOURCE_FIELD from '@salesforce/label/c.Core_Rollups_ErrorSourceFiel
 import ERROR_ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_ErrorOrderByNeeded';
 import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindowNeedsDate';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
 
 const NUMBERS = new Set(['double', 'integer', 'long']);
 const MONEY = new Set(['currency', 'percent']);
@@ -106,7 +108,8 @@ export default class RollupWizard extends LightningElement {
     next: NEXT,
     cancel: CANCEL,
     save: SAVE,
-    saveAndCalculate: SAVE_AND_CALCULATE
+    saveAndCalculate: SAVE_AND_CALCULATE,
+    previewRecord: PREVIEW_RECORD
   };
 
   step = 1;
@@ -117,6 +120,10 @@ export default class RollupWizard extends LightningElement {
   targetEntityFields = [];
   error;
   busy = false;
+  /** Step 5: how many records the rollup maintains, and its total on a picked record (S12). */
+  maintains;
+  previewResult;
+  previewRecordId;
 
   /** The rollup to edit or copy, or nothing for a new one. */
   @api
@@ -127,6 +134,7 @@ export default class RollupWizard extends LightningElement {
     this.current = { active: true, fiscalYearAware: false, ...(value || {}) };
     this.step = 1;
     this.error = undefined;
+    this.previewRecordId = undefined;
     this.loadTarget();
   }
 
@@ -441,7 +449,36 @@ export default class RollupWizard extends LightningElement {
     this.error = this.stepProblem();
     if (!this.error) {
       this.step = Math.min(5, this.step + 1);
+      if (this.step === 5) {
+        this.loadPreview();
+      }
     }
+  }
+
+  handlePreviewRecord(event) {
+    this.previewRecordId = event.detail.recordId;
+    this.loadPreview();
+  }
+
+  /** Calculates the unsaved rollup on the picked record and counts what it maintains. */
+  loadPreview() {
+    this.maintains = undefined;
+    this.previewResult = undefined;
+    preview({ draft: this.payload(), recordId: this.previewRecordId || null })
+      .then((result) => {
+        this.maintains = result.maintains;
+        this.previewResult = result.result;
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  /** The draft as the server reads it. */
+  payload() {
+    const draft = { ...this.current };
+    if (READS_NO_FIELD.has(draft.aggregate)) {
+      draft.sourceField = null;
+    }
+    return draft;
   }
 
   handleBack() {
@@ -459,12 +496,8 @@ export default class RollupWizard extends LightningElement {
       return;
     }
     const calculateNow = event.target.dataset.id === 'save-and-calculate';
-    const draft = { ...this.current };
-    if (READS_NO_FIELD.has(draft.aggregate)) {
-      draft.sourceField = null;
-    }
     this.busy = true;
-    save({ draft, calculateNow })
+    save({ draft: this.payload(), calculateNow })
       .then((result) => {
         this.dispatchEvent(
           new CustomEvent('saved', { detail: { notice: result.notice, recordId: result.recordId } })

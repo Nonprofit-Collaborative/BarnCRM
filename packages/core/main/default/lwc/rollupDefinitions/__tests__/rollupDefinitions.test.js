@@ -5,6 +5,9 @@ import recalculate from '@salesforce/apex/RollupController.recalculate';
 import setSchedule from '@salesforce/apex/RollupController.setSchedule';
 import setActive from '@salesforce/apex/RollupController.setActive';
 import restoreDefaults from '@salesforce/apex/RollupController.restoreDefaults';
+import recalculateAll from '@salesforce/apex/RollupController.recalculateAll';
+import estimateFullRun from '@salesforce/apex/RollupController.estimateFullRun';
+import runTonight from '@salesforce/apex/RollupController.runTonight';
 
 jest.mock(
   '@salesforce/apex/RollupController.getPage',
@@ -31,6 +34,12 @@ jest.mock('@salesforce/apex/RollupController.setMode', () => ({ default: jest.fn
   virtual: true
 });
 jest.mock('@salesforce/apex/RollupController.restoreDefaults', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/RollupController.estimateFullRun', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/RollupController.runTonight', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -292,5 +301,51 @@ describe('c-rollup-definitions', () => {
     expect(events.map(([name]) => name)).toEqual(['new', 'edit', 'copy']);
     expect(events[1][1].recordId).toBe(ROLLUP.recordId);
     expect(events[2][1].recordId).toBe(ROLLUP.recordId);
+  });
+
+  it('says how many records and how long before Recalculate all, and starts on Start now', async () => {
+    estimateFullRun.mockResolvedValue({
+      summary: 'About 41,200 records, roughly 25 minutes.',
+      workingHours: true
+    });
+    recalculateAll.mockResolvedValue(PAGE);
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    element.shadowRoot.querySelector('[data-id="recalculate-all"]').click();
+    await flush();
+
+    expect(recalculateAll).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id="estimate-summary"]').textContent).toBe(
+      'About 41,200 records, roughly 25 minutes.'
+    );
+    expect(element.shadowRoot.querySelector('[data-id="working-hours"]')).not.toBeNull();
+
+    element.shadowRoot.querySelector('[data-id="start-now"]').click();
+    await flush();
+
+    expect(recalculateAll).toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id="estimate"]')).toBeNull();
+  });
+
+  it('runs it tonight instead and says what will happen', async () => {
+    estimateFullRun.mockResolvedValue({ summary: 'About 12 records.', workingHours: false });
+    runTonight.mockResolvedValue('One recalculation is set for 2:00 AM tonight.');
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    element.shadowRoot.querySelector('[data-id="recalculate-all"]').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="working-hours"]')).toBeNull();
+    element.shadowRoot.querySelector('[data-id="run-tonight"]').click();
+    await flush();
+
+    expect(runTonight).toHaveBeenCalled();
+    expect(recalculateAll).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toBe(
+      'One recalculation is set for 2:00 AM tonight.'
+    );
   });
 });

@@ -4,6 +4,7 @@ import getTargetFields from '@salesforce/apex/RollupBuilderController.getTargetF
 import getSources from '@salesforce/apex/RollupBuilderController.getSources';
 import getSourceFields from '@salesforce/apex/RollupBuilderController.getSourceFields';
 import save from '@salesforce/apex/RollupBuilderController.save';
+import preview from '@salesforce/apex/RollupBuilderController.preview';
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getTargetFields',
@@ -19,6 +20,9 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/apex/RollupBuilderController.save', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/RollupBuilderController.preview', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -85,6 +89,7 @@ async function build(draft) {
     { value: 'Amount__c', label: 'Amount', type: 'currency' },
     { value: 'Gift_Date__c', label: 'Gift Date', type: 'date' }
   ]);
+  preview.mockResolvedValue({ maintains: 'This rollup will maintain about 1,204 records.' });
   const element = createElement('c-rollup-wizard', { is: RollupWizard });
   element.model = MODEL;
   element.draft = draft;
@@ -172,5 +177,34 @@ describe('c-rollup-wizard', () => {
     query(element, 'save').click();
     await flush();
     expect(query(element, 'error-message').textContent).toBe('Another rollup fills this field.');
+  });
+
+  it('previews the total on a picked record and counts what it maintains', async () => {
+    const element = await build(DRAFT);
+    await toLastStep(element);
+    expect(preview).toHaveBeenCalledWith({
+      draft: expect.objectContaining({ targetField: 'Total_Giving__c' }),
+      recordId: null
+    });
+    expect(query(element, 'maintains').textContent).toBe(
+      'This rollup will maintain about 1,204 records.'
+    );
+
+    preview.mockResolvedValue({
+      maintains: 'This rollup will maintain about 1,204 records.',
+      result: 'Calculated: 250. On the record now: 200.'
+    });
+    query(element, 'preview-record').dispatchEvent(
+      new CustomEvent('change', { detail: { recordId: '001000000000001AAA' } })
+    );
+    await flush();
+
+    expect(preview).toHaveBeenLastCalledWith({
+      draft: expect.objectContaining({ aggregate: 'SUM' }),
+      recordId: '001000000000001AAA'
+    });
+    expect(query(element, 'preview-result').textContent).toBe(
+      'Calculated: 250. On the record now: 200.'
+    );
   });
 });

@@ -127,6 +127,11 @@
 
     <template lwc:if={isStep5}>
         <p class="slds-var-m-bottom_small" data-id="summary">{summary}</p>
+        <p data-id="maintains">{maintains}</p>
+        <lightning-record-picker data-id="preview-record" label={labels.previewRecord} object-api-name={draft.targetObject} value={previewRecordId} onchange={handlePreviewRecord}></lightning-record-picker>
+        <template lwc:if={previewResult}>
+            <p class="slds-var-m-bottom_small" data-id="preview-result">{previewResult}</p>
+        </template>
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
         <lightning-radio-group name="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
