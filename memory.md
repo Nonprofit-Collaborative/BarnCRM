@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-55).
+Last refreshed from BMemory 2026-10-13 (through D-67).
 
 ## Decision log (plan Section 12)
 
@@ -63,6 +63,18 @@ Last refreshed from BMemory 2026-10-13 (through D-55).
 | D-53 | 2026-10-13 | Commitment page: Clone and Printable View stay off |
 | D-54 | 2026-10-13 | Program Staff and Volunteer Coordinator groups get their module permission sets when those modules ship |
 | D-55 | 2026-10-13 | Shipped import templates added at install and on upgrade (closes Section 11.2 item 14) |
+| D-56 | 2026-10-13 | Org gates may batch several PRs into one combined org run and deploy only changed metadata; every test that would have run still runs |
+| D-57 | 2026-10-13 | Console app: on oi-test, oi-pa and barn-core Claude deletes and redeploys the app; on barn-npc and mwdbdevsb the owner switches Navigation Style to Console in App Manager |
+| D-58 | 2026-10-13 | Logo: red barn icon, header #B3261E, approved |
+| D-59 | 2026-10-13 | Console tab icons: keep the page icons set by Q-07 |
+| D-60 | 2026-10-13 | Q-11: no Platform Cache for now; revisit after security review |
+| D-61 | 2026-10-13 | Q-09: user access policies documented with samples, not packaged |
+| D-62 | 2026-10-13 | Setup prerequisites: avoid Setup changes; when a feature needs one, the matching BarnCRM Settings section shows an instruction for it. Q-10 tips are turned off in Setup under this rule |
+| D-63 | 2026-10-13 | Field utilization on demand: no 13-month auto-cleanup, no Health Check entry for the old job |
+| D-64 | 2026-10-13 | ADR-0088 and ADR-0091 accepted; rollup S16 and S17 deferred to after v1; per-automation switch end date stays; neutral labels and one app stay |
+| D-65 | 2026-10-13 | Coverage gate measures BarnCRM classes at 75% total and per class (not org-wide); the 23 low classes held at current figures until tests lift them |
+| D-66 | 2026-10-13 | Q-05: confirm buttons Cancel then action; message-only toasts show the text as the bold main line; Health Check finding title not bold in the confirm |
+| D-67 | 2026-10-13 | Q-04: job finish notifications on by default |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 

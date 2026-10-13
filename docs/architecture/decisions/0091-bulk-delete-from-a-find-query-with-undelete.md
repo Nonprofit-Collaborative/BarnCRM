@@ -1,6 +1,6 @@
 # ADR-0091: Bulk delete runs from a Find query, as the user, and is undone by undelete
 
-**Status:** Proposed (builder decision)
+**Status:** Accepted (owner decision D-64, 2026-10-13)
 **Date:** 2026-10-12
 **Source:** plan Section 4.9 (Bulk update; bulk delete is [later, C-37] by owner decision
 2026-09-23) and D-13; builds on ADR-0047 (data jobs), ADR-0077 (bulk update), ADR-0080 (the
