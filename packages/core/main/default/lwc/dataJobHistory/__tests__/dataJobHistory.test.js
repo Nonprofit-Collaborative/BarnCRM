@@ -11,6 +11,12 @@ import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
+jest.mock('@salesforce/customPermission/Bulk_Update_Records', () => ({ default: true }), {
+  virtual: true
+});
+jest.mock('@salesforce/customPermission/Bulk_Delete_Records', () => ({ default: true }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/ImportController.getRecentBatches', () => ({ default: jest.fn() }), {
   virtual: true
 });
