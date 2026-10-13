@@ -2,7 +2,7 @@
 
 **Status:** Accepted (builder decision, accepted as recommended under the owner standing instruction, 2026-10-12)
 **Superseded in part by ADR-NEXT** `NEXT-field-utilization-on-demand.md` (owner decision,
-2026-10-13): the count runs on demand from its own tab. The batch, weekly schedule, tracked list,
+2026-10-13): the count runs on demand in Org Optimizer. The batch, weekly schedule, tracked list,
 run stamps, 13-month retention and Health Check registration (decisions 5, 6 and 7, the tracked
 list in 3, the run stamps in 2) are replaced; decisions 1, 3 and 4 otherwise stand.
 **Date:** 2026-10-12

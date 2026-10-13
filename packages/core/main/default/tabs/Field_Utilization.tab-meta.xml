@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
-  <description>
-    Count how many records have each field filled in, for one kind of record at a time.
-  </description>
-  <flexiPage>Field_Utilization</flexiPage>
-  <label>Field Utilization</label>
-  <motif>Custom24: Bar Chart</motif>
-</CustomTab>
