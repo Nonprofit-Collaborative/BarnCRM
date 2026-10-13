@@ -21,6 +21,20 @@ public with sharing class HealthCheckController {
     }
 
     /**
+     * When Health Check last ran in full and how many findings it had, without running it
+     * (ADMIN-7). The panel shows this first where its lastResultFirst property is set.
+     */
+    @AuraEnabled
+    public static HealthCheckLastRun.Summary getLastRun() {
+        try {
+            return HealthCheckLastRun.read();
+        } catch (Exception e) {
+            ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
+            throw new AuraHandledException(System.Label.Core_HealthCheck_LoadFailed);
+        }
+    }
+
+    /**
      * Take the recommendation: set the coexistence mode detection proposes, and return the
      * re-run report so the panel shows the result of what it just did.
      */

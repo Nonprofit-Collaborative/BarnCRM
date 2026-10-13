@@ -240,6 +240,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Jobs of a deactivated owner | Minor | Health Check names every scheduled BarnCRM job whose owner was deactivated (it has stopped but still looks scheduled), and one fix schedules them again as the admin. | Built, not merged (fix/admin-4) | ADMIN-12, new ADR |
 | Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Shipped | plan 11.3 |
 | One capped error count | Minor | The home page, the Error Log tile and Health Check share one capped count of new errors, and the install problem count arrives in the home page's one server call. | Built, not merged (fix/admin-4) | ADMIN-8 |
+| Health Check last result on Home | Minor | BarnCRM Home shows when Health Check last ran in full and how many findings it had, with Run now, instead of running every check on each load. Any page can do the same through one panel setting. | Built, not merged (fix/admin-5) | ADMIN-7, ADR-NEXT |
 
 ### 1.9 Record Pages and App Experience
 

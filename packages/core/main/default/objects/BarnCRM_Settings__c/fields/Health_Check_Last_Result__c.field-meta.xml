@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Health_Check_Last_Result__c</fullName>
+  <description>
+    How many findings the last full Health Check run had, as three counts separated by commas: to
+    fix, to be aware of, for information. Written with Health Check Last Run (ADMIN-7).
+  </description>
+  <externalId>false</externalId>
+  <label>Health Check Last Result</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

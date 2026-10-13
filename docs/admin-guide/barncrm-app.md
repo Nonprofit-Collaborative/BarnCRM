@@ -89,8 +89,9 @@ Admin role.
 5. Use **Next**, **Back**, and **Skip for now** to move around. Skipping does not mark a
    step done: it moves the step out of the way and offers it to you again next time. The
    full walkthrough of every step is in [setup-assistant.md](setup-assistant.md).
-6. Below the checklist, the **Health Check** lists anything BarnCRM found in your org that
-   needs attention, with a button to fix it where it can. The full guide is
+6. Below the checklist, **Health Check** shows its last result: when it last ran and how
+   many findings it had. Click **Run now** to check the org again and see every finding,
+   with a button to fix it where it can. The full guide is
    [health-check.md](health-check.md).
 7. Look at the **Errors to review** tile. On a fresh org it says `0`. If it ever shows a
    number, click **Open the Error Log** and read the plain-language message on each row.

@@ -949,6 +949,16 @@ range reads as the nearest end.
 | `Unused_Login_Days__c` | integer | 90 | Days without a login before Unused setup lists an active user. From 30 to 365; empty reads as 90. |
 | `Unused_Report_Days__c` | integer | 365 | Days without a run before Unused setup lists a report. From 90 to 1,095; empty reads as 365. |
 
+### Health Check keys
+
+Added by ADMIN-7 (ADR-NEXT `NEXT-health-check-on-home-shows-the-last-result.md`). BarnCRM Home
+shows the last full Health Check result instead of running every check on each load.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Health_Check_Last_Run__c` | datetime | empty | When Health Check last ran in full for someone with Manage BarnCRM Settings. Written by Health Check, without an audit row. |
+| `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -6664,6 +6674,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Real-time rollups recalculated just after the save (ADR-0098, `0098-real-time-rollups-recalculated-just-after-the-save.md`, Core quality pass Q-01). BarnCRM Settings gains `Rollup_Processing__c` (Section 12, Background or In_Save, default Background). R-R4: by default a save queues its marked targets and the Rollup Queue recalculates them just after the save; In_Save keeps recalculation in the save when the planned queries fit. R-RQ3: the nightly run, the end of a pause, Retry and Start now start a processor for Pending entries no save started one for. R-RQ4: Health Check reports Failed entries and Pending entries older than an hour. No object added. |
 | v0.6 | 2026-10-13 | Rollup Queue ready event (ADR-0100, `0100-rollup-queue-ready-event-from-queueable-jobs.md`). New platform event `Rollup_Queue_Ready__e` (no fields, Publish After Commit), subscribed by `RollupQueueReadyTrigger`; the three packaged permission sets grant Read and Create on it, as on `Error_Log_Event__e`. R-RQ3: a save inside a Queueable publishes one event per transaction and its subscriber starts the processor, so those totals stay near real time without taking the job's one chained job. |
 | post-1.0 | 2026-10-13 | Field utilization on demand (ADR-0101, `0101-field-utilization-on-demand.md`, owner decision). `BarnCRM_Settings__c` loses `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c`. Section 29F: R-FU1 (objects as Find offers them), R-FU5, R-FU7 (on demand, saved by choice, no retention job) and R-FU8 (previous saved count shown) rewritten; `Field_Utilization_Snapshot__c` unchanged. |
+| v0.6 | 2026-10-13 | Health Check on Home shows the last result (ADMIN-7, ADR-NEXT `NEXT-health-check-on-home-shows-the-last-result.md`). No object added. `BarnCRM_Settings__c` gains `Health_Check_Last_Run__c` and `Health_Check_Last_Result__c` (Section 12, Health Check keys). |
 
 ---
 ## 32. Entity ownership by package

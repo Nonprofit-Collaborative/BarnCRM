@@ -920,4 +920,36 @@
         <shortDescription>Fix button for the rollup queue findings.</shortDescription>
         <value>Open Needs attention</value>
     </labels>
+    <labels>
+        <fullName>Core_HealthCheck_LastResult</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Last Health Check result. {0} to fix, {1} to be aware of, {2} information.</shortDescription>
+        <value>{0} to fix, {1} to be aware of, {2} for your information.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_LastRunLabel</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label before the time Health Check last ran in full.</shortDescription>
+        <value>Last run</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NeverRun</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown where the last result goes when Health Check has never run.</shortDescription>
+        <value>Health Check has not run yet. Click Run now to check this org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_RunNowButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that runs every check where the panel showed the last result.</shortDescription>
+        <value>Run now</value>
+    </labels>
 </CustomLabels>

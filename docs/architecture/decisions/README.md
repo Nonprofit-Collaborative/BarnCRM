@@ -114,6 +114,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-org-optimizer-and-data-manager-pages.md) | Org Optimizer and Data Manager pages | Accepted (owner decisions) |
 | [NEXT](NEXT-agent-ready-core-actions.md) | Core ships four agent-ready Flow actions, and no agent metadata | Accepted (builder decision, Q-14 approved by the owner) |
 | [NEXT](NEXT-health-check-reschedules-jobs-of-deactivated-owners.md) | Health Check reschedules jobs whose owner was deactivated (amends ADR-0048, extends ADR-0075) | Accepted (builder decision) |
+| [NEXT](NEXT-health-check-on-home-shows-the-last-result.md) | Health Check on Home shows the last result, with Run now | Accepted (owner approved) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
