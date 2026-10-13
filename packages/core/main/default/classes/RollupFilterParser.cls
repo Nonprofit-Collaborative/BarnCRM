@@ -105,6 +105,18 @@ public with sharing class RollupFilterParser {
         } catch (Exception parseFailure) {
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
         }
+        if (parsed == null) {
+            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+        }
+        try {
+            return compile(parsed, binder);
+        } catch (TypeException wrongShape) {
+            // A part of the right name but the wrong shape, such as "conditions": ["Name"].
+            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+        }
+    }
+
+    private static String compile(Map<String, Object> parsed, FilterValueBinder binder) {
         Integer version = parsed.get('version') == null
             ? SUPPORTED_VERSION
             : Integer.valueOf(parsed.get('version'));

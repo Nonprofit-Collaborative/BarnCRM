@@ -46,6 +46,29 @@ private class FilterValueBinderTest {
         );
     }
 
+    /**
+     * The displayed query is SOQL a person can type back: a backslash in a value is written
+     * doubled ("C:\temp" must not read as a tab), and in a LIKE pattern the escaped backslash
+     * is doubled again, while the escaped % and _ are written as bound.
+     */
+    @IsTest
+    static void backslashesAreWrittenAsSoqlReadsThem() {
+        FilterValueBinder bound = bind(
+            'Error_Log__c',
+            '{"id": 1, "field": "Context__c", "operator": "equals", "value": "C:\\\\temp"},' +
+            '{"id": 2, "field": "Message__c", "operator": "contains", "value": "a\\\\b"}',
+            null
+        );
+
+        System.Assert.areEqual('C:\\temp', bound.binds.get('fb0'), 'Bound as typed');
+        System.Assert.areEqual('%a\\\\b%', bound.binds.get('fb1'), 'A LIKE escape');
+        System.Assert.areEqual(
+            'Context__c = \'C:\\\\temp\' AND Message__c LIKE \'%a\\\\\\\\b%\'',
+            bound.display(),
+            'Both read back as the values bound'
+        );
+    }
+
     @IsTest
     static void listsLikeAndRelativeDatesRenderAsSoqlExpects() {
         FilterValueBinder bound = bind(

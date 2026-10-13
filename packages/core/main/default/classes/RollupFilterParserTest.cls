@@ -207,6 +207,30 @@ private class RollupFilterParserTest {
         }
     }
 
+    /** A part of the right name but the wrong shape is refused with the filter message. */
+    @IsTest
+    static void aDocumentOfTheWrongShapeIsRefused() {
+        for (
+            String document : new List<String>{
+                'null',
+                '{"conditions": ["Status__c"]}',
+                '{"conditions": {"id": 1}}',
+                '{"logic": 1, "conditions": [{"id": 1, "field": "Status__c", "operator": "equals", "value": "Open"}]}'
+            }
+        ) {
+            try {
+                RollupFilterParser.toWhereClause(document);
+                System.Assert.fail('Must be refused: ' + document);
+            } catch (RollupFilterParser.RollupFilterException expected) {
+                System.Assert.areEqual(
+                    System.Label.Core_Rollups_ErrorInvalidFilter,
+                    expected.getMessage(),
+                    document
+                );
+            }
+        }
+    }
+
     @IsTest
     static void aVersionThisPackageDoesNotKnowIsRefused() {
         try {

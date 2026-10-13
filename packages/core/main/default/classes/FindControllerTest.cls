@@ -189,6 +189,31 @@ private class FindControllerTest {
         }
     }
 
+    /** Other people's shared queries never push one of the person's own off the list. */
+    @IsTest
+    static void herOwnQueriesComeFirstEvenPastTheCap() {
+        System.runAs(TestUsers.admin()) {
+            User maria = maria();
+            // Shared by the administrator this test runs as.
+            for (Integer index = 0; index < 3; index++) {
+                FindController.saveQuery(null, 'Alpha ' + index, ERRORS_ONLY, true);
+            }
+            System.runAs(maria) {
+                FindController.saveQuery(null, 'Zulu', ERRORS_ONLY, false);
+            }
+            FindController.maxSavedQueries = 3;
+
+            List<FindController.SavedQueryView> listed;
+            System.runAs(maria) {
+                listed = FindController.getPage().savedQueries;
+            }
+            System.Assert.areEqual(3, listed.size(), 'The cap holds');
+            System.Assert.areEqual('Zulu', listed[0].name, 'Hers first, late in the alphabet');
+            System.Assert.isTrue(listed[0].mine);
+            System.Assert.isFalse(listed[1].mine, 'Then the shared ones');
+        }
+    }
+
     @IsTest
     static void sharingTwoHundredQueriesAtOnceWritesOneShareEach() {
         System.runAs(TestUsers.admin()) {

@@ -96,7 +96,8 @@ a value; the operators offered depend on the field:
   who can use Find. Untick it to stop sharing. Only the person who saved a query can change,
   share or delete it; anyone it is shared with can open it, run it, and save their own copy.
 - The **Saved queries** list shows your own queries first, then the ones shared with you,
-  with the name of the person who shared each.
+  with the name of the person who shared each. The list holds up to 500 queries; your own
+  are always counted first, so shared queries never push one of yours off it.
 - A shared query that names a field someone cannot see opens with that condition or column
   marked, and does not run for them until it is removed from their copy.
 - Another page, such as the Data Hygiene console, can open Find on a saved query. Find opens
