@@ -65,8 +65,10 @@ public with sharing class BulkUpdateController {
         public List<Failure> failures;
     }
 
-    /** The tab: the run limit and the recent bulk updates. */
+    /** The tab: whether the person may, the run limit and the recent bulk updates. */
     public class BulkUpdatePage {
+        @AuraEnabled
+        public Boolean allowed;
         @AuraEnabled
         public Integer runLimit;
         @AuraEnabled
@@ -75,14 +77,21 @@ public with sharing class BulkUpdateController {
         public List<JobView> jobs;
     }
 
+    /**
+     * The person's recent bulk updates. A person without the permissions gets an empty page that
+     * says so, rather than an error, because the Bulk Update tab shows the list to all.
+     */
     @AuraEnabled
     public static BulkUpdatePage getPage() {
         try {
-            requirePermission();
             BulkUpdatePage page = new BulkUpdatePage();
+            page.allowed = hasPermission();
+            page.jobs = new List<JobView>();
+            if (!page.allowed) {
+                return page;
+            }
             page.runLimit = BulkUpdateService.runLimit();
             page.maxChanges = BulkUpdateService.MAX_CHANGES;
-            page.jobs = new List<JobView>();
             for (Import_Batch__c job : jobs(null, RECENT_JOBS)) {
                 page.jobs.add(toView(job, false));
             }

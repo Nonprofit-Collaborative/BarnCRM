@@ -189,4 +189,32 @@ describe('the changes to one column', () => {
     element.shadowRoot.querySelector('[data-id="done"]').click();
     expect(done).toHaveBeenCalledTimes(1);
   });
+
+  it('inside bulk update: steps only, a record fields to add, and no preview of its own', async () => {
+    const element = createElement('c-import-column-transforms', { is: ImportColumnTransforms });
+    Object.assign(element, {
+      embedded: true,
+      source: 'Title',
+      columnOptions: [
+        { label: 'Title', value: 'Title' },
+        { label: 'Last Name', value: 'LastName' }
+      ],
+      transforms: [{ op: 'append', columns: ['LastName'] }]
+    });
+    document.body.appendChild(element);
+    listen(element);
+    await flush();
+
+    expect(previewChanges).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('h3')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="done"]')).toBeNull();
+    expect(input(element, 'columns').options).toEqual([{ label: 'Last Name', value: 'LastName' }]);
+    element.shadowRoot.querySelector('[data-id="add"]').click();
+    await flush();
+    expect(changes[0].transforms).toEqual([
+      { op: 'append', columns: ['LastName'] },
+      { op: 'trim' }
+    ]);
+    expect(previewChanges).not.toHaveBeenCalled();
+  });
 });

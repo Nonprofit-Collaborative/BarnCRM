@@ -135,7 +135,7 @@ public with sharing class ImportUndoService {
      * moment produce one undo and one refusal. The status is the package's own bookkeeping,
      * written in system mode (ADR-0021).
      */
-    private static void latch(Id batchId) {
+    public static void latch(Id batchId) {
         Import_Batch__c batch = [
             SELECT Id, Status__c, Is_Dry_Run__c, Undo_Deadline__c, Completed_At__c, Job_Id__c
             FROM Import_Batch__c
@@ -282,17 +282,18 @@ public with sharing class ImportUndoService {
 
     /**
      * Whether any undo job is queued or running. Batches carry no job reference, so this asks
-     * about the undo job class; a second undo running for another batch only delays the
-     * moment an aborted one is seen as failed. Read in system mode: the job may be another
-     * user's.
+     * about the undo job classes (an import's, and a bulk delete's undelete); a second undo
+     * running for another batch only delays the moment an aborted one is seen as failed. Read
+     * in system mode: the job may be another user's.
      */
     private static Boolean isUndoJobRunning() {
         if (undoJobRunning == null) {
             Set<String> running = RUNNING_JOB_STATUSES;
+            Set<String> undoClasses = new Set<String>{ 'ImportUndoBatch', 'BulkDeleteUndoBatch' };
             undoJobRunning = ![
                     SELECT Id
                     FROM AsyncApexJob
-                    WHERE ApexClass.Name = 'ImportUndoBatch' AND Status IN :running
+                    WHERE ApexClass.Name IN :undoClasses AND Status IN :running
                     WITH SYSTEM_MODE
                     LIMIT 1
                 ]

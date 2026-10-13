@@ -56,6 +56,7 @@ import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
 import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
 import LOADING from '@salesforce/label/c.Core_Find_Loading';
 import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
+import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
 import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
 import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
@@ -136,6 +137,7 @@ export default class FindRecords extends LightningElement {
     exportExcel: EXPORT_EXCEL,
     summarize: SUMMARIZE,
     bulkUpdate: BULK_UPDATE,
+    bulkDelete: BULK_DELETE,
     noResults: NO_RESULTS,
     savedQueries: SAVED_QUERIES,
     chooseSaved: CHOOSE_SAVED,
@@ -164,6 +166,7 @@ export default class FindRecords extends LightningElement {
   shared = false;
   openQueryId;
   bulkQueryJson;
+  deleteQueryJson;
   busy = false;
   errorMessage;
   noticeMessage;
@@ -421,6 +424,14 @@ export default class FindRecords extends LightningElement {
     return Boolean(this.bulkQueryJson);
   }
 
+  get canBulkDelete() {
+    return Boolean(this.page && this.page.canBulkDelete);
+  }
+
+  get showBulkDelete() {
+    return Boolean(this.deleteQueryJson);
+  }
+
   get showNoResults() {
     return !!this.rows && this.rows.length === 0;
   }
@@ -477,8 +488,9 @@ export default class FindRecords extends LightningElement {
   }
 
   async refreshPreview() {
-    // The bulk update panel acts on the query it was opened with; an edited query closes it.
+    // A bulk panel acts on the query it was opened with; an edited query closes it.
     this.bulkQueryJson = undefined;
+    this.deleteQueryJson = undefined;
     if (
       !this.objectApiName ||
       this.columns.length === 0 ||
@@ -778,11 +790,27 @@ export default class FindRecords extends LightningElement {
     if (!this.checkReady()) {
       return;
     }
+    this.deleteQueryJson = undefined;
     this.bulkQueryJson = this.queryDocument();
   }
 
   handleBulkClose() {
     this.bulkQueryJson = undefined;
+  }
+
+  /** Opens bulk delete over the query as it is now (C-37); one bulk panel is open at a time. */
+  handleBulkDelete() {
+    this.noticeMessage = undefined;
+    this.errorMessage = undefined;
+    if (!this.checkReady()) {
+      return;
+    }
+    this.bulkQueryJson = undefined;
+    this.deleteQueryJson = this.queryDocument();
+  }
+
+  handleDeleteClose() {
+    this.deleteQueryJson = undefined;
   }
 
   handleNew() {
@@ -855,6 +883,7 @@ export default class FindRecords extends LightningElement {
     this.queryName = '';
     this.shared = false;
     this.bulkQueryJson = undefined;
+    this.deleteQueryJson = undefined;
     this.related = [];
     this.children = [];
     this.relatedValid = true;

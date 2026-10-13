@@ -99,6 +99,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0088](0088-unlocked-to-managed-migration-kit.md) | Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API | Proposed (builder decision) |
 | [0089](0089-interaction-notes-are-completed-tasks.md) | Interaction notes are completed tasks logged through one packaged action | Accepted (builder decision) |
 | [0090](0090-flow-templates-which-automations-get-one.md) | Flow templates: which automations get one, how they are named, and what they leave out (applies ADR-0040) | Accepted (builder decision) |
+| [NEXT](NEXT-bulk-delete-from-a-find-query-with-undelete.md) | Bulk delete runs from a Find query, as the user, and is undone by undelete | Proposed (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

@@ -30,6 +30,8 @@ import previewHeading from '@salesforce/label/c.Core_Import_ChangesPreviewHeadin
 import beforeHeader from '@salesforce/label/c.Core_Import_ChangesBefore';
 import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
 import rowNumberHeader from '@salesforce/label/c.Core_Import_RowNumberHeader';
+import opAddFields from '@salesforce/label/c.Core_BulkUpdate_StepAddFields';
+import fieldsLabel from '@salesforce/label/c.Core_BulkUpdate_StepFields';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
@@ -40,6 +42,10 @@ const SAMPLE_ROWS = 5;
  * of named steps, edited here and saved with the mapping by the wizard. Nothing here changes a
  * value itself: the preview asks the server, so what is shown is what the import will do.
  * See docs/admin-guide/importing.md, section 10.
+ *
+ * Bulk update (C-37, R-BU7) uses it `embedded`, for a field's change with steps: the steps
+ * only, with the record's fields to add (`columnOptions`), and no heading, preview or Done,
+ * because the bulk update preview shows each record before and after.
  */
 export default class ImportColumnTransforms extends LightningElement {
   /** The column whose values are changed; another column is previewed afresh. */
@@ -61,6 +67,10 @@ export default class ImportColumnTransforms extends LightningElement {
   @api columnNames = [];
   /** The file's first rows, each a map of column to value. */
   @api sampleRows = [];
+  /** Steps only, inside another tool's form: no heading, preview or Done. */
+  @api embedded = false;
+  /** In place of columnNames, the values to add as label and value (a record's fields). */
+  @api columnOptions;
 
   steps = [];
   counter = 0;
@@ -110,6 +120,15 @@ export default class ImportColumnTransforms extends LightningElement {
     return heading.replace('{0}', this.source || '');
   }
 
+  get standalone() {
+    return !this.embedded;
+  }
+
+  /** What the values to add are called: a file's columns, or a record's fields. */
+  get columnsText() {
+    return this.embedded ? fieldsLabel : columnsLabel;
+  }
+
   get operationOptions() {
     return [
       { label: opTrim, value: 'trim' },
@@ -118,7 +137,7 @@ export default class ImportColumnTransforms extends LightningElement {
       { label: opProper, value: 'proper' },
       { label: opReplace, value: 'replace' },
       { label: opIfBlank, value: 'ifBlank' },
-      { label: opAppend, value: 'append' },
+      { label: this.embedded ? opAddFields : opAppend, value: 'append' },
       { label: opDate, value: 'date' }
     ];
   }
@@ -132,6 +151,9 @@ export default class ImportColumnTransforms extends LightningElement {
   }
 
   get otherColumnOptions() {
+    if (this.columnOptions) {
+      return this.columnOptions.filter((option) => option.value !== this.source);
+    }
     return (this.columnNames || [])
       .filter((name) => name !== this.source)
       .map((name) => ({ label: name, value: name }));
@@ -209,6 +231,10 @@ export default class ImportColumnTransforms extends LightningElement {
   }
 
   async refreshPreview() {
+    if (this.embedded) {
+      // The tool it sits in previews (bulk update checks the steps when it previews).
+      return;
+    }
     try {
       const preview = await previewChanges({
         source: this.source,

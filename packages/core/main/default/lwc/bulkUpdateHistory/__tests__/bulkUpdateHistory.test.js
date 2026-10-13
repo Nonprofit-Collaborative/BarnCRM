@@ -60,8 +60,17 @@ describe('c-bulk-update-history', () => {
     jest.clearAllMocks();
   });
 
+  it('renders nothing for a person without the bulk update permissions', async () => {
+    getPage.mockResolvedValue({ allowed: false, jobs: [] });
+    const element = await render();
+
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="no-jobs"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="refresh"]')).toBeNull();
+  });
+
   it('says so when there are no bulk updates', async () => {
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [] });
+    getPage.mockResolvedValue({ allowed: true, runLimit: 48000, maxChanges: 5, jobs: [] });
     const element = await render();
 
     expect(element.shadowRoot.querySelector('[data-id="no-jobs"]')).not.toBeNull();
@@ -69,7 +78,7 @@ describe('c-bulk-update-history', () => {
   });
 
   it('lists recent bulk updates and undoes one once its number is typed', async () => {
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [FINISHED] });
+    getPage.mockResolvedValue({ allowed: true, runLimit: 48000, maxChanges: 5, jobs: [FINISHED] });
     undoUpdate.mockResolvedValue({ ...FINISHED, status: 'Undoing', canUndo: false });
     const element = await render();
 
@@ -99,7 +108,7 @@ describe('c-bulk-update-history', () => {
   });
 
   it('shows the server refusal as it is', async () => {
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [FINISHED] });
+    getPage.mockResolvedValue({ allowed: true, runLimit: 48000, maxChanges: 5, jobs: [FINISHED] });
     undoUpdate.mockRejectedValue({
       body: { message: 'This bulk update can no longer be undone.' }
     });
@@ -117,9 +126,9 @@ describe('c-bulk-update-history', () => {
   });
 
   it('reads the list again on refresh', async () => {
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [] });
+    getPage.mockResolvedValue({ allowed: true, runLimit: 48000, maxChanges: 5, jobs: [] });
     const element = await render();
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [FINISHED] });
+    getPage.mockResolvedValue({ allowed: true, runLimit: 48000, maxChanges: 5, jobs: [FINISHED] });
 
     element.shadowRoot.querySelector('[data-id="refresh"]').click();
     await flush();

@@ -212,7 +212,9 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 Exports run on the server, for more rows than a browser can hold, are planned for a later
 release (C-36). Totals are a summary table, not a chart. To change many records to the same
 value at once, run a query and press **Bulk update**, shown to people who also hold the Bulk
-Update Records permission. See [Bulk update](bulk-update.md).
+Update Records permission. See [Bulk update](bulk-update.md). To delete every record a query
+returns, press **Bulk delete**, shown only to people who hold the Bulk Delete Records
+permission. See [Bulk delete](bulk-delete.md).
 
 ## Field reference
 

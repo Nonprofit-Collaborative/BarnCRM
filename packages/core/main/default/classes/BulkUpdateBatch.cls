@@ -117,15 +117,28 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
             SObject change = checked.objectType.newSObject(record.Id);
             Map<String, Object> before = new Map<String, Object>();
             Map<String, Object> after = new Map<String, Object>();
+            String refusal;
             for (BulkUpdateService.Change planned : checked.changes) {
                 String field = planned.target.getName();
                 Object was = record.get(field);
-                Object becomes = planned.newValueFor(record);
+                Object becomes;
+                try {
+                    becomes = planned.newValueFor(record);
+                } catch (BulkUpdateFields.BulkUpdateException cannotTake) {
+                    // A transform's result this field cannot take (R-BU7): this record only.
+                    refusal = cannotTake.getMessage();
+                    break;
+                }
                 if (!same(was, becomes)) {
                     before.put(field, was);
                     after.put(field, becomes);
                     change.put(field, becomes);
                 }
+            }
+            if (refusal != null) {
+                failedRecords++;
+                journal.add(ImportJournalService.failed(checked.objectName, record.Id, refusal));
+                continue;
             }
             if (after.isEmpty()) {
                 unchanged++;

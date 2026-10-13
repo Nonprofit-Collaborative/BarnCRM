@@ -1,7 +1,9 @@
 <template>
     <div class="slds-box slds-var-m-top_small" data-id="changes">
-        <h3 class="slds-text-heading_x-small">{heading}</h3>
-        <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.help}</p>
+        <template lwc:if={standalone}>
+            <h3 class="slds-text-heading_x-small">{heading}</h3>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.help}</p>
+        </template>
         <template for:each={rows} for:item="step">
             <div key={step.key} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small" data-id="step">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
@@ -25,7 +27,7 @@
                         <lightning-input label={labels.valueLabel} data-key={step.key} data-name="value" value={step.value} max-length="255" onchange={handleInput}></lightning-input>
                     </template>
                     <template lwc:if={step.isAppend}>
-                        <lightning-checkbox-group label={labels.columnsLabel} data-key={step.key} data-name="columns" options={otherColumnOptions} value={step.columns} onchange={handleInput}></lightning-checkbox-group>
+                        <lightning-checkbox-group label={columnsText} data-key={step.key} data-name="columns" options={otherColumnOptions} value={step.columns} onchange={handleInput}></lightning-checkbox-group>
                         <lightning-input label={labels.separatorLabel} data-key={step.key} data-name="separator" value={step.separator} max-length="10" onchange={handleInput}></lightning-input>
                     </template>
                     <template lwc:if={step.isDate}>
@@ -71,12 +73,14 @@
                 </tbody>
             </table>
         </template>
-        <lightning-button
-            class="slds-var-m-top_small"
-            variant="brand"
-            label={labels.doneLabel}
-            data-id="done"
-            onclick={handleDone}
-        ></lightning-button>
+        <template lwc:if={standalone}>
+            <lightning-button
+                class="slds-var-m-top_small"
+                variant="brand"
+                label={labels.doneLabel}
+                data-id="done"
+                onclick={handleDone}
+            ></lightning-button>
+        </template>
     </div>
 </template>

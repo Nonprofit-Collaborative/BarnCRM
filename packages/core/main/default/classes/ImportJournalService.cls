@@ -31,6 +31,9 @@ public with sharing class ImportJournalService {
     /** A record a bulk update could not save (C-35). */
     @NamespaceAccessible
     public static final String ACTION_FAILED = 'Failed';
+    /** A record a bulk delete deleted, which its undo brings back from the Recycle Bin (C-37). */
+    @NamespaceAccessible
+    public static final String ACTION_DELETED = 'Deleted';
 
     /** The document version written into every page, so a reader can tell the shape. */
     private static final Integer DOCUMENT_VERSION = 1;
@@ -123,6 +126,17 @@ public with sharing class ImportJournalService {
             'object' => objectName,
             'id' => String.valueOf(recordId),
             'reason' => shorten(reason)
+        };
+    }
+
+    /** A record a bulk delete deleted, with its name for the undo to report (R-IJ2, R-BD3). */
+    @NamespaceAccessible
+    public static Map<String, Object> deleted(String objectName, Id recordId, String label) {
+        return new Map<String, Object>{
+            'action' => ACTION_DELETED,
+            'object' => objectName,
+            'id' => String.valueOf(recordId),
+            'label' => shorten(label)
         };
     }
 

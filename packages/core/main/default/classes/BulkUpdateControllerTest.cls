@@ -66,8 +66,11 @@ private class BulkUpdateControllerTest {
             );
             System.runAs(david) {
                 System.Assert.isFalse(FindController.getPage().canBulkUpdate, 'Not offered');
+                BulkUpdateController.BulkUpdatePage page = BulkUpdateController.getPage();
+                System.Assert.isFalse(page.allowed, 'Find alone does not open bulk update');
+                System.Assert.isTrue(page.jobs.isEmpty(), 'The tab lists nothing for them');
                 try {
-                    BulkUpdateController.getPage();
+                    BulkUpdateController.getTargets('Contact');
                     System.Assert.fail('Find alone does not open bulk update');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(
@@ -79,6 +82,7 @@ private class BulkUpdateControllerTest {
             }
             System.runAs(maria()) {
                 System.Assert.isTrue(FindController.getPage().canBulkUpdate, 'Offered to an admin');
+                System.Assert.isTrue(BulkUpdateController.getPage().allowed, 'Listed for an admin');
             }
 
         }
