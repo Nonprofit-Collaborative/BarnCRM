@@ -24,6 +24,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
     private Integer alreadyBack = 0;
     private Integer refused = 0;
     private Boolean failed = false;
+    private Boolean journalIncomplete = false;
     /** When the bulk delete started: households binned since then may be its side effect. */
     private Datetime startedAt;
 
@@ -73,7 +74,9 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
             failed = true;
             ErrorLogger.log(e, 'BulkDeleteUndoBatch.execute', jobId);
         }
-        ImportJournalService.write(jobId, ImportJournalService.PHASE_UNDO, journal);
+        if (!ImportJournalService.write(jobId, ImportJournalService.PHASE_UNDO, journal)) {
+            journalIncomplete = true;
+        }
     }
 
     /** Brings back the Deleted records of one page, grouped by object. */
@@ -260,6 +263,9 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                     (counted == null ? 0 : counted).format()
                 }
             );
+            if (journalIncomplete) {
+                line += '\n' + System.Label.Core_BulkUpdate_LogJournalIncomplete;
+            }
             job.Run_Log__c = (String.isBlank(job.Run_Log__c) ? line : job.Run_Log__c + '\n' + line)
                 .right(32768);
             job.Status__c = failed

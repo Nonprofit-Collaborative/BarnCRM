@@ -17,6 +17,8 @@
  */
 public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>, Database.Stateful {
     private final Id jobId;
+    /** Read in start; a test replaces it to stand for access taken away part way. */
+    @TestVisible
     private String definition;
     private Integer deletedRecords = 0;
     private Integer noLongerMatching = 0;
@@ -90,6 +92,10 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
             );
             noLongerMatching += ids.size() - current.size();
             remove(checked, current, journal);
+        } catch (BulkDeleteService.BulkDeleteException refused) {
+            stop(refused);
+        } catch (QueryCompiler.QueryCompilerException refused) {
+            stop(refused);
         } catch (Exception e) {
             failed = true;
             ErrorLogger.log(e, 'BulkDeleteBatch.execute', jobId);
@@ -97,6 +103,15 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
         if (!ImportJournalService.write(jobId, ImportJournalService.PHASE_COMMIT, journal)) {
             journalIncomplete = true;
         }
+    }
+
+    /**
+     * Stops the job for something the person can fix, found when a chunk checks the definition
+     * again: the remaining chunks return at once, and the reason goes in the run log.
+     */
+    private void stop(Exception refused) {
+        failed = true;
+        stoppedBecause = refused.getMessage();
     }
 
     /** Deletes one chunk as the person and journals each record. */

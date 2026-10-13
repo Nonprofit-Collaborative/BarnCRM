@@ -25,6 +25,7 @@ public with sharing class BulkUpdateService {
     /** Query rows left free for the reads around a count. */
     private static final Integer COUNT_MARGIN = 100;
     private static final Integer DEFINITION_VERSION = 1;
+    private static final String RECORD_TYPE_FIELD = 'RecordTypeId';
 
     /** One change, as checked: the field it writes and the value or field it takes. */
     public class Change {
@@ -43,9 +44,15 @@ public with sharing class BulkUpdateService {
         /**
          * The value this change gives one record. A transform's result is typed for the
          * target; a result the target cannot take is refused for this record alone, with a
-         * `BulkUpdateException` whose message is the reason (R-BU7).
+         * `BulkUpdateException` whose message is the reason (R-BU7). So is a household's
+         * Account Name, which household naming keeps (R-H8), as an import refuses it.
          */
         public Object newValueFor(SObject record) {
+            if (keptOnRecord(record)) {
+                throw new BulkUpdateFields.BulkUpdateException(
+                    System.Label.Core_BulkUpdate_ErrorHouseholdName
+                );
+            }
             if (action == ACTION_COPY) {
                 return record.get(source.getName());
             }
@@ -65,6 +72,19 @@ public with sharing class BulkUpdateService {
                 return BulkUpdateFields.fromText(target, result);
             }
             return action == ACTION_CLEAR ? null : value;
+        }
+
+        /** Whether this change's field is one this record keeps for itself. */
+        private Boolean keptOnRecord(SObject record) {
+            if (record.getSObjectType() != Account.SObjectType) {
+                return false;
+            }
+            Object recordType = record.getPopulatedFieldsAsMap().get(RECORD_TYPE_FIELD);
+            return DataProtectedFields.isProtectedOnRecord(
+                Account.SObjectType,
+                target.getName(),
+                (Id) recordType
+            );
         }
 
         public Map<String, Object> toMap() {
@@ -97,6 +117,15 @@ public with sharing class BulkUpdateService {
             Set<String> names = new Set<String>();
             for (Change change : changes) {
                 names.add(change.target.getName());
+                // A household's name is kept by household naming: the record type tells.
+                if (
+                    objectType == Account.SObjectType &&
+                    'Name'.equalsIgnoreCase(change.target.getName()) &&
+                    Schema.SObjectType.Account.fields.getMap()
+                        .containsKey(RECORD_TYPE_FIELD.toLowerCase())
+                ) {
+                    names.add(RECORD_TYPE_FIELD);
+                }
                 if (change.source != null) {
                     names.add(change.source.getName());
                 }

@@ -75,6 +75,12 @@ public with sharing class ImportUndoService {
         if (batch == null) {
             return view;
         }
+        // A bulk delete is undone by undeleting, from the Bulk Update tab; this undo would only
+        // mark it Undone and bring nothing back (R-BD5).
+        if (BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c)) {
+            view.reason = Label.Core_Import_UndoErrorBulkDelete;
+            return view;
+        }
         countTagged(batch.Id, view);
         // A bulk update journals a Failed entry for each record it could not save, which has
         // nothing to put back, so its count is the records it saved (R-BU5). A job aborted or

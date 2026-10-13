@@ -89,8 +89,11 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 - **Copy from another field** offers only fields whose values fit: a field of the same type;
   any text, email, phone, URL or picklist into a text field; any number into a number field;
   and a lookup into a lookup that can point at the same kind of record.
-- **Household names.** A household's name is kept by household naming. To give a household a
-  name of its own, bulk update **Custom Name** rather than **Account Name**.
+- **Household names.** A household's name is kept by household naming, so a bulk update of
+  **Account Name** leaves every household as it is and lists each one with the reason; the
+  organizations in the same query are changed. To give one household a name of its own, open
+  the household, check **Custom name** and type the name (see
+  [Household naming](household-naming.md)).
 
 ## 5. Common mistakes
 
@@ -111,7 +114,12 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
   correction.
 - **The job was stopped part way.** A job stopped in Setup, or by Salesforce, saved the records
   of the chunks that ran before it stopped. It shows as **Failed**, and **Undo** asks you to
-  confirm the number of values those chunks saved, then puts them back.
+  confirm the number of values those chunks saved, then puts them back. A job also stops when
+  your access to the object or a field is taken away while it runs; the run log says why, and
+  the records it had not reached are left as they were.
+- **"The old and new values of this record are too long to keep for an undo."** A very long
+  text value (tens of thousands of characters) cannot be kept for an undo, so that record is
+  left as it was rather than changed without one. Change it on the record itself.
 
 ## 6. Changing values with steps
 

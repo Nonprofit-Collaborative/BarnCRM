@@ -268,6 +268,112 @@ private class BulkUpdateBatchTest {
         }
     }
 
+    /** A household's name is kept by household naming (R-H8); an organization's is not. */
+    @IsTest
+    static void aHouseholdNameIsLeftAloneAndAnOrganizationsIsChanged() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+                .get('Organization')
+                .getRecordTypeId();
+            List<Account> accounts = new List<Account>();
+            for (Integer index = 0; index < 100; index++) {
+                Account household = HouseholdTestDataFactory.newHousehold('Renameme Home ' + index);
+                // Named by hand, so household naming keeps this name and the query finds it.
+                household.Custom_Name__c = true;
+                accounts.add(household);
+                accounts.add(
+                    new Account(Name = 'Renameme Org ' + index, RecordTypeId = organizationType)
+                );
+            }
+            insert accounts;
+            String query = JSON.serialize(
+                new Map<String, Object>{
+                    'version' => 1,
+                    'object' => 'Account',
+                    'fields' => new List<Object>{ 'Name' },
+                    'filter' => new Map<String, Object>{
+                        'version' => 1,
+                        'conditions' => new List<Object>{
+                            new Map<String, Object>{
+                                'id' => 1,
+                                'field' => 'Name',
+                                'operator' => 'starts with',
+                                'value' => 'Renameme'
+                            }
+                        }
+                    }
+                }
+            );
+            String rename = changes(
+                new Map<String, Object>{ 'field' => 'Name', 'action' => 'set', 'value' => 'Same' }
+            );
+            User person = maria();
+            Import_Batch__c started;
+
+            Test.startTest();
+            System.runAs(person) {
+                BulkUpdateService.Preview preview = BulkUpdateService.preview(query, rename);
+                System.Assert.areEqual(200, preview.count, 'Both kinds match');
+                started = BulkUpdateService.start(query, rename, 200);
+            }
+            Test.stopTest();
+
+            Import_Batch__c job = reread(started.Id);
+            System.Assert.areEqual(100, job.Rows_Updated__c, job.Run_Log__c);
+            System.Assert.areEqual(100, job.Rows_Rejected__c, 'Each household is refused');
+            System.Assert.areEqual(100, [SELECT COUNT() FROM Account WHERE Name = 'Same']);
+            Id householdType = HouseholdService.householdRecordTypeId();
+            System.Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Name = 'Same' AND RecordTypeId = :householdType],
+                'No household was renamed'
+            );
+            Boolean reasonGiven = false;
+            for (Map<String, Object> entry : journal(job.Id, ImportJournalService.PHASE_COMMIT)) {
+                reasonGiven =
+                    reasonGiven ||
+                    System.Label.Core_BulkUpdate_ErrorHouseholdName.equals(entry.get('reason'));
+            }
+            System.Assert.isTrue(reasonGiven, 'The reason is journaled');
+        }
+    }
+
+    /**
+     * A record whose old and new values are too long for a journal page is refused, never saved
+     * without an undo, and the reason is journaled.
+     */
+    @IsTest
+    static void aChangeTooLargeToUndoIsRefusedNotSaved() {
+        System.runAs(TestUsers.admin()) {
+            makePeople(200, 0);
+            ImportJournalService.maxDocumentLength = 1500;
+            String longText = changes(
+                new Map<String, Object>{
+                    'field' => 'Description',
+                    'action' => 'set',
+                    'value' => 'x'.repeat(2000)
+                }
+            );
+            Import_Batch__c job = run(maria(), longText, 200);
+
+            System.Assert.areEqual(0, job.Rows_Updated__c, job.Run_Log__c);
+            System.Assert.areEqual(200, job.Rows_Rejected__c, 'Each record is refused');
+            System.Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Description != NULL],
+                'Nothing was saved without an undo'
+            );
+            List<Map<String, Object>> entries = journal(job.Id, ImportJournalService.PHASE_COMMIT);
+            System.Assert.areEqual(200, entries.size(), 'One refusal per record');
+            System.Assert.areEqual(
+                System.Label.Core_BulkUpdate_ErrorTooLargeToUndo,
+                entries[0].get('reason')
+            );
+        }
+    }
+
     @IsTest
     static void undoPutsBackTwoHundredValuesExceptOneChangedSince() {
         System.runAs(TestUsers.admin()) {

@@ -69,8 +69,8 @@
         <categories>BulkDelete</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log: bulk delete stopped before deleting; {0} is the reason</shortDescription>
-        <value>Stopped before deleting anything: {0}</value>
+        <shortDescription>Run log: the bulk delete stopped; {0} is the reason</shortDescription>
+        <value>Stopped, leaving every record not yet reached as it was: {0}</value>
     </labels>
     <labels>
         <fullName>Core_BulkDelete_LogFinished</fullName>

@@ -793,6 +793,14 @@
         <value>A household this import created could not be marked with the import, so an undo will not remove it: {0}</value>
     </labels>
     <labels>
+        <fullName>Core_Import_UndoErrorBulkDelete</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import undo: refused for a bulk delete</shortDescription>
+        <value>This is a bulk delete. Undo it from Recent bulk deletes on the Bulk Update tab, which brings the records back from the Recycle Bin.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_UndoErrorDryRun</fullName>
         <categories>Import</categories>
         <language>en_US</language>

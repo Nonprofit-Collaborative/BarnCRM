@@ -166,6 +166,62 @@ private class BulkDeleteBatchTest {
         }
     }
 
+    /**
+     * A refusal found when a later chunk checks the definition again stops the job: the chunks
+     * after it return at once, the run log says why, and no Error Log row is written per chunk.
+     */
+    @IsTest
+    static void aRefusalPartWayStopsTheJobAndSaysWhy() {
+        System.runAs(TestUsers.admin()) {
+            makePeople(200, 0);
+            Import_Batch__c created = BulkDeleteService.createJob(
+                BulkDeleteService.plan(VOLUNTEERS),
+                200,
+                200
+            );
+            BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
+            List<SObject> scope = startQuery(job);
+            List<SObject> first = new List<SObject>();
+            List<SObject> second = new List<SObject>();
+            List<SObject> third = new List<SObject>();
+            for (Integer i = 0; i < scope.size(); i++) {
+                (i < 100 ? first : (i < 150 ? second : third)).add(scope[i]);
+            }
+            job.execute(null, first);
+            // Stands for access taken away after the first chunk.
+            job.definition = JSON.serialize(
+                new Map<String, Object>{
+                    'version' => 1,
+                    'query' => new Map<String, Object>{
+                        'version' => 1,
+                        'object' => 'Import_Journal__c',
+                        'fields' => new List<Object>{ 'Id' }
+                    },
+                    'confirmedCount' => 200
+                }
+            );
+            job.execute(null, second);
+            job.execute(null, third);
+            job.finish(null);
+
+            Import_Batch__c done = reread(created.Id);
+            System.Assert.areEqual(ImportBatchService.STATUS_FAILED, done.Status__c);
+            System.Assert.areEqual(100, done.Rows_Deleted__c, done.Run_Log__c);
+            System.Assert.areEqual(100, [SELECT COUNT() FROM Contact], 'The rest stay');
+            System.Assert.isTrue(
+                done.Run_Log__c.contains(
+                    System.Label.Core_BulkDelete_LogStopped.substringBefore('{0}')
+                ),
+                done.Run_Log__c
+            );
+            System.Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'BulkDeleteBatch.execute'],
+                'A refusal the person can fix is not an error'
+            );
+        }
+    }
+
     @IsTest
     static void aJobWhoseObjectIsNoLongerAllowedStopsBeforeDeleting() {
         System.runAs(TestUsers.admin()) {

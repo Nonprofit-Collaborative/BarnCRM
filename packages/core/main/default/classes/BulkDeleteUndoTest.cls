@@ -248,4 +248,33 @@ private class BulkDeleteUndoTest {
             System.Assert.areEqual(System.Label.Core_BulkDelete_ErrorNotBulkDelete, preview.reason);
         }
     }
+
+    /** The import undo would mark a bulk delete Undone and bring nothing back, so it refuses. */
+    @IsTest
+    static void theImportUndoRefusesABulkDelete() {
+        System.runAs(TestUsers.admin()) {
+            Id jobId;
+            System.runAs(deleter()) {
+                jobId = deleteVolunteers(5);
+            }
+            ImportUndoService.Preview preview = ImportUndoService.preview(jobId);
+            System.Assert.isFalse(preview.allowed, 'Refused');
+            System.Assert.areEqual(System.Label.Core_Import_UndoErrorBulkDelete, preview.reason);
+            try {
+                ImportUndoService.start(jobId, 0);
+                System.Assert.fail('Refused');
+            } catch (ImportException expected) {
+                System.Assert.areEqual(
+                    System.Label.Core_Import_UndoErrorBulkDelete,
+                    expected.getMessage()
+                );
+            }
+            System.Assert.areEqual(
+                ImportBatchService.STATUS_COMPLETE,
+                reread(jobId).Status__c,
+                'Not marked Undone'
+            );
+            System.Assert.isTrue(BulkDeleteService.undoPreview(jobId).allowed, 'Still undoable');
+        }
+    }
 }
