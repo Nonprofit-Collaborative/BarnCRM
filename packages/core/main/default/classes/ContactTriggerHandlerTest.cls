@@ -264,4 +264,66 @@ private class ContactTriggerHandlerTest {
             );
         }
     }
+
+    @IsTest
+    static void correctingOnlyTheCaseOfASurnameRenamesTheHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact person = HouseholdTestDataFactory.newContact('Mr.', 'Sean', 'Mcdonald');
+            insert person;
+            Id household = [SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId;
+
+            Test.startTest();
+            update new Contact(Id = person.Id, LastName = 'McDonald');
+            Test.stopTest();
+
+            Account saved = [
+                SELECT Name, Household_Formal_Greeting__c
+                FROM Account
+                WHERE Id = :household
+            ];
+            Assert.isTrue(
+                'The McDonald Family'.equals(saved.Name),
+                'A case-only correction reaches the household name: ' + saved.Name
+            );
+            Assert.isTrue(
+                saved.Household_Formal_Greeting__c.contains('McDonald'),
+                'And the greeting: ' + saved.Household_Formal_Greeting__c
+            );
+        }
+    }
+
+    @IsTest
+    static void changingEmployerAndSurnameTogetherInJunctionModeRenamesTheHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account employer = new Account(Name = 'Riverside Library');
+            insert new List<Account>{ household, employer };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            insert new Household_Member__c(
+                Household__c = household.Id,
+                Contact__c = maria.Id,
+                Start_Date__c = Date.today()
+            );
+
+            Test.startTest();
+            // One save that both changes her employer (her account in junction mode) and
+            // her surname: the second change used to be skipped because of the first.
+            update new Contact(Id = maria.Id, AccountId = employer.Id, LastName = 'Garcia-Lee');
+            Test.stopTest();
+
+            Assert.areEqual(
+                'The Garcia-Lee Family',
+                [SELECT Name FROM Account WHERE Id = :household.Id].Name,
+                'The household she belongs to follows the surname'
+            );
+            Assert.areEqual(
+                'Riverside Library',
+                [SELECT Name FROM Account WHERE Id = :employer.Id].Name,
+                'The employer is not a household and is left alone'
+            );
+        }
+    }
 }

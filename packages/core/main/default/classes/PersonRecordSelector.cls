@@ -109,11 +109,22 @@ public with sharing class PersonRecordSelector {
         Map<String, Object> current = record.getPopulatedFieldsAsMap();
         Map<String, Object> before = previous.getPopulatedFieldsAsMap();
         for (String fieldName : namingFields()) {
-            if (current.get(fieldName) != before.get(fieldName)) {
+            if (valueChanged(current.get(fieldName), before.get(fieldName))) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Text is compared case-sensitively, so that correcting "Mcdonald" to "McDonald"
+     * counts as a change: Apex `==` and `!=` ignore case for Strings.
+     */
+    private static Boolean valueChanged(Object now, Object before) {
+        if (now instanceof String && before instanceof String) {
+            return !((String) now).equals((String) before);
+        }
+        return now != before;
     }
 
     /**

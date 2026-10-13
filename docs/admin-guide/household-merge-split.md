@@ -35,7 +35,13 @@ them leaves you with one empty household rather than with none.
 **What happens to the empty household after a split.** If "Delete a household when the last
 person leaves" is on (BarnCRM Settings, Households), a household that a split empties is
 deleted for you. If it is off, the empty household stays and you delete it yourself. The
-setting is on when Core is installed.
+setting is off when Core is installed.
+
+**People who belong to more than one household.** In the flexible way of belonging a person
+can be in two households at once, such as a child of separated parents. A merge or a split
+moves them out of the household you are working on only; their other household is left
+exactly as it was. A merge keeps the date each person joined, since the two households were
+one family all along.
 
 **Where the button is.** Core ships the placement, not just the action: the **Merge or
 split** action sits in the action bar of the packaged Account record page, on households
@@ -75,7 +81,9 @@ Maria does this from the sample data, after an import left her with the Garcia f
    away, and that a merge cannot be undone. Read it, then click **Merge households**.
 8. You land on the surviving household. It lists all of the members from both households,
    the member count is right, and the name has been recalculated from the members unless you
-   chose to keep a custom name. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
+   chose to keep a custom name. A name or greeting you took from the other household is kept
+   as you chose it; when it is not what naming would produce, the household is marked as
+   having a custom name, so naming stops rewriting its name and greetings. Every letter, file, and note (and, with Giving, every gift) from the duplicate is now
    on this household.
 
 ### Splitting a member out

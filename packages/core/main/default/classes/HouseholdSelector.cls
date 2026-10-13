@@ -378,13 +378,18 @@ public with sharing class HouseholdSelector {
      * The households a merge compares, with every field the comparison offers a choice
      * about: the wording, the primary contact, the anniversary, and the address a letter
      * is sent to.
+     *
+     * A display read (ADR-0021), but stripped rather than `WITH USER_MODE`, which refuses
+     * the whole query when a single field is unreadable. The comparison leaves out a field
+     * the person cannot read, so somebody without access to, say, the anniversary still
+     * gets the merge screen. Sharing still applies: the class is `with sharing`.
      */
     @NamespaceAccessible
     public static List<Account> getHouseholdsForMerge(Set<Id> householdIds) {
         if (householdIds == null || householdIds.isEmpty()) {
             return new List<Account>();
         }
-        return [
+        List<Account> records = [
             SELECT
                 Id,
                 Name,
@@ -403,9 +408,10 @@ public with sharing class HouseholdSelector {
                 BillingCountry
             FROM Account
             WHERE Id IN :householdIds
-            WITH USER_MODE
+            WITH SYSTEM_MODE
             LIMIT 100
         ];
+        return (List<Account>) readableRecords(records, Schema.SObjectType.Account);
     }
 
     /**
@@ -587,5 +593,43 @@ public with sharing class HouseholdSelector {
                 WITH SYSTEM_MODE
             ]
         );
+    }
+
+    /**
+     * The households among these that any contact at all points at, whether or not the
+     * running user can see that contact.
+     *
+     * The guard before an emptied household is deleted in contact mode. The member reads
+     * above honour sharing, so with a private Contact sharing model a household can look
+     * empty to somebody who cannot see the other people in it, and deleting it would take
+     * those people's household away. Only which households are occupied is answered, never
+     * who is in them, so nothing hidden reaches the user.
+     */
+    @NamespaceAccessible
+    public static Set<Id> householdsWithAnyContact(Set<Id> householdIds) {
+        return new OccupancyReader().householdsWithAnyContact(householdIds);
+    }
+
+    /**
+     * Reads across sharing (ADR-0021 category 2: package upkeep must not depend on what the
+     * saving user can see) and answers ids only.
+     */
+    private without sharing class OccupancyReader {
+        Set<Id> householdsWithAnyContact(Set<Id> householdIds) {
+            Set<Id> result = new Set<Id>();
+            if (householdIds == null || householdIds.isEmpty()) {
+                return result;
+            }
+            for (AggregateResult row : [
+                SELECT AccountId
+                FROM Contact
+                WHERE AccountId IN :householdIds
+                WITH SYSTEM_MODE
+                GROUP BY AccountId
+            ]) {
+                result.add((Id) row.get('AccountId'));
+            }
+            return result;
+        }
     }
 }

@@ -18,11 +18,6 @@ public with sharing class HouseholdMergeService {
     @NamespaceAccessible
     public static final String KEEP_VICTIM = 'Victim';
 
-    // The two handlers that keep household membership tidy. Named here because a merge
-    // deliberately stands them down while it moves people (see mergeHouseholds).
-    private static final String CONTACT_HANDLER = 'ContactTriggerHandler';
-    private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
-
     /**
      * The fields a merge offers a choice about, in the order the comparison shows them.
      * Every one of them is a field a person typed or a person cares about; the computed
@@ -238,12 +233,14 @@ public with sharing class HouseholdMergeService {
             // fold into the survivor, and everything hanging off it, activities, files,
             // notes and giving history, would go with it instead of following the merge.
             // So the handlers are stood down for the move only, and this method settles the
-            // survivor up itself once the merge has happened.
-            withoutMembershipUpkeep(movedPeople, survivorId);
+            // survivor up itself once the merge has happened. Only the memberships in the
+            // household going away move; a person who also belongs to a third household
+            // stays there, and keeps the date they joined.
+            HouseholdService.moveMembersWithoutUpkeep(movedPeople, survivorId, victimId, true);
         }
 
         Boolean keepsCustomName = applyChoices(survivor, victim, choices);
-        String chosenName = chosenOtherName(victim, choices);
+        Map<String, Object> chosenWording = chosenOtherWording(victim, choices);
 
         // The platform's own merge, so that activities, files, notes, and every lookup
         // another package points at this household follow the record that goes away.
@@ -286,7 +283,7 @@ public with sharing class HouseholdMergeService {
             // carried has just been moved onto it. Two households that were both empty
             // would otherwise merge into nothing at all.
             HouseholdService.afterMembershipChange(survivorOnly, false);
-            customNameKept = keepChosenName(survivorId, chosenName);
+            customNameKept = keepChosenWording(survivorId, chosenWording);
         }
         MergeResult result = new MergeResult();
         result.survivorId = survivorId;
@@ -297,56 +294,82 @@ public with sharing class HouseholdMergeService {
         return result;
     }
 
+    /** The wording fields naming computes, which a merge also offers as choices. */
+    private static final List<String> WORDING_FIELDS = new List<String>{
+        'Name',
+        'Household_Formal_Greeting__c',
+        'Household_Informal_Greeting__c'
+    };
+
     /**
-     * The other household's name, when the person chose to keep it, on the same terms
-     * applyChoices wrote it: the field is theirs to update and the value is not empty.
+     * The other household's name and greetings, those the person chose to keep, on the
+     * same terms applyChoices wrote them: the field is theirs to update and the value is
+     * not empty.
      */
-    private static String chosenOtherName(Account victim, MergeChoices choices) {
-        Boolean chosen =
-            choices != null &&
-            choices.keepFrom != null &&
-            KEEP_VICTIM.equalsIgnoreCase(choices.keepFrom.get('Name'));
-        if (!chosen || String.isBlank(victim.Name)) {
-            return null;
+    private static Map<String, Object> chosenOtherWording(Account victim, MergeChoices choices) {
+        Map<String, Object> result = new Map<String, Object>();
+        if (choices == null || choices.keepFrom == null) {
+            return result;
         }
-        return Schema.SObjectType.Account.fields.Name.isUpdateable() ? victim.Name : null;
+        Map<String, Schema.SObjectField> describe = Schema.SObjectType.Account.fields.getMap();
+        for (String fieldName : WORDING_FIELDS) {
+            if (!KEEP_VICTIM.equalsIgnoreCase(choices.keepFrom.get(fieldName))) {
+                continue;
+            }
+            if (!describe.get(fieldName).getDescribe().isUpdateable()) {
+                continue;
+            }
+            Object value = victim.getPopulatedFieldsAsMap().get(fieldName);
+            if (value != null && String.isNotBlank(String.valueOf(value))) {
+                result.put(fieldName, value);
+            }
+        }
+        return result;
     }
 
     /**
-     * Makes the name the person chose stick when the settle-up has just written a
-     * different one over it.
+     * Makes the name and greetings the person chose stick when the settle-up has just
+     * written different ones over them.
      *
-     * The screen offers the other household's name as a choice. On a household whose
-     * wording is not custom, the settle-up above recomputes the name from everyone now in
-     * it and would throw that choice away, so a choice the screen offers has to be
-     * honored rather than quietly discarded. Where the recomputed name is the very name
-     * the person chose there is nothing to do, and the household stays one that naming
-     * keeps up to date. Where it differs, the person has chosen wording that naming would
-     * not produce, which is what a custom name is (R-H8), so the household is marked as
-     * one, exactly as if they had typed that name in by hand. Written with their own
-     * access, like every other choice on this screen: a person who may not take over a
-     * household's wording is not given that power by a merge.
+     * The screen offers the other household's name and greetings as choices. On a
+     * household whose wording is not custom, the settle-up above recomputes all three from
+     * everyone now in it and would throw those choices away, so a choice the screen offers
+     * has to be honored rather than quietly discarded. Where the recomputed wording is the
+     * very wording the person chose there is nothing to do, and the household stays one
+     * that naming keeps up to date. Where it differs, the person has chosen wording that
+     * naming would not produce, which is what a custom name is (R-H8: it covers the name
+     * and both greetings), so the household is marked as one, exactly as if they had typed
+     * that wording in by hand. Written with their own access, like every other choice on
+     * this screen: a person who may not take over a household's wording is not given that
+     * power by a merge.
      *
-     * Answers whether the household is now one whose name is held as a custom one, so the
+     * Answers whether the household is now one whose wording is held as custom, so the
      * caller can pass that on to the screen.
      */
-    private static Boolean keepChosenName(Id survivorId, String chosenName) {
-        if (chosenName == null) {
+    private static Boolean keepChosenWording(Id survivorId, Map<String, Object> chosen) {
+        if (chosen.isEmpty()) {
             return false;
         }
         if (!Schema.SObjectType.Account.fields.Custom_Name__c.isUpdateable()) {
             return false;
         }
         List<Account> settled = HouseholdSelector.getHouseholdsByIds(new Set<Id>{ survivorId });
-        if (settled.isEmpty() || settled[0].Name == chosenName) {
+        if (settled.isEmpty()) {
             return false;
         }
-        Database.update(
-            new List<Account>{
-                new Account(Id = survivorId, Name = chosenName, Custom_Name__c = true)
-            },
-            AccessLevel.USER_MODE
-        );
+        Account changes = new Account(Id = survivorId, Custom_Name__c = true);
+        Boolean differs = false;
+        for (String fieldName : chosen.keySet()) {
+            String value = String.valueOf(chosen.get(fieldName));
+            if (!value.equals(String.valueOf(settled[0].get(fieldName)))) {
+                differs = true;
+            }
+            changes.put(fieldName, value);
+        }
+        if (!differs) {
+            return false;
+        }
+        Database.update(new List<Account>{ changes }, AccessLevel.USER_MODE);
         return true;
     }
 
@@ -381,9 +404,11 @@ public with sharing class HouseholdMergeService {
         if (anyChange) {
             Database.update(new List<Account>{ changes }, AccessLevel.USER_MODE);
         }
+        // Read from the populated values: a field this person cannot read has been stripped
+        // from the records, and asking for it by name would throw.
         Object custom = KEEP_VICTIM.equalsIgnoreCase(keepFrom.get('Custom_Name__c'))
-            ? victim.get('Custom_Name__c')
-            : survivor.get('Custom_Name__c');
+            ? victim.getPopulatedFieldsAsMap().get('Custom_Name__c')
+            : survivor.getPopulatedFieldsAsMap().get('Custom_Name__c');
         return custom == true;
     }
 
@@ -444,7 +469,12 @@ public with sharing class HouseholdMergeService {
             destination = HouseholdService.createHouseholdFor(moving);
         }
 
-        Set<Id> affected = HouseholdService.moveMembers(personIds, destination);
+        Set<Id> affected = HouseholdService.moveMembersWithoutUpkeep(
+            personIds,
+            destination,
+            householdId,
+            false
+        );
         affected.add(householdId);
         // One settle-up for the whole split, however many people moved: counts, names and
         // greetings on both households, and the household left empty tidied away when the
@@ -466,22 +496,6 @@ public with sharing class HouseholdMergeService {
             result.remove(result.indexOf('Primary_Contact__c'));
         }
         return result;
-    }
-
-    /**
-     * Moves people with the membership handlers stood down, so that nothing is recounted,
-     * renamed, or tidied away in the middle of a merge. The bypass is per transaction and
-     * is always cleared, including when the move throws.
-     */
-    private static void withoutMembershipUpkeep(Set<Id> personIds, Id survivorId) {
-        AutomationControl.bypass(CONTACT_HANDLER);
-        AutomationControl.bypass(MEMBER_HANDLER);
-        try {
-            HouseholdService.moveMembers(personIds, survivorId);
-        } finally {
-            AutomationControl.clearBypass(CONTACT_HANDLER);
-            AutomationControl.clearBypass(MEMBER_HANDLER);
-        }
     }
 
     /**

@@ -497,7 +497,8 @@ describe('c-household-members-panel', () => {
 
     expect(moveContact).toHaveBeenCalledWith({
       contactId: PERSON_ID,
-      targetHouseholdId: OTHER_HOUSEHOLD_ID
+      targetHouseholdId: OTHER_HOUSEHOLD_ID,
+      sourceHouseholdId: HOUSEHOLD_ID
     });
   });
 
@@ -547,7 +548,8 @@ describe('c-household-members-panel', () => {
 
     expect(moveContact).toHaveBeenCalledWith({
       contactId: PERSON_ACCOUNT_ID,
-      targetHouseholdId: OTHER_HOUSEHOLD_ID
+      targetHouseholdId: OTHER_HOUSEHOLD_ID,
+      sourceHouseholdId: HOUSEHOLD_ID
     });
   });
 

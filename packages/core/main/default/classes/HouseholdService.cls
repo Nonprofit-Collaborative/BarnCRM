@@ -57,6 +57,10 @@ public with sharing class HouseholdService {
      */
     private static Boolean writingPrimaryContacts = false;
 
+    /** The trigger handlers stood down by `moveMembersWithoutUpkeep`. */
+    private static final String CONTACT_HANDLER = 'ContactTriggerHandler';
+    private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
+
     /**
      * One member of a household, whichever object the person is stored on.
      */
@@ -1313,6 +1317,18 @@ public with sharing class HouseholdService {
      */
     @NamespaceAccessible
     public static void moveContact(Id contactId, Id targetHouseholdId) {
+        moveContact(contactId, targetHouseholdId, null);
+    }
+
+    /**
+     * The same, naming the household the person is leaving. In junction mode a person can
+     * belong to several households, and only the membership in this one ends: a child in
+     * two households who is moved out of one stays in the other. With no household named,
+     * every other household the person is in is left, which is what contact mode always
+     * means (a contact has one household).
+     */
+    @NamespaceAccessible
+    public static void moveContact(Id contactId, Id targetHouseholdId, Id sourceHouseholdId) {
         if (contactId == null || targetHouseholdId == null) {
             throw new HouseholdException(Label.Core_Households_ErrorMoveMissingInput);
         }
@@ -1326,9 +1342,39 @@ public with sharing class HouseholdService {
         ) {
             throw new HouseholdException(Label.Core_Households_ErrorMoveNoEditAccess);
         }
-        // One upkeep path, the same one the membership trigger uses, so the work is not
-        // done twice when the trigger has already run for this move.
-        afterMembershipChange(moveMembers(new Set<Id>{ contactId }, targetHouseholdId));
+        // The person and membership handlers are stood down for the move, and the households
+        // are settled once here, rather than once by each trigger and again by this method.
+        afterMembershipChange(
+            moveMembersWithoutUpkeep(
+                new Set<Id>{ contactId },
+                targetHouseholdId,
+                sourceHouseholdId,
+                false
+            )
+        );
+    }
+
+    /**
+     * `moveMembers` with the person and membership trigger handlers stood down, for a caller
+     * that settles the households itself straight after (a single move, a split, a merge).
+     * The bypass is per transaction and is always cleared, including when the move throws.
+     * A merge keeps the dates people joined on (`keepStartDates`); a move or a split does not.
+     */
+    @NamespaceAccessible
+    public static Set<Id> moveMembersWithoutUpkeep(
+        Set<Id> personIds,
+        Id targetHouseholdId,
+        Id sourceHouseholdId,
+        Boolean keepStartDates
+    ) {
+        AutomationControl.bypass(CONTACT_HANDLER);
+        AutomationControl.bypass(MEMBER_HANDLER);
+        try {
+            return move(personIds, targetHouseholdId, sourceHouseholdId, keepStartDates == true);
+        } finally {
+            AutomationControl.clearBypass(CONTACT_HANDLER);
+            AutomationControl.clearBypass(MEMBER_HANDLER);
+        }
     }
 
     /**
@@ -1343,6 +1389,29 @@ public with sharing class HouseholdService {
      */
     @NamespaceAccessible
     public static Set<Id> moveMembers(Set<Id> personIds, Id targetHouseholdId) {
+        return moveMembers(personIds, targetHouseholdId, null);
+    }
+
+    /**
+     * The same, naming the household the people are leaving. In junction mode only their
+     * memberships in that household end, so a person who also belongs to a third household
+     * stays there. With no household named, every other current membership ends.
+     */
+    @NamespaceAccessible
+    public static Set<Id> moveMembers(
+        Set<Id> personIds,
+        Id targetHouseholdId,
+        Id sourceHouseholdId
+    ) {
+        return move(personIds, targetHouseholdId, sourceHouseholdId, false);
+    }
+
+    private static Set<Id> move(
+        Set<Id> personIds,
+        Id targetHouseholdId,
+        Id sourceHouseholdId,
+        Boolean keepStartDates
+    ) {
         if (personIds == null || personIds.isEmpty() || targetHouseholdId == null) {
             throw new HouseholdException(Label.Core_Households_ErrorMoveMissingInput);
         }
@@ -1384,7 +1453,13 @@ public with sharing class HouseholdService {
         }
         Set<Id> affected = new Set<Id>{ targetHouseholdId };
         if (isJunctionMode()) {
-            moveJunctionMembers(personIds, targetHouseholdId, affected);
+            moveJunctionMembers(
+                personIds,
+                targetHouseholdId,
+                sourceHouseholdId,
+                keepStartDates,
+                affected
+            );
         } else {
             moveContactMembers(contacts.values(), targetHouseholdId, affected);
         }
@@ -1426,10 +1501,17 @@ public with sharing class HouseholdService {
      * room for it: at most one current member of a household is primary (R-M3), so if the
      * target already has a primary, or two people arrive holding the flag, the arrivals
      * join as ordinary members and the household keeps the one primary it is allowed.
+     *
+     * With a source household named, only the memberships in that household end: the
+     * person's other households are none of this move's business. A merge keeps the start
+     * date the person joined the merged-away household on, since the two households were
+     * one family all along; a move starts the new membership today.
      */
     private static void moveJunctionMembers(
         Set<Id> personIds,
         Id targetHouseholdId,
+        Id sourceHouseholdId,
+        Boolean keepStartDates,
         Set<Id> affected
     ) {
         Boolean primaryIsFree = true;
@@ -1445,13 +1527,12 @@ public with sharing class HouseholdService {
         Set<Id> alreadyInTarget = new Set<Id>();
         Map<Id, String> roleByPerson = new Map<Id, String>();
         Set<Id> wasPrimary = new Set<Id>();
+        Map<Id, Date> startByPerson = new Map<Id, Date>();
         List<Household_Member__c> ended = new List<Household_Member__c>();
         for (
             Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)
         ) {
-            Id personId = membership.Contact__c != null
-                ? membership.Contact__c
-                : membership.Account__c;
+            Id personId = personOf(membership);
             if (personId == null || !personIds.contains(personId)) {
                 continue;
             }
@@ -1459,7 +1540,17 @@ public with sharing class HouseholdService {
                 alreadyInTarget.add(personId);
                 continue;
             }
+            if (sourceHouseholdId != null && membership.Household__c != sourceHouseholdId) {
+                continue;
+            }
             affected.add(membership.Household__c);
+            Date started = membership.Start_Date__c;
+            if (
+                started != null &&
+                (!startByPerson.containsKey(personId) || started < startByPerson.get(personId))
+            ) {
+                startByPerson.put(personId, started);
+            }
             if (
                 String.isBlank(roleByPerson.get(personId)) && String.isNotBlank(membership.Role__c)
             ) {
@@ -1485,9 +1576,16 @@ public with sharing class HouseholdService {
             if (takesPrimary) {
                 primaryStillFree = false;
             }
-            joined.add(
-                newMembership(personId, targetHouseholdId, roleByPerson.get(personId), takesPrimary)
+            Household_Member__c membership = newMembership(
+                personId,
+                targetHouseholdId,
+                roleByPerson.get(personId),
+                takesPrimary
             );
+            if (keepStartDates && startByPerson.containsKey(personId)) {
+                membership.Start_Date__c = startByPerson.get(personId);
+            }
+            joined.add(membership);
         }
         if (!joined.isEmpty()) {
             Database.insert(joined, AccessLevel.USER_MODE);
@@ -1957,6 +2055,24 @@ public with sharing class HouseholdService {
         }
         // One probe for the whole batch, so a split of fifty households still asks once.
         Set<Id> emptyIds = new Map<Id, Account>(empties).keySet();
+        if (!isJunctionMode()) {
+            // Contact mode reads members with sharing, so a household can look empty to
+            // somebody who cannot see the people still in it. Those households are kept.
+            Set<Id> occupied = HouseholdSelector.householdsWithAnyContact(emptyIds);
+            if (!occupied.isEmpty()) {
+                List<Account> stillEmpty = new List<Account>();
+                for (Account household : empties) {
+                    if (!occupied.contains(household.Id)) {
+                        stillEmpty.add(household);
+                    }
+                }
+                empties = stillEmpty;
+                if (empties.isEmpty()) {
+                    return;
+                }
+                emptyIds = new Map<Id, Account>(empties).keySet();
+            }
+        }
         Set<Id> dependent = HouseholdSelector.getAccountsWithNativeDependents(emptyIds);
         // Records another BarnCRM package still credits to the household, such as the gifts
         // given from it, which keep that household when the donor moves (R-G2). Kept quietly:

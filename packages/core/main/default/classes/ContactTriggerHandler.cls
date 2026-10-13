@@ -61,19 +61,25 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         Map<Id, Contact> previousById = (Map<Id, Contact>) Trigger.oldMap;
         Set<Id> affected = new Set<Id>();
         Set<Id> renamed = new Set<Id>();
+        // In junction mode the account a contact points at is an employer, not a household,
+        // so a change of account is not a change of household and is not settled here.
+        Boolean accountIsHousehold = !HouseholdService.isJunctionMode();
         for (Contact record : (List<Contact>) Trigger.new) {
             Contact previous = previousById.get(record.Id);
-            Boolean moved = record.AccountId != previous.AccountId;
-            if (moved) {
+            if (accountIsHousehold && record.AccountId != previous.AccountId) {
                 add(affected, previous.AccountId);
                 add(affected, record.AccountId);
-            } else if (namingChanged(record, previous)) {
-                add(affected, record.AccountId);
+            }
+            // Checked on its own, so that a save that moves a person and corrects their
+            // name in one go still renames the household they are in.
+            if (namingChanged(record, previous)) {
+                if (accountIsHousehold) {
+                    add(affected, record.AccountId);
+                }
                 renamed.add(record.Id);
             }
         }
-        // In junction mode the account a contact points at is an employer, not their
-        // household, so the households to rewrite have to be read from the membership
+        // In junction mode the households to rewrite have to be read from the membership
         // rows. Answers empty in contact mode, where the loop above already has them.
         affected.addAll(HouseholdService.householdIdsForPeople(renamed));
         refresh(affected, true);
@@ -177,15 +183,23 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         return result;
     }
 
+    /**
+     * Text is compared case-sensitively (`!=` on Strings ignores case in Apex), so that
+     * correcting "Mcdonald" to "McDonald" renames the household and greetings too.
+     */
     private static Boolean namingChanged(Contact record, Contact previous) {
-        return record.FirstName != previous.FirstName ||
-            record.LastName != previous.LastName ||
-            record.Salutation != previous.Salutation ||
-            record.Preferred_Name__c != previous.Preferred_Name__c ||
+        return textChanged(record.FirstName, previous.FirstName) ||
+            textChanged(record.LastName, previous.LastName) ||
+            textChanged(record.Salutation, previous.Salutation) ||
+            textChanged(record.Preferred_Name__c, previous.Preferred_Name__c) ||
             record.Deceased__c != previous.Deceased__c ||
             record.Household_Role__c != previous.Household_Role__c ||
             record.Exclude_From_Household_Name__c != previous.Exclude_From_Household_Name__c ||
             record.Exclude_From_Greetings__c != previous.Exclude_From_Greetings__c;
+    }
+
+    private static Boolean textChanged(String now, String before) {
+        return now == null ? before != null : !now.equals(before);
     }
 
     private static Set<Id> householdIds(List<Contact> records) {

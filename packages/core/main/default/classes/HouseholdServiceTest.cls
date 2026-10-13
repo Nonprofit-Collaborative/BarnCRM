@@ -1804,4 +1804,126 @@ private class HouseholdServiceTest {
             Assert.areEqual(before, after, 'The short circuit runs no query at all');
         }
     }
+
+    // ---------------------------------------------------------- moving out of one of several
+
+    /**
+     * A child in two households, moved out of one of them, stays in the other: only the
+     * membership in the household named as the one they leave ends.
+     */
+    @IsTest
+    static void movingAPersonOutOfOneHouseholdLeavesTheirOtherHouseholdAlone() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account first = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account second = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            Account target = HouseholdTestDataFactory.newHousehold('The Okonkwo Family');
+            insert new List<Account>{ first, second, target };
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert new List<Contact>{ ana, maria };
+            insert new List<Household_Member__c>{
+                new Household_Member__c(Household__c = first.Id, Contact__c = ana.Id),
+                new Household_Member__c(Household__c = first.Id, Contact__c = maria.Id),
+                new Household_Member__c(Household__c = second.Id, Contact__c = ana.Id)
+            };
+
+            Test.startTest();
+            HouseholdService.moveContact(ana.Id, target.Id, first.Id);
+            Test.stopTest();
+
+            Map<Id, Integer> current = new Map<Id, Integer>();
+            for (Household_Member__c row : [
+                SELECT Household__c
+                FROM Household_Member__c
+                WHERE Contact__c = :ana.Id AND End_Date__c = NULL
+            ]) {
+                Integer seen = current.get(row.Household__c);
+                current.put(row.Household__c, seen == null ? 1 : seen + 1);
+            }
+            Assert.isFalse(
+                current.containsKey(first.Id),
+                'Ana left the household she was moved out of'
+            );
+            Assert.areEqual(1, current.get(second.Id), 'Ana is still in her other household');
+            Assert.areEqual(1, current.get(target.Id), 'Ana joined the household she was moved to');
+            Map<Id, Account> counts = new Map<Id, Account>(
+                [
+                    SELECT Member_Count__c
+                    FROM Account
+                    WHERE Id IN :new Set<Id>{ first.Id, second.Id, target.Id }
+                ]
+            );
+            Assert.areEqual(1, counts.get(first.Id).Member_Count__c, 'Maria is left in the first');
+            Assert.areEqual(
+                1,
+                counts.get(second.Id).Member_Count__c,
+                'The second still counts Ana'
+            );
+            Assert.areEqual(1, counts.get(target.Id).Member_Count__c, 'The target counts Ana');
+        }
+    }
+
+    /**
+     * A single move stands the person and membership handlers down while it moves, and
+     * settles the households itself once. The handlers are back on straight afterwards, so
+     * the next save in the same transaction is looked after as usual.
+     */
+    @IsTest
+    static void theHandlersAreBackOnAfterAMove() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account first = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account target = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ first, target };
+            Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Garcia');
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert new List<Contact>{ ana, maria };
+            insert new List<Household_Member__c>{
+                new Household_Member__c(Household__c = first.Id, Contact__c = ana.Id),
+                new Household_Member__c(Household__c = first.Id, Contact__c = maria.Id)
+            };
+
+            Test.startTest();
+            HouseholdService.moveContact(ana.Id, target.Id, first.Id);
+            Assert.areEqual(
+                'The Garcia Family',
+                [SELECT Name FROM Account WHERE Id = :target.Id].Name,
+                'The move settled the household she joined: it is named from her'
+            );
+            update new Contact(Id = ana.Id, LastName = 'Garcia-Lee');
+            Test.stopTest();
+
+            Assert.areEqual(
+                'The Garcia-Lee Family',
+                [SELECT Name FROM Account WHERE Id = :target.Id].Name,
+                'The next save after the move is looked after by the handlers again'
+            );
+        }
+    }
+
+    /**
+     * The guard against deleting a household that only looks empty: it names the households
+     * any contact points at, and only those.
+     */
+    @IsTest
+    static void anOccupiedHouseholdIsNamedAsOccupied() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account occupied = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account empty = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ occupied, empty };
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            maria.AccountId = occupied.Id;
+            insert maria;
+
+            Test.startTest();
+            Set<Id> result = HouseholdSelector.householdsWithAnyContact(
+                new Set<Id>{ occupied.Id, empty.Id }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(new Set<Id>{ occupied.Id }, result, 'Only the occupied household');
+        }
+    }
 }

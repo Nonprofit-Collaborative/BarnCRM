@@ -177,10 +177,15 @@ public with sharing class HouseholdController {
         }
     }
 
+    /**
+     * Moves a person from the household whose page the panel sits on (`sourceHouseholdId`)
+     * to another. In junction mode only that one membership ends; left out, every other
+     * household the person is in is left.
+     */
     @AuraEnabled
-    public static void moveContact(Id contactId, Id targetHouseholdId) {
+    public static void moveContact(Id contactId, Id targetHouseholdId, Id sourceHouseholdId) {
         try {
-            HouseholdService.moveContact(contactId, targetHouseholdId);
+            HouseholdService.moveContact(contactId, targetHouseholdId, sourceHouseholdId);
         } catch (Exception e) {
             throw asUserError(e, Label.Core_Households_ErrorContextMembership, contactId);
         }

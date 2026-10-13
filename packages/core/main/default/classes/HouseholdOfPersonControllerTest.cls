@@ -336,6 +336,72 @@ private class HouseholdOfPersonControllerTest {
         }
     }
 
+    /**
+     * Automatic creation is on (the shipped default). The new person joins the household
+     * the panel is on and is not given an empty household of their own first.
+     */
+    @IsTest
+    static void addingANewPersonInContactModeLeavesNoStrayHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert household;
+            Id recordTypeId = HouseholdService.householdRecordTypeId();
+            Integer householdsBefore = [
+                SELECT COUNT()
+                FROM Account
+                WHERE RecordTypeId = :recordTypeId
+            ];
+
+            Test.startTest();
+            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+            Test.stopTest();
+
+            Contact created = [SELECT AccountId FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+            Assert.areEqual(
+                household.Id,
+                created.AccountId,
+                'Wei is in the household he was added to'
+            );
+            Assert.areEqual(
+                householdsBefore,
+                [SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId],
+                'No household of his own was made and left empty'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c,
+                'The household counts him'
+            );
+        }
+    }
+
+    @IsTest
+    static void addingANewPersonInJunctionModeJoinsOnlyThatHousehold() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert household;
+
+            Test.startTest();
+            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+            Test.stopTest();
+
+            Contact created = [SELECT Id FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+            List<Household_Member__c> memberships = [
+                SELECT Household__c
+                FROM Household_Member__c
+                WHERE Contact__c = :created.Id AND End_Date__c = NULL
+            ];
+            Assert.areEqual(1, memberships.size(), 'Wei belongs to one household, not two');
+            Assert.areEqual(
+                household.Id,
+                memberships[0].Household__c,
+                'It is the one he was added to'
+            );
+        }
+    }
+
     @IsTest
     static void addingANewPersonWithNoLastNameIsRefused() {
         System.runAs(TestUsers.admin()) {

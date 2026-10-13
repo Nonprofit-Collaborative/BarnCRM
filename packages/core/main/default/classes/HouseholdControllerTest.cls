@@ -116,7 +116,11 @@ private class HouseholdControllerTest {
             Id toHousehold = [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId;
 
             Test.startTest();
-            HouseholdController.moveContact(maria.Id, toHousehold);
+            HouseholdController.moveContact(
+                maria.Id,
+                toHousehold,
+                [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId
+            );
             Test.stopTest();
 
             Assert.areEqual(
@@ -135,7 +139,7 @@ private class HouseholdControllerTest {
 
             Test.startTest();
             try {
-                HouseholdController.moveContact(null, null);
+                HouseholdController.moveContact(null, null, null);
             } catch (Exception e) {
                 refused = true;
             }
@@ -236,7 +240,7 @@ private class HouseholdControllerTest {
             Test.startTest();
             System.runAs(reader) {
                 try {
-                    HouseholdController.moveContact(maria.Id, toHousehold);
+                    HouseholdController.moveContact(maria.Id, toHousehold, fromHousehold);
                 } catch (Exception e) {
                     message = e.getMessage();
                 }
