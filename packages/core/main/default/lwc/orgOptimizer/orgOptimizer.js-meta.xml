@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Org Optimizer page: data quality, duplicates, field utilization and Health Check as
+    sections, each loaded only when opened and shown only to people who may use it.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Org Optimizer</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

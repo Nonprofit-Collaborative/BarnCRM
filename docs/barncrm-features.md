@@ -92,7 +92,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
 | Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Shipped | C-28 |
-| Org Optimizer | Major | The Data Hygiene tab becomes Org Optimizer: one page with lazily loaded sections for data quality, duplicates, field utilization and Health Check (run on demand), each shown only to people who may use it. Duplicate review moves here from BarnCRM Settings, which keeps a link. | Planned (`docs/org-optimizer-data-manager`) | ADR-NEXT org-optimizer-and-data-manager-pages |
+| Org Optimizer | Major | The Data Hygiene tab becomes Org Optimizer: one page with lazily loaded sections for data quality, duplicates, field utilization and Health Check (run on demand), each shown only to people who may use it. Duplicate review moves here from BarnCRM Settings, which keeps a link. | Built, not merged (`feature/org-optimizer-shell`) | ADR-NEXT org-optimizer-and-data-manager-pages |
 
 ### 1.5 Import and Data Management
 
@@ -189,7 +189,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. | Shipped | C-24 |
 | Suite choice | Major | The Setup Assistant's first step asks Impact Suite or Community Suite and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
 | Neutral Core | Major | Moves nonprofit wording, the giving and receipt settings and the nonprofit setup steps out of Core into Giving, so Core alone is the Community Suite. | Shipped | C-29, ADR-0059 |
-| Analytics module: field utilization | Major | An on-demand count, in Org Optimizer's Field utilization section (no tab of its own in the app navigation), of how often each field of a chosen object is filled in, per record type, with saved counts for trends and reports. | Built, not merged (`feature/field-utilization-on-demand`) | plan 6.1 item 10, ADR-0086, ADR-0101 field-utilization-on-demand |
+| Analytics module: field utilization | Major | An on-demand count, in Org Optimizer's Field utilization section (no tab or app page of its own), of how often each field of a chosen object is filled in, per record type, with saved counts for trends and reports. | Built, not merged (`feature/field-utilization-on-demand`) | plan 6.1 item 10, ADR-0086, ADR-0101 field-utilization-on-demand |
 | Packaged roles | Minor | Five roles: Admin, Fundraising Staff, Program Staff, Volunteer Coordinator and Read Only; packaged sets are never cloned. | Shipped | C-06 |
 | Manage settings permission | Minor | Only holders of the manage-settings permission can change settings; everyone else sees a read-only view with a notice. | Shipped | C-03 |
 | Settings change history | Minor | "Recent changes" records each changed setting with old value, new value, who and when; unchanged saves write nothing. | Shipped | C-03 |

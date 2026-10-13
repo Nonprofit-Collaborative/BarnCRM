@@ -4,7 +4,7 @@
   <protected>true</protected>
   <values>
     <field>Component__c</field>
-    <value xsi:type="xsd:string">duplicateReview</value>
+    <value xsi:nil="true" />
   </values>
   <values>
     <field>Data_Type__c</field>
@@ -12,7 +12,11 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Possible duplicate people and households, found by the duplicate rules this org has switched on. Scan the records you already have, merge two households, or say a pair is not the same.</value>
+    <value xsi:type="xsd:string">Duplicate review is in Org Optimizer: scan the records you already have for possible duplicate people and households, merge two households, or say a pair is not the same.</value>
+  </values>
+  <values>
+    <field>Navigation_Target__c</field>
+    <value xsi:type="xsd:string">Data_Hygiene</value>
   </values>
   <values>
     <field>Help_Path__c</field>

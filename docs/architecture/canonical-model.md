@@ -925,7 +925,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 None. ADR-0086 added three (`Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c`,
 `Field_Utilization_Last_Run_Summary__c`); ADR-0101 `0101-field-utilization-on-demand.md`
-removed them when the count moved to its own tab and runs on demand (Section 29F).
+removed them when the count moved to Org Optimizer and runs on demand (Section 29F).
 
 ### Job notification key
 
@@ -6148,8 +6148,9 @@ third-party code (the same reasoning as ADR-0049).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
-- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data Hygiene tab
-  (app page `Data_Hygiene`, component `dataHygieneConsole`).
+- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data quality section
+  of the Org Optimizer tab (app page `Data_Hygiene`, shell `orgOptimizer`, component
+  `dataHygieneConsole`).
 
 ---
 
@@ -6399,8 +6400,7 @@ current one, with the change in percentage points.
 - **Service:** `FieldUtilizationService` (plan, count, save), `FieldUtilizationSelector`
   (latest saved count), `FieldUtilizationController` (every method requires
   `Manage_BarnCRM_Settings`). The page is the `fieldUtilization` component, embedded in Org
-  Optimizer; the app page and tab `Field_Utilization` also host it but are not in the BarnCRM
-  app navigation.
+  Optimizer, its only host (no app page or tab of its own).
 
 ---
 

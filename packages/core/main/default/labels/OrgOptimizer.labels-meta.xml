@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_OrgOptimizer_Title</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: page title</shortDescription>
+        <value>Org Optimizer</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Intro</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: one line under the title</shortDescription>
+        <value>What in your org needs attention. Each section runs only when you open it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Overview</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Overview section name</shortDescription>
+        <value>Overview</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Quality</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Data quality section name</shortDescription>
+        <value>Data quality</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_QualityText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Data quality section answers</shortDescription>
+        <value>Which records need tidying up, each check with Open in Find.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Duplicates</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Duplicates section name</shortDescription>
+        <value>Duplicates</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_DuplicatesText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Duplicates section answers</shortDescription>
+        <value>Which people and households are in your database twice.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_FieldUtilization</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Field utilization section name</shortDescription>
+        <value>Field utilization</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_FieldUtilizationText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Field utilization section answers</shortDescription>
+        <value>How often each field of a kind of record is filled in.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HealthCheck</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: Health Check section name</shortDescription>
+        <value>Health Check</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HealthCheckText</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: what the Health Check section answers</shortDescription>
+        <value>Whether BarnCRM is set up the way it should be.</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_Open</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: button that opens a section from Overview</shortDescription>
+        <value>Open</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_RunHealthCheck</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: button that runs Health Check</shortDescription>
+        <value>Run Health Check</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgOptimizer_HealthCheckIntro</fullName>
+        <categories>OrgOptimizer</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Org Optimizer: why Health Check waits for the button</shortDescription>
+        <value>Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.</value>
+    </labels>
+</CustomLabels>

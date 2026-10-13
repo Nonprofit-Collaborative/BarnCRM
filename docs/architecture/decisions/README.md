@@ -109,7 +109,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0098](0098-real-time-rollups-recalculated-just-after-the-save.md) | Real-time rollups are recalculated just after the save, by default (modifies ADR-0082 decision 4) | Proposed (builder decision) |
 | [0099](0099-rollups-recalculate-only-what-a-save-changed.md) | A save recalculates only the rollups its change can affect (narrows ADR-0082 decision 2) | Accepted (owner decision D-48) |
 | [0100](0100-rollup-queue-ready-event-from-queueable-jobs.md) | A platform event starts the Rollup Queue after a save inside a Queueable | Accepted (builder decision) |
-| [0101](0101-field-utilization-on-demand.md) | Field utilization runs on demand from its own tab (supersedes ADR-0086 in part) | Accepted (owner decision) |
+| [0101](0101-field-utilization-on-demand.md) | Field utilization runs on demand in Org Optimizer (supersedes ADR-0086 in part) | Accepted (owner decision) |
 | [0102](0102-barncrm-app-is-a-console-app.md) | The BarnCRM app is a Lightning console app with a packaged logo | Accepted (owner request) |
 | [NEXT](NEXT-org-optimizer-and-data-manager-pages.md) | Org Optimizer and Data Manager pages | Accepted (owner decisions) |
 
