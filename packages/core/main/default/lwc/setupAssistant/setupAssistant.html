@@ -13,9 +13,11 @@
         <h2 class="slds-text-heading_small" data-id="complete-heading">
             {labels.completeHeading}
         </h2>
-        <p class="slds-text-body_small slds-var-m-bottom_small">
-            {labels.elapsed}: <span data-id="elapsed">{elapsedText}</span>
-        </p>
+        <template lwc:if={elapsedText}>
+            <p class="slds-text-body_small slds-var-m-bottom_small" data-id="elapsed">
+                {elapsedText}
+            </p>
+        </template>
         <ul class="slds-has-dividers_bottom-space">
             <template for:each={summaryRows} for:item="step">
                 <li key={step.key} class="slds-item slds-var-p-vertical_xx-small">
@@ -67,6 +69,15 @@
                 <p class="slds-text-body_small slds-var-m-bottom_small">
                     {activeStep.description}
                 </p>
+
+                <template lwc:if={isSuiteStep}>
+                    <c-setup-step-suite
+                        suite={suite}
+                        can-edit={canEdit}
+                        onconfirm={handleSuiteConfirm}
+                        oncheckagain={handleCheckAgain}
+                    ></c-setup-step-suite>
+                </template>
 
                 <template lwc:if={isCoexistenceStep}>
                     <c-setup-step-coexistence
@@ -141,12 +152,12 @@
                         onclick={handleShowSampleData}
                     ></lightning-button>
                     <template lwc:if={importAvailable}>
-                        <a
-                            class="slds-button slds-button_neutral slds-var-m-left_x-small"
-                            href={importUrl}
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            label={labels.importButton}
                             data-id="import-link"
-                            >{labels.importButton}</a
-                        >
+                            onclick={handleOpenImport}
+                        ></lightning-button>
                     </template>
                     <template lwc:else>
                         <p class="slds-text-body_small slds-var-m-top_x-small" data-id="import-missing">
@@ -179,9 +190,13 @@
 
                 <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_small">
                     {ruleText}
-                    <a class="slds-var-m-left_x-small" href={sectionUrl} data-id="section-link"
-                        >{labels.openSection}</a
-                    >
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        variant="base"
+                        label={labels.openSection}
+                        data-id="section-link"
+                        onclick={handleOpenSection}
+                    ></lightning-button>
                 </p>
 
                 <div class="slds-var-m-top_small">

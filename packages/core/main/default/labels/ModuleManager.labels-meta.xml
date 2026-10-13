@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_ModuleManager_UnknownModuleError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: the module is not installed or cannot be switched</shortDescription>
+        <value>That module is not installed here, or it cannot be turned on and off. Click Check again to refresh the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_SaveErrorMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: a turn on or off failed</shortDescription>
+        <value>The module could not be switched. Nothing was changed. Try again, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_LoadErrorMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: the list or report could not be read</shortDescription>
+        <value>The module list could not be read. Reload the page, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_AccessErrorMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: the admin permission set could not be given</shortDescription>
+        <value>The module is on, but its administrator access could not be given to you. Give it on the Access page or in Setup.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_StatusOn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: status of an installed module that is on</shortDescription>
+        <value>On</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_StatusOff</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: status of an installed module turned off</shortDescription>
+        <value>Installed and off</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_StatusNotInstalled</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: status of a module not in the org</shortDescription>
+        <value>Not installed</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_NoInstallLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: no published version to install</shortDescription>
+        <value>No install link is published for this module yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_TurnOffButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: button that turns a module off</shortDescription>
+        <value>Turn off</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_TurnOnButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: button that turns a module on</shortDescription>
+        <value>Turn on</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_ReportButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: button that shows the uninstall report</shortDescription>
+        <value>What an uninstall deletes</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_ReportIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: what the uninstall report lists</shortDescription>
+        <value>Uninstalling this module deletes these records, and the fields it added to people, households and organizations. Export what you need first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_ReportEmpty</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: the module owns no records</shortDescription>
+        <value>This module keeps no records of its own. Uninstalling it removes its settings and the fields it added.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_InstalledPackagesLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: link to Installed Packages in Setup</shortDescription>
+        <value>Open Installed Packages</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_TabsNotice</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: turning off does not hide tabs</shortDescription>
+        <value>Turning a module off stops its automation and keeps its records. It does not hide its tabs: to hide a module from someone, change their role on the Access page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_ReadOnlyNotice</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: the reader cannot switch modules</shortDescription>
+        <value>You can see the modules but not change them. Ask an administrator for the Manage BarnCRM Settings permission.</value>
+    </labels>
+</CustomLabels>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_FieldUtilization_JobLabel</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: the weekly job's name in Health Check</shortDescription>
+        <value>Weekly field utilization count</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NoRecordType</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: records that have no record type</shortDescription>
+        <value>No record type</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NothingChosen</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: Count now with nothing chosen</shortDescription>
+        <value>Choose at least one kind of record to count, then save.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_PermissionRequired</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: change refused without the permission</shortDescription>
+        <value>You need the Manage BarnCRM Settings permission to change this.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_RunSkipped</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: run summary, objects skipped as too large</shortDescription>
+        <value>Skipped as too large to count: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_RunSummary</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: run summary sentence</shortDescription>
+        <value>Counted {0} fields on {1} kinds of records. {2} could not be counted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_TooMany</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: the chosen objects do not fit</shortDescription>
+        <value>Those choices do not fit. Choose fewer kinds of records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_UnexpectedError</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: unexpected error on the page</shortDescription>
+        <value>Something went wrong on the Field Utilization page. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_UnknownObject</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: a chosen object cannot be counted</shortDescription>
+        <value>{0} cannot be counted. Choose from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_PageTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: heading</shortDescription>
+        <value>Field utilization</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_PageIntro</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: what the page is for</shortDescription>
+        <value>How many records have each field filled in, by record type, counted once a week. Counts are kept for 13 months so you can see which fields are used, which are growing, and which nobody fills in.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_LastRunTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: heading over the last count</shortDescription>
+        <value>Last counted</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NeverRun</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: no count has run</shortDescription>
+        <value>Field use has not been counted yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NotScheduled</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: the weekly count is off</shortDescription>
+        <value>The weekly count is not scheduled, so these numbers will not change on their own.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ScheduleActive</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: the weekly count is on</shortDescription>
+        <value>The count runs every Sunday at 4:00 AM.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ScheduleButton</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: button that schedules the count</shortDescription>
+        <value>Schedule the weekly count</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_StopButton</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: button that stops the count</shortDescription>
+        <value>Stop the weekly count</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_RunNow</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: button that counts now</shortDescription>
+        <value>Count now</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_RunNowStarted</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: the count has started</shortDescription>
+        <value>The count has started. Refresh this page in a few minutes to see the results.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ChooseTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: heading over the object picker</shortDescription>
+        <value>What to count</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ChooseLabel</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: object picker label</shortDescription>
+        <value>Kinds of records to count</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_Available</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: objects not counted</shortDescription>
+        <value>Available</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_Counted</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: objects counted</shortDescription>
+        <value>Counted</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_Save</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: save the object choice</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_Saved</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: the object choice was saved</shortDescription>
+        <value>Saved. The next count covers these.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ResultsTitle</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: heading over the results</shortDescription>
+        <value>Results</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ShowResultsFor</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: object to show results for</shortDescription>
+        <value>Show results for</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_NoResults</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: nothing counted for this object</shortDescription>
+        <value>Nothing has been counted for this kind of record yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ComparedWith</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization page: date of the count compared with</shortDescription>
+        <value>Change is compared with the count taken</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColField</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: field column</shortDescription>
+        <value>Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColRecordType</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: record type column</shortDescription>
+        <value>Record type</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColFilled</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: share filled column</shortDescription>
+        <value>Filled</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColWithValue</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: records with a value column</shortDescription>
+        <value>With a value</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColRecords</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: records looked at column</shortDescription>
+        <value>Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColChange</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: change since last count column</shortDescription>
+        <value>Change (points)</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColSampled</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization table: sampled column</shortDescription>
+        <value>Sampled</value>
+    </labels>
+</CustomLabels>

@@ -3,7 +3,7 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Staff</label>
   <description>
-    David, Priya, and everyone else doing the day job. Reads the Error Log so that a problem can be
+    For everyone doing the day job. Reads the Error Log so that a problem can be
     described accurately, and changes nothing about how BarnCRM is configured.
   </description>
   <applicationVisibilities>
@@ -131,6 +131,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ModuleManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>NamespaceUtil</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -156,6 +160,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>PersonReference</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -240,6 +248,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>UserSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>WhatsNewController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>
@@ -575,7 +587,7 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Error_Log__c.Technical_Detail__c</field>
-    <readable>true</readable>
+    <readable>false</readable>
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
@@ -684,12 +696,37 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Import_Batch__c.Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.File_Values_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Match_Only__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Import_Batch__c.Row_Count__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
     <field>Import_Batch__c.Rows_Created__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Rows_Deleted__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -788,6 +825,16 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Several_Matches__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Duplicate_Rule_Match__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Relationship__c.Contact__c</field>
     <readable>true</readable>
@@ -850,6 +897,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Rollup_Definition__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Definition__c.Delimiter__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -930,6 +982,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Setting_Change__c.Changed_By__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Setting_Change__c.Deployment_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

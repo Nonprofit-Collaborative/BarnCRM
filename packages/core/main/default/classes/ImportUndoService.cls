@@ -85,6 +85,16 @@ public with sharing class ImportUndoService {
         }
         countTagged(batch.Id, view);
         view.updates = ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT);
+        // A bulk update journals a Failed entry for each record it could not save, which has
+        // nothing to put back, so its count is the records it saved (R-BU5). A job the platform
+        // stopped before its finish counted them keeps the journal's count.
+        if (
+            BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c) &&
+            batch.Rows_Updated__c != null &&
+            batch.Rows_Updated__c > 0
+        ) {
+            view.updates = batch.Rows_Updated__c.intValue();
+        }
         if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
             view.reason = Label.Core_Import_UndoErrorNothingToUndo;
         }
@@ -125,7 +135,7 @@ public with sharing class ImportUndoService {
      * moment produce one undo and one refusal. The status is the package's own bookkeeping,
      * written in system mode (ADR-0021).
      */
-    private static void latch(Id batchId) {
+    public static void latch(Id batchId) {
         Import_Batch__c batch = [
             SELECT Id, Status__c, Is_Dry_Run__c, Undo_Deadline__c, Completed_At__c, Job_Id__c
             FROM Import_Batch__c
@@ -155,9 +165,25 @@ public with sharing class ImportUndoService {
         Integer restored,
         Boolean failed
     ) {
+        finish(batchId, countedAtStart, restored, failed, 0);
+    }
+
+    /**
+     * The same, for an undo that also deleted journaled creations (R-IJ3): `createdGone` is how
+     * many of them are no longer there, so the ones left are the ones kept.
+     */
+    @NamespaceAccessible
+    public static void finish(
+        Id batchId,
+        Integer countedAtStart,
+        Integer restored,
+        Boolean failed,
+        Integer createdGone
+    ) {
         try {
             Preview left = new Preview();
             countTagged(batchId, left);
+            left.total = Math.max(left.total - (createdGone == null ? 0 : createdGone), 0);
             Integer counted = countedAtStart == null ? 0 : countedAtStart;
             Import_Batch__c batch = [
                 SELECT Id, Run_Log__c
@@ -256,17 +282,18 @@ public with sharing class ImportUndoService {
 
     /**
      * Whether any undo job is queued or running. Batches carry no job reference, so this asks
-     * about the undo job class; a second undo running for another batch only delays the
-     * moment an aborted one is seen as failed. Read in system mode: the job may be another
-     * user's.
+     * about the undo job classes (an import's, and a bulk delete's undelete); a second undo
+     * running for another batch only delays the moment an aborted one is seen as failed. Read
+     * in system mode: the job may be another user's.
      */
     private static Boolean isUndoJobRunning() {
         if (undoJobRunning == null) {
             Set<String> running = RUNNING_JOB_STATUSES;
+            Set<String> undoClasses = new Set<String>{ 'ImportUndoBatch', 'BulkDeleteUndoBatch' };
             undoJobRunning = ![
                     SELECT Id
                     FROM AsyncApexJob
-                    WHERE ApexClass.Name = 'ImportUndoBatch' AND Status IN :running
+                    WHERE ApexClass.Name IN :undoClasses AND Status IN :running
                     WITH SYSTEM_MODE
                     LIMIT 1
                 ]
@@ -331,6 +358,49 @@ public with sharing class ImportUndoService {
             otherTotal += counted.count;
             view.others.add(counted);
         }
+        TaggedCount created = createdCount(batchId);
+        if (created != null) {
+            otherTotal += created.count;
+            view.others.add(created);
+        }
         view.total = view.people + view.households + view.organizations + otherTotal;
+    }
+
+    /**
+     * The records a one-object import journaled as created (R-IJ3), under their object's plural
+     * label, or null when it created none. A one-object import loads one object, so the first
+     * Created page names it. Read in system mode, as the tagged counts are.
+     */
+    private static TaggedCount createdCount(Id batchId) {
+        Integer count = ImportJournalService.entryCount(
+            batchId,
+            ImportJournalService.PHASE_CREATED
+        );
+        if (count == 0) {
+            return null;
+        }
+        String phase = ImportJournalService.PHASE_CREATED;
+        List<Import_Journal__c> first = [
+            SELECT Entries_JSON__c
+            FROM Import_Journal__c
+            WHERE Import_Batch__c = :batchId AND Phase__c = :phase
+            WITH SYSTEM_MODE
+            ORDER BY CreatedDate ASC, Id ASC
+            LIMIT 1
+        ];
+        List<Map<String, Object>> entries = first.isEmpty()
+            ? new List<Map<String, Object>>()
+            : ImportJournalService.entries(first[0]);
+        String objectName = entries.isEmpty() ? null : (String) entries[0].get('object');
+        Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
+        TaggedCount counted = new TaggedCount();
+        counted.objectName = type == null
+            ? objectName
+            : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+        counted.label = type == null
+            ? objectName
+            : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+        counted.count = count;
+        return counted;
     }
 }

@@ -28,6 +28,218 @@ public with sharing class ImportTemplateService {
         RULE_EXTERNAL_ID
     };
 
+    /** The organization rules (R-IT2); an empty value means Name exact. */
+    @NamespaceAccessible
+    public static final String ORGANIZATION_RULE_NAME = 'Name exact';
+    @NamespaceAccessible
+    public static final String ORGANIZATION_RULE_EXTERNAL_ID = 'External ID';
+
+    /** What happens when a key finds several records (R-IT9); empty means reject the row. */
+    @NamespaceAccessible
+    public static final String SEVERAL_REJECT = 'Reject the row';
+    @NamespaceAccessible
+    public static final String SEVERAL_MOST_RECENT = 'Use the most recently changed';
+
+    /** How a template matches, as the wizard sends it (R-IT2, R-IT8, R-IT9). */
+    @NamespaceAccessible
+    public class MatchingChoices {
+        @NamespaceAccessible
+        public String personRule;
+        @NamespaceAccessible
+        public String personMatchField;
+        @NamespaceAccessible
+        public String organizationRule;
+        @NamespaceAccessible
+        public String organizationMatchField;
+        @NamespaceAccessible
+        public String severalMatches;
+        /** Whether the org's duplicate rules are asked too (R-IT16); false when absent. */
+        @NamespaceAccessible
+        public Boolean useDuplicateRules;
+    }
+
+    /**
+     * Saves how a template matches people and organizations, and what happens when several
+     * records match (R-IT2, R-IT8, R-IT9, R-IT16). A chosen field is stored as describe names it,
+     * and one the object does not offer for matching is refused, saying which.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c saveMatching(Id templateId, MatchingChoices choices) {
+        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+        if (template == null) {
+            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+        }
+        MatchingChoices given = choices == null ? new MatchingChoices() : choices;
+        template.Matching_Rule__c = normalizedRule(given.personRule);
+        template.Organization_Matching_Rule__c = normalizedOrganizationRule(given.organizationRule);
+        template.Several_Matches__c = normalizedSeveralMatches(given.severalMatches);
+        template.Use_Duplicate_Rules__c = given.useDuplicateRules == true;
+        template.Person_Match_Field__c = RULE_EXTERNAL_ID.equals(template.Matching_Rule__c)
+            ? checkedField(personType(template), given.personMatchField)
+            : null;
+        template.Organization_Match_Field__c = ORGANIZATION_RULE_EXTERNAL_ID.equals(
+                template.Organization_Matching_Rule__c
+            )
+            ? checkedField(Account.SObjectType, given.organizationMatchField)
+            : null;
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /**
+     * Creates a template that loads one object (R-IT12), empty until its first file is mapped.
+     * The object must be one `ImportObjectSchema` offers: admitted by the allow-list rule
+     * (R-IT14) and one the user can read and create or edit records of. It is stored by the name
+     * describe gives it. People and organizations start on Update by record Id, their only
+     * operation; any other object on Insert when the user may create its records.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c createObjectTemplate(String name, String objectName) {
+        if (String.isBlank(name)) {
+            throw new ImportException(Label.Core_Import_ErrorObjectTemplateName);
+        }
+        Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
+        String refused = DataProtectedFields.objectRefusal(type);
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        Boolean creates = described.isCreateable() && !ImportObjectSchema.updatesOnly(type);
+        if (!described.isAccessible() || !(creates || described.isUpdateable())) {
+            throw new ImportException(
+                String.format(
+                    Label.Core_Import_ErrorObjectNoAccess,
+                    new List<String>{ described.getLabelPlural() }
+                )
+            );
+        }
+        Import_Template__c template = new Import_Template__c(
+            Name = name.trim().abbreviate(80),
+            Template_Key__c = 'object_' +
+                described.getName().toLowerCase().left(40) +
+                '_' +
+                String.valueOf(Math.abs(Crypto.getRandomLong())).left(12),
+            Column_Mapping_JSON__c = new ImportMapping().serialize(),
+            Default_Values_JSON__c = '{"version":1,"defaults":[]}',
+            Matching_Rule__c = RULE_EMAIL,
+            Person_Mode__c = defaultPersonMode(),
+            Is_Package_Default__c = false,
+            Is_Recurring__c = false,
+            Active__c = true,
+            Target_Object__c = described.getName(),
+            Load_Operation__c = creates
+                ? ImportObjectSchema.OPERATION_INSERT
+                : ImportObjectSchema.OPERATION_UPDATE,
+            Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_REJECT,
+            Several_Matches__c = SEVERAL_REJECT
+        );
+        Database.insert(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** What a one-object template does with each row, as the wizard sends it (R-IT12). */
+    @NamespaceAccessible
+    public class LoadChoices {
+        @NamespaceAccessible
+        public String operation;
+        @NamespaceAccessible
+        public String matchField;
+        @NamespaceAccessible
+        public String lookupNotFound;
+        @NamespaceAccessible
+        public String severalMatches;
+    }
+
+    /**
+     * Saves what a one-object template does with each row (R-IT12, R-IT13, R-IT9): the
+     * operation, the external ID field an upsert matches on, what a row whose lookup finds no
+     * record does, and what a row matching several does. People and organizations keep Update
+     * by record Id. An upsert field the object does not offer is refused, naming it.
+     */
+    @NamespaceAccessible
+    public static Import_Template__c saveLoad(Id templateId, LoadChoices choices) {
+        Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+        if (template == null) {
+            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+        }
+        LoadChoices given = choices == null ? new LoadChoices() : choices;
+        Schema.SObjectType type = ImportObjectSchema.typeOf(template);
+        template.Load_Operation__c = given.operation;
+        template.Load_Operation__c = ImportObjectSchema.updatesOnly(type)
+            ? ImportObjectSchema.OPERATION_UPDATE
+            : ImportObjectSchema.operationOf(template);
+        template.Load_Match_Field__c = null;
+        if (
+            template.Load_Operation__c == ImportObjectSchema.OPERATION_UPSERT &&
+            String.isNotBlank(given.matchField)
+        ) {
+            String found = ImportObjectSchema.keyField(type, given.matchField);
+            if (found == null) {
+                throw new ImportException(
+                    String.format(
+                        Label.Core_Import_ErrorKeyFieldUnusable,
+                        new List<String>{ given.matchField.trim().abbreviate(80) }
+                    )
+                );
+            }
+            template.Load_Match_Field__c = found;
+        }
+        template.Lookup_Not_Found__c = ImportObjectSchema.LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(
+                given.lookupNotFound == null ? '' : given.lookupNotFound.trim()
+            )
+            ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
+            : ImportObjectSchema.LOOKUP_REJECT;
+        template.Several_Matches__c = normalizedSeveralMatches(given.severalMatches);
+        Database.update(template, AccessLevel.USER_MODE);
+        return template;
+    }
+
+    /** A chosen matching field as describe names it, or null for none; refused when not offered. */
+    private static String checkedField(Schema.SObjectType type, String chosen) {
+        if (String.isBlank(chosen)) {
+            return null;
+        }
+        String field = ImportMatcher.matchField(type, chosen);
+        if (field == null) {
+            throw new ImportException(
+                String.format(
+                    Label.Core_Import_ErrorMatchFieldNotAllowed,
+                    new List<String>{ chosen.trim().left(80) }
+                )
+            );
+        }
+        return field;
+    }
+
+    /** The object a template's people are stored on (R-IT3). */
+    @NamespaceAccessible
+    public static Schema.SObjectType personType(Import_Template__c template) {
+        return isPersonAccountMode(template) ? Account.SObjectType : Contact.SObjectType;
+    }
+
+    /** An organization rule the picklist accepts; anything else is Name exact. */
+    @NamespaceAccessible
+    public static String normalizedOrganizationRule(String rule) {
+        return rule != null && ORGANIZATION_RULE_EXTERNAL_ID.equalsIgnoreCase(rule.trim())
+            ? ORGANIZATION_RULE_EXTERNAL_ID
+            : ORGANIZATION_RULE_NAME;
+    }
+
+    /** A several-matches choice the picklist accepts; anything else rejects the row. */
+    @NamespaceAccessible
+    public static String normalizedSeveralMatches(String choice) {
+        return choice != null && SEVERAL_MOST_RECENT.equalsIgnoreCase(choice.trim())
+            ? SEVERAL_MOST_RECENT
+            : SEVERAL_REJECT;
+    }
+
+    /** True when a row matching several records takes the most recently changed (R-IT9). */
+    @NamespaceAccessible
+    public static Boolean usesMostRecent(Import_Template__c template) {
+        return template != null &&
+            SEVERAL_MOST_RECENT.equals(normalizedSeveralMatches(template.Several_Matches__c));
+    }
+
     /**
      * Creates an `Import_Template__c` for every shipped default this org does not have yet,
      * and returns how many were created. Safe to call repeatedly: it is called on install
@@ -122,8 +334,15 @@ public with sharing class ImportTemplateService {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
         ImportMapping mapping = ImportMapping.parse(mappingDocument);
-        if (!mapping.identifiesSomebody()) {
+        // A one-object template names no person; its own refusals are asked when its dry run
+        // starts, once its load choices are saved too (R-IT12).
+        if (!ImportObjectSchema.loadsOneObject(template) && !mapping.identifiesSomebody()) {
             throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
+        }
+        // A broken step is skipped on read, so it is refused here, where the admin can fix it.
+        List<String> changeProblems = mapping.transformProblems();
+        if (!changeProblems.isEmpty()) {
+            throw new ImportException(String.join(changeProblems, ' '));
         }
         template.Column_Mapping_JSON__c = mapping.serialize();
         template.Matching_Rule__c = normalizedRule(matchingRule);

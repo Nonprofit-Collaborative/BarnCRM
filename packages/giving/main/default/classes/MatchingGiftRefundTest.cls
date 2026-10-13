@@ -23,54 +23,58 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void aFullyRefundedMatchLeavesTheEmployeeRecognizedForNothing() {
-        Setup data = setUp();
-        MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
+            MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
 
-        Test.startTest();
-        Id refundId = GiftService.refund(data.employerGift.Id, 500, 'The company reversed it');
-        Test.stopTest();
+            Test.startTest();
+            Id refundId = GiftService.refund(data.employerGift.Id, 500, 'The company reversed it');
+            Test.stopTest();
 
-        Assert.areEqual(
-            'Refunded',
-            [SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
-            'The whole match has gone back, so R-G3 moves the employer gift off Received.'
-        );
-        List<Soft_Credit__c> onEmployerGift = RecognitionTestData.creditsFor(data.employerGift.Id);
-        Assert.areEqual(
-            1,
-            onEmployerGift.size(),
-            'The employer gift keeps the credit the link created: the reversal is the negative ' +
-            'gift, not the deletion of this one (ADR-0031).'
-        );
-        Assert.areEqual(
-            500,
-            onEmployerGift[0].Amount__c,
-            'And keeps it at the amount that was matched, so a recognition list produced before ' +
-            'the refund is still explicable afterwards.'
-        );
+            Assert.areEqual(
+                'Refunded',
+                [SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
+                'The whole match has gone back, so R-G3 moves the employer gift off Received.'
+            );
+            List<Soft_Credit__c> onEmployerGift = RecognitionTestData.creditsFor(
+                data.employerGift.Id
+            );
+            Assert.areEqual(
+                1,
+                onEmployerGift.size(),
+                'The employer gift keeps the credit the link created: the reversal is the negative ' +
+                'gift, not the deletion of this one (ADR-0031).'
+            );
+            Assert.areEqual(
+                500,
+                onEmployerGift[0].Amount__c,
+                'And keeps it at the amount that was matched, so a recognition list produced before ' +
+                'the refund is still explicable afterwards.'
+            );
 
-        List<Soft_Credit__c> onRefund = RecognitionTestData.creditsFor(refundId);
-        Assert.areEqual(1, onRefund.size(), 'The negative gift carries exactly one credit.');
-        Assert.areEqual(
-            data.ana.Id,
-            onRefund[0].Contact__c,
-            'It reverses the person the match recognized, not the company that gave it.'
-        );
-        Assert.areEqual(
-            SoftCreditService.ROLE_MATCHED_DONOR,
-            onRefund[0].Role__c,
-            'It is the same recognition being taken back, so it carries the same role.'
-        );
-        Assert.areEqual(
-            -500,
-            onRefund[0].Amount__c,
-            'The whole match came back, so the whole of the credit is reversed.'
-        );
-        Assert.areEqual(
-            true,
-            onRefund[0].Is_Automatic__c,
-            'The package created it, so the package may maintain it (R-SC6).'
-        );
+            List<Soft_Credit__c> onRefund = RecognitionTestData.creditsFor(refundId);
+            Assert.areEqual(1, onRefund.size(), 'The negative gift carries exactly one credit.');
+            Assert.areEqual(
+                data.ana.Id,
+                onRefund[0].Contact__c,
+                'It reverses the person the match recognized, not the company that gave it.'
+            );
+            Assert.areEqual(
+                SoftCreditService.ROLE_MATCHED_DONOR,
+                onRefund[0].Role__c,
+                'It is the same recognition being taken back, so it carries the same role.'
+            );
+            Assert.areEqual(
+                -500,
+                onRefund[0].Amount__c,
+                'The whole match came back, so the whole of the credit is reversed.'
+            );
+            Assert.areEqual(
+                true,
+                onRefund[0].Is_Automatic__c,
+                'The package created it, so the package may maintain it (R-SC6).'
+            );
+        }
     }
 
     /**
@@ -80,45 +84,49 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void aPartlyRefundedMatchLeavesRecognitionForWhatTheEmployerStillHolds() {
-        Setup data = setUp();
-        MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
-        Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
+            MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+            Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
 
-        Assert.areEqual(
-            'Received',
-            [SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
-            'Part of the match is still held, so the employer gift keeps its status.'
-        );
-        Assert.areEqual(
-            -200,
-            RecognitionTestData.creditsFor(refundId)[0].Amount__c,
-            'The credit reverses what came back, not what was given.'
-        );
+            Assert.areEqual(
+                'Received',
+                [SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
+                'Part of the match is still held, so the employer gift keeps its status.'
+            );
+            Assert.areEqual(
+                -200,
+                RecognitionTestData.creditsFor(refundId)[0].Amount__c,
+                'The credit reverses what came back, not what was given.'
+            );
 
-        Test.startTest();
-        RollupService.ensureDefaults();
-        RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
-        Test.stopTest();
+            Test.startTest();
+            RollupService.ensureDefaults();
+            RollupService.runFullRecalculation(
+                definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
+            );
+            Test.stopTest();
 
-        Contact recalculated = [
-            SELECT Total_Soft_Credits__c, Soft_Credit_Count__c
-            FROM Contact
-            WHERE Id = :data.ana.Id
-        ];
+            Contact recalculated = [
+                SELECT Total_Soft_Credits__c, Soft_Credit_Count__c
+                FROM Contact
+                WHERE Id = :data.ana.Id
+            ];
 
-        GivingTestDataFactory.assertRollupWrote(recalculated.Total_Soft_Credits__c);
-        Assert.areEqual(
-            300,
-            recalculated.Total_Soft_Credits__c,
-            'Both rows sit on gifts inside the widened status filter (ADR-0022), so the rollup ' +
-            'sums 500 and minus 200: what the employer still holds because of Ana.'
-        );
-        Assert.areEqual(
-            1,
-            recalculated.Soft_Credit_Count__c,
-            'Ana was recognized on one gift. The count row requires a positive amount, so the ' +
-            'reversal is not a second gift recognized.'
-        );
+            GivingTestDataFactory.assertRollupWrote(recalculated.Total_Soft_Credits__c);
+            Assert.areEqual(
+                300,
+                recalculated.Total_Soft_Credits__c,
+                'Both rows sit on gifts inside the widened status filter (ADR-0022), so the rollup ' +
+                'sums 500 and minus 200: what the employer still holds because of Ana.'
+            );
+            Assert.areEqual(
+                1,
+                recalculated.Soft_Credit_Count__c,
+                'Ana was recognized on one gift. The count row requires a positive amount, so the ' +
+                'reversal is not a second gift recognized.'
+            );
+        }
     }
 
     /**
@@ -127,24 +135,26 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void aWrittenOffMatchReversesTheCreditTheSameWay() {
-        Setup data = setUp();
-        MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
+            MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
 
-        Test.startTest();
-        Id writeOffId = GiftService.writeOff(data.employerGift.Id, 'The check never cleared');
-        Test.stopTest();
+            Test.startTest();
+            Id writeOffId = GiftService.writeOff(data.employerGift.Id, 'The check never cleared');
+            Test.stopTest();
 
-        Assert.areEqual(
-            'Written off',
-            [SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
-            'A write-off moves the original to its own status.'
-        );
-        Assert.areEqual(
-            -500,
-            RecognitionTestData.creditsFor(writeOffId)[0].Amount__c,
-            'Money the organization never collected recognizes nobody, so the whole credit is ' +
-            'reversed.'
-        );
+            Assert.areEqual(
+                'Written off',
+                [SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
+                'A write-off moves the original to its own status.'
+            );
+            Assert.areEqual(
+                -500,
+                RecognitionTestData.creditsFor(writeOffId)[0].Amount__c,
+                'Money the organization never collected recognizes nobody, so the whole credit is ' +
+                'reversed.'
+            );
+        }
     }
 
     /**
@@ -154,22 +164,28 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void refundingAnUnmatchedEmployerGiftCreatesNoCredit() {
-        Setup data = setUp();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
 
-        Test.startTest();
-        Id refundId = GiftService.refund(data.employerGift.Id, 500, 'Sent to the wrong charity');
-        Test.stopTest();
+            Test.startTest();
+            Id refundId = GiftService.refund(
+                data.employerGift.Id,
+                500,
+                'Sent to the wrong charity'
+            );
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            RecognitionTestData.creditsFor(data.employerGift.Id).size(),
-            'An unlinked company gift recognizes nobody in the first place.'
-        );
-        Assert.areEqual(
-            0,
-            RecognitionTestData.creditsFor(refundId).size(),
-            'So its refund has nothing to reverse, and invents no recognition to take away.'
-        );
+            Assert.areEqual(
+                0,
+                RecognitionTestData.creditsFor(data.employerGift.Id).size(),
+                'An unlinked company gift recognizes nobody in the first place.'
+            );
+            Assert.areEqual(
+                0,
+                RecognitionTestData.creditsFor(refundId).size(),
+                'So its refund has nothing to reverse, and invents no recognition to take away.'
+            );
+        }
     }
 
     /**
@@ -179,24 +195,26 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void refundingTheEmployeeGiftLeavesTheMatchedCreditStanding() {
-        Setup data = setUp();
-        MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
+            MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
 
-        Test.startTest();
-        Id refundId = GiftService.refund(data.employeeGift.Id, 500, 'Ana asked for hers back');
-        Test.stopTest();
+            Test.startTest();
+            Id refundId = GiftService.refund(data.employeeGift.Id, 500, 'Ana asked for hers back');
+            Test.stopTest();
 
-        Assert.areEqual(
-            500,
-            RecognitionTestData.creditsFor(data.employerGift.Id)[0].Amount__c,
-            'The employer gift still recognizes Ana for the match the company still holds.'
-        );
-        Assert.areEqual(
-            0,
-            RecognitionTestData.creditsFor(refundId).size(),
-            'And the negative gift reversing her own gift carries no matched donor credit, ' +
-            'because the gift it reverses carried none.'
-        );
+            Assert.areEqual(
+                500,
+                RecognitionTestData.creditsFor(data.employerGift.Id)[0].Amount__c,
+                'The employer gift still recognizes Ana for the match the company still holds.'
+            );
+            Assert.areEqual(
+                0,
+                RecognitionTestData.creditsFor(refundId).size(),
+                'And the negative gift reversing her own gift carries no matched donor credit, ' +
+                'because the gift it reverses carried none.'
+            );
+        }
     }
 
     /**
@@ -206,29 +224,31 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void unlinkingAfterARefundRemovesBothHalvesOfThePair() {
-        Setup data = setUp();
-        MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
-        Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
-        Assert.areEqual(
-            1,
-            RecognitionTestData.creditsFor(refundId).size(),
-            'The reversal is there to be removed.'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
+            MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+            Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
+            Assert.areEqual(
+                1,
+                RecognitionTestData.creditsFor(refundId).size(),
+                'The reversal is there to be removed.'
+            );
 
-        Test.startTest();
-        MatchingGiftService.unlink(data.employerGift.Id);
-        Test.stopTest();
+            Test.startTest();
+            MatchingGiftService.unlink(data.employerGift.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            RecognitionTestData.creditsFor(data.employerGift.Id).size(),
-            'The credit the link created goes with the link.'
-        );
-        Assert.areEqual(
-            0,
-            RecognitionTestData.creditsFor(refundId).size(),
-            'And the negative credit that only existed to reverse it goes too.'
-        );
+            Assert.areEqual(
+                0,
+                RecognitionTestData.creditsFor(data.employerGift.Id).size(),
+                'The credit the link created goes with the link.'
+            );
+            Assert.areEqual(
+                0,
+                RecognitionTestData.creditsFor(refundId).size(),
+                'And the negative credit that only existed to reverse it goes too.'
+            );
+        }
     }
 
     /**
@@ -239,24 +259,26 @@ private class MatchingGiftRefundTest {
      */
     @IsTest
     static void linkingAGiftAlreadyPartlyRefundedReversesTheReturnedPart() {
-        Setup data = setUp();
-        Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Setup data = setUp();
+            Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
 
-        Test.startTest();
-        MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
-        Test.stopTest();
+            Test.startTest();
+            MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            500,
-            RecognitionTestData.creditsFor(data.employerGift.Id)[0].Amount__c,
-            'The credit the link creates is still the employer gift, whole.'
-        );
-        Assert.areEqual(
-            -200,
-            RecognitionTestData.creditsFor(refundId)[0].Amount__c,
-            'And the part already returned is already reversed, so the total reads 300 ' +
-            'whichever of the refund and the link happened first.'
-        );
+            Assert.areEqual(
+                500,
+                RecognitionTestData.creditsFor(data.employerGift.Id)[0].Amount__c,
+                'The credit the link creates is still the employer gift, whole.'
+            );
+            Assert.areEqual(
+                -200,
+                RecognitionTestData.creditsFor(refundId)[0].Amount__c,
+                'And the part already returned is already reversed, so the total reads 300 ' +
+                'whichever of the refund and the link happened first.'
+            );
+        }
     }
 
     private class Setup {

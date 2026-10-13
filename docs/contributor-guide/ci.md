@@ -19,7 +19,15 @@ Salesforce org is needed for this job. Steps:
 
 1. `npm ci`
 2. `npm run prettier:verify`
-3. `npm run lint`
+3. `npm run lint`. Besides the LWC rules, it holds the pure modules to plain JavaScript:
+   each file in `PURE_MODULES` at the top of `eslint.config.js` (today the import wizard's
+   `csv.js` and `xlsx.js`) fails lint if it imports `lwc`, `lightning/*` or `@salesforce/*`.
+   A pure module is a helper inside a component bundle (its file name differs from the
+   bundle's) that works on plain values only; add each new one to the list, and the config
+   refuses to load if a listed file no longer exists, so a rename cannot drop a module out
+   of the rule silently. Without the rule the next edit can pull in the platform and the
+   module stops being reusable outside Salesforce or testable without stubs (plan Section
+   4.4, portability at near-zero cost).
 4. `npm run test:unit:coverage`
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
@@ -87,6 +95,19 @@ Salesforce org is needed for this job. Steps:
    `scripts/ci/check-labels.py` does the same for custom labels: a name or short
    description over 80 characters, a value over 1000, or any of them missing, each of
    which only an org would otherwise report.
+   `scripts/ci/check-metadata-lengths.py` (`npm run check:metadata-lengths`) covers the
+   other limits only an org reports: a description over 255 characters on a custom
+   permission, permission set, permission set group, FlexiPage, Lightning web component
+   bundle, tab or app; a field label over 40, inline help over 510, a field or object
+   description over 1000, a custom label value over 1000; two layout actions with the same
+   sort order or name; a record page visibility rule that tests a lookup field itself (the
+   platform refuses EQUAL and NE there, so test a field across it, such as
+   `{!Record.Donor_Account__r.Name}`); a dynamic related list column value that names
+   several fields instead of one per `valueListItems`; and an Apex class, interface or enum named after a reserved Apex type
+   (Page, Package, Type, Object, Limit, Group, Case, Sort, Select, Trigger, System, Schema,
+   Database). Lengths are counted with leading and trailing whitespace trimmed but the line
+   breaks and indentation inside counted, as the platform does, so a description that
+   Prettier wraps across lines needs a few characters of room.
 9. `scripts/ci/check-symlinks.sh`, failing the build if a tracked file is a symlink
    pointing outside the repository or at an absolute path. Such a link resolves on the
    machine that committed it and dangles everywhere else, so every local check passes and
@@ -135,7 +156,26 @@ Salesforce org is needed for this job. Steps:
    `Gift_Record_Page` and `Commitment_Record_Page` were stranded the same way in Fundraising.
 15. `scripts/ci/check-canonical-model.py`, failing the build if a shipped object or field
    is missing from `docs/architecture/canonical-model.md`. The canonical model is updated
-   before an object or a field is added, so this is the gate that keeps it true.
+   before an object or a field is added, so this is the gate that keeps it true. It checks
+   both directions. Inside the model: no API name declared twice for one object, and no
+   name used in prose that no table declares. Against the metadata: every folder under
+   `packages/*/main/default/objects/` is named in the model, and every custom field shipped
+   in it is named in backticks in a top-level section that also names that object. Until
+   2026-10 only the first direction ran, so this line claimed more than the script did, and
+   four custom metadata fields had shipped with no API name in the model. The vendored
+   rollup engine (`packages/core/vendor/`) is not BarnCRM's data model and is outside the
+   path it reads.
+   `scripts/ci/check-openapi.js` (`npm run check:openapi`) fails the build if
+   `docs/architecture/reference/inbound-gift-api.openapi.yaml` does not parse as YAML, is
+   not OpenAPI 3.1, has a `$ref` that resolves to nothing, an operation without a unique
+   `operationId` or a response without a description, or has drifted from the Apex: its
+   request properties and required list against `InboundGift`, its result properties
+   against `InboundGiftResult`, its `outcome` and `errorCode` values against that class's
+   constants, and its two length limits against `InboundGiftRequest`. The document is only
+   read by integrators' tools, never by the build, so without this a broken file or a new
+   field missing from it would ship and be found by a partner. It is not a full OpenAPI
+   validator, which would need a network install; it reads the file with the `yaml`
+   package already in `devDependencies`.
 16. `scripts/ci/check-setting-defaults.py`, failing the build if a checkbox setting that
    ships switched on is not declared in `SettingsService.SHIPPED_DEFAULTS`, or is declared
    there with a value the field metadata disagrees with. A field's own `defaultValue` is
@@ -151,8 +191,30 @@ Salesforce org is needed for this job. Steps:
    keeps the value it first stored. The rename of the default to `BarnCRM_Settings__c` left
    such orgs pointed at the old object and every save refused with "That setting does not
    exist in this org".
-17. A grep check that fails the build if any tracked file contains an em dash character.
-18. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
+   `scripts/ci/check-apex-access-modes.py` fails the build if packaged Apex (tests and
+   `vendor/` excepted) leaves its sharing or access mode to the platform default: a class
+   with no `with`, `without` or `inherited sharing` keyword (an inner class only when it
+   touches the database), an inline query with no `WITH USER_MODE` or `WITH SYSTEM_MODE`, a
+   DML statement with no `as user` or `as system`, or a `Database` or `Search` method with no
+   `AccessLevel`. A query string that carries its own `WITH` clause is marked with an
+   `// Access mode:` comment on the call's line or the line above. From API version 67.0 a
+   query or DML statement with no mode runs in user mode and a class with no keyword runs
+   with sharing (Apex Developer Guide, Versioned Behavior Changes), so an elevated read that
+   relied on the old system-mode default fails for a user without access, and only an org
+   run as that user shows it.
+   `scripts/ci/check-tests-run-as.py` fails the build if an `@IsTest` or `@TestSetup` method
+   in Core, Giving or Connect (the vendored engine excepted) never calls `System.runAs` and
+   carries no `// runs-as: deploying user (reason)` comment. See "Tests run as a user they
+   create" below for why.
+17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
+   (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
+   mapping from the real package source, so a new object or field that breaks it fails here.
+18. `scripts/ci/check-flow-templates.py`, failing the build if a switchable Core automation
+   has neither a Flow template (`Template_<registry name>`) nor a row on
+   `docs/admin-guide/flow-templates.md` saying why it has none, or if a template ships active
+   or not marked as a template (ADR-0040, ADR-0090).
+19. A grep check that fails the build if any tracked file contains an em dash character.
+20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.
    The results are uploaded as a build artifact (`code-analyzer-results.html` and
    `code-analyzer-results.json`) even if the job fails, so anyone can download and read
@@ -174,6 +236,7 @@ npm run check:namespace
 npm run check:standard-objects
 npm run check:object-allowlist
 npm run check:custom-metadata
+npm run check:metadata-lengths
 npm run check:symlinks
 npm run check:permission-sets
 npm run check:help-links
@@ -181,7 +244,10 @@ npm run check:adrs
 npm run check:components-reachable
 npm run check:record-pages-assigned
 npm run check:canonical-model
+npm run check:openapi
 npm run check:setting-defaults
+npm run check:flow-templates
+npm run check:tests-run-as
 npm run check:apex
 npm run check:analyzer
 ```
@@ -326,15 +392,17 @@ needs no org run. A pull request from a fork gets a read-only token and cannot p
 way, so a maintainer runs the script for it, which is the right outcome for untested code from
 outside anyway.
 
-**Test classes run in parallel, all as the same running user**, each in a transaction that
-rolls back. Anything the platform keeps per user is therefore shared between classes that
-happen to run at the same moment, and a test that writes it fails now and then for no reason
-in its own code. Two have been found: a permission set assignment to the running user (one
-row per person and set, so a second insert is refused), and a saved file (it goes into the
-user's private library, and a save is refused with `INVALID_CROSS_REFERENCE_KEY, invalid
-cross reference id: []` while another transaction on that library rolls back). A test that
-does either runs as a person created for it: `TestDataFactory.createUser`, or
-`ReceiptTestDataFactory.issuer()` for a test that saves a receipt, letter or logo file.
+**Test classes run in parallel**, each in a transaction that rolls back, and each as a user it
+creates for itself (see "Tests run as a user they create" below), not as the user who started
+the run. That also keeps classes from colliding over what the platform keeps per user, which
+used to make tests fail now and then for no reason in their own code when every class ran as
+the same person. Two such collisions were found: a permission set assignment to the running
+user (one row per person and set, so a second insert is refused), and a saved file (it goes
+into the user's private library, and a save is refused with `INVALID_CROSS_REFERENCE_KEY,
+invalid cross reference id: []` while another transaction on that library rolls back). The
+few tests marked `// runs-as: deploying user` still share the running user, so they must do
+neither. A test that saves a receipt, letter or logo file runs as
+`ReceiptTestDataFactory.issuer()`.
 
 **A test run that returns no results is retried once.** When `sf apex run test` comes back
 with no test results and its output names `UNKNOWN_EXCEPTION` or a platform or network error
@@ -365,6 +433,47 @@ including the gate, fails at once with `UNKNOWN_EXCEPTION` before any test start
 
 While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` against
 your own org for speed; the script is the final full run before merge, not the inner loop.
+
+### Tests run as a user they create
+
+From API version 67.0 a query or DML statement with no access mode runs in user mode, and
+that includes the plain `insert` and `[SELECT ...]` in a test class. A test that runs as
+whoever deploys or runs it passes only where that person already holds the BarnCRM
+permission sets. The gate above assigns them, so the gate alone never showed the problem; a
+check-only deploy to a real sandbox, as an administrator without them, failed 565 of 1008
+Core tests ("fields being inaccessible", "No such column", "Record Type ID: this ID value
+isn't valid for the user", "You need the Manage BarnCRM Settings permission"). A subscriber
+running the tests, or a different administrator, would see the same.
+
+So every test is self-contained:
+
+- Every `@IsTest` method and every `@TestSetup` method runs its body inside
+  `System.runAs(TestUsers.admin())` in Core, and `System.runAs(TestUsers.adminWith('Giving_Admin'))`
+  in Giving and Connect. `TestUsers` (Core, `@IsTest`, namespace accessible) creates a user
+  on the running user's own profile and assigns the packaged permission sets by their bare
+  name, preferring the ones in this package's namespace. `withPermissionSets(names)` takes any
+  other list. It keeps one user per list of sets per transaction, and finds the user a
+  `@TestSetup` made again in every test method, so setup data and the test share an owner.
+- A Core test whose code calls into whichever modules are installed (the sample data loader
+  counts and removes each module's records) runs as `TestUsers.adminWithInstalledModules()`:
+  BarnCRM Admin plus the admin permission set of each module the org has, and `admin()` in
+  an org with Core alone.
+- The profile stays the running user's so a test keeps what an administrator's profile gave
+  it before (View All Data over Giving's Private objects, Manage Users for the tests that
+  create people) and loses only the dependence on permission set assignments. A test that has
+  something to prove about least privilege still builds its own user with
+  `TestDataFactory.createUser` on the Standard User profile, inside the outer `runAs`.
+- Users and permission set assignments are setup objects. `TestUsers` writes them in a
+  context of their own; a test that creates more people does the same with a nested
+  `System.runAs(new User(Id = UserInfo.getUserId()))`, as before.
+- A test that touches no data and no permission dependent code (a parser, an in-memory
+  calculation) may run as the deploying user, and says so with
+  `// runs-as: deploying user (reason)` above the class, or inside one method.
+  `scripts/ci/check-tests-run-as.py` fails the build on any other test method without
+  `System.runAs`.
+
+To prove a branch is self-contained, run its tests in an org as a user who holds none of the
+BarnCRM permission sets.
 
 ### `org-tests`
 
@@ -804,13 +913,6 @@ removed, so a list may start above 1.
    - **Anything else:** skip the field, with a note in the run log.
 
    Update the admin guide first. Add tests, including a 200-row bulk case.
-5. **Smaller review follow-ups.**
-   - X-01: the `DUPLICATE_VALUE` handling matches on a message substring, which is loose.
-   - X-01: the admin guide should warn against listing `Master` in the record-type filter.
-   - C-29: optionally assert `Limits.getQueryRows()` in the receipt-cap test.
-   - X-01: about 30 Opportunity mirror tests return early where Opportunity is absent without
-     asserting that case. Add an `OpportunityMirrorService` unavailable seam, as
-     `CampaignSyncService.unavailableForTest` does for Campaign.
 
 ### Next on the roadmap
 

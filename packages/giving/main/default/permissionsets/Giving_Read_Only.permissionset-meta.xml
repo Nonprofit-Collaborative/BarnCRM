@@ -703,6 +703,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Gift_Batch_Row__c.Installment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Gift_Batch_Row__c.Payment_Method__c</field>
     <readable>true</readable>
   </fieldPermissions>

@@ -57,6 +57,14 @@
         <value>What it counts</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_CountsSeparatedBy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Added to what a text list counts: {0} is the delimiter, such as semicolon.</shortDescription>
+        <value>separated by {0}</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ColumnCalculation</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -206,7 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error returned when a mode value is not one of the three.</shortDescription>
-        <value>That is not a rollup mode. Choose Real time, Scheduled, or Both.</value>
+        <value>That is not a rollup mode. Choose Instantly, Every night, or Both (recommended).</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ErrorInvalidOperator</fullName>
@@ -233,20 +241,76 @@
         <value>The records this rollup counts are not in this org, so it was skipped.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsCheckbox</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Any or None is set to fill a field that is not a checkbox.</shortDescription>
+        <value>Any and None show their answer in a checkbox field. Choose a checkbox field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a text list is set to fill a field that is not text.</shortDescription>
+        <value>A text list shows its answer in a text field. Choose a text or long text field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsNumber</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Count distinct is set to fill a field that is not a number.</shortDescription>
+        <value>Count distinct shows its answer in a number field. Choose a number field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorCheckboxTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a checkbox field is given a calculation other than Any or None.</shortDescription>
+        <value>A checkbox field can show only Any or None. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTextTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a text field is given a calculation that does not produce text.</shortDescription>
+        <value>A text field can show only First, Last or a text list. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetType</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the field chosen to show a rollup cannot hold its calculation.</shortDescription>
+        <value>That field cannot show this calculation. Choose a number, currency, percent or date field, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNotWritable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the field chosen to show a rollup is missing or cannot be written.</shortDescription>
+        <value>BarnCRM cannot write to the field this rollup fills. Choose a field that exists and is not a formula or read only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorSourceFieldNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a calculation that reads a field on each record has no Source Field.</shortDescription>
+        <value>This calculation reads a field on each record. Fill in Source Field with the field to read.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_ErrorRecalculateFailed</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Error returned when a recalculation cannot start.</shortDescription>
         <value>The recalculation could not be started. The Error Log has the details.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_BatchIncomplete</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup batch finished with failures</shortDescription>
-        <value>{0} rollup(s) could not be recalculated and {1} completed. The Error Log has the details.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_Recalculate</fullName>
@@ -313,11 +377,139 @@
         <value>Something went wrong on the Rollups page. The Error Log has the details.</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_MergeRecalcDeferred</fullName>
+        <fullName>Core_Rollups_QueueSaveFailed</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Rollups: log entry when a merge's totals are left to the nightly run.</shortDescription>
-        <value>A merge of {0} records left too little room to recalculate the kept records' totals now. They are recalculated in tonight's run.</value>
+        <shortDescription>Rollup Queue: why a record's totals could not be saved.</shortDescription>
+        <value>The totals could not be saved: {0} BarnCRM tries again automatically, and the nightly run puts them right if it still cannot.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueRunStopped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: why a background recalculation stopped.</shortDescription>
+        <value>The background recalculation stopped before it finished: {0} BarnCRM tries these records again, a few at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueRunSummary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log summary when queued totals could not be saved.</shortDescription>
+        <value>{0} records' totals could not be saved in the background and wait in the Rollup Queue. They are tried again automatically; after five tries they wait for Retry.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunPaused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: full recalculation skipped while automation is paused.</shortDescription>
+        <value>The rollup recalculation did not run because all automation is paused. It runs again tonight, or click Recalculate all once automation is back on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunSummary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log summary when a full recalculation did not save everything.</shortDescription>
+        <value>The rollup recalculation finished, but {0} records' totals could not be saved and {1} batches of records stopped before they finished. The saves are tried again automatically; rollups whose records stopped are not marked calculated and are put right by the next run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunAlreadyRunning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollups page: a full recalculation is already running.</shortDescription>
+        <value>A full recalculation is already running. Its totals will be on the records when it finishes, so try again after that.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunAlreadyRunningLog</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a full recalculation did not start, one was running.</shortDescription>
+        <value>A rollup recalculation did not start because another one was still running (job {0}). The running one brings the totals up to date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunChunkQueued</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: records of a stopped recalculation chunk were queued.</shortDescription>
+        <value>Part of a rollup recalculation stopped before it finished. The totals of its {0} records are recalculated in the background within minutes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_Summary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: the opening line of the report.</shortDescription>
+        <value>Engine comparison: {0} definitions and {1} values compared, {2} differences.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_Difference</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: one value the two engines disagree on.</shortDescription>
+        <value>{0} writes {1} on {2}: stored {3}, BarnCRM engine {4}, vendored engine {5}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NotCompared</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: a definition that was not compared, and why.</shortDescription>
+        <value>{0} was not compared: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NotReached</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: definitions the run stopped before.</shortDescription>
+        <value>The run stopped before these definitions to stay within limits. Run it again with these keys: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NoDefinition</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: no active definition has the key asked for.</shortDescription>
+        <value>No active definition has this key.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_NoRecords</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: no target records to compare a definition over.</shortDescription>
+        <value>No records to compare it over.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_RefusedByBarnCrm</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: the BarnCRM engine refused the definition.</shortDescription>
+        <value>The BarnCRM engine could not plan it. Recalculating it on the Rollups page writes the reason to the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_VendoredFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: the vendored engine failed on the definition.</shortDescription>
+        <value>The vendored engine failed: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupComparison_BackgroundWork</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Engine comparison: run undone, the vendored engine started a job.</shortDescription>
+        <value>The vendored engine started a background job, so nothing from this run was kept. Compare fewer records or fewer definitions at a time. The report: {0}</value>
     </labels>
 </CustomLabels>

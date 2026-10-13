@@ -95,7 +95,7 @@ sync switched on as above.
 
 ## Common mistakes
 
-**An appeal has no Campaign.** The **Appeals and their Campaigns** list view on the
+**An appeal has no Campaign.** The **Appeals and Their Campaigns** list view on the
 Appeals tab shows which ones: their Campaign ID is empty. Most often the person who created
 it cannot create Campaigns (see How to turn it on). The Error Log has one Warning when such a
 person creates appeals; later edits by the same person are skipped without a new Warning, so
@@ -120,7 +120,7 @@ replace yours. Edit the appeal instead. Fields that are not copied, such as Type
 your own custom fields, are never touched.
 
 **Linking an appeal to a Campaign you already had.** Open the **Appeals** tab and choose
-the **Appeals and their Campaigns** list view, which Campaign sync adds. It shows each
+the **Appeals and Their Campaigns** list view, which Campaign sync adds. It shows each
 appeal's **Campaign ID**. Double-click the appeal's Campaign ID cell, paste the existing
 Campaign's record ID (the 18-character code in its web address, starting `701`), and save.
 
@@ -137,7 +137,7 @@ allowed to see, and a replacement for a Campaign that still exists would be a du
 change to the appeal logs a Warning saying the Campaign was deleted or is not visible. First
 check, as someone who can see every Campaign, whether it still exists. If it does, give the
 person who saves the appeal access to it. If it was deleted, clear the appeal's **Campaign
-ID** in the **Appeals and their Campaigns** list view and save: a new Campaign is created.
+ID** in the **Appeals and Their Campaigns** list view and save: a new Campaign is created.
 
 **Turning Campaign sync off and expecting the Campaigns to go.** They stay. Switching it off
 stops the copying and deletes nothing.

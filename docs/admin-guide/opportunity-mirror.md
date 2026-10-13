@@ -42,10 +42,13 @@ the totals agree, the counts are NPSP's own.
 date you set: the donor is the Opportunity's primary contact (or its Account when it has none),
 the amount and date are the Opportunity's, the type is Other, the status Received, and the
 appeal is the one whose Campaign is the Opportunity's Campaign. To make gifts from some kinds of
-Opportunity only, list their record types' API names, separated by commas, in **Opportunity
-mirror record types** (for example `Donation,Major_Gift`); left empty, every won Opportunity
-after the start date counts, and a name your org does not have is named in a Warning in the
-Error Log. The start date is read in your organization's default time zone. The gift then gets its fund,
+Opportunity only, tick their record types under **Opportunity mirror record types** (for
+example Donation and Major Gift); with none ticked, every won Opportunity after the start date
+counts. A record type that is later deleted or renamed is named in a Warning in the Error Log.
+An Opportunity without a record type (Salesforce shows it as `Master`) stores no record type
+at all, so no ticked record type matches it and no gift is made from it; to include those
+Opportunities, tick none. If `Master` is ever in the saved list, a run leaves it out and says
+so in a Warning in the Error Log. The start date is read in your organization's default time zone. The gift then gets its fund,
 household and thank-you status from your Giving settings, like any gift. A gift is never
 changed afterwards, even if its Opportunity is: the reconciliation shows the difference.
 
@@ -69,7 +72,7 @@ Opportunity mirror page says so.
    Opportunities does not create, and thank donors for, a gift for every one of them.
 3. Still in **Giving**, open **Opportunity mirror** (the row shows only to someone with the
    permission set). Click **Run now** once, to copy what you already have, and **Schedule
-   nightly**, so the mirror catches up every night at 01:30. The page shows when the last run
+   nightly run**, so the mirror catches up every night at 1:30 AM, in your organization's time zone. The page shows when the last run
    completed and what it did, and Health Check warns if two days pass without one.
 
 **Whose access the copy uses.** Opportunities are written with the access of the person saving
@@ -81,7 +84,7 @@ Opportunity. Give fundraising staff Opportunity create and edit access in Setup 
 Opportunity at once. The Error Log has one Warning when such a person creates or changes gifts;
 imports add none, and the nightly run catches them up. That catch-up looks at every gift without
 an Opportunity and every linked gift changed since the last run; with hundreds of thousands of
-gifts the run takes longer to start, which does not matter at 01:30.
+gifts the run takes longer to start, which does not matter at 1:30 AM.
 
 **Two switches, one of them in charge.** **Opportunity mirror direction** decides what the
 mirror does. The **Opportunity mirror** row on the Automation page is the switch every BarnCRM automation has: switched off, it stops the copy made when a gift is saved and the runs.
@@ -135,11 +138,11 @@ deletes an Opportunity. Decide whether it should stay, and delete it yourself if
 replacement, because it cannot tell a deleted Opportunity from one the person saving may not
 see, and a replacement for one that still exists would count the gift twice. The Error Log says
 so when the gift next changes. Check, as someone who sees every Opportunity, whether it exists.
-If it was deleted, clear the gift's **Opportunity ID** in the **Gifts and their Opportunities**
+If it was deleted, clear the gift's **Opportunity ID** in the **Gifts and Their Opportunities**
 list view and save: a new Opportunity is made.
 
 **Linking a gift to an Opportunity you already had.** Open the **Gifts** tab and choose the
-**Gifts and their Opportunities** list view, which the mirror adds. Double-click the gift's
+**Gifts and Their Opportunities** list view, which the mirror adds. Double-click the gift's
 **Opportunity ID** cell, paste the Opportunity's record ID (the 18-character code in its web
 address, starting `006`), and save. Be sure it is the right one: in Gifts to Opportunities the gift's amount, date, stage,
 account and campaign are written onto it at once. An Opportunity belongs to one gift only;

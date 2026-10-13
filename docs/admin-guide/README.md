@@ -112,8 +112,11 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-03 BarnCRM app and setup checklist | [barncrm-app.md](barncrm-app.md) | Core | v0.1 |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core | v0.1 |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
+| C-24 Module Manager | [module-manager.md](module-manager.md) | Core | v0.8 |
+| Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core | Proposed, not scheduled |
 | C-13 Rollups | [rollups.md](rollups.md) | Core | v0.2 |
 | C-14 Importing | [importing.md](importing.md) | Core | v0.2 |
+| C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package | v0.6 |
 | G-01 Gifts | [gifts.md](gifts.md) | Giving | v0.2 |
 | G-03 Quick gift entry | [quick-gift-entry.md](quick-gift-entry.md) | Giving | v0.2 |
 | G-01 Funds | [funds.md](funds.md) | Giving | v0.2 |
@@ -144,5 +147,15 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Connect | v0.6 |
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Connect | v0.6 |
 | X-03 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Connect | v0.6 |
+| X-03 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Connect | v0.7 |
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Connect | v0.6 |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving | v0.6 |
+| UX review item 2 | [A donor's giving on their record](donor-records.md) | Giving | v0.6 |
+| C-34 Find and export | [find.md](find.md) | Core | v0.7 |
+| C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |
+| C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core | 1.x (built ahead) |
+| C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
+| Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
+| C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module | v0.6 |
+| C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core | v0.9 |
+| ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core | v0.6 |

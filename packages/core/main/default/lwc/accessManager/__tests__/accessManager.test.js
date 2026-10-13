@@ -210,6 +210,21 @@ describe('c-access-manager', () => {
     });
   });
 
+  it('shows the confirmation as a labelled region and moves focus to its heading', async () => {
+    const element = createComponent();
+    getAccessOverview.emit(OVERVIEW);
+    await flush();
+
+    element.shadowRoot.querySelector('[data-id="remove-button"]').click();
+    await flush();
+
+    const confirmation = element.shadowRoot.querySelector('[data-id="confirmation"]');
+    expect(confirmation.getAttribute('role')).toBe('region');
+    expect(element.shadowRoot.activeElement).toBe(
+      element.shadowRoot.querySelector('[data-id="confirmation-heading"]')
+    );
+  });
+
   it('closes the confirmation without changing anything when Cancel is used', async () => {
     const element = createComponent();
     getAccessOverview.emit(OVERVIEW);

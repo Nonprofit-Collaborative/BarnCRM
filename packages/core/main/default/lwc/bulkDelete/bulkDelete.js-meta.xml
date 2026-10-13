@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Bulk delete (C-37): delete the records a Find query returns, previewed with what goes with
+    them and confirmed by typing the count, run in the background as the user. Undone from the
+    Bulk Update tab.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

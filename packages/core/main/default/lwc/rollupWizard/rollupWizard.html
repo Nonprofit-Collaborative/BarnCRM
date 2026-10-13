@@ -1,0 +1,175 @@
+<template>
+    <lightning-progress-indicator current-step={stepValue} type="path" variant="base">
+        <template for:each={steps} for:item="item">
+            <lightning-progress-step key={item.value} label={item.label} value={item.value}></lightning-progress-step>
+        </template>
+    </lightning-progress-indicator>
+    <h3 class="slds-text-heading_small slds-var-m-vertical_small" data-id="step-title">{stepTitle}</h3>
+
+    <template lwc:if={hasError}>
+        <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+            <span data-id="error-message">{error}</span>
+        </div>
+    </template>
+
+    <template lwc:if={isStep1}>
+        <lightning-combobox
+            name="targetObject"
+            data-id="target-object"
+            label={labels.targetObject}
+            value={draft.targetObject}
+            options={targetOptions}
+            onchange={handleTargetObject}
+        ></lightning-combobox>
+        <lightning-combobox
+            name="targetField"
+            data-id="target-field"
+            label={labels.targetField}
+            value={draft.targetField}
+            options={targetFieldOptions}
+            field-level-help={labels.targetFieldHelp}
+            onchange={handleInput}
+        ></lightning-combobox>
+    </template>
+
+    <template lwc:if={isStep2}>
+        <lightning-combobox
+            data-id="source"
+            label={labels.source}
+            value={sourceValue}
+            options={sourceOptions}
+            onchange={handleSource}
+        ></lightning-combobox>
+    </template>
+
+    <template lwc:if={isStep3}>
+        <lightning-combobox
+            name="aggregate"
+            data-id="aggregate"
+            label={labels.aggregate}
+            value={draft.aggregate}
+            options={aggregateOptions}
+            onchange={handleInput}
+        ></lightning-combobox>
+        <template lwc:if={needsSourceField}>
+            <lightning-combobox
+                name="sourceField"
+                data-id="source-field"
+                label={labels.sourceField}
+                value={draft.sourceField}
+                options={sourceFieldOptions}
+                onchange={handleInput}
+            ></lightning-combobox>
+        </template>
+        <template lwc:if={needsOrderBy}>
+            <lightning-combobox
+                name="orderByField"
+                data-id="order-by"
+                label={labels.orderBy}
+                value={draft.orderByField}
+                options={sourceFieldOptions}
+                onchange={handleInput}
+            ></lightning-combobox>
+        </template>
+        <template lwc:if={isTextList}>
+            <lightning-combobox
+                name="delimiter"
+                label={labels.delimiter}
+                value={draft.delimiter}
+                options={delimiterOptions}
+                onchange={handleInput}
+            ></lightning-combobox>
+        </template>
+        <lightning-radio-group
+            data-id="window"
+            label={labels.window}
+            value={windowValue}
+            options={windowOptions}
+            onchange={handleWindow}
+        ></lightning-radio-group>
+        <template lwc:if={hasWindow}>
+            <lightning-combobox
+                name="fiscalDateField"
+                data-id="window-date"
+                label={labels.windowDate}
+                value={draft.fiscalDateField}
+                options={dateFieldOptions}
+                onchange={handleInput}
+            ></lightning-combobox>
+        </template>
+        <template lwc:if={currencyWarning}>
+            <div class="slds-box slds-box_x-small slds-theme_warning slds-var-m-top_small" role="status">
+                <span data-id="currency-warning">{currencyWarning}</span>
+            </div>
+        </template>
+    </template>
+
+    <template lwc:if={isStep4}>
+        <c-rollup-filter-builder
+            data-name="filterJson"
+            label={labels.filter}
+            fields={sourceFields}
+            records-label={recordsLabel}
+            value={draft.filterJson}
+            onchange={handleFilter}
+        ></c-rollup-filter-builder>
+        <div class="slds-var-m-top_medium">
+            <c-rollup-filter-builder
+                data-name="targetFilterJson"
+                label={labels.targetFilter}
+                fields={targetEntityFields}
+                records-label={targetLabel}
+                value={draft.targetFilterJson}
+                onchange={handleFilter}
+            ></c-rollup-filter-builder>
+        </div>
+    </template>
+
+    <template lwc:if={isStep5}>
+        <p class="slds-var-m-bottom_small" data-id="summary">{summary}</p>
+        <p data-id="maintains">{maintains}</p>
+        <lightning-record-picker data-id="preview-record" label={labels.previewRecord} object-api-name={draft.targetObject} value={previewRecordId} onchange={handlePreviewRecord}></lightning-record-picker>
+        <template lwc:if={previewResult}>
+            <p class="slds-var-m-bottom_small" data-id="preview-result">{previewResult}</p>
+        </template>
+        <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
+        <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
+        <lightning-radio-group name="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
+        <lightning-input type="toggle" name="active" label={labels.active} checked={draft.active} onchange={handleInput}></lightning-input>
+    </template>
+
+    <div class="slds-var-m-top_medium slds-clearfix">
+        <lightning-button data-id="cancel" label={labels.cancel} onclick={handleCancel}></lightning-button>
+        <div class="slds-float_right">
+            <template lwc:if={showBack}>
+                <lightning-button data-id="back" label={labels.back} onclick={handleBack}></lightning-button>
+            </template>
+            <template lwc:if={isStep5}>
+                <lightning-button
+                    class="slds-var-m-left_x-small"
+                    data-id="save"
+                    label={labels.save}
+                    disabled={busy}
+                    onclick={handleSave}
+                ></lightning-button>
+                <lightning-button
+                    class="slds-var-m-left_x-small"
+                    variant="brand"
+                    data-id="save-and-calculate"
+                    label={labels.saveAndCalculate}
+                    disabled={busy}
+                    onclick={handleSave}
+                ></lightning-button>
+            </template>
+            <template lwc:else>
+                <lightning-button
+                    class="slds-var-m-left_x-small"
+                    variant="brand"
+                    data-id="next"
+                    label={labels.next}
+                    onclick={handleNext}
+                ></lightning-button>
+            </template>
+        </div>
+    </div>
+</template>

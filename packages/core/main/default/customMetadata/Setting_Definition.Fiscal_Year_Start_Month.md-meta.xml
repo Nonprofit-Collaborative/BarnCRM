@@ -6,8 +6,9 @@
     <values><field>Settings_Object__c</field><value xsi:type="xsd:string">BarnCRM_Settings__c</value></values>
     <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
     <values><field>Section__c</field><value xsi:type="xsd:string">General</value></values>
-    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Number</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">The month your fiscal year starts, 1 for January through 12 for December. Totals for this year, last year, and two years ago are calculated from it.</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
+    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">1:January;2:February;3:March;4:April;5:May;6:June;7:July;8:August;9:September;10:October;11:November;12:December</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The month your fiscal year starts. Totals for this year, last year, and two years ago are calculated from it.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
 </CustomMetadata>

@@ -9,17 +9,17 @@
     ></lightning-button>
 
     <div class="slds-var-p-horizontal_medium">
-      <template if:true={hasError}>
-        <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+      <template lwc:if={hasError}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
 
-      <template if:true={isEmpty}>
+      <template lwc:if={isEmpty}>
         <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
       </template>
 
-      <template if:true={hasCredits}>
+      <template lwc:if={hasCredits}>
         <ul data-id="credit-list" class="slds-has-dividers_bottom-space">
           <template for:each={credits} for:item="credit">
             <li key={credit.recordId} class="slds-item">
@@ -29,14 +29,14 @@
                 value={credit.amount}
                 format-style="currency"
               ></lightning-formatted-number>
-              <template if:true={credit.isAutomatic}>
+              <template lwc:if={credit.isAutomatic}>
                 <lightning-badge
                   class="automatic-badge"
                   label={labels.automaticBadge}
                 ></lightning-badge>
                 <lightning-helptext content={labels.automaticHelp}></lightning-helptext>
               </template>
-              <template if:true={credit.showRemove}>
+              <template lwc:if={credit.showRemove}>
                 <lightning-button
                   class="remove-button"
                   data-credit={credit.recordId}
@@ -51,7 +51,7 @@
         </ul>
       </template>
 
-      <template if:true={showForm}>
+      <template lwc:if={showForm}>
         <div data-id="add-form" class="slds-box slds-var-m-top_small">
           <lightning-record-picker
             data-id="person-picker"
@@ -66,7 +66,7 @@
             options={roleOptions}
             onchange={handleRoleChange}
           ></lightning-combobox>
-          <template if:true={isCustomRole}>
+          <template lwc:if={isCustomRole}>
             <lightning-input
               data-id="custom-role-input"
               label={labels.customRoleLabel}

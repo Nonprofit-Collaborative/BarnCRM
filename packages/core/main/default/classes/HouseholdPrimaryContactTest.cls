@@ -40,86 +40,94 @@ private class HouseholdPrimaryContactTest {
 
     @IsTest
     static void thePrimaryMemberIsMirroredWhenTheMembershipIsSaved() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
-        insert new List<Contact>{ john, jane };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
 
-        Test.startTest();
-        insert new List<Household_Member__c>{
-            membership(smiths.Id, john.Id, 'Head', false),
-            membership(smiths.Id, jane.Id, 'Spouse or Partner', true)
-        };
-        Test.stopTest();
+            Test.startTest();
+            insert new List<Household_Member__c>{
+                membership(smiths.Id, john.Id, 'Head', false),
+                membership(smiths.Id, jane.Id, 'Spouse or Partner', true)
+            };
+            Test.stopTest();
 
-        Assert.areEqual(jane.Id, primaryContactOf(smiths.Id), 'Jane is marked primary (R-M3)');
+            Assert.areEqual(jane.Id, primaryContactOf(smiths.Id), 'Jane is marked primary (R-M3)');
+        }
     }
 
     @IsTest
     static void thePrimaryContactFollowsWhenAnotherMemberIsMadePrimary() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
-        insert new List<Contact>{ john, jane };
-        insert new List<Household_Member__c>{
-            membership(smiths.Id, john.Id, 'Head', true),
-            membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
-        };
-        Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'John starts as primary');
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            insert new List<Household_Member__c>{
+                membership(smiths.Id, john.Id, 'Head', true),
+                membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
+            };
+            Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'John starts as primary');
 
-        Test.startTest();
-        HouseholdOfPersonController.makePrimary(smiths.Id, jane.Id);
-        Test.stopTest();
+            Test.startTest();
+            HouseholdOfPersonController.makePrimary(smiths.Id, jane.Id);
+            Test.stopTest();
 
-        Assert.areEqual(jane.Id, primaryContactOf(smiths.Id), 'The field follows Make primary');
+            Assert.areEqual(jane.Id, primaryContactOf(smiths.Id), 'The field follows Make primary');
+        }
     }
 
     @IsTest
     static void endingThePrimaryMembershipClearsThePrimaryContactAndPromotesNobody() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
-        insert new List<Contact>{ john, jane };
-        Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
-        insert new List<Household_Member__c>{
-            johns,
-            membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
-        };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
+            insert new List<Household_Member__c>{
+                johns,
+                membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
+            };
 
-        Test.startTest();
-        update new Household_Member__c(Id = johns.Id, End_Date__c = Date.today());
-        Test.stopTest();
+            Test.startTest();
+            update new Household_Member__c(Id = johns.Id, End_Date__c = Date.today());
+            Test.stopTest();
 
-        Assert.isNull(
-            primaryContactOf(smiths.Id),
-            'John has left, and Jane is proposed rather than assigned (R-H10)'
-        );
+            Assert.isNull(
+                primaryContactOf(smiths.Id),
+                'John has left, and Jane is proposed rather than assigned (R-H10)'
+            );
+        }
     }
 
     @IsTest
     static void deletingAndRestoringThePrimaryMembershipClearsAndRestoresTheField() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
-        insert new List<Contact>{ john, jane };
-        Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
-        insert new List<Household_Member__c>{
-            johns,
-            membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
-        };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
+            insert new List<Household_Member__c>{
+                johns,
+                membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
+            };
 
-        Test.startTest();
-        delete new Household_Member__c(Id = johns.Id);
-        Id afterDelete = primaryContactOf(smiths.Id);
-        undelete new Household_Member__c(Id = johns.Id);
-        Test.stopTest();
+            Test.startTest();
+            delete new Household_Member__c(Id = johns.Id);
+            Id afterDelete = primaryContactOf(smiths.Id);
+            undelete new Household_Member__c(Id = johns.Id);
+            Test.stopTest();
 
-        Assert.isNull(afterDelete, 'The primary membership is gone, so is the field');
-        Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'Restored with the membership');
+            Assert.isNull(afterDelete, 'The primary membership is gone, so is the field');
+            Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'Restored with the membership');
+        }
     }
 
     /**
@@ -129,194 +137,208 @@ private class HouseholdPrimaryContactTest {
      */
     @IsTest
     static void aPrimaryPersonAccountIsMirroredAsItsPersonContact() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        HouseholdService.personAccountOverride = true;
-        Account garcias = household('The Garcia Family');
-        Account maria = new Account(Name = 'Maria Garcia');
-        insert maria;
-        Contact behindMaria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-        insert behindMaria;
-        PersonRecordSelector.personContactIdOverride = new Map<Id, Id>{
-            maria.Id => behindMaria.Id
-        };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            HouseholdService.personAccountOverride = true;
+            Account garcias = household('The Garcia Family');
+            Account maria = new Account(Name = 'Maria Garcia');
+            insert maria;
+            Contact behindMaria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert behindMaria;
+            PersonRecordSelector.personContactIdOverride = new Map<Id, Id>{
+                maria.Id => behindMaria.Id
+            };
 
-        Test.startTest();
-        insert membership(garcias.Id, maria.Id, 'Head', true);
-        Test.stopTest();
+            Test.startTest();
+            insert membership(garcias.Id, maria.Id, 'Head', true);
+            Test.stopTest();
 
-        Assert.areEqual(
-            behindMaria.Id,
-            primaryContactOf(garcias.Id),
-            'The person account is named by its person contact (R-M3)'
-        );
+            Assert.areEqual(
+                behindMaria.Id,
+                primaryContactOf(garcias.Id),
+                'The person account is named by its person contact (R-M3)'
+            );
+        }
     }
 
     @IsTest
     static void aRealPersonAccountIsItsNewHouseholdsPrimaryContact() {
-        Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
-        if (personTypes.isEmpty()) {
-            // Proven on every shape by the test above; this one needs real person accounts.
-            return;
+        System.runAs(TestUsers.admin()) {
+            Set<Id> personTypes = OrgShapeSelector.personTypeRecordTypeIds();
+            if (personTypes.isEmpty()) {
+                // Proven on every shape by the test above; this one needs real person accounts.
+                return;
+            }
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_JUNCTION
+            );
+            // Kept when emptied, so the household is still there for the person to come back to.
+            settings.Delete_Empty_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            SObject person = Account.SObjectType.newSObject();
+            person.put('RecordTypeId', new List<Id>(personTypes)[0]);
+            person.put('LastName', 'Okafor');
+            person.put('FirstName', 'Ada');
+
+            Test.startTest();
+            insert person;
+            Household_Member__c joined = [
+                SELECT Household__c, Is_Primary__c
+                FROM Household_Member__c
+                WHERE Account__c = :person.Id
+            ];
+            Id personContactId = (Id) Database.queryWithBinds(
+                    'SELECT PersonContactId FROM Account WHERE Id = :personId',
+                    new Map<String, Object>{ 'personId' => person.Id },
+                    AccessLevel.SYSTEM_MODE
+                )[0]
+                .get('PersonContactId');
+            Id created = primaryContactOf(joined.Household__c);
+            delete person;
+            Id afterDelete = primaryContactOf(joined.Household__c);
+            undelete person;
+            Test.stopTest();
+
+            Assert.isTrue(joined.Is_Primary__c, 'The new person is their household primary (R-H2)');
+            Assert.areEqual(personContactId, created, 'Named by their person contact (R-M3)');
+            Assert.isNull(afterDelete, 'Deleting the person empties the field');
+            Assert.areEqual(
+                personContactId,
+                primaryContactOf(joined.Household__c),
+                'Restoring the person restores their membership and the field with it'
+            );
         }
-        BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-            HouseholdTestDataFactory.MODE_JUNCTION
-        );
-        // Kept when emptied, so the household is still there for the person to come back to.
-        settings.Delete_Empty_Households__c = false;
-        HouseholdTestDataFactory.save(settings);
-        SObject person = Account.SObjectType.newSObject();
-        person.put('RecordTypeId', new List<Id>(personTypes)[0]);
-        person.put('LastName', 'Okafor');
-        person.put('FirstName', 'Ada');
-
-        Test.startTest();
-        insert person;
-        Household_Member__c joined = [
-            SELECT Household__c, Is_Primary__c
-            FROM Household_Member__c
-            WHERE Account__c = :person.Id
-        ];
-        Id personContactId = (Id) Database.queryWithBinds(
-                'SELECT PersonContactId FROM Account WHERE Id = :personId',
-                new Map<String, Object>{ 'personId' => person.Id },
-                AccessLevel.SYSTEM_MODE
-            )[0]
-            .get('PersonContactId');
-        Id created = primaryContactOf(joined.Household__c);
-        delete person;
-        Id afterDelete = primaryContactOf(joined.Household__c);
-        undelete person;
-        Test.stopTest();
-
-        Assert.isTrue(joined.Is_Primary__c, 'The new person is their household primary (R-H2)');
-        Assert.areEqual(personContactId, created, 'Named by their person contact (R-M3)');
-        Assert.isNull(afterDelete, 'Deleting the person empties the field');
-        Assert.areEqual(
-            personContactId,
-            primaryContactOf(joined.Household__c),
-            'Restoring the person restores their membership and the field with it'
-        );
     }
 
     @IsTest
     static void withTwoPrimariesTheFirstInMemberOrderIsMirroredAndTheRowsAreLeftAlone() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
-        insert new List<Contact>{ john, jane };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
 
-        Test.startTest();
-        insert new List<Household_Member__c>{
-            membership(smiths.Id, jane.Id, 'Spouse or Partner', true),
-            membership(smiths.Id, john.Id, 'Head', true)
-        };
-        Test.stopTest();
+            Test.startTest();
+            insert new List<Household_Member__c>{
+                membership(smiths.Id, jane.Id, 'Spouse or Partner', true),
+                membership(smiths.Id, john.Id, 'Head', true)
+            };
+            Test.stopTest();
 
-        Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'Head comes first (R-H5)');
-        Assert.areEqual(
-            2,
-            [SELECT COUNT() FROM Household_Member__c WHERE Is_Primary__c = TRUE],
-            'Which of the two is right is a decision somebody makes, so no row is changed'
-        );
+            Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'Head comes first (R-H5)');
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Household_Member__c WHERE Is_Primary__c = TRUE],
+                'Which of the two is right is a decision somebody makes, so no row is changed'
+            );
+        }
     }
 
     @IsTest
     static void aHandEditOfAHouseholdsPrimaryContactIsRefusedInJunctionMode() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        insert john;
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            insert john;
 
-        Test.startTest();
-        Database.SaveResult result = Database.update(
-            new Account(Id = smiths.Id, Primary_Contact__c = john.Id),
-            false
-        );
-        Test.stopTest();
+            Test.startTest();
+            Database.SaveResult result = Database.update(
+                new Account(Id = smiths.Id, Primary_Contact__c = john.Id),
+                false
+            );
+            Test.stopTest();
 
-        Assert.isFalse(result.isSuccess(), 'Only HouseholdService writes the mirror');
-        Assert.areEqual(
-            Label.Core_Households_PrimaryContactFollowsMembers,
-            result.getErrors()[0].getMessage(),
-            'The refusal says where to make the change instead'
-        );
+            Assert.isFalse(result.isSuccess(), 'Only HouseholdService writes the mirror');
+            Assert.areEqual(
+                Label.Core_Households_PrimaryContactFollowsMembers,
+                result.getErrors()[0].getMessage(),
+                'The refusal says where to make the change instead'
+            );
+        }
     }
 
     @IsTest
     static void anOrganizationsPrimaryContactIsSetByHandInJunctionMode() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account shelter = new Account(Name = 'Riverside Shelter');
-        insert shelter;
-        Contact ada = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Nkosi');
-        insert ada;
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account shelter = new Account(Name = 'Riverside Shelter');
+            insert shelter;
+            Contact ada = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Nkosi');
+            insert ada;
 
-        Test.startTest();
-        update new Account(Id = shelter.Id, Primary_Contact__c = ada.Id);
-        Test.stopTest();
+            Test.startTest();
+            update new Account(Id = shelter.Id, Primary_Contact__c = ada.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            ada.Id,
-            primaryContactOf(shelter.Id),
-            'R-O3: not a mirror on an organization'
-        );
+            Assert.areEqual(
+                ada.Id,
+                primaryContactOf(shelter.Id),
+                'R-O3: not a mirror on an organization'
+            );
+        }
     }
 
     @IsTest
     static void aHouseholdsPrimaryContactIsSetByHandInContactMode() {
-        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-        Account smiths = household('The Smith Family');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        john.AccountId = smiths.Id;
-        insert john;
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account smiths = household('The Smith Family');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            john.AccountId = smiths.Id;
+            insert john;
 
-        Test.startTest();
-        update new Account(Id = smiths.Id, Primary_Contact__c = john.Id);
-        Test.stopTest();
+            Test.startTest();
+            update new Account(Id = smiths.Id, Primary_Contact__c = john.Id);
+            Test.stopTest();
 
-        Assert.areEqual(
-            john.Id,
-            primaryContactOf(smiths.Id),
-            'In contact mode the field is the mark'
-        );
+            Assert.areEqual(
+                john.Id,
+                primaryContactOf(smiths.Id),
+                'In contact mode the field is the mark'
+            );
+        }
     }
 
     @IsTest
     static void aMergeInJunctionModeMirrorsThePrimaryItCarriesAndOffersNoChoiceAboutIt() {
-        HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-        Account survivor = household('The Smith Family');
-        Account other = household('Smith Household');
-        Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-        Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
-        insert new List<Contact>{ john, jane };
-        insert new List<Household_Member__c>{
-            membership(survivor.Id, john.Id, 'Head', false),
-            membership(other.Id, jane.Id, 'Spouse or Partner', true)
-        };
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            Account survivor = household('The Smith Family');
+            Account other = household('Smith Household');
+            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+            Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
+            insert new List<Contact>{ john, jane };
+            insert new List<Household_Member__c>{
+                membership(survivor.Id, john.Id, 'Head', false),
+                membership(other.Id, jane.Id, 'Spouse or Partner', true)
+            };
 
-        Test.startTest();
-        HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(
-            survivor.Id,
-            other.Id
-        );
-        HouseholdMergeService.mergeHouseholds(
-            survivor.Id,
-            other.Id,
-            new HouseholdMergeService.MergeChoices(null)
-        );
-        Test.stopTest();
+            Test.startTest();
+            HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(
+                survivor.Id,
+                other.Id
+            );
+            HouseholdMergeService.mergeHouseholds(
+                survivor.Id,
+                other.Id,
+                new HouseholdMergeService.MergeChoices(null)
+            );
+            Test.stopTest();
 
-        for (HouseholdMergeService.FieldChoice choice : preview.fields) {
-            Assert.areNotEqual(
-                'Primary_Contact__c',
-                choice.fieldName,
-                'The membership rows decide the primary in junction mode'
+            for (HouseholdMergeService.FieldChoice choice : preview.fields) {
+                Assert.areNotEqual(
+                    'Primary_Contact__c',
+                    choice.fieldName,
+                    'The membership rows decide the primary in junction mode'
+                );
+            }
+            Assert.areEqual(
+                jane.Id,
+                primaryContactOf(survivor.Id),
+                'The survivor had no primary, so Jane keeps the flag and the field follows'
             );
         }
-        Assert.areEqual(
-            jane.Id,
-            primaryContactOf(survivor.Id),
-            'The survivor had no primary, so Jane keeps the flag and the field follows'
-        );
     }
 }

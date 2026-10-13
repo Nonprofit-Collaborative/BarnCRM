@@ -6,8 +6,10 @@
 private class GiftControllerTest {
     @TestSetup
     static void makeData() {
-        GivingTestDataFactory.insertDefaultFund();
-        GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+            GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+        }
     }
 
     private static Gift__c insertGift(Decimal amount) {
@@ -19,94 +21,110 @@ private class GiftControllerTest {
 
     @IsTest
     static void theSummaryAddsUpWhatAScreenWouldOtherwiseWorkOut() {
-        Gift__c gift = insertGift(250);
-        GiftService.refund(gift.Id, 100, 'Part back');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c gift = insertGift(250);
+            GiftService.refund(gift.Id, 100, 'Part back');
 
-        Test.startTest();
-        GiftController.GiftSummary summary = GiftController.getGiftSummary(gift.Id);
-        Test.stopTest();
+            Test.startTest();
+            GiftController.GiftSummary summary = GiftController.getGiftSummary(gift.Id);
+            Test.stopTest();
 
-        System.assertEquals(250, summary.allocatedAmount, 'The gift is fully allocated.');
-        System.assertEquals(100, summary.reversedAmount, 'One hundred has gone back.');
-        System.assertEquals(150, summary.remainingAmount, 'One hundred and fifty is left.');
-        System.assertEquals(false, summary.fullyReversed, 'The gift is not fully refunded yet.');
-        System.assertEquals(1, summary.allocations.size(), 'With its one allocation.');
+            System.assertEquals(250, summary.allocatedAmount, 'The gift is fully allocated.');
+            System.assertEquals(100, summary.reversedAmount, 'One hundred has gone back.');
+            System.assertEquals(150, summary.remainingAmount, 'One hundred and fifty is left.');
+            System.assertEquals(
+                false,
+                summary.fullyReversed,
+                'The gift is not fully refunded yet.'
+            );
+            System.assertEquals(1, summary.allocations.size(), 'With its one allocation.');
+        }
     }
 
     @IsTest
     static void theSummaryOfAFullyRefundedGiftSaysSo() {
-        Gift__c gift = insertGift(90);
-        GiftController.refund(gift.Id, 90, 'All back');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c gift = insertGift(90);
+            GiftController.refund(gift.Id, 90, 'All back');
 
-        Test.startTest();
-        GiftController.GiftSummary summary = GiftController.getGiftSummary(gift.Id);
-        Test.stopTest();
+            Test.startTest();
+            GiftController.GiftSummary summary = GiftController.getGiftSummary(gift.Id);
+            Test.stopTest();
 
-        System.assertEquals(true, summary.fullyReversed, 'Nothing is left of this gift.');
+            System.assertEquals(true, summary.fullyReversed, 'Nothing is left of this gift.');
+        }
     }
 
     @IsTest
     static void theWriteOffActionRecordsTheReversal() {
-        Gift__c gift = insertGift(400);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c gift = insertGift(400);
 
-        Test.startTest();
-        Id writeOffId = GiftController.writeOff(gift.Id, 'Never paid');
-        Test.stopTest();
+            Test.startTest();
+            Id writeOffId = GiftController.writeOff(gift.Id, 'Never paid');
+            Test.stopTest();
 
-        System.assertEquals(
-            -400,
-            [SELECT Amount__c FROM Gift__c WHERE Id = :writeOffId].Amount__c,
-            'The write-off reverses what was left.'
-        );
+            System.assertEquals(
+                -400,
+                [SELECT Amount__c FROM Gift__c WHERE Id = :writeOffId].Amount__c,
+                'The write-off reverses what was left.'
+            );
+        }
     }
 
     @IsTest
     static void aBadRequestComesBackAsAMessageAScreenCanShow() {
-        String message = '';
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            String message = '';
 
-        Test.startTest();
-        try {
-            GiftController.refund(null, 10, 'No gift');
-        } catch (AuraHandledException screenError) {
-            message = screenError.getMessage();
+            Test.startTest();
+            try {
+                GiftController.refund(null, 10, 'No gift');
+            } catch (AuraHandledException screenError) {
+                message = screenError.getMessage();
+            }
+            Test.stopTest();
+
+            System.assert(
+                String.isNotBlank(message),
+                'The screen gets a sentence, not a stack trace: ' + message
+            );
         }
-        Test.stopTest();
-
-        System.assert(
-            String.isNotBlank(message),
-            'The screen gets a sentence, not a stack trace: ' + message
-        );
     }
 
     @IsTest
     static void askingForAGiftThatIsNotThereIsHandled() {
-        String message = '';
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            String message = '';
 
-        Test.startTest();
-        try {
-            GiftController.getGiftSummary(null);
-        } catch (AuraHandledException missing) {
-            message = missing.getMessage();
+            Test.startTest();
+            try {
+                GiftController.getGiftSummary(null);
+            } catch (AuraHandledException missing) {
+                message = missing.getMessage();
+            }
+            Test.stopTest();
+
+            System.assert(String.isNotBlank(message), 'A missing gift is reported, not swallowed.');
         }
-        Test.stopTest();
-
-        System.assert(String.isNotBlank(message), 'A missing gift is reported, not swallowed.');
     }
 
     @IsTest
     static void writeOffFailuresAreReportedToTheScreen() {
-        Gift__c gift = insertGift(60);
-        GiftController.writeOff(gift.Id, 'Never paid');
-        String message = '';
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c gift = insertGift(60);
+            GiftController.writeOff(gift.Id, 'Never paid');
+            String message = '';
 
-        Test.startTest();
-        try {
-            GiftController.writeOff(gift.Id, 'Again');
-        } catch (AuraHandledException already) {
-            message = already.getMessage();
+            Test.startTest();
+            try {
+                GiftController.writeOff(gift.Id, 'Again');
+            } catch (AuraHandledException already) {
+                message = already.getMessage();
+            }
+            Test.stopTest();
+
+            System.assert(String.isNotBlank(message), 'The second write-off is refused politely.');
         }
-        Test.stopTest();
-
-        System.assert(String.isNotBlank(message), 'The second write-off is refused politely.');
     }
 }

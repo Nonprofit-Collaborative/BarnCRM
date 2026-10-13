@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_ChangesButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the button that opens a column&apos;s changes</shortDescription>
+        <value>Change values</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesButtonCount</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the changes button when a column has some</shortDescription>
+        <value>Change values ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the heading of a column&apos;s changes</shortDescription>
+        <value>Change values: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what a column&apos;s changes do</shortDescription>
+        <value>Changes run in order, before the values are matched or saved, and are saved with the mapping.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesAdd</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: adds a change to a column</shortDescription>
+        <value>Add a change</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesKind</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the picker for what a change does</shortDescription>
+        <value>Change</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesRemove</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: removes one change</shortDescription>
+        <value>Remove this change</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesDone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: closes a column&apos;s changes</shortDescription>
+        <value>Done</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpTrim</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: remove extra spaces</shortDescription>
+        <value>Remove extra spaces</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpUpper</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: all capitals</shortDescription>
+        <value>All capitals</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpLower</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: all small letters</shortDescription>
+        <value>All lower case</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpProper</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: a capital for each word</shortDescription>
+        <value>Capitalize each word</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpReplace</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: find and replace</shortDescription>
+        <value>Find and replace</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpIfBlank</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: a value when the cell is empty</shortDescription>
+        <value>Value when empty</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpAppend</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: add other columns of the row</shortDescription>
+        <value>Add other columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOpDate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: read the value as a date</shortDescription>
+        <value>Read as a date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesFind</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: the text to find</shortDescription>
+        <value>Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesReplaceWith</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: the text to replace it with</shortDescription>
+        <value>Replace with</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesMatchCapitals</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: find and replace tells capitals apart</shortDescription>
+        <value>Match capitals</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesWholeValue</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: replace only a value that is exactly the text</shortDescription>
+        <value>Whole value only</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesValue</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: the value an empty cell takes</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesColumns</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: the other columns added</shortDescription>
+        <value>Columns to add</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesSeparator</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: what goes between added columns</shortDescription>
+        <value>Separator (a space if empty)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesDateOrder</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: how the file writes its dates</shortDescription>
+        <value>Dates in the file are written</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOrderMDY</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: dates written month first</shortDescription>
+        <value>Month first (12/31/2025)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOrderDMY</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: dates written day first</shortDescription>
+        <value>Day first (31/12/2025)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesOrderYMD</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: dates written year first</shortDescription>
+        <value>Year first (2025-12-31)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesPreviewHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: the before and after of the first rows</shortDescription>
+        <value>The first values, before and after</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesBefore</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard and results: a value before its changes</shortDescription>
+        <value>Before</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangesAfter</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard and results: a value after its changes</shortDescription>
+        <value>After</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ChangedValuesHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: the values a dry run changed</shortDescription>
+        <value>Changed values (first rows)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DuplicateRulesLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: also match with the org&apos;s duplicate rules</shortDescription>
+        <value>Also match with my duplicate rules</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DuplicateRulesHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what matching with duplicate rules risks</shortDescription>
+        <value>People and organizations the rule above does not find are looked for with your org&apos;s duplicate rules. They are looser, so a row can be loaded into somebody only similar: check the ticked rows in the dry run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DuplicateRulesNone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: no duplicate rule is switched on</shortDescription>
+        <value>No duplicate rule is switched on for these records, so this changes nothing for them. The Duplicates page of the admin guide says how to switch one on.</value>
+    </labels>
+</CustomLabels>

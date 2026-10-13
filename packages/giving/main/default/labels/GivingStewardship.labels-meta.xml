@@ -169,22 +169,6 @@
     <value>Plan name</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_FieldKey</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: field, the plan key</shortDescription>
-    <value>Plan key</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_FieldKeyHelp</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: help, what the plan key is for</shortDescription>
-    <value>A short unchanging code, for example first_gift_welcome. It is how BarnCRM recognizes this plan across upgrades even after you rename it.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_FieldEvent</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -365,8 +349,8 @@
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Stewardship: a plan needs a name and a key</shortDescription>
-    <value>A plan needs a name and a plan key before it can be saved.</value>
+    <shortDescription>Stewardship: a plan needs a name</shortDescription>
+    <value>A plan needs a name before it can be saved.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ErrorSubjectRequired</fullName>
@@ -382,6 +366,22 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the page could not do what was asked</shortDescription>
-    <value>BarnCRM could not do that. The details are in the Error Log.</value>
+    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_Selected</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Stewardship: screen reader text on the plan being edited</shortDescription>
+    <value>Selected</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_ColumnActions</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Stewardship: screen reader name of the buttons column</shortDescription>
+    <value>Actions</value>
   </labels>
 </CustomLabels>

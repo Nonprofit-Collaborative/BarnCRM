@@ -15,13 +15,16 @@ Read the product plan before any work. Its canonical copy is the BMemory documen
 - Canonical model (`docs/architecture/canonical-model.md`) is updated before any object or field is added.
 - A new ADR written on a branch uses `ADR-NEXT`, never a chosen number: file `NEXT-title.md`, heading `# ADR-NEXT`, and every citation the same. The integrator assigns the number at merge. Picking a number on a branch collides when branches run in parallel, and renumbering afterwards is what rewrites correct citations in files that mention several ADRs.
 - Admin-guide page (`docs/admin-guide/`) is written before the LWC.
+- Feature catalog (`docs/barncrm-features.md`) is updated in the same PR as any feature added, changed, or removed.
 - Definition of done: plan Section 7.4. Review checklist: Section 9.4.
 
 ## Project docs
-The four standard project docs map to existing files (mapping recorded so they are not duplicated):
-- `architecture.md` = `docs/architecture/` (canonical model, ADRs) and `docs/contributor-guide/environment.md`
-- `roadmap.md` = `docs/product-plan.md` Section 6 (roadmap by iteration)
-- `changelog.md` = `docs/release-notes/`
-- `memory.md` = `docs/architecture/decisions/` (ADRs) and `docs/product-plan.md` Section 11 (open questions, parking lot)
+The four project docs live at the repo root:
+- `architecture.md`: durable reference facts (repo rules, orgs by alias, credentials by name, package layout, gotchas). Updated in the same session a durable fact changes; points to `docs/architecture/` and `docs/contributor-guide/` for detail.
+- `roadmap.md`: planned work with status. Mirrors BMemory plan Section 6.
+- `changelog.md`: dated, newest-first log of every change, including each Claude change (merge, deploy, org change, BMemory edit, branch built), logged in the same session. Iteration reports stay in `docs/release-notes/`.
+- `memory.md`: decisions, open questions and owner working agreements. Mirrors BMemory plan Sections 11 and 12; architecture decisions stay in ADRs.
 
-Onboarding complete 2026-09-06.
+`roadmap.md` and `memory.md` are refreshed from the BMemory plan whenever it changes (BMemory first, then these and `docs/product-plan.md`). Feature branches do not edit the root docs (they conflict); agents list entries in their reports and the integrator writes them.
+
+Onboarding complete 2026-09-06. Root project docs added 2026-10-12.

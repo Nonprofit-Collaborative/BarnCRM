@@ -257,7 +257,15 @@ names is deleted.
 **R-H12 Reparenting and empty households.** Moving a contact to a different household
 recalculates both households' member counts and, once Giving is installed, their giving
 rollups. The vacated household is deleted when it is empty, `Delete_Empty_Households__c`
-is on, and nothing outside BarnCRM depends on the account (ADR-0036). "Empty" is
+is on, nothing outside BarnCRM depends on the account (ADR-0036), and no installed module
+still credits records to it (ADR-0070,
+`0070-empty-household-tidy-up-keeps-households-with-gifts.md`). A module reports its
+credited records through the Core extension point `HouseholdDependentsExtension`, found by
+class name the way Health Check finds its extensions; Giving reports every household that
+a Gift or a Commitment names in its Household field, because those lookups clear on delete
+and a gift keeps the household it was given to (R-G2). Such a household is kept without an
+Error Log entry: keeping a donor's past household is the ordinary outcome of a move, not
+something an administrator has to act on. "Empty" is
 measured in BarnCRM's own membership, which is the only membership BarnCRM can
 see, so a household that also carries a Salesforce Nonprofit Cloud household group or its
 membership rows reads as empty here while being anything but. The account is the master of
@@ -751,6 +759,7 @@ what. Required by the C-03 acceptance criterion that every settings change is lo
 | New Value | long text | no | The value after the change, blank when the setting was cleared. |
 | Changed By | reference(User) | yes | The user who made the change. |
 | Changed At | datetime | yes | When the change was saved. |
+| Deployment Id | text (18) | no | For a change made through the custom metadata manager, the metadata deployment that applied it; blank for every other change. The manager reads it to tell the page the save finished (R-S6). |
 
 ### Rules
 
@@ -767,13 +776,19 @@ was written with.
 not only as text. A Datetime handed in as a Datetime is stored as it is: `String.valueOf`
 of a Datetime is not the ISO 8601 form the service parses back, so a round trip through
 text would refuse the package's own writes.
+**R-S6** A custom metadata record changed through the custom metadata manager is audited
+once the deployment succeeds, not when it is requested: the deployment's callback writes
+one Setting Change with Setting Name `<Type>.<DeveloperName>`, the old and new values as
+JSON, Changed By set to the user who saved, and Deployment Id set. A failed deployment
+writes no Setting Change; it writes an Error Log entry whose Record Reference is the
+deployment Id.
 
 ### Salesforce implementation
 
 - **Object:** `Setting_Change__c` with `Setting_Name__c`, `Old_Value__c`, `New_Value__c`
-  (Long Text Area), `Changed_By__c` (Lookup to User), `Changed_At__c` (DateTime). The
-  record name is the auto number `SC-{000000}`.
-- **Service:** `SettingsService`.
+  (Long Text Area), `Changed_By__c` (Lookup to User), `Changed_At__c` (DateTime),
+  `Deployment_Id__c` (Text 18). The record name is the auto number `SC-{000000}`.
+- **Service:** `SettingsService`; `CustomMetadataDeployCallback` for R-S6.
 
 ---
 
@@ -827,7 +842,7 @@ assistant that wrote them (they are Giving keys from v0.6, Section 21A).
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Fiscal_Year_Start_Month__c` | picklist(1 to 12) | 1 | The month the organization's fiscal year begins, used by every fiscal-year-aware rollup window (R-R3). |
-| `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. |
+| `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Import_Chunk_Size__c` | integer | 200 | How many rows an import processes per chunk; lower it on an org with heavy custom automation. |
 
 Custom settings do not support a long text attribute, so each step list holds a comma
@@ -884,6 +899,38 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
 
+### v0.7 keys
+
+Added by Find (C-34, Section 29D), bulk update (C-35, Section 29E) and bulk delete (C-37,
+Section 29E, R-BD2). Shown in the console's Import section.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
+| `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
+| `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
+
+### v0.8 keys
+
+Added by the suite choice (C-30) and the Module Manager (C-24).
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). |
+| `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
+
+### Field utilization keys
+
+Added by field utilization (plan Section 6.1 item 10, Section 29F, ADR-0086
+`0086-field-utilization-ships-in-core.md`). The weekly count is switched on and off by
+scheduling its job from the console (ADR-0038), so it has no on and off key.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Field_Utilization_Objects__c` | text (255) | empty | The API names of the objects the field utilization count covers, separated by commas, each checked against describe when saved and again when counted. Empty counts nothing. Written from the Field Utilization page only, with Manage BarnCRM Settings, and audited. |
+| `Field_Utilization_Last_Run__c` | datetime | empty | When the last field utilization count finished. Written by the job. |
+| `Field_Utilization_Last_Run_Summary__c` | text (255) | empty | What the last count did, in one sentence: fields and objects counted, fields that could not be counted, objects skipped as too large. Written by the job. |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -914,6 +961,52 @@ definition.
 
 ---
 
+## 12A. What's New Seen
+
+### Definition
+
+For one person, the newest release whose notes they have dismissed from the What's new card on
+the BarnCRM home page (C-27). It exists so that each person sees each release's notes once. It
+holds no setting anybody chooses: it is written only by that person's Dismiss.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Person | reference(User) | yes | The person this record belongs to. One record per person at most. |
+| Last Seen Version | text (20) | no | The release version, as dot separated numbers such as 0.12, that was current when this person last dismissed the card. |
+
+### Rules
+
+**R-WN1 Per person only.** A record belongs to one person. No organization-wide or profile
+value exists, and none is read: a person with no record has never dismissed the card.
+**R-WN2 What is shown.** The current version is the highest version among the shipped Release
+Note records (Section 13). A person with no record sees the notes of the current version only.
+A person with a record sees every note whose version is higher than their Last Seen Version,
+newest version first. A person whose Last Seen Version is the current one or higher sees
+nothing.
+**R-WN3 Versions compare as numbers.** Versions are compared part by part as whole numbers, so
+0.12 is newer than 0.9, and a missing part counts as zero, so 0.12 and 0.12.0 are the same
+release. A version that is not dot separated whole numbers is ignored: a note carrying one is
+never shown, and a stored Last Seen Version carrying one reads as no record.
+**R-WN4 Dismiss.** Dismissing stores the current version as the person's Last Seen Version.
+With no notes shipped, Dismiss stores nothing.
+
+### Salesforce implementation
+
+- **Custom setting:** `Whats_New_Seen__c`, hierarchy, protected, with user-level records only
+  (`SetupOwnerId` is the person). Not a key on `BarnCRM_Settings__c`, because a user-level
+  record of that setting would hide the organization's values from that person (ADR-0087,
+  `0087-whats-new-from-packaged-release-notes.md`).
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Last Seen Version | `Last_Seen_Version__c` | Text(20) | Written in system mode by `WhatsNewSeenWriter` (ADR-0021), for the running user only. |
+
+- **Service:** `WhatsNewController`, with the LWC `whatsNew` on the BarnCRM home page.
+
+---
+
 ## 13. Shipped defaults (custom metadata)
 
 Package-shipped defaults are read-only to admins and are materialized into the
@@ -935,8 +1028,9 @@ settings to the console by shipping rows rather than by editing the console.
 | `Settings_Object__c` | text (80), default `BarnCRM_Settings__c` | The protected hierarchy custom setting this row reads and writes, so a module can ship rows against its own settings object (Decision ADR-0017). Every row states it explicitly, because a default is not re-applied when a record is redeployed or upgraded; `check-setting-object-explicit.py` enforces it. |
 | `Section__c` | text (80) | The left navigation group this row belongs to, for example Households, Automation, Access, Health. |
 | `Module__c` | text (40) | The package that ships this row, for example Core or Giving. |
-| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Component) | How the console renders and validates this row. |
+| `Data_Type__c` | picklist(Checkbox, Text, Number, Picklist, DateTime, Record, RecordTypeList, Component) | How the console renders and validates this row. Record is a record picker storing one record Id; RecordTypeList is a checkbox list of the active record types of an object, storing their developer names separated by commas (ADR-0074, settings console pickers). |
 | `Picklist_Values__c` | long text | The choices for a picklist row, as semicolon separated `value:label` pairs. |
+| `Record_Object__c` | text (80) | The object a Record row picks from, or whose record types a RecordTypeList row lists, by API name without a namespace prefix. Blank for every other data type. |
 | `Component__c` | text (80) | The Lightning web component rendered when the data type is Component. Core components only: the console imports them by name at compile time (Decision ADR-0020). |
 | `Navigation_Target__c` | text (80) | The Lightning tab a module's own settings page lives on, used when the data type is Component and no component is named, because Core cannot import a component from a package that depends on it (Decision ADR-0020). |
 | `Description__c` | long text | The plain-language help shown under the control. |
@@ -953,12 +1047,13 @@ Automation Setting records (Section 10) on install and on upgrade.
 |---|---|---|
 | DeveloperName | text | The stable identifier of the automation, matched to Automation Setting. |
 | Label | text | The automation's name as the admin sees it. |
-| Description__c | long text | What the automation does, in nonprofit language. |
-| Enabled_By_Default__c | boolean | Whether the automation is on when it is first materialized. |
+| `Description__c` | long text | What the automation does, in nonprofit language. |
+| `Enabled_By_Default__c` | boolean | Whether the automation is on when it is first materialized. |
 | `Always_Runs__c` | boolean, default false | Whether this automation enforces a rule rather than providing a convenience, so it cannot be switched off from the console or suppressed by a pause (ADR-0024). Copied to `Automation_Setting__c.Always_Runs__c` when the record is materialized. |
-| Handler_Class__c | text | The Apex handler the trigger dispatcher invokes. |
-| Object_Name__c | text | The object whose trigger this automation runs on. |
-| Execution_Order__c | integer | The order in which handlers run for that object. |
+| `Handler_Class__c` | text | The Apex handler the trigger dispatcher invokes. |
+| `Object_Name__c` | text | The object whose trigger this automation runs on. |
+| `Execution_Order__c` | integer | The order in which handlers run for that object. |
+| `Module__c` | text (40) | The module that ships this automation, for example Giving or Connect; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized
@@ -973,27 +1068,27 @@ materialized into `Rollup_Definition__c` records (Section 14) on install and on 
 defaults", matched by Definition Key. Both Core and Giving ship rows; the metadata type
 itself belongs to Core.
 
-| Field | Type | Definition |
-|---|---|---|
-| DeveloperName | text | The stable identifier of the shipped definition. |
-| Label | text | The rollup's name as the admin sees it. |
-| Description | long text | What this number means, in nonprofit language. |
-| Definition Key | text | The key written to the materialized record and matched on upgrade. |
-| Source Object | text | The entity whose records are aggregated. |
-| Target Object | text | The entity that carries the number. |
-| Relationship Path | text | The path from source to target, in the notation in R-R1. |
-| Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG) | The calculation applied. |
-| Source Field | text | The attribute aggregated, empty for COUNT. |
-| Order By Field | text | The attribute that decides first and last. |
-| Target Field | text | The attribute that receives the result. |
-| Filter JSON | long text | The source filter document (R-R2). |
-| Target Filter JSON | long text | The target filter document (R-R8). |
-| Fiscal Year Aware | boolean | Whether the calculation is limited to a fiscal year window. |
-| Fiscal Year Offset | integer | Which window: 0, -1, or -2. |
-| Fiscal Date Field | text | The date attribute the window is measured on, written to the materialized definition. |
-| Mode | picklist(Real-time, Scheduled, Both) | The mode the materialized definition starts in. |
-| Default Active | boolean | Whether the definition is active when it is first materialized. |
-| Package | text | The package that ships this row, so Giving's rows are materialized only when Giving is installed. |
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the shipped definition. |
+| Label | `MasterLabel` | text | The rollup's name as the admin sees it. |
+| Description | `Description__c` | long text | What this number means, in nonprofit language. |
+| Definition Key | `Definition_Key__c` | text | The key written to the materialized record and matched on upgrade. |
+| Source Object | `Source_Object__c` | text | The entity whose records are aggregated. |
+| Target Object | `Target_Object__c` | text | The entity that carries the number. |
+| Relationship Path | `Relationship_Path__c` | text | The path from source to target, in the notation in R-R1. |
+| Aggregate | `Aggregate__c` | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG) | The calculation applied. |
+| Source Field | `Source_Field__c` | text | The attribute aggregated, empty for COUNT. |
+| Order By Field | `Order_By_Field__c` | text | The attribute that decides first and last. |
+| Target Field | `Target_Field__c` | text | The attribute that receives the result. |
+| Filter JSON | `Filter_JSON__c` | long text | The source filter document (R-R2). |
+| Target Filter JSON | `Target_Filter_JSON__c` | long text | The target filter document (R-R8). |
+| Fiscal Year Aware | `Fiscal_Year_Aware__c` | boolean | Whether the calculation is limited to a fiscal year window. |
+| Fiscal Year Offset | `Fiscal_Year_Offset__c` | integer | Which window: 0, -1, or -2. |
+| Fiscal Date Field | `Fiscal_Date_Field__c` | text | The date attribute the window is measured on, written to the materialized definition. |
+| Mode | `Mode__c` | picklist(Real-time, Scheduled, Both) | The mode the materialized definition starts in. |
+| Default Active | `Default_Active__c` | boolean | Whether the definition is active when it is first materialized. |
+| Package | `Package__c` | text | The package that ships this row, so Giving's rows are materialized only when Giving is installed. |
 
 ### Import Template Default
 
@@ -1001,17 +1096,17 @@ itself belongs to Core.
 materialized into `Import_Template__c` records (Section 15) the same way. Its fields
 mirror the template's own attributes.
 
-| Field | Type | Definition |
-|---|---|---|
-| DeveloperName | text | The stable identifier of the shipped template. |
-| Label | text | The template's name as the admin sees it. |
-| Description | long text | What kind of file this template reads. |
-| Template Key | text | The key written to the materialized record and matched on upgrade. |
-| Column Mapping JSON | long text | The mapping document (R-IT1). |
-| Default Values JSON | long text | The defaults document (R-IT1). |
-| Matching Rule | picklist(Email exact, Name plus postal code, External ID) | The matching rule the template starts with. |
-| Person Mode | picklist(Contacts, Person Accounts) | Whether the template creates Contacts or person Accounts, overridden from the detected org shape on materialization. |
-| Default Active | boolean | Whether the template is offered when it is first materialized. |
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the shipped template. |
+| Label | `MasterLabel` | text | The template's name as the admin sees it. |
+| Description | `Description__c` | long text | What kind of file this template reads. |
+| Template Key | `Template_Key__c` | text | The key written to the materialized record and matched on upgrade. |
+| Column Mapping JSON | `Column_Mapping_JSON__c` | long text | The mapping document (R-IT1). |
+| Default Values JSON | `Default_Values_JSON__c` | long text | The defaults document (R-IT1). |
+| Matching Rule | `Matching_Rule__c` | picklist(Email exact, Name plus postal code, External ID) | The matching rule the template starts with. |
+| Person Mode | `Person_Mode__c` | picklist(Contacts, Person Accounts) | Whether the template creates Contacts or person Accounts, overridden from the detected org shape on materialization. |
+| Default Active | `Default_Active__c` | boolean | Whether the template is offered when it is first materialized. |
 
 ### Relationship Type
 
@@ -1026,18 +1121,52 @@ read by the relationship service when it maintains the other side of a connectio
 | Type | `Type__c` | text | The type as it appears in the Type picklist. |
 | Reciprocal Type | `Reciprocal_Type__c` | text | The type the other side takes, for example Child for Parent. |
 | Is Gendered | `Is_Gendered__c` | boolean | Whether the reciprocal depends on a person's gender; false on every shipped row, and the package ships no gendered mapping. |
-| Active | `Active__c` | boolean | Whether this mapping is applied. |
+| Active | `Active__c` | boolean | Whether this mapping is applied. Clearing it is how an administrator archives a row they added (R-D2). |
 | Description | `Description__c` | long text | What this relationship means, in nonprofit language. |
+| Is Shipped | `Is_Shipped__c` | boolean, default false | True on every row the package ships; false on a row an administrator added through the custom metadata manager. A shipped row is read only in the app (R-D2). |
 
 The API names are given here, as they are for Automation Registry above, because the
 shipped records name fields and a record that names a field its type does not define
 refuses the whole deployment.
 
-### Rule
+Relationship Type is the one shipped list that also holds the organization's own rows,
+because the relationship service reads it directly rather than through a materialized
+copy. Administrators add, edit and archive their rows from the Custom metadata page in
+BarnCRM Settings (ADR-0085, `0085-custom-metadata-manager-edits-only-types-read-directly.md`).
+
+### Release Note
+
+`Release_Note__mdt` (C-27): the notes the What's new card on the BarnCRM home page shows after
+an upgrade, one record per note. Unlike the types above it is never materialized into records:
+it is read as shipped (R-WN2, Section 12A). The type belongs to Core, and any package that
+depends on Core may ship its own records; Core never names them.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the note. |
+| Label | `MasterLabel` | text | The note's name in Setup; not shown on the card. |
+| Version | `Version__c` | text (20) | The product release this note describes, as dot separated numbers such as 0.12. One numbering for every package, because a release ships them together. |
+| Headline | `Headline__c` | text (255) | The note in one line, shown in bold. |
+| Details | `Details__c` | long text | Optional. Plain text, one point per line; each line is shown as one item under the headline. |
+| Sort Order | `Sort_Order__c` | number | Optional. The order of this note within its version, lowest first; a note without one comes last. |
+| Module | `Module__c` | text (40) | Optional. The package the note describes, for example Giving, shown beside the headline. |
+
+### Rules
 
 **R-D1** These lists are the **starting inventory** for the iterations covered here and
 each feature pull request may extend them. Any new custom metadata field is added to the
 tables above before the metadata file is created.
+**R-D2** The custom metadata manager edits only the types registered in
+`CustomMetadataManagerService` as admin-editable; today that is Relationship Type alone.
+For a registered type: a row with `Is_Shipped__c` true is never changed by the manager;
+a row the manager creates has `Is_Shipped__c` false, is not protected, and has a
+DeveloperName starting `Org_`, a prefix no shipped row uses, so a later package version
+can never ship a row with the same name; archiving clears the type's active field and
+restoring sets it, since the Apex Metadata API cannot delete a record. Types materialized
+into custom object records (Rollup Definition Default, Import Template Default, Receipt
+Template Default) and types that describe packaged code or pages (Automation Registry,
+Setting Definition) are not registered: the admin edits the materialized records instead,
+and a row they added to the code catalogs would point at nothing.
 
 ---
 
@@ -1061,8 +1190,10 @@ step writes `Default_Fund__c` and `Default_Appeal__c` in the same place.
 One calculated number: which records are counted, how they reach the record that shows
 the number, what is aggregated, and when it is recalculated. This is the whole
 configuration surface of the rollup engine (plan Section 4.10, feature C-13). An
-administrator creates and edits these in the settings console with a filter builder, and
-never types SOQL (plan Section 2.3).
+administrator creates and edits these with a filter builder, and never types SOQL (plan
+Section 2.3), in the Rollup Builder, a tab of its own where every rollup, shipped or
+admin-made, is created and edited (`decisions/0082-barncrm-owns-its-rollup-engine.md`). The
+Rollups page of the settings console lists them with the same switches and links to it.
 
 ### Attributes
 
@@ -1074,16 +1205,17 @@ never types SOQL (plan Section 2.3).
 | Source Entity | text | yes | The entity whose records are aggregated, for example Gift. |
 | Target Entity | text | yes | The entity that carries the calculated number, for example Household. |
 | Relationship Path | text | yes | How a source record reaches its target, written in the path notation below; supports the household membership abstraction. |
-| Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG) | yes | The calculation applied to the matching source records. |
-| Source Attribute | text | conditional | The attribute aggregated; required for every aggregate except COUNT. |
-| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST. |
-| Target Attribute | text | yes | The attribute on the target entity that receives the result. |
+| Aggregate | picklist(SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT) | yes | The calculation applied to the matching source records (R-R15). |
+| Source Attribute | text | conditional | The attribute aggregated; required for every aggregate except COUNT, ANY and NONE. |
+| Order By Attribute | text | conditional | The attribute that decides which record is first or last; required for FIRST and LAST. For a text list, optional: the order the values are listed in. |
+| Delimiter | picklist(Comma, Semicolon, New line) | no (defaults Comma) | What separates the values of a text list (R-R15); read only by TEXT_LIST and TEXT_LIST_DISTINCT. |
+| Target Attribute | text | yes | The attribute on the target entity that receives the result; its type must suit the aggregate (R-R15). |
 | Filter | long text | no | Which source records count, held as a filter document (see R-R2); empty means all of them. |
 | Target Filter | long text | no | Which target records this definition maintains, held in the same filter format; empty means all of them. |
 | Fiscal Year Aware | boolean | yes (defaults false) | Whether the calculation is limited to one fiscal year window. |
 | Fiscal Year Offset | integer | conditional | Which window: 0 this fiscal year, -1 last, -2 two years ago; required when Fiscal Year Aware is true. |
 | Fiscal Date Attribute | text | conditional | The date attribute the window is measured on, for example the gift date; required when Fiscal Year Aware is true and the attribute being aggregated is not itself the date. |
-| Mode | picklist(Real-time, Scheduled, Both) | yes | When the number is recalculated; defaults from the org's rollup mode default. |
+| Mode | picklist(Real-time, Scheduled, Both) | yes | When the number is recalculated (R-R4); defaults from the org's rollup mode default. Shown to the admin as Instantly, Every night and Both (recommended). |
 | Last Calculated | datetime | computed | When this definition last completed a calculation, of any scope. |
 | Is Package Default | boolean | yes (defaults false) | Marks a definition materialized from a shipped default rather than created by the admin. |
 | Active | boolean | yes (defaults true) | Whether the engine runs this definition; turning it off never deletes the values already calculated. |
@@ -1142,6 +1274,36 @@ Operators: equals, not equals, less than, less or equal, greater than, greater o
 contains, does not contain, starts with, is null, is not null, in, not in. The `logic`
 key is optional and defaults to every condition joined by AND.
 
+*Extensions added with Find (C-34), still version 1.* Every addition is new syntax a
+version 1 reader refuses rather than misreads, so the version number does not change.
+
+- **Relative dates.** Three more operators, for date and date/time fields only: `this
+  year` and `last year` (no value; calendar years in the running user's time zone) and
+  `last n days` (value: a whole number from 1 to 3650; today and the n days before it).
+  They render as the platform's date literals (`THIS_YEAR`, `LAST_YEAR`,
+  `LAST_N_DAYS:n`), never as typed text: the number is read as an integer and written
+  back from that integer.
+- **Parent fields.** `field` may be a path through lookups, written with relationship
+  names (`Household__r.Name`), at most two lookups deep. Each segment is checked against
+  the running user's describe of the object it is on.
+- **Typed values.** The filter builder writes a number as a JSON number, a checkbox as
+  `true` or `false`, a date as `YYYY-MM-DD`, a date/time as `YYYY-MM-DDThh:mm:ssZ`, and
+  `in` and `not in` as a list. A reader that knows the object coerces each value to the
+  field's type and refuses one that does not fit.
+- **Operators by field type.** The builder offers only what suits the field: text, email,
+  phone and URL get equals, not equals, contains, does not contain, starts with, in, not
+  in and the two null tests; picklists get equals, not equals, in, not in and the null
+  tests; numbers, currency and percent get the six comparisons and the null tests; dates
+  and date/times get those plus the three relative operators; checkboxes get equals only;
+  lookups and Ids get equals, not equals, in, not in and the null tests. Fields the
+  platform cannot filter on (long text, compound address and location fields) are not
+  offered.
+
+The filter builder (`filterBuilder`, one Core component) is the only writer of the
+document, for both the Rollups page and Find, and it reads field lists from the running
+user's describe through `QueryFieldCatalog`, so it never offers a field the user cannot
+see.
+
 *Why a document and not child rows.* Nothing the plan requires breaks without child rows.
 A filter is never managed as a list in its own right: it is built, saved, and shipped as
 part of one definition, so child rows would add parent-child DML ordering, orphan
@@ -1162,10 +1324,26 @@ attribute being aggregated is used.
 Windows are never stored on the definition, so changing the fiscal year start month and
 recalculating is enough to correct every fiscal rollup in the org.
 
-**R-R4 Modes.** Real-time recalculates in the transaction that changed a source record.
-Scheduled recalculates in the nightly batch. Both does the first and reconciles with the
-second, and it is the mode the packaged giving definitions ship with, because it is the
-combination that keeps the numbers visibly right (Principle 2).
+**R-R4 Modes.** Real-time (shown as Instantly) keeps the number current as source records
+change: a normal save updates the totals in the same save, and a bulk change (an import, a
+data loader run, a large update, or any save that is already running in the background) is
+queued (Section 14A) and finishes within minutes. Scheduled (shown as Every night)
+recalculates in the nightly full run. Both (shown as Both (recommended)) does the first and
+reconciles with the second, so the nightly run is the safety net for anything the first
+missed; it is the mode the packaged giving definitions ship with, because it is the
+combination that keeps the numbers visibly right (Principle 2). Real-time needs a trigger on
+the source entity (R-R12); where there is none, the definition is recalculated only by the
+nightly run and on demand. The stored values are unchanged; only what the admin reads is.
+
+One exception to "in the same save": a merge (of people, Section 29A, or of households,
+R-H13).
+The platform refuses a trigger's write to a record while it is in a merge, so the
+survivors' real-time totals are recalculated just after the merge is saved, by a small
+queued job (`SurvivorRecalculation` in `RollupService`) that runs only the real-time
+definitions targeting the merged entity. When there are more than 50 survivors, or the save
+cannot queue another job, the survivors go to the Rollup Queue (Section 14A) instead, and a
+survivor the platform still refuses in the job is queued to be tried again
+(ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`).
 
 **R-R5 Freshness.** Last Calculated on the definition answers "when was this number last
 calculated" for the admin looking at the rollup list. The record page answer comes from
@@ -1187,7 +1365,12 @@ direction forbids (ADR-0014).
 the same Target Entity only when their Target Filters make their target record sets
 disjoint. This is what lets one total giving attribute on Account serve households
 through one definition and organizations and person Accounts through another. The
-settings console refuses a save that would overlap.
+Rollup Builder refuses a save of an active definition that would overlap another active one on
+the same attribute: when either has no Target Filter, when the two Target Filters are the same
+document, or when a record in the org meets both (one query per such pair, as the saving user).
+Disjointness by construction cannot be decided from two arbitrary filters, so two filters no
+current record meets together are allowed; the engine then writes each record from the
+definition whose filter admits it.
 
 **R-R9 Idempotency and negative amounts.** Recalculating any set of records produces the
 same result as calculating it the first time, and every aggregate is correct in the
@@ -1200,7 +1383,105 @@ packaged defaults of Section 26.
 **R-R10 Validation on save.** The target attribute must exist and be writable, the
 aggregate must suit the source attribute type, and FIRST and LAST must have an Order By
 Attribute. A definition that fails validation is not saved, and the message names the
-problem in plain language.
+problem in plain language. The checks sit in two places:
+
+- **Every save** (the "Check rollups before saving" automation) refuses a target attribute
+  whose type does not suit the aggregate (R-R15) and a COUNT_DISTINCT or text list with no
+  Source Attribute. It leaves an entity or attribute the org does not have to the planner, so
+  a definition for a module that is not installed can still be saved.
+- **The Rollup Builder's save** (`RollupBuilderController`) also refuses: a blank name; a
+  target entity or attribute the org does not have, or cannot write; a source entity the org
+  does not have, or a path whose first segment on any alternative is not a reference
+  attribute of the source; a Source Attribute the source does not have; SUM and AVG of
+  anything but a number, currency or percent, and MIN and MAX of anything but those or a
+  date; FIRST and LAST with no Order By Attribute; a fiscal window whose offset is not 0, -1 or
+  -2 or whose date attribute is not a date; a filter document that cannot be read or names an
+  attribute the entity does not have; and an overlap under R-R8.
+
+A definition written another way (an import, the API) that fails a Builder check is left out of
+the run by the planner, which records why in the Error Log.
+
+**R-R11 Recompute, and what marks a target.** Every calculation, instant, queued, nightly
+or on demand, recomputes each affected target record from all its source records; nothing
+is added to or subtracted from a stored total, which is what makes R-R9 hold when two
+calculations overlap. A source change marks a target record for recalculation when it
+touches an attribute a definition reads: the source, order-by and fiscal date attributes,
+the path attributes, any attribute named in the filter, and attributes read through a
+relationship (for example a gift's status, which the fund totals read from Gift Allocation
+as `Gift__r.Status__c`). A changed path marks both the old and the new target; a delete
+marks the old target, including when a parent record is deleted and its source records go
+with it, which fires no trigger on them (deleting a gift removes its allocations, so the
+gift's delete marks their funds); an undelete marks the target again. A person who changes
+household marks both households, in both membership modes. All active definitions on one
+target entity are calculated together, one write per target record, and a value that did
+not change is not written.
+
+**R-R12 Where real time comes from.** Each package ships the trigger registration for its
+own source entities (Automation Registry, Section 13). An administrator's own entity has no
+packaged trigger, so real time on it comes from one of two places: a trigger the Rollup
+Builder generates and deploys for the administrator (one line that hands the changed
+records to the engine, plus its test, named from the entity so the same code is produced in
+every org), or a record-triggered Flow built from the shipped template. Editing a rollup
+never regenerates the trigger, because the rollup's settings live only in the definition.
+When the last active definition on that entity is removed, the Builder offers to remove the
+generated trigger, and Health Check reports a generated trigger that no active definition
+uses. A generated trigger is switched off like any other automation, through an Automation
+Setting row (Section 10) the Builder creates with Is Package Default false.
+
+**R-R13 Freshness stamps are written when the work is done.** A calculation writes
+`Rollups_Last_Calculated__c` on a target record in the same write as its totals (Section
+26), and a definition's Last Calculated is set when the run that covers it has finished,
+not when it was queued (R-R5). Because unchanged values are not written (R-R11), a record
+whose totals a run confirmed without changing keeps its earlier stamp; the definition's Last
+Calculated is what says the run happened. Stamping every record on every run would rewrite
+every target record every night, which is the load the changed-only rule removes.
+
+**R-R14 One full run at a time, and nothing lost when a chunk stops.** A full recalculation
+(the nightly run, Recalculate, Recalculate all) does not start while another is running: the
+second start is refused, names the running job, and tells the admin to try again when it
+finishes. A chunk of a full run that the platform stops with an error the run cannot catch
+(a governor limit) has its target records written to the Rollup Queue (Section 14A), so they
+are recalculated within minutes rather than at the next night.
+
+**R-R15 Aggregates and the target types they fill.** Each aggregate fills only the target
+types below; any other pairing is refused on save (R-R10) and by the planner.
+
+| Aggregate | What it answers | Target attribute types |
+|---|---|---|
+| SUM, AVG, MIN, MAX | The total, the average, the smallest and the largest value of the Source Attribute. | number, currency, percent, date, datetime |
+| COUNT | How many records match. | number, currency, percent, date, datetime (as before; a number is what makes sense) |
+| FIRST, LAST | The Source Attribute of the record with the lowest (FIRST) or highest (LAST) Order By Attribute. | number, currency, percent, date, datetime, text, long text |
+| COUNT_DISTINCT | How many different values the Source Attribute holds among the matching records. | number |
+| ANY | True when at least one record matches, false when none does. | checkbox |
+| NONE | True when no record matches, false when at least one does. | checkbox |
+| TEXT_LIST | The Source Attribute of every matching record, joined by the Delimiter. | text, long text |
+| TEXT_LIST_DISTINCT | The same, with each value listed once. | text, long text |
+
+- **Blanks.** A blank Source Attribute is never counted by COUNT_DISTINCT and never listed by
+  a text list. FIRST and LAST take the first record's value even when it is blank; a filter
+  condition "is not null" on the Source Attribute skips such records. ANY and NONE read no
+  Source Attribute: the filter says which records count, so "any gift over 1,000" is ANY with
+  the filter `Amount__c greater than 1000`.
+- **Ties.** When two records have the same Order By Attribute, FIRST and LAST take the one
+  with the lower record Id, so the answer is the same on every run (R-R9).
+- **Order of a text list.** By the Order By Attribute when there is one, ascending, records
+  with a blank one last; otherwise alphabetically by value, ignoring case. Ties go to the lower
+  record Id. TEXT_LIST_DISTINCT keeps the first occurrence of each value, compared exactly
+  (letter case counts), and so does COUNT_DISTINCT.
+- **Delimiter.** Comma joins with a comma and a space, Semicolon with a semicolon and a space,
+  New line with a line break. A value that contains the delimiter is written as it is, not
+  escaped, so a list of names that contain commas reads best with Semicolon or New line.
+- **Values into text.** A number, date or checkbox copied into text by FIRST, LAST or a text
+  list is written as its plain value (`1250.00`, `2026-03-01`, `true`; a datetime in UTC as
+  `2026-03-01 14:05`), not converted between currencies.
+- **Cut at the field length.** A text result longer than the target attribute holds is cut at
+  the attribute's length, so the save never fails on it and the same value is written on every
+  run.
+- **Exact under recompute.** Every aggregate here is recomputed from all the source records of
+  each marked target (R-R11), so an instant, queued, nightly or on-demand calculation gives the
+  same answer; none of them needs a fallback to a full recalculation. COUNT_DISTINCT and the
+  text lists read the matching rows rather than a grouped answer, so a value found on the
+  records of two household members, or of two path alternatives, is counted once.
 
 ### Salesforce implementation
 
@@ -1214,7 +1495,8 @@ problem in plain language.
 | Source Entity | `Source_Object__c` | Text |
 | Target Entity | `Target_Object__c` | Text |
 | Relationship Path | `Relationship_Path__c` | Text |
-| Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG |
+| Aggregate | `Aggregate__c` | Picklist: SUM, COUNT, MIN, MAX, FIRST, LAST, AVG, COUNT_DISTINCT, ANY, NONE, TEXT_LIST, TEXT_LIST_DISTINCT (labels Sum, Count, Minimum, Maximum, First, Last, Average, Count distinct, Any, None, Text list, Text list, each value once) |
+| Delimiter | `Delimiter__c` | Picklist: Comma, Semicolon, New line (default Comma) |
 | Source Attribute | `Source_Field__c` | Text |
 | Order By Attribute | `Order_By_Field__c` | Text |
 | Target Attribute | `Target_Field__c` | Text |
@@ -1223,15 +1505,134 @@ problem in plain language.
 | Fiscal Year Aware | `Fiscal_Year_Aware__c` | Checkbox |
 | Fiscal Year Offset | `Fiscal_Year_Offset__c` | Number (0 decimals) |
 | Fiscal Date Attribute | `Fiscal_Date_Field__c` | Text |
-| Mode | `Mode__c` | Picklist: Real-time, Scheduled, Both |
+| Mode | `Mode__c` | Picklist: Real-time, Scheduled, Both (labels Instantly, Every night, Both (recommended); the same on `Rollup_Mode_Default__c`) |
 | Last Calculated | `Last_Calculated__c` | DateTime |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
 | Active | `Active__c` | Checkbox |
 
 - **Shipped defaults:** `Rollup_Definition_Default__mdt` (Section 13).
+- **Automation:** one registry row on `Rollup_Definition__c`, `Rollup_Definition_Validation`
+  ("Check rollups before saving"), handler `RollupDefinitionValidationHandler`, execution order
+  10, the save check of R-R10 and R-R15. It checks an insert and an edit of the aggregate, the
+  target or the source attribute, so switching a definition on or off never re-checks it.
 - **Settings keys:** `Fiscal_Year_Start_Month__c`, `Rollup_Mode_Default__c` (Section 12).
-- **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser`, `RollupBatch`,
-  `RollupScheduler`, subject to the vendoring evaluation in ADR-0011.
+- **Field history:** tracked on Source Entity, Target Entity, Relationship Path, Aggregate,
+  Source Attribute, Target Attribute, Filter, Target Filter, Mode and Active, so "who changed
+  how this total is calculated" has an answer (owner decision 2026-10-12; a platform feature,
+  completed with the Rollup Builder, which set Filter and Target Filter). Long text attributes
+  record that they changed, not the values.
+- **Rollup Builder:** the `Rollup_Builder` tab and app page, `rollupBuilder` (which nests the
+  Rollups list, `rollupDefinitions`, with New, Edit and Copy), `rollupWizard` (the five steps)
+  and `rollupFilterBuilder` (R-R2 documents, built once and shared with Find, plan Section
+  4.9). `RollupBuilderController` describes the org for the steps, in the running user's
+  describe, and saves a definition in user mode after the checks of R-R10 and R-R8. A new
+  definition gets the Definition Key `Custom_` followed by 16 random hexadecimal characters,
+  and Is Package Default false; an edited one keeps its key. Its preview (S12) calculates the
+  unsaved definition for one record through `RollupEngine.preview`, which writes nothing, and
+  counts the target records it would maintain in user mode. `RollupController.estimateFullRun`
+  counts the records Recalculate all goes through at a fixed rough rate (1,650 records a
+  minute, to be measured on an org), and `runTonight` sets up one 2:00 AM run through
+  `RollupScheduler.scheduleTonight` only when the nightly run is not scheduled. Needs
+  attention (S13), `rollupNeedsAttention` under the list, reads the Rollup Queue in user mode
+  through `RollupAttentionController` (records waiting and the oldest's age, one row per record
+  of each Failed entry named by describe, at most 200, whether the nightly run is scheduled and
+  how the last full run ended); its Retry, for the selected records' entries or all, goes
+  through `RollupQueue.retry`, which sets them Pending with Attempts 0 and no Next Attempt in
+  system mode (R-RQ4, R-RQ5).
+- **Service:** `RollupService`, `RollupSelector`, `RollupFilterParser` and `RollupScheduler`,
+  in front of BarnCRM's own aggregation core (`decisions/0082-barncrm-owns-its-rollup-engine.md`;
+  apex-rollup and `RollupAdapter` stay in the repository, unreached by any run, only for the
+  comparison `RollupEngineComparison` makes before they are deleted). That core is
+  `RollupEngine` (one pass per target entity), `RollupPlanner` (definitions into source queries), `RollupAggregator` (the calculator), `RollupCurrency` (target record currency),
+  `RollupWriter` (changed-only writes), `RollupChanges` (which targets a save marks, R-R11),
+  `RollupQueue` (the queue processor, Section 14A), and `RollupFullRecalcBatch` (the full and
+  nightly recalculation: one batch pass per target entity in turn, records with many source rows
+  in smaller chunks or alone, Last Calculated stamped when the last pass finishes, R-R13, one
+  run at a time, R-R14) with `RollupRecalcErrorHandler` queueing a stopped chunk's records from
+  `BatchApexErrorEvent` (R-R14).
+- **Flow action and template (R-R12):** `RollupRecalcAction`, the invocable action "Recalculate
+  rollups", takes the saved record and its prior values (generic, so it serves any entity) and
+  marks targets exactly as a packaged trigger does (R-R11): in the same save when few, queued
+  otherwise, and always queued for a record being deleted, since a Flow runs before the delete.
+  It does nothing while all automation is paused. `Recalculate_Rollups_Template` is a
+  record-triggered Flow template (on Contact, never active) an administrator saves as her own
+  copy and points at her entity.
+
+## 14A. Rollup Queue
+
+### Definition
+
+The list of target records waiting for their totals to be recalculated, and of the ones that
+could not be. A bulk change (R-R4) writes the records it affected here instead of
+recalculating them in the same save, and one background processor works through the list
+(`decisions/0082-barncrm-owns-its-rollup-engine.md`). It is also what the Rollup Builder's
+"Needs attention" list reads and what its Retry acts on, so one entity serves as queue,
+failure list and retry.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The entry's identifier, assigned automatically. |
+| Target Entity | text | yes | The entity whose records are listed, for example Account or Fund. |
+| Record Ids | long text | yes | The identifiers of the target records to recalculate, at most 200, held as text (R-RQ2). |
+| Record Count | integer | yes | How many identifiers Record Ids holds, so "records waiting" is a sum rather than a parse. |
+| Status | picklist(Pending, Failed) | yes (defaults Pending) | Pending: waiting for the processor. Failed: tried five times without success; waits for Retry. |
+| Attempts | integer | yes (defaults 0) | How many times the processor has tried these records. |
+| Next Attempt | datetime | no | The earliest time the processor tries these records again after a failure; empty means now. |
+| Last Error | long text | no | What went wrong on the last attempt, in plain language first, for the Needs attention list. |
+
+### Relationships
+
+- None. Record Ids and Target Entity are text, never references (R-RQ2), and an entry is not
+  tied to a Rollup Definition: it lists records, and every active definition on their target
+  entity is recalculated for them (R-R11).
+
+### Rules
+
+**R-RQ1 Append-only for writers.** A transaction that changes source records inserts entries
+(one per target entity, split at 200 identifiers) and never updates or deletes one. Only the
+processor updates or deletes entries. Two writers therefore never contend for the same entry.
+
+**R-RQ2 Identifiers as text.** A reference to the target would lock the target record when the
+entry is inserted, so a large import touching one household would queue behind itself.
+Identifiers held as text lock nothing. The cost is that an entry is not reportable by target;
+the Needs attention list resolves the names.
+
+**R-RQ3 How the processor works.** It reads Pending entries whose Next Attempt has passed,
+merges and sorts their identifiers, recalculates a slice (R-R11), and deletes the entries it
+finished. Target records that failed are written back as a new entry with Attempts increased
+and Next Attempt set later each time; after the fifth attempt the entry is Failed. The
+processor runs again while Pending entries remain. A second processor started by accident is
+harmless, because recalculation recomputes (R-R11).
+
+**R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
+back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
+(which deletes it). Each processor and nightly run writes one summary entry to the Error Log
+(Section 9) when anything failed, so the Hub's error tile sees it.
+
+**R-RQ5 Written in system mode.** Entries are the engine's own bookkeeping and are written
+under ADR-0021, so a gift saved by a user who cannot see the queue still queues its totals.
+The engine's automation switch and the global pause (Section 10) stop entries being written
+and processed; the nightly run puts the totals right afterwards in Both mode.
+
+### Salesforce implementation
+
+- **Object:** `Rollup_Queue__c`, auto-number Name with format `RQ-{0000000}`, private sharing,
+  readable by the BarnCRM Admin permission set and written only by the engine.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Target Entity | `Target_Object__c` | Text (80) |
+| Record Ids | `Record_Ids__c` | Long Text Area |
+| Record Count | `Record_Count__c` | Number (0 decimals) |
+| Status | `Status__c` | Picklist: Pending, Failed |
+| Attempts | `Attempts__c` | Number (0 decimals) |
+| Next Attempt | `Next_Attempt__c` | DateTime |
+| Last Error | `Last_Error__c` | Long Text Area |
+
+- **Service:** `RollupQueue`, which writes entries and is the one processor (a Queueable with a
+  finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 
 ---
 
@@ -1252,7 +1653,12 @@ Maria load the same payment processor export every month without rebuilding the 
 | Description | long text | no | What kind of file this template reads, with an example of its columns. |
 | Template Key | text | yes | The stable identifier of this template, matching the shipped default it came from; unique. |
 | Column Mapping | long text | yes | The mapping from source column names to canonical targets, held as a mapping document (see R-IT1). |
-| Matching Rule | picklist(Email exact, Name plus postal code, External ID) | yes | How an incoming row is matched to an existing person or organization before a new one is created. |
+| Person Matching Rule | picklist(Email exact, Name plus postal code, External ID) | yes | How an incoming row's people are matched to people the org already has before new ones are created (R-IT2). |
+| Person Match Field | text | no | Under the External ID person rule, the API name of the field people are matched on, one marked External ID or Unique (R-IT8); empty means the first external identifier the user may read. |
+| Organization Matching Rule | picklist(Name exact, External ID) | no | How a row's organization is matched to an organization the org already has; empty means Name exact (R-IT2). |
+| Organization Match Field | text | no | Under the External ID organization rule, the API name of the account field organizations are matched on (R-IT8). |
+| Several Matches | picklist(Reject the row, Use the most recently changed) | no | What happens when the key a row is looked for by finds more than one record; empty means Reject the row (R-IT9). |
+| Use Duplicate Rules | boolean | yes (defaults false) | Whether people and organizations the rule found nobody for are also matched through the org's active duplicate rules (R-IT16). |
 | Default Values | long text | no | Values applied to every row that does not carry its own, held in the same document format. |
 | Person Mode | picklist(Contacts, Person Accounts) | yes | Whether a person in this file becomes a Contact or a person Account; defaulted from the detected org shape. |
 | Is Package Default | boolean | yes (defaults false) | Marks a template materialized from a shipped default rather than built by the admin. |
@@ -1263,6 +1669,10 @@ Maria load the same payment processor export every month without rebuilding the 
 | Payment Matching | picklist(Always create, Match or create, Match only, Never match) | no | Whether an imported record pays a scheduled payment it matches (used by modules that load payments; with Giving, a gift matched to a payment the donor already owes); empty means Match or create (R-IT7, R-DM5). |
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
+| Target Object | text | no | The API name of the one object this template loads, as describe gives it; empty for a template that loads people and organizations (R-IT12). |
+| Load Operation | picklist(Insert, Update by record Id, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
+| Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; required then (R-IT12). |
+| Lookup Not Found | picklist(Reject the row, Leave it empty) | no | What a row of a one-object template does when a lookup column finds no record; empty means Reject the row (R-IT13). |
 
 ### Relationships
 
@@ -1292,11 +1702,188 @@ processor-specific templates (plan Section 4.9).
 ```
 
 Targets are written as `Entity.Attribute` using the row entity names in R-IR1, so a
-template can be read without knowing the object model.
+template can be read without knowing the object model. A one-object template (R-IT12) uses
+the one entity `Record`, whose attributes are the target object's field API names, and a
+lookup column may carry `"lookupField"`, the parent field it names its parent by (R-IT13):
+
+```
+{ "source": "Program", "target": "Record.Program__c", "lookupField": "Program_Code__c" }
+```
+
+Any column may also carry `"transforms"`, the steps that change its values as they load
+(R-IT15).
 
 **R-IT2 Matching rules in plain language.** The wizard states what each matching rule
 does and what it risks, for example that "Name plus postal code" merges two people who
-share a name at one address. No rule is offered without that sentence (plan Section 2.3).
+share a name at one address. No rule is offered without that sentence (plan Section 2.3). People and organizations have
+a rule each (ADR-0068, `0068-import-matching-per-entity-and-per-file-values.md`): a person by
+Email exact, Name plus postal code, or External ID; an organization by Name exact (compared
+ignoring case and surrounding spaces) or External ID, and only among organization accounts.
+The organization rule applies only where the mapping names an organization.
+
+**R-IT8 A chosen matching field.** Under External ID the template names the field: one the
+object marks External ID or Unique, holding text or an email, that the importing user may
+read. For people it is a Contact field, or an Account field where Person Mode is Person
+Accounts; for organizations it is an Account field. The row gives the value through a column
+mapped to that field on the entity (for example `Contact1.Member_Number__c` or
+`Organization.Charity_Number__c`). The field is checked against describe when the template is
+saved and again when rows are matched; one that no longer qualifies matches nobody and the
+run log says so. An empty Person Match Field means the first external identifier field the
+user may read, which is how templates saved before C-32 matched. A row with no value in the
+field is not matched and its person or organization is created (an organization only with a
+name).
+
+**R-IT9 Several matches.** When the key a row is looked for by finds more than one record
+(R-IB12 says which key), Several Matches decides: Reject the row, the default, with a message
+naming the problem; or Use the most recently changed record, by Last Modified Date as the chunk
+reads it, the later created winning a tie. Either way the row's Several Matches box is ticked
+(Section 17) and the run log says once that such rows exist. It applies to people and
+organizations alike. A lookup stopped at its row cap is not a several-matches case: its keys
+find nobody alone, as R-IB12 describes.
+
+**R-IT10 A record ID in the file.** A column can be mapped to a person's or the
+organization's Salesforce record ID (`Contact1.Id`, `Contact2.Id`, `Organization.Id`; ADR-0069,
+`0069-import-record-id-matching-and-match-only.md`). A row giving one is matched to that record
+and no rule is asked: the ID must be a valid record ID of the object the entity is stored on
+(Contact, or Account in Person Accounts mode, for a person; Account for an organization), the
+record must exist and be visible to the importing user, a person account must have a person
+record type and an organization the Organization record type. A row whose ID fails any of these
+is rejected with the reason, and nothing is created for it: an ID given but not found never
+creates a record. The ID itself is never written to a field. A blank ID cell is no ID, and the
+row is matched by its rule. A value for every row of a file may not give a person's ID (R-IB14).
+
+**R-IT11 Custom fields on people and organizations.** A column can be mapped to any field of
+the person's or the organization's object that the importing user may create or edit, by its
+API name (for example `Contact1.Member_Since__c` or `Organization.Region__c`). The wizard offers
+these from describe: fields the user may read and create or edit, not formula, roll-up, auto
+number, lookup, compound address or location fields, not system fields, not the package's own
+bookkeeping fields (the import batch tag, the sample data marks, the household fields the
+household automation writes), and not a field the fixed column list already offers. For people
+it lists Contact fields in contact terms, which R-IT3 translates in Person Accounts mode; for
+organizations it lists Account fields that are not person account fields. Values are written
+as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
+value with a blank, and a field the user may not write is skipped and named in the run log.
+
+**R-IT12 A template that loads one object.** A template with a Target Object loads each row
+as one record of that object (ADR-0080, `0080-import-load-one-object.md`), through the same
+batch, dry run, results, journal and undo as any import, in the running user's own access. The
+object and every field come from the running user's describe, when the template is saved and
+in every chunk. Load Operation decides what a row does:
+
+- **Insert** creates one record per row.
+- **Update by record Id** changes the record named by the row's `Record.Id`. An ID that is not
+  a valid ID of the target object, or names no record the user can see, rejects the row, and
+  nothing is created for it.
+- **Upsert by external ID** finds the record whose Load Match Field (a field the object marks
+  External ID, holding text or an email, that the user may read) holds the row's value,
+  compared ignoring case; it changes that record, or creates one when none holds the value. A
+  row with no value in the field is rejected. A value several records hold follows Several
+  Matches (R-IT9).
+
+The loader reads the existing records itself, in user mode, and never calls the platform's
+upsert, so the dry run decides exactly as the commit will and the journal holds each value
+before. An update writes only the values that differ from the record's, and a row that changes
+nothing is Matched. A value its field cannot take (a date or number that cannot be read, a
+checkbox value that is neither yes nor no, text longer than the field) rejects the row, naming
+the field and the value, because a row is one record. A row naming the same record as an
+earlier row of the file (the same ID or upsert value) is rejected wherever the file's chunks
+fall, through a digest in its Processor Key (Section 17). Under Match only (R-IB15) a row that
+would create a record is rejected. A value for every row of the file (R-IB14) may not be the
+record ID or the Load Match Field. Each row's resulting record is written to its Resulting
+Record. A row a save refuses carries the platform's words. Account and Contact load by Update
+by record Id only (R-IT14).
+
+**R-IT13 Lookup columns.** A column mapped to a lookup field of the target object names its
+parent by the column's `lookupField` (R-IT1): the record ID when it is empty or `Id`, or else
+the parent's name field or one of the parent's External ID or Unique fields that holds text or
+an email and that the user may read. A lookup that can point at more than one object is read by
+record ID only. Parents are found in user mode, one query per column and chunk, and a parent the
+user cannot see is not found. When none is found, Lookup Not Found decides: Reject the row (the
+default), naming the column and the value, or Leave it empty, loading the rest of the row and
+saying once in the run log that lookups were left empty. A value that finds several parents
+follows Several Matches (R-IT9) and ticks the row's Several Matches.
+
+**R-IT14 What a load may write.** An object may be loaded only when all of these hold, decided
+from describe at run time, so a new object is judged without a code change:
+
+1. It is a custom object, not a custom setting, custom metadata, platform event, big object or
+   external object; or a standard object that describe calls searchable and queryable.
+2. Its name does not end in Share, History, Feed or ChangeEvent.
+3. It is not a Salesforce setup or security object: User, Group, GroupMember, QueueSobject,
+   Profile, UserRole, PermissionSet, PermissionSetAssignment, PermissionSetGroup,
+   PermissionSetGroupComponent, PermissionSetLicenseAssign, SetupEntityAccess,
+   ObjectPermissions, FieldPermissions, RecordType, Organization, UserLicense,
+   UserPackageLicense, NetworkMember.
+4. It is not the package's own bookkeeping (`Import_Template__c`, `Import_Batch__c`,
+   `Import_Row__c`, `Import_Journal__c`, `Error_Log__c`, `Setting_Change__c`,
+   `Automation_Setting__c`, `Rollup_Definition__c`), not `Household_Member__c` (membership is
+   written only through the household service, R-M5), and not an object a dependent package
+   names through the data protection seam (`DataProtectionExtension`; Giving names receipts,
+   receipt runs, receipt number sequences, acknowledgments and acknowledgment runs).
+5. The user can read it and query it, and can create records of it for Insert, edit them for
+   Update, or both for Upsert.
+
+Account and Contact may be loaded only by Update by record Id: people, households and
+organizations are created by a people template, which builds households (R-IR1a).
+
+These fields are never written, whatever the file holds: the fields the platform keeps (Id,
+created and modified stamps, system mod stamp, last activity, viewed and referenced dates),
+formula and auto number fields, every Rollup Definition target on the object, the batch tag
+(R-IB3), the sample data marks, any package field whose name ends in Last Calculated, the
+household fields the household automation keeps on accounts and contacts (greetings, member
+count, custom name, household role, primary contact, primary affiliation), and a household's
+Name. A column mapped to one is
+named once in the run log and skipped; so is a field the user may not create or edit, asked of
+describe for each row according to whether it creates or updates.
+
+**R-IT15 Changing a column's values (the transform document).** A column of the mapping
+document may carry `"transforms"`, an ordered list of at most 10 steps that change the
+column's value before it is matched or written (ADR-0081, `0081-data-transform-document.md`):
+
+```
+{ "source": "Last", "target": "Contact1.LastName",
+  "transforms": [ { "op": "trim" }, { "op": "proper" } ] }
+```
+
+| `op` | Parameters | What it does |
+|---|---|---|
+| `trim` | none | Removes leading and trailing white space and turns each run of white space into one space. |
+| `upper`, `lower` | none | Every letter as a capital, or as a small letter. |
+| `proper` | none | A capital for each letter that starts a word (a run of letters, digits and apostrophes), every other letter small. |
+| `replace` | `text` (required, at most 255 characters), `replaceWith` (at most 255), `matchCase` (default false), `wholeValue` (default false) | Replaces each occurrence of `text`, read as literal text, with `replaceWith`; under `wholeValue`, replaces the value only when the whole value equals `text`. |
+| `ifBlank` | `value` (required, at most 255) | The value, when the value so far is blank. |
+| `append` | `columns` (1 to 5 source column names of the same row), `separator` (at most 10, default one space) | Adds the named columns' values after the value so far, leaving blank ones out, joined by the separator. |
+| `date` | `dateOrder`: `MDY`, `DMY` or `YMD` | Reads the first three numbers, separated by any characters that are not digits, in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
+
+Steps run in order, before values for every row (R-IB14): a step's output that is blank is
+filled by a file or template value like any blank cell. A document is checked when it is saved
+(an unknown `op`, a missing or oversized parameter, more than 10 steps, or an `append` naming
+no column refuses the save with the column named); a stored step that fails the check is skipped
+on read, as the rest of R-IT1 is forgiving. No step evaluates an expression, calls code, reads a
+record or uses a pattern the administrator typed: `replace` quotes its text. The engine is
+`DataTransform` in Core, which knows nothing of imports: it takes a value and the other values
+of the row by name, so bulk update (C-35) can apply the same steps to a record's fields.
+
+**R-IT16 Matching through the org's duplicate rules.** A people template with Use Duplicate
+Rules ticked also asks the org's active duplicate rules (ADR-0081,
+`0081-data-transform-document.md`) about each person and organization of a chunk that its rule
+(R-IT2, R-IT8) found nobody for, that no record ID names (R-IT10), that no earlier row of the
+pass is creating (R-IB12) and whose row is not already rejected. The row's values for the
+entity, as stored names (R-IT11), are set on an unsaved record of the entity's object (Contact,
+or Account in Person Accounts mode, for a person; Account for an organization), copying only
+fields the user may read and create that hold text, an email, a phone, a URL or a picklist value,
+and passed to the platform's duplicate matcher, at most 50 records a call. Matches of another
+object are ignored. The matched identifiers are then read in user mode, keeping only records the
+user can see and, for accounts, of the entity's kind (a person record type for a person account,
+the Organization record type for an organization). One record kept matches; several follow
+Several Matches (R-IT9). A row whose two people are matched to one record is rejected. In a dry
+run an organization an earlier chunk would create is not asked about (the commit finds it by its
+key). A row matched this way has Matched By Duplicate Rule ticked (Section 17) and the run log
+says that such rows exist. The active rules are read first (`DuplicateRule`, user mode): when
+the object has none the user can see, or the matcher raises, the entity is matched by its rule
+alone and the run log says so; nothing is rejected for it. A matcher failure is written to the
+Error Log only when a rule was known to be active. Duplicate rules are not asked for a
+one-object template.
 
 **R-IT3 Person mode.** Person Mode is proposed from the org shape detected by the Setup
 Assistant: Person Accounts where the org uses them, Contacts otherwise. The admin can
@@ -1369,7 +1956,12 @@ from Nonprofit Cloud", section 5).
 | Description | `Description__c` | Long Text Area |
 | Template Key | `Template_Key__c` | Text, External Id, unique |
 | Column Mapping | `Column_Mapping_JSON__c` | Long Text Area |
-| Matching Rule | `Matching_Rule__c` | Picklist: Email exact, Name plus postal code, External ID |
+| Person Matching Rule (labelled Matching Rule before v0.7) | `Matching_Rule__c` | Picklist: Email exact, Name plus postal code, External ID |
+| Person Match Field | `Person_Match_Field__c` | Text (255) |
+| Organization Matching Rule | `Organization_Matching_Rule__c` | Picklist: Name exact, External ID |
+| Organization Match Field | `Organization_Match_Field__c` | Text (255) |
+| Several Matches | `Several_Matches__c` | Picklist: Reject the row, Use the most recently changed |
+| Use Duplicate Rules | `Use_Duplicate_Rules__c` | Checkbox |
 | Default Values | `Default_Values_JSON__c` | Long Text Area |
 | Person Mode | `Person_Mode__c` | Picklist: Contacts, Person Accounts |
 | Is Package Default | `Is_Package_Default__c` | Checkbox |
@@ -1380,12 +1972,22 @@ from Nonprofit Cloud", section 5).
 | Payment Matching (labelled Donation Matching, API name `Donation_Matching__c`, before v0.6) | `Payment_Matching__c` | Picklist: Always create, Match or create, Match only, Never match |
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
+| Target Object | `Target_Object__c` | Text (255) |
+| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Upsert by external ID |
+| Load Match Field | `Load_Match_Field__c` | Text (255) |
+| Lookup Not Found | `Lookup_Not_Found__c` | Picklist: Reject the row, Leave it empty |
 
 - **Shipped defaults:** `Import_Template_Default__mdt` (Section 13).
 - **Service:** `ImportTemplateService` (materialization and save), `ImportTemplateSelector`,
   `ImportMapping` (the mapping document in R-IT1), `ImportColumnLibrary` (the known column
   names automatic mapping suggests from), LWC `importWizard` (where a template is marked
-  recurring), `HubController` and LWC `hubHome` (the recurring sources list, R-IT6).
+  recurring), `HubController` and LWC `hubRecurringFiles` (the recurring sources list, R-IT6).
+  One-object templates (R-IT12 to R-IT14): `ImportObjectSchema` (the objects, fields, keys and
+  parents describe offers, and reading a value as its field's type), `ImportObjectLoader` (one
+  chunk), `DataProtectedFields` with the `DataProtectionExtension` seam and
+  `DataProtectionExtensions` (what a load never writes), LWC `importLoadOptions`.
+  Column changes (R-IT15): `DataTransform` (the engine, shared with bulk update), LWC
+  `importColumnTransforms`. Duplicate rules (R-IT16): `ImportDuplicateRuleMatcher`.
 
 ---
 
@@ -1393,9 +1995,11 @@ from Nonprofit Cloud", section 5).
 
 ### Definition
 
-One upload: the file, the template it was read with, what happened, and the log of it
-(plan Section 4.9). A batch is the unit an administrator dry-runs, commits, and in v0.5
-undoes.
+One data job: a file import (one upload: the file, the template it was read with, what
+happened, and the log of it) or, from v0.7, a bulk update (C-35, Section 29E: the query and the
+changes, and what happened). An import is the unit an administrator dry-runs, commits, and in
+v0.5 undoes; a bulk update is committed when it starts and is undone the same way
+(plan Section 4.9, ADR-0047).
 
 ### Attributes
 
@@ -1424,6 +2028,11 @@ undoes.
 | Processor Settings | long text | computed | The settings the entity processor ran the last dry run under, as a document only that processor reads; the commit runs under them (R-IB11). |
 | Pass Number | integer | computed | How many dry runs and commits have been started on this batch; the current one is the latest (R-IB13). |
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
+| File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
+| Match Only | boolean | yes (defaults false) | When true, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15). |
+| Operation | picklist(Import, Update, Delete) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1) or a bulk delete (R-BD1). Empty on a batch created before v0.7, which reads as Import. |
+| Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
+| Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 
 ### Relationships
 
@@ -1480,8 +2089,9 @@ after the deadline is refused, in a sentence naming the date it passed.
    a status, a name or a user to decide what to delete, and there is no undo of more than one
    batch. A flag can be true of records nobody meant to include; a batch identifier cannot.
 2. **Counted, shown, then confirmed.** The first step counts what carries the tag, by kind
-   (people, households, organizations, and each object an entity processor tags, R-IB9), and
-   shows those numbers with the batch's name and file name. The undo starts only when the number the person confirms is still the number
+   (people, households, organizations, and each object an entity processor tags, R-IB9), adds
+   the records a one-object load journaled as created (R-IT12, Section 17A) under that object's
+   plural label, and shows those numbers with the batch's name and file name. The undo starts only when the number the person confirms is still the number
    counted, so it can only delete a set somebody has seen the size of.
 3. **Once.** The batch's status moves from Complete to Undoing inside a locked read of the
    batch, so a second request, while the first runs or after it has finished, is refused
@@ -1503,7 +2113,12 @@ after the deadline is refused, in a sentence naming the date it passed.
   them, and the organizations it created. The tag is written when the record is created and
   never afterwards, so a record the batch matched or updated cannot be in scope. People are
   deleted first, then accounts, so a household can be judged after its imported members are
-  gone.
+  gone. A one-object load (R-IT12) tags nothing, because its object has no tag: the records it
+  created are named on the batch's Created journal pages (Section 17A) and deleted in a pass of
+  their own, after the values are put back and before any module's pass. A journaled record is
+  deleted only when it was created by the committer between the commit's start and its
+  completion; any other is kept and journaled, so a journal entry can never delete somebody
+  else's record. The checks below apply to these records as to tagged ones.
 - **It keeps a tagged record that has gained something since.** A tagged record is kept,
   counted and journaled with the reason, when:
   - any record points at it through any reference the org can filter on (a gift, a soft
@@ -1516,7 +2131,12 @@ after the deadline is refused, in a sentence naming the date it passed.
     are the import's own follow-on work, such as rollups and household naming, which runs as
     the committer); or an activity has been logged on it;
   - for a household or an organization, a person this import did not create is still on it,
-    or Nonprofit Cloud records depend on it (ADR-0036).
+    or Nonprofit Cloud records depend on it (ADR-0036), or an installed module still credits
+    records to it, asked through `HouseholdDependentsExtensions` as the empty household
+    tidy-up asks (R-H12): a gift or pledge that points at the household without having been
+    created since the import, such as an older gift whose donor was changed, which the first
+    bullet cannot see. A module that cannot answer keeps the household, journaled as not
+    checked.
 
   Work the undo itself does (a household renamed as its imported members are deleted) is
   not counted. A check that cannot run, or would leave the delete too few queries, keeps the
@@ -1614,29 +2234,34 @@ rows of the chunk and against earlier chunks, in the commit and the dry run alik
 same file again matches both rather than creating the second again. Every person an import
 creates is remembered under both the shared key and the narrowed one.
 
-**A person is found by first name before a shared key.** Under the same two rules, a row's
-person with a first name is looked for first by the key narrowed to it, in the org, among the
-people earlier chunks create and among those earlier rows of the chunk create. The shared key
-alone finds them only when exactly one person holds it, or when the row gives no first name
-(the earliest holder then). When several hold the shared key (a couple, or two couples at one
-address) and none has their first name, the person is created: a new record is the safe
-failure, where taking somebody else would rename them. A couple of the chunk not yet created
-counts as two holders, so a row naming one partner alone is never given the other. A row
-naming alone the second person of a couple of the same chunk waits until the couple is saved
-(first people are saved before second people) and then shares that partner, so both rows
-name one person in the couple's one household, whichever row comes first. A lookup of the
-org reads at most 5,000 records, filtered on both the last names and the postal codes of the
-chunk; where it stops at that cap, another holder of the key may be unseen, so the keys it
-covers find a person by first name only, and otherwise create them, and a warning is logged. First names
-are compared ignoring case and surrounding spaces but not accents: "Jáne" is not "Jane", so an
-accented spelling of a name held with another spelling is created. One consequence follows the
-rule: where one record holds the shared key, a row with a different first name still matches
-it, as the rule has always matched, and its first name is updated. A row whose two people also
+**A person with a first name is found only by it (ADR-0067).** Under the same two rules, a
+row's person with a first name is looked for by the key narrowed to it, in the org, among the
+people earlier chunks create and among those earlier rows of the chunk create, and nowhere
+else. A record holding the shared key under another first name, or under none, is somebody
+else: the person is created, and that record is neither matched nor renamed, however many
+records hold the key (one, as with John Smith alone at a postal code and a "Jane Smith" row,
+or several, as with a couple). A new record is the safe failure, left for the duplicate scan
+(R-DP3); taking somebody else would rename them. The shared key alone finds a person only when
+the row gives no first name (R-IT9 decides when it finds several), and since a blank incoming value never
+clears a stored one, such a row renames nobody. A row naming alone the second person of a
+couple of the same chunk waits until the couple is saved (first people are saved before second
+people) and then shares that partner, so both rows name one person in the couple's one
+household, whichever row comes first. A lookup of the org reads at most 5,000 records,
+filtered on both the last names and the postal codes of the chunk; where it stops at that cap,
+another holder of the key may be unseen, so a row with no first name finds nobody by those
+keys and its person is created, and a warning is logged. First names are compared ignoring
+case, surrounding spaces and runs of inner spaces ("Mary  Ann" is "Mary Ann"), and nothing
+else: "Jáne" is not "Jane", an initial ("J.") is not the name it stands for, and there is no
+short-form matching ("Bob" is not "Robert"), so each is created. A row whose two people also
 share a first name cannot be told apart and is rejected, saying so. Under the Email rule a
 second person with no last name of their own therefore matches only a record with the same
 email and first name; otherwise they are to be created, and are rejected without a last name
-as any new person is. Where the org holds several records under one key, the earliest created
-wins, and the lower identifier breaks a tie, so the same file always resolves the same way.
+as any new person is. Where the key a row is looked for by (narrowed to its first name, or
+shared when it gives none) finds several records, Several Matches decides (R-IT9): by default
+the row is rejected, where before v0.7 the earliest created was taken. In a dry run a person an
+earlier chunk would create counts as a holder of their keys, because the commit will find them.
+An organization is found by its rule's key the same way, and several organizations holding it
+are the same case.
 
 **An import saves past a duplicate alert, not past a block.** People, organizations and
 household names are saved past a duplicate rule that only alerts, as an administrator's bulk
@@ -1664,6 +2289,26 @@ with the pass. A key is looked up only on rows stamped with the current pass (R-
 key from an earlier pass is never read. While a pass runs, rows it has not reached yet still
 show the last pass's outcome; the batch's counts are read back when it finishes, by which time
 every row belongs to it.
+
+**R-IB14 Values for every row of a file.** The wizard can give a file values that apply to
+each of its rows, for example every row's appeal (ADR-0068,
+`0068-import-matching-per-entity-and-per-file-values.md`). They are held on the batch as
+`{ "version": 1, "defaults": [ { "target": "Entity.Attribute", "value": "..." } ] }`, the
+defaults half of the R-IT1 document, so the dry run and the commit of the file use the same
+values and the template is not changed. A row's own value wins, then the file's value, then
+the template's default: each fills only a blank. A file value may not target a person's name
+parts, full name or email, or the field people are matched on under External ID (R-IT8),
+since every row would then be one person; the batch is refused with that reason. It may name
+an organization. The entity processor receives the row's values with the file's values
+applied, as it receives the template's defaults (R-IR6).
+
+**R-IB15 Match only.** The wizard can mark a file Match only (ADR-0069,
+`0069-import-record-id-matching-and-match-only.md`), for a file meant to update records the org
+already has. A row whose organization or either person matches no record, by its rule or by a
+record ID (R-IT10), is rejected with a message saying the file creates nobody; nothing is
+created for it. The dry run and the commit reject the same rows. Matched records are updated as
+in any import, and an entity processor still loads the rest of a matched row (R-IR6). The
+choice belongs to the file, not the template, and is set again for each upload.
 
 ### Salesforce implementation
 
@@ -1693,6 +2338,11 @@ every row belongs to it.
 | Processor Settings | `Processor_Settings_JSON__c` | Long Text Area (32768) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
 | Job Id | `Job_Id__c` | Text (18) |
+| File Values | `File_Values_JSON__c` | Long Text Area (32768) |
+| Match Only | `Match_Only__c` | Checkbox (default false) |
+| Operation | `Operation__c` | Picklist: Import, Update, Delete (default Import) |
+| Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
+| Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -1708,7 +2358,8 @@ every row belongs to it.
 - **Service:** `ImportBatchService`, `ImportBatchSelector`, `ImportProcessorBatch`,
   `ImportUndoService` and `ImportUndoBatch` (R-IB7 to R-IB9), `ImportController` (the one
   Aura-enabled entry point the import screens call), LWC `importWizard`, `importResults`,
-  `importHistory` (recent imports and their undo).
+  `importHistory` (recent imports and their undo). The import history lists imports only; bulk
+  updates are listed by their own page (Section 29E).
 
 ---
 
@@ -1736,7 +2387,7 @@ processor resolves those in dependency order.
 | Contact 2 | reference(Contact) | computed | The second person, where people are Contacts. |
 | Person 2 Account | reference(Organization) | computed | The second person, where people are person Accounts. |
 | Organization | reference(Organization) | computed | The organization this row resolved to. |
-| Gift | text | computed | The gift this row resolved to, held as a record identifier (R-IR2). |
+| Gift | text | computed | The gift this row resolved to, held as a record identifier (R-IR2); for a one-object template, the record the row created, updated or matched (R-IT12). Labelled Resulting Record. |
 | Soft Credit | text | computed | The soft credit this row resolved to, held as a record identifier (R-IR2). |
 | Person 1 Key | text | computed | In a dry run only, a digest of the matching key of the first person this row would create, so later chunks count that person once (R-IB12). Cleared when the row is processed again. |
 | Person 2 Key | text | computed | The same for the second person. |
@@ -1744,7 +2395,9 @@ processor resolves those in dependency order.
 | Person 2 Name Key | text | computed | The same for the second person. |
 | Organization Key | text | computed | The same for the organization this row would create. |
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
-| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. |
+| Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
+| Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule, matched this row's person or organization (R-IT16). |
+| Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12). |
 
 ### Relationships
 
@@ -1758,7 +2411,9 @@ processor resolves those in dependency order.
 `Household`, `Contact1`, `Contact2`, `Organization`, `Affiliation`, `Gift`, `Allocation`,
 `SoftCredit` and `Tribute` in the template's mapping document, and they are resolved in
 dependency order: organization, household, people, membership and affiliation, gift,
-allocations, soft credit, tribute. Resolution is idempotent per row (R-IB4).
+allocations, soft credit, tribute. Resolution is idempotent per row (R-IB4). A row of a
+one-object template (R-IT12) is read as the one entity `Record` instead, and none of the
+others.
 
 **R-IR1a What a row means for households.** A row is one household. The row's first
 person is saved first and is given a household by the ordinary creation path (R-H1 in
@@ -1816,7 +2471,7 @@ column nothing can load yet. The contract, which ADR-0052 records:
 - **Resolve.** Called once per chunk, after Core has resolved the organization, the household
   and the people and written them onto the rows (their references, and Status Rejected with
   the reason where Core rejected the row), with each row's values grouped by entity and the
-  template's defaults applied. It must be bulk safe, must write nothing when the pass is a dry
+  file's values and the template's defaults applied (R-IB14). It must be bulk safe, must write nothing when the pass is a dry
   run, and must not throw: a failure belongs on its row. It returns a note for the run log,
   the total of the gift amounts it read, for the control totals (R-IB10), and in a dry run the
   settings it ran under, which the commit is held to (R-IB11).
@@ -1866,6 +2521,8 @@ when the corrected row is loaded again.
 | Organization Key | `Organization_Key__c` | Text (16), External ID (indexed) |
 | Processor Key | `Processor_Key__c` | Text (16), External ID (indexed) |
 | Pass Number | `Pass_Number__c` | Number (9, 0) |
+| Several Matches | `Several_Matches__c` | Checkbox |
+| Matched By Duplicate Rule | `Duplicate_Rule_Match__c` | Checkbox |
 
 The six keys and the row's Pass Number are bookkeeping written and read in system mode
 (ADR-0021), in no permission set. The keys are marked External ID only so that they are
@@ -1892,7 +2549,7 @@ undo left in place and why (feature C-19).
 |---|---|---|---|
 | Name | text | computed | The journal page's identifier, assigned automatically. |
 | Import Batch | reference(Import Batch) | yes | The import this page belongs to. |
-| Phase | picklist(Commit, Undo) | yes | Whether this page records the import or the undoing of it. |
+| Phase | picklist(Commit, Created, Undo) | yes | Whether this page records the changes an import made, the records a one-object import created (R-IJ3), or the undoing of it. |
 | Entry Count | integer | yes | How many entries this page holds, so a total is a sum rather than a parse. |
 | Entries | long text | yes | The entries themselves, held as one document per page (R-IJ2). |
 
@@ -1924,15 +2581,29 @@ a date as `YYYY-MM-DD`), so a value put back is the value that was there.
     { "action": "Kept", "object": "Account", "id": "001...", "label": "The Smith Family",
       "reason": "A person this import did not create is in this household." },
     { "action": "NotRestored", "object": "Contact", "id": "003...", "field": "Email",
-      "reason": "Changed since the import." }
+      "reason": "Changed since the import." },
+    { "action": "Failed", "object": "Contact", "id": "003...",
+      "reason": "The platform's own message, for example a validation rule's." },
+    { "action": "Created", "object": "Program_Session__c", "id": "a01...", "row": 14 },
+    { "action": "Deleted", "object": "Contact", "id": "003...", "label": "Ana Ramirez" }
   ]
 }
 ```
 
-**R-IJ3 What is journaled.** A commit journals updates only: the attributes a row changed on
+**R-IJ3 What is journaled.** A commit journals updates: the attributes a row changed on
 a record the import did not create, with the value before and the value written, in full. A
-created record needs no entry because it carries the tag (R-IB3), and a matched or rejected
-row changed nothing and is recorded on its staged row (Section 17). An undo journals the
+record an import of people creates needs no entry because it carries the tag (R-IB3), and a
+matched or rejected row changed nothing and is recorded on its staged row (Section 17). A
+one-object import (R-IT12) creates records of an object with no tag, so each record it
+creates is journaled as a Created entry (object, ID, file row) on pages of their own, Phase
+Created, at most 100 to a page so an undo deletes one page inside one transaction's limits;
+the undo reads them as R-IB9 says. A bulk update (R-BU3) journals, for each record it saved,
+the fields whose value changed, before and after, and for each record the platform refused, a
+Failed entry with the reason; a record that already held the new values is not saved and not
+journaled. A bulk delete (R-BD3) journals a Deleted entry (object, ID, the record's name) for
+each record it deleted, and a Failed entry for each record the platform refused; its undo
+journals a NotRestored entry, with no field, for each record it could not bring back. An undo
+journals the
 records it kept and the values it did not put back, each with its reason; the records it
 deleted are counted in the Run Log rather than listed, because the recycle bin lists them.
 
@@ -1953,12 +2624,13 @@ By, Started At and Completed At.
 | Attribute | API name | Type |
 |---|---|---|
 | Import Batch | `Import_Batch__c` | Master-Detail to `Import_Batch__c` |
-| Phase | `Phase__c` | Picklist: Commit, Undo |
+| Phase | `Phase__c` | Picklist: Commit, Created, Undo |
 | Entry Count | `Entry_Count__c` | Number |
 | Entries | `Entries_JSON__c` | Long Text Area |
 
 - **Service:** `ImportJournalService` (writes and reads pages), `ImportRowProcessor` (writes
-  the commit phase), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
+  the commit phase), `ImportObjectLoader` (writes the commit and created phases of a one-object
+  import), `ImportUndoBatch` (writes the undo phase), LWC `importHistory`.
 
 ---
 
@@ -1989,10 +2661,10 @@ refund is another gift rather than an edit (ADR-0010).
 | Name | text | computed | The gift's identifier, assigned automatically. |
 | Donor Contact | reference(Contact) | conditional | The person credited with the gift, where people are Contacts. |
 | Donor Account | reference(Organization) | conditional | The account credited with the gift: an organization, a household giving in its own name, or a person Account. |
-| Household | reference(Household) | computed | The household credited with the gift, derived from the donor (R-G2). |
+| Household | reference(Household) | computed | The household credited with the gift, derived from the donor when the gift is given and kept when the donor later moves households (R-G2). |
 | Gift Date | date | yes | The date the gift was received, which is the date that appears on the receipt. |
 | Amount | decimal | yes | The money received, negative for a refund or a write-off, and zero on an in-kind gift, which is goods rather than money (R-G12). |
-| Type | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | yes | How the gift arrived. |
+| Payment Method | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | yes | How the gift arrived. Labelled Type before v0.6; the API name is still `Type__c`. |
 | Status | picklist(Received, Pending, Refunded, Written off, Cancelled) | yes | Where the gift stands; Received, Refunded and Written off count in the packaged giving totals, so a reversal nets against its original (ADR-0022), and Pending and Cancelled do not. Cancelled is a Pending gift that will never be paid (R-G16). |
 | Appeal | reference(Appeal) | no | The fundraising effort this gift responded to. |
 | Acknowledgment Status | picklist(Not required, To acknowledge, Acknowledged, Do not acknowledge) | yes (defaults To acknowledge) | Whether this gift still needs a thank you. |
@@ -2037,9 +2709,15 @@ person-account test in Section 4, never by a static field reference.
 **R-G2 Household is derived.** Household is written by the package, not by the user: from
 the donor contact's household through `HouseholdService`, from the person Account's
 household the same way in junction mode, from the Donor Account itself when that account
-is a household, and left empty when the donor is an organization. It is recomputed when
-the donor changes and when the donor's household membership changes, which is what keeps
-household totals correct after a merge, split, or reparent (R-H12, R-H13).
+is a household, and left empty when the donor is an organization. It is derived when the
+gift is saved and recomputed only when the gift's donor changes. A gift stays credited to
+the household it was credited to when it was given: when the donor later moves households
+(a reparent, a split, or a membership ending), their past gifts stay with the household
+they left and only gifts given after the move are credited to the new one (ADR-0071,
+`0071-a-gift-keeps-the-household-it-was-given-to.md`; R-H12). A household merge is not a
+move: the platform account merge carries the merged household's gifts to the survivor
+(R-H13). Household rollups reached through current membership, such as automatic household
+soft credits, follow current membership instead.
 
 **R-G3 Refunds and write-offs.** A refund or a write-off is a new gift with a negative
 Amount and Original Gift set, never an edit and never a deletion (ADR-0010). The package
@@ -2208,7 +2886,7 @@ receipt.
 | Household | `Household__c` | Lookup to Account |
 | Gift Date | `Gift_Date__c` | Date |
 | Amount | `Amount__c` | Currency |
-| Type | `Type__c` | Picklist: Cash, Check, Card, ACH, Stock, In-kind, Grant, Other |
+| Payment Method | `Type__c` | Picklist: Cash, Check, Card, ACH, Stock, In-kind, Grant, Other |
 | Status | `Status__c` | Picklist: Received, Pending, Refunded, Written off, Cancelled |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
 | Acknowledgment Status | `Acknowledgment_Status__c` | Picklist: Not required, To acknowledge, Acknowledged, Do not acknowledge |
@@ -2401,7 +3079,7 @@ object means something specific and is unavailable on Platform licenses.
 | Parent Appeal | reference(Appeal) | no | The larger effort this appeal is part of, for example a gala within a capital campaign. |
 | Active | boolean | yes (defaults true) | Whether the appeal is offered when entering a new gift. |
 | Net Raised | decimal | computed | Total raised less cost, calculated live from the two values. |
-| Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. |
+| Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. The Percent formula returns the plain ratio (0.5 for half) and Salesforce displays it as 50%. |
 
 ### Relationships
 
@@ -3103,8 +3781,8 @@ nothing packaged to conflict with it (ADR-0006).
 | Maximum Amount | `Maximum_Amount__c` | Currency |
 | Active | `Active__c` | Checkbox |
 
-- **Fields on Account** (shipped by Giving, on the Household, Organization, and person
-  layouts):
+- **Fields on Account** (shipped by Giving, shown read only in the Giving section of
+  Giving's own Account and Contact record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -3245,11 +3923,12 @@ charity describes the property and the donor values it.
 
 **R-RC13 What the document is branded with, and what it is valid without.** Every document
 prints the organization's legal name and address and its tax identification number. The name
-and address come from the template where the template placed the token for them, and from a
-block the package prints above the letter where it did not, on the same reasoning as the gift
-lines of R-RC8: an administrator who deletes the letterhead out of a template has not thereby
-issued a receipt with no organization on it. The tax identification number prints in the
-signature block.
+and address are the letterhead, and the letterhead is code, not template (ADR-0065,
+`0065-receipt-letters-are-edited-as-rich-text.md`): the package prints them in a block above
+the letter whatever the letter says, so an administrator editing the letter can neither delete
+nor misplace them. A letter saved before that decision still carries its own letterhead block
+(`class="letterhead"`); while it does, the package prints the logo only, and the letter's
+block prints the name. The tax identification number prints in the signature block.
 
 The logo is optional, is printed only when the organization has uploaded one and left the
 Print Logo On Receipts setting on, and is sized by one setting.
@@ -3508,7 +4187,7 @@ about which thank you takes precedence.
 | Active | boolean | yes (defaults true) | Whether the rule takes part in matching. An inactive rule matches nothing and is kept rather than deleted. |
 | Order | integer | yes | Where the rule sits in the list. The lowest numbered matching rule wins. |
 | Channel | picklist(Email, Letter, None) | yes | How the donor is thanked, or that this kind of gift is not acknowledged. |
-| Email Template | text | conditional | The developer name of the standard email template this rule sends; required when Channel is Email. |
+| Email Template | text | conditional | The developer name of the standard email template this rule sends; required when Channel is Email. Chosen from a picker of the org's active templates, by name, on the Acknowledgments page (ADR-0066, `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
 | Minimum Amount | currency | no | The smallest gift this rule matches. Empty means no lower bound. |
 | Maximum Amount | currency | no | The largest gift this rule matches. Empty means no upper bound. |
 | Gift Type | picklist(Cash, Check, Card, ACH, Stock, In-kind, Grant, Other) | no | The one gift type this rule matches. Empty means any type. |
@@ -3755,7 +4434,7 @@ belong to the people who have to do them.
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Name | text | yes | What the administrator calls the plan, for example "First gift welcome". |
-| Plan Key | text | yes | A stable key, unique, so a shipped default is recognized on upgrade without matching on a name the administrator may have changed. |
+| Plan Key | text | yes | A stable key, unique, so a shipped default is recognized on upgrade without matching on a name the administrator may have changed. Generated from the plan name when an administrator creates a plan, made unique with a number suffix, and never shown or changed afterwards (ADR-0066, `0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md`). |
 | Active | boolean | yes (defaults false) | Whether the plan can start. An inactive template keeps the plans it already started. |
 | Trigger Event | picklist(Manual, First gift, Gift received, Commitment started) | yes | What starts a plan from this template. Manual means a person starts it and nothing starts it automatically. Commitment started means a pledge or a recurring gift became active (R-SP3a). |
 | Minimum Amount | currency | no | For the two gift events, the smallest gift that starts a plan. Blank means any amount. |
@@ -4072,10 +4751,13 @@ the browser being closed and the interruption halfway down the pile.
 | Payment Reference | text | no | The check number or deposit reference, which is what makes a batch reconcilable against the bank statement. |
 | Fund | reference(Fund) | no | The fund this gift is designated to, when it differs from the batch's. |
 | Appeal | reference(Appeal) | no | The appeal this gift responded to, when it differs from the batch's. |
+| Installment | reference(Installment) | no | The scheduled payment this line's gift pays, chosen by the person or chosen in advance as the only suggestion (R-GR5, R-DM8). Empty means a gift on its own. |
 | Gift | reference(Gift) | computed | The gift this line produced, written by posting and empty before it (R-GB6). |
 
 ### Relationships
 
+- **Gift Batch Row to Installment**, many to one, optional; cleared if the installment is
+  deleted.
 - **Gift Batch Row to Gift Batch**, many to one, master-detail, not reparentable.
 - **Gift Batch Row to Donor**, many to one, to exactly one of Donor Contact or Donor Account
   by the time the batch posts (Section 4 "Person references").
@@ -4100,7 +4782,15 @@ entered one at a time with its description.
 added to the batch or changed. The one change allowed is the platform clearing Gift when
 that gift is deleted, because refusing it would let a posted batch stop a gift from ever
 being deleted. Deleting a line of a posted batch is refused by the entry screen but not by
-the database: see "Known gaps in shipped rules" in Section 30.
+the database: see "Known gaps in shipped rules" in Section 30. The platform clearing
+Installment when that installment is deleted is allowed for the same reason.
+
+**R-GR5 A line pays the payment it names, or nothing.** A line's Installment is offered and
+suggested as R-DM8 says, using the line's date or the batch's (R-GB1). Posting checks every
+named installment again, in the posting user's mode, before any gift is created: one that is
+no longer a candidate of the line's donor refuses the post and names the line (R-GB5). A
+posted gift carries the line's Installment and that installment's Commitment. Two lines may
+name one installment.
 
 ### Salesforce implementation
 
@@ -4119,6 +4809,7 @@ the database: see "Known gaps in shipped rules" in Section 30.
 | Payment Reference | `Payment_Reference__c` | Text(255), the length of the gift's |
 | Fund | `Fund__c` | Lookup to `Fund__c` |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
+| Installment | `Installment__c` | Lookup to `Installment__c`, cleared if the installment is deleted |
 | Gift | `Gift__c` | Lookup to `Gift__c`, cleared if the gift is deleted |
 
 - **Validation rule:** `Posted_Batch_Rows_Are_Final` (R-GR4).
@@ -4258,8 +4949,24 @@ from the batch, never from the template or the settings, so an edit made after t
 cannot make the commit match, refuse or create what the dry run did not show. A batch with no
 recorded values, or values that cannot be read, falls back to the template.
 
+**R-DM8 A gift entry screen suggests, and a person decides.** Quick Gift Entry (G-03) and a
+gift batch line (G-17, R-GR5, checked again at posting) offer the chosen donor's candidates (R-DM2, with no date bound) as payments the new gift can pay,
+with None always offered. A candidate whose due date and expected amount fall within R-DM3's
+window and tolerance, taken from the org's settings (no template is involved), is marked
+suggested. It is chosen in advance only when it is the only one suggested, and then it is
+shown chosen with a note saying why; otherwise None is chosen. R-DM4's choice by closest date
+and R-DM5's behaviours do not apply: the person sees the choice and may change it. The save
+checks the chosen installment again in the saving user's mode: it must still be a candidate of
+the gift's donor, and a gift of goods (R-G12) pays none; otherwise the save is refused, beside
+the choice, and nothing is written. A gift saved with a choice carries the Installment and
+that installment's Commitment, and the numbers follow as in R-DM6. Two gifts may pay one
+installment: each counts toward it.
+
 ### Salesforce implementation
 
+- **Gift entry:** `GiftEntryPayments` (the candidates for a donor, the suggestion and the
+  check at save, R-DM8), using `DonationMatcher.matching` for R-DM3 and
+  `InstallmentSelector.selectOpenForDonors` for R-DM2.
 - **Service:** `GiftImportProcessor` (the `ImportEntityProcessor` Core finds by name),
   `GiftImportRow` (one row's gift as read), `GiftImportReferences` (funds and appeals),
   `GiftImportCredits` (soft credit and tribute), `GiftImportSelector` (funds, appeals and open
@@ -4376,7 +5083,10 @@ or `Contact__c` on Soft Credit.
 The fund definitions aggregate Gift Allocation but filter and read attributes on the
 parent gift, written with a relationship-qualified name such as `Gift__r.Status__c`. That
 is a requirement on the aggregation engine, recorded here so that it is part of the
-vendoring evaluation in ADR-0011 rather than a surprise during the build.
+vendoring evaluation in ADR-0011 rather than a surprise during the build. It has a second
+half that R-R11 states: a change to the gift (its status, or its delete, which removes its
+allocations without firing their trigger) has to mark the gift's funds for recalculation,
+because the allocation row the fund total counts was not itself saved.
 
 Appeal donor count is deliberately absent: counting distinct donors is not one of the
 seven aggregates the engine offers (plan Section 4.10), and a grouped report answers it
@@ -4400,8 +5110,8 @@ why the definition keeps its own Last Calculated as well.
 
 ### Salesforce implementation
 
-- **Fields on Account** (shipped by Giving, shown on the Household and Organization
-  layouts and, in Person Account orgs, on the person layout):
+- **Fields on Account** (shipped by Giving, shown read only in the Giving section of
+  Giving's own Account and Contact record pages, ADR-0064 on the donor record pages):
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -4929,6 +5639,8 @@ The inbound gift API and the accounting export add nothing to the model (Section
 sync (X-02) adds one attribute to Appeal and Connect's own settings object. The Opportunity
 mirror (X-01) adds one attribute to Gift and two keys to that settings object.
 
+---
+
 ## 29B. Campaign Sync
 
 ### Definition
@@ -5239,6 +5951,470 @@ only, because a gift is never edited from its Opportunity.
 
 ---
 
+## 29D. Saved Query (and the query document)
+
+### Definition
+
+A named, reusable Find query (plan Section 4.9, feature C-34): which object, which columns,
+which records, in what order and how many. Each belongs to the person who saved it, who may
+share it, read only, with everyone who uses Find. A saved query holds no records and grants
+access to none: whoever runs it sees what their own access allows.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text (80) | yes | The name the person gave it. |
+| Object | text (255) | yes | API name of the object the query reads, copied from the document so the list can show and filter it without parsing JSON. |
+| Query | long text | yes | The query document (R-SQ1). |
+| Shared | boolean | no | True when everyone who uses Find can open it (R-SQ4). Default false. |
+| Owner | reference(User) | yes | The person who saved it; only they can change, share or delete it. |
+
+### Rules
+
+**R-SQ1 Query document.** Find, saved queries and bulk update (C-35) share one document:
+
+```
+{
+  "version": 1,
+  "object": "Gift__c",
+  "fields": ["Name", "Amount__c", "Donor_Contact__r.LastName"],
+  "filter": { "version": 1, "conditions": [ ... ] },
+  "orderBy": [{ "field": "Gift_Date__c", "direction": "DESC" }],
+  "limit": 200
+}
+```
+
+`fields` holds 1 to 20 field paths (relationship names, at most two lookups deep, the same
+paths as R-R2); `filter` is an R-R2 filter document, or absent for every record; `orderBy`
+holds at most one entry, `direction` ASC or DESC; `limit` is 1 to 2,000 rows shown. The
+`version` key exists for the reason R-R2 gives.
+
+Advanced Find (C-36) adds three optional keys, still at version 1, so every earlier document
+reads unchanged:
+
+```
+  "related": [
+    { "object": "Gift__c", "field": "Household__c", "has": false,
+      "filter": { "version": 1, "conditions": [ ... ] } }
+  ],
+  "children": [
+    { "relationship": "Contacts", "fields": ["Name", "Email"], "limit": 10 }
+  ],
+  "aggregate": { "function": "sum", "field": "Amount__c", "groupBy": "Status__c" }
+```
+
+`related` holds at most two related-records conditions (R-SQ8), `children` at most two
+related record columns of 1 to 5 field paths and a `limit` of 1 to 10 (R-SQ8), and
+`aggregate` the last summary chosen (R-SQ9): `function` is `count`, `sum`, `min` or `max`,
+`field` is required except for `count`, and `groupBy` is optional.
+
+**R-SQ2 Compiled, never typed.** `QueryCompiler` turns a document into SOQL using only names
+taken from the running user's describe (`QueryFieldCatalog`): an object or field the user
+cannot see is refused with a message naming it. Every filter value is a bind variable, a
+relative date is a date literal written from an integer (R-R2), and the query runs through
+`Database.queryWithBinds` with `AccessLevel.USER_MODE`, so CRUD, field-level security and
+sharing apply. The SOQL shown to the admin is rendered from the same document with the values
+written in, for display only; no SOQL text is ever accepted (ADR-0047).
+
+**R-SQ3 Export.** An export reads the same document in pages ordered by Id (the document's
+own order is ignored for paging), at most 2,000 rows a page, and stops at Export Row Limit
+(`Find_Export_Row_Limit__c`). The file is CSV, UTF-8 with a byte-order mark, built in the
+browser.
+
+**R-SQ4 Sharing.** Saved Query is Private. Sharing is an Apex managed share with the reason
+Shared With Find Users, to the org's All Internal Users group, granting Read. Only the owner
+can set or clear Shared, and the share row follows the flag. The share row is the one
+system-mode write here, recorded in ADR-0076
+(`0076-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`); every other read
+and write runs as the user.
+
+**R-SQ5 Permission.** Every Find action requires the `Find_And_Export_Records` custom
+permission, which opens the tool and grants no record access.
+
+**R-SQ6 Data hygiene copies (C-28).** The Data Hygiene tab builds each check's query document
+in code when it is counted or opened, from schema tokens and the org's membership mode; no
+check is stored in the package. Its count is `SELECT COUNT()` over that same document, bound
+and in user mode, capped at 2,000. "Open in Find" saves the document as a Saved Query owned by
+the person, unshared, named "Data hygiene: " plus the check name, replacing the query of their
+own saved query of that name if there is one. Nothing else about Saved Query changes
+(ADR-0079, `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`).
+
+**R-SQ7 Typed queries are read into the document in the browser.** A person may type a query
+in a subset of SOQL (`SELECT`, `FROM`, `WHERE`, `ORDER BY`, `LIMIT`; the admin guide lists
+what each accepts). The browser parses it into a query document and loads that document into
+the builder; the server never receives the text. Every check of R-SQ2 then applies to the
+document as to one built by hand, so there is one enforcement path (ADR-0078,
+`0078-typed-find-queries-are-parsed-into-the-query-document.md`). Text the parser cannot map
+onto the document, including anything R-R2 has no operator for, is refused before anything is
+sent.
+
+**R-SQ8 Related records.** A `related` entry names a child object and its lookup to the
+query's object; both come from the running user's describe, the lookup must be readable,
+filterable and point at the query's object, and the child object must be queryable. It
+compiles to `Id IN (SELECT lookup FROM child WHERE ...)`, or `NOT IN` when `has` is false,
+with the entry's R-R2 filter bound as any other (its own bind names), and is joined to the
+document's filter with AND. A `children` entry names a child relationship of the query's
+object, found in describe, and compiles to a subquery in the select list of the grid query
+and the export pages, newest first by Created Date, at most `limit` rows per record. Counts,
+bulk update selections and summaries ignore `children`.
+
+**R-SQ9 Summaries.** A summary compiles the document's object, filter and `related` entries to
+one aggregate query with `GROUP BY` the `groupBy` path (a groupable field, at most two lookups
+deep), and runs it in user mode. `sum` takes a number field, `min` and `max` a number, date or
+date and time field, each aggregatable. A summary is refused when more than 20,000 records
+match (counted first, at most 20,001), so the count and the aggregate stay inside one
+request's query rows, and shows at most 2,000 groups.
+
+**R-SQ10 Editing results.** A person who holds `Bulk_Update_Records` as well (R-BU6) may edit
+the results grid. A save sends at most 200 records, each an Id of the query's object and
+values for fields that pass R-BU4; each value is typed as a bulk update's set value is, and an
+empty value clears a field that may be empty. The records are read again as the person, a
+field whose value is unchanged is not written, and the rest are saved with
+`Database.update(records, false, AccessLevel.USER_MODE)`. Each save is one data job with
+Operation Update (R-BU1), committed and complete when the request ends, whose definition
+holds the query object, the record Ids as an R-R2 `in` condition, no changes and the count;
+one commit journal page holds an Updated or Failed entry per record (R-IJ3), so the save is
+listed and undone as a bulk update is (R-BU5).
+
+**R-SQ11 Excel export.** An Excel export reads exactly the pages of R-SQ3 and writes, in the
+browser, one sheet with a header row of column labels, numbers as numbers, dates and times as
+dates, and everything else as text. The workbook is written by BarnCRM's own module, with no
+third-party code (the same reasoning as ADR-0049).
+
+### Salesforce implementation
+
+- **Object:** `Saved_Query__c`, sharing model Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Name | `Name` | Text (80, standard) |
+| Object | `Object_Name__c` | Text (255) |
+| Query | `Query_JSON__c` | Long Text Area (131072) |
+| Shared | `Shared__c` | Checkbox, default false |
+
+- **Apex sharing reason:** `Shared_With_Find_Users__c` (Apex sharing reason API names end in `__c`).
+- **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
+- **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
+  `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10).
+- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`.
+- **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
+  permission set `BarnCRM_Find_And_Export`, assignable alone.
+- **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
+- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data Hygiene tab
+  (app page `Data_Hygiene`, component `dataHygieneConsole`).
+
+---
+
+## 29E. Bulk update
+
+### Definition
+
+Up to five changes to every record a Find query returns (plan Section 4.9, feature C-35): set
+a field to a value, clear it, copy another field of the same record into it, or change its own
+value with transform steps (C-37, R-BU7). A bulk update
+adds no object of its own: it is a data job (Section 16) with Operation Update, journaled in
+the import journal (Section 17A) and undone as an import is (ADR-0047; builder decisions in
+ADR-0077, `0077-bulk-update-runs-as-the-user-from-a-find-query.md`).
+
+### Rules
+
+**R-BU1 A data job with no rows.** A bulk update is an `Import_Batch__c` with Operation Update,
+no template, no file and no staged rows. Its Bulk Update Definition holds, as one document,
+the query document (R-SQ1), the changes and the count the person confirmed:
+
+```
+{
+  "version": 1,
+  "query": { "version": 1, "object": "Contact", "fields": ["Name"], "filter": { ... } },
+  "changes": [
+    { "field": "MailingCity", "action": "set", "value": "Portland" },
+    { "field": "Preferred_Email__c", "action": "copy", "source": "Work_Email__c" },
+    { "field": "Title", "action": "clear" },
+    { "field": "MailingStreet", "action": "transform",
+      "transforms": [ { "op": "replace", "text": "St.", "replaceWith": "Street" } ] }
+  ],
+  "confirmedCount": 37
+}
+```
+
+The record set comes only from the query document, compiled by `QueryCompiler` as the person
+(R-SQ2); no SOQL text is accepted. The query's columns, order and row count are ignored: the
+job reads the fields its changes need, in Id order.
+
+**R-BU2 Counted, confirmed, and a ceiling.** The preview counts the matching records as the
+person, in user mode, and shows the first five before and after. The start counts again and is
+refused when none match, when more match than the person confirmed, or when more match than
+`Bulk_Update_Run_Limit__c`. One request may read just under 50,000 rows, so the count reads at
+most the run limit plus one, and the limit is held to 48,000. When the count starts, the job
+stamps Committed By, Started At, Row Count (the count) and the Undo Deadline (R-IB7), and runs
+in Batch Apex, at most 200 records a chunk.
+
+**R-BU3 Only records that still match, as the person.** The job reads at most the confirmed
+number of records, in Id order, in user mode. Each chunk reads its records again with the
+query's filter, so a record changed since so that it no longer matches is left alone and
+counted in the Run Log. Each record is saved with `Database.update(records, false,
+AccessLevel.USER_MODE)`, so access, validation rules, duplicate rules and automation apply and
+one refusal does not stop the rest. Rows Updated counts the records saved, Rows Matched those
+that already held the new values (not saved), and Rows Rejected those the platform refused.
+Each chunk writes one commit journal page (R-IJ1, R-IJ3).
+
+**R-BU4 What a bulk update never writes.** A target field must be on the query's object (no
+path to another record), editable by the person (`isUpdateable`, which excludes formula,
+auto-number and system fields), of a type a value can be written to, and not one the package
+keeps: the target of any Rollup Definition (active or not, read when the job is checked, so a
+new rollup is protected without a code change), and the fields the household automation and
+the package write (R-IT14's list: the household greetings, custom name, role and member count,
+the primary contact and primary affiliation, the import tag `Created_By_Import_Batch__c`, the
+sample data marks), and any field ending `Last_Calculated__c`. The object must be editable by
+the person and not one of the package's bookkeeping objects (data jobs, import rows and
+templates, the journal, the error log, settings and setting changes, automation settings,
+rollup definitions, duplicate dismissals, saved queries) or an object a module protects through
+`DataProtectionExtensions`, a custom setting, or a Salesforce setup object (users, groups,
+profiles, roles, permission sets and their assignments, record types, the organization). The
+protected list is one list, `DataProtectedFields`, shared with the one-object import (R-IT14). A
+copy needs a compatible source: the same type; any text, email, phone, URL or picklist into a
+text field; any number into a number field; a lookup into a lookup that can point at the same
+kind of record. A value to set is typed for its field before the job starts; a restricted
+picklist takes only its active values. Locks on another module's records (a posted gift, an
+issued receipt) are not listed here: their triggers refuse the save, and the record is
+journaled as Failed.
+
+**R-BU5 Undo.** The undo is the import undo (R-IB8): counted and confirmed, once, within the
+Undo Deadline. For a data job whose Operation is Update it runs the restore pass only, and it
+restores any object its journal names that describe still finds, where an import restores
+only people, households and organizations. A value is put back only where the record still
+holds the value the bulk update wrote; anything else is journaled as not put back.
+
+**R-BU6 Permission.** Every bulk update action requires the `Bulk_Update_Records` custom
+permission and, because every bulk update starts from a Find query, `Find_And_Export_Records`
+(R-SQ5). Neither grants record access.
+
+**R-BU7 Change with steps.** A change whose action is `transform` carries `transforms`, a list
+of steps in the transform document of R-IT15 (ADR-0081), and changes each record's own value.
+For each record the job reads the target's value as text and applies the steps with
+`DataTransform.apply`; an `append` step names fields of the same record by API name, each a
+field of the query's object the person may read, read with the record and passed to the engine
+by `DataTransform.key(apiName)`. The result is saved as the field's type: blank clears the
+field (refused for that record when the field is required), a checkbox reads `true`, `yes` or
+`1` as true, a number drops everything but digits, the point and the minus sign, a date reads
+`YYYY-MM-DD`, and a text field takes the text as it is. A result the field cannot take (too
+long, not a number or date, a value a restricted picklist lacks) is not shortened or guessed:
+that record is journaled as Failed with the reason, and the rest still save. A change with
+steps is checked when it is previewed and when the job starts: it is refused when it has no
+step, when `DataTransform.problems` names any, when an `append` names a field the person may
+not read, or when the target is a lookup. Comparison is exact (`equals`), so a step that only
+changes capitals still writes and journals the record. The preview shows each sampled record's
+own result, and the reason in place of a result the field cannot take.
+
+### Bulk delete (C-37)
+
+Deletes every record a Find query returns (plan Section 4.9; owner decision 2026-09-23; builder
+decisions in ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`). Like a bulk
+update, it is a data job with no rows of its own.
+
+**R-BD1 A data job with Operation Delete.** A bulk delete is an `Import_Batch__c` with
+Operation Delete, no template, no file and no staged rows. Its Bulk Update Definition holds the
+query document and the confirmed count: `{ "version": 1, "query": { ... }, "confirmedCount":
+112 }`. The record set comes only from the query document, compiled by `QueryCompiler` as the
+person (R-SQ2).
+
+**R-BD2 Counted, confirmed, and a ceiling.** As R-BU2, with `Bulk_Delete_Run_Limit__c` (default
+10,000, held between 1 and 48,000). The preview also names, from describe, the kinds of child
+record the platform deletes with each record (child relationships marked cascade delete whose
+object the person may read). The Undo Deadline is stamped at the start as the earlier of the
+import undo window (R-IB7) and 15 days, the time the platform keeps a deleted record in the
+Recycle Bin.
+
+**R-BD3 Only records that still match, as the person.** The job reads at most the confirmed
+number of records, in Id order, in user mode. Each chunk reads its records again with the
+query's filter; a record that no longer matches is left alone and counted in the Run Log. Each
+chunk deletes with `Database.delete(records, false, AccessLevel.USER_MODE)`, so access,
+automation and locks apply and one refusal does not stop the rest. Rows Deleted counts the
+records deleted and Rows Rejected those the platform refused. Each chunk writes one commit
+journal page: a Deleted entry for each deleted record and a Failed entry for each refusal
+(R-IJ2, R-IJ3). Child records the platform deleted with a parent are not journaled: they come
+back when their parent is undeleted.
+
+**R-BD4 What a bulk delete never deletes.** The object must pass `DataProtectedFields`'
+object rule (R-IT14: not the package's bookkeeping, a module's protected object, household
+membership rows, a custom setting, a setup object, or an object that is never loaded), and
+describe must say the person may delete its records and that the platform can undelete them
+(`isDeletable`, `isUndeletable`). Locks on another module's records refuse the delete through
+their own triggers, and the record is journaled as Failed.
+
+**R-BD5 Undo is undelete.** Counted and confirmed, once, within the Undo Deadline, with the
+same guards as the import undo (R-IB8: Undoing latches the job, and an undo that stops can be
+run again). The undo reads the commit journal pages, one page a chunk, and for each Deleted
+entry finds the record in the Recycle Bin (read with `ALL ROWS` in system mode, by the Id the
+journal holds): a record still deleted is undeleted with `Database.undelete(ids, false,
+AccessLevel.USER_MODE)`; a record no longer in the Recycle Bin is counted as purged; a record
+somebody already restored is left alone. Each record not brought back is journaled as
+NotRestored with the reason, and the Run Log says how many were restored, purged and refused.
+
+**R-BD6 Permission.** Every bulk delete action requires the `Bulk_Delete_Records` custom
+permission and `Find_And_Export_Records`. `Bulk_Delete_Records` is in its own permission set
+only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
+
+### Salesforce implementation
+
+- **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`,
+  `Rows_Deleted__c`) and `Import_Journal__c` (Sections 16 and 17A).
+- **Settings keys:** `Bulk_Update_Run_Limit__c` and `Bulk_Delete_Run_Limit__c` (Section 12, v0.7
+  keys).
+- **Bulk delete services:** `BulkDeleteService` (check, preview, start, undo),
+  `BulkDeleteBatch` (the job), `BulkDeleteUndoBatch` (the undelete), `BulkDeleteController`;
+  component `bulkDelete`, opened from Find's results, and `bulkDeleteHistory` on the Bulk Update
+  tab. Custom permission `Bulk_Delete_Records`, permission set `BarnCRM_Bulk_Delete`.
+- **Services:** `BulkUpdateFields` (which fields and objects can be written, from the shared
+  `DataProtectedFields` list, and how a value or a copy is typed), `BulkUpdateService` (check, preview, start, recent jobs),
+  `BulkUpdateBatch` (the job), `BulkUpdateController`; `QueryCompiler` gains the count and the
+  chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
+- **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
+  permission set `BarnCRM_Bulk_Update`, assigned beside `BarnCRM_Find_And_Export`.
+- **UI:** component `bulkUpdate`, opened from Find's results with the query, and on the Bulk
+  Update tab (app page `Bulk_Update`) listing recent bulk updates with their progress and undo.
+
+---
+
+## 29F. Field Utilization Snapshot
+
+### Definition
+
+One count of how many records hold a value in one field, for one object and one record type,
+taken by one run of the field utilization count (plan Section 6.1 item 10, ADR-0086
+`0086-field-utilization-ships-in-core.md`). Every row of one run carries the same Taken At, so
+a run is the set of rows sharing it, and a trend is the same object, field and record type
+across runs. Neutral: it names no nonprofit concept and is in Core.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The snapshot's identifier, assigned automatically. |
+| Object Name | text | yes | The API name of the object counted, as describe gives it. |
+| Field Name | text | yes | The API name of the field counted, as describe gives it. |
+| Field Label | text | yes | The field's label when it was counted, for reports. |
+| Record Type | text | no | The developer name of the record type the count is for. Empty when the object has no record types, or for its records with none. |
+| Filled Count | number | yes | Records in this group with a value in the field. |
+| Record Count | number | yes | Records in this group that were looked at. |
+| Fill Rate | percent | computed | Filled Count divided by Record Count. |
+| Sampled | boolean | yes | True when the count covers a sample of recent records rather than all of them. |
+| Taken At | datetime | yes | When the run started. |
+
+### Rules
+
+**R-FU1 Describe only.** Objects come from the saved list `Field_Utilization_Objects__c`,
+each kept only when the global describe has it and it is queryable and accessible; fields come
+from that object's describe. No typed text reaches a query.
+**R-FU2 What is counted.** A field is counted when the runner can read it and either create or
+edit it, and it is not a formula, roll-up, auto number, checkbox, compound (address or
+location) or non-nillable field.
+**R-FU3 User mode.** Every count, read and write is in user mode, so a run counts the records
+its runner can see. Written into the page and the admin guide.
+**R-FU4 Count, else sample.** A filterable field is counted with one `COUNT(field)` query
+grouped by record type, one query row per group. A field that is not filterable, or whose
+count is refused, is counted on the 200 most recently modified records and its rows are
+Sampled.
+**R-FU5 Size limit.** An object holding more than 1,000,000 records is skipped and named in the
+run summary.
+**R-FU6 Groups with no records are not stored.** A record type with no records produces no row.
+**R-FU7 Retention.** Rows are never edited. Each run's finish deletes rows whose Taken At is more
+than 13 months old.
+**R-FU8 Visible last run.** Each run records when it finished and a one sentence summary on
+`BarnCRM_Settings__c`, including a run that counted nothing.
+
+### Salesforce implementation
+
+- **Object** `Field_Utilization_Snapshot__c`, auto number Name `FUS-{000000}`, public read only
+  sharing, reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it:
+  Read, Create, Delete, View All and Modify All (the last so a user-mode retention delete
+  reaches another administrator's rows).
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Object Name | `Object_Name__c` | Text(80) | |
+| Field Name | `Field_Name__c` | Text(80) | |
+| Field Label | `Field_Label__c` | Text(255) | |
+| Record Type | `Record_Type__c` | Text(80) | Developer name. |
+| Filled Count | `Filled_Count__c` | Number(18, 0) | |
+| Record Count | `Record_Count__c` | Number(18, 0) | |
+| Fill Rate | `Fill_Rate__c` | Formula (Percent) | Blank when Record Count is 0. |
+| Sampled | `Sampled__c` | Checkbox | Default false. |
+| Taken At | `Taken_At__c` | DateTime | |
+
+- **Service:** `FieldUtilizationService` (plan and count), `FieldUtilizationBatch` (25 fields
+  per chunk), `FieldUtilizationScheduler` (weekly, Sundays 04:00), `FieldUtilizationSelector`,
+  `FieldUtilizationController`. The page is the `fieldUtilization` panel on the Field
+  Utilization page of BarnCRM Settings.
+
+---
+
+---
+
+## 29G. Interaction Note
+
+### Definition
+
+A note a staff member writes about a conversation, a meeting or a visit with a person or an
+account: when it happened, what kind of interaction it was, who took part and what was said
+(plan Section 5.1, feature C-39). It is the lightweight version of a contact report.
+
+An interaction note is not an entity of its own. It is a completed platform activity (a Task)
+logged through the packaged action "Log an interaction". The package adds no object, no field
+on Task or Activity, and no automation on Task (ADR-0089,
+`0089-interaction-notes-are-completed-tasks.md`).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Subject | text | yes | A short line that says what the interaction was about. |
+| Date | date | yes (defaults today) | The day the interaction happened, which may be earlier than the day the note is written. |
+| Kind | picklist (the org's Task Type values) | no (defaults Meeting) | What kind of interaction it was: a meeting, a call, a visit, or another value the org keeps. |
+| Notes | long text | no | What was said and what was agreed. |
+| Staff member | reference(User) | yes (defaults the person logging it) | Who held the interaction. |
+| People | reference(Contact), one or several | no | The people who took part. Several only where the org relates multiple contacts to tasks. |
+| Account | reference(Account) | no | The household or organization the note is about. Set from the account the note is logged on, or derived by the platform from the person's account. |
+| Status | picklist | yes (always Completed) | Completed, so the note is history rather than a to-do. |
+
+### Relationships
+
+- **Interaction Note to Contact**, many to one (many to many where the org relates multiple
+  contacts to tasks), through `WhoId`.
+- **Interaction Note to Account**, many to one, through `WhatId` when logged on an account and
+  through the platform-derived `AccountId` when logged on a person.
+
+### Rules
+
+**R-IN1 An interaction note is history.** It is created Completed and dated the day the
+interaction happened. Next steps are an open task, not a field on the note.
+
+**R-IN2 Visibility follows the record.** A note is readable by anyone who can see the person or
+the account it is on. There is no per-note confidentiality (ADR-0089, owner question).
+
+**R-IN3 Where it shows.** A note logged on a person shows on the person's timeline and on the
+timeline of the account their contact points at: the household in contact mode, the employer
+or nothing in junction mode. A note logged on an account shows on that account.
+
+**R-IN4 No packaged schema on activities.** Nothing in the package reads, writes or extends
+Task for this feature beyond the action that creates it.
+
+### Salesforce implementation
+
+- **Object:** Task (standard), Status Completed.
+- **Standard fields used:** `Subject`, `ActivityDate` (Date), `Type` (Kind), `Description`
+  (Notes), `OwnerId` (Staff member), `WhoId` (People), `WhatId` and `AccountId` (Account),
+  `Status`.
+- **Quick actions:** `Contact.Log_Interaction` (Create on Task, parent field Who) and
+  `Account.Log_Interaction` (Create on Task, parent field What), labelled "Log an interaction".
+  Predefined values: Status Completed, ActivityDate `TODAY()`, Type Meeting.
+- **Placement:** Dynamic Actions on `Contact_Record_Page` (Edit, Log an interaction, Delete)
+  and `Account_Record_Page` (after Edit, for every record type), and the action list of the
+  Account fallback layout (ADR-0043).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -5266,7 +6442,9 @@ as Stewardship Plan Template, Stewardship Plan Step and the running Stewardship 
 Gift Batch left this table in v0.5 and is specified in Section 25L, together with Gift
 Batch Row (25M), the line of a batch.
 
-The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Connect entity: the
+The v0.6 inbound gift API (X-03) and accounting export (X-04) add no Connect entity (the export is
+gated by the custom permission `Export_Accounting`, on the `Accounting_Export` permission set, see
+the 2026-10-12 accounting export row of Section 31): the
 API writes ordinary gifts through Giving, and the export reads gifts and allocations and
 records nothing (ADR-0051). The posting flag plan Section 4.12 mentions is G-20's, in Giving:
 two attributes on Gift and one Giving settings key, and no new entity (R-G13, R-G14, ADR-0053).
@@ -5292,8 +6470,8 @@ is closed deliberately rather than discovered.
 | Rule | Gap | Why it is open |
 |---|---|---|
 
-None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-23 by C-22
-(ADR-0044, primary contact mirrors the primary member).
+R-M3's Primary Contact mirror was closed on 2026-09-23 by C-22 (ADR-0044, primary contact
+mirrors the primary member).
 | R-M3 (Section 6) | The primary member is not mirrored to the household's Primary Contact. | `Primary_Contact__c` is a lookup to Contact, so it cannot name a person stored as a Person Account, which is the org shape junction membership serves. Closing the gap means changing the field (a Contact and Account pair, per Section 4) or dropping the second half of the rule. Needs an ADR either way. |
 | R-GR4 (Section 25M) | A line of a posted batch can still be deleted through the API or a report by someone holding delete access on lines. | Validation rules do not run on delete, and a trigger for this alone costs more than the risk: the entry screen refuses it, the gifts are untouched, and only the record of the deposit loses a line. Revisit if an org reports it. |
 
@@ -5305,25 +6483,27 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 |---|---|---|
 | v0.1 | 2026-09-06 | Initial model: Household, Household Member, Contact, Organization, plus the platform configuration entities Error Log, Automation Setting, Setting Change, Nonprofit Settings, and the shipped-defaults custom metadata Naming Pattern and Automation Registry. |
 | v0.1 | 2026-09-07 | C-05 review fix: Error Log entries are published as `Error_Log_Event__e` (Publish Immediately) and written by a subscriber, so an entry survives the rollback it documents (new rule R-E4). |
-| v0.1 | 2026-09-08 | C-05 review fix: all three packaged permission sets grant Read and Create on `Error_Log_Event__e`, because publishing is governed by Create on the event (rule R-E4). |
-| v0.1 | 2026-09-08 | C-01 follow-up, R-H10 enforced in code. No object or field added. Household upkeep now clears Primary Contact when the person it names is no longer a current member, in both membership modes, and promotes nobody in their place: R-H10 already said the next member is proposed and not silently assigned, so the code follows the rule rather than the rule following the code. An organization shares the Primary Contact field (R-O3) and is never touched by this upkeep. |
-| v0.1 | 2026-09-09 | C-01 documentation corrections. No object, field, or code changed. The duplicated "Person attributes on Account" bullet in Section 5 is removed. Household Member's `Account` attribute is retyped `reference(Account)` and defined as the person's own account only, because `reference(Household)` read as a second household reference and invited the confusion R-M4 exists to prevent. R-M3's Primary Contact mirror is recorded as unimplemented and unimplementable as written, and listed in Section 30 as a known gap. R-H14 now says what the console does: a preview over fixed sample households rather than the org's own, and a recompute batch that confirms it was queued and then reports nothing further. |
-| v0.1 | 2026-09-08 | C-09 merge and split build. No object or field added. R-H13 gains the paragraph above on what a merge does, in what order, and what audits it. Recorded against R-M3: a move carries a person's role and primary flag with them, but never gives a household a second primary, so a merge or a split of people who were each primary in their own household leaves the survivor with one. |
 | v0.1 | 2026-09-07 | C-04 and C-05 build. Error Log gains Object Name. Automation Setting gains Handler Class, Object Name, Execution Order, and Package Default, all copied from the shipped registry when a record is materialized. Automation Registry field API names fixed ("Object" and "Order" are reserved words). Error Log and Setting Change record names recorded as auto numbers. Nonprofit Settings picklist keys recorded as text, per ADR-0019. |
 | v0.1 | 2026-09-07 | C-01 and C-02 build. Added `Household__c` (Lookup to Account) to Household Member: the original field list named the household side and the person side with the same attribute, so junction mode had no way to say which household a membership belonged to. `Account__c` is now defined as the person side only, matching R-M4. Recorded the naming service's token forms: `{FirstName}`, `{LastName}`, and `{Salutation}`, with the `{!Token}` spelling accepted as an alias so patterns copied from formula fields keep working. |
 | v0.1 | 2026-09-07 | Junction membership made a first-class v0.1 path for orgs that store people as accounts (product owner priority change). The five Contact person attributes (`Deceased__c`, `Household_Role__c`, `Exclude_From_Household_Name__c`, `Exclude_From_Greetings__c`, `Preferred_Name__c`) are now present on Account with the same API names and definitions, because a person stored as an account carries them on that record. Naming and greetings read a person through the `HouseholdService.Person` shape rather than through Contact, so one set of rules serves both. |
-| v0.1 | 2026-09-08 | C-01 and C-02 review round. `Household__c` on Household Member is now a required lookup with a cascade delete, matching the "Required: yes" already in the attribute table. The Salesforce note that a household could be deleted without touching membership history was written before the field was required and is corrected: a deleted household now takes its own membership rows with it, which is the only case where history is lost.
 | v0.2 | 2026-09-07 | Core: Rollup Definition (Section 14) with the filter document format and the mode-resolved path notation; Import Template, Import Batch, and Import Row (Sections 15 to 17) with the Created By Import Batch tag on Household, Contact, Organization, and Gift. Giving: Gift, Gift Allocation, Fund, and Appeal (Sections 18 to 21), and the packaged default giving rollups (Section 26). Nonprofit Settings gains `Fiscal_Year_Start_Month__c`, `Default_Fund__c`, `Default_Appeal__c`, `Rollup_Mode_Default__c`, `Import_Chunk_Size__c`, and `Setup_Assistant_Steps_Complete__c`. Shipped defaults gain `Rollup_Definition_Default__mdt` and `Import_Template_Default__mdt`. Published for build, objects not yet created. |
 | v0.3 | 2026-09-07 | Giving: Commitment, Installment, Soft Credit, and Tribute (Sections 22 to 25) with their rollup targets. Core: Relationship, Affiliation, and Address (Sections 27 to 29), the Primary Affiliation reference on Contact, and the shipped defaults `Relationship_Type__mdt`. Nonprofit Settings gains `Automatic_Household_Soft_Credits__c`, `Installment_Generation_Horizon_Months__c`, `Installment_Overdue_Grace_Days__c`, `Contact_Address_Change_Behavior__c`, `Relationship_Auto_Reciprocal__c`, and `Seasonal_Address_Last_Run__c`. Published for build, objects not yet created. |
 | v0.3 | 2026-09-07 | Convention added: person references are a Contact and Account pair with exactly one set (Section 4), following the change of first customer to Nonprofit Cloud and Agentforce Nonprofit orgs where individuals are person Accounts. Import Row and Import Template carry the person-mode attributes this requires. |
-| v0.3 | 2026-09-08 | G-08, G-09, G-10 review round. R-SC3a records that the membership change recompute is queued and capped at 500 gifts per household. R-TR6 now reads Deceased on Account as well as Contact, and allows notifying an honoree who is not marked deceased. R-G11 refuses a link where either gift has been refunded or written off. |
 | v0.3 | 2026-09-07 | Giving G-08, G-09, G-10: the Employer attribute on Contact and on Account (`Employer__c`), rule R-G11 (matching gift linkage), rules R-SC6 and R-SC7 (automatic soft credits are recomputed and deduplicated), rule R-TR6 (a memorial is never notified to the person who died), and the gift status Received filter on the two soft credit rollups in Section 26. |
 | v0.3 | 2026-09-07 | Giving: Gift gains `Refund_Reason__c`, so the reason a refund or a write-off was recorded is held on the negative gift rather than by editing the original (R-G3, G-04). Giving Settings added as Section 21A: `Giving_Settings__c` holds the three v0.3 Giving keys that ADR-0017 moved out of `Nonprofit_Settings__c`, and Section 12 records the move. |
 | v0.3 | 2026-09-07 | Commitments (G-07, G-11): Giving Settings gains `Auto_Apply_Gifts_To_Installments__c` and `Installment_Top_Up_Last_Run__c`, and Section 12 records that the Giving keys live on `Giving_Settings__c` rather than `Nonprofit_Settings__c` (ADR-0017). R-CM5 states that Balance is empty for a recurring commitment; R-IN3 states the automatic linking of a gift to the earliest unpaid installment. |
 | v0.3 | 2026-09-07 | Sections renumbered to keep the document in reading order: the former Section 14 "Deferred to later iterations" is now Section 30 and the former Section 15 "Change log" is now Section 31. Section 32 "Entity ownership by package" is new. |
 | v0.3 | 2026-09-07 | C-10 sample data loader: added `Sample Data` (`Sample_Data__c`, Checkbox, default false) to Household, Contact, and Organization so the sample data set can be removed in one action. |
+| v0.1 | 2026-09-07 | C-03: added the shipped-defaults type Setting Definition (Section 13), which drives the Nonprofit Settings console, and the Nonprofit Settings key `Setup_Steps_Completed__c` (Section 12), which records Setup Assistant progress. |
+| v0.1 | 2026-09-07 | C-03, following ADR-0017: added `Settings_Object__c` to Setting Definition, so each package owns its own protected hierarchy custom setting and the console reads and writes any registered one. |
+| v0.1 | 2026-09-07 | C-03, following ADR-0020: added `Navigation_Target__c` to Setting Definition, so a module's settings page is reached by navigation while Core's own panels are imported by name. |
+| v0.2 | 2026-09-07 | C-12: added the Nonprofit Settings keys that the full Setup Assistant fills in (Section 12): the organization identity keys used on receipts (`Organization_Legal_Name__c`, `Organization_EIN__c`, `Organization_Address__c`, `Receipt_Logo_Document_Id__c`, `Receipt_Signature_Document_Id__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`), the giving defaults written only when the Giving module is present (`Default_Fund__c`, `Default_Appeal__c`), and the assistant's own progress keys `Setup_Steps_Skipped__c` and `Setup_Started_At__c`. The v0.2 key planned as `Setup_Assistant_Steps_Complete__c` shipped as `Setup_Steps_Completed__c` plus `Setup_Steps_Skipped__c`. |
+| v0.1 | 2026-09-08 | C-05 review fix: all three packaged permission sets grant Read and Create on `Error_Log_Event__e`, because publishing is governed by Create on the event (rule R-E4). |
+| v0.1 | 2026-09-08 | C-01 follow-up, R-H10 enforced in code. No object or field added. Household upkeep now clears Primary Contact when the person it names is no longer a current member, in both membership modes, and promotes nobody in their place: R-H10 already said the next member is proposed and not silently assigned, so the code follows the rule rather than the rule following the code. An organization shares the Primary Contact field (R-O3) and is never touched by this upkeep. |
+| v0.1 | 2026-09-08 | C-09 merge and split build. No object or field added. R-H13 gains the paragraph above on what a merge does, in what order, and what audits it. Recorded against R-M3: a move carries a person's role and primary flag with them, but never gives a household a second primary, so a merge or a split of people who were each primary in their own household leaves the survivor with one. |
+| v0.1 | 2026-09-08 | C-01 and C-02 review round. `Household__c` on Household Member is now a required lookup with a cascade delete, matching the "Required: yes" already in the attribute table. The Salesforce note that a household could be deleted without touching membership history was written before the field was required and is corrected: a deleted household now takes its own membership rows with it, which is the only case where history is lost.
+| v0.3 | 2026-09-08 | G-08, G-09, G-10 review round. R-SC3a records that the membership change recompute is queued and capped at 500 gifts per household. R-TR6 now reads Deceased on Account as well as Contact, and allows notifying an honoree who is not marked deceased. R-G11 refuses a link where either gift has been refunded or written off. |
 | v0.3 | 2026-09-08 | C-15 and C-16 automation split (product owner decision). No object or field added. Relationships and affiliations each ship two `Automation_Registry__mdt` rows instead of one: `Relationship_Validation` (order 10, `RelationshipValidationHandler`) with `Relationship_Reciprocal` (order 30, `RelationshipMaintenanceHandler`), and `Affiliation_Validation` (order 10, `AffiliationValidationHandler`) with `Affiliation_Primary` (order 30, `AffiliationMaintenanceHandler`). Switching the maintenance automation off no longer switches off that object's validation, which is what an administrator pausing automation before a bulk import needs. `applyDefaults` sits with the validation handler because the status and date rules (R-RL5, R-AF4) have to survive the upkeep being off. Both services now bypass the validation row alongside their own while they write. |
-| v0.3 | 2026-09-09 | C-15 defect found by the first org run: the reciprocal upkeep never ran on a fresh org. `Relationship_Auto_Reciprocal__c` ships on, but a checkbox on a hierarchy custom setting read through `getOrgDefaults()` before the org has saved comes back false rather than carrying its declared default, so `RelationshipService` read the feature as switched off and wrote no other side, silently. No object or field added: the shipped value is now declared in `SettingsService.SHIPPED_DEFAULTS` and applied to the unsaved record, and `scripts/ci/check-setting-defaults.py` fails the build for any checkbox that ships on and is not registered (ADR-0035). |
 | v0.3 | 2026-09-08 | C-13 rollup adapter build. `Rollup_Definition__c` and `Rollup_Definition_Default__mdt` created as Sections 14 and 13 specify, with one correction: both gain `Fiscal_Date_Field__c`. R-R3 said the fiscal window is computed from the start month and the offset but never said which date attribute it is measured on, and every fiscal definition in Section 26 sums an amount rather than a date, so the window had nothing to bound. The attribute is optional and falls back to the attribute being aggregated, which is right for a rollup that aggregates a date. `Mode__c` on the definition ships with Both as its default value, matching R-R4 and the shipped Giving rows. |
 | v0.3 | 2026-09-08 | C-17 Addresses build. `Address__c` and its fields, list views, compact layout, and validation rules created as specified in Section 29, with two recorded deviations: `Street__c` ships as Text Area (255) because the platform has no long text field that a list view or a validation rule can read, and `Contact_Address_Change_Behavior__c` ships as Text(40) on `Nonprofit_Settings__c` per ADR-0019 rather than as a picklist. `Verification_Status__c` defaults to Unverified and is left writable for a third party verification app (R-AD6); no packaged code writes it. |
 | v0.3 | 2026-09-08 | G-02 defect fix (ADR-0022). No object or field added. Section 26's base filter changes from `Status equals Received` to `Status` in `Received`, `Refunded`, `Written off`, because R-G3 moves a fully refunded gift's status while leaving the negative gifts that reverse it at Received, so the old filter kept the negatives, dropped the positive, and subtracted a refunded gift twice. The count rows, largest gift, and the two date rows additionally require `Amount__c` greater than 0, so a gift given once and refunded in full reads as one gift and a total of zero. All 38 gift sourced, Gift Allocation sourced and Soft Credit sourced `Rollup_Definition_Default__mdt` rows updated; the three Pledge Balance rows filter on Commitment status and are unaffected. R-R9 gains the sentence that makes this a consequence of the rule rather than an exception to it. |
@@ -5333,14 +6513,16 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.4 | 2026-09-08 | G-15 gaps closed. `Stewardship_Plan__c` gains `Commitment__c` (Lookup), because the Commitment started event now starts plans and a plan started that way had nothing recording what started it. New rule R-SP3a says what the event means: a commitment created Active, or an existing commitment moving into Active from any other status. The automation is two registry rows rather than one, `Stewardship_Plan_Starter` on `Gift__c` and `Stewardship_Plan_Starter_Commitment` on `Commitment__c`, so each is switchable on its own. Templates, steps, step order and the Active state are now administered on a Stewardship Plans page in the settings console rather than on raw object tabs, which is what the every setting in the console rule requires. R-SP10 is unchanged: completion is still a person's judgment. |
 | v0.4 | 2026-09-08 | G-16 retention reports. One attribute added: `Gifts_Last_Year__c` (Number) on Account and Contact, filled by three new `Rollup_Definition_Default__mdt` rows (`Household_Gifts_Last_Year`, `Account_Gifts_Last_Year`, `Contact_Gifts_Last_Year`) as a COUNT over Gift with the ADR-0022 count filter and fiscal year offset -1. It is the one retention question no shipped attribute could answer: whether a donor gave last fiscal year, counted rather than summed. Everything else G-16 needs was already here, so LYBUNT, SYBUNT and the conversion report add no fields and read `Last_Gift_Date__c`, `First_Gift_Date__c` and `Gift_Count__c`, which already carry the count filter. No object added (ADR-0025, ADR-0026). |
 | v0.4 | 2026-09-08 | C-18 seasonal address swap build. `Address__c` gains `Replaced_By_Seasonal__c` (Checkbox, default false): R-AD4 said the previous default is restored when a season ends but nothing recorded which address that was, so an owner with a home address, a work address and a winter address had no unambiguous address to go back to. `Nonprofit_Settings__c` gains `Seasonal_Address_Last_Run_Summary__c` (Text 255) alongside the `Seasonal_Address_Last_Run__c` timestamp already specified in v0.3: a bare timestamp says the job woke up, not that it did anything, and "visible last run" is the half of C-18 that makes the job trustworthy. R-AD4 restated with the four outcomes per owner and the inclusive boundary days; R-AD8 added for the visible run and the system mode posture (ADR-0027). |
-| v0.4 | 2026-09-09 | G-10 refund propagation (ADR-0031). No object, field, or rollup row changed. ADR-0023 left one credit unreversed: the Matched Donor credit R-G11 creates sits on the employer's gift, and the negative gift recording a refund is not half of a matching pair, so a refunded match left the employee recognized for the full amount. R-G11 and R-SC5 restated: the negative gift carries a negative Matched Donor credit for the same person, prorated to the amount returned, so an employer gift of 500 with 200 returned leaves the employee recognized for 300. Only the employer's gift reverses the credit, the link survives the refund, and unlinking removes both halves. Section 26's soft credit rows already read gift status through the widened set from ADR-0022 and need no change. |
 | v0.4 | 2026-09-08 | G-14 donor levels (ADR-0028). New Section 25A, `Donor_Level__c`, with `Minimum_Amount__c`, `Maximum_Amount__c`, `Description__c` and `Active__c`, and three fields shipped by Giving on both Account and Contact: `Donor_Level__c`, `Previous_Donor_Level__c` and `Donor_Level_Changed_Date__c`. Giving Settings gains `Donor_Levels_Enabled__c`, `Donor_Level_Source_Field__c` and `Donor_Levels_Last_Recalculated__c`. A level is a label on a giving total the rollup engine already maintains (R-DL1), never a second aggregation, so the ladder cannot disagree with the total printed beside it and the household membership modes are resolved once, by the rollup, rather than twice. Donor Level is removed from the deferred table in Section 30 and its ownership row now points at Section 25A. |
 | v0.4 | 2026-09-08 | G-13 receipting (ADR-0016). Four objects added: `Receipt__c` (Section 25B), `Receipt_Number_Sequence__c` (25C), `Receipt_Run__c` (25D) and `Receipt_Template__c` (25E), with rules R-RC1 to R-RC10, R-RS1 to R-RS3, R-RR1 to R-RR3 and R-RT1 to R-RT3. Gift gains `Benefit_Description__c`, `Benefit_Value__c` and `Intangible_Religious_Benefits__c`, which is what a receipt needs to state a quid pro quo disclosure and the intangible religious benefits sentence; the deductible amount is computed by the renderer rather than stored, because a stored copy of a subtraction is a second place for it to be wrong. Giving Settings gains `Receipt_Number_Prefix__c`, `Receipt_Next_Counter__c`, `Receipt_Statement_Year__c`, `Receipt_Place_Of_Issue__c` and `Receipt_Renderer__c`, and its implementation subsection now lists every key it holds. Receipt leaves Section 30. |
+| v0.4 | 2026-09-08 | C-10 sample data extended to the Giving module and to connections. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c`, `Relationship__c` and `Affiliation__c`, so every record the sample loader creates can be found and removed in one action; a gift's allocations, soft credits and tributes, and a commitment's installments, are details of a flagged record and go with it. `Sample Data Key` (`Sample_Data_Key__c`, Text(20)) added to Account and Contact: it holds the key the generated file gives a household, an organization or a person, which is how the Giving sample gifts find the donor they belong to across the asynchronous chain. No object added. |
+| v0.1 | 2026-09-09 | C-01 documentation corrections. No object, field, or code changed. The duplicated "Person attributes on Account" bullet in Section 5 is removed. Household Member's `Account` attribute is retyped `reference(Account)` and defined as the person's own account only, because `reference(Household)` read as a second household reference and invited the confusion R-M4 exists to prevent. R-M3's Primary Contact mirror is recorded as unimplemented and unimplementable as written, and listed in Section 30 as a known gap. R-H14 now says what the console does: a preview over fixed sample households rather than the org's own, and a recompute batch that confirms it was queued and then reports nothing further. |
+| v0.3 | 2026-09-09 | C-15 defect found by the first org run: the reciprocal upkeep never ran on a fresh org. `Relationship_Auto_Reciprocal__c` ships on, but a checkbox on a hierarchy custom setting read through `getOrgDefaults()` before the org has saved comes back false rather than carrying its declared default, so `RelationshipService` read the feature as switched off and wrote no other side, silently. No object or field added: the shipped value is now declared in `SettingsService.SHIPPED_DEFAULTS` and applied to the unsaved record, and `scripts/ci/check-setting-defaults.py` fails the build for any checkbox that ships on and is not registered (ADR-0035). |
+| v0.4 | 2026-09-09 | G-10 refund propagation (ADR-0031). No object, field, or rollup row changed. ADR-0023 left one credit unreversed: the Matched Donor credit R-G11 creates sits on the employer's gift, and the negative gift recording a refund is not half of a matching pair, so a refunded match left the employee recognized for the full amount. R-G11 and R-SC5 restated: the negative gift carries a negative Matched Donor credit for the same person, prorated to the amount returned, so an employer gift of 500 with 200 returned leaves the employee recognized for 300. Only the employer's gift reverses the credit, the link survives the refund, and unlinking removes both halves. Section 26's soft credit rows already read gift status through the widened set from ADR-0022 and need no change. |
 | v0.4 | 2026-09-09 | G-18 in-kind gifts (ADR-0030). No object added. Two attributes added on both Account and Contact, `In_Kind_Value__c` (Currency) and `In_Kind_Gift_Count__c` (Number), filled by six new `Rollup_Definition_Default__mdt` rows across the three scopes of Section 26, filtered to `Type__c` equals `In-kind` on top of the ADR-0022 status set. Rule R-G12 records what an in-kind gift is: a Gift of Type In-kind whose Amount is zero, whose worth is on `Fair_Market_Value__c`, which is never printed on a receipt, and whose description is required and is printed. R-G4 gains `In_Kind_Description__c`, because it appears on the document the donor holds. The `Amount_Cannot_Be_Zero` validation rule is narrowed to gifts that are not in-kind, and `In_Kind_Needs_Description`, `In_Kind_Has_No_Amount`, `In_Kind_Fields_Need_In_Kind_Type` and `Fair_Market_Value_Not_Negative` are added. |
 | v0.4 | 2026-09-09 | G-12 acknowledgments (ADR-0032). Three objects added: `Acknowledgment_Rule__c` (Section 25F), `Acknowledgment__c` (25G) and `Acknowledgment_Run__c` (25H), with rules R-AK1 to R-AK12. No field is added to `Gift__c`: `Acknowledgment_Status__c` and `Acknowledgment_Date__c` were shipped in v0.2 for this feature (R-G9), and the rule that matched a gift is deliberately not stored on it, so that an edited rule applies to the gifts already queued (R-AK3). Giving Settings gains `Acknowledgments_Enabled__c`, `Acknowledgment_From_Address__c`, `Acknowledgments_Last_Run__c` and `Acknowledgments_Last_Run_Summary__c`. The wording of an emailed thank you lives in a standard `EmailTemplate` rather than in a packaged template object, which is what the plan's note on G-12 asks for and is the whole of the difference between this feature and receipting. Acknowledgment Rule leaves Section 30.
 | v0.4 | 2026-09-09 | G-13 receipt number tampering fixed (ADR-0033). No object or field added. `Gift__c.Receipt_Number__c` becomes read only in `Giving_Staff` and `Giving_Admin`, matching `Giving_Read_Only`, and the receipt lock refuses every write to it, including the first one and including an insert, unless the receipting code is renumbering that gift. R-G4 restated: the number comes from the sequence in Section 25C or it does not exist. A number typed on by hand belonged to no receipt, locked the gift irreversibly, could be issued again later by the sequence, and left the gift unreceiptable, which is the collision ADR-0016 says nobody can recover from. The write moves from user mode to `GiftReceiptNumberWriter` in system mode under ADR-0021, because a field nobody may edit cannot be written in user mode, and the renumbering allowance changes from a transaction wide flag to the set of gift Ids being renumbered, so it no longer reaches an unrelated gift saved in the same transaction. |
 | v0.4 | 2026-09-09 | G-13 receipting defects found by security review (ADR-0034). No object or field added. Section 25B gains R-RC11: a receipt's stored file is linked to its receipt and, on a per gift receipt, to its gift, and never to the donor Contact or Account, because a `ContentDocumentLink` grants access to a file through the record it names and every Core role can read a donor. The relationship bullet is corrected to match. Section 25E gains R-RT4: the shipped letters are materialized by the Giving post-install script rather than by a cacheable controller method, which cannot perform DML, and every write to `Receipt_Template__c` checks `Manage_Nonprofit_Settings`. |
-| v0.4 | 2026-09-08 | C-10 sample data extended to the Giving module and to connections. `Sample Data` (`Sample_Data__c`, Checkbox, default false) added to `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c`, `Relationship__c` and `Affiliation__c`, so every record the sample loader creates can be found and removed in one action; a gift's allocations, soft credits and tributes, and a commitment's installments, are details of a flagged record and go with it. `Sample Data Key` (`Sample_Data_Key__c`, Text(20)) added to Account and Contact: it holds the key the generated file gives a household, an organization or a person, which is how the Giving sample gifts find the donor they belong to across the asynchronous chain. No object added. |
 | v0.4 | 2026-09-09 | C-01 person account trigger defect. No object or field added. The person account path ran on insert and update only, so deleting a person left their household with a stale Member Count and stale wording and their membership row identifying nobody, undeleting them did nothing, and the only person change that rewrote a household name was the household's own custom name box. R-H11 now says plainly that a person stored as an account is a member on the same terms as a contact, and R-M4 records what happens to a membership row when the person it names is deleted, and why the row is removed with the person rather than left to the platform. |
 | v0.4 | 2026-09-09 | C-17 address propagation defect, found by the first org run on a person accounts org. No object or field added. R-AD3 gains the record type test: the person mailing fields exist on every account in a person accounts org, so `AddressService` asked the org whether it had them and then wrote them on whatever account it was holding. A household member, or an owner named in Person Account, that is a household or an organization was written through fields it cannot carry, the platform refused the update, and the address the user was saving was refused with it, with a message about permissions that named nothing true. The write is now decided by the account's record type, read once per save through `HouseholdSelector.getAccountRecordTypes` as an ADR-0021 upkeep read, and an account that holds no person is left out of the copy. Invisible on the Platform-only shape (ADR-0013), where the fields do not exist and the path returns early. |
 | v0.4 | 2026-09-09 | C-14 import defect: a row with two people in it. No object or field added. Section 16 gains R-IR1a (what a row means for households) and R-IR2a (the household is named from the row). The importer joined a row's second person to the first person's household by writing the person's account reference, which is contact mode's mechanism, and skipped the join entirely where the org stores people as accounts. In junction mode that reference joined nobody and stopped the automatic path from acting, so a couple imported into the configuration the product recommends became two households or one household and one person with none. The join now goes through `HouseholdService.addMembers`, and automatic creation is suspended while the people about to be joined are saved, so nobody is given a household and then taken out of it. |
@@ -5348,16 +6530,65 @@ None open. R-M3's Primary Contact mirror, the only entry, was closed on 2026-09-
 | v0.3 | 2026-09-09 | C-17 deploy defect, found by the first org run to validate `Address__c` on its own. No rule changed. `Street__c` shipped with a `length` of 255 on a `TextArea` field, which the metadata schema does not accept: `TextArea`'s 255 character limit is fixed by the type, not settable, and only `LongTextArea` takes a `length`. The `length` element is removed; the field is unchanged in every way an admin or a user sees. `Address_Compact` shipped listing `Street__c`, which the platform also refused: no text area field, long or short, can appear in a compact layout. `Street__c` is removed from `Address_Compact`, which now reads Type, City, State, Default. Street is still visible everywhere a text field can appear: the four list views in Section 29 and the page layout are unaffected. |
 | v0.4 | 2026-09-09 | G-18 receipt branding, and what a document for donated property may not print. No object added. R-RC12 says what a receipt for an in-kind gift may not say: no currency figure where the template asked for an amount, no amount on an in-kind statement line, in-kind gifts left out of the total a statement states with one sentence explaining the difference, and a Total Amount of zero on the receipt record, because a receipt record states what its document states and the fair market value stays on the gift (R-G12). R-RC13 says what a document is branded with: the legal name and address print from the template, or from a block above the letter when the template did not place them, on the same reasoning as the gift lines of R-RC8; the tax identification number prints in the signature block; the logo is optional and sized by one setting; and the image delivery route is a setting because ADR-0016's second spike cannot be closed without an org, so an unresolvable logo is logged at Warning severity and the document is produced without it. Giving Settings gains `Receipt_Print_Logo__c`, `Receipt_Logo_Width_Mm__c` and `Receipt_Logo_Delivery__c`. The two rules this branch numbered R-RC11 and R-RC12 are renumbered here, because ADR-0034 took R-RC11 first. |
 | v0.4 | 2026-09-15 | X-09 native household guards (product-plan Section 11.2 item 9, mutual exclusion). No object or field added. `HouseholdSelector.nativeHouseholdAccountsAmong` is the single predicate, built on the existing ADR-0036 delete guard probe and short circuited by `OrgShapeDetector.hasNativeHouseholdGroups`, that every guard below asks. The naming batch and the naming path in `HouseholdService.afterMembershipChange` leave out an Account that already carries a native Nonprofit Cloud household group and count what they skipped. Automatic household creation, in both membership modes, does not make a second household for a person already linked to one, by the weaker but safe rule of asking the person's own Account. `AddressService` never writes the billing or person mailing fields of such an Account, from a default address or by propagation to its members. Health Check gains an informational finding naming how many native households were found, and a warning naming how many Accounts carry both household models at once, from a new `HouseholdSelector.nativeHouseholdCollisionCount` probe. No migration and no sync: an Account with both models keeps whatever name, greetings and address it already has until an administrator settles it on one model. |
+| v0.4 | 2026-09-15 | C-16 review fix. No object or field added. `Primary_Affiliation__c` was maintained by `AffiliationService` (R-AF2) but shown nowhere: added, read only, to the Contact page layout in the Person section and to the Contact compact layout, so a list view or a mail merge can show a person's employer as the field's own description says. The matching field on Account is left off both Account page layouts: per Section 28, it is populated only in Person Account orgs, and neither the Household nor the Organization record type is a person, so it has nowhere on those layouts to belong. Also removed the internal feature tag "(C-10)" from the inline help text and description of `Sample_Data__c` and `Sample_Data_Key__c` on Account and Contact, since a feature ID means nothing to a nonprofit user; the same tag was removed from the Relationship, Affiliation, Commitment, Gift, Fund, and Appeal copies of `Sample_Data__c` in the same pass, so no field help or description in either package carries a feature ID now. |
+| v0.4 | 2026-09-15 | C-01 defect, found by a Sales Cloud readiness audit. No object or field added. In junction mode a person's household is a `Household_Member__c` row, not the account their contact points at, but `ContactTriggerHandler` read the household from `Contact.AccountId` in every context, which in junction mode is an employer or nothing. So renaming, deleting and restoring a person stored as a contact quietly did nothing to their household: the count stayed stale, the dead person stayed in the name and both greetings, the membership row survived naming nobody because `Contact__c` empties itself on delete, and undelete never put them back. `AccountTriggerHandler` had always handled the account half of this correctly (see the 2026-09-09 C-01 person account row above); only the contact half was missing. `ContactTrigger` now declares before delete, and the handler mirrors the account one: memberships are removed in before delete while they still name the person, the departing households are carried to after delete, after undelete restores them, and a rename asks `householdIdsForPeople` which households to rewrite. Contact mode is unchanged by construction, since each of those calls answers empty outside junction mode. R-M4 and R-H11 now hold for both representations of a person, which matters because a Platform-only org (ADR-0013) can only run junction mode with contacts, and a mixed org holds both. |
+| v0.4 | 2026-09-15 | Deploy stability: `packages/core/main/default/labels/CustomLabels.labels-meta.xml` (391 labels, 141 KB) split into per-feature label files, following the pattern already used for Address, Import, CoreRollups, Relationship, SeasonalAddress and Affiliation. No label was renamed, so no Apex or LWC reference changed. Groups of 8 or more labels, grouped by the second underscore-separated segment of `fullName`, became their own file: Access (33), AutomationControl (16), HealthCheck (73), HouseholdMembersPanel (13), HouseholdMerge (39), HouseholdNamingSettings (18), Households (19), HubHome (11), SampleData (31), Settings (23), SetupAssistant (84, after the four removals below). Groups under 8 (Automation, CoexistenceMode, ErrorLog, ErrorLogTile, HouseholdNaming, SettingsSearch, 27 labels total) were merged into `CoreShared.labels-meta.xml`. Four unreferenced Setup Assistant labels were deleted in the same pass, each re-verified with a grep of `packages/` for `.cls`, `.js` and `.html` consumers before removal: `Core_SetupAssistant_AllDoneMessage`, `Core_SetupAssistant_MarkDoneButton`, `Core_SetupAssistant_MarkNotDoneButton`, `Core_SetupAssistant_OpenButton`. Two label values were reworded without renaming the label: `Core_HouseholdNamingSettings_Recompute` from "Recompute all households" to "Update all household names", and `Core_HouseholdNamingSettings_RecomputeStarted` from "Recompute started. Households are being brought up to date in the background." to "Updating household names in the background." Verified: the 387 labels written across the new and shared files plus the 4 deleted equal the original 391, no label name is duplicated across files, and all 486 distinct `System.Label.X` and `@salesforce/label/c.X` references under `packages/core/` resolve to exactly one file. |
+| v0.5 | 2026-09-15 | C-25: added the email attributes `Personal_Email__c`, `Work_Email__c`, `Alternate_Email__c` and `Preferred_Email__c` to the person attributes (Section 7), on both Contact and Account, with rule R-C6. When Preferred Email is set, the standard email is copied from the address it names on every save; when it is empty nothing is copied; when the address it names is empty the save is refused rather than the standard email being blanked. |
+| v0.5 | 2026-09-22 | Removed the Naming Pattern custom metadata type (its four fields and six shipped records) before the first package version, by the owner's decision. Nothing read it: household naming reads the three pattern fields on Nonprofit Settings. A custom metadata type is effectively permanent once packaged, so it goes now rather than never. |
 | v0.5 | 2026-09-23 | G-17 gift batch entry (ADR-0045). Two objects added: `Gift_Batch__c` (Section 25L) and its master-detail child `Gift_Batch_Row__c` (25M), with rules R-GB1 to R-GB6 and R-GR1 to R-GR4. The batch holds the control total and four defaults; a line holds only what varies, and its empty values are resolved from the batch at posting (R-GB1). The entered total is computed, never stored (R-GB2). Posting locks the batch, refuses an unbalanced or already posted batch, inserts ordinary gifts in user mode, and rolls everything back if any line fails. Status and a line's Gift are written only by posting; validation rules keep a posted batch and its lines unchanged. No trigger and no registry entry. The import framework is not used: ADR-0045 records why. No field added to an existing object. Gift Batch leaves Section 30. |
 | v0.5 | 2026-09-23 | C-21 Health Check v2 (ADR-0048). No object, field, settings key or rollup row added. Health Check reads state the model already defines: shipped rollup definitions, automation switch rows and import templates not yet materialized from their shipped defaults (Section 13), the nightly rollup run when an active definition is in Scheduled or Both mode (Section 14). Recorded against R-A2: an `Automation_Setting__c` row whose registry entry is no longer shipped is left alone, because no fix deletes a record. `Automation_Setting__c` rows are now materialized by Core's and Giving's post-install scripts, one per shipped registry entry not yet present, never touching an existing row (before C-21 nothing created them). Recorded against R-R6: a shipped rollup default is not materialized when an active, administrator-made definition (`Is_Package_Default__c` false) already writes the same target entity and attribute; shipped defaults are not counted against each other, because household and organization pairs write one attribute for different accounts. Health Check detects orphans without changing them (cleanup is C-28): a person in no household, reported only while `Auto_Create_Households__c` is on (R-C1), which in contact mode is a Contact with no Account (a Contact whose Account is an Organization belongs to it, Section 7) and in junction mode a Contact or person account with no current Household Member row (R-M2, R-M4; a Contact whose Account is a Household is left to the membership check); and a Household with no current member (in contact mode no Contact on it, in junction mode no current row naming a person). Person accounts are recognised by the org's person record types, never by a person account field. |
 | v0.5 | 2026-09-23 | C-20 duplicate detection (ADR-0050). One object added, `Duplicate_Dismissal__c` (Section 29A) with `Pair_Key__c` and `Reason__c`, which holds a decision rather than a finding. Detection is the org's own active duplicate rules; BarnCRM ships none, and the suggestions are the standard `DuplicateRecordSet` and `DuplicateRecordItem` records. A scan started from Nonprofit Settings evaluates those rules against the people and households already in the org. Rules R-DP1 to R-DP5 added. |
 | v0.6 | 2026-09-23 | X-03, X-04 and X-06, the Connect integration surface (ADR-0051). No object or field added. R-G7 is reworded: the inbound gift API answers a resend with the gift already recorded and never edits it, and refuses a resend whose amount differs. The accounting export reads `Gift__c`, `Gift_Allocation__c` and `Fund__c` and writes nothing: the posting flag plan Section 4.12 names belongs to G-20 in Giving, and no Connect object records export runs. Section 30 notes that X-03 and X-04 add no Connect entity. |
+| v0.5 | 2026-09-23 | Removed the packaged Contact record type, its compact layout, and the list view that filtered on it, by the owner's decision (R-C4, ADR-0041). It drove no behavior: no code, rule or page branched on it, and the sample data loader was the only code that set it. People are now created with the org's default Contact record type. No field changed; the `Household_Role__c` picklist values it listed are all active on the master record type. |
+| v0.5 | 2026-09-23 | No object or field added. The Account, Contact, Gift and Commitment record pages show their fields with Dynamic Forms (ADR-0043). R-O3 now holds on the Account record page: the Name and Greetings section, which carries Member Count, Anniversary, Custom Name and the two greetings, shows only for the Household record type. Account keeps one fallback page layout for both record types, and no layout is assigned to a profile. |
+| v0.5 | 2026-09-23 | C-22, product-plan Section 11.2 item 8. No object or field added. R-M3's second half is implemented and its known-gaps row in Section 30 closed (ADR-0044, primary contact mirrors the primary member): in junction mode `Primary_Contact__c` mirrors the current member marked Is Primary, as that member's Contact or, for a Person Account, its person contact, and a hand edit of it on a household is refused. R-H5 now states the primary tiebreak the code already applied and which source each mode reads it from. R-H10 and the Household attribute table say which record is the mark in each mode. |
+| v0.5 | 2026-09-23 | C-19 Import 2.0. New Section 17A, `Import_Journal__c`, a page per chunk recording the updates an import made (value before and value written) and what an undo kept or did not put back, with rules R-IJ1 to R-IJ5. `Import_Batch__c` status gains Undoing and Undo failed; R-IB6 restated and R-IB7 (the undo window is stamped at commit), R-IB8 (one named batch, counted and confirmed, once, to the recycle bin) and R-IB9 (deletes only tagged records, keeps a tagged record that has gained something since, puts back only values nobody has changed since) added. R-IB3 now says the import tags the household it made a new person. R-IT6 added: a recurring template is listed on the Hub with its last import date, and nothing loads a file on a schedule. `Nonprofit_Settings__c` gains `Import_Undo_Retention_Days__c`. R-IR5 notes that undo does not read the staged rows. |
+| v0.5 | 2026-09-23 | C-19 review. No object or field added. R-IB1: a dry run is refused on a batch that has started a commit or is in an undo status. R-IB8: a chunk the platform stopped, or an undo job that is no longer running, ends Undo failed. R-IB9: a tagged record is kept when anything created since points at it through any reference the org can filter on (not only custom ones), when something was created during the commit by somebody else, when the record was edited since or has an activity, and when the person undoing cannot delete it; the system-mode reads and writes are recorded against ADR-0021. R-IJ1: a page holds at most 200 entries, and one oversized entry is logged rather than losing the chunk's journal. |
 | v0.6 | 2026-09-24 | X-02 Campaign sync (ADR-0056, Campaign sync keeps its link on the appeal). New Part F and Section 29B, rules R-CS1 to R-CS8. `Appeal__c` gains `Campaign_Id__c` (Text 18, unique, external ID), shipped by Connect rather than Giving, because Giving may not name Campaign and a lookup to Campaign would stop Connect installing where Campaign is absent. New custom setting `Connect_Settings__c` with `Campaign_Sync_Enabled__c` (default off). New automation `Campaign_Sync` on Appeal. No object added. R-AP4 points at Section 29B. Review changes of 2026-09-25: R-CS1 names the setting as the authoritative switch; R-CS4 logs a saver without access once, on create; R-CS5 writes refusals in one statement and skips a save too large to copy; R-CS7 lets Sync all appeals delete a Campaign it created and could not link. |
-| v0.6 | 2026-09-25 | X-01 Opportunity mirror (ADR-0058). New Section 29C, rules R-OM1 to R-OM11. `Gift__c` gains `Opportunity_Id__c` (Text 18, unique, external ID), shipped by Connect for the reason Section 29B gives. `Connect_Settings__c` gains `Opportunity_Mirror_Direction__c` (one direction or Off, empty reads as Off) and `Opportunity_Mirror_Start__c`. New automation `Opportunity_Mirror` on Gift. No object added. R-G10 names the attribute. Review changes of 2026-09-25: R-OM3 leaves a Pending gift's stage alone and omits Campaign where the saver cannot read it; R-OM5 needs only Opportunity create and edit; R-OM6 requires half the query and DML limits unspent and caps the distinct messages; R-OM7 gains an optional record type list (`Opportunity_Mirror_Record_Types__c`) and reads the start date in the org's time zone; R-OM8 rechecks linked gifts changed since the last completed run, skips a run while automation is paused or the switch is off, records the last completed run (`Opportunity_Mirror_Last_Run__c`, `Opportunity_Mirror_Last_Summary__c`) and has a Health Check finding; R-OM9 warns when a linked gift is deleted; R-OM11 caps its counts and refuses a viewer without read access. Setting Definition gains `Required_Permission__c`, and `HealthCheckExtensions` looks up Connect's extension as well as Giving's (ADR-0057 amended). |
 | v0.6 | 2026-09-24 | G-20 posting flag and period lock (ADR-0053). No object added. `Gift__c` gains `Accounting_Posted_At__c` (Date/Time) and `Accounting_Posted_By__c` (Lookup to User), both package written and read only in every permission set (R-G13). `Giving_Settings__c` gains `Books_Closed_Through__c` (Date), set on the Accounting Periods page and named by no Setting Definition row. New rules R-G13 (posting and unposting), R-G14 (a gift in the books that is posted or dated in a closed period is locked; nothing enters the books in a closed period) and R-GA5 (a locked gift's allocations are fixed). Two Always Runs automations, `Gift_Posting_Lock` and `Gift_Allocation_Posting_Lock`, and two custom permissions, `Post_Gifts` and `Override_Posting_Lock`, the second on no permission set. |
 | v0.6 | 2026-09-24 | Cancelled gift status, by the owner's decision (ADR-0054, amending G-04, ADR-0022, ADR-0023 and ADR-0031). No object added. `Gift__c.Status__c` gains Cancelled. New R-G16: a Pending gift that will never be paid is cancelled, with no negative gift, outside every total, the export and receipts, and allowed in a closed period; it moves only between Pending and Cancelled and unlinks its installment. R-G3: only a Received gift is refunded or written off. R-G14, R-AK8, R-RC8 and Section 26 name Cancelled. |
 | v0.6 | 2026-09-24 | C-23 automation pause with automatic resume, and the error digest (ADR-0055). No object added. `Nonprofit_Settings__c` gains five keys (Section 12, v0.6 keys): `Error_Digest_Recipients__c`, `Error_Digest_Frequency__c`, `Error_Digest_Covered_Until__c`, `Error_Digest_Last_Run__c` and `Error_Digest_Last_Run_Summary__c`. New rules R-A5 (a pause ends by itself through a one-time job that records the resume) and R-E5 (the digest counts and links, never quotes, and goes only to active users); R-E3 reworded to point at R-E5. |
+| v0.5 | 2026-09-24 | G-23 gift import and G-24 donation matching (ADR-0052). No object added. `Import_Template__c` gains `Donation_Matching__c`, `Match_Date_Window_Days__c` and `Match_Amount_Tolerance__c` (R-IT7); `Import_Batch__c` gains the control totals `Expected_Count__c`, `Expected_Amount__c` and `File_Amount__c` (R-IB10); `Giving_Settings__c` gains `Donation_Match_Date_Window_Days__c` and `Donation_Match_Amount_Tolerance__c`. R-IR1 adds the `Tribute` row entity; R-IR6 states the entity processor contract and R-IR7 how a row's outcome is folded; R-IB8 and R-IB9 let an undo delete what an entity processor tagged, with the processor's reasons to keep. New Section 25N, rules R-GI1 to R-GI9 and R-DM1 to R-DM6. |
+| v0.5 | 2026-09-24 | G-24 follow-up (ADR-0052, amended). `Import_Batch__c` gains `Processor_Settings_JSON__c`, one document the entity processor fills in a dry run and reads back in the commit, which Core never reads. R-IB11 added: a commit runs under the settings its dry run showed. R-DM7 added: donation matching's behaviour, window and tolerance are taken once per dry run and the commit uses them, not the template as edited since. R-IR6 and R-IT7 say so. |
+| v0.5 | 2026-09-24 | C-14 defect. No object or field added. R-IB12: a commit no longer creates a new person once per row when several rows of one chunk name them; the rows share the first row's record, and the dry run counts them the same way. |
+| v0.5 | 2026-09-24 | C-14 first names. No field added. R-IB12: a person is found by the key narrowed to their first name before the shared key, which alone finds them only when one person holds it or the row gives no first name; otherwise they are created. The same in the org, across chunks and within a chunk. |
+| v0.5 | 2026-09-24 | C-14 passes. `Import_Batch__c` and `Import_Row__c` gain `Pass_Number__c`, and `Import_Batch__c` gains `Job_Id__c`. R-IB13 added: a start is refused while the batch's job is running (a pass whose job was aborted reads Failed and can start again, and an aborted commit can be undone), the synchronous reset of every staged row is removed (it failed past 10,000 rows), and each chunk clears and stamps its own rows so keys are read only by the pass that wrote them. |
+| v0.5 | 2026-09-24 | C-14 dry run at scale. `Import_Row__c` gains `Person_1_Key__c`, `Person_2_Key__c`, `Person_1_Name_Key__c`, `Person_2_Name_Key__c`, `Organization_Key__c` and `Processor_Key__c`, indexed digests a dry run writes on the row that would create a record or load an external ID. R-IB12 and R-IR6: the digests are looked up per chunk instead of carried in the batch's state, so a dry run's heap no longer grows with the rows before the chunk. |
+| v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
+| v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
+| v0.6 | 2026-09-25 | X-01 Opportunity mirror (ADR-0058). New Section 29C, rules R-OM1 to R-OM11. `Gift__c` gains `Opportunity_Id__c` (Text 18, unique, external ID), shipped by Connect for the reason Section 29B gives. `Connect_Settings__c` gains `Opportunity_Mirror_Direction__c` (one direction or Off, empty reads as Off) and `Opportunity_Mirror_Start__c`. New automation `Opportunity_Mirror` on Gift. No object added. R-G10 names the attribute. Review changes of 2026-09-25: R-OM3 leaves a Pending gift's stage alone and omits Campaign where the saver cannot read it; R-OM5 needs only Opportunity create and edit; R-OM6 requires half the query and DML limits unspent and caps the distinct messages; R-OM7 gains an optional record type list (`Opportunity_Mirror_Record_Types__c`) and reads the start date in the org's time zone; R-OM8 rechecks linked gifts changed since the last completed run, skips a run while automation is paused or the switch is off, records the last completed run (`Opportunity_Mirror_Last_Run__c`, `Opportunity_Mirror_Last_Summary__c`) and has a Health Check finding; R-OM9 warns when a linked gift is deleted; R-OM11 caps its counts and refuses a viewer without read access. Setting Definition gains `Required_Permission__c`, and `HealthCheckExtensions` looks up Connect's extension as well as Giving's (ADR-0057 amended). |
 | v0.6 | 2026-09-25 | G-20 follow-up: Health Check finding for unposted gifts in a closed period (ADR-0053's recorded follow-up, ADR-0057). No object, field or rule added: the finding reports what R-G14 already locks, a gift with a counting status (ADR-0022) and a type other than In-kind, dated on or before Books Closed Through, whose `Accounting_Posted_At__c` is still empty, capped and linked the way C-21's orphan findings already are. Because Core may not name a gift or a closed period (C-29), Core gains a small extension seam instead of a new Core check: `HealthCheckExtension`, an interface, and `HealthCheckExtensions`, a resolver that finds an implementation by name with `Type.forName`, the same shape `ImportEntityProcessor` already uses for the opposite direction (R-IR6). `HealthCheckService.run()` folds a found extension's findings into the one report, isolated the way one failing check already is. Giving ships the one implementation, `GivingHealthCheckExtension`, delegating to `HealthCheckGivingChecks`, grouped the way ADR-0039 groups Core's own checks. |
+| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
+| v0.6 | 2026-10-12 | Neutral Core wording (ADR-0062). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
+| v0.6 | 2026-10-12 | API name pass (ADR-0063). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
+| v0.6 | 2026-10-12 | API name pass, access and navigation (ADR-0063). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
+| v0.6 | 2026-10-12 | API name pass, stored values and the import field (ADR-0063). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |
+| v0.6 | 2026-10-12 | UX review item 2 (ADR-0064, Giving ships the donor record pages). No object or field added. The giving rollups, the donor level and `Rollups_Last_Calculated__c` on Account and Contact are shown read only in a Giving section of Giving's own `Giving_Account_Record_Page` and `Giving_Contact_Record_Page`, with Dynamic Related Lists for Gifts, Commitments and Soft Credits and a New Gift quick action (`Account.New_Gift`, `Contact.New_Gift`), activated in the Fundraising app. Principle 2 (a rollup shows when it was last calculated) now holds on the donor's record. |
+| v0.6 | 2026-10-12 | UX review item 10. No object or field added. `Gift__c.Type__c` is relabelled Payment Method (label only; the API name is unchanged), so the gift record, Quick Gift Entry, gift batches, import and the accounting export all say payment method. `Gift_Compact` and `Commitment_Overview` gain the donor (`Donor_Contact__c`, `Donor_Account__c`). On `Gift_Record_Page` (Dynamic Forms, ADR-0043) Donor Contact shows only when Donor Account is empty and Donor Account only when it is filled (R-G1 allows one donor), Original Gift and Refund Reason only when filled, and Matched Gift only when filled or when the donor is an account; the page gains the activity panel (ADR-0042). |
+| v0.6 | 2026-10-12 | UX review quick wins. No object or field added. One minimal fallback page layout each (ADR-0043) for Relationship, Affiliation, Receipt, Receipt Run, Acknowledgment, Acknowledgment Rule, Acknowledgment Run, Stewardship Plan and Stewardship Plan Template, which had tabs and no layout. |
+| v0.6 | 2026-10-12 | Import first names (ADR-0067, plan Section 11.2 item 17, option a). No object or field added. R-IB12: a row's person with a first name is matched only to a record with that first name; a record holding the shared key under another first name or none is not matched or renamed, and the person is created, where before a sole holder was matched and renamed. The shared key alone finds a person only when the row gives no first name. First names are compared ignoring case and runs of spaces, not accents, initials or short forms. |
+| v0.7 | 2026-10-12 | C-32 import matching and per-file values (ADR-0068, `0068-import-matching-per-entity-and-per-file-values.md`). `Import_Template__c` gains `Person_Match_Field__c`, `Organization_Matching_Rule__c`, `Organization_Match_Field__c` and `Several_Matches__c`, and `Matching_Rule__c` is labelled Person Matching Rule. `Import_Batch__c` gains `File_Values_JSON__c`; `Import_Row__c` gains `Several_Matches__c`. R-IT2 gives organizations a rule of their own; R-IT8 (a chosen matching field), R-IT9 (several matches, rejected by default) and R-IB14 (values for every row of a file) added. R-IB12: several holders of a key no longer resolve to the earliest created. |
+| v0.7 | 2026-10-12 | C-32 record ID matching, match only and custom fields (ADR-0069, `0069-import-record-id-matching-and-match-only.md`; plan Section 11 open question 15 answered yes). `Import_Batch__c` gains `Match_Only__c`. R-IT10 (a record ID in the file matches that record, and one not found rejects the row), R-IT11 (custom fields on people and organizations, offered from describe) and R-IB15 (a file that only matches) added. |
+| v0.6 | 2026-10-12 | The empty household tidy-up keeps a household with gifts (ADR-0070, `0070-empty-household-tidy-up-keeps-households-with-gifts.md`; resolves the open follow-up of `0071-a-gift-keeps-the-household-it-was-given-to.md`). No object or field added. R-H12: an emptied household is also kept when an installed module still credits records to it, reported through the new Core extension point `HouseholdDependentsExtension`; Giving reports households named by a Gift's or a Commitment's Household field. Such a household is kept without an Error Log entry. |
+| v0.6 | 2026-10-12 | A gift keeps the household it was given to (ADR-0071, `0071-a-gift-keeps-the-household-it-was-given-to.md`; plan decision D-20). No object or field added. R-G2 amended: a gift's Household is derived when the gift is saved and again when its donor changes, and is not recomputed when the donor's household membership changes, so a donor who moves households leaves their past gifts with the household they were given to. A household merge still carries the merged household's gifts to the survivor (R-H13). Household rollups reached through current membership, such as automatic household soft credits, follow current membership. The Gift Household attribute says so. This matches what the Giving trigger already did. |
+| v0.7 | 2026-10-12 | C-34 part 1, the shared filter builder. No object or field added. R-R2 gains, still at version 1, three relative date operators (`this year`, `last year`, `last n days`), parent field paths up to two lookups deep, typed values, and the operators each field type is offered. One Core component, `filterBuilder`, is the document's only writer for both the Rollups page and Find; it reads fields from the running user's describe through `QueryFieldCatalog`. `RollupFilterParser` renders the relative operators as date literals. |
+| v0.7 | 2026-10-12 | C-35 bulk update (ADR-0077, `0077-bulk-update-runs-as-the-user-from-a-find-query.md`). New Section 29E, rules R-BU1 to R-BU6; no new object. `Import_Batch__c` gains `Operation__c` (Import, Update) and `Operation_JSON__c`, and Section 16's definition covers both kinds of data job. R-IJ2 and R-IJ3: the journal gains the Failed entry. BarnCRM Settings gains `Bulk_Update_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Update_Records` and permission set `BarnCRM_Bulk_Update`. |
+| v0.7 | 2026-10-12 | C-34 Find. New Section 29D, Saved Query (`Saved_Query__c`: `Object_Name__c`, `Query_JSON__c`, `Shared__c`; Private, Apex sharing reason `Shared_With_Find_Users`), rules R-SQ1 to R-SQ5, including the query document. BarnCRM Settings gains `Find_Export_Row_Limit__c` (Section 12, v0.7 keys). New custom permission `Find_And_Export_Records` and permission set `BarnCRM_Find_And_Export`. ADR-0076 `0076-saved-queries-are-private-and-shared-by-apex-managed-sharing.md`. |
+| v0.7 | 2026-10-12 | C-36 Advanced Find (ADR-0078, `0078-typed-find-queries-are-parsed-into-the-query-document.md`). No object, field or settings key added. R-SQ1 gains three optional keys at version 1 (`related`, `children`, `aggregate`). New rules R-SQ7 (typed queries parsed in the browser into the document), R-SQ8 (related-records conditions as semi-joins and anti-joins, related record columns as subqueries), R-SQ9 (summaries), R-SQ10 (editing results, journaled as an Update data job) and R-SQ11 (Excel export). New service `FindInlineEditService`. |
+| v0.7 | 2026-10-12 | C-28 Data hygiene console. No object or field added. New rule R-SQ6: the Data Hygiene tab builds each check's query document in code, counts it in user mode over the same document, and opens it in Find by saving an unshared Saved Query owned by the person. The checks read rules already defined: R-C1 and R-M2 (no household), R-H11 (Member Count), R-M4 (a membership naming nobody), R-AD1 (an address with no owner), R-AD3 (the default address) and R-AD6 (Verification Status). ADR-0079 `0079-data-hygiene-checks-are-find-queries-built-at-request-time.md`. |
+| v0.7 | 2026-10-12 | C-33 load one object (ADR-0080, `0080-import-load-one-object.md`). `Import_Template__c` gains `Target_Object__c`, `Load_Operation__c`, `Load_Match_Field__c` and `Lookup_Not_Found__c`; `Import_Journal__c.Phase__c` gains Created. R-IT12 (a template that loads one object: insert, update by record Id, upsert by external ID), R-IT13 (lookup columns by ID, name or a unique field) and R-IT14 (the allow-list of objects and the fields never written) added. R-IT1 gains the `Record` entity and `lookupField`; R-IR1, R-IB8, R-IB9 and R-IJ3 say how a one-object import's creations are journaled and undone; Import Row's Resulting Record and Processor Key serve one-object rows. |
+| v0.7 | 2026-10-12 | C-37 data transforms and dedupe on import (ADR-0081, `0081-data-transform-document.md`). R-IT1 columns gain `transforms`; R-IT15 (the transform document and the `DataTransform` engine shared with bulk update) and R-IT16 (matching through the org's active duplicate rules) added. `Import_Template__c` gains `Use_Duplicate_Rules__c`; `Import_Row__c` gains `Duplicate_Rule_Match__c`. |
+| v0.6 | 2026-10-12 | Rollup engine ownership (`decisions/0082-barncrm-owns-its-rollup-engine.md`, rollup slice S4). Specified ahead of the build; no metadata changed yet. New Section 14A, Rollup Queue (`Rollup_Queue__c`), the append-only list of target records waiting for recalculation, with rules R-RQ1 to R-RQ5. Section 14: R-R4 reworded (a normal save updates the totals in the same save, a bulk change is queued and finishes within minutes, the nightly run is the safety net) and the Mode labels become Instantly, Every night and Both (recommended), stored values unchanged, also on `Rollup_Mode_Default__c` (Section 12); new R-R11 (recompute, and which changes mark a target, including a gift's status and delete for fund totals and both households on a move), R-R12 (where real time comes from: packaged registrations, a trigger the Rollup Builder generates for an admin's own entity, or the Flow template) and R-R13 (freshness stamps written when the work is done), and field history on ten definition attributes. Section 26 records the fund half of R-R11. Section 30 lists the four rollup rules the current engine does not meet. |
+| v0.6 | 2026-10-12 | Rollup engine swap (`decisions/0082-barncrm-owns-its-rollup-engine.md`, rollup slice S8). No object or field added. BarnCRM's own engine is the only path for real time, the queue, Recalculate, Recalculate all and the nightly run; `RollupBatch` is removed. The Mode picklist labels become Instantly, Every night and Both (recommended) on `Rollup_Definition__c`, `Rollup_Definition_Default__mdt` and the `Rollup_Mode_Default__c` setting, stored values unchanged. R-R4 loses its interim sentence; new R-R14 (one full run at a time, and a stopped chunk's records are queued). The four rollup rows in Section 30 are closed. |
+| v0.6 | 2026-10-12 | Rollup operations slice (`decisions/0082-barncrm-owns-its-rollup-engine.md`, decision 10). `Rollup_Definition__c.Aggregate__c` gains COUNT_DISTINCT, ANY, NONE, TEXT_LIST and TEXT_LIST_DISTINCT, and the definition gains `Delimiter__c` (Comma, Semicolon, New line). New rule R-R15 says which target types each aggregate fills (checkbox targets for ANY and NONE, text targets for FIRST, LAST and the text lists), how blanks, ties, order, the delimiter and the field length are handled, and that every aggregate stays exact under recompute. R-R10 records what the save checks today. The shipped-default type `Rollup_Definition_Default__mdt` keeps its seven aggregates and has no delimiter: no shipped rollup uses the new ones. |
+| v0.6 | 2026-10-12 | Quick Gift Entry pays a scheduled payment (ADR-0084, `0084-gift-entry-pays-a-scheduled-payment.md`). No object or field added. New rule R-DM8: the entry form offers the donor's open installments (R-DM2), marks those within the donation matching window and tolerance as suggested, chooses one in advance only when it is the only one suggested, and checks the choice again at save. The gift carries `Installment__c` and `Commitment__c`, which `Gift__c` already had. |
+| v0.6 | 2026-10-12 | Gift batch lines pay a scheduled payment (`0084-gift-entry-pays-a-scheduled-payment.md`). `Gift_Batch_Row__c` gains `Installment__c` (Lookup to `Installment__c`, cleared on delete), so a choice survives saving the grid. New rule R-GR5: posting checks every named installment again and refuses the post naming the line; the gift carries the installment and its commitment. `Posted_Batch_Rows_Are_Final` refuses a change to Installment on a posted line, except the platform clearing it. R-DM8 names batch lines. No object added. |
+| post-1.0 | 2026-10-12 | Field utilization (plan Section 6.1 item 10, ADR-0086 `0086-field-utilization-ships-in-core.md`). New Section 29F, `Field_Utilization_Snapshot__c`, rules R-FU1 to R-FU8. `BarnCRM_Settings__c` gains `Field_Utilization_Objects__c`, `Field_Utilization_Last_Run__c` and `Field_Utilization_Last_Run_Summary__c` (Section 12, field utilization keys). |
+| v0.6 | 2026-10-12 | C-27 What's new after an upgrade (ADR-0087, `0087-whats-new-from-packaged-release-notes.md`). New Section 12A, `Whats_New_Seen__c`, a protected hierarchy custom setting with user-level records only and one field, `Last_Seen_Version__c`, with rules R-WN1 to R-WN4. New shipped type Release Note in Section 13, `Release_Note__mdt`, with `Version__c`, `Headline__c`, `Details__c`, `Sort_Order__c` and `Module__c`, read as shipped and never materialized. |
+| v0.9 | 2026-10-12 | C-39 interaction notes (ADR-0089, `0089-interaction-notes-are-completed-tasks.md`). New Section 29G, rules R-IN1 to R-IN4. No object, field or picklist value added: an interaction note is a completed Task logged through the packaged action "Log an interaction" (`Contact.Log_Interaction`, `Account.Log_Interaction`), which fills Status Completed, Date today and Type Meeting. Visibility follows the record (R-IN2); per-note confidentiality is an owner question. |
+| v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
+| 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
+| v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 
 ---
 ## 32. Entity ownership by package
@@ -5377,6 +6608,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Naming Pattern (shipped default) | Core | v0.1 | 13 |
 | Automation Registry (shipped default) | Core | v0.1 | 13 |
 | Rollup Definition | Core | v0.2 | 14 |
+| Rollup Queue | Core | v0.6 (rollup engine) | 14A |
 | Rollup Definition Default (shipped default) | Core | v0.2 | 13 |
 | Import Template | Core | v0.2 | 15 |
 | Import Template Default (shipped default) | Core | v0.2 | 13 |
@@ -5398,16 +6630,19 @@ included; standard objects the packages extend are named by the entity that gove
 | Affiliation | Core | v0.3 | 28 |
 | Address | Core | v0.3 | 29 |
 | Duplicate Dismissal | Core | v0.5 | 29A |
+| Saved Query | Core | v0.7 | 29D |
+| Field Utilization Snapshot, and the three field utilization keys | Core | not scheduled (plan Section 6.1 item 10) | 29F, 12 |
+| What's New Seen | Core | v0.6 | 12A |
+| Release Note (shipped, read as shipped) | Core, records from any package | v0.6 | 13 |
+| Interaction Note (Task, no packaged schema) | Core | v0.9 | 29G |
 | Acknowledgment Rule | Giving | v0.4 | 25F |
 | Acknowledgment | Giving | v0.4 | 25G |
 | Acknowledgment Run | Giving | v0.4 | 25H |
-| Receipt | Giving | v0.4 | 30 |
 | Donor Level | Giving | v0.4 | 25A |
-| Receipt | Giving | v0.4 | 25A |
-| Receipt Number Sequence | Giving | v0.4 | 25B |
-| Receipt Run | Giving | v0.4 | 25C |
-| Receipt Template | Giving | v0.4 | 25D |
-| Donor Level | Giving | v0.4 | 30 |
+| Receipt | Giving | v0.4 | 25B |
+| Receipt Number Sequence | Giving | v0.4 | 25C |
+| Receipt Run | Giving | v0.4 | 25D |
+| Receipt Template | Giving | v0.4 | 25E |
 | Stewardship Plan Template | Giving | v0.4 | 25I |
 | Stewardship Plan Step | Giving | v0.4 | 25J |
 | Stewardship Plan | Giving | v0.4 | 25K |
@@ -5444,30 +6679,3 @@ Two rows differ from plan Section 6 because the first customers are now Nonprofi
 orgs: the Gift Transaction mirror is v0.6, brought forward from
 v0.9, and NPSP household adoption is v0.9, moved back from v0.6. The plan's roadmap table
 is the place that reprioritization is recorded permanently; this table follows it.
-| v0.1 | 2026-09-07 | C-03: added the shipped-defaults type Setting Definition (Section 13), which drives the Nonprofit Settings console, and the Nonprofit Settings key `Setup_Steps_Completed__c` (Section 12), which records Setup Assistant progress. |
-| v0.1 | 2026-09-07 | C-03, following ADR-0017: added `Settings_Object__c` to Setting Definition, so each package owns its own protected hierarchy custom setting and the console reads and writes any registered one. |
-| v0.1 | 2026-09-07 | C-03, following ADR-0020: added `Navigation_Target__c` to Setting Definition, so a module's settings page is reached by navigation while Core's own panels are imported by name. |
-| v0.2 | 2026-09-07 | C-12: added the Nonprofit Settings keys that the full Setup Assistant fills in (Section 12): the organization identity keys used on receipts (`Organization_Legal_Name__c`, `Organization_EIN__c`, `Organization_Address__c`, `Receipt_Logo_Document_Id__c`, `Receipt_Signature_Document_Id__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`), the giving defaults written only when the Giving module is present (`Default_Fund__c`, `Default_Appeal__c`), and the assistant's own progress keys `Setup_Steps_Skipped__c` and `Setup_Started_At__c`. The v0.2 key planned as `Setup_Assistant_Steps_Complete__c` shipped as `Setup_Steps_Completed__c` plus `Setup_Steps_Skipped__c`. |
-| v0.4 | 2026-09-15 | C-16 review fix. No object or field added. `Primary_Affiliation__c` was maintained by `AffiliationService` (R-AF2) but shown nowhere: added, read only, to the Contact page layout in the Person section and to the Contact compact layout, so a list view or a mail merge can show a person's employer as the field's own description says. The matching field on Account is left off both Account page layouts: per Section 28, it is populated only in Person Account orgs, and neither the Household nor the Organization record type is a person, so it has nowhere on those layouts to belong. Also removed the internal feature tag "(C-10)" from the inline help text and description of `Sample_Data__c` and `Sample_Data_Key__c` on Account and Contact, since a feature ID means nothing to a nonprofit user; the same tag was removed from the Relationship, Affiliation, Commitment, Gift, Fund, and Appeal copies of `Sample_Data__c` in the same pass, so no field help or description in either package carries a feature ID now. |
-| v0.4 | 2026-09-15 | C-01 defect, found by a Sales Cloud readiness audit. No object or field added. In junction mode a person's household is a `Household_Member__c` row, not the account their contact points at, but `ContactTriggerHandler` read the household from `Contact.AccountId` in every context, which in junction mode is an employer or nothing. So renaming, deleting and restoring a person stored as a contact quietly did nothing to their household: the count stayed stale, the dead person stayed in the name and both greetings, the membership row survived naming nobody because `Contact__c` empties itself on delete, and undelete never put them back. `AccountTriggerHandler` had always handled the account half of this correctly (see the 2026-09-09 C-01 person account row above); only the contact half was missing. `ContactTrigger` now declares before delete, and the handler mirrors the account one: memberships are removed in before delete while they still name the person, the departing households are carried to after delete, after undelete restores them, and a rename asks `householdIdsForPeople` which households to rewrite. Contact mode is unchanged by construction, since each of those calls answers empty outside junction mode. R-M4 and R-H11 now hold for both representations of a person, which matters because a Platform-only org (ADR-0013) can only run junction mode with contacts, and a mixed org holds both. |
-| v0.4 | 2026-09-15 | Deploy stability: `packages/core/main/default/labels/CustomLabels.labels-meta.xml` (391 labels, 141 KB) split into per-feature label files, following the pattern already used for Address, Import, CoreRollups, Relationship, SeasonalAddress and Affiliation. No label was renamed, so no Apex or LWC reference changed. Groups of 8 or more labels, grouped by the second underscore-separated segment of `fullName`, became their own file: Access (33), AutomationControl (16), HealthCheck (73), HouseholdMembersPanel (13), HouseholdMerge (39), HouseholdNamingSettings (18), Households (19), HubHome (11), SampleData (31), Settings (23), SetupAssistant (84, after the four removals below). Groups under 8 (Automation, CoexistenceMode, ErrorLog, ErrorLogTile, HouseholdNaming, SettingsSearch, 27 labels total) were merged into `CoreShared.labels-meta.xml`. Four unreferenced Setup Assistant labels were deleted in the same pass, each re-verified with a grep of `packages/` for `.cls`, `.js` and `.html` consumers before removal: `Core_SetupAssistant_AllDoneMessage`, `Core_SetupAssistant_MarkDoneButton`, `Core_SetupAssistant_MarkNotDoneButton`, `Core_SetupAssistant_OpenButton`. Two label values were reworded without renaming the label: `Core_HouseholdNamingSettings_Recompute` from "Recompute all households" to "Update all household names", and `Core_HouseholdNamingSettings_RecomputeStarted` from "Recompute started. Households are being brought up to date in the background." to "Updating household names in the background." Verified: the 387 labels written across the new and shared files plus the 4 deleted equal the original 391, no label name is duplicated across files, and all 486 distinct `System.Label.X` and `@salesforce/label/c.X` references under `packages/core/` resolve to exactly one file. |
-| v0.5 | 2026-09-15 | C-25: added the email attributes `Personal_Email__c`, `Work_Email__c`, `Alternate_Email__c` and `Preferred_Email__c` to the person attributes (Section 7), on both Contact and Account, with rule R-C6. When Preferred Email is set, the standard email is copied from the address it names on every save; when it is empty nothing is copied; when the address it names is empty the save is refused rather than the standard email being blanked. |
-| v0.5 | 2026-09-22 | Removed the Naming Pattern custom metadata type (its four fields and six shipped records) before the first package version, by the owner's decision. Nothing read it: household naming reads the three pattern fields on Nonprofit Settings. A custom metadata type is effectively permanent once packaged, so it goes now rather than never. |
-| v0.5 | 2026-09-23 | Removed the packaged Contact record type, its compact layout, and the list view that filtered on it, by the owner's decision (R-C4, ADR-0041). It drove no behavior: no code, rule or page branched on it, and the sample data loader was the only code that set it. People are now created with the org's default Contact record type. No field changed; the `Household_Role__c` picklist values it listed are all active on the master record type. |
-| v0.5 | 2026-09-23 | No object or field added. The Account, Contact, Gift and Commitment record pages show their fields with Dynamic Forms (ADR-0043). R-O3 now holds on the Account record page: the Name and Greetings section, which carries Member Count, Anniversary, Custom Name and the two greetings, shows only for the Household record type. Account keeps one fallback page layout for both record types, and no layout is assigned to a profile. |
-| v0.5 | 2026-09-23 | C-22, product-plan Section 11.2 item 8. No object or field added. R-M3's second half is implemented and its known-gaps row in Section 30 closed (ADR-0044, primary contact mirrors the primary member): in junction mode `Primary_Contact__c` mirrors the current member marked Is Primary, as that member's Contact or, for a Person Account, its person contact, and a hand edit of it on a household is refused. R-H5 now states the primary tiebreak the code already applied and which source each mode reads it from. R-H10 and the Household attribute table say which record is the mark in each mode. |
-| v0.5 | 2026-09-23 | C-19 Import 2.0. New Section 17A, `Import_Journal__c`, a page per chunk recording the updates an import made (value before and value written) and what an undo kept or did not put back, with rules R-IJ1 to R-IJ5. `Import_Batch__c` status gains Undoing and Undo failed; R-IB6 restated and R-IB7 (the undo window is stamped at commit), R-IB8 (one named batch, counted and confirmed, once, to the recycle bin) and R-IB9 (deletes only tagged records, keeps a tagged record that has gained something since, puts back only values nobody has changed since) added. R-IB3 now says the import tags the household it made a new person. R-IT6 added: a recurring template is listed on the Hub with its last import date, and nothing loads a file on a schedule. `Nonprofit_Settings__c` gains `Import_Undo_Retention_Days__c`. R-IR5 notes that undo does not read the staged rows. |
-| v0.5 | 2026-09-23 | C-19 review. No object or field added. R-IB1: a dry run is refused on a batch that has started a commit or is in an undo status. R-IB8: a chunk the platform stopped, or an undo job that is no longer running, ends Undo failed. R-IB9: a tagged record is kept when anything created since points at it through any reference the org can filter on (not only custom ones), when something was created during the commit by somebody else, when the record was edited since or has an activity, and when the person undoing cannot delete it; the system-mode reads and writes are recorded against ADR-0021. R-IJ1: a page holds at most 200 entries, and one oversized entry is logged rather than losing the chunk's journal. |
-| v0.5 | 2026-09-24 | G-23 gift import and G-24 donation matching (ADR-0052). No object added. `Import_Template__c` gains `Donation_Matching__c`, `Match_Date_Window_Days__c` and `Match_Amount_Tolerance__c` (R-IT7); `Import_Batch__c` gains the control totals `Expected_Count__c`, `Expected_Amount__c` and `File_Amount__c` (R-IB10); `Giving_Settings__c` gains `Donation_Match_Date_Window_Days__c` and `Donation_Match_Amount_Tolerance__c`. R-IR1 adds the `Tribute` row entity; R-IR6 states the entity processor contract and R-IR7 how a row's outcome is folded; R-IB8 and R-IB9 let an undo delete what an entity processor tagged, with the processor's reasons to keep. New Section 25N, rules R-GI1 to R-GI9 and R-DM1 to R-DM6. |
-| v0.5 | 2026-09-24 | G-24 follow-up (ADR-0052, amended). `Import_Batch__c` gains `Processor_Settings_JSON__c`, one document the entity processor fills in a dry run and reads back in the commit, which Core never reads. R-IB11 added: a commit runs under the settings its dry run showed. R-DM7 added: donation matching's behaviour, window and tolerance are taken once per dry run and the commit uses them, not the template as edited since. R-IR6 and R-IT7 say so. |
-| v0.5 | 2026-09-24 | C-14 defect. No object or field added. R-IB12: a commit no longer creates a new person once per row when several rows of one chunk name them; the rows share the first row's record, and the dry run counts them the same way. |
-| v0.5 | 2026-09-24 | C-14 first names. No field added. R-IB12: a person is found by the key narrowed to their first name before the shared key, which alone finds them only when one person holds it or the row gives no first name; otherwise they are created. The same in the org, across chunks and within a chunk. |
-| v0.5 | 2026-09-24 | C-14 passes. `Import_Batch__c` and `Import_Row__c` gain `Pass_Number__c`, and `Import_Batch__c` gains `Job_Id__c`. R-IB13 added: a start is refused while the batch's job is running (a pass whose job was aborted reads Failed and can start again, and an aborted commit can be undone), the synchronous reset of every staged row is removed (it failed past 10,000 rows), and each chunk clears and stamps its own rows so keys are read only by the pass that wrote them. |
-| v0.5 | 2026-09-24 | C-14 dry run at scale. `Import_Row__c` gains `Person_1_Key__c`, `Person_2_Key__c`, `Person_1_Name_Key__c`, `Person_2_Name_Key__c`, `Organization_Key__c` and `Processor_Key__c`, indexed digests a dry run writes on the row that would create a record or load an external ID. R-IB12 and R-IR6: the digests are looked up per chunk instead of carried in the batch's state, so a dry run's heap no longer grows with the rows before the chunk. |
-| v0.5 | 2026-09-24 | C-14 dry run fix. No object or field added. R-IB12 added: a dry run carries, across chunks, digests of the people and organizations it would create, so a later chunk naming one counts it matched, as the commit does, rather than created again. |
-| v0.5 | 2026-09-24 | Import engine review fixes. No object or field added. R-IT3: in Person Accounts mode a person's contact attributes are written to the account's person fields (PersonEmail, PersonMailingStreet, PersonHasOptedOutOfEmail and the rest), found by describe, where before only the name, salutation and phone were written. R-IB12: a person account is matched on the fields it is written to, PersonEmail and PersonMailingPostalCode, and also on BillingPostalCode, where another tool often put it; a matching field the user may not read is skipped and named in the run log, and the dry run remembers a person it would create only where the commit writes the matched field, now including a person account and excluding a field the importing user may not write. |
-| v0.6 | 2026-09-25 | C-29 neutral Core (ADR-0059). No object added. Seven keys move from `Nonprofit_Settings__c` (Section 12) to `Giving_Settings__c` (Section 21A) with their API names and definitions unchanged: `Default_Fund__c`, `Default_Appeal__c`, `Organization_EIN__c`, `Receipt_Signer_Name__c`, `Receipt_Signer_Title__c`, `Receipt_Logo_Document_Id__c` and `Receipt_Signature_Document_Id__c`. `Organization_Legal_Name__c` and `Organization_Address__c` stay in Core with neutral definitions. Nothing is migrated: no package version exists, so no org holds values on the old fields. Section 12 is labelled BarnCRM Settings, its API name unchanged. Section 32 gains the ownership of components that are not entities: the app, the Setup Assistant steps, the Health Check findings, the roles and the custom permissions. |
-| v0.6 | 2026-10-12 | Neutral Core wording (ADR-0062). No object or field added, no API name changed. Rule 5 in Section 2 states that Core is neutral, with the Giving, detected-product, import-alias and edition exceptions. Section 12: `Coexistence_Mode__c` says which modes are offered when and which is recommended; the third mode is shown as Nonprofit Cloud coexistence. Section 15: the example name is "Generic contact list"; R-IT5 ships the generic gift list and every migration template, including `npc_person_accounts` and `npsp_contacts`, from Giving; `Donation_Matching__c` is labelled Payment Matching. |
-| v0.6 | 2026-10-12 | API name pass (ADR-0063). No object or field added. `Nonprofit_Settings__c` is renamed `BarnCRM_Settings__c` (Section 12) with every field unchanged, and the custom permission `Manage_Nonprofit_Settings` is renamed `Manage_BarnCRM_Settings`. The other renames of that pass are recorded below as they land. |
-| v0.6 | 2026-10-12 | API name pass, access and navigation (ADR-0063). No object or field added. Permission sets `Nonprofit_Admin`, `Nonprofit_Staff`, `Nonprofit_Read_Only` and `Nonprofit_Duplicate_Review` are renamed `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only` and `BarnCRM_Duplicate_Review`; the permission set group `Nonprofit_Admin_Group` is renamed `BarnCRM_Admin_Group`; the app `Nonprofit_Hub` is renamed `BarnCRM`; the tabs and flexipages `Nonprofit_Hub_Home` and `Nonprofit_Settings` are renamed `BarnCRM_Home` and `BarnCRM_Settings`. |
-| v0.6 | 2026-10-12 | API name pass, stored values and the import field (ADR-0063). No object or field added. `Import_Template__c.Donation_Matching__c` is renamed `Payment_Matching__c` (Section 15), with the same picklist values. The `Coexistence_Mode__c` value `AgentforceNonprofit` becomes `NonprofitCloud` (Section 12). The shipped Import Template key `generic_donor_list` becomes `generic_contact_list`, and the Health Check keys `nonprofit_admin` and `no_nonprofit_admin` become `admin_role` and `no_admin`. |

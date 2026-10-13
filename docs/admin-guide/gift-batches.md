@@ -59,6 +59,31 @@ Do this as David, with the Tuesday mail: three checks and a deposit slip that sa
 9. Click the first gift link. It is dated today, type Check, appeal Spring Appeal, check
    number 1042, with one allocation to your default fund.
 
+## Checks that pay a pledge
+
+A check is often a pledge payment. Each line has a **Pays** column for that. Once a line has
+a donor, **Pays** lists that donor's payments still owed: scheduled, overdue or partly paid,
+on pledges and recurring gifts that are active or paused, including the ones made in the name
+of the donor's household. **None: a new gift on its own** is always there, and is what a line
+does unless you or a suggestion says otherwise.
+
+A payment is marked **suggested** when its due date is within the date window of the line's
+date (its own, or the batch's) and its expected amount is within the allowed difference of
+the line's amount. These are the settings gift imports use: **BarnCRM Settings**, **Import**,
+**Days either side of a payment's due date** and **Amount difference allowed**. When exactly
+one payment is suggested, the line chooses it and the cell says so; when two or more are,
+nothing is chosen and you pick. A payment you picked yourself stays picked. Change the amount
+or the date, and the list is looked up again; change the donor, and the line goes back to
+None until the new donor's list arrives.
+
+Posting links each such gift to its payment and pledge, and the payment's status and the
+pledge's paid to date and balance update on their own. Posting checks every chosen payment
+again first: one paid or closed since you chose it, or one that is not the line's donor's,
+stops the post and names the line, and nothing is created.
+
+Two lines can pay the same payment, for example two checks that each pay half of it. The
+payment counts both, and shows Partially paid until they add up to what it expects.
+
 ## Common mistakes
 
 **The batch does not balance.** The message says how far out it is and in which direction:
@@ -92,6 +117,24 @@ attempt. A batch's **Posted** status is not the same as a gift posted to account
 **No default fund anywhere.** Posting fails and names every line: the gifts have nowhere
 to be designated. Set the default fund in BarnCRM Settings and post again; nothing was
 created by the failed attempt.
+
+**A line says "This line pays a payment that is no longer open".** The payment was paid, or
+its pledge completed or cancelled, after you chose it. Its **Pays** cell reads **A payment
+that is no longer open: choose again**. Choose another payment, or None, and post again;
+nothing was created by the failed attempt.
+
+**A saved line keeps its choice.** A line you saved keeps the payment it was saved with, or
+None, when you open the batch again: nothing is chosen for it in advance a second time. A new
+line, or a saved line whose donor you change, gets a suggestion as described above.
+
+**A suggestion chosen for the wrong pledge.** A suggestion is only a suggestion: check the
+**Pays** cell of every line that shows one before you post, and choose **None** where the
+check is not a pledge payment. If it was posted anyway, open the gift and clear its
+**Installment** and **Commitment**; the payment is owed again.
+
+**Typing a batch on a phone.** The grid has ten columns, so on a phone it scrolls sideways
+and the screen says **Batches are easier on a computer.** It still works. For one gift on a
+phone, Quick Gift Entry is quicker.
 
 **Two people typing the same batch.** Each save sends the whole grid. Type a batch on one
 screen at a time, or split the stack into two batches.

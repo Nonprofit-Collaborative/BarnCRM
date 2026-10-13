@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_BulkDelete_ErrorNoPermission</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the person lacks the bulk delete permissions.</shortDescription>
+        <value>Bulk delete needs the Bulk Delete Records and Find and Export Records permissions. Ask your administrator.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorObject</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the query's object cannot be bulk deleted, and why.</shortDescription>
+        <value>{0} cannot be bulk deleted: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ReasonNoDelete</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason: the person may not delete records of this object.</shortDescription>
+        <value>your access does not let you delete them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ReasonNoUndelete</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reason: these records cannot come back from the Recycle Bin.</shortDescription>
+        <value>Salesforce cannot bring them back from the Recycle Bin, so the delete could not be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorNothingMatches</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: no records match the query.</shortDescription>
+        <value>No records match this query, so there is nothing to delete.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorOverLimit</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more records match than the bulk delete run limit.</shortDescription>
+        <value>More than {0} records match, the run limit for one bulk delete. Narrow the query, or run it in parts.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorMoreThanConfirmed</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: more records match now than were confirmed.</shortDescription>
+        <value>More records match now than the {0} you confirmed. Nothing was deleted. Preview again and confirm the new number.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogStarted</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: who started a bulk delete, when, and the counts.</shortDescription>
+        <value>{0} started a bulk delete on {1}: {2} {3} matched; {4} confirmed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogStopped</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: the bulk delete stopped before deleting anything.</shortDescription>
+        <value>Stopped before deleting anything: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogFinished</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: what a bulk delete did.</shortDescription>
+        <value>Finished: {0} deleted, {1} no longer matched, {2} refused.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_ErrorNotBulkDelete</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the bulk delete asked for cannot be found.</shortDescription>
+        <value>This bulk delete could not be found. Refresh the page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoNothing</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the bulk delete deleted nothing to bring back.</shortDescription>
+        <value>This bulk delete deleted nothing, so there is nothing to bring back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoCountChanged</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: the confirmed count is not what the job deleted.</shortDescription>
+        <value>You confirmed {0} records, but this bulk delete deleted {1}. Nothing was brought back. Look at the count and confirm again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoPurged</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Journal: a deleted record is no longer in the Recycle Bin.</shortDescription>
+        <value>No longer in the Recycle Bin, so it cannot be brought back.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_LogUndone</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log: who undid a bulk delete, when, and what came back.</shortDescription>
+        <value>{0} undid this bulk delete on {1}: of {6} deleted, {2} brought back, {3} no longer in the Recycle Bin, {4} already restored, {5} refused.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_Title</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete panel title and the Find button that opens it.</shortDescription>
+        <value>Bulk delete</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_PanelIntro</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete panel: what it does.</shortDescription>
+        <value>Delete every record this query returns, with your own access. Deleted records go to the Recycle Bin, and the delete can be undone from the Bulk Update tab while they are there. Nothing is deleted until you preview and confirm the number of records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_PreviewCount</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete preview: the count and object, before the first names.</shortDescription>
+        <value>{0} {1} match. The first ones:</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_Cascades</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete preview: warning that related records are deleted too.</shortDescription>
+        <value>Salesforce also deletes these related records with them, and brings them back with an undo:</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_DeleteButton</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: the button that starts the delete, with the count.</shortDescription>
+        <value>Delete {0} records</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_Started</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: notice that the job started.</shortDescription>
+        <value>The bulk delete started. It keeps running if you leave this page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_Progress</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: progress of a running job.</shortDescription>
+        <value>Deleting: {0} of {1} chunks done.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_Summary</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: what a finished job did.</shortDescription>
+        <value>{0} matched: {1} deleted, {2} refused.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoFromTab</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: where to undo a finished job.</shortDescription>
+        <value>To bring these records back, use Undo under Recent bulk deletes on the Bulk Update tab.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_Recent</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk Update tab: heading over recent bulk deletes.</shortDescription>
+        <value>Recent bulk deletes</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_NoJobs</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk Update tab: no bulk deletes yet.</shortDescription>
+        <value>No bulk deletes yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoConfirm</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete undo: what it brings back and the number to type.</shortDescription>
+        <value>Undo brings back {0} records from the Recycle Bin, except any no longer there. Type {0} to confirm.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_UndoButton</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete undo: the button that starts it.</shortDescription>
+        <value>Undo bulk delete</value>
+    </labels>
+</CustomLabels>

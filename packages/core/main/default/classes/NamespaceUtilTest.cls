@@ -5,6 +5,7 @@
  * The namespace is deferred, so the tests assert the shape of the answer rather than a
  * literal prefix: they have to keep passing on the day the namespace is registered.
  */
+// runs-as: deploying user (pure logic: reads a class name, no DML or SOQL)
 @IsTest
 private class NamespaceUtilTest {
     @IsTest

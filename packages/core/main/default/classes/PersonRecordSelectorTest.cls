@@ -7,27 +7,31 @@
 private class PersonRecordSelectorTest {
     @IsTest
     static void nothingIsReadWhenTheOrgDoesNotStorePeopleAsAccounts() {
-        HouseholdService.personAccountOverride = false;
-        Account organization = new Account(Name = 'Riverside Community Trust');
-        insert organization;
+        System.runAs(TestUsers.admin()) {
+            HouseholdService.personAccountOverride = false;
+            Account organization = new Account(Name = 'Riverside Community Trust');
+            insert organization;
 
-        Test.startTest();
-        List<HouseholdService.Person> people = PersonRecordSelector.getPersons(
-            new Set<Id>{ organization.Id }
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<HouseholdService.Person> people = PersonRecordSelector.getPersons(
+                new Set<Id>{ organization.Id }
+            );
+            Test.stopTest();
 
-        Assert.areEqual(0, people.size(), 'The person branch does not run on this org shape');
+            Assert.areEqual(0, people.size(), 'The person branch does not run on this org shape');
+        }
     }
 
     @IsTest
     static void anEmptyRequestReadsNothing() {
-        HouseholdService.personAccountOverride = true;
-        Assert.areEqual(
-            0,
-            PersonRecordSelector.getPersons(new Set<Id>()).size(),
-            'No ids means no query and no rows'
-        );
+        System.runAs(TestUsers.admin()) {
+            HouseholdService.personAccountOverride = true;
+            Assert.areEqual(
+                0,
+                PersonRecordSelector.getPersons(new Set<Id>()).size(),
+                'No ids means no query and no rows'
+            );
+        }
     }
 
     /**
@@ -41,25 +45,27 @@ private class PersonRecordSelectorTest {
      */
     @IsTest
     static void theUpkeepReadSeesAFieldTheReadingUserCannotRead() {
-        HouseholdService.personAccountOverride = true;
-        User staff = HouseholdTestDataFactory.standardUser('upk');
-        Account person = new Account(Name = 'Maria Garcia');
-        // Saved by the same user who reads it back, so that what this measures is field
-        // level access and not the org's sharing model.
-        System.runAs(staff) {
-            insert person;
-        }
-        update new Account(Id = person.Id, Deceased__c = true);
-        List<HouseholdService.Person> people;
+        System.runAs(TestUsers.admin()) {
+            HouseholdService.personAccountOverride = true;
+            User staff = HouseholdTestDataFactory.standardUser('upk');
+            Account person = new Account(Name = 'Maria Garcia');
+            // Saved by the same user who reads it back, so that what this measures is field
+            // level access and not the org's sharing model.
+            System.runAs(staff) {
+                insert person;
+            }
+            update new Account(Id = person.Id, Deceased__c = true);
+            List<HouseholdService.Person> people;
 
-        Test.startTest();
-        System.runAs(staff) {
-            people = PersonRecordSelector.getPersons(new Set<Id>{ person.Id });
-        }
-        Test.stopTest();
+            Test.startTest();
+            System.runAs(staff) {
+                people = PersonRecordSelector.getPersons(new Set<Id>{ person.Id });
+            }
+            Test.stopTest();
 
-        Assert.areEqual(1, people.size(), 'The read works for a user with no packaged access');
-        Assert.isTrue(people[0].isDeceased, 'And it sees the flag the greetings depend on');
+            Assert.areEqual(1, people.size(), 'The read works for a user with no packaged access');
+            Assert.isTrue(people[0].isDeceased, 'And it sees the flag the greetings depend on');
+        }
     }
 
     /**
@@ -70,94 +76,108 @@ private class PersonRecordSelectorTest {
      */
     @IsTest
     static void theDisplayReadStripsAFieldTheReadingUserCannotRead() {
-        HouseholdService.personAccountOverride = true;
-        User staff = HouseholdTestDataFactory.standardUser('disp');
-        Account person = new Account(Name = 'Maria Garcia');
-        System.runAs(staff) {
-            insert person;
-        }
-        update new Account(Id = person.Id, Deceased__c = true);
-        List<HouseholdService.Person> people;
+        System.runAs(TestUsers.admin()) {
+            HouseholdService.personAccountOverride = true;
+            User staff = HouseholdTestDataFactory.standardUser('disp');
+            Account person = new Account(Name = 'Maria Garcia');
+            System.runAs(staff) {
+                insert person;
+            }
+            update new Account(Id = person.Id, Deceased__c = true);
+            List<HouseholdService.Person> people;
 
-        Test.startTest();
-        System.runAs(staff) {
-            people = PersonRecordSelector.getPersonsForDisplay(new Set<Id>{ person.Id });
-        }
-        Test.stopTest();
+            Test.startTest();
+            System.runAs(staff) {
+                people = PersonRecordSelector.getPersonsForDisplay(new Set<Id>{ person.Id });
+            }
+            Test.stopTest();
 
-        Assert.areEqual(1, people.size(), 'The person is still shown');
-        Assert.isFalse(
-            people[0].isDeceased,
-            'A user with no access to the deceased field is not told that she died'
-        );
+            Assert.areEqual(1, people.size(), 'The person is still shown');
+            Assert.isFalse(
+                people[0].isDeceased,
+                'A user with no access to the deceased field is not told that she died'
+            );
+        }
     }
 
     @IsTest
     static void aDisplayReadOfNobodyReadsNothing() {
-        HouseholdService.personAccountOverride = true;
-        Assert.areEqual(
-            0,
-            PersonRecordSelector.getPersonsForDisplay(new Set<Id>()).size(),
-            'No ids means no query and no rows'
-        );
+        System.runAs(TestUsers.admin()) {
+            HouseholdService.personAccountOverride = true;
+            Assert.areEqual(
+                0,
+                PersonRecordSelector.getPersonsForDisplay(new Set<Id>()).size(),
+                'No ids means no query and no rows'
+            );
+        }
     }
 
     @IsTest
     static void aRecordIsTurnedIntoAPersonWithoutNamingFieldsThatMayNotExist() {
-        Account record = new Account(Name = 'Maria Garcia');
-        insert record;
+        System.runAs(TestUsers.admin()) {
+            Account record = new Account(Name = 'Maria Garcia');
+            insert record;
 
-        Test.startTest();
-        HouseholdService.Person person = PersonRecordSelector.toPerson(
-            [SELECT Id, Name, Preferred_Name__c, Deceased__c FROM Account WHERE Id = :record.Id]
-        );
-        Test.stopTest();
+            Test.startTest();
+            HouseholdService.Person person = PersonRecordSelector.toPerson(
+                [SELECT Id, Name, Preferred_Name__c, Deceased__c FROM Account WHERE Id = :record.Id]
+            );
+            Test.stopTest();
 
-        Assert.areEqual(record.Id, person.id, 'The person is the record');
-        Assert.areEqual(
-            HouseholdService.SOURCE_ACCOUNT,
-            person.sourceObject,
-            'The person came from an account'
-        );
-        Assert.isFalse(person.isDeceased, 'A missing or empty flag reads as false');
+            Assert.areEqual(record.Id, person.id, 'The person is the record');
+            Assert.areEqual(
+                HouseholdService.SOURCE_ACCOUNT,
+                person.sourceObject,
+                'The person came from an account'
+            );
+            Assert.isFalse(person.isDeceased, 'A missing or empty flag reads as false');
+        }
     }
 
     @IsTest
     static void anOrganizationIsNeverTakenForAPerson() {
-        Account organization = new Account(Name = 'Riverside Community Trust');
-        insert organization;
+        System.runAs(TestUsers.admin()) {
+            Account organization = new Account(Name = 'Riverside Community Trust');
+            insert organization;
 
-        Test.startTest();
-        Boolean isPerson = PersonRecordSelector.isPersonRecord(organization);
-        List<SObject> people = PersonRecordSelector.filterPeople(new List<SObject>{ organization });
-        Test.stopTest();
+            Test.startTest();
+            Boolean isPerson = PersonRecordSelector.isPersonRecord(organization);
+            List<SObject> people = PersonRecordSelector.filterPeople(
+                new List<SObject>{ organization }
+            );
+            Test.stopTest();
 
-        Assert.isFalse(isPerson, 'An organization is not a person');
-        Assert.areEqual(0, people.size(), 'Nothing is treated as a person');
+            Assert.isFalse(isPerson, 'An organization is not a person');
+            Assert.areEqual(0, people.size(), 'Nothing is treated as a person');
+        }
     }
 
     @IsTest
     static void nothingAtAllIsHandled() {
-        Assert.isFalse(PersonRecordSelector.isPersonRecord(null), 'No record means no person');
-        Assert.areEqual(
-            0,
-            PersonRecordSelector.filterPeople(null).size(),
-            'No list means no people'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.isFalse(PersonRecordSelector.isPersonRecord(null), 'No record means no person');
+            Assert.areEqual(
+                0,
+                PersonRecordSelector.filterPeople(null).size(),
+                'No list means no people'
+            );
+        }
     }
 
     @IsTest
     static void aListOfRecordsIsTurnedIntoPeople() {
-        Account record = new Account(Name = 'Maria Garcia');
-        insert record;
+        System.runAs(TestUsers.admin()) {
+            Account record = new Account(Name = 'Maria Garcia');
+            insert record;
 
-        Test.startTest();
-        List<HouseholdService.Person> people = PersonRecordSelector.toPersons(
-            [SELECT Id, Name, Preferred_Name__c, Deceased__c FROM Account WHERE Id = :record.Id]
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<HouseholdService.Person> people = PersonRecordSelector.toPersons(
+                [SELECT Id, Name, Preferred_Name__c, Deceased__c FROM Account WHERE Id = :record.Id]
+            );
+            Test.stopTest();
 
-        Assert.areEqual(1, people.size(), 'One record makes one person');
+            Assert.areEqual(1, people.size(), 'One record makes one person');
+        }
     }
 
     /**
@@ -167,72 +187,80 @@ private class PersonRecordSelectorTest {
      */
     @IsTest
     static void everyAttributeTheWordingIsBuiltFromCountsAsAChange() {
-        Map<String, Object> changes = new Map<String, Object>{
-            'Preferred_Name__c' => 'Mari',
-            'Deceased__c' => true,
-            'Household_Role__c' => 'Head',
-            'Exclude_From_Household_Name__c' => true,
-            'Exclude_From_Greetings__c' => true
-        };
+        System.runAs(TestUsers.admin()) {
+            Map<String, Object> changes = new Map<String, Object>{
+                'Preferred_Name__c' => 'Mari',
+                'Deceased__c' => true,
+                'Household_Role__c' => 'Head',
+                'Exclude_From_Household_Name__c' => true,
+                'Exclude_From_Greetings__c' => true
+            };
 
-        Test.startTest();
-        Map<String, Boolean> noticed = new Map<String, Boolean>();
-        for (String fieldName : changes.keySet()) {
-            Account previous = new Account(Name = 'Maria Garcia');
-            Account record = new Account(Name = 'Maria Garcia');
-            record.put(fieldName, changes.get(fieldName));
-            noticed.put(fieldName, PersonRecordSelector.namingChanged(record, previous));
-        }
-        Test.stopTest();
+            Test.startTest();
+            Map<String, Boolean> noticed = new Map<String, Boolean>();
+            for (String fieldName : changes.keySet()) {
+                Account previous = new Account(Name = 'Maria Garcia');
+                Account record = new Account(Name = 'Maria Garcia');
+                record.put(fieldName, changes.get(fieldName));
+                noticed.put(fieldName, PersonRecordSelector.namingChanged(record, previous));
+            }
+            Test.stopTest();
 
-        for (String fieldName : changes.keySet()) {
-            Assert.isTrue(
-                noticed.get(fieldName),
-                'A change to ' + fieldName + ' changes what the household is called'
-            );
+            for (String fieldName : changes.keySet()) {
+                Assert.isTrue(
+                    noticed.get(fieldName),
+                    'A change to ' + fieldName + ' changes what the household is called'
+                );
+            }
         }
     }
 
     @IsTest
     static void aChangeTheWordingIsNotBuiltFromIsIgnored() {
-        Account previous = new Account(Name = 'Maria Garcia', Deceased__c = false);
-        Account record = new Account(
-            Name = 'Maria Garcia',
-            Deceased__c = false,
-            BillingCity = 'Riverside',
-            Description = 'Met at the gala'
-        );
+        System.runAs(TestUsers.admin()) {
+            Account previous = new Account(Name = 'Maria Garcia', Deceased__c = false);
+            Account record = new Account(
+                Name = 'Maria Garcia',
+                Deceased__c = false,
+                BillingCity = 'Riverside',
+                Description = 'Met at the gala'
+            );
 
-        Test.startTest();
-        Boolean noticed = PersonRecordSelector.namingChanged(record, previous);
-        Boolean unchanged = PersonRecordSelector.namingChanged(previous, previous);
-        Test.stopTest();
+            Test.startTest();
+            Boolean noticed = PersonRecordSelector.namingChanged(record, previous);
+            Boolean unchanged = PersonRecordSelector.namingChanged(previous, previous);
+            Test.stopTest();
 
-        Assert.isFalse(noticed, 'An address or a note is not part of the wording');
-        Assert.isFalse(unchanged, 'A record compared with itself has not changed');
+            Assert.isFalse(noticed, 'An address or a note is not part of the wording');
+            Assert.isFalse(unchanged, 'A record compared with itself has not changed');
+        }
     }
 
     @IsTest
     static void aChangeBackAgainIsNotAChange() {
-        Account previous = new Account(Name = 'Maria Garcia', Household_Role__c = 'Head');
-        Account record = new Account(Name = 'Maria Garcia', Household_Role__c = 'Head');
+        System.runAs(TestUsers.admin()) {
+            Account previous = new Account(Name = 'Maria Garcia', Household_Role__c = 'Head');
+            Account record = new Account(Name = 'Maria Garcia', Household_Role__c = 'Head');
 
-        Test.startTest();
-        Boolean noticed = PersonRecordSelector.namingChanged(record, previous);
-        Test.stopTest();
+            Test.startTest();
+            Boolean noticed = PersonRecordSelector.namingChanged(record, previous);
+            Test.stopTest();
 
-        Assert.isFalse(noticed, 'The same value on both sides is not a change');
+            Assert.isFalse(noticed, 'The same value on both sides is not a change');
+        }
     }
 
     @IsTest
     static void nothingToCompareIsNotAChange() {
-        Assert.isFalse(
-            PersonRecordSelector.namingChanged(null, new Account(Name = 'Maria Garcia')),
-            'No record means nothing changed'
-        );
-        Assert.isFalse(
-            PersonRecordSelector.namingChanged(new Account(Name = 'Maria Garcia'), null),
-            'No previous version means nothing to compare with'
-        );
+        System.runAs(TestUsers.admin()) {
+            Assert.isFalse(
+                PersonRecordSelector.namingChanged(null, new Account(Name = 'Maria Garcia')),
+                'No record means nothing changed'
+            );
+            Assert.isFalse(
+                PersonRecordSelector.namingChanged(new Account(Name = 'Maria Garcia'), null),
+                'No previous version means nothing to compare with'
+            );
+        }
     }
 }

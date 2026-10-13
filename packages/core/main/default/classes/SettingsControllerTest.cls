@@ -10,16 +10,23 @@ private class SettingsControllerTest {
 
     @TestSetup
     static void makeData() {
-        PermissionSet permissionSet = SettingsTestPermissions.build('C03_Settings_Console_Test');
-        User maria = SettingsTestPermissions.buildStandardUser('Maria', 'Alvarez', 'mariac');
-        insert maria;
-        insert new List<PermissionSetAssignment>{
-            new PermissionSetAssignment(
-                AssigneeId = UserInfo.getUserId(),
-                PermissionSetId = permissionSet.Id
-            ),
-            new PermissionSetAssignment(AssigneeId = maria.Id, PermissionSetId = permissionSet.Id)
-        };
+        System.runAs(TestUsers.admin()) {
+            PermissionSet permissionSet = SettingsTestPermissions.build(
+                'C03_Settings_Console_Test'
+            );
+            User maria = SettingsTestPermissions.buildStandardUser('Maria', 'Alvarez', 'mariac');
+            insert maria;
+            insert new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(
+                    AssigneeId = UserInfo.getUserId(),
+                    PermissionSetId = permissionSet.Id
+                ),
+                new PermissionSetAssignment(
+                    AssigneeId = maria.Id,
+                    PermissionSetId = permissionSet.Id
+                )
+            };
+        }
     }
 
     private static void stubDefinitions() {
@@ -97,82 +104,86 @@ private class SettingsControllerTest {
 
     @IsTest
     static void showsEverySectionWithItsSettings() {
-        stubDefinitions();
-        // An org with the Nonprofit Cloud objects, so both stubbed coexistence choices apply.
-        OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
-        shape.hasIndustriesNonprofit = true;
-        OrgShapeDetector.overrideShape = shape;
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            // An org with the Nonprofit Cloud objects, so both stubbed coexistence choices apply.
+            OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
+            shape.hasIndustriesNonprofit = true;
+            OrgShapeDetector.overrideShape = shape;
 
-        Test.startTest();
-        SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
-        Test.stopTest();
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
 
-        Assert.areEqual(
-            3,
-            model.sections.size(),
-            'Sections with something to show appear; Giving is not installed'
-        );
-        Map<String, SettingsController.SectionModel> byName = new Map<String, SettingsController.SectionModel>();
-        for (SettingsController.SectionModel section : model.sections) {
-            byName.put(section.name, section);
+            Assert.areEqual(
+                3,
+                model.sections.size(),
+                'Sections with something to show appear; Giving is not installed'
+            );
+            Map<String, SettingsController.SectionModel> byName = new Map<String, SettingsController.SectionModel>();
+            for (SettingsController.SectionModel section : model.sections) {
+                byName.put(section.name, section);
+            }
+            Assert.isTrue(
+                byName.containsKey(SettingSections.HOUSEHOLDS),
+                'The household settings have their own section'
+            );
+            Assert.areEqual(
+                2,
+                byName.get(SettingSections.HOUSEHOLDS).settings.size(),
+                'Both household settings are in it'
+            );
+            Assert.isTrue(
+                byName.get(SettingSections.HOUSEHOLDS)
+                    .settings[0]
+                    .helpUrl.endsWith('household-naming.md'),
+                'Learn more points at the admin guide page for that setting'
+            );
+            Assert.areEqual(
+                2,
+                byName.get(SettingSections.GENERAL).settings[0].options.size(),
+                'A picklist setting arrives with its choices, labelled'
+            );
+            Assert.areEqual(
+                'automationControl',
+                byName.get(SettingSections.AUTOMATION).settings[0].component,
+                'A section another feature renders arrives as a component to load'
+            );
         }
-        Assert.isTrue(
-            byName.containsKey(SettingSections.HOUSEHOLDS),
-            'The household settings have their own section'
-        );
-        Assert.areEqual(
-            2,
-            byName.get(SettingSections.HOUSEHOLDS).settings.size(),
-            'Both household settings are in it'
-        );
-        Assert.isTrue(
-            byName.get(SettingSections.HOUSEHOLDS)
-                .settings[0]
-                .helpUrl.endsWith('household-naming.md'),
-            'Learn more points at the admin guide page for that setting'
-        );
-        Assert.areEqual(
-            2,
-            byName.get(SettingSections.GENERAL).settings[0].options.size(),
-            'A picklist setting arrives with its choices, labelled'
-        );
-        Assert.areEqual(
-            'automationControl',
-            byName.get(SettingSections.AUTOMATION).settings[0].component,
-            'A section another feature renders arrives as a component to load'
-        );
     }
 
     @IsTest
     static void offersAProductsCoexistenceModeOnlyWhereThatProductIsDetected() {
-        stubDefinitions();
-        OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            OrgShapeDetector.overrideShape = new OrgShapeDetector.OrgShape();
 
-        Test.startTest();
-        List<SettingsController.Option> fresh = coexistenceOptions();
-        SettingsService.saveValues(
-            new Map<String, Object>{
-                'Coexistence_Mode__c' => CoexistenceService.MODE_NONPROFIT_CLOUD
-            }
-        );
-        List<SettingsController.Option> saved = coexistenceOptions();
-        Test.stopTest();
+            Test.startTest();
+            List<SettingsController.Option> fresh = coexistenceOptions();
+            SettingsService.saveValues(
+                new Map<String, Object>{
+                    'Coexistence_Mode__c' => CoexistenceService.MODE_NONPROFIT_CLOUD
+                }
+            );
+            List<SettingsController.Option> saved = coexistenceOptions();
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            fresh.size(),
-            'An org without Nonprofit Cloud is offered Standalone only'
-        );
-        Assert.areEqual(
-            CoexistenceService.MODE_STANDALONE,
-            fresh[0].value,
-            'Standalone is always there'
-        );
-        Assert.areEqual(
-            2,
-            saved.size(),
-            'A mode already saved stays visible, so the choice is never hidden from its maker'
-        );
+            Assert.areEqual(
+                1,
+                fresh.size(),
+                'An org without Nonprofit Cloud is offered Standalone only'
+            );
+            Assert.areEqual(
+                CoexistenceService.MODE_STANDALONE,
+                fresh[0].value,
+                'Standalone is always there'
+            );
+            Assert.areEqual(
+                2,
+                saved.size(),
+                'A mode already saved stays visible, so the choice is never hidden from its maker'
+            );
+        }
     }
 
     private static List<SettingsController.Option> coexistenceOptions() {
@@ -190,181 +201,258 @@ private class SettingsControllerTest {
 
     @IsTest
     static void findsSettingsByWordsMariaWouldUse() {
-        stubDefinitions();
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
 
-        Test.startTest();
-        List<SettingsController.SearchHit> byDescription = SettingsController.search('greetings');
-        List<SettingsController.SearchHit> bySection = SettingsController.search('households');
-        List<SettingsController.SearchHit> nothing = SettingsController.search('   ');
-        Test.stopTest();
+            Test.startTest();
+            List<SettingsController.SearchHit> byDescription = SettingsController.search(
+                'greetings'
+            );
+            List<SettingsController.SearchHit> bySection = SettingsController.search('households');
+            List<SettingsController.SearchHit> nothing = SettingsController.search('   ');
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            byDescription.size(),
-            'Searching the description finds the naming setting'
-        );
-        Assert.areEqual(
-            SettingSections.HOUSEHOLDS,
-            byDescription[0].section,
-            'The result says which section to open'
-        );
-        Assert.areEqual(2, bySection.size(), 'Searching a section name finds everything in it');
-        Assert.areEqual(0, nothing.size(), 'An empty search asks for nothing');
+            Assert.areEqual(
+                1,
+                byDescription.size(),
+                'Searching the description finds the naming setting'
+            );
+            Assert.areEqual(
+                SettingSections.HOUSEHOLDS,
+                byDescription[0].section,
+                'The result says which section to open'
+            );
+            Assert.areEqual(2, bySection.size(), 'Searching a section name finds everything in it');
+            Assert.areEqual(0, nothing.size(), 'An empty search asks for nothing');
+        }
     }
 
     @IsTest
     static void aRowForAModulePermissionIsHiddenFromThoseWithoutIt() {
-        stubDefinitions();
-        SettingDefinitionSelector.stubbedRows.add(
-            new Setting_Definition__mdt(
-                DeveloperName = 'Module_Page',
-                MasterLabel = 'Mirror page',
-                Section__c = SettingSections.AUTOMATION,
-                Module__c = 'Connect',
-                Data_Type__c = 'Component',
-                Component__c = 'modulePage',
-                Required_Permission__c = 'Permission_Nobody_Holds',
-                Sort_Order__c = 2
-            )
-        );
-        SettingDefinitionSelector.stubbedRows.add(
-            new Setting_Definition__mdt(
-                DeveloperName = 'Held_Page',
-                MasterLabel = 'Held page',
-                Section__c = SettingSections.AUTOMATION,
-                Module__c = 'Connect',
-                Data_Type__c = 'Component',
-                Component__c = 'heldPage',
-                Required_Permission__c = EDIT_PERMISSION,
-                Sort_Order__c = 3
-            )
-        );
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            SettingDefinitionSelector.stubbedRows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Module_Page',
+                    MasterLabel = 'Mirror page',
+                    Section__c = SettingSections.AUTOMATION,
+                    Module__c = 'Connect',
+                    Data_Type__c = 'Component',
+                    Component__c = 'modulePage',
+                    Required_Permission__c = 'Permission_Nobody_Holds',
+                    Sort_Order__c = 2
+                )
+            );
+            SettingDefinitionSelector.stubbedRows.add(
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Held_Page',
+                    MasterLabel = 'Held page',
+                    Section__c = SettingSections.AUTOMATION,
+                    Module__c = 'Connect',
+                    Data_Type__c = 'Component',
+                    Component__c = 'heldPage',
+                    Required_Permission__c = EDIT_PERMISSION,
+                    Sort_Order__c = 3
+                )
+            );
 
-        Test.startTest();
-        SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
-        List<SettingsController.SearchHit> hits = SettingsController.search('mirror page');
-        Test.stopTest();
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            List<SettingsController.SearchHit> hits = SettingsController.search('mirror page');
+            Test.stopTest();
 
-        Set<String> shown = new Set<String>();
-        for (SettingsController.SectionModel section : model.sections) {
-            for (SettingsController.SettingModel setting : section.settings) {
-                shown.add(setting.key);
+            Set<String> shown = new Set<String>();
+            for (SettingsController.SectionModel section : model.sections) {
+                for (SettingsController.SettingModel setting : section.settings) {
+                    shown.add(setting.key);
+                }
             }
+            Assert.isFalse(shown.contains('Module_Page'), 'Not shown without the permission.');
+            Assert.isTrue(
+                shown.contains('Held_Page'),
+                'Shown to one who holds it, named unprefixed.'
+            );
+            Assert.isTrue(hits.isEmpty(), 'Nor found by search.');
         }
-        Assert.isFalse(shown.contains('Module_Page'), 'Not shown without the permission.');
-        Assert.isTrue(shown.contains('Held_Page'), 'Shown to one who holds it, named unprefixed.');
-        Assert.isTrue(hits.isEmpty(), 'Nor found by search.');
     }
 
     @IsTest
     static void savesWhatMariaChanged() {
-        stubDefinitions();
-        Assert.isTrue(
-            FeatureManagement.checkPermission(EDIT_PERMISSION),
-            'The permission set built in setup carries Manage BarnCRM Settings'
-        );
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            Assert.isTrue(
+                FeatureManagement.checkPermission(EDIT_PERMISSION),
+                'The permission set built in setup carries Manage BarnCRM Settings'
+            );
 
-        Test.startTest();
-        SettingsController.ConsoleModel model = SettingsController.saveSettings(
-            new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-        );
-        Test.stopTest();
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.saveSettings(
+                new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
+            );
+            Test.stopTest();
 
-        Assert.isTrue(model.canEdit, 'The page comes back knowing Maria may keep editing');
-        Assert.areEqual(
-            'The {LastName} Family',
-            SettingsService.getValue(TEXT_KEY),
-            'The value Maria typed is the one in force'
-        );
-        Assert.areEqual(
-            1,
-            SettingsController.getRecentChanges(10).size(),
-            'Her change is on the recent changes list'
-        );
+            Assert.isTrue(model.canEdit, 'The page comes back knowing Maria may keep editing');
+            Assert.areEqual(
+                'The {LastName} Family',
+                SettingsService.getValue(TEXT_KEY),
+                'The value Maria typed is the one in force'
+            );
+            Assert.areEqual(
+                1,
+                SettingsController.getRecentChanges(10).size(),
+                'Her change is on the recent changes list'
+            );
+        }
     }
 
     @IsTest
     static void letsAStandardUserWithThePermissionSave() {
-        User maria = [SELECT Id FROM User WHERE LastName = 'Alvarez' AND IsActive = TRUE LIMIT 1];
-        Boolean saved = false;
+        System.runAs(TestUsers.admin()) {
+            User maria = [
+                SELECT Id
+                FROM User
+                WHERE LastName = 'Alvarez' AND IsActive = TRUE
+                LIMIT 1
+            ];
+            Boolean saved = false;
 
-        Test.startTest();
-        System.runAs(maria) {
-            stubDefinitions();
-            SettingsController.ConsoleModel model = SettingsController.saveSettings(
-                new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
+            Test.startTest();
+            System.runAs(maria) {
+                stubDefinitions();
+                SettingsController.ConsoleModel model = SettingsController.saveSettings(
+                    new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
+                );
+                saved = model.canEdit;
+            }
+            Test.stopTest();
+
+            Assert.isTrue(
+                saved,
+                'Maria is on the Standard User profile and holds only the permission, and she saves'
             );
-            saved = model.canEdit;
         }
-        Test.stopTest();
-
-        Assert.isTrue(
-            saved,
-            'Maria is on the Standard User profile and holds only the permission, and she saves'
-        );
     }
 
     @IsTest
     static void tellsDavidWhichPermissionHeNeeds() {
-        stubDefinitions();
-        User david = buildDavid();
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insert david;
-        }
-        Boolean refused = false;
-
-        Test.startTest();
-        System.runAs(david) {
-            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
-            Assert.isFalse(model.canEdit, 'David may read the settings but not change them');
-            try {
-                SettingsController.saveSettings(
-                    new Map<String, Object>{ TEXT_KEY => 'The {LastName} Clan' }
-                );
-            } catch (AuraHandledException e) {
-                refused = true;
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
+            User david = buildDavid();
+            System.runAs(new User(Id = UserInfo.getUserId())) {
+                insert david;
             }
-        }
-        Test.stopTest();
+            Boolean refused = false;
 
-        Assert.isTrue(refused, 'Saving without the permission is refused');
+            Test.startTest();
+            System.runAs(david) {
+                SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+                Assert.isFalse(model.canEdit, 'David may read the settings but not change them');
+                try {
+                    SettingsController.saveSettings(
+                        new Map<String, Object>{ TEXT_KEY => 'The {LastName} Clan' }
+                    );
+                } catch (AuraHandledException e) {
+                    refused = true;
+                }
+            }
+            Test.stopTest();
+
+            Assert.isTrue(refused, 'Saving without the permission is refused');
+        }
     }
 
     @IsTest
     static void savingNothingChangesNothing() {
-        stubDefinitions();
+        System.runAs(TestUsers.admin()) {
+            stubDefinitions();
 
-        Test.startTest();
-        SettingsController.ConsoleModel model = SettingsController.saveSettings(
-            new Map<String, Object>()
-        );
-        Test.stopTest();
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.saveSettings(
+                new Map<String, Object>()
+            );
+            Test.stopTest();
 
-        Assert.isNotNull(model, 'An empty save still returns the page');
-        Assert.areEqual(
-            0,
-            SettingsController.getRecentChanges(10).size(),
-            'Nothing was changed, so nothing is recorded'
-        );
+            Assert.isNotNull(model, 'An empty save still returns the page');
+            Assert.areEqual(
+                0,
+                SettingsController.getRecentChanges(10).size(),
+                'Nothing was changed, so nothing is recorded'
+            );
+        }
     }
 
     @IsTest
     static void listsRecentChangesForThePageFooter() {
-        insert new Setting_Change__c(
-            Setting_Name__c = TEXT_KEY,
-            Old_Value__c = 'The {LastName} Family',
-            New_Value__c = 'The {LastName} Household',
-            Changed_By__c = UserInfo.getUserId(),
-            Changed_At__c = System.now()
-        );
+        System.runAs(TestUsers.admin()) {
+            insert new Setting_Change__c(
+                Setting_Name__c = TEXT_KEY,
+                Old_Value__c = 'The {LastName} Family',
+                New_Value__c = 'The {LastName} Household',
+                Changed_By__c = UserInfo.getUserId(),
+                Changed_At__c = System.now()
+            );
 
-        Test.startTest();
-        List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
-        Test.stopTest();
+            Test.startTest();
+            List<SettingsController.ChangeModel> changes = SettingsController.getRecentChanges(5);
+            Test.stopTest();
 
-        Assert.areEqual(1, changes.size(), 'The change is listed');
-        Assert.areEqual(TEXT_KEY, changes[0].settingName, 'The row names the setting');
-        Assert.isNotNull(changes[0].changedBy, 'The row names who changed it');
-        Assert.isNotNull(changes[0].changedAt, 'The row says when');
+            Assert.areEqual(1, changes.size(), 'The change is listed');
+            Assert.areEqual(TEXT_KEY, changes[0].settingName, 'The row names the setting');
+            Assert.isNotNull(changes[0].changedBy, 'The row names who changed it');
+            Assert.isNotNull(changes[0].changedAt, 'The row says when');
+        }
+    }
+
+    @IsTest
+    static void aRecordRowNamesItsObjectAndARecordTypeRowListsItsChoices() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Picked_Account',
+                    MasterLabel = 'Picked account',
+                    Setting_Key__c = 'Organization_Legal_Name__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.RECORD,
+                    Record_Object__c = 'Account',
+                    Sort_Order__c = 1
+                ),
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Picked_Record_Types',
+                    MasterLabel = 'Picked record types',
+                    Setting_Key__c = 'Formal_Greeting_Pattern__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.RECORD_TYPE_LIST,
+                    Record_Object__c = 'Account',
+                    Sort_Order__c = 2
+                ),
+                new Setting_Definition__mdt(
+                    DeveloperName = 'Picked_From_Nowhere',
+                    MasterLabel = 'Picked from an object this org lacks',
+                    Setting_Key__c = 'Informal_Greeting_Pattern__c',
+                    Section__c = SettingSections.GENERAL,
+                    Module__c = 'Core',
+                    Data_Type__c = SettingsService.RECORD,
+                    Record_Object__c = 'Not_An_Object_Here__c',
+                    Sort_Order__c = 3
+                )
+            };
+
+            Test.startTest();
+            SettingsController.ConsoleModel model = SettingsController.getConsoleModel();
+            Test.stopTest();
+
+            List<SettingsController.SettingModel> rows = model.sections[0].settings;
+            Assert.areEqual(2, rows.size(), 'A row about an object this org lacks is left out');
+            Assert.areEqual('Account', rows[0].objectApiName, 'The picker is told its object');
+            Assert.areEqual(
+                SettingsService.recordTypes(Account.SObjectType).size(),
+                rows[1].options.size(),
+                'Every active record type is offered'
+            );
+            Assert.isNotNull(rows[1].options[0].label, 'Each choice carries the label Setup shows');
+            Assert.isNotNull(rows[1].options[0].value, 'Each choice stores its developer name');
+        }
     }
 }

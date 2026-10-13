@@ -12,14 +12,9 @@
   </values>
   <values>
     <field>Body__c</field>
-    <value xsi:type="xsd:string">&lt;div class="letterhead"&gt;
-  &lt;h1&gt;{{OrganizationName}}&lt;/h1&gt;
-  &lt;p&gt;{{OrganizationAddress}}&lt;/p&gt;
-&lt;/div&gt;
-&lt;p class="reference"&gt;Receipt {{ReceiptNumber}}, issued {{IssueDate}}&lt;/p&gt;
+    <value xsi:type="xsd:string">&lt;p&gt;Receipt {{ReceiptNumber}}, issued {{IssueDate}}&lt;/p&gt;
 &lt;p&gt;Dear {{DonorName}},&lt;/p&gt;
-&lt;p&gt;Thank you for your gift of {{Amount}}, received on {{GiftDate}}. Your support makes our work
-possible, and we are grateful for it.&lt;/p&gt;
+&lt;p&gt;Thank you for your gift of {{Amount}}, received on {{GiftDate}}. Your support makes our work possible, and we are grateful for it.&lt;/p&gt;
 &lt;p&gt;Please keep this receipt for your records.&lt;/p&gt;
 </value>
   </values>

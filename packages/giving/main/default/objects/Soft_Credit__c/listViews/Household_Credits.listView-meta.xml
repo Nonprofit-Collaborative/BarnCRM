@@ -12,5 +12,5 @@
     <operation>equals</operation>
     <value>Household Member</value>
   </filters>
-  <label>Household members</label>
+  <label>Household Members</label>
 </ListView>

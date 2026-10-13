@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Find (C-34): a visual query over one object, run, saved, shared and exported to CSV with the
+    user's own access. The SOQL is shown read only; none is accepted.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Find</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

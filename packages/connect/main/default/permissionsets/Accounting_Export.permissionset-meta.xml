@@ -4,12 +4,17 @@
   <label>Accounting Export</label>
   <description>
     For the bookkeeper: downloads gifts from the Accounting Export page as a CSV file and marks
-    them posted (Post Gifts). Assign with a Giving permission set that reads gifts.
+    them posted (Export Accounting, Post Gifts). Assign with a Giving permission set that reads
+    gifts.
   </description>
   <classAccesses>
     <apexClass>AccountingExportController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Export_Accounting</name>
+  </customPermissions>
   <customPermissions>
     <enabled>true</enabled>
     <name>Post_Gifts</name>

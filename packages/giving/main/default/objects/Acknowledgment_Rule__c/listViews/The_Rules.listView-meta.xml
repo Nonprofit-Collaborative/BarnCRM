@@ -9,5 +9,5 @@
   <columns>Maximum_Amount__c</columns>
   <columns>Active__c</columns>
   <filterScope>Everything</filterScope>
-  <label>The Rules</label>
+  <label>All Acknowledgment Rules</label>
 </ListView>

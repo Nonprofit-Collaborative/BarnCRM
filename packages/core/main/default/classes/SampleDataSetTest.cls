@@ -3,6 +3,7 @@
  * stage depends on, and every malformed payload that must raise SampleDataException with
  * the Core_SampleData_ErrorInvalidData label rather than a null dereference deeper in.
  */
+// runs-as: deploying user (pure logic: parses a sample data payload, no DML or SOQL)
 @IsTest
 private class SampleDataSetTest {
     private static Map<String, Object> validMember() {

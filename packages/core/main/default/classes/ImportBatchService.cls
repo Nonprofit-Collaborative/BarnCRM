@@ -68,6 +68,48 @@ public with sharing class ImportBatchService {
         Integer expectedCount,
         Decimal expectedAmount
     ) {
+        return create(templateId, fileId, fileName, expectedCount, expectedAmount, null);
+    }
+
+    /**
+     * Creates the batch for one upload with its control totals and the values every row of
+     * the file takes where it has none of its own (R-IB14). A value that would make every row
+     * one person is refused, saying which.
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c create(
+        Id templateId,
+        String fileId,
+        String fileName,
+        Integer expectedCount,
+        Decimal expectedAmount,
+        List<ImportMapping.Assignment> fileValues
+    ) {
+        return create(
+            templateId,
+            fileId,
+            fileName,
+            expectedCount,
+            expectedAmount,
+            fileValues,
+            false
+        );
+    }
+
+    /**
+     * Creates the batch for one upload as above, marked Match only when the file is to update
+     * records the org already has and create none (R-IB15).
+     */
+    @NamespaceAccessible
+    public static Import_Batch__c create(
+        Id templateId,
+        String fileId,
+        String fileName,
+        Integer expectedCount,
+        Decimal expectedAmount,
+        List<ImportMapping.Assignment> fileValues,
+        Boolean matchOnly
+    ) {
         if (expectedCount != null && expectedCount < 0) {
             throw new ImportException(Label.Core_Import_ErrorControlCountNegative);
         }
@@ -75,6 +117,7 @@ public with sharing class ImportBatchService {
         if (template == null) {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
+        String fileValuesDocument = fileValuesDocument(template, fileValues);
         Import_Batch__c batch = new Import_Batch__c(
             Import_Template__c = template.Id,
             File_Id__c = String.isBlank(fileId) ? null : fileId.left(18),
@@ -88,10 +131,56 @@ public with sharing class ImportBatchService {
             Rows_Rejected__c = 0,
             Chunk_Size__c = chunkSize(),
             Expected_Count__c = expectedCount,
-            Expected_Amount__c = expectedAmount == null ? null : expectedAmount.setScale(2)
+            Expected_Amount__c = expectedAmount == null ? null : expectedAmount.setScale(2),
+            File_Values_JSON__c = fileValuesDocument,
+            Match_Only__c = matchOnly == true
         );
         Database.insert(batch, AccessLevel.USER_MODE);
         return batch;
+    }
+
+    /**
+     * The file's values as the defaults half of a mapping document, or null when there are
+     * none (R-IB14). Blank targets and values are dropped. A value for a person's name parts,
+     * full name or email, or for the field people are matched on, is refused: every row would
+     * then be one person.
+     */
+    private static String fileValuesDocument(
+        Import_Template__c template,
+        List<ImportMapping.Assignment> fileValues
+    ) {
+        if (fileValues == null || fileValues.isEmpty()) {
+            return null;
+        }
+        String personField = ImportTemplateService.RULE_EXTERNAL_ID.equals(
+                ImportTemplateService.normalizedRule(template.Matching_Rule__c)
+            )
+            ? ImportMatcher.matchField(
+                  ImportTemplateService.personType(template),
+                  template.Person_Match_Field__c
+              )
+            : null;
+        ImportMapping document = new ImportMapping();
+        for (ImportMapping.Assignment given : fileValues) {
+            if (
+                given == null ||
+                ImportMapping.isIgnored(given.target) ||
+                String.isBlank(given.value)
+            ) {
+                continue;
+            }
+            String target = given.target.trim();
+            if (ImportMapping.namesAPerson(target, personField)) {
+                throw new ImportException(
+                    String.format(
+                        Label.Core_Import_ErrorFileValueNotAllowed,
+                        new List<String>{ target.left(80) }
+                    )
+                );
+            }
+            document.defaults.add(new ImportMapping.Assignment(target, given.value.trim()));
+        }
+        return document.defaults.isEmpty() ? null : document.serialize();
     }
 
     /**
@@ -259,23 +348,31 @@ public with sharing class ImportBatchService {
             throw new ImportException(Label.Core_Import_ErrorTemplateGone);
         }
         ImportMapping mapping = ImportMapping.parse(
-            template.Column_Mapping_JSON__c,
-            template.Default_Values_JSON__c
-        );
-        if (!mapping.identifiesSomebody()) {
+                template.Column_Mapping_JSON__c,
+                template.Default_Values_JSON__c
+            )
+            .withFileValues(batch.File_Values_JSON__c);
+        Boolean oneObject = ImportObjectSchema.loadsOneObject(template);
+        // A one-object template is refused for its own reasons, before any row is read (R-IT12).
+        String refused = oneObject ? ImportObjectSchema.refusal(template, mapping) : null;
+        if (refused != null) {
+            throw new ImportException(refused);
+        }
+        if (!oneObject && !mapping.identifiesSomebody()) {
             throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
         }
         if (batch.Row_Count__c == null || batch.Row_Count__c <= 0) {
             throw new ImportException(Label.Core_Import_ErrorNoRows);
         }
         if (
+            !oneObject &&
             ImportTemplateService.isPersonAccountMode(template) &&
             OrgShapeDetector.detect().personAccountRecordTypeIds.isEmpty()
         ) {
             throw new ImportException(Label.Core_Import_ErrorPersonModeUnavailable);
         }
         // No reset of the staged rows: each chunk clears and stamps its own, so a pass costs the
-        // same one write here however long the file (R-IB13).
+        // same two writes here however long the file (R-IB13).
         batch.Pass_Number__c = nextPass(batch);
         batch.Status__c = dryRun ? STATUS_DRY_RUN : STATUS_COMMITTING;
         batch.Is_Dry_Run__c = dryRun;
@@ -298,8 +395,39 @@ public with sharing class ImportBatchService {
             new ImportProcessorBatch(batch.Id, dryRun),
             scopeSize(batch.Chunk_Size__c)
         );
-        Database.update(batch, AccessLevel.USER_MODE);
+        Database.update(passStamp(batch), AccessLevel.USER_MODE);
+        // The pass number and job are the package's bookkeeping, read only in every permission
+        // set, so they are written in system mode (ADR-0021).
+        Database.update(
+            new Import_Batch__c(
+                Id = batch.Id,
+                Pass_Number__c = batch.Pass_Number__c,
+                Job_Id__c = batch.Job_Id__c
+            ),
+            AccessLevel.SYSTEM_MODE
+        );
         return batch.Job_Id__c;
+    }
+
+    /** Only what starting a pass changes and the person starting it may edit, saved as them. */
+    private static Import_Batch__c passStamp(Import_Batch__c batch) {
+        Import_Batch__c stamp = new Import_Batch__c(
+            Id = batch.Id,
+            Status__c = batch.Status__c,
+            Is_Dry_Run__c = batch.Is_Dry_Run__c,
+            Started_At__c = batch.Started_At__c,
+            Completed_At__c = null,
+            Run_Log__c = null,
+            Rows_Created__c = 0,
+            Rows_Updated__c = 0,
+            Rows_Matched__c = 0,
+            Rows_Rejected__c = 0
+        );
+        if (batch.Is_Dry_Run__c != true) {
+            stamp.Committed_By__c = batch.Committed_By__c;
+            stamp.Undo_Deadline__c = batch.Undo_Deadline__c;
+        }
+        return stamp;
     }
 
     /** Set by a test to stand for the platform's answer about a batch's job. */

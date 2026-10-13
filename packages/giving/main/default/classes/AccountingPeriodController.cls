@@ -77,7 +77,7 @@ public with sharing class AccountingPeriodController {
                             Label.Giving_Periods_ReopenLogged,
                             new List<String>{
                                 asText(current),
-                                closeDate == null ? 'no date' : asText(closeDate)
+                                closeDate == null ? Label.Giving_Periods_NoDate : asText(closeDate)
                             }
                         )
                     },

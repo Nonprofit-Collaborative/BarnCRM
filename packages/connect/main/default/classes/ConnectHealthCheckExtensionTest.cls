@@ -27,61 +27,84 @@ private class ConnectHealthCheckExtensionTest {
         return false;
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: a run
+     * scheduled and three days late is not reported, since no run can work there (R-OM1).
+     * `OpportunityMirrorUnavailableTest` runs this branch.
+     */
+    private static void assertNothingReported() {
+        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+        System.runAs(maria()) {
+            OpportunityMirrorSchedulable.schedule();
+            ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);
+            Assert.isFalse(
+                reported(new ConnectHealthCheckExtension().findings()),
+                'Without Opportunity there is no run to be late.'
+            );
+        }
+    }
+
     @IsTest
     static void aScheduledRunThatHasNotRunForTwoDaysIsReportedInCoresReport() {
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingReported();
+                return;
+            }
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+            User admin = maria();
+            Test.startTest();
+            System.runAs(admin) {
+                OpportunityMirrorSchedulable.schedule();
+                Assert.isFalse(
+                    reported(new ConnectHealthCheckExtension().findings()),
+                    'Just scheduled: nothing to say yet.'
+                );
+                ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);
+                Assert.isTrue(reported(HealthCheckService.run()), 'Core finds Connect by name.');
+                ConnectSettingsWriter.recordOpportunityMirrorRun(System.now().addDays(2), 'Ran');
+                Assert.isFalse(
+                    reported(new ConnectHealthCheckExtension().findings()),
+                    'A run completed a day ago.'
+                );
+            }
+            Test.stopTest();
         }
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-        User admin = maria();
-        Test.startTest();
-        System.runAs(admin) {
-            OpportunityMirrorSchedulable.schedule();
-            Assert.isFalse(
-                reported(new ConnectHealthCheckExtension().findings()),
-                'Just scheduled: nothing to say yet.'
-            );
-            ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);
-            Assert.isTrue(reported(HealthCheckService.run()), 'Core finds Connect by name.');
-            ConnectSettingsWriter.recordOpportunityMirrorRun(System.now().addDays(2), 'Ran');
-            Assert.isFalse(
-                reported(new ConnectHealthCheckExtension().findings()),
-                'A run completed a day ago.'
-            );
-        }
-        Test.stopTest();
     }
 
     @IsTest
     static void nothingIsReportedWhenTheRunIsNotExpected() {
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);
-        User admin = maria();
-        User viewer = TestDataFactory.createUserOnTheRunningUsersProfile(
-            'Ana',
-            new List<String>{ 'Giving_Admin' }
-        );
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
-        Test.startTest();
-        System.runAs(admin) {
-            Assert.isFalse(
-                reported(new ConnectHealthCheckExtension().findings()),
-                'Not scheduled.'
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingReported();
+                return;
+            }
+            ConnectHealthCheckExtension.nowForTest = System.now().addDays(3);
+            User admin = maria();
+            User viewer = TestDataFactory.createUserOnTheRunningUsersProfile(
+                'Ana',
+                new List<String>{ 'Giving_Admin' }
             );
-            OpportunityMirrorSchedulable.schedule();
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+            Test.startTest();
+            System.runAs(admin) {
+                Assert.isFalse(
+                    reported(new ConnectHealthCheckExtension().findings()),
+                    'Not scheduled.'
+                );
+                OpportunityMirrorSchedulable.schedule();
+            }
+            System.runAs(viewer) {
+                Assert.isFalse(
+                    reported(new ConnectHealthCheckExtension().findings()),
+                    'Only a viewer who may manage settings is told.'
+                );
+            }
+            choose(OpportunityMirrorService.OFF);
+            System.runAs(admin) {
+                Assert.isFalse(reported(new ConnectHealthCheckExtension().findings()), 'Off.');
+            }
+            Test.stopTest();
         }
-        System.runAs(viewer) {
-            Assert.isFalse(
-                reported(new ConnectHealthCheckExtension().findings()),
-                'Only a viewer who may manage settings is told.'
-            );
-        }
-        choose(OpportunityMirrorService.OFF);
-        System.runAs(admin) {
-            Assert.isFalse(reported(new ConnectHealthCheckExtension().findings()), 'Off.');
-        }
-        Test.stopTest();
     }
 }

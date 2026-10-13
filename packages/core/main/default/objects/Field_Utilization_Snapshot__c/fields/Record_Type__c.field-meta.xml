@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Record_Type__c</fullName>
+  <description>
+    The developer name of the record type this count is for. Empty when the object has no record
+    types, or for its records that have none.
+  </description>
+  <externalId>false</externalId>
+  <label>Record Type</label>
+  <length>80</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

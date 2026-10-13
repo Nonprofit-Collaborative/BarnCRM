@@ -208,6 +208,19 @@ describe('c-stewardship-plans', () => {
     expect(subjects[1].textContent).toBe('Send the welcome packet');
   });
 
+  it('tells a screen reader which plan is chosen, not only by colour', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="plan-selected"]')).toBeNull();
+    await select(element, 0);
+
+    const rows = element.shadowRoot.querySelectorAll('[data-id="plan-row"]');
+    const marker = rows[0].querySelector('[data-id="plan-selected"]');
+    expect(marker.textContent).toBe('c.Giving_Stewardship_Selected');
+    expect(rows[1].querySelector('[data-id="plan-selected"]')).toBeNull();
+  });
+
   it('says a plan with no steps would start and lay nothing out', async () => {
     const element = createComponent();
     getPage.emit(PAGE);
@@ -215,6 +228,20 @@ describe('c-stewardship-plans', () => {
     await select(element, 1);
 
     expect(element.shadowRoot.querySelector('[data-id="no-steps"]')).not.toBeNull();
+  });
+
+  it('asks for a plan to be chosen until one is, then shows its steps instead', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="select-plan"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="no-steps"]')).toBeNull();
+
+    await select(element, 0);
+
+    expect(element.shadowRoot.querySelector('[data-id="select-plan"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="no-steps"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('[data-id="step-row"]').length).toBe(2);
   });
 
   it('creates a plan from the page rather than from an object tab', async () => {
@@ -227,8 +254,7 @@ describe('c-stewardship-plans', () => {
     await flush();
     const name = element.shadowRoot.querySelector('[data-id="plan-name"]');
     name.dispatchEvent(new CustomEvent('change', { detail: { value: 'Pledge welcome' } }));
-    const key = element.shadowRoot.querySelector('[data-id="plan-key"]');
-    key.dispatchEvent(new CustomEvent('change', { detail: { value: 'pledge_welcome' } }));
+    expect(element.shadowRoot.querySelector('[data-id="plan-key"]')).toBeNull();
     const event = element.shadowRoot.querySelector('[data-id="plan-event-input"]');
     event.dispatchEvent(new CustomEvent('change', { detail: { value: 'Commitment started' } }));
     element.shadowRoot.querySelector('[data-id="save-plan"]').click();
@@ -238,7 +264,6 @@ describe('c-stewardship-plans', () => {
       template: {
         recordId: null,
         name: 'Pledge welcome',
-        planKey: 'pledge_welcome',
         triggerEvent: 'Commitment started',
         minimumAmount: null,
         description: '',

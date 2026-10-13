@@ -6,30 +6,41 @@
 private class PermissionSetSelectorTest {
     @IsTest
     static void selectByNameFindsThePackagedAdminPermissionSet() {
-        PermissionSetSelector selector = new PermissionSetSelector();
+        System.runAs(TestUsers.admin()) {
+            PermissionSetSelector selector = new PermissionSetSelector();
 
-        Test.startTest();
-        PermissionSet found = selector.selectByNameInSystemMode(AccessService.ADMIN_PERMISSION_SET);
-        Test.stopTest();
+            Test.startTest();
+            PermissionSet found = selector.selectByNameInSystemMode(
+                AccessService.ADMIN_PERMISSION_SET
+            );
+            Test.stopTest();
 
-        Assert.isNotNull(found, 'The BarnCRM Admin permission set ships with BarnCRM Core.');
-        Assert.areEqual(
-            AccessService.ADMIN_PERMISSION_SET,
-            found.Name,
-            'The wrong permission set came back.'
-        );
+            Assert.isNotNull(found, 'The BarnCRM Admin permission set ships with BarnCRM Core.');
+            Assert.areEqual(
+                AccessService.ADMIN_PERMISSION_SET,
+                found.Name,
+                'The wrong permission set came back.'
+            );
+        }
     }
 
     @IsTest
     static void selectByNameReturnsNullForSomethingThatIsNotThere() {
-        PermissionSetSelector selector = new PermissionSetSelector();
+        System.runAs(TestUsers.admin()) {
+            PermissionSetSelector selector = new PermissionSetSelector();
 
-        Test.startTest();
-        PermissionSet missing = selector.selectByNameInSystemMode('No_Such_Permission_Set_Here');
-        PermissionSet blank = selector.selectByNameInSystemMode('  ');
-        Test.stopTest();
+            Test.startTest();
+            PermissionSet missing = selector.selectByNameInSystemMode(
+                'No_Such_Permission_Set_Here'
+            );
+            PermissionSet blank = selector.selectByNameInSystemMode('  ');
+            Test.stopTest();
 
-        Assert.isNull(missing, 'A permission set that does not exist should come back as nothing.');
-        Assert.isNull(blank, 'A blank name should come back as nothing without querying.');
+            Assert.isNull(
+                missing,
+                'A permission set that does not exist should come back as nothing.'
+            );
+            Assert.isNull(blank, 'A blank name should come back as nothing without querying.');
+        }
     }
 }

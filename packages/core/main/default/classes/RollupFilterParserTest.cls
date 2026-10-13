@@ -5,6 +5,7 @@
  * here has run. They are written against the format the canonical model states and the behaviour
  * the class documents.
  */
+// runs-as: deploying user (pure logic: parses a filter document, no DML or SOQL)
 @IsTest
 private class RollupFilterParserTest {
     @IsTest
@@ -104,6 +105,54 @@ private class RollupFilterParserTest {
         );
 
         System.Assert.areEqual('Gift_Date__c >= 2026-01-01', clause, 'A date is not a string');
+    }
+
+    @IsTest
+    static void relativeDatesRenderAsDateLiterals() {
+        System.Assert.areEqual(
+            'Gift_Date__c = THIS_YEAR',
+            RollupFilterParser.toWhereClause(
+                '{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "this year"}]}'
+            ),
+            'This year takes no value'
+        );
+        System.Assert.areEqual(
+            'Gift_Date__c = LAST_YEAR',
+            RollupFilterParser.toWhereClause(
+                '{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "last year"}]}'
+            ),
+            'Last year takes no value'
+        );
+        System.Assert.areEqual(
+            'Gift_Date__c = LAST_N_DAYS:30',
+            RollupFilterParser.toWhereClause(
+                '{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "last n days", "value": 30}]}'
+            ),
+            'The day count is written back from a whole number'
+        );
+        System.Assert.areEqual(
+            'Gift_Date__c = LAST_N_DAYS:7',
+            RollupFilterParser.toWhereClause(
+                '{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "last n days", "value": "7"}]}'
+            ),
+            'A day count saved as text is still read as a number'
+        );
+    }
+
+    @IsTest
+    static void aDayCountThatIsNotAWholeNumberInRangeIsRefused() {
+        for (String value : new List<String>{ '0', '3651', '2.5', '"30 OR Id != null"', 'null' }) {
+            try {
+                RollupFilterParser.toWhereClause(
+                    '{"version": 1, "conditions": [{"id": 1, "field": "Gift_Date__c", "operator": "last n days", "value": ' +
+                        value +
+                        '}]}'
+                );
+                System.Assert.fail('A day count must be a whole number from 1 to 3650: ' + value);
+            } catch (RollupFilterParser.RollupFilterException expected) {
+                System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
+            }
+        }
     }
 
     @IsTest

@@ -26,16 +26,16 @@ nothing to configure.
 4. Click **Re-run** whenever you want a fresh look. Health Check reads your org each time;
    it never shows you a saved result.
 
-The BarnCRM home page does not carry a Health Check card today, although the Hub
-itself has shipped. The settings console is the way in, and it is the way that always
-works.
+An administrator also finds the same report on the BarnCRM home page, under the setup
+checklist. The settings console is the way in that always works, including for staff who
+do not see the home page copy and for an org where someone removed it from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
 so at the top and the Fix buttons are hidden. Three checks are skipped for you rather than
 answered wrongly, because Salesforce only lets you see your own access: who holds the
 BarnCRM Admin role, who holds the Override Receipt Lock permission (asked only where Giving is installed), and how many errors
-nobody has read. In their place you get one line, **Sign in as a BarnCRM Admin to see the
+nobody has read. In their place you get one line, **Only a BarnCRM Admin can see the
 access checks**.
 
 ## A five-minute walkthrough
@@ -76,7 +76,7 @@ Total time: about five minutes, most of it assigning roles.
 **Only if your org has NPSP or Nonprofit Cloud.** With the Nonprofit Success Pack, step 2
 reads **NPSP detected** and the recommendation is **NPSP coexistence**. With Nonprofit Cloud,
 step 2 reads **Nonprofit Cloud objects detected**, the recommendation is **Nonprofit Cloud
-coexistence**, and **Use recommended mode** switches household membership to junction mode
+coexistence**, and **Use recommended mode** switches household membership to the flexible way of belonging, with one membership record per person,
 with it. If that org has Nonprofit Cloud gift objects and the Connect module is not
 installed, there is also a blue finding, **The Gift Transaction mirror is in the Connect
 module**: install Connect if you want Nonprofit Cloud's own summaries to keep working.
@@ -105,6 +105,7 @@ Nothing is broken today.
 | Settings | Whether any of the totals BarnCRM ships are missing from the Rollups page. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
+| Settings | Whether any BarnCRM nightly job is not scheduled: the rollup recalculation, the seasonal address swap and the error digest, the weekly field utilization count once you have chosen what it counts, plus the nightly jobs of any module that registers them. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Connect it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
 | Settings | Whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Connect: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
@@ -156,7 +157,7 @@ pressing it once. Most can be undone on their own page:
 | **Shipped totals are missing** | Creates the missing totals exactly as shipped. Each one starts calculating straight away, as it would have from install. Your own totals are not touched, and a shipped total whose field one of your own active totals already writes is skipped and named, so the two never overwrite each other. | Switch a total off on the Rollups page. Do not delete it: a deleted shipped total comes back the next time totals are restored or the package is upgraded (see Rollups). |
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
 | **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
-| **Nightly totals are not scheduled** | Schedules the nightly run at 2:00 AM. | **Stop the nightly recalculation** on the Rollups page. |
+| **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollups page, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Connect. |
 | **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
@@ -166,8 +167,11 @@ a household with nobody in it.
 
 ## People with no household, and households with nobody in them
 
-Health Check finds these and links them; it never changes them. Cleaning them up in bulk
-belongs to the data hygiene console, planned for a later release.
+Health Check finds these and links them; it never changes them. To see every one of them, and
+other record checks such as addresses with parts missing, use the **Data Hygiene** tab, which
+opens each list in Find (see [Data hygiene](data-hygiene.md), which also says how the two
+pages differ). Health Check is about whether BarnCRM is set up right; Data hygiene is about
+the records themselves.
 
 | Finding | Who is counted | Who is not counted | What to do |
 |---|---|---|---|
@@ -181,7 +185,7 @@ permission. Only in an org that also has Nonprofit Cloud households: some of the
 households listed may belong to one: BarnCRM cannot see that membership, and the finding
 says so.
 
-The four checks about shipped totals, switches, templates and the nightly run are shown only to
+The checks about shipped totals, switches, templates and nightly jobs are shown only to
 people with the Manage BarnCRM Settings permission, because only they can act on them. The
 two household checks are shown only to them too, for the reason given above.
 
@@ -203,8 +207,7 @@ today are the ones somebody has to group by hand later.
 
 **Ignoring the red membership finding in a Person Accounts org.** "Household membership does
 not fit Person Accounts" is red for a reason: in that state, new households are built through
-the person's account, which in a Person Accounts org is the person. Click **Switch to junction
-membership** and the app fixes it for you. The longer it waits, the more households have to be
+the person's account, which in a Person Accounts org is the person. Click **Switch to the flexible way of belonging** and the app fixes it for you. The longer it waits, the more households have to be
 sorted out afterward.
 
 **Fixing access by editing profiles.** Health Check counts the packaged roles the Access page
@@ -215,7 +218,7 @@ list them, because the packaged roles are what the app relies on.
 **Reading the access findings from someone else's screen.** Salesforce only lets a person see
 their own access, so for anyone without the Manage BarnCRM Settings permission Health Check
 skips the two access counts rather than printing a number it cannot stand behind. If the report
-you are looking at says **Sign in as a BarnCRM Admin to see the access checks**, that is why:
+you are looking at says **Only a BarnCRM Admin can see the access checks**, that is why:
 run it again as an administrator.
 
 **Treating the Override Receipt Lock finding as a formality (with Giving).** It is amber rather than red
@@ -236,9 +239,15 @@ unexplained one, and the receipts still will not generate. Fix the cause and re-
 left behind by an older version, or a total you created yourself, stays where it is. Nothing
 runs an automation whose switch is left over, so it does no harm.
 
-**Scheduling the nightly run only for the finding to come back.** The nightly-run finding only
-appears while at least one total is set to Scheduled or Both. If you switch every total to Real
-time, the finding goes away without the schedule, which is also correct.
+**Waiting for install to schedule the nightly jobs.** Nothing is scheduled when BarnCRM is
+installed, because a scheduled job runs as the person who scheduled it. Press **Schedule all
+nightly jobs** once, as the administrator the jobs should run as. If that person later leaves,
+stop the jobs on their pages and press the fix again as somebody else.
+
+**Wondering why "Nightly totals are not scheduled" has no button.** It explains what an
+unscheduled rollup run costs you. The button that fixes it is **Schedule all nightly jobs**, on
+the nightly jobs finding. The totals finding only appears while at least one total is set to
+Scheduled or Both.
 
 **Leaving automation paused.** Pausing automation for a bulk load is exactly right. Forgetting
 to turn it back on means households stop being created and names stop being recomputed, quietly.

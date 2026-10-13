@@ -7,14 +7,16 @@
 private class SettingsWriterTest {
     @TestSetup
     static void makeData() {
-        PermissionSet permissionSet = SettingsTestPermissions.build('C03_Settings_Writer_Test');
-        User maria = SettingsTestPermissions.buildStandardUser('Maria', 'Alvarez', 'mariaw');
-        User david = SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'davidw');
-        insert new List<User>{ maria, david };
-        insert new PermissionSetAssignment(
-            AssigneeId = maria.Id,
-            PermissionSetId = permissionSet.Id
-        );
+        System.runAs(TestUsers.admin()) {
+            PermissionSet permissionSet = SettingsTestPermissions.build('C03_Settings_Writer_Test');
+            User maria = SettingsTestPermissions.buildStandardUser('Maria', 'Alvarez', 'mariaw');
+            User david = SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'davidw');
+            insert new List<User>{ maria, david };
+            insert new PermissionSetAssignment(
+                AssigneeId = maria.Id,
+                PermissionSetId = permissionSet.Id
+            );
+        }
     }
 
     private static User userNamed(String lastName) {
@@ -23,74 +25,80 @@ private class SettingsWriterTest {
 
     @IsTest
     static void letsAStandardUserWithThePermissionSave() {
-        User maria = userNamed('Alvarez');
-        Boolean saved = false;
+        System.runAs(TestUsers.admin()) {
+            User maria = userNamed('Alvarez');
+            Boolean saved = false;
 
-        Test.startTest();
-        System.runAs(maria) {
-            SettingsWriter.saveOrgDefault(
-                BarnCRM_Settings__c.SObjectType,
-                null,
-                patternChange('The {LastName} Family')
+            Test.startTest();
+            System.runAs(maria) {
+                SettingsWriter.saveOrgDefault(
+                    BarnCRM_Settings__c.SObjectType,
+                    null,
+                    patternChange('The {LastName} Family')
+                );
+                saved = true;
+            }
+            Test.stopTest();
+
+            Assert.isTrue(
+                saved,
+                'Maria holds the permission and is not an administrator, and she saves'
             );
-            saved = true;
+            Assert.areEqual(
+                'The {LastName} Family',
+                BarnCRM_Settings__c.getOrgDefaults().Household_Name_Pattern__c,
+                'What she saved is what the org now runs on'
+            );
         }
-        Test.stopTest();
-
-        Assert.isTrue(
-            saved,
-            'Maria holds the permission and is not an administrator, and she saves'
-        );
-        Assert.areEqual(
-            'The {LastName} Family',
-            BarnCRM_Settings__c.getOrgDefaults().Household_Name_Pattern__c,
-            'What she saved is what the org now runs on'
-        );
     }
 
     @IsTest
     static void refusesAStandardUserWithoutThePermission() {
-        User david = userNamed('Okonkwo');
-        Boolean refused = false;
+        System.runAs(TestUsers.admin()) {
+            User david = userNamed('Okonkwo');
+            Boolean refused = false;
 
-        Test.startTest();
-        System.runAs(david) {
-            try {
-                SettingsWriter.saveOrgDefault(
-                    BarnCRM_Settings__c.SObjectType,
-                    null,
-                    patternChange('The {LastName} Clan')
-                );
-            } catch (SettingsWriter.PermissionException e) {
-                refused = true;
-                Assert.areEqual(
-                    System.Label.Core_Settings_PermissionRequiredError,
-                    e.getMessage(),
-                    'The message names the permission to ask for'
-                );
+            Test.startTest();
+            System.runAs(david) {
+                try {
+                    SettingsWriter.saveOrgDefault(
+                        BarnCRM_Settings__c.SObjectType,
+                        null,
+                        patternChange('The {LastName} Clan')
+                    );
+                } catch (SettingsWriter.PermissionException e) {
+                    refused = true;
+                    Assert.areEqual(
+                        System.Label.Core_Settings_PermissionRequiredError,
+                        e.getMessage(),
+                        'The message names the permission to ask for'
+                    );
+                }
             }
-        }
-        Test.stopTest();
+            Test.stopTest();
 
-        Assert.isTrue(refused, 'System mode is reachable only through the permission');
+            Assert.isTrue(refused, 'System mode is reachable only through the permission');
+        }
     }
 
     @IsTest
     static void ignoresNothingToSave() {
-        Test.startTest();
-        SettingsWriter.saveOrgDefault(BarnCRM_Settings__c.SObjectType, null, null);
-        SettingsWriter.saveOrgDefault(
-            BarnCRM_Settings__c.SObjectType,
-            null,
-            new Map<Schema.SObjectField, Object>()
-        );
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SettingsWriter.saveOrgDefault(BarnCRM_Settings__c.SObjectType, null, null);
+            SettingsWriter.saveOrgDefault(
+                BarnCRM_Settings__c.SObjectType,
+                null,
+                new Map<Schema.SObjectField, Object>()
+            );
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM BarnCRM_Settings__c],
-            'Nothing to save writes nothing and raises nothing'
-        );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM BarnCRM_Settings__c],
+                'Nothing to save writes nothing and raises nothing'
+            );
+        }
     }
 
     /**
@@ -99,43 +107,45 @@ private class SettingsWriterTest {
      */
     @IsTest
     static void savesOnlyTheChangedKeyOverTheStoredRecord() {
-        insert new BarnCRM_Settings__c(
-            SetupOwnerId = UserInfo.getOrganizationId(),
-            Household_Name_Pattern__c = 'The {LastName} Family',
-            Relationship_Auto_Reciprocal__c = true
-        );
-        BarnCRM_Settings__c stored = OrgSettingsSystemWriter.lockStored();
-        BarnCRM_Settings__c theirs = new BarnCRM_Settings__c(
-            Id = stored.Id,
-            Relationship_Auto_Reciprocal__c = false
-        );
-        update theirs;
-        User maria = userNamed('Alvarez');
+        System.runAs(TestUsers.admin()) {
+            insert new BarnCRM_Settings__c(
+                SetupOwnerId = UserInfo.getOrganizationId(),
+                Household_Name_Pattern__c = 'The {LastName} Family',
+                Relationship_Auto_Reciprocal__c = true
+            );
+            BarnCRM_Settings__c stored = OrgSettingsSystemWriter.lockStored();
+            BarnCRM_Settings__c theirs = new BarnCRM_Settings__c(
+                Id = stored.Id,
+                Relationship_Auto_Reciprocal__c = false
+            );
+            update theirs;
+            User maria = userNamed('Alvarez');
 
-        Test.startTest();
-        System.runAs(maria) {
-            SettingsWriter.saveOrgDefault(
-                BarnCRM_Settings__c.SObjectType,
-                stored,
-                patternChange('{LastName} Household')
+            Test.startTest();
+            System.runAs(maria) {
+                SettingsWriter.saveOrgDefault(
+                    BarnCRM_Settings__c.SObjectType,
+                    stored,
+                    patternChange('{LastName} Household')
+                );
+            }
+            Test.stopTest();
+
+            BarnCRM_Settings__c saved = [
+                SELECT Household_Name_Pattern__c, Relationship_Auto_Reciprocal__c
+                FROM BarnCRM_Settings__c
+                WHERE Id = :stored.Id
+            ];
+            Assert.areEqual(
+                '{LastName} Household',
+                saved.Household_Name_Pattern__c,
+                'Her key is saved'
+            );
+            Assert.isFalse(
+                saved.Relationship_Auto_Reciprocal__c,
+                'And the key the other administrator saved is not written back from her copy'
             );
         }
-        Test.stopTest();
-
-        BarnCRM_Settings__c saved = [
-            SELECT Household_Name_Pattern__c, Relationship_Auto_Reciprocal__c
-            FROM BarnCRM_Settings__c
-            WHERE Id = :stored.Id
-        ];
-        Assert.areEqual(
-            '{LastName} Household',
-            saved.Household_Name_Pattern__c,
-            'Her key is saved'
-        );
-        Assert.isFalse(
-            saved.Relationship_Auto_Reciprocal__c,
-            'And the key the other administrator saved is not written back from her copy'
-        );
     }
 
     private static Map<Schema.SObjectField, Object> patternChange(String pattern) {

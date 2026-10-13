@@ -237,6 +237,26 @@ public with sharing class StewardshipSelector {
         return counts;
     }
 
+    /**
+     * Every plan key that starts with `prefix`, in lower case, so a generated key can be made
+     * unique. In system mode on purpose: the key field is unique across the org, so a key held by
+     * a plan the running user cannot see would still refuse the save. Only the keys are read.
+     */
+    public static Set<String> selectPlanKeysStartingWith(String prefix) {
+        Set<String> keys = new Set<String>();
+        String pattern = prefix + '%';
+        for (Stewardship_Plan_Template__c template : [
+            SELECT Plan_Key__c
+            FROM Stewardship_Plan_Template__c
+            WHERE Plan_Key__c LIKE :pattern
+            WITH SYSTEM_MODE
+            LIMIT 10000
+        ]) {
+            keys.add(template.Plan_Key__c.toLowerCase());
+        }
+        return keys;
+    }
+
     /** One template's steps, in the order they are laid out, for a reorder or an edit. */
     public static List<Stewardship_Plan_Step__c> selectStepsFor(Id templateId) {
         if (templateId == null) {

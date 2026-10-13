@@ -41,6 +41,14 @@
         <value>Donor</value>
     </labels>
     <labels>
+        <fullName>Giving_QuickGiftEntry_NewPerson</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Quick gift entry: opens the standard new person form</shortDescription>
+        <value>Not in the list? Add a new person</value>
+    </labels>
+    <labels>
         <fullName>Giving_QuickGiftEntry_OrganizationLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -109,8 +117,8 @@
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Quick gift entry: how the gift arrived</shortDescription>
-        <value>How it arrived</value>
+        <shortDescription>Quick gift entry: payment method</shortDescription>
+        <value>Payment method</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_TypePlaceholder</fullName>
@@ -254,7 +262,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: gift type missing</shortDescription>
-        <value>Choose how the gift arrived.</value>
+        <value>Choose a payment method.</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_ErrorTypeInvalid</fullName>
@@ -262,7 +270,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: gift type not one of the choices</shortDescription>
-        <value>Choose how the gift arrived from the list.</value>
+        <value>Choose a payment method from the list.</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_ErrorFundUnavailable</fullName>

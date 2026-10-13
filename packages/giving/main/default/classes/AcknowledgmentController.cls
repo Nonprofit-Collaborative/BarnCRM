@@ -180,17 +180,17 @@ public with sharing class AcknowledgmentController {
         view.lastRun = settings.Acknowledgments_Last_Run__c;
         view.lastRunSummary = settings.Acknowledgments_Last_Run_Summary__c;
 
-        Map<String, Id> templateIds = new Map<String, Id>();
+        Map<String, String> templateNames = new Map<String, String>();
         List<TemplateView> templates = new List<TemplateView>();
         for (EmailTemplate template : AcknowledgmentSelector.activeTemplates()) {
             TemplateView row = new TemplateView();
             row.label = template.Name;
             row.developerName = template.DeveloperName;
             templates.add(row);
-            templateIds.put(template.DeveloperName, template.Id);
+            templateNames.put(template.DeveloperName, template.Name);
         }
         view.templates = templates;
-        view.rules = ruleViews(templateIds);
+        view.rules = ruleViews(templateNames);
         view.runs = runViews();
         countQueue(view);
         return view;
@@ -242,7 +242,11 @@ public with sharing class AcknowledgmentController {
         view.withoutRecipient = unreachable;
     }
 
-    private static List<RuleView> ruleViews(Map<String, Id> templateIds) {
+    /**
+     * The rules, each with its template shown by the name an administrator recognizes rather
+     * than the developer name the rule stores (ADR-0032).
+     */
+    private static List<RuleView> ruleViews(Map<String, String> templateNames) {
         List<RuleView> views = new List<RuleView>();
         for (Acknowledgment_Rule__c rule : AcknowledgmentSelector.allRules()) {
             RuleView view = new RuleView();
@@ -251,10 +255,11 @@ public with sharing class AcknowledgmentController {
             view.order = rule.Order__c;
             view.channel = rule.Channel__c;
             view.template = rule.Email_Template__c;
-            view.templateFound =
-                String.isBlank(rule.Email_Template__c) ||
-                templateIds.containsKey(rule.Email_Template__c.trim());
-            view.templateLabel = rule.Email_Template__c;
+            String developerName = String.isBlank(rule.Email_Template__c)
+                ? null
+                : rule.Email_Template__c.trim();
+            view.templateFound = developerName == null || templateNames.containsKey(developerName);
+            view.templateLabel = developerName == null ? null : templateNames.get(developerName);
             view.minimumAmount = rule.Minimum_Amount__c;
             view.maximumAmount = rule.Maximum_Amount__c;
             view.giftType = rule.Gift_Type__c;

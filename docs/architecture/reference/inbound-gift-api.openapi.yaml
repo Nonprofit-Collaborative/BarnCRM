@@ -1,0 +1,280 @@
+# The inbound gift API (feature X-03, ADR-0051) as an OpenAPI 3.1 document.
+#
+# It describes exactly what packages/connect accepts and returns: InboundGiftResource (the
+# endpoint), InboundGift (the body), InboundGiftResult (the answer) and InboundGiftRequest and
+# InboundGiftService (the rules). The prose reference for developers is
+# docs/api/inbound-gift-api.md; the two say the same thing, and the code wins if they ever
+# differ. scripts/ci/check-openapi.js parses this file and fails the build if its field names
+# or error codes drift from the Apex.
+openapi: 3.1.0
+info:
+  title: BarnCRM inbound gift API
+  version: 1.0.0
+  summary: Record a gift received by another system, once, however many times it is sent.
+  description: >-
+    One request records one gift for a donor who already exists. The API never creates a
+    donor, never records a refund and never changes a gift that is already recorded. Sending
+    the same request again is always safe: a gift already recorded under the same externalId
+    and amount answers 200 with outcome existing.
+
+
+    Authenticate with OAuth 2.0 as the integration user the administrator created (for example
+    the client credentials flow of an External Client App) and send the access token as a
+    bearer token. The user needs the Inbound Gift API permission set; without it Salesforce
+    answers 403 before BarnCRM sees the request.
+
+
+    The path carries the package namespace once one is registered
+    (/services/apexrest/<namespace>/v1/gifts). In an org where the source is deployed without
+    a namespace, as in development and test orgs, it is /services/apexrest/v1/gifts, which is
+    what this document shows.
+  license:
+    name: Apache-2.0
+    identifier: Apache-2.0
+servers:
+  - url: '{instanceUrl}/services/apexrest'
+    description: The organization's own Salesforce domain.
+    variables:
+      instanceUrl:
+        default: https://example.my.salesforce.com
+        description: The org's My Domain URL, as returned with the access token.
+security:
+  - salesforceOAuth: []
+paths:
+  /v1/gifts:
+    post:
+      operationId: recordInboundGift
+      summary: Record one gift
+      description: >-
+        Records the gift with status Received, the way a gift typed in by hand is recorded:
+        its household is filled in, it is designated to its fund (the default fund when none is
+        named), it counts in the giving totals and it can be receipted. Every rejected outcome
+        is also written to the organization's Error Log with the externalId and the error code
+        only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundGift'
+            examples:
+              byEmail:
+                summary: A gift found by email, designated by fund accounting code
+                value:
+                  externalId: 'stripe:ch_3N1xY2'
+                  amount: 50.00
+                  paymentMethod: Card
+                  giftDate: '2026-09-23'
+                  paymentReference: ch_3N1xY2
+                  donorEmail: luis.garcia2@example.org
+                  fundCode: '4100'
+              minimal:
+                summary: The smallest valid body
+                value:
+                  externalId: 'giving-page:10045'
+                  amount: 25
+                  paymentMethod: Card
+                  donorEmail: luis.garcia2@example.org
+      responses:
+        '201':
+          description: The gift is recorded (outcome created).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundGiftResult'
+              example:
+                outcome: created
+                giftId: a0CXXXXXXXXXXXXXXX
+                message: Gift recorded.
+        '200':
+          description: >-
+            A gift with this externalId and the same amount was already recorded by an earlier
+            send (outcome existing). Nothing changed. Treat it as success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundGiftResult'
+              example:
+                outcome: existing
+                giftId: a0CXXXXXXXXXXXXXXX
+                message: This gift was already recorded. Nothing was changed.
+        '400':
+          description: >-
+            invalid_request: the body is not JSON, names a field this API does not know, or has
+            a value of the wrong type. invalid_field: a field is missing, too long or not an
+            allowed value, or two fields that exclude each other were both sent. Fix the
+            request; do not retry it unchanged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundGiftResult'
+        '401':
+          description: >-
+            Sent by Salesforce, not BarnCRM: the access token is missing, expired or invalid.
+            The body is Salesforce's standard error list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformErrors'
+        '403':
+          description: >-
+            Sent by Salesforce, not BarnCRM: the user lacks the Inbound Gift API permission set
+            (access to the endpoint). The body is Salesforce's standard error list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformErrors'
+        '409':
+          description: >-
+            external_id_conflict: this externalId already belongs to a gift with a different
+            amount, or to a gift the integration user cannot see. Nothing changed. giftId is the
+            existing gift when the user can see it. Do not retry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundGiftResult'
+        '422':
+          description: >-
+            donor_not_found, fund_not_found, appeal_not_found or gift_not_saved. A reference
+            that is malformed, of the wrong kind or to a record the integration user cannot see
+            is answered the same as one to nothing. gift_not_saved: a rule of the organization
+            refused the gift (a validation rule, no default fund, a closed accounting period) or
+            the user lacks access to something recording it needs. Nothing was saved, and
+            sending it again gives the same answer until the cause is fixed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundGiftResult'
+        '500':
+          description: >-
+            internal_error: something unexpected. Nothing was saved, the Error Log has the
+            details, and sending the same request again is safe. A failure outside BarnCRM's
+            code can also answer 500 with Salesforce's standard error list instead.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/InboundGiftResult'
+                  - $ref: '#/components/schemas/PlatformErrors'
+components:
+  securitySchemes:
+    salesforceOAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        A Salesforce OAuth 2.0 access token for the integration user, for example from the
+        client credentials flow of an External Client App
+        (POST {instanceUrl}/services/oauth2/token).
+  schemas:
+    InboundGift:
+      type: object
+      description: >-
+        One gift. Read strictly: a property not listed here refuses the whole request with
+        invalid_request, so a misspelling cannot quietly send a restricted gift to the default
+        fund. A property may be null or left out unless it is required. Send exactly one of
+        donorId and donorEmail, and at most one of fundCode and fundId.
+      additionalProperties: false
+      required:
+        - externalId
+        - amount
+        - paymentMethod
+      properties:
+        externalId:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: >-
+            The gift's identifier in the sending system, trimmed, up to 100 characters. It is
+            what makes a resend safe, so never reuse it for a different gift. Matched ignoring
+            case. Prefix it with the system's name (stripe:ch_3N1xY2) so two systems never
+            collide.
+        amount:
+          type: number
+          exclusiveMinimum: 0
+          multipleOf: 0.01
+          description: The amount received, greater than zero, at most two decimal places.
+        paymentMethod:
+          type: string
+          description: >-
+            How the gift was paid, not case sensitive: any active value of the gift Type
+            picklist except In-kind. As shipped: Cash, Check, Card, ACH, Stock, Grant, Other.
+          examples:
+            - Card
+            - Check
+            - ACH
+        giftDate:
+          type: string
+          format: date
+          description: >-
+            The day the money arrived, YYYY-MM-DD. Today, in the integration user's time zone,
+            when left out.
+        paymentReference:
+          type: string
+          maxLength: 255
+          description: A check number, transaction id or deposit reference, trimmed, up to 255 characters.
+        donorId:
+          type: string
+          description: >-
+            The Salesforce record id of the person (a contact, or a person account) or
+            organization (an account) who gave. Organizations can be named only this way.
+        donorEmail:
+          type: string
+          description: >-
+            The donor's email address, matched exactly, ignoring case, the way the importer
+            matches: the oldest person with that address. Never creates a donor.
+        fundCode:
+          type: string
+          description: >-
+            The accounting code of the active fund the gift is designated to. With neither
+            fundCode nor fundId the gift goes to the organization's default fund.
+        fundId:
+          type: string
+          description: The record id of that active fund, instead of fundCode.
+        appealId:
+          type: string
+          description: The record id of the appeal the gift responds to.
+    InboundGiftResult:
+      type: object
+      description: >-
+        What became of the gift. Properties with no value are left out of the response.
+      additionalProperties: false
+      required:
+        - outcome
+        - message
+      properties:
+        outcome:
+          type: string
+          enum:
+            - created
+            - existing
+            - rejected
+        giftId:
+          type: string
+          description: >-
+            The gift recorded, for created and existing, and the gift already holding the
+            externalId for external_id_conflict when the integration user can see it.
+        errorCode:
+          type: string
+          description: Present only when outcome is rejected. Stable; branch on this, not on message.
+          enum:
+            - invalid_request
+            - invalid_field
+            - external_id_conflict
+            - donor_not_found
+            - fund_not_found
+            - appeal_not_found
+            - gift_not_saved
+            - internal_error
+        message:
+          type: string
+          description: A sentence for a person reading the log. Its wording may change.
+    PlatformErrors:
+      type: array
+      description: Salesforce's own error response, sent when a request never reaches BarnCRM's code.
+      items:
+        type: object
+        properties:
+          message:
+            type: string
+          errorCode:
+            type: string

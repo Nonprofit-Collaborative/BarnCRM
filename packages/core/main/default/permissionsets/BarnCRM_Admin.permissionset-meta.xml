@@ -3,7 +3,7 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Admin</label>
   <description>
-    Maria, the operations manager who configures BarnCRM. Grants the settings
+    For the person who configures BarnCRM. Grants the settings
     console, automation control, and the Error Log. Later features add to this set: it is never
     meant to be cloned.
   </description>
@@ -64,6 +64,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>DataHygieneController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DuplicateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -81,6 +85,14 @@
   </classAccesses>
   <classAccesses>
     <apexClass>ErrorLogCountSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FieldUtilizationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FindController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -196,6 +208,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ModuleManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>NamespaceUtil</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -224,6 +240,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>RelationshipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -237,6 +257,14 @@
   </classAccesses>
   <classAccesses>
     <apexClass>RelationshipService</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>RollupAttentionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>RollupBuilderController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -315,6 +343,18 @@
     <apexClass>UserSelector</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>WhatsNewController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Bulk_Update_Records</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Find_And_Export_Records</name>
+  </customPermissions>
   <customPermissions>
     <enabled>true</enabled>
     <name>Manage_BarnCRM_Settings</name>
@@ -756,6 +796,51 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Field_Label__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Field_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Field_Utilization_Snapshot__c.Fill_Rate__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Filled_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Record_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Record_Type__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Sampled__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Field_Utilization_Snapshot__c.Taken_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Household_Member__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -850,6 +935,26 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Batch__c.Operation_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Batch__c.File_Values_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Batch__c.Match_Only__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Import_Batch__c.Row_Count__c</field>
     <readable>true</readable>
@@ -857,6 +962,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Import_Batch__c.Rows_Created__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Batch__c.Rows_Deleted__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -970,6 +1080,16 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Several_Matches__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Import_Row__c.Duplicate_Rule_Match__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Import_Template__c.Active__c</field>
     <readable>true</readable>
@@ -1032,6 +1152,51 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Import_Template__c.Source_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Person_Match_Field__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Organization_Matching_Rule__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Organization_Match_Field__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Several_Matches__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Target_Object__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Load_Operation__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Load_Match_Field__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Lookup_Not_Found__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Import_Template__c.Use_Duplicate_Rules__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1111,6 +1276,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Rollup_Definition__c.Delimiter__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Rollup_Definition__c.Filter_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1180,6 +1350,56 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Attempts__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Last_Error__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Next_Attempt__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Record_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Record_Ids__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Rollup_Queue__c.Target_Object__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Query_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Shared__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Setting_Change__c.Changed_At__c</field>
     <readable>true</readable>
@@ -1187,6 +1407,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Setting_Change__c.Changed_By__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Setting_Change__c.Deployment_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1282,6 +1507,15 @@
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
+    <object>Field_Utilization_Snapshot__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
     <viewAllRecords>true</viewAllRecords>
     <object>Household_Member__c</object>
   </objectPermissions>
@@ -1340,6 +1574,24 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Rollup_Queue__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Saved_Query__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>false</allowDelete>
     <allowEdit>false</allowEdit>
@@ -1381,11 +1633,27 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Bulk_Update</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Find</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Data_Hygiene</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
     <tab>BarnCRM_Settings</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Rollup_Builder</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

@@ -2,8 +2,8 @@
   <div class="slds-p-around_medium">
     <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
 
-    <template if:true={loadError}>
-      <p class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
+    <template lwc:if={loadError}>
+      <p role="alert" class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
     </template>
 
     <lightning-radio-group
@@ -24,7 +24,7 @@
       ></lightning-formatted-number>
     </p>
 
-    <template if:false={isWriteOff}>
+    <template lwc:if={showAmount}>
       <lightning-input
         data-id="amount"
         type="number"

@@ -1,0 +1,35 @@
+<template>
+    <lightning-button
+        data-id="toggle"
+        label={labels.typeQuery}
+        icon-name="utility:edit_form"
+        aria-expanded={expanded}
+        aria-controls="query-text"
+        disabled={disabled}
+        onclick={handleToggle}
+    ></lightning-button>
+    <template if:true={open}>
+        <div id="query-text" class="slds-var-m-top_x-small">
+            <lightning-textarea
+                data-id="text"
+                label={labels.queryText}
+                field-level-help={labels.queryTextHelp}
+                value={text}
+                onchange={handleTextChange}
+            ></lightning-textarea>
+            <template if:true={hasError}>
+                <div class="slds-text-color_error slds-var-m-top_xx-small" role="alert" data-id="text-error">
+                    {errorMessage}
+                </div>
+            </template>
+            <lightning-button
+                class="slds-var-m-top_x-small"
+                data-id="use"
+                variant="brand-outline"
+                label={labels.useQuery}
+                disabled={disabled}
+                onclick={handleUse}
+            ></lightning-button>
+        </div>
+    </template>
+</template>

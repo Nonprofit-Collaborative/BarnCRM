@@ -1,0 +1,46 @@
+<template>
+    <template lwc:if={hasReleases}>
+        <lightning-card title={labels.title} icon-name="utility:announcement">
+            <lightning-button
+                slot="actions"
+                data-id="dismiss"
+                label={labels.dismiss}
+                disabled={busy}
+                onclick={handleDismiss}
+            ></lightning-button>
+            <div class="slds-var-p-horizontal_medium">
+                <template lwc:if={errorMessage}>
+                    <p class="slds-text-color_error slds-var-m-bottom_small" role="alert">
+                        {errorMessage}
+                    </p>
+                </template>
+                <p class="slds-var-m-bottom_small">{labels.intro}</p>
+                <template for:each={releases} for:item="release">
+                    <section key={release.version} data-id="release">
+                        <h2 class="slds-text-heading_small slds-var-m-top_small">
+                            {release.heading}
+                        </h2>
+                        <ul>
+                            <template for:each={release.notes} for:item="note">
+                                <li key={note.key} class="slds-var-m-top_x-small" data-id="note">
+                                    <strong>{note.headline}</strong>
+                                    <template lwc:if={note.module}>
+                                        <lightning-badge
+                                            class="slds-var-m-left_x-small"
+                                            label={note.module}
+                                        ></lightning-badge>
+                                    </template>
+                                    <ul class="slds-list_dotted">
+                                        <template for:each={note.details} for:item="detail">
+                                            <li key={detail}>{detail}</li>
+                                        </template>
+                                    </ul>
+                                </li>
+                            </template>
+                        </ul>
+                    </section>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+</template>

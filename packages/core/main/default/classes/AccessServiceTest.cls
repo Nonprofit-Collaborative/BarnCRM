@@ -65,359 +65,412 @@ private class AccessServiceTest {
 
     @IsTest
     static void assignRoleGivesThePersonTheRole() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
 
-        Test.startTest();
-        AccessService.assignRole(david.Id, PROGRAM_ROLE);
-        Test.stopTest();
+            Test.startTest();
+            AccessService.assignRole(david.Id, PROGRAM_ROLE);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            countAssignments(david.Id, PROGRAM_ROLE),
-            'David should hold the Program Staff role once Maria has given it to him.'
-        );
+            Assert.areEqual(
+                1,
+                countAssignments(david.Id, PROGRAM_ROLE),
+                'David should hold the Program Staff role once Maria has given it to him.'
+            );
+        }
     }
 
     @IsTest
     static void assignRoleTwiceChangesNothingTheSecondTime() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        AccessService.assignRole(david.Id, PROGRAM_ROLE);
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            AccessService.assignRole(david.Id, PROGRAM_ROLE);
 
-        Test.startTest();
-        AccessService.assignRole(david.Id, PROGRAM_ROLE);
-        Test.stopTest();
+            Test.startTest();
+            AccessService.assignRole(david.Id, PROGRAM_ROLE);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            countAssignments(david.Id, PROGRAM_ROLE),
-            'Giving David a role he already holds should leave exactly one assignment.'
-        );
+            Assert.areEqual(
+                1,
+                countAssignments(david.Id, PROGRAM_ROLE),
+                'Giving David a role he already holds should leave exactly one assignment.'
+            );
+        }
     }
 
     @IsTest
     static void removeRoleTakesTheRoleAway() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        AccessService.assignRole(david.Id, PROGRAM_ROLE);
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            AccessService.assignRole(david.Id, PROGRAM_ROLE);
 
-        Test.startTest();
-        AccessService.removeRole(david.Id, PROGRAM_ROLE);
-        Test.stopTest();
+            Test.startTest();
+            AccessService.removeRole(david.Id, PROGRAM_ROLE);
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            countAssignments(david.Id, PROGRAM_ROLE),
-            'David should not hold the Program Staff role after Maria removes it.'
-        );
+            Assert.areEqual(
+                0,
+                countAssignments(david.Id, PROGRAM_ROLE),
+                'David should not hold the Program Staff role after Maria removes it.'
+            );
+        }
     }
 
     @IsTest
     static void removeRoleThePersonDoesNotHoldIsNotAnError() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
 
-        Test.startTest();
-        AccessService.removeRole(david.Id, PROGRAM_ROLE);
-        Test.stopTest();
+            Test.startTest();
+            AccessService.removeRole(david.Id, PROGRAM_ROLE);
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            countAssignments(david.Id, PROGRAM_ROLE),
-            'Removing a role nobody holds should leave the org unchanged.'
-        );
+            Assert.areEqual(
+                0,
+                countAssignments(david.Id, PROGRAM_ROLE),
+                'Removing a role nobody holds should leave the org unchanged.'
+            );
+        }
     }
 
     @IsTest
     static void searchUsersFindsAPersonByName() {
-        User david = insertUser('Davidsearch', 'Okafor');
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('Davidsearch', 'Okafor');
 
-        Test.startTest();
-        List<AccessService.UserSummary> found = AccessService.searchUsers('Davidsearch');
-        Test.stopTest();
+            Test.startTest();
+            List<AccessService.UserSummary> found = AccessService.searchUsers('Davidsearch');
+            Test.stopTest();
 
-        Set<Id> foundIds = new Set<Id>();
-        for (AccessService.UserSummary summary : found) {
-            foundIds.add(summary.userId);
+            Set<Id> foundIds = new Set<Id>();
+            for (AccessService.UserSummary summary : found) {
+                foundIds.add(summary.userId);
+            }
+            Assert.isTrue(
+                foundIds.contains(david.Id),
+                'Maria should find David by typing the start of his name.'
+            );
         }
-        Assert.isTrue(
-            foundIds.contains(david.Id),
-            'Maria should find David by typing the start of his name.'
-        );
     }
 
     @IsTest
     static void searchUsersReturnsNothingForABlankTerm() {
-        Test.startTest();
-        List<AccessService.UserSummary> found = AccessService.searchUsers('   ');
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<AccessService.UserSummary> found = AccessService.searchUsers('   ');
+            Test.stopTest();
 
-        Assert.areEqual(0, found.size(), 'An empty search box should not list the whole org.');
+            Assert.areEqual(0, found.size(), 'An empty search box should not list the whole org.');
+        }
     }
 
     @IsTest
     static void assignRoleRejectsARoleThatIsNotOurs() {
-        User david = insertUser('David', 'Okafor');
-        String message;
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            String message;
 
-        Test.startTest();
-        try {
-            AccessService.assignRole(david.Id, 'Some_Other_Group');
-            Assert.fail('A role that BarnCRM does not ship should be refused.');
-        } catch (AccessService.AccessException e) {
-            message = e.getMessage();
+            Test.startTest();
+            try {
+                AccessService.assignRole(david.Id, 'Some_Other_Group');
+                Assert.fail('A role that BarnCRM does not ship should be refused.');
+            } catch (AccessService.AccessException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Core_Access_ErrorRoleNotFound,
+                message,
+                'An unknown role should be reported in the words the admin guide uses.'
+            );
         }
-        Test.stopTest();
-
-        Assert.areEqual(
-            Label.Core_Access_ErrorRoleNotFound,
-            message,
-            'An unknown role should be reported in the words the admin guide uses.'
-        );
     }
 
     @IsTest
     static void assignRoleRefusesSomebodyWhoCanNoLongerSignIn() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        david.IsActive = false;
-        update david;
-        String message;
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            david.IsActive = false;
+            update david;
+            String message;
 
-        Test.startTest();
-        try {
-            AccessService.assignRole(david.Id, PROGRAM_ROLE);
-            Assert.fail('A deactivated person should not be given a role.');
-        } catch (AccessService.AccessException e) {
-            message = e.getMessage();
+            Test.startTest();
+            try {
+                AccessService.assignRole(david.Id, PROGRAM_ROLE);
+                Assert.fail('A deactivated person should not be given a role.');
+            } catch (AccessService.AccessException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Core_Access_ErrorUserNotFound,
+                message,
+                'Maria should be told the person is not there or is no longer active.'
+            );
+            Assert.areEqual(
+                0,
+                countAssignments(david.Id, PROGRAM_ROLE),
+                'A deactivated person should hold no role.'
+            );
         }
-        Test.stopTest();
-
-        Assert.areEqual(
-            Label.Core_Access_ErrorUserNotFound,
-            message,
-            'Maria should be told the person is not there or is no longer active.'
-        );
-        Assert.areEqual(
-            0,
-            countAssignments(david.Id, PROGRAM_ROLE),
-            'A deactivated person should hold no role.'
-        );
     }
 
     @IsTest
     static void removeRoleRefusesToRemoveTheLastBarnCrmAdmin() {
-        TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
-        User maria = insertUser('Maria', 'Alvarez');
-        AccessService.assignRole(maria.Id, AccessService.ADMIN_ROLE);
-        String message;
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
+            User maria = insertUser('Maria', 'Alvarez');
+            AccessService.assignRole(maria.Id, AccessService.ADMIN_ROLE);
+            String message;
 
-        Test.startTest();
-        try {
-            AccessService.removeRole(maria.Id, AccessService.ADMIN_ROLE);
-            Assert.fail('Removing the only BarnCRM Admin should be refused.');
-        } catch (AccessService.AccessException e) {
-            message = e.getMessage();
+            Test.startTest();
+            try {
+                AccessService.removeRole(maria.Id, AccessService.ADMIN_ROLE);
+                Assert.fail('Removing the only BarnCRM Admin should be refused.');
+            } catch (AccessService.AccessException e) {
+                message = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Core_Access_ErrorLastAdmin,
+                message,
+                'Maria should be told to give the role to someone else first.'
+            );
+            Assert.areEqual(
+                1,
+                countAssignments(maria.Id, AccessService.ADMIN_ROLE),
+                'Maria should still hold the BarnCRM Admin role.'
+            );
         }
-        Test.stopTest();
-
-        Assert.areEqual(
-            Label.Core_Access_ErrorLastAdmin,
-            message,
-            'Maria should be told to give the role to someone else first.'
-        );
-        Assert.areEqual(
-            1,
-            countAssignments(maria.Id, AccessService.ADMIN_ROLE),
-            'Maria should still hold the BarnCRM Admin role.'
-        );
     }
 
     @IsTest
     static void getRolesReturnsThePackagedRoles() {
-        Test.startTest();
-        List<AccessService.Role> roles = AccessService.getRoles();
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<AccessService.Role> roles = AccessService.getRoles();
+            Test.stopTest();
 
-        Set<String> names = new Set<String>();
-        for (AccessService.Role role : roles) {
-            names.add(role.developerName);
-            Assert.isNotNull(role.label, 'Every role needs a label the page can show.');
+            Set<String> names = new Set<String>();
+            for (AccessService.Role role : roles) {
+                names.add(role.developerName);
+                Assert.isNotNull(role.label, 'Every role needs a label the page can show.');
+            }
+            Assert.isTrue(
+                names.contains(AccessService.ADMIN_ROLE),
+                'The BarnCRM Admin role should be one of the packaged roles.'
+            );
+            Assert.isTrue(
+                names.contains(PROGRAM_ROLE),
+                'The Program Staff role should be packaged.'
+            );
         }
-        Assert.isTrue(
-            names.contains(AccessService.ADMIN_ROLE),
-            'The BarnCRM Admin role should be one of the packaged roles.'
-        );
-        Assert.isTrue(names.contains(PROGRAM_ROLE), 'The Program Staff role should be packaged.');
     }
 
     @IsTest
     static void getAssignmentsListsThePeopleInEachRole() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        AccessService.assignRole(david.Id, PROGRAM_ROLE);
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            AccessService.assignRole(david.Id, PROGRAM_ROLE);
 
-        Test.startTest();
-        List<AccessService.RoleAssignments> assignments = AccessService.getAssignments();
-        Test.stopTest();
+            Test.startTest();
+            List<AccessService.RoleAssignments> assignments = AccessService.getAssignments();
+            Test.stopTest();
 
-        Boolean davidIsListed = false;
-        for (AccessService.RoleAssignments entry : assignments) {
-            if (PROGRAM_ROLE.equals(entry.roleDeveloperName)) {
-                for (AccessService.UserSummary summary : entry.users) {
-                    davidIsListed = davidIsListed || summary.userId == david.Id;
+            Boolean davidIsListed = false;
+            for (AccessService.RoleAssignments entry : assignments) {
+                if (PROGRAM_ROLE.equals(entry.roleDeveloperName)) {
+                    for (AccessService.UserSummary summary : entry.users) {
+                        davidIsListed = davidIsListed || summary.userId == david.Id;
+                    }
                 }
             }
+            Assert.isTrue(
+                davidIsListed,
+                'David should appear under Program Staff on the Access page.'
+            );
         }
-        Assert.isTrue(davidIsListed, 'David should appear under Program Staff on the Access page.');
     }
 
     @IsTest
     static void aPersonWithoutThePermissionCannotChangeRoles() {
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        User david = insertUser('David', 'Okafor');
-        User priya = insertUser('Priya', 'Nair');
-        Boolean refused = false;
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            User david = insertUser('David', 'Okafor');
+            User priya = insertUser('Priya', 'Nair');
+            Boolean refused = false;
 
-        // The test only means anything if Priya really is an ordinary staff member, so
-        // check the profile she was built from before relying on it.
-        Profile priyaProfile = [
-            SELECT Id, Name, PermissionsModifyAllData, PermissionsAssignPermissionSets
-            FROM Profile
-            WHERE Id = :priya.ProfileId
-        ];
-        Assert.isFalse(
-            priyaProfile.PermissionsModifyAllData || priyaProfile.PermissionsAssignPermissionSets,
-            'Priya must be built from a profile that cannot assign permission sets, or this ' +
-                'test proves nothing. Profile used: ' +
-                priyaProfile.Name
-        );
+            // The test only means anything if Priya really is an ordinary staff member, so
+            // check the profile she was built from before relying on it.
+            Profile priyaProfile = [
+                SELECT Id, Name, PermissionsModifyAllData, PermissionsAssignPermissionSets
+                FROM Profile
+                WHERE Id = :priya.ProfileId
+            ];
+            Assert.isFalse(
+                priyaProfile.PermissionsModifyAllData ||
+                priyaProfile.PermissionsAssignPermissionSets,
+                'Priya must be built from a profile that cannot assign permission sets, or this ' +
+                    'test proves nothing. Profile used: ' +
+                    priyaProfile.Name
+            );
 
-        Test.startTest();
-        System.runAs(priya) {
-            try {
-                AccessService.assignRole(david.Id, PROGRAM_ROLE);
-            } catch (AccessService.AccessException e) {
-                refused = true;
+            Test.startTest();
+            System.runAs(priya) {
+                try {
+                    AccessService.assignRole(david.Id, PROGRAM_ROLE);
+                } catch (AccessService.AccessException e) {
+                    refused = true;
+                }
             }
-        }
-        Test.stopTest();
+            Test.stopTest();
 
-        Assert.isTrue(
-            refused,
-            'A person without the Manage BarnCRM Settings permission should be refused.'
-        );
-        Assert.areEqual(
-            0,
-            countAssignments(david.Id, PROGRAM_ROLE),
-            'A refused attempt should leave no assignment behind.'
-        );
+            Assert.isTrue(
+                refused,
+                'A person without the Manage BarnCRM Settings permission should be refused.'
+            );
+            Assert.areEqual(
+                0,
+                countAssignments(david.Id, PROGRAM_ROLE),
+                'A refused attempt should leave no assignment behind.'
+            );
+        }
     }
 
     @IsTest
     static void severalPeopleAreGivenARoleInOneOperation() {
-        // Five, not two hundred. Every user inserted here consumes a real user license,
-        // and a Developer edition scratch org (the base of all four org shapes) allocates
-        // only a handful of Salesforce seats, so a larger number fails on
-        // LICENSE_LIMIT_EXCEEDED rather than on anything this feature does. The
-        // collection handling at 200 is proven without DML in
-        // theAssignmentListIsBuiltInOneCollectionAtTwoHundred below.
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        List<User> staff = new List<User>();
-        for (Integer i = 0; i < 5; i++) {
-            staff.add(
-                buildUser('Staff' + i, 'Bulk', String.valueOf(Math.abs(Crypto.getRandomLong())) + i)
+        System.runAs(TestUsers.admin()) {
+            // Five, not two hundred. Every user inserted here consumes a real user license,
+            // and a Developer edition scratch org (the base of all four org shapes) allocates
+            // only a handful of Salesforce seats, so a larger number fails on
+            // LICENSE_LIMIT_EXCEEDED rather than on anything this feature does. The
+            // collection handling at 200 is proven without DML in
+            // theAssignmentListIsBuiltInOneCollectionAtTwoHundred below.
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            List<User> staff = new List<User>();
+            for (Integer i = 0; i < 5; i++) {
+                staff.add(
+                    buildUser(
+                        'Staff' + i,
+                        'Bulk',
+                        String.valueOf(Math.abs(Crypto.getRandomLong())) + i
+                    )
+                );
+            }
+            insert staff;
+            Set<Id> staffIds = new Map<Id, User>(staff).keySet();
+
+            // Test.startTest resets the governor counters, so the count read inside the window
+            // is already the count this call alone spent.
+            Test.startTest();
+            AccessService.assignRole(staffIds, PROGRAM_ROLE);
+            Integer dmlUsed = Limits.getDmlStatements();
+            Test.stopTest();
+
+            Integer assigned = [
+                SELECT COUNT()
+                FROM PermissionSetAssignment
+                WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
+            ];
+            Assert.areEqual(5, assigned, 'All five people should have been given the role.');
+            Assert.areEqual(
+                1,
+                dmlUsed,
+                'Five assignments should cost one DML statement, not five.'
             );
         }
-        insert staff;
-        Set<Id> staffIds = new Map<Id, User>(staff).keySet();
-
-        // Test.startTest resets the governor counters, so the count read inside the window
-        // is already the count this call alone spent.
-        Test.startTest();
-        AccessService.assignRole(staffIds, PROGRAM_ROLE);
-        Integer dmlUsed = Limits.getDmlStatements();
-        Test.stopTest();
-
-        Integer assigned = [
-            SELECT COUNT()
-            FROM PermissionSetAssignment
-            WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
-        ];
-        Assert.areEqual(5, assigned, 'All five people should have been given the role.');
-        Assert.areEqual(1, dmlUsed, 'Five assignments should cost one DML statement, not five.');
     }
 
     @IsTest
     static void theAssignmentListIsBuiltInOneCollectionAtTwoHundred() {
-        // The bulk safety the plan asks for (200 records per DML context) proven on the
-        // collection logic itself. No users are inserted, so no licenses are consumed and
-        // the assertion holds on every org shape.
-        // The prefixes come from the describe rather than being typed out, so nothing here
-        // is a hard-coded Id and the test still works if a prefix ever changes.
-        String userPrefix = Schema.User.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .getKeyPrefix();
-        String groupPrefix = Schema.PermissionSetGroup.SObjectType.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            )
-            .getKeyPrefix();
-        Set<Id> people = new Set<Id>();
-        for (Integer i = 0; i < 200; i++) {
-            people.add(Id.valueOf(userPrefix + '00000000' + String.valueOf(1000 + i)));
-        }
-        Id groupId = Id.valueOf(groupPrefix + '000000000001');
-        Set<Id> alreadyAssigned = new Set<Id>{ Id.valueOf(userPrefix + '000000001000') };
+        System.runAs(TestUsers.admin()) {
+            // The bulk safety the plan asks for (200 records per DML context) proven on the
+            // collection logic itself. No users are inserted, so no licenses are consumed and
+            // the assertion holds on every org shape.
+            // The prefixes come from the describe rather than being typed out, so nothing here
+            // is a hard-coded Id and the test still works if a prefix ever changes.
+            String userPrefix = Schema.User.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                .getKeyPrefix();
+            String groupPrefix = Schema.PermissionSetGroup.SObjectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
+                .getKeyPrefix();
+            Set<Id> people = new Set<Id>();
+            for (Integer i = 0; i < 200; i++) {
+                people.add(Id.valueOf(userPrefix + '00000000' + String.valueOf(1000 + i)));
+            }
+            Id groupId = Id.valueOf(groupPrefix + '000000000001');
+            Set<Id> alreadyAssigned = new Set<Id>{ Id.valueOf(userPrefix + '000000001000') };
 
-        Test.startTest();
-        List<PermissionSetAssignment> rows = AccessService.buildAssignments(
-            people,
-            alreadyAssigned,
-            groupId
-        );
-        Test.stopTest();
+            Test.startTest();
+            List<PermissionSetAssignment> rows = AccessService.buildAssignments(
+                people,
+                alreadyAssigned,
+                groupId
+            );
+            Test.stopTest();
 
-        Assert.areEqual(
-            199,
-            rows.size(),
-            'Two hundred people, one of whom already holds the role, is 199 rows to insert.'
-        );
-        Set<Id> assignees = new Set<Id>();
-        for (PermissionSetAssignment row : rows) {
-            assignees.add(row.AssigneeId);
-            Assert.areEqual(groupId, row.PermissionSetGroupId, 'Every row is for the chosen role.');
+            Assert.areEqual(
+                199,
+                rows.size(),
+                'Two hundred people, one of whom already holds the role, is 199 rows to insert.'
+            );
+            Set<Id> assignees = new Set<Id>();
+            for (PermissionSetAssignment row : rows) {
+                assignees.add(row.AssigneeId);
+                Assert.areEqual(
+                    groupId,
+                    row.PermissionSetGroupId,
+                    'Every row is for the chosen role.'
+                );
+            }
+            Assert.areEqual(199, assignees.size(), 'Every row is for a different person.');
         }
-        Assert.areEqual(199, assignees.size(), 'Every row is for a different person.');
     }
 
     @IsTest
     static void severalPeopleHaveARoleTakenAwayInOneOperation() {
-        // Five for the same license reason as the assignment test above.
-        TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
-        List<User> staff = new List<User>();
-        for (Integer i = 0; i < 5; i++) {
-            staff.add(
-                buildUser('Staff' + i, 'Bulk', String.valueOf(Math.abs(Crypto.getRandomLong())) + i)
-            );
+        System.runAs(TestUsers.admin()) {
+            // Five for the same license reason as the assignment test above.
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            List<User> staff = new List<User>();
+            for (Integer i = 0; i < 5; i++) {
+                staff.add(
+                    buildUser(
+                        'Staff' + i,
+                        'Bulk',
+                        String.valueOf(Math.abs(Crypto.getRandomLong())) + i
+                    )
+                );
+            }
+            insert staff;
+            Set<Id> staffIds = new Map<Id, User>(staff).keySet();
+            AccessService.assignRole(staffIds, PROGRAM_ROLE);
+
+            // Test.startTest resets the governor counters, so the count read inside the window
+            // is already the count this call alone spent.
+            Test.startTest();
+            AccessService.removeRole(staffIds, PROGRAM_ROLE);
+            Integer dmlUsed = Limits.getDmlStatements();
+            Test.stopTest();
+
+            Integer assigned = [
+                SELECT COUNT()
+                FROM PermissionSetAssignment
+                WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
+            ];
+            Assert.areEqual(0, assigned, 'All five assignments should have been removed.');
+            Assert.areEqual(1, dmlUsed, 'Five removals should cost one DML statement, not five.');
         }
-        insert staff;
-        Set<Id> staffIds = new Map<Id, User>(staff).keySet();
-        AccessService.assignRole(staffIds, PROGRAM_ROLE);
-
-        // Test.startTest resets the governor counters, so the count read inside the window
-        // is already the count this call alone spent.
-        Test.startTest();
-        AccessService.removeRole(staffIds, PROGRAM_ROLE);
-        Integer dmlUsed = Limits.getDmlStatements();
-        Test.stopTest();
-
-        Integer assigned = [
-            SELECT COUNT()
-            FROM PermissionSetAssignment
-            WHERE AssigneeId IN :staffIds AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
-        ];
-        Assert.areEqual(0, assigned, 'All five assignments should have been removed.');
-        Assert.areEqual(1, dmlUsed, 'Five removals should cost one DML statement, not five.');
     }
 
     /**

@@ -107,11 +107,10 @@ public with sharing class ReceiptLogoSource {
                 ContentVersion version = latestVersionOf(documentId, embedded);
                 if (version == null) {
                     warnOnce(
-                        'The receipt logo file ' +
-                            documentId +
-                            ' could not be read, so documents are being produced without a logo. ' +
-                            'Check that the file still exists and that the people who issue ' +
-                            'receipts can see it.'
+                        String.format(
+                            Label.Giving_Receipt_LogoUnreadable,
+                            new List<String>{ String.valueOf(documentId) }
+                        )
                     );
                 } else if (embedded) {
                     source = embeddedImage(version);

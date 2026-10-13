@@ -6,29 +6,33 @@
 private class SettingsRecordSelectorTest {
     @IsTest
     static void readsNothingWhenTheOrgHasNeverSaved() {
-        Test.startTest();
-        SObject record = SettingsRecordSelector.getOrgDefault(BarnCRM_Settings__c.SObjectType);
-        Test.stopTest();
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            SObject record = SettingsRecordSelector.getOrgDefault(BarnCRM_Settings__c.SObjectType);
+            Test.stopTest();
 
-        Assert.isNull(record, 'An org that has never saved has no org-level record to read');
+            Assert.isNull(record, 'An org that has never saved has no org-level record to read');
+        }
     }
 
     @IsTest
     static void readsTheOrgLevelRecordOnceItExists() {
-        insert new BarnCRM_Settings__c(
-            SetupOwnerId = UserInfo.getOrganizationId(),
-            Household_Name_Pattern__c = 'The {LastName} Family'
-        );
+        System.runAs(TestUsers.admin()) {
+            insert new BarnCRM_Settings__c(
+                SetupOwnerId = UserInfo.getOrganizationId(),
+                Household_Name_Pattern__c = 'The {LastName} Family'
+            );
 
-        Test.startTest();
-        SObject record = SettingsRecordSelector.getOrgDefault(BarnCRM_Settings__c.SObjectType);
-        Test.stopTest();
+            Test.startTest();
+            SObject record = SettingsRecordSelector.getOrgDefault(BarnCRM_Settings__c.SObjectType);
+            Test.stopTest();
 
-        Assert.isNotNull(record, 'The org-level record is found by its setup owner');
-        Assert.areEqual(
-            'The {LastName} Family',
-            record.get('Household_Name_Pattern__c'),
-            'The values on it come back with it'
-        );
+            Assert.isNotNull(record, 'The org-level record is found by its setup owner');
+            Assert.areEqual(
+                'The {LastName} Family',
+                record.get('Household_Name_Pattern__c'),
+                'The values on it come back with it'
+            );
+        }
     }
 }

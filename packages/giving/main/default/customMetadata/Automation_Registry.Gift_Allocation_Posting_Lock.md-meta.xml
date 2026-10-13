@@ -28,4 +28,8 @@
       xsi:type="xsd:string"
     >Keeps the funds of a gift in the books the way the books hold them: an allocation of a gift that is posted to accounting, or dated on or before the date the books are closed through, cannot be added, changed or deleted. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it. The one way past it is the Override Posting Lock permission, which an administrator grants in Setup and every use of which is written to the Error Log.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

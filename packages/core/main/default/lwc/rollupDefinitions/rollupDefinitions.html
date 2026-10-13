@@ -73,7 +73,58 @@
                         disabled={controlsDisabled}
                         onclick={handleRestoreDefaults}
                     ></lightning-button>
+                    <template lwc:if={builder}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="brand"
+                            data-id="new-rollup"
+                            label={labels.newRollup}
+                            disabled={controlsDisabled}
+                            onclick={handleNew}
+                        ></lightning-button>
+                    </template>
+                    <template lwc:if={showBuilderLink}>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="base"
+                            data-id="open-builder"
+                            label={labels.openBuilder}
+                            onclick={handleOpenBuilder}
+                        ></lightning-button>
+                    </template>
                 </div>
+                <template lwc:if={estimate}>
+                    <div class="slds-box slds-var-m-top_small" data-id="estimate">
+                        <p role="status" data-id="estimate-summary">{estimate.summary}</p>
+                        <template lwc:if={estimate.workingHours}>
+                            <p class="slds-text-color_error" data-id="working-hours">
+                                {labels.workingHours}
+                            </p>
+                        </template>
+                        <div class="slds-var-m-top_x-small">
+                            <lightning-button
+                                data-id="cancel-estimate"
+                                label={labels.cancel}
+                                onclick={handleCancelEstimate}
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                data-id="start-now"
+                                label={labels.startNow}
+                                disabled={controlsDisabled}
+                                onclick={handleStartNow}
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                variant="brand"
+                                data-id="run-tonight"
+                                label={labels.runTonight}
+                                disabled={controlsDisabled}
+                                onclick={handleRunTonight}
+                            ></lightning-button>
+                        </div>
+                    </div>
+                </template>
             </div>
 
             <template if:true={isEmpty}>
@@ -152,6 +203,24 @@
                                             disabled={controlsDisabled}
                                             onclick={handleRecalculate}
                                         ></lightning-button>
+                                        <template lwc:if={builder}>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small"
+                                                data-id={row.recordId}
+                                                data-action="edit"
+                                                label={labels.edit}
+                                                disabled={controlsDisabled}
+                                                onclick={handleEdit}
+                                            ></lightning-button>
+                                            <lightning-button
+                                                class="slds-var-m-left_x-small"
+                                                data-id={row.recordId}
+                                                data-action="copy"
+                                                label={labels.copy}
+                                                disabled={controlsDisabled}
+                                                onclick={handleCopy}
+                                            ></lightning-button>
+                                        </template>
                                     </td>
                                 </tr>
                             </template>

@@ -14,17 +14,17 @@
             <value>
                 <fullName>Real-time</fullName>
                 <default>false</default>
-                <label>Real time</label>
+                <label>Instantly</label>
             </value>
             <value>
                 <fullName>Scheduled</fullName>
                 <default>false</default>
-                <label>Scheduled</label>
+                <label>Every night</label>
             </value>
             <value>
                 <fullName>Both</fullName>
                 <default>false</default>
-                <label>Both</label>
+                <label>Both (recommended)</label>
             </value>
         </valueSetDefinition>
     </valueSet>

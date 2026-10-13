@@ -176,334 +176,372 @@ private class GivingSampleDataTest {
 
     @IsTest
     static void testReferenceStageInsertsFundsAppealsAndCommitments() {
-        insertSamplePeople();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
 
-        Test.startTest();
-        GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
-        GivingSampleDataLoader.loadReferenceData(data);
-        Test.stopTest();
+            Test.startTest();
+            GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
+            GivingSampleDataLoader.loadReferenceData(data);
+            Test.stopTest();
 
-        System.assertEquals(
-            2,
-            [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
-            'both funds in the payload are created'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE AND Is_Default__c = TRUE],
-            'no sample fund claims the default: the org keeps the default fund it had'
-        );
-        Appeal__c child = [
-            SELECT Parent_Appeal__r.Name, Goal__c
-            FROM Appeal__c
-            WHERE Name = 'Spring Appeal'
-            LIMIT 1
-        ];
-        System.assertEquals(
-            'Annual Fund',
-            child.Parent_Appeal__r.Name,
-            'a child appeal is loaded under the parent it names'
-        );
-        Commitment__c pledge = [
-            SELECT Amount__c, Expected_Total__c, Sample_Data__c
-            FROM Commitment__c
-            LIMIT 1
-        ];
-        System.assertEquals(250, pledge.Amount__c, 'the pledge keeps its installment amount');
-        System.assertEquals(true, pledge.Sample_Data__c, 'the pledge is flagged for removal');
-        System.assertEquals(
-            4,
-            [SELECT COUNT() FROM Installment__c],
-            'the commitment trigger generated the four installments the pledge planned'
-        );
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE],
+                'both funds in the payload are created'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Fund__c WHERE Sample_Data__c = TRUE AND Is_Default__c = TRUE],
+                'no sample fund claims the default: the org keeps the default fund it had'
+            );
+            Appeal__c child = [
+                SELECT Parent_Appeal__r.Name, Goal__c
+                FROM Appeal__c
+                WHERE Name = 'Spring Appeal'
+                LIMIT 1
+            ];
+            System.assertEquals(
+                'Annual Fund',
+                child.Parent_Appeal__r.Name,
+                'a child appeal is loaded under the parent it names'
+            );
+            Commitment__c pledge = [
+                SELECT Amount__c, Expected_Total__c, Sample_Data__c
+                FROM Commitment__c
+                LIMIT 1
+            ];
+            System.assertEquals(250, pledge.Amount__c, 'the pledge keeps its installment amount');
+            System.assertEquals(true, pledge.Sample_Data__c, 'the pledge is flagged for removal');
+            System.assertEquals(
+                4,
+                [SELECT COUNT() FROM Installment__c],
+                'the commitment trigger generated the four installments the pledge planned'
+            );
+        }
     }
 
     @IsTest
     static void testGiftStageInsertsGiftsAllocationsTributesAndSoftCredits() {
-        insertSamplePeople();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
 
-        Test.startTest();
-        loadEverything();
-        Test.stopTest();
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
 
-        System.assertEquals(
-            5,
-            [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
-            'every gift in the payload is loaded, the reversal included'
-        );
-        Gift__c organizationGift = [
-            SELECT Donor_Account__c, Donor_Contact__c, Amount__c, External_Id__c
-            FROM Gift__c
-            WHERE External_Id__c = 'SAMPLE-G0002'
-        ];
-        System.assertNotEquals(
-            null,
-            organizationGift.Donor_Account__c,
-            'a gift whose donor key is an organization is credited to the account'
-        );
-        System.assertEquals(
-            null,
-            organizationGift.Donor_Contact__c,
-            'an organization gift names no person as the donor'
-        );
-        System.assertEquals(
-            1,
-            [
-                SELECT COUNT()
-                FROM Gift_Allocation__c
-                WHERE Gift__c = :organizationGift.Id AND Amount__c = 5000
-            ],
-            'the allocation in the file is the one the gift gets, not a default fund one'
-        );
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Tribute__c],
-            'the tribute named against its gift is loaded'
-        );
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Soft_Credit__c WHERE Is_Automatic__c = FALSE],
-            'the hand-entered soft credit is loaded as a credit staff entered'
-        );
+            System.assertEquals(
+                5,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'every gift in the payload is loaded, the reversal included'
+            );
+            Gift__c organizationGift = [
+                SELECT Donor_Account__c, Donor_Contact__c, Amount__c, External_Id__c
+                FROM Gift__c
+                WHERE External_Id__c = 'SAMPLE-G0002'
+            ];
+            System.assertNotEquals(
+                null,
+                organizationGift.Donor_Account__c,
+                'a gift whose donor key is an organization is credited to the account'
+            );
+            System.assertEquals(
+                null,
+                organizationGift.Donor_Contact__c,
+                'an organization gift names no person as the donor'
+            );
+            System.assertEquals(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Gift_Allocation__c
+                    WHERE Gift__c = :organizationGift.Id AND Amount__c = 5000
+                ],
+                'the allocation in the file is the one the gift gets, not a default fund one'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Tribute__c],
+                'the tribute named against its gift is loaded'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Soft_Credit__c WHERE Is_Automatic__c = FALSE],
+                'the hand-entered soft credit is loaded as a credit staff entered'
+            );
+        }
     }
 
     @IsTest
     static void testRefundIsANegativeGiftLinkedToTheGiftItReverses() {
-        insertSamplePeople();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
 
-        Test.startTest();
-        loadEverything();
-        Test.stopTest();
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
 
-        Gift__c original = [
-            SELECT Id, Status__c
-            FROM Gift__c
-            WHERE External_Id__c = 'SAMPLE-G0004'
-        ];
-        Gift__c reversal = [
-            SELECT Amount__c, Original_Gift__c, Refund_Reason__c, Status__c
-            FROM Gift__c
-            WHERE External_Id__c = 'SAMPLE-G0005'
-        ];
-        System.assertEquals(
-            'Refunded',
-            original.Status__c,
-            'the gift that went back keeps its own amount and takes the reversed status (R-G3)'
-        );
-        System.assertEquals(
-            original.Id,
-            reversal.Original_Gift__c,
-            'the negative gift names the gift it reverses, in a later insert than the original'
-        );
-        System.assertEquals(-500, reversal.Amount__c, 'the reversal carries the money back out');
-        System.assertEquals(
-            'Card charged twice at the gala.',
-            reversal.Refund_Reason__c,
-            'the reason is held on the negative gift rather than by editing the original'
-        );
+            Gift__c original = [
+                SELECT Id, Status__c
+                FROM Gift__c
+                WHERE External_Id__c = 'SAMPLE-G0004'
+            ];
+            Gift__c reversal = [
+                SELECT Amount__c, Original_Gift__c, Refund_Reason__c, Status__c
+                FROM Gift__c
+                WHERE External_Id__c = 'SAMPLE-G0005'
+            ];
+            System.assertEquals(
+                'Refunded',
+                original.Status__c,
+                'the gift that went back keeps its own amount and takes the reversed status (R-G3)'
+            );
+            System.assertEquals(
+                original.Id,
+                reversal.Original_Gift__c,
+                'the negative gift names the gift it reverses, in a later insert than the original'
+            );
+            System.assertEquals(
+                -500,
+                reversal.Amount__c,
+                'the reversal carries the money back out'
+            );
+            System.assertEquals(
+                'Card charged twice at the gala.',
+                reversal.Refund_Reason__c,
+                'the reason is held on the negative gift rather than by editing the original'
+            );
+        }
     }
 
     @IsTest
     static void testNoSampleGiftCarriesAReceiptNumber() {
-        insertSamplePeople();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
 
-        Test.startTest();
-        loadEverything();
-        Test.stopTest();
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
 
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Gift__c WHERE Receipt_Number__c != NULL],
-            'a receipted gift cannot be deleted (ADR-0024), so the sample set never receipts one'
-        );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Gift__c WHERE Receipt_Number__c != NULL],
+                'a receipted gift cannot be deleted (ADR-0024), so the sample set never receipts one'
+            );
+        }
     }
 
     @IsTest
     static void testGiftDatesAreCountedBackFromTheDayTheSetIsLoaded() {
-        insertSamplePeople();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
 
-        Test.startTest();
-        loadEverything();
-        Test.stopTest();
+            Test.startTest();
+            loadEverything();
+            Test.stopTest();
 
-        Gift__c recent = [SELECT Gift_Date__c FROM Gift__c WHERE External_Id__c = 'SAMPLE-G0001'];
-        Gift__c oldest = [SELECT Gift_Date__c FROM Gift__c WHERE External_Id__c = 'SAMPLE-G0003'];
-        System.assertEquals(
-            Date.today().addDays(-30),
-            recent.Gift_Date__c,
-            'a thirty day offset is thirty days before the load, so this year is never empty'
-        );
-        System.assertEquals(
-            Date.today().addDays(-800),
-            oldest.Gift_Date__c,
-            'the oldest gift stays two years back whenever the set is loaded'
-        );
+            Gift__c recent = [
+                SELECT Gift_Date__c
+                FROM Gift__c
+                WHERE External_Id__c = 'SAMPLE-G0001'
+            ];
+            Gift__c oldest = [
+                SELECT Gift_Date__c
+                FROM Gift__c
+                WHERE External_Id__c = 'SAMPLE-G0003'
+            ];
+            System.assertEquals(
+                Date.today().addDays(-30),
+                recent.Gift_Date__c,
+                'a thirty day offset is thirty days before the load, so this year is never empty'
+            );
+            System.assertEquals(
+                Date.today().addDays(-800),
+                oldest.Gift_Date__c,
+                'the oldest gift stays two years back whenever the set is loaded'
+            );
+        }
     }
 
     @IsTest
     static void testRemoveDeletesEverySampleRecordAndItsDetails() {
-        insertSamplePeople();
-        loadEverything();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            loadEverything();
 
-        Test.startTest();
-        Integer removed = GivingSampleDataLoader.removeAll();
-        Test.stopTest();
+            Test.startTest();
+            Integer removed = GivingSampleDataLoader.removeAll();
+            Test.stopTest();
 
-        System.assertEquals(
-            10,
-            removed,
-            'five gifts, one commitment, two appeals and two funds are the ten rows deleted by name'
-        );
-        System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'no sample gift is left');
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Gift_Allocation__c],
-            'allocations go with the gift they belong to'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Tribute__c],
-            'tributes go with the gift they belong to'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Soft_Credit__c],
-            'soft credits go with the gift they belong to'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Installment__c],
-            'installments go with the commitment they belong to'
-        );
-        System.assertEquals(0, [SELECT COUNT() FROM Commitment__c]);
-        System.assertEquals(0, [SELECT COUNT() FROM Appeal__c]);
-        System.assertEquals(0, [SELECT COUNT() FROM Fund__c]);
+            System.assertEquals(
+                10,
+                removed,
+                'five gifts, one commitment, two appeals and two funds are the ten rows deleted by name'
+            );
+            System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'no sample gift is left');
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Gift_Allocation__c],
+                'allocations go with the gift they belong to'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Tribute__c],
+                'tributes go with the gift they belong to'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Soft_Credit__c],
+                'soft credits go with the gift they belong to'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Installment__c],
+                'installments go with the commitment they belong to'
+            );
+            System.assertEquals(0, [SELECT COUNT() FROM Commitment__c]);
+            System.assertEquals(0, [SELECT COUNT() FROM Appeal__c]);
+            System.assertEquals(0, [SELECT COUNT() FROM Fund__c]);
+        }
     }
 
     @IsTest
     static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
-        insertSamplePeople();
-        loadEverything();
-        // The organization's own default fund: sample funds never take the flag, and a gift
-        // the fundraiser enters saves only when there is a default fund to allocate it to.
-        Fund__c ownFund = GivingTestDataFactory.buildFund('Our own fund', true);
-        insert ownFund;
-        Contact ownDonor = GivingTestDataFactory.insertHouseholdContact(
-            'The Real Family',
-            'Ada',
-            'Real'
-        );
-        Gift__c ownGift = GivingTestDataFactory.buildGift(ownDonor.Id, 40);
-        insert ownGift;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            loadEverything();
+            // The organization's own default fund: sample funds never take the flag, and a gift
+            // the fundraiser enters saves only when there is a default fund to allocate it to.
+            Fund__c ownFund = GivingTestDataFactory.buildFund('Our own fund', true);
+            insert ownFund;
+            Contact ownDonor = GivingTestDataFactory.insertHouseholdContact(
+                'The Real Family',
+                'Ada',
+                'Real'
+            );
+            Gift__c ownGift = GivingTestDataFactory.buildGift(ownDonor.Id, 40);
+            insert ownGift;
 
-        Test.startTest();
-        GivingSampleDataLoader.removeAll();
-        Test.stopTest();
+            Test.startTest();
+            GivingSampleDataLoader.removeAll();
+            Test.stopTest();
 
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Gift__c WHERE Id = :ownGift.Id],
-            'a gift the fundraiser entered is not touched by removing sample data'
-        );
-        System.assertEquals(
-            1,
-            [SELECT COUNT() FROM Fund__c WHERE Id = :ownFund.Id],
-            'a fund the administrator created is not touched'
-        );
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
-            'every sample gift is gone'
-        );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Gift__c WHERE Id = :ownGift.Id],
+                'a gift the fundraiser entered is not touched by removing sample data'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Fund__c WHERE Id = :ownFund.Id],
+                'a fund the administrator created is not touched'
+            );
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'every sample gift is gone'
+            );
+        }
     }
 
     @IsTest
     static void testCountLoadedAndLabelAnswerTheStatusCard() {
-        insertSamplePeople();
-        loadEverything();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            loadEverything();
 
-        GivingSampleData module = new GivingSampleData();
+            GivingSampleData module = new GivingSampleData();
 
-        System.assertEquals(
-            'Giving',
-            module.moduleName(),
-            'the module names itself the way Core knows it'
-        );
-        System.assertEquals(
-            System.Label.Giving_SampleData_GiftsLabel,
-            module.countLabel(),
-            'the card is given the packaged label rather than a hard-coded word'
-        );
-        System.assertEquals(
-            5,
-            module.countLoaded(),
-            'the number the card shows is the sample gifts in the org'
-        );
+            System.assertEquals(
+                'Giving',
+                module.moduleName(),
+                'the module names itself the way Core knows it'
+            );
+            System.assertEquals(
+                System.Label.Giving_SampleData_GiftsLabel,
+                module.countLabel(),
+                'the card is given the packaged label rather than a hard-coded word'
+            );
+            System.assertEquals(
+                5,
+                module.countLoaded(),
+                'the number the card shows is the sample gifts in the org'
+            );
+        }
     }
 
     @IsTest
     static void testChunksAtOneHundredGifts() {
-        GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
-        System.assertEquals(
-            5,
-            data.gifts.size(),
-            'the payload holds five gifts, which is one chunk'
-        );
-        System.assertEquals(1, data.chunkCount(), 'five gifts need one chunk of a hundred');
-        System.assertEquals(
-            5,
-            data.giftsInChunk(0).size(),
-            'the only chunk holds every gift in the payload'
-        );
-        System.assertEquals(
-            0,
-            data.giftsInChunk(1).size(),
-            'a chunk past the end of the payload holds nothing'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
+            System.assertEquals(
+                5,
+                data.gifts.size(),
+                'the payload holds five gifts, which is one chunk'
+            );
+            System.assertEquals(1, data.chunkCount(), 'five gifts need one chunk of a hundred');
+            System.assertEquals(
+                5,
+                data.giftsInChunk(0).size(),
+                'the only chunk holds every gift in the payload'
+            );
+            System.assertEquals(
+                0,
+                data.giftsInChunk(1).size(),
+                'a chunk past the end of the payload holds nothing'
+            );
+        }
     }
 
     @IsTest
     static void testAPayloadMissingItsGiftAmountIsRejected() {
-        Map<String, Object> root = new Map<String, Object>{
-            'funds' => new List<Object>{ fund('General Fund', '4000') },
-            'appeals' => new List<Object>(),
-            'commitments' => new List<Object>(),
-            'gifts' => new List<Object>{
-                new Map<String, Object>{ 'key' => 'G0001', 'donor' => PERSON_KEY, 'daysAgo' => 10 }
-            },
-            'tributes' => new List<Object>(),
-            'softCredits' => new List<Object>()
-        };
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Map<String, Object> root = new Map<String, Object>{
+                'funds' => new List<Object>{ fund('General Fund', '4000') },
+                'appeals' => new List<Object>(),
+                'commitments' => new List<Object>(),
+                'gifts' => new List<Object>{
+                    new Map<String, Object>{
+                        'key' => 'G0001',
+                        'donor' => PERSON_KEY,
+                        'daysAgo' => 10
+                    }
+                },
+                'tributes' => new List<Object>(),
+                'softCredits' => new List<Object>()
+            };
 
-        Boolean threw = false;
-        try {
-            GivingSampleDataSet.parse(JSON.serialize(root));
-        } catch (GivingSampleData.SampleDataException failed) {
-            threw = true;
-            System.assertEquals(
-                System.Label.Giving_SampleData_ErrorInvalidData,
-                failed.getMessage(),
-                'a payload that cannot be loaded says so with the packaged label'
-            );
+            Boolean threw = false;
+            try {
+                GivingSampleDataSet.parse(JSON.serialize(root));
+            } catch (GivingSampleData.SampleDataException failed) {
+                threw = true;
+                System.assertEquals(
+                    System.Label.Giving_SampleData_ErrorInvalidData,
+                    failed.getMessage(),
+                    'a payload that cannot be loaded says so with the packaged label'
+                );
+            }
+            System.assertEquals(true, threw, 'a gift with no amount is invalid data');
         }
-        System.assertEquals(true, threw, 'a gift with no amount is invalid data');
     }
 
     @IsTest
     static void testGiftsForPeopleWhoAreNotInTheOrgAreSkippedRatherThanFailing() {
-        // No sample people at all: the Giving set is loaded into an org whose Core sample
-        // data has already been removed, which must not throw.
-        Test.startTest();
-        GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
-        Map<String, Id> idsByKey = GivingSampleDataLoader.loadReferenceData(data);
-        Integer loaded = GivingSampleDataLoader.loadGiftChunk(data, 0, idsByKey);
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // No sample people at all: the Giving set is loaded into an org whose Core sample
+            // data has already been removed, which must not throw.
+            Test.startTest();
+            GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
+            Map<String, Id> idsByKey = GivingSampleDataLoader.loadReferenceData(data);
+            Integer loaded = GivingSampleDataLoader.loadGiftChunk(data, 0, idsByKey);
+            Test.stopTest();
 
-        System.assertEquals(0, loaded, 'a gift with no donor in the org is skipped');
-        System.assertEquals(
-            0,
-            [SELECT COUNT() FROM Gift__c],
-            'nothing is inserted for a donor that is not there'
-        );
+            System.assertEquals(0, loaded, 'a gift with no donor in the org is skipped');
+            System.assertEquals(
+                0,
+                [SELECT COUNT() FROM Gift__c],
+                'nothing is inserted for a donor that is not there'
+            );
+        }
     }
 }

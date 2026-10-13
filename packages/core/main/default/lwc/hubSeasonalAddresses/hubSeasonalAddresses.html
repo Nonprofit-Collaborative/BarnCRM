@@ -1,0 +1,55 @@
+<template>
+    <lightning-card title={labels.heading}>
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={errorMessage}>
+                <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
+            </template>
+            <template lwc:elseif={lastRun}>
+                <p data-id="seasonal-last-run">
+                    <lightning-formatted-date-time
+                        value={lastRun}
+                        year="numeric"
+                        month="short"
+                        day="2-digit"
+                        hour="2-digit"
+                        minute="2-digit"
+                    ></lightning-formatted-date-time>
+                </p>
+                <template lwc:if={lastRunSummary}>
+                    <p class="slds-text-body_small" data-id="seasonal-last-run-summary">
+                        {lastRunSummary}
+                    </p>
+                </template>
+            </template>
+            <template lwc:else>
+                <p data-id="seasonal-never">{labels.never}</p>
+            </template>
+            <template lwc:if={notScheduled}>
+                <p
+                    class="slds-text-body_small"
+                    data-id="seasonal-not-scheduled"
+                    role="status"
+                    aria-live="polite"
+                >
+                    {labels.notScheduled}
+                </p>
+            </template>
+            <template lwc:if={stale}>
+                <p class="slds-text-color_error" data-id="seasonal-stale" role="status" aria-live="polite">
+                    <lightning-icon
+                        icon-name="utility:warning"
+                        size="x-small"
+                        alternative-text={labels.warning}
+                    ></lightning-icon>
+                    {labels.stale}
+                </p>
+            </template>
+            <lightning-button
+                variant="base"
+                label={labels.link}
+                data-id="open-addresses"
+                onclick={handleOpenAddresses}
+            ></lightning-button>
+        </div>
+    </lightning-card>
+</template>

@@ -2,12 +2,12 @@
     <lightning-card title={labels.heading} icon-name="standard:data_integration_hub">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={notice}>
-                <p class="slds-text-color_success slds-var-m-bottom_small" data-id="notice">
+                <p role="status" class="slds-text-color_success slds-var-m-bottom_small" data-id="notice">
                     {notice}
                 </p>
             </template>
             <template lwc:if={error}>
-                <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error">
+                <p role="alert" class="slds-text-color_error slds-var-m-bottom_small" data-id="error">
                     {error}
                 </p>
             </template>

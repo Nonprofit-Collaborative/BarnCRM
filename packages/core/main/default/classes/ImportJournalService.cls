@@ -16,13 +16,24 @@ public with sharing class ImportJournalService {
     public static final String PHASE_COMMIT = 'Commit';
     @NamespaceAccessible
     public static final String PHASE_UNDO = 'Undo';
+    /** The records a one-object import created, which carry no batch tag (R-IJ3, R-IT12). */
+    @NamespaceAccessible
+    public static final String PHASE_CREATED = 'Created';
 
     @NamespaceAccessible
     public static final String ACTION_UPDATED = 'Updated';
     @NamespaceAccessible
+    public static final String ACTION_CREATED = 'Created';
+    @NamespaceAccessible
     public static final String ACTION_KEPT = 'Kept';
     @NamespaceAccessible
     public static final String ACTION_NOT_RESTORED = 'NotRestored';
+    /** A record a bulk update could not save (C-35). */
+    @NamespaceAccessible
+    public static final String ACTION_FAILED = 'Failed';
+    /** A record a bulk delete deleted, which its undo brings back from the Recycle Bin (C-37). */
+    @NamespaceAccessible
+    public static final String ACTION_DELETED = 'Deleted';
 
     /** The document version written into every page, so a reader can tell the shape. */
     private static final Integer DOCUMENT_VERSION = 1;
@@ -37,6 +48,24 @@ public with sharing class ImportJournalService {
      */
     @TestVisible
     private static Integer maxEntriesPerPage = 200;
+
+    /**
+     * The most entries one Created page holds: an undo deletes a page's records in one
+     * transaction, after reading each one's children (R-IJ3).
+     */
+    @TestVisible
+    private static Integer maxCreatedPerPage = 100;
+
+    /** A created record: which object, which record, which file row (R-IJ3). */
+    @NamespaceAccessible
+    public static Map<String, Object> created(String objectName, Id recordId, Integer row) {
+        return new Map<String, Object>{
+            'action' => ACTION_CREATED,
+            'object' => objectName,
+            'id' => String.valueOf(recordId),
+            'row' => row
+        };
+    }
 
     /** How long a label or a reason may be; neither is needed to put anything back. */
     private static final Integer MAX_TEXT_LENGTH = 255;
@@ -89,6 +118,28 @@ public with sharing class ImportJournalService {
         };
     }
 
+    /** A record a bulk update could not save, and the platform's reason (R-IJ2, R-BU3). */
+    @NamespaceAccessible
+    public static Map<String, Object> failed(String objectName, Id recordId, String reason) {
+        return new Map<String, Object>{
+            'action' => ACTION_FAILED,
+            'object' => objectName,
+            'id' => String.valueOf(recordId),
+            'reason' => shorten(reason)
+        };
+    }
+
+    /** A record a bulk delete deleted, with its name for the undo to report (R-IJ2, R-BD3). */
+    @NamespaceAccessible
+    public static Map<String, Object> deleted(String objectName, Id recordId, String label) {
+        return new Map<String, Object>{
+            'action' => ACTION_DELETED,
+            'object' => objectName,
+            'id' => String.valueOf(recordId),
+            'label' => shorten(label)
+        };
+    }
+
     /** A value an undo did not put back, and why. */
     @NamespaceAccessible
     public static Map<String, Object> notRestored(
@@ -122,12 +173,16 @@ public with sharing class ImportJournalService {
         try {
             List<Import_Journal__c> pages = new List<Import_Journal__c>();
             Integer paged = 0;
-            for (List<Map<String, Object>> page : paginate(entries, batchId)) {
+            String written = PHASE_UNDO.equals(phase) || PHASE_CREATED.equals(phase)
+                ? phase
+                : PHASE_COMMIT;
+            Integer cap = written == PHASE_CREATED ? maxCreatedPerPage : maxEntriesPerPage;
+            for (List<Map<String, Object>> page : paginate(entries, batchId, cap)) {
                 paged += page.size();
                 pages.add(
                     new Import_Journal__c(
                         Import_Batch__c = batchId,
-                        Phase__c = PHASE_UNDO.equals(phase) ? PHASE_UNDO : PHASE_COMMIT,
+                        Phase__c = written,
                         Entry_Count__c = page.size(),
                         Entries_JSON__c = document(page)
                     )
@@ -203,13 +258,11 @@ public with sharing class ImportJournalService {
      */
     private static List<List<Map<String, Object>>> paginate(
         List<Map<String, Object>> entries,
-        Id batchId
+        Id batchId,
+        Integer cap
     ) {
         List<List<Map<String, Object>>> result = new List<List<Map<String, Object>>>();
-        if (
-            entries.size() <= maxEntriesPerPage &&
-            document(entries).length() <= maxDocumentLength
-        ) {
+        if (entries.size() <= cap && document(entries).length() <= maxDocumentLength) {
             result.add(entries);
             return result;
         }
@@ -228,8 +281,8 @@ public with sharing class ImportJournalService {
         for (Integer i = 0; i < entries.size(); i++) {
             (i < half ? first : second).add(entries[i]);
         }
-        result.addAll(paginate(first, batchId));
-        result.addAll(paginate(second, batchId));
+        result.addAll(paginate(first, batchId, cap));
+        result.addAll(paginate(second, batchId, cap));
         return result;
     }
 

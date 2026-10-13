@@ -10,7 +10,7 @@ public with sharing class GiftBatchSelector {
     /** One batch without its lines, or null when it does not exist or cannot be seen. */
     public static Gift_Batch__c selectById(Id batchId) {
         List<Gift_Batch__c> batches = [
-            SELECT Id, Name, Status__c, Control_Total__c
+            SELECT Id, Name, Status__c, Control_Total__c, Default_Gift_Date__c
             FROM Gift_Batch__c
             WHERE Id = :batchId
             WITH USER_MODE
@@ -80,6 +80,7 @@ public with sharing class GiftBatchSelector {
                 Payment_Reference__c,
                 Fund__c,
                 Appeal__c,
+                Installment__c,
                 Gift__c,
                 Gift__r.Name
             FROM Gift_Batch_Row__c

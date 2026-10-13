@@ -22,7 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when the viewer cannot run the access checks.</shortDescription>
-        <value>Sign in as a BarnCRM Admin to see the access checks</value>
+        <value>Only a BarnCRM Admin can see the access checks</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationFix</fullName>
@@ -190,7 +190,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: households with no current member.</shortDescription>
-        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. Open each one to add a member, merge it into another household, or delete it. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically. Open each one to add a member, merge it into another household, or delete it. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_EmptyHouseholdsTitle</fullName>
@@ -277,8 +277,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>After the nightly run fix: what it did.</shortDescription>
-        <value>Done. The nightly run is scheduled every night at 2:00 AM.</value>
+        <shortDescription>After the nightly jobs fix: what it did. {0} the job names.</shortDescription>
+        <value>Done. Scheduled: {0}.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_FixStale</fullName>
@@ -313,6 +313,30 @@
         <value>What BarnCRM found in your org, and what to do about it.</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_JobErrorDigest</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that emails the error digest.</shortDescription>
+        <value>Error digest email</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_JobRollups</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that recalculates rollups.</shortDescription>
+        <value>Rollup recalculation</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_JobSeasonalAddresses</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that swaps seasonal addresses.</shortDescription>
+        <value>Seasonal address swap</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_LoadFailed</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -334,15 +358,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Explains why contact membership does not work with Person Accounts.</shortDescription>
-        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to junction membership fixes it, and the households you already have are not changed.</value>
+        <value>Person Accounts are enabled, but household membership is still set to use the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switching to the flexible way of belonging, with one membership record per person, fixes it, and the households you already have are not changed.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that switches household membership to the junction.</shortDescription>
-        <value>Switch to junction membership</value>
+        <shortDescription>Button that switches household membership to the flexible way of belonging.</shortDescription>
+        <value>Switch to the flexible way of belonging</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipTitle</fullName>
@@ -417,20 +441,36 @@
         <value>This org uses more than one currency</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_NightlyJobsDetail</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check detail: nightly jobs not scheduled. {0} the job names.</shortDescription>
+        <value>Not scheduled: {0}. Each keeps something up to date overnight, and none runs until somebody schedules it. The fix schedules each one at its usual time, to run as you. Stop any of them on its own page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyJobsFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fix button: schedule every nightly job that is not scheduled.</shortDescription>
+        <value>Schedule all nightly jobs</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NightlyJobsTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: some nightly jobs are not scheduled.</shortDescription>
+        <value>Nightly jobs are not scheduled</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_NightlyOffDetail</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: nightly run off. {0} waiting rollups, {1} nightly only.</shortDescription>
-        <value>{0} active totals are set to recalculate in the nightly run, and it is not scheduled. {1} of them recalculate only then, so their values are not being kept up to date. The fix schedules the run every night at 2:00 AM. Stop it on the Rollups page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_NightlyOffFix</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Fix button: schedule the nightly rollup run.</shortDescription>
-        <value>Schedule the nightly run</value>
+        <value>{0} active totals are set to recalculate in the nightly run, and it is not scheduled. {1} of them recalculate only then, so their values are not being kept up to date. Schedule all nightly jobs fixes this.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyOffTitle</fullName>
@@ -558,7 +598,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: contacts with no account, in contact mode.</shortDescription>
-        <value>These contacts have no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>These contacts have no account, so they are in no household: they count toward no household total, and no household name or greeting includes them. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail</fullName>
@@ -566,7 +606,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check detail: people with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names these people, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them; cleaning them up in bulk belongs to the data hygiene console.</value>
+        <value>No current household membership names these people, so they are in no household: they count toward no household total, and no household name or greeting includes them. Open each one and add them to a household from its members panel. Health Check finds these and does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdTitle</fullName>

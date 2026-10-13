@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Count the records that need tidying up (people with no household, empty households, orphaned
+    memberships and addresses, incomplete or failed default addresses) and open each in Find.
+  </description>
+  <flexiPage>Data_Hygiene</flexiPage>
+  <label>Data Hygiene</label>
+  <motif>Custom2: Sun</motif>
+</CustomTab>

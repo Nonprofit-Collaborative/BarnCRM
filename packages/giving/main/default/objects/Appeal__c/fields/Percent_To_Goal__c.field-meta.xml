@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Percent_To_Goal__c</fullName>
   <externalId>false</externalId>
-  <formula>IF(Goal__c = 0, null, (Total_Raised__c / Goal__c) * 100)</formula>
+  <formula>IF(Goal__c = 0, null, Total_Raised__c / Goal__c)</formula>
   <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
   <inlineHelpText>
     How far the appeal has come against its goal. Empty until a goal is set.

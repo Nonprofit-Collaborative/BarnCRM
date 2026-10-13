@@ -1,0 +1,67 @@
+<template>
+    <div class="slds-is-relative">
+        <template if:true={busy}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                <lightning-combobox
+                    data-id="function"
+                    label={labels.summaryFunction}
+                    options={functionOptions}
+                    value={fn}
+                    onchange={handleFunctionChange}
+                ></lightning-combobox>
+            </div>
+            <template if:true={needsField}>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <lightning-combobox
+                        data-id="field"
+                        label={labels.summaryField}
+                        options={fieldOptions}
+                        value={field}
+                        required
+                        onchange={handleFieldChange}
+                    ></lightning-combobox>
+                </div>
+            </template>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                <lightning-combobox
+                    data-id="group-by"
+                    label={labels.groupBy}
+                    options={groupOptions}
+                    value={groupBy}
+                    onchange={handleGroupChange}
+                ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-shrink-none">
+                <lightning-button
+                    data-id="summarize"
+                    label={labels.summarize}
+                    icon-name="utility:summary"
+                    disabled={summarizeDisabled}
+                    onclick={handleSummarize}
+                ></lightning-button>
+            </div>
+        </div>
+        <template if:true={hasError}>
+            <div class="slds-text-color_error slds-var-m-top_x-small" role="alert" data-id="summary-error">
+                {errorMessage}
+            </div>
+        </template>
+        <template if:true={hasLines}>
+            <div class="slds-var-m-top_small" role="region" aria-live="polite" aria-label={labels.summarize}>
+                <lightning-datatable
+                    data-id="summary"
+                    key-field="key"
+                    columns={columns}
+                    data={rows}
+                    hide-checkbox-column
+                ></lightning-datatable>
+                <template if:true={capped}>
+                    <p class="slds-var-m-top_x-small" data-id="capped">{cappedNote}</p>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

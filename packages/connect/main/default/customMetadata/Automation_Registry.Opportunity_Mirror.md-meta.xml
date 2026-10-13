@@ -22,4 +22,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Creates or updates the gift's matching Opportunity when it is saved, while Opportunity mirror direction is Gifts to Opportunities in the Giving settings. Switched off, the mirror's runs stop too. Reports the Opportunity a deleted gift leaves behind.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Connect</value>
+    </values>
 </CustomMetadata>

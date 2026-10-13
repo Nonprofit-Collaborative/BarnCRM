@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Operation_JSON__c</fullName>
+  <description>For a bulk update, the query document, the changes and the confirmed count it ran with, as one document; empty for an import (canonical model R-BU1). Written only by bulk update, never run as query text.</description>
+  <inlineHelpText>Which records a bulk update chose and what it changed, as the job stored it.</inlineHelpText>
+  <label>Bulk Update Definition</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

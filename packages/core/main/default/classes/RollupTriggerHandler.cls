@@ -6,10 +6,9 @@
  * become real time, without Core naming that object anywhere (R-R7, ADR-0014).
  *
  * Core registers it against Contact and Household Member. That is not decoration: in contact mode
- * a household total reaches its household through the contact, and the engine requires the
- * intermediate object in a grandparent chain to re-run when a record is reparented, which is what
- * makes moving a person between households correct (ADR-0015). In junction mode the membership row
- * is the reparenting event, so the same is true there.
+ * a household total reaches its household through the contact, so a person who moves household
+ * has to mark both households for recalculation (R-R11). In junction mode the membership row is
+ * the reparenting event, so the same is true there.
  */
 public with sharing class RollupTriggerHandler extends TriggerHandler {
     private static final String CONTEXT = 'RollupTriggerHandler';
@@ -27,21 +26,26 @@ public with sharing class RollupTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * A merge: the records deleted with `MasterRecordId` filled name the survivors, whose totals
-     * are recalculated so they include what the merge moved onto them. An ordinary delete was
-     * already handled before the delete.
+     * After a delete, the totals the deleted records counted towards no longer include them
+     * (`RollupService.runAfterDelete`; `beforeDelete` collected the rows the platform deletes
+     * with them). A merge: the records deleted with `MasterRecordId` filled name the survivors,
+     * whose totals are recalculated so they include what the merge moved onto them.
      */
     public override void afterDelete() {
+        List<SObject> deleted = oldRecords();
         List<SObject> merged = new List<SObject>();
-        for (SObject record : oldRecords()) {
+        for (SObject record : deleted == null ? new List<SObject>() : deleted) {
             if (record.getPopulatedFieldsAsMap().get('MasterRecordId') != null) {
                 merged.add(record);
             }
         }
-        if (merged.isEmpty()) {
-            return;
-        }
         try {
+            if (deleted != null && !deleted.isEmpty()) {
+                RollupService.runAfterDelete(objectNameOf(deleted), deleted);
+            }
+            if (merged.isEmpty()) {
+                return;
+            }
             RollupService.runAfterMerge(objectNameOf(merged), merged);
         } catch (Exception failed) {
             // As for every rollup: never fail the save, and the nightly run puts it right.

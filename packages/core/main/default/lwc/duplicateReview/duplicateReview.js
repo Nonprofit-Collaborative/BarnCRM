@@ -103,8 +103,31 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   mergePreview;
   keepId;
 
+  /** The data-id of the box heading already given focus, so it is focused once per opening. */
+  focusedHeading;
+
   connectedCallback() {
     this.load();
+  }
+
+  /**
+   * Moves focus to the heading of the dismiss or merge box when it opens, so a keyboard or
+   * screen reader user lands on it rather than having to find it below the list.
+   */
+  renderedCallback() {
+    let open;
+    if (this.showDismissDialog) {
+      open = 'dismiss-heading';
+    } else if (this.showMergeDialog) {
+      open = 'merge-heading';
+    }
+    if (open && open !== this.focusedHeading) {
+      const heading = this.template.querySelector(`[data-id="${open}"]`);
+      if (heading) {
+        heading.focus();
+      }
+    }
+    this.focusedHeading = open;
   }
 
   async load() {

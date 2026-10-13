@@ -1,0 +1,33 @@
+<template>
+    <div class="slds-box slds-theme_default">
+        <h1 class="slds-text-heading_medium">{labels.welcomeHeading}</h1>
+        <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="welcome-message">
+            {welcomeMessage}
+        </p>
+
+        <template lwc:if={showNewHouseholdButton}>
+            <lightning-button
+                variant="brand"
+                label={labels.newHousehold}
+                data-id="new-household"
+                onclick={handleNewHousehold}
+            ></lightning-button>
+        </template>
+
+        <template lwc:if={automationPaused}>
+            <div
+                class="slds-box slds-theme_warning slds-var-m-top_small"
+                data-id="paused-banner"
+                role="status"
+            >
+                {labels.pausedBanner}
+            </div>
+        </template>
+
+        <template lwc:if={errorMessage}>
+            <p class="slds-text-color_error slds-var-m-top_small" data-id="load-error" role="alert">
+                {errorMessage}
+            </p>
+        </template>
+    </div>
+</template>

@@ -31,87 +31,101 @@ private class HouseholdMemberTriggerHandlerTest {
 
     @IsTest
     static void addingAMembershipCountsAndNamesTheHousehold() {
-        setUp();
+        System.runAs(TestUsers.admin()) {
+            setUp();
 
-        Test.startTest();
-        insert membership(john.Id);
-        Test.stopTest();
+            Test.startTest();
+            insert membership(john.Id);
+            Test.stopTest();
 
-        Account saved = reload();
-        Assert.areEqual(1, saved.Member_Count__c, 'John is counted');
-        Assert.areEqual('The Smith Family', saved.Name, 'The household is named from its member');
+            Account saved = reload();
+            Assert.areEqual(1, saved.Member_Count__c, 'John is counted');
+            Assert.areEqual(
+                'The Smith Family',
+                saved.Name,
+                'The household is named from its member'
+            );
+        }
     }
 
     @IsTest
     static void endingAMembershipTodayTakesThePersonOutOfTheHousehold() {
-        setUp();
-        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-        settings.Delete_Empty_Households__c = false;
-        HouseholdTestDataFactory.save(settings);
-        Household_Member__c row = membership(john.Id);
-        insert row;
+        System.runAs(TestUsers.admin()) {
+            setUp();
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Delete_Empty_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            Household_Member__c row = membership(john.Id);
+            insert row;
 
-        Test.startTest();
-        update new Household_Member__c(Id = row.Id, End_Date__c = Date.today());
-        Test.stopTest();
+            Test.startTest();
+            update new Household_Member__c(Id = row.Id, End_Date__c = Date.today());
+            Test.stopTest();
 
-        Assert.areEqual(0, reload().Member_Count__c, 'A membership that ended today is over');
+            Assert.areEqual(0, reload().Member_Count__c, 'A membership that ended today is over');
+        }
     }
 
     @IsTest
     static void changingTheHouseholdOnAMembershipCorrectsBoth() {
-        setUp();
-        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-        settings.Delete_Empty_Households__c = false;
-        HouseholdTestDataFactory.save(settings);
-        Account other = HouseholdTestDataFactory.newHousehold('Other');
-        insert other;
-        Household_Member__c row = membership(john.Id);
-        insert row;
+        System.runAs(TestUsers.admin()) {
+            setUp();
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Delete_Empty_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            Account other = HouseholdTestDataFactory.newHousehold('Other');
+            insert other;
+            Household_Member__c row = membership(john.Id);
+            insert row;
 
-        Test.startTest();
-        update new Household_Member__c(Id = row.Id, Household__c = other.Id);
-        Test.stopTest();
+            Test.startTest();
+            update new Household_Member__c(Id = row.Id, Household__c = other.Id);
+            Test.stopTest();
 
-        Assert.areEqual(0, reload().Member_Count__c, 'The household John left counts nobody');
-        Assert.areEqual(
-            1,
-            [SELECT Member_Count__c FROM Account WHERE Id = :other.Id].Member_Count__c,
-            'The household John joined counts him'
-        );
+            Assert.areEqual(0, reload().Member_Count__c, 'The household John left counts nobody');
+            Assert.areEqual(
+                1,
+                [SELECT Member_Count__c FROM Account WHERE Id = :other.Id].Member_Count__c,
+                'The household John joined counts him'
+            );
+        }
     }
 
     @IsTest
     static void removingTheLastMembershipTidiesTheHouseholdAway() {
-        setUp();
-        Household_Member__c row = membership(john.Id);
-        insert row;
+        System.runAs(TestUsers.admin()) {
+            setUp();
+            Household_Member__c row = membership(john.Id);
+            insert row;
 
-        Test.startTest();
-        delete row;
-        Test.stopTest();
+            Test.startTest();
+            delete row;
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Account WHERE Id = :household.Id],
-            'The emptied household went too'
-        );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Id = :household.Id],
+                'The emptied household went too'
+            );
+        }
     }
 
     @IsTest
     static void restoringAMembershipCountsThePersonAgain() {
-        setUp();
-        BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-        settings.Delete_Empty_Households__c = false;
-        HouseholdTestDataFactory.save(settings);
-        Household_Member__c row = membership(john.Id);
-        insert row;
-        delete row;
+        System.runAs(TestUsers.admin()) {
+            setUp();
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Delete_Empty_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+            Household_Member__c row = membership(john.Id);
+            insert row;
+            delete row;
 
-        Test.startTest();
-        undelete row;
-        Test.stopTest();
+            Test.startTest();
+            undelete row;
+            Test.stopTest();
 
-        Assert.areEqual(1, reload().Member_Count__c, 'John is counted again');
+            Assert.areEqual(1, reload().Member_Count__c, 'John is counted again');
+        }
     }
 }

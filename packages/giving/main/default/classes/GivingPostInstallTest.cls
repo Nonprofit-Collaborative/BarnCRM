@@ -15,103 +15,112 @@
 private class GivingPostInstallTest {
     @IsTest
     static void installingGivingCreatesTheGivingTotals() {
-        // The defect this covers: nothing called ensureDefaults, so a fresh install had no
-        // Rollup Definition records and every giving total on every donor was blank.
-        GivingPostInstall handler = new GivingPostInstall();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // The defect this covers: nothing called ensureDefaults, so a fresh install had no
+            // Rollup Definition records and every giving total on every donor was blank.
+            GivingPostInstall handler = new GivingPostInstall();
 
-        Test.startTest();
-        Test.testInstall(handler, null);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(handler, null);
+            Test.stopTest();
 
-        Map<String, Rollup_Definition__c> byKey = definitionsByKey();
-        List<String> shippedKeys = shippedGivingKeys();
-        Assert.isFalse(shippedKeys.isEmpty(), 'The package ships rollup defaults to materialize.');
-        for (String key : shippedKeys) {
+            Map<String, Rollup_Definition__c> byKey = definitionsByKey();
+            List<String> shippedKeys = shippedGivingKeys();
+            Assert.isFalse(
+                shippedKeys.isEmpty(),
+                'The package ships rollup defaults to materialize.'
+            );
+            for (String key : shippedKeys) {
+                Assert.isTrue(
+                    byKey.containsKey(key),
+                    'Every rollup Giving ships is created by its own install, including ' + key
+                );
+            }
             Assert.isTrue(
-                byKey.containsKey(key),
-                'Every rollup Giving ships is created by its own install, including ' + key
+                byKey.containsKey('Household_Total_Giving'),
+                'A household has its total giving, which is the number every gift screen shows.'
+            );
+
+            Rollup_Definition__c householdGiving = byKey.get('Household_Total_Giving');
+            Assert.areEqual(
+                'Total_Giving__c',
+                householdGiving.Target_Field__c,
+                'It writes the attribute the record page and the donor level read.'
+            );
+            Assert.isTrue(
+                householdGiving.Active__c,
+                'It arrives switched on, so the total is calculated without a second step.'
+            );
+            Assert.isTrue(
+                householdGiving.Is_Package_Default__c,
+                'It is marked as shipped, so the Rollups page can tell it from an admin rollup.'
             );
         }
-        Assert.isTrue(
-            byKey.containsKey('Household_Total_Giving'),
-            'A household has its total giving, which is the number every gift screen shows.'
-        );
-
-        Rollup_Definition__c householdGiving = byKey.get('Household_Total_Giving');
-        Assert.areEqual(
-            'Total_Giving__c',
-            householdGiving.Target_Field__c,
-            'It writes the attribute the record page and the donor level read.'
-        );
-        Assert.isTrue(
-            householdGiving.Active__c,
-            'It arrives switched on, so the total is calculated without a second step.'
-        );
-        Assert.isTrue(
-            householdGiving.Is_Package_Default__c,
-            'It is marked as shipped, so the Rollups page can tell it from an admin rollup.'
-        );
     }
 
     @IsTest
     static void upgradingCreatesNothingAndKeepsWhatTheAdminChanged() {
-        GivingPostInstall handler = new GivingPostInstall();
-        Test.testInstall(handler, null);
-        Integer afterInstall = [SELECT COUNT() FROM Rollup_Definition__c];
-        Rollup_Definition__c householdGiving = definitionsByKey().get('Household_Total_Giving');
-        // Maria decides she does not want this one, which R-R6 says is done by switching it
-        // off rather than by deleting it.
-        update new Rollup_Definition__c(Id = householdGiving.Id, Active__c = false);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingPostInstall handler = new GivingPostInstall();
+            Test.testInstall(handler, null);
+            Integer afterInstall = [SELECT COUNT() FROM Rollup_Definition__c];
+            Rollup_Definition__c householdGiving = definitionsByKey().get('Household_Total_Giving');
+            // Maria decides she does not want this one, which R-R6 says is done by switching it
+            // off rather than by deleting it.
+            update new Rollup_Definition__c(Id = householdGiving.Id, Active__c = false);
 
-        Test.startTest();
-        Test.testInstall(handler, new Version(1, 0), true);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(handler, new Version(1, 0), true);
+            Test.stopTest();
 
-        Assert.areEqual(
-            afterInstall,
-            [SELECT COUNT() FROM Rollup_Definition__c],
-            'An upgrade creates no second copy of a rollup that is already here.'
-        );
-        Rollup_Definition__c afterUpgrade = definitionsByKey().get('Household_Total_Giving');
-        Assert.areEqual(
-            householdGiving.Id,
-            afterUpgrade.Id,
-            'It is the same record, not a replacement.'
-        );
-        Assert.isFalse(
-            afterUpgrade.Active__c,
-            'A rollup the admin switched off stays off across an upgrade (R-R6).'
-        );
+            Assert.areEqual(
+                afterInstall,
+                [SELECT COUNT() FROM Rollup_Definition__c],
+                'An upgrade creates no second copy of a rollup that is already here.'
+            );
+            Rollup_Definition__c afterUpgrade = definitionsByKey().get('Household_Total_Giving');
+            Assert.areEqual(
+                householdGiving.Id,
+                afterUpgrade.Id,
+                'It is the same record, not a replacement.'
+            );
+            Assert.isFalse(
+                afterUpgrade.Active__c,
+                'A rollup the admin switched off stays off across an upgrade (R-R6).'
+            );
+        }
     }
 
     @IsTest
     static void everyDefinitionCreatedNamesObjectsThisOrgHas() {
-        // The guard that keeps a Core-only org clean is the same one that would let a broken
-        // row through here: a definition naming an object nobody has can never calculate.
-        Test.startTest();
-        Test.testInstall(new GivingPostInstall(), null);
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // The guard that keeps a Core-only org clean is the same one that would let a broken
+            // row through here: a definition naming an object nobody has can never calculate.
+            Test.startTest();
+            Test.testInstall(new GivingPostInstall(), null);
+            Test.stopTest();
 
-        List<Rollup_Definition__c> created = [
-            SELECT Definition_Key__c, Source_Object__c, Target_Object__c
-            FROM Rollup_Definition__c
-        ];
-        Assert.isFalse(created.isEmpty(), 'There is something to check.');
-        for (Rollup_Definition__c definition : created) {
-            Assert.isNotNull(
-                SettingsService.typeByName(definition.Source_Object__c),
-                'Source of ' +
-                    definition.Definition_Key__c +
-                    ' is an object this org has: ' +
-                    definition.Source_Object__c
-            );
-            Assert.isNotNull(
-                SettingsService.typeByName(definition.Target_Object__c),
-                'Target of ' +
-                    definition.Definition_Key__c +
-                    ' is an object this org has: ' +
-                    definition.Target_Object__c
-            );
+            List<Rollup_Definition__c> created = [
+                SELECT Definition_Key__c, Source_Object__c, Target_Object__c
+                FROM Rollup_Definition__c
+            ];
+            Assert.isFalse(created.isEmpty(), 'There is something to check.');
+            for (Rollup_Definition__c definition : created) {
+                Assert.isNotNull(
+                    SettingsService.typeByName(definition.Source_Object__c),
+                    'Source of ' +
+                        definition.Definition_Key__c +
+                        ' is an object this org has: ' +
+                        definition.Source_Object__c
+                );
+                Assert.isNotNull(
+                    SettingsService.typeByName(definition.Target_Object__c),
+                    'Target of ' +
+                        definition.Definition_Key__c +
+                        ' is an object this org has: ' +
+                        definition.Target_Object__c
+                );
+            }
         }
     }
 
@@ -124,31 +133,36 @@ private class GivingPostInstallTest {
      */
     @IsTest
     static void installingGivingCreatesTheTwoShippedReceiptLetters() {
-        GivingPostInstall handler = new GivingPostInstall();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingPostInstall handler = new GivingPostInstall();
 
-        Test.startTest();
-        Test.testInstall(handler, null);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(handler, null);
+            Test.stopTest();
 
-        Map<String, Receipt_Template__c> byType = new Map<String, Receipt_Template__c>();
-        for (Receipt_Template__c letter : [
-            SELECT Id, Name, Type__c, Body__c, Active__c
-            FROM Receipt_Template__c
-        ]) {
-            byType.put(letter.Type__c, letter);
-        }
-        Assert.areEqual(
-            2,
-            byType.size(),
-            'A fresh install arrives with one letter of each kind, not with an empty page.'
-        );
-        for (String type : byType.keySet()) {
-            Receipt_Template__c letter = byType.get(type);
-            Assert.isTrue(letter.Active__c, 'It arrives switched on, so a receipt can be issued.');
-            Assert.isFalse(
-                String.isBlank(letter.Body__c),
-                'It carries the shipped wording: ' + letter.Name
+            Map<String, Receipt_Template__c> byType = new Map<String, Receipt_Template__c>();
+            for (Receipt_Template__c letter : [
+                SELECT Id, Name, Type__c, Body__c, Active__c
+                FROM Receipt_Template__c
+            ]) {
+                byType.put(letter.Type__c, letter);
+            }
+            Assert.areEqual(
+                2,
+                byType.size(),
+                'A fresh install arrives with one letter of each kind, not with an empty page.'
             );
+            for (String type : byType.keySet()) {
+                Receipt_Template__c letter = byType.get(type);
+                Assert.isTrue(
+                    letter.Active__c,
+                    'It arrives switched on, so a receipt can be issued.'
+                );
+                Assert.isFalse(
+                    String.isBlank(letter.Body__c),
+                    'It carries the shipped wording: ' + letter.Name
+                );
+            }
         }
     }
 
@@ -157,25 +171,27 @@ private class GivingPostInstallTest {
      */
     @IsTest
     static void upgradingKeepsTheLetterTheAdministratorRewrote() {
-        GivingPostInstall handler = new GivingPostInstall();
-        Test.testInstall(handler, null);
-        Receipt_Template__c letter = [SELECT Id, Body__c FROM Receipt_Template__c LIMIT 1];
-        update new Receipt_Template__c(Id = letter.Id, Body__c = '<p>Maria wrote this.</p>');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingPostInstall handler = new GivingPostInstall();
+            Test.testInstall(handler, null);
+            Receipt_Template__c letter = [SELECT Id, Body__c FROM Receipt_Template__c LIMIT 1];
+            update new Receipt_Template__c(Id = letter.Id, Body__c = '<p>Maria wrote this.</p>');
 
-        Test.startTest();
-        Test.testInstall(handler, new Version(1, 0), true);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(handler, new Version(1, 0), true);
+            Test.stopTest();
 
-        Assert.areEqual(
-            2,
-            [SELECT COUNT() FROM Receipt_Template__c],
-            'An upgrade creates no second copy of a letter that is already here.'
-        );
-        Assert.areEqual(
-            '<p>Maria wrote this.</p>',
-            [SELECT Body__c FROM Receipt_Template__c WHERE Id = :letter.Id].Body__c,
-            'And it does not put the shipped wording back over what she wrote.'
-        );
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Receipt_Template__c],
+                'An upgrade creates no second copy of a letter that is already here.'
+            );
+            Assert.areEqual(
+                '<p>Maria wrote this.</p>',
+                [SELECT Body__c FROM Receipt_Template__c WHERE Id = :letter.Id].Body__c,
+                'And it does not put the shipped wording back over what she wrote.'
+            );
+        }
     }
 
     /**
@@ -185,51 +201,55 @@ private class GivingPostInstallTest {
      */
     @IsTest
     static void installingGivingCreatesTheSwitchesForItsAutomations() {
-        // Core's script runs before Giving's registry rows exist, so it cannot create their
-        // switches; without this the receipt lock and every giving automation had none (C-21).
-        GivingPostInstall handler = new GivingPostInstall();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // Core's script runs before Giving's registry rows exist, so it cannot create their
+            // switches; without this the receipt lock and every giving automation had none (C-21).
+            GivingPostInstall handler = new GivingPostInstall();
 
-        Test.startTest();
-        Test.testInstall(handler, null);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(handler, null);
+            Test.stopTest();
 
-        Map<String, Automation_Setting__c> byName = switchesByName();
-        for (Automation_Registry__mdt entry : [
-            SELECT DeveloperName
-            FROM Automation_Registry__mdt
-        ]) {
+            Map<String, Automation_Setting__c> byName = switchesByName();
+            for (Automation_Registry__mdt entry : [
+                SELECT DeveloperName
+                FROM Automation_Registry__mdt
+            ]) {
+                Assert.isTrue(
+                    byName.containsKey(entry.DeveloperName),
+                    'Every shipped automation has a switch, including ' + entry.DeveloperName
+                );
+            }
             Assert.isTrue(
-                byName.containsKey(entry.DeveloperName),
-                'Every shipped automation has a switch, including ' + entry.DeveloperName
+                byName.get('Gift_Receipt_Lock').Always_Runs__c,
+                'The receipt lock is listed as always running, so the page can say why (ADR-0024).'
             );
         }
-        Assert.isTrue(
-            byName.get('Gift_Receipt_Lock').Always_Runs__c,
-            'The receipt lock is listed as always running, so the page can say why (ADR-0024).'
-        );
     }
 
     @IsTest
     static void upgradingGivingKeepsASwitchTheAdminTurnedOff() {
-        GivingPostInstall handler = new GivingPostInstall();
-        Test.testInstall(handler, null);
-        Integer afterInstall = [SELECT COUNT() FROM Automation_Setting__c];
-        Automation_Setting__c acknowledgment = switchesByName().get('Gift_Acknowledgment');
-        update new Automation_Setting__c(Id = acknowledgment.Id, Enabled__c = false);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingPostInstall handler = new GivingPostInstall();
+            Test.testInstall(handler, null);
+            Integer afterInstall = [SELECT COUNT() FROM Automation_Setting__c];
+            Automation_Setting__c acknowledgment = switchesByName().get('Gift_Acknowledgment');
+            update new Automation_Setting__c(Id = acknowledgment.Id, Enabled__c = false);
 
-        Test.startTest();
-        Test.testInstall(handler, new Version(1, 0), true);
-        Test.stopTest();
+            Test.startTest();
+            Test.testInstall(handler, new Version(1, 0), true);
+            Test.stopTest();
 
-        Assert.areEqual(
-            afterInstall,
-            [SELECT COUNT() FROM Automation_Setting__c],
-            'An upgrade creates no second switch.'
-        );
-        Assert.isFalse(
-            switchesByName().get('Gift_Acknowledgment').Enabled__c,
-            'A switch the admin turned off stays off across an upgrade.'
-        );
+            Assert.areEqual(
+                afterInstall,
+                [SELECT COUNT() FROM Automation_Setting__c],
+                'An upgrade creates no second switch.'
+            );
+            Assert.isFalse(
+                switchesByName().get('Gift_Acknowledgment').Enabled__c,
+                'A switch the admin turned off stays off across an upgrade.'
+            );
+        }
     }
 
     private static Map<String, Automation_Setting__c> switchesByName() {

@@ -4,7 +4,7 @@
     <defaultValue>"Both"</defaultValue>
     <description>The mode a newly created rollup starts in: Real-time, Scheduled, or Both. Custom settings cannot hold a picklist, so the allowed values are declared on the Rollup_Mode_Default setting definition and validated by the settings service.</description>
     <externalId>false</externalId>
-    <inlineHelpText>How a new rollup starts out: Real time, Scheduled, or Both.</inlineHelpText>
+    <inlineHelpText>How a new rollup starts out: Instantly, Every night, or Both (recommended).</inlineHelpText>
     <label>Default Rollup Mode</label>
     <length>20</length>
     <required>false</required>

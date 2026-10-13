@@ -35,6 +35,8 @@ public with sharing class AutomationControl {
     private static final Set<String> BYPASSED_NAMES = new Set<String>();
 
     private static Map<String, Boolean> enabledByName;
+    /** The automations of modules turned off in the Module Manager, lower case (C-24). */
+    private static Set<String> offByModule;
 
     @NamespaceAccessible
     public class AutomationControlException extends Exception {
@@ -54,6 +56,9 @@ public with sharing class AutomationControl {
         }
         if (enabledByName == null) {
             loadEnabledCache();
+        }
+        if (offByModule.contains(automationName.toLowerCase())) {
+            return false;
         }
         Boolean enabled = enabledByName.get(automationName.toLowerCase());
         return enabled == null ? true : enabled;
@@ -401,7 +406,33 @@ public with sharing class AutomationControl {
         return AutomationRegistrySelector.selectAll();
     }
 
+    /**
+     * A module turned off in the Module Manager stops every automation its registry rows name,
+     * except one that always runs (ADR-0024), whatever that automation's own switch says; the
+     * switch keeps its value for when the module is turned on again
+     * (0073-module-manager-turns-automation-off-and-never-installs.md). The registry is read
+     * only when some module is off.
+     */
+    private static void loadOffByModule() {
+        offByModule = new Set<String>();
+        Set<String> modulesOff = ModuleManagerService.turnedOff();
+        if (modulesOff.isEmpty()) {
+            return;
+        }
+        for (Automation_Registry__mdt entry : shippedRegistry()) {
+            if (
+                String.isNotBlank(entry.Module__c) &&
+                String.isNotBlank(entry.DeveloperName) &&
+                entry.Always_Runs__c != true &&
+                modulesOff.contains(entry.Module__c.trim().toLowerCase())
+            ) {
+                offByModule.add(entry.DeveloperName.toLowerCase());
+            }
+        }
+    }
+
     private static void loadEnabledCache() {
+        loadOffByModule();
         enabledByName = new Map<String, Boolean>();
         for (Automation_Setting__c setting : AutomationSettingSelector.selectAllForFramework()) {
             if (String.isNotBlank(setting.Automation_Name__c)) {

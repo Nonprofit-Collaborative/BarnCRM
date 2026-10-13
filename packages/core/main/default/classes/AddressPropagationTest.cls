@@ -17,58 +17,17 @@ private class AddressPropagationTest {
 
     @IsTest
     static void contactModeMembersGetTheHouseholdAddress() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        insert garcia;
-        List<Contact> members = new List<Contact>{
-            AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
-            AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id),
-            AddressTestDataFactory.newContact('Sofia', 'Garcia', garcia.Id)
-        };
-        insert members;
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            List<Contact> members = new List<Contact>{
+                AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
+                AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id),
+                AddressTestDataFactory.newContact('Sofia', 'Garcia', garcia.Id)
+            };
+            insert members;
 
-        Test.startTest();
-        insert new Address__c(
-            Account__c = garcia.Id,
-            Type__c = 'Home',
-            Street__c = WINTER_STREET,
-            City__c = WINTER_CITY,
-            Is_Default__c = true
-        );
-        Test.stopTest();
-
-        List<Contact> moved = [
-            SELECT MailingStreet, MailingCity
-            FROM Contact
-            WHERE AccountId = :garcia.Id
-        ];
-        Assert.areEqual(3, moved.size(), 'All three members should still be in the household.');
-        for (Contact member : moved) {
-            Assert.areEqual(
-                WINTER_STREET,
-                member.MailingStreet,
-                'Every member moves with the household.'
-            );
-            Assert.areEqual(
-                WINTER_CITY,
-                member.MailingCity,
-                'Every member moves with the household.'
-            );
-        }
-    }
-
-    @IsTest
-    static void junctionModeMembershipOverridesWhatContactModeWouldSay() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        Account otherHousehold = AddressTestDataFactory.newHousehold('The Nowak Family');
-        insert new List<Account>{ garcia, otherHousehold };
-        Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', otherHousehold.Id);
-        insert ana;
-
-        Test.startTest();
-        AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
-            garcia.Id => new Set<Id>{ ana.Id }
-        };
-        try {
+            Test.startTest();
             insert new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
@@ -76,17 +35,62 @@ private class AddressPropagationTest {
                 City__c = WINTER_CITY,
                 Is_Default__c = true
             );
-        } finally {
-            AddressService.membersByHouseholdOverride = null;
-        }
-        Test.stopTest();
+            Test.stopTest();
 
-        Contact moved = [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id];
-        Assert.areEqual(
-            WINTER_STREET,
-            moved.MailingStreet,
-            'A person who belongs to the household through the junction moves with it, even though the contact sits under another account.'
-        );
+            List<Contact> moved = [
+                SELECT MailingStreet, MailingCity
+                FROM Contact
+                WHERE AccountId = :garcia.Id
+            ];
+            Assert.areEqual(3, moved.size(), 'All three members should still be in the household.');
+            for (Contact member : moved) {
+                Assert.areEqual(
+                    WINTER_STREET,
+                    member.MailingStreet,
+                    'Every member moves with the household.'
+                );
+                Assert.areEqual(
+                    WINTER_CITY,
+                    member.MailingCity,
+                    'Every member moves with the household.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void junctionModeMembershipOverridesWhatContactModeWouldSay() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            Account otherHousehold = AddressTestDataFactory.newHousehold('The Nowak Family');
+            insert new List<Account>{ garcia, otherHousehold };
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', otherHousehold.Id);
+            insert ana;
+
+            Test.startTest();
+            AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
+                garcia.Id => new Set<Id>{ ana.Id }
+            };
+            try {
+                insert new Address__c(
+                    Account__c = garcia.Id,
+                    Type__c = 'Home',
+                    Street__c = WINTER_STREET,
+                    City__c = WINTER_CITY,
+                    Is_Default__c = true
+                );
+            } finally {
+                AddressService.membersByHouseholdOverride = null;
+            }
+            Test.stopTest();
+
+            Contact moved = [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id];
+            Assert.areEqual(
+                WINTER_STREET,
+                moved.MailingStreet,
+                'A person who belongs to the household through the junction moves with it, even though the contact sits under another account.'
+            );
+        }
     }
 
     /**
@@ -108,198 +112,208 @@ private class AddressPropagationTest {
      */
     @IsTest
     static void aMemberAccountIsNeverWrittenThroughItsBillingFields() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        Account personLikeAccount = AddressTestDataFactory.newHousehold('Ana Garcia');
-        personLikeAccount.BillingStreet = MEMBER_OWN_STREET;
-        personLikeAccount.BillingCity = MEMBER_OWN_CITY;
-        insert new List<Account>{ garcia, personLikeAccount };
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            Account personLikeAccount = AddressTestDataFactory.newHousehold('Ana Garcia');
+            personLikeAccount.BillingStreet = MEMBER_OWN_STREET;
+            personLikeAccount.BillingCity = MEMBER_OWN_CITY;
+            insert new List<Account>{ garcia, personLikeAccount };
 
-        Test.startTest();
-        AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
-            garcia.Id => new Set<Id>{ personLikeAccount.Id }
-        };
-        try {
-            insert new Address__c(
+            Test.startTest();
+            AddressService.membersByHouseholdOverride = new Map<Id, Set<Id>>{
+                garcia.Id => new Set<Id>{ personLikeAccount.Id }
+            };
+            try {
+                insert new Address__c(
+                    Account__c = garcia.Id,
+                    Type__c = 'Home',
+                    Street__c = WINTER_STREET,
+                    City__c = WINTER_CITY,
+                    Is_Default__c = true
+                );
+            } finally {
+                AddressService.membersByHouseholdOverride = null;
+            }
+            Test.stopTest();
+
+            Account member = [
+                SELECT BillingStreet, BillingCity
+                FROM Account
+                WHERE Id = :personLikeAccount.Id
+            ];
+            Assert.areEqual(
+                MEMBER_OWN_STREET,
+                member.BillingStreet,
+                'The household address is never copied into a member account billing fields.'
+            );
+            Assert.areEqual(
+                MEMBER_OWN_CITY,
+                member.BillingCity,
+                'Which is true of every billing field, not just the street.'
+            );
+            Account household = [SELECT BillingStreet FROM Account WHERE Id = :garcia.Id];
+            Assert.areEqual(
+                WINTER_STREET,
+                household.BillingStreet,
+                'The household that owns the address still gets its billing fields.'
+            );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
+                'And the address was saved rather than refused on account of the member.'
+            );
+        }
+    }
+
+    @IsTest
+    static void addressHandlerIgnoresASaveThatChangedNothingAboutTheAddress() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Address__c home = new Address__c(
                 Account__c = garcia.Id,
                 Type__c = 'Home',
                 Street__c = WINTER_STREET,
                 City__c = WINTER_CITY,
                 Is_Default__c = true
             );
-        } finally {
-            AddressService.membersByHouseholdOverride = null;
+            insert home;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            insert ana;
+            update new Contact(Id = ana.Id, MailingStreet = null, MailingCity = null);
+
+            Test.startTest();
+            Address__c unchanged = [
+                SELECT
+                    Id,
+                    Account__c,
+                    Contact__c,
+                    Person_Account__c,
+                    Type__c,
+                    Street__c,
+                    City__c,
+                    State__c,
+                    Postal_Code__c,
+                    Country__c,
+                    Is_Default__c
+                FROM Address__c
+                WHERE Id = :home.Id
+            ];
+            driveAfterUpdate(
+                new AddressTriggerHandler(),
+                new List<SObject>{ unchanged },
+                new Map<Id, SObject>{ unchanged.Id => unchanged }
+            );
+            Test.stopTest();
+
+            Contact stillCleared = [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id];
+            Assert.areEqual(
+                null,
+                stillCleared.MailingStreet,
+                'Saving an address without changing it should not rewrite anybody.'
+            );
         }
-        Test.stopTest();
-
-        Account member = [
-            SELECT BillingStreet, BillingCity
-            FROM Account
-            WHERE Id = :personLikeAccount.Id
-        ];
-        Assert.areEqual(
-            MEMBER_OWN_STREET,
-            member.BillingStreet,
-            'The household address is never copied into a member account billing fields.'
-        );
-        Assert.areEqual(
-            MEMBER_OWN_CITY,
-            member.BillingCity,
-            'Which is true of every billing field, not just the street.'
-        );
-        Account household = [SELECT BillingStreet FROM Account WHERE Id = :garcia.Id];
-        Assert.areEqual(
-            WINTER_STREET,
-            household.BillingStreet,
-            'The household that owns the address still gets its billing fields.'
-        );
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
-            'And the address was saved rather than refused on account of the member.'
-        );
-    }
-
-    @IsTest
-    static void addressHandlerIgnoresASaveThatChangedNothingAboutTheAddress() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        insert garcia;
-        Address__c home = new Address__c(
-            Account__c = garcia.Id,
-            Type__c = 'Home',
-            Street__c = WINTER_STREET,
-            City__c = WINTER_CITY,
-            Is_Default__c = true
-        );
-        insert home;
-        Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
-        insert ana;
-        update new Contact(Id = ana.Id, MailingStreet = null, MailingCity = null);
-
-        Test.startTest();
-        Address__c unchanged = [
-            SELECT
-                Id,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c,
-                Is_Default__c
-            FROM Address__c
-            WHERE Id = :home.Id
-        ];
-        driveAfterUpdate(
-            new AddressTriggerHandler(),
-            new List<SObject>{ unchanged },
-            new Map<Id, SObject>{ unchanged.Id => unchanged }
-        );
-        Test.stopTest();
-
-        Contact stillCleared = [SELECT MailingStreet FROM Contact WHERE Id = :ana.Id];
-        Assert.areEqual(
-            null,
-            stillCleared.MailingStreet,
-            'Saving an address without changing it should not rewrite anybody.'
-        );
     }
 
     @IsTest
     static void handlerContextsThatDoNothingAreSafeToCall() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        insert garcia;
-        Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
-        insert ana;
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            Contact ana = AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id);
+            insert ana;
 
-        Test.startTest();
-        for (
-            TriggerHandler handler : new List<TriggerHandler>{
-                new AddressTriggerHandler(),
-                new ContactAddressHandler(),
-                new AccountAddressHandler()
+            Test.startTest();
+            for (
+                TriggerHandler handler : new List<TriggerHandler>{
+                    new AddressTriggerHandler(),
+                    new ContactAddressHandler(),
+                    new AccountAddressHandler()
+                }
+            ) {
+                TriggerHandler.testNew = new List<SObject>();
+                TriggerHandler.testNewMap = new Map<Id, SObject>();
+                TriggerHandler.testOld = new List<SObject>();
+                TriggerHandler.testOldMap = new Map<Id, SObject>();
+                handler.beforeInsert();
+                handler.beforeUpdate();
+                handler.beforeDelete();
+                handler.afterInsert();
+                handler.afterUpdate();
+                handler.afterDelete();
+                handler.afterUndelete();
             }
-        ) {
-            TriggerHandler.testNew = new List<SObject>();
-            TriggerHandler.testNewMap = new Map<Id, SObject>();
-            TriggerHandler.testOld = new List<SObject>();
-            TriggerHandler.testOldMap = new Map<Id, SObject>();
-            handler.beforeInsert();
-            handler.beforeUpdate();
-            handler.beforeDelete();
-            handler.afterInsert();
-            handler.afterUpdate();
-            handler.afterDelete();
-            handler.afterUndelete();
-        }
-        clearHandlerContext();
-        Test.stopTest();
+            clearHandlerContext();
+            Test.stopTest();
 
-        Assert.areEqual(
-            0,
-            [SELECT COUNT() FROM Address__c],
-            'A handler called with nothing to do writes nothing.'
-        );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Address__c],
+                'A handler called with nothing to do writes nothing.'
+            );
+        }
     }
 
     @IsTest
     static void handlersCalledDirectlyDoTheirWork() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        garcia.BillingStreet = WINTER_STREET;
-        garcia.BillingCity = WINTER_CITY;
-        insert garcia;
-        Account reloaded = [
-            SELECT
-                Id,
-                RecordTypeId,
-                BillingStreet,
-                BillingCity,
-                BillingState,
-                BillingPostalCode,
-                BillingCountry
-            FROM Account
-            WHERE Id = :garcia.Id
-        ];
-        delete [SELECT Id FROM Address__c];
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            garcia.BillingStreet = WINTER_STREET;
+            garcia.BillingCity = WINTER_CITY;
+            insert garcia;
+            Account reloaded = [
+                SELECT
+                    Id,
+                    RecordTypeId,
+                    BillingStreet,
+                    BillingCity,
+                    BillingState,
+                    BillingPostalCode,
+                    BillingCountry
+                FROM Account
+                WHERE Id = :garcia.Id
+            ];
+            delete [SELECT Id FROM Address__c];
 
-        Test.startTest();
-        driveAfterInsert(new AccountAddressHandler(), new List<SObject>{ reloaded });
-        Test.stopTest();
+            Test.startTest();
+            driveAfterInsert(new AccountAddressHandler(), new List<SObject>{ reloaded });
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
-            'The account handler should keep the address the household was created with.'
-        );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
+                'The account handler should keep the address the household was created with.'
+            );
+        }
     }
 
     @IsTest
     static void contactHandlerCapturesOnlyThePeopleWhoActuallyMoved() {
-        Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-        insert garcia;
-        List<Contact> members = new List<Contact>{
-            AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
-            AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
-        };
-        insert members;
-        Contact ana = new Contact(Id = members[0].Id, MailingStreet = WINTER_STREET);
-        Contact luis = new Contact(Id = members[1].Id);
-        Map<Id, SObject> oldMap = new Map<Id, SObject>{
-            members[0].Id => new Contact(Id = members[0].Id),
-            members[1].Id => new Contact(Id = members[1].Id)
-        };
+        System.runAs(TestUsers.admin()) {
+            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+            insert garcia;
+            List<Contact> members = new List<Contact>{
+                AddressTestDataFactory.newContact('Ana', 'Garcia', garcia.Id),
+                AddressTestDataFactory.newContact('Luis', 'Garcia', garcia.Id)
+            };
+            insert members;
+            Contact ana = new Contact(Id = members[0].Id, MailingStreet = WINTER_STREET);
+            Contact luis = new Contact(Id = members[1].Id);
+            Map<Id, SObject> oldMap = new Map<Id, SObject>{
+                members[0].Id => new Contact(Id = members[0].Id),
+                members[1].Id => new Contact(Id = members[1].Id)
+            };
 
-        Test.startTest();
-        driveAfterUpdate(new ContactAddressHandler(), new List<SObject>{ ana, luis }, oldMap);
-        Test.stopTest();
+            Test.startTest();
+            driveAfterUpdate(new ContactAddressHandler(), new List<SObject>{ ana, luis }, oldMap);
+            Test.stopTest();
 
-        Assert.areEqual(
-            1,
-            [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
-            'One household address, created once, from the one person who moved.'
-        );
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Address__c WHERE Account__c = :garcia.Id],
+                'One household address, created once, from the one person who moved.'
+            );
+        }
     }
 
     /**

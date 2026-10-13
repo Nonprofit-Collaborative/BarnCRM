@@ -21,11 +21,32 @@ public with sharing class ModuleDetectionService {
     /** Each module's own README, which says what the module is without assuming a suite. */
     private static final String DOCS_BASE = 'https://github.com/Nonprofit-Collaborative/BarnCRM/blob/main/packages/';
 
+    /** The two suites the Setup Assistant's first step offers, as `Suite__c` stores them (C-30). */
+    public static final String SUITE_COMMUNITY = 'Community';
+    public static final String SUITE_IMPACT = 'Impact';
+
+    /** Salesforce's installer for one package version, relative to the org's own domain. */
+    private static final String INSTALL_PATH = '/packaging/installPackage.apexp?p0=';
+
+    /**
+     * Each module's published package version Id (`04t`), blank until that module is first
+     * published. The release that publishes a module fills its Id in here: Core never installs
+     * anything, it only links to Salesforce's installer
+     * (0072-suite-choice-is-the-first-setup-step.md).
+     */
+    @TestVisible
+    private static Map<String, String> installVersionIds = new Map<String, String>{
+        MODULE_GIVING => '',
+        'Volunteers' => '',
+        'Programs' => '',
+        'Funders' => '',
+        'Connect' => ''
+    };
+
     /**
      * The modules every organization is offered (ADR-0046: the Community Suite is Core with
-     * the modules that fit). The others are offered only once Giving is installed, since
-     * until the suite choice exists (C-30) Giving being here is what says the org is a
-     * nonprofit (ADR-0062).
+     * the modules that fit). The others are offered once the Nonprofit Edition is chosen
+     * (C-30) or Giving is installed (ADR-0062).
      */
     private static final Set<String> OFFERED_TO_EVERY_ORG = new Set<String>{
         MODULE_CORE,
@@ -44,6 +65,9 @@ public with sharing class ModuleDetectionService {
         public Boolean present;
         @AuraEnabled
         public String docsUrl;
+        /** Salesforce's installer for this module, or null when it is here or not published. */
+        @AuraEnabled
+        public String installUrl;
     }
 
     /**
@@ -68,15 +92,36 @@ public with sharing class ModuleDetectionService {
         return objectExists(IMPORT_BATCH_OBJECT);
     }
 
+    /** The suite the administrator chose, `Community` or `Impact`, or null before anyone chose. */
+    public static String chosenSuite() {
+        String suite = SettingsService.getSettings().Suite__c;
+        return String.isBlank(suite) ? null : suite.trim();
+    }
+
+    /** The Giving module alone, for the suite step: whether it is here, and where to read and install it. */
+    public static ModuleInfo givingModule() {
+        return module(MODULE_GIVING, isGivingPresent(), 'giving');
+    }
+
+    /** Salesforce's installer for the given module, or null when no version is published. */
+    private static String installUrl(String moduleName) {
+        String versionId = installVersionIds.get(moduleName);
+        if (String.isBlank(versionId) || !versionId.startsWith('04t')) {
+            return null;
+        }
+        return INSTALL_PATH + versionId;
+    }
+
     /**
      * The BarnCRM packages this org is offered, each saying whether it is here. Every org sees
-     * Core and Volunteers; the rest are listed once Giving is installed, and any module that
-     * is already installed is always listed.
+     * Core and Volunteers; the rest are listed once the Nonprofit Edition is chosen or Giving
+     * is installed, and any module that is already installed is always listed.
      */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
         Boolean givingPresent =
             isGivingPresent() || announced.contains(MODULE_GIVING.toLowerCase());
+        Boolean offerAll = givingPresent || chosenSuite() == SUITE_IMPACT;
         List<ModuleInfo> all = new List<ModuleInfo>{
             module(MODULE_CORE, true, 'core'),
             module(MODULE_GIVING, givingPresent, 'giving'),
@@ -87,7 +132,7 @@ public with sharing class ModuleDetectionService {
         };
         List<ModuleInfo> offered = new List<ModuleInfo>();
         for (ModuleInfo info : all) {
-            if (givingPresent || info.present || OFFERED_TO_EVERY_ORG.contains(info.name)) {
+            if (offerAll || info.present || OFFERED_TO_EVERY_ORG.contains(info.name)) {
                 offered.add(info);
             }
         }
@@ -114,6 +159,7 @@ public with sharing class ModuleDetectionService {
         info.name = name;
         info.present = present;
         info.docsUrl = DOCS_BASE + folder + '/README.md';
+        info.installUrl = present ? null : installUrl(name);
         return info;
     }
 
@@ -126,7 +172,7 @@ public with sharing class ModuleDetectionService {
      * the same probe works before and after a namespace is assigned (Decision D-01), or null
      * when no object matches.
      */
-    private static String resolveObject(String unqualifiedName) {
+    public static String resolveObject(String unqualifiedName) {
         String wanted = unqualifiedName.toLowerCase();
         Map<String, Schema.SObjectType> describes = Schema.getGlobalDescribe();
         if (describes.containsKey(wanted)) {

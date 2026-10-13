@@ -19,11 +19,11 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0008](0008-license-apache-2-0.md) | License: Apache-2.0 | Accepted |
 | [0009](0009-no-industries-or-paid-add-on-dependency.md) | No Person Account, Industries, OmniStudio, Data Cloud, or Experience Cloud dependency | Accepted |
 | [0010](0010-receipt-immutability.md) | Receipts are immutable; corrections void and reissue; refunds are negative linked gifts | Accepted |
-| [0011](0011-evaluate-vendoring-a-rollup-library.md) | Evaluate vendoring a proven Apex rollup library before building one | Accepted |
+| [0011](0011-evaluate-vendoring-a-rollup-library.md) | Evaluate vendoring a proven Apex rollup library before building one | Accepted; amended for rollups by `0082-barncrm-owns-its-rollup-engine.md` |
 | [0012](0012-trunk-based-development.md) | Trunk-based development with squash merges and an always-releasable main | Accepted |
 | [0013](0013-platform-only-org-shape-verification.md) | How the Platform-only org shape is provisioned and verified | Accepted |
 | [0014](0014-cross-package-references-as-record-identifiers.md) | Core holds Giving record identifiers, not lookups | Accepted |
-| [0015](0015-vendor-apex-rollup-behind-adapter.md) | Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter | Accepted |
+| [0015](0015-vendor-apex-rollup-behind-adapter.md) | Vendor apex-rollup as the aggregation core, behind a BarnCRM adapter | Superseded by `0082-barncrm-owns-its-rollup-engine.md` |
 | [0016](0016-receipt-pdf-rendering.md) | Receipt PDFs are rendered by the Visualforce PDF rendering service, called from Apex | Proposed |
 | [0017](0017-cross-package-mechanisms.md) | Cross-package mechanisms under one namespace: NamespaceAccessible, per-package settings objects, registry-driven trigger dispatch | Accepted |
 | [0018](0018-module-tabs-and-apps.md) | Each module ships its own Lightning app; the Hub links to the module apps | Accepted |
@@ -72,6 +72,35 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0061](0061-module-settings-first-save-takes-checkbox-defaults-from-metadata.md) | A module's first settings save takes its checkbox defaults from field metadata | Accepted (builder decision) |
 | [0062](0062-core-names-other-products-only-when-detected.md) | Core shows nonprofit wording and other products' names only where they apply (amends ADR-0059 decision 5) | Accepted (owner decision) |
 | [0063](0063-barncrm-api-names.md) | The `Nonprofit_*` API names become BarnCRM names before the first package version (supersedes ADR-0059 decision 6) | Accepted (owner decision) |
+| [0064](0064-giving-ships-the-donor-record-pages.md) | Giving ships the donor record pages, with Dynamic Related Lists for giving (amends ADR-0043 for the giving lists) | Accepted (owner-approved UX review) |
+| [0065](0065-receipt-letters-are-edited-as-rich-text.md) | Receipt letters are edited as rich text, and the package prints the letterhead | Accepted (owner-approved UX review) |
+| [0066](0066-acknowledgment-rule-template-picker-and-generated-plan-keys.md) | Acknowledgment rules pick their template by name, and plan keys are generated | Accepted (owner-approved UX review) |
+| [0067](0067-import-matches-a-person-only-by-their-first-name.md) | An import matches a person with a first name only by that first name | Accepted |
+| [0068](0068-import-matching-per-entity-and-per-file-values.md) | Import matching per entity, a rule for several matches, and values for every row of a file | Accepted |
+| [0069](0069-import-record-id-matching-and-match-only.md) | Import matching by Salesforce record ID, files that only match, and custom fields | Accepted (owner decision) |
+| [0070](0070-empty-household-tidy-up-keeps-households-with-gifts.md) | The empty household tidy-up keeps a household that still has gifts (extends ADR-0036) | Accepted (owner decision) |
+| [0071](0071-a-gift-keeps-the-household-it-was-given-to.md) | A gift keeps the household it was given to when the donor moves (amends R-G2) | Accepted (owner decision) |
+| [0072](0072-suite-choice-is-the-first-setup-step.md) | The suite choice is a Core setting the Setup Assistant asks first | Accepted (builder decision) |
+| [0073](0073-module-manager-turns-automation-off-and-never-installs.md) | The Module Manager switches a module's automation, links to installs, and counts before an uninstall | Accepted (builder decision) |
+| [0074](0074-settings-console-picks-records-and-record-types.md) | The settings console picks records and record types instead of taking identifiers | Accepted (builder decision) |
+| [0075](0075-health-check-schedules-every-nightly-job.md) | Health Check schedules every nightly job with one fix, and modules register theirs (amends ADR-0048) | Accepted (builder decision) |
+| [0076](0076-saved-queries-are-private-and-shared-by-apex-managed-sharing.md) | Saved queries are private and shared by Apex managed sharing | Accepted (builder decision) |
+| [0077](0077-bulk-update-runs-as-the-user-from-a-find-query.md) | Bulk update runs as the user, from a Find query, and is undone by the import undo | Accepted (builder decision) |
+| [0078](0078-typed-find-queries-are-parsed-into-the-query-document.md) | Typed Find queries are parsed into the query document in the browser | Accepted (owner, as recommended) |
+| [0079](0079-data-hygiene-checks-are-find-queries-built-at-request-time.md) | Data hygiene checks are Find queries built at request time | Accepted (builder decision) |
+| [0080](0080-import-load-one-object.md) | Import loads one object: insert, update by record ID or upsert, with an allow-list and journaled creations | Accepted (builder decision) |
+| [0081](0081-data-transform-document.md) | Column changes as a declarative transform document, and import matching through the org's duplicate rules | Accepted (builder decision) |
+| [0083](0083-rollup-totals-in-the-target-record-currency.md) | Rollup totals are in the target record's currency | Accepted (owner decision) |
+| [0082](0082-barncrm-owns-its-rollup-engine.md) | BarnCRM owns its rollup engine (supersedes ADR-0015, amends ADR-0011) | Accepted (owner decision) |
+| [0084](0084-gift-entry-pays-a-scheduled-payment.md) | Gift entry screens suggest the scheduled payment a gift pays, and a person decides | Accepted (owner decision) |
+| [0085](0085-custom-metadata-manager-edits-only-types-read-directly.md) | The custom metadata manager edits only types BarnCRM reads directly, and never a shipped row | Accepted (owner, as recommended) |
+| [0086](0086-field-utilization-ships-in-core.md) | Field utilization ships in Core, counts in user mode, and keeps weekly snapshots | Accepted (builder decision, as recommended) |
+| [0087](0087-whats-new-from-packaged-release-notes.md) | What's new is read from packaged release notes and remembered per person | Accepted (builder decision) |
+| [0088](0088-unlocked-to-managed-migration-kit.md) | Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API | Proposed (builder decision) |
+| [0089](0089-interaction-notes-are-completed-tasks.md) | Interaction notes are completed tasks logged through one packaged action | Accepted (builder decision) |
+| [0090](0090-flow-templates-which-automations-get-one.md) | Flow templates: which automations get one, how they are named, and what they leave out (applies ADR-0040) | Accepted (builder decision) |
+| [0091](0091-bulk-delete-from-a-find-query-with-undelete.md) | Bulk delete runs from a Find query, as the user, and is undone by undelete | Proposed (builder decision) |
+| [0092](0092-merge-survivors-recalculated-after-the-merge.md) | Merge survivors' real-time totals are recalculated just after the merge | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

@@ -112,4 +112,20 @@
         <shortDescription>Hub home: link to the Import tab</shortDescription>
         <value>Go to Import</value>
     </labels>
+    <labels>
+        <fullName>Core_HubHome_WelcomeMessageReady</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: welcome sentence once setup is done, or for staff who do not run setup</shortDescription>
+        <value>Your households, people and organizations are in the tabs above.</value>
+    </labels>
+    <labels>
+        <fullName>Core_HubHome_WarningAltText</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Hub home: what a screen reader says for the warning icon on a tile</shortDescription>
+        <value>Warning</value>
+    </labels>
 </CustomLabels>

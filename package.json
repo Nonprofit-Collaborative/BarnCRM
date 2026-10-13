@@ -15,6 +15,7 @@
     "check:person-account-fields": "python3 scripts/ci/check-person-account-fields.py",
     "check:object-allowlist": "python3 scripts/ci/check-object-allowlist.py",
     "check:custom-metadata": "python3 scripts/ci/check-custom-metadata.py",
+    "check:metadata-lengths": "python3 scripts/ci/check-metadata-lengths.py",
     "check:symlinks": "bash scripts/ci/check-symlinks.sh",
     "check:permission-sets": "python3 scripts/ci/check-permission-sets.py",
     "check:help-links": "python3 scripts/ci/check-help-links.py",
@@ -22,8 +23,11 @@
     "check:components-reachable": "python3 scripts/ci/check-components-reachable.py",
     "check:record-pages-assigned": "python3 scripts/ci/check-record-pages-assigned.py",
     "check:canonical-model": "python3 scripts/ci/check-canonical-model.py",
+    "check:openapi": "node scripts/ci/check-openapi.js",
     "check:setting-defaults": "python3 scripts/ci/check-setting-defaults.py",
     "check:setting-object-explicit": "python3 scripts/ci/check-setting-object-explicit.py",
+    "check:flow-templates": "python3 scripts/ci/check-flow-templates.py",
+    "check:tests-run-as": "python3 scripts/ci/check-tests-run-as.py",
     "precommit": "lint-staged",
     "check:apex": "bash scripts/ci/check-apex-offline.sh",
     "check:analyzer": "sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2"
@@ -40,6 +44,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "prettier": "3.9.9",
-    "prettier-plugin-apex": "2.3.0"
+    "prettier-plugin-apex": "2.3.0",
+    "yaml": "2.9.1"
   }
 }

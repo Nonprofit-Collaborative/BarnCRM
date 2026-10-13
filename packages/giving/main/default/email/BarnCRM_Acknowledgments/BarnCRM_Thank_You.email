@@ -1,4 +1,4 @@
-Dear {!Contact.FirstName},
+Dear {!Contact.FirstName, friend},
 
 Thank you for your gift of {!Gift__c.Amount__c}, received on {!Gift__c.Gift_Date__c}.
 

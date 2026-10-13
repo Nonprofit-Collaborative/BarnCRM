@@ -59,55 +59,49 @@ public with sharing class ImportRowProcessor {
     private static ChunkPeople keysBeingCreated = new ChunkPeople();
 
     /**
-     * The new people of one chunk: how many are created under each key, and which people
-     * (by first-name key) hold each shared key, counting a couple not yet created as two, so
-     * a row naming one partner alone is never given the other (R-IB12).
+     * The new people of one chunk: how many are created under each key, and the couples'
+     * second people still to be created, so a row naming one of them alone waits for them
+     * rather than creating them twice (R-IB12).
      */
     private class ChunkPeople {
         Map<String, Integer> created = new Map<String, Integer>();
-        Map<String, Set<String>> people = new Map<String, Set<String>>();
         /** The first-name keys of couples' second people the chunk has yet to create. */
         Set<String> waitingSeconds = new Set<String>();
-
-        void hold(String shared, String person) {
-            if (!people.containsKey(shared)) {
-                people.put(shared, new Set<String>());
-            }
-            people.get(shared).add(person);
-        }
-
-        Integer holding(String shared) {
-            return people.containsKey(shared) ? people.get(shared).size() : 0;
-        }
     }
 
-    /** Counts the couples of the chunk, found by nobody yet, before anybody is created. */
+    /** Notes the couples' second people of the chunk, found by nobody yet, before any save. */
     private static ChunkPeople chunkPeople(List<Working> working) {
         ChunkPeople chunk = new ChunkPeople();
         for (Working item : working) {
-            for (Integer which = 1; which <= 2; which++) {
-                String key = which == 1 ? item.personKey1 : item.personKey2;
-                Id found = which == 1 ? item.person1Id : item.person2Id;
-                Boolean coming = which == 1 ? item.comingPerson1 : item.comingPerson2;
-                String shared = ImportMatcher.baseKey(key);
-                if (
-                    item.error == null &&
-                    key != null &&
-                    shared != key &&
-                    found == null &&
-                    !coming
-                ) {
-                    chunk.hold(shared, key);
-                    if (which == 2) {
-                        chunk.waitingSeconds.add(key);
-                    }
-                }
+            String key = item.personKey2;
+            if (
+                item.error == null &&
+                key != null &&
+                ImportMatcher.baseKey(key) != key &&
+                item.person2Id == null &&
+                !item.comingPerson2
+            ) {
+                chunk.waitingSeconds.add(key);
             }
         }
         return chunk;
     }
     private static Map<String, Id> createdByKey = new Map<String, Id>();
     private static Map<String, String> failedByKey = new Map<String, String>();
+
+    /**
+     * How this chunk matches, read from the template once by `readMatchingChoices`: the field
+     * people and organizations are matched on under External ID (R-IT8; null when the rule
+     * uses none or the chosen field no longer qualifies), whether organizations are matched by
+     * that field rather than by name (R-IT2), and whether a key several records hold takes the
+     * most recently changed of them rather than rejecting the row (R-IT9).
+     */
+    private static String personMatchField;
+    private static Boolean organizationsByField = false;
+    private static String organizationMatchField;
+    private static Boolean mostRecent = false;
+    /** Whether the org's duplicate rules are asked about whom the rule found nobody for (R-IT16). */
+    private static Boolean useDuplicateRules = false;
 
     /**
      * The attributes that can name or find a person. A full name column is not listed because
@@ -158,7 +152,22 @@ public with sharing class ImportRowProcessor {
         Import_Row__c row;
         Map<String, String> values;
         Map<String, Map<String, String>> byEntity;
+        /** The organization's name, and the key it is matched by under the template's rule. */
+        String organizationName;
         String organizationKey;
+        /** The row's organization among those this chunk creates: its key, or the row's own. */
+        String organizationGroup;
+        /** True when a key this row was looked for by found several records (R-IT9). */
+        Boolean severalMatches = false;
+        /** True when the org's duplicate rules matched a person or the organization (R-IT16). */
+        Boolean duplicateRuleMatch = false;
+        /** The record IDs the row gives, as typed, taken out of its values (R-IT10). */
+        String givenOrganizationId;
+        String givenPerson1Id;
+        String givenPerson2Id;
+        /** True when a person was matched by the record ID the row gives (R-IT10). */
+        Boolean givenPerson1 = false;
+        Boolean givenPerson2 = false;
         String personKey1;
         String personKey2;
         Id organizationId;
@@ -198,12 +207,18 @@ public with sharing class ImportRowProcessor {
         if (rows == null || rows.isEmpty()) {
             return outcome;
         }
+        if (ImportObjectSchema.loadsOneObject(template)) {
+            // A row of a one-object template is one record of that object (R-IT12).
+            return ImportObjectLoader.process(batch, template, mapping, rows, dryRun);
+        }
         Boolean personAccounts = ImportTemplateService.isPersonAccountMode(template);
         String rule = ImportTemplateService.normalizedRule(template.Matching_Rule__c);
+        readMatchingChoices(template, rule, outcome);
         noteFieldsWithoutAccess(mapping, personAccounts, outcome);
 
         List<Working> working = read(batch, rows, mapping, outcome);
-        resolveOrganizations(working, rule, batch, dryRun, outcome);
+        resolveGivenIds(working, personAccounts);
+        resolveOrganizations(working, batch, dryRun, outcome);
         resolvePeople(working, rule, batch, personAccounts, dryRun, outcome);
         tagAndNameHouseholds(working, batch, dryRun, outcome);
         offerToEntityProcessor(batch, template, mapping, working, dryRun, outcome);
@@ -223,6 +238,68 @@ public with sharing class ImportRowProcessor {
         return outcome;
     }
 
+    /**
+     * Reads how the template matches (R-IT2, R-IT8, R-IT9) into this chunk's settings. A chosen
+     * field is used only while describe still offers it for matching; one that is gone, or no
+     * field at all, matches nobody under its rule, and the run log says which.
+     */
+    private static void readMatchingChoices(
+        Import_Template__c template,
+        String rule,
+        Outcome outcome
+    ) {
+        mostRecent = ImportTemplateService.usesMostRecent(template);
+        useDuplicateRules = template.Use_Duplicate_Rules__c == true;
+        ImportMatcher.keepMostRecent(mostRecent);
+        personMatchField = null;
+        if (ImportTemplateService.RULE_EXTERNAL_ID.equals(rule)) {
+            personMatchField = ImportMatcher.matchField(
+                ImportTemplateService.personType(template),
+                template.Person_Match_Field__c
+            );
+            noteMissingField(personMatchField, template.Person_Match_Field__c, outcome);
+        }
+        organizationsByField = ImportTemplateService.ORGANIZATION_RULE_EXTERNAL_ID.equals(
+            ImportTemplateService.normalizedOrganizationRule(template.Organization_Matching_Rule__c)
+        );
+        organizationMatchField = null;
+        if (organizationsByField) {
+            organizationMatchField = ImportMatcher.matchField(
+                Account.SObjectType,
+                template.Organization_Match_Field__c
+            );
+            noteMissingField(organizationMatchField, template.Organization_Match_Field__c, outcome);
+        }
+    }
+
+    /** The run log line for an External ID rule that has no field to match on. */
+    private static void noteMissingField(String field, String chosen, Outcome outcome) {
+        if (field != null) {
+            return;
+        }
+        outcome.notes.add(
+            String.isBlank(chosen)
+                ? Label.Core_Import_LogNoExternalIdField
+                : String.format(
+                      Label.Core_Import_LogMatchFieldUnavailable,
+                      new List<String>{ chosen.trim() }
+                  )
+        );
+    }
+
+    /** A value from a row entity's attributes by field name, ignoring case. */
+    private static String valueOf(Map<String, String> held, String fieldName) {
+        if (held == null || fieldName == null) {
+            return null;
+        }
+        for (String attributeName : held.keySet()) {
+            if (attributeName.equalsIgnoreCase(fieldName)) {
+                return held.get(attributeName);
+            }
+        }
+        return null;
+    }
+
     // -------------------------------------------------------------------------------------
     // Reading
     // -------------------------------------------------------------------------------------
@@ -235,20 +312,78 @@ public with sharing class ImportRowProcessor {
         Outcome outcome
     ) {
         Map<String, String> targets = mapping.targetsBySourceKey();
+        Map<String, List<DataTransform.Step>> transforms = mapping.transformsBySourceKey();
         List<Working> working = new List<Working>();
         for (Import_Row__c row : rows) {
             startPass(row, ImportRowSelector.passOf(batch));
             Working item = new Working();
             item.row = row;
             item.values = rawValues(row);
-            item.byEntity = groupByEntity(item.values, targets, mapping.defaults);
+            item.byEntity = groupByEntity(item.values, targets, transforms, mapping.defaults);
             splitFullNames(item.byEntity);
-            item.organizationKey = ImportMatcher.nameKey(
-                attribute(item.byEntity, ImportMapping.ENTITY_ORGANIZATION, 'Name')
-            );
+            // A record ID matches and is never written to a field (R-IT10).
+            item.givenOrganizationId = takeId(item.byEntity, ImportMapping.ENTITY_ORGANIZATION);
+            item.givenPerson1Id = takeId(item.byEntity, ImportMapping.ENTITY_CONTACT_1);
+            item.givenPerson2Id = takeId(item.byEntity, ImportMapping.ENTITY_CONTACT_2);
+            String name = attribute(item.byEntity, ImportMapping.ENTITY_ORGANIZATION, 'Name');
+            item.organizationName = String.isBlank(name) ? null : name;
+            // A blank key is never looked up, so a row without one is never matched (R-IT8).
+            item.organizationKey = organizationsByField
+                ? ImportMatcher.nameKey(
+                      valueOf(
+                          item.byEntity.get(ImportMapping.ENTITY_ORGANIZATION),
+                          organizationMatchField
+                      )
+                  )
+                : ImportMatcher.nameKey(name);
+            item.organizationGroup = item.organizationKey == null
+                ? 'row:' + working.size()
+                : item.organizationKey;
             working.add(item);
         }
         return working;
+    }
+
+    /**
+     * A row's values by entity and attribute, after each column's changes (R-IT15), with the
+     * mapping's values for every row filled in where the row has none: what the one-object
+     * loader reads a row as (R-IT12).
+     */
+    @NamespaceAccessible
+    public static Map<String, Map<String, String>> valuesByEntity(
+        Import_Row__c row,
+        ImportMapping mapping
+    ) {
+        return groupByEntity(
+            rawValues(row),
+            mapping.targetsBySourceKey(),
+            mapping.transformsBySourceKey(),
+            mapping.defaults
+        );
+    }
+
+    /**
+     * Each changed cell of a row, before and after its column's changes (R-IT15), keyed by the
+     * column as the mapping names it, in the mapping's order. What the dry run shows.
+     */
+    @NamespaceAccessible
+    public static List<List<String>> changedValues(Import_Row__c row, ImportMapping mapping) {
+        List<List<String>> result = new List<List<String>>();
+        Map<String, String> values = rawValues(row);
+        Map<String, List<DataTransform.Step>> transforms = mapping.transformsBySourceKey();
+        for (ImportMapping.Column column : mapping.columns) {
+            String sourceKey = column == null ? null : ImportMapping.key(column.source);
+            if (sourceKey == null || !transforms.containsKey(sourceKey)) {
+                continue;
+            }
+            String before = values.get(sourceKey);
+            String after = DataTransform.apply(transforms.get(sourceKey), before, values);
+            // equals, not ==, which ignores capitals and would hide a change to them.
+            if (before == null ? after != null : !before.equals(after)) {
+                result.add(new List<String>{ column.source, before, after });
+            }
+        }
+        return result;
     }
 
     /** The row's uploaded values, keyed the way a mapping's source columns are keyed. */
@@ -275,15 +410,24 @@ public with sharing class ImportRowProcessor {
         return result;
     }
 
-    /** entity to attribute to value, with the template's defaults filled in where empty. */
+    /**
+     * entity to attribute to value, after each column's changes, with the template's defaults
+     * filled in where empty. The changes read the row's uploaded values, never each other's
+     * output, so the order of the columns does not matter (R-IT15).
+     */
     private static Map<String, Map<String, String>> groupByEntity(
         Map<String, String> values,
         Map<String, String> targets,
+        Map<String, List<DataTransform.Step>> transforms,
         List<ImportMapping.Assignment> defaults
     ) {
         Map<String, Map<String, String>> result = new Map<String, Map<String, String>>();
         for (String sourceKey : targets.keySet()) {
             String value = values.get(sourceKey);
+            List<DataTransform.Step> steps = transforms.get(sourceKey);
+            if (steps != null) {
+                value = DataTransform.apply(steps, value, values);
+            }
             if (String.isBlank(value)) {
                 continue;
             }
@@ -365,24 +509,186 @@ public with sharing class ImportRowProcessor {
         }
     }
 
+    /** Removes an entity's record ID from its values and returns it, or null when blank. */
+    private static String takeId(Map<String, Map<String, String>> byEntity, String entity) {
+        Map<String, String> held = byEntity.get(entity);
+        if (held == null) {
+            return null;
+        }
+        String given;
+        for (String attributeName : new List<String>(held.keySet())) {
+            if ('Id'.equalsIgnoreCase(attributeName)) {
+                String value = held.remove(attributeName);
+                given = String.isBlank(value) ? given : value.trim();
+            }
+        }
+        return given;
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Record IDs
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Matches each row's people and organization by the record IDs it gives (R-IT10), before
+     * any rule is asked. An ID must be a record ID of the object the entity is stored on, of a
+     * record the user can see, with the right record type for an account; any other ID
+     * rejects the row with the reason, and nothing is created for it. One query per object
+     * for the whole chunk.
+     */
+    private static void resolveGivenIds(List<Working> working, Boolean personAccounts) {
+        Schema.SObjectType personType = personAccounts ? Account.SObjectType : Contact.SObjectType;
+        Set<Id> personIds = new Set<Id>();
+        Set<Id> organizationIds = new Set<Id>();
+        for (Working item : working) {
+            for (Integer which = 0; which <= 2; which++) {
+                String given = which == 0
+                    ? item.givenOrganizationId
+                    : which == 1 ? item.givenPerson1Id : item.givenPerson2Id;
+                if (given == null || item.error != null) {
+                    continue;
+                }
+                Id parsed = parsedId(given);
+                Schema.SObjectType expected = which == 0 ? Account.SObjectType : personType;
+                if (parsed == null) {
+                    item.error = String.format(
+                        Label.Core_Import_ErrorRecordIdInvalid,
+                        new List<String>{ given }
+                    );
+                } else if (parsed.getSObjectType() != expected) {
+                    item.error = wrongKind(which, given);
+                } else {
+                    (which == 0 ? organizationIds : personIds).add(parsed);
+                }
+            }
+        }
+        if (personIds.isEmpty() && organizationIds.isEmpty()) {
+            return;
+        }
+        Map<Id, Id> recordTypeById = visibleRecords(personIds, organizationIds, personAccounts);
+        Id organizationType = recordTypeId(ORGANIZATION_RECORD_TYPE);
+        for (Working item : working) {
+            for (Integer which = 0; which <= 2; which++) {
+                String given = which == 0
+                    ? item.givenOrganizationId
+                    : which == 1 ? item.givenPerson1Id : item.givenPerson2Id;
+                if (given == null || item.error != null) {
+                    continue;
+                }
+                Id parsed = parsedId(given);
+                if (!recordTypeById.containsKey(parsed)) {
+                    item.error = String.format(
+                        Label.Core_Import_ErrorRecordIdNotFound,
+                        new List<String>{ given }
+                    );
+                    continue;
+                }
+                Id recordType = recordTypeById.get(parsed);
+                Boolean rightKind = which == 0
+                    ? recordType != null && recordType == organizationType
+                    : !personAccounts || personRecordTypeIds().contains(recordType);
+                if (!rightKind) {
+                    item.error = wrongKind(which, given);
+                } else if (which == 0) {
+                    item.organizationId = parsed;
+                    item.organizationKey = null;
+                } else if (which == 1) {
+                    item.person1Id = parsed;
+                    item.givenPerson1 = true;
+                } else {
+                    item.person2Id = parsed;
+                    item.givenPerson2 = true;
+                }
+            }
+        }
+    }
+
+    /** A record ID as typed, or null when it is not one. */
+    private static Id parsedId(String given) {
+        try {
+            return Id.valueOf(given);
+        } catch (Exception notAnId) {
+            return null;
+        }
+    }
+
+    /** The rejection for an ID of the wrong kind of record: 0 the organization, else a person. */
+    private static String wrongKind(Integer which, String given) {
+        return String.format(
+            which == 0
+                ? Label.Core_Import_ErrorRecordIdNotOrganization
+                : Label.Core_Import_ErrorRecordIdNotPerson,
+            new List<String>{ given }
+        );
+    }
+
+    /**
+     * The given records the user can see, each with its account record type (null for a
+     * contact). Read in user mode, so a record the user may not see reads as not found.
+     */
+    private static Map<Id, Id> visibleRecords(
+        Set<Id> personIds,
+        Set<Id> organizationIds,
+        Boolean personAccounts
+    ) {
+        Map<Id, Id> result = new Map<Id, Id>();
+        Set<Id> accountIds = new Set<Id>(organizationIds);
+        if (personAccounts) {
+            accountIds.addAll(personIds);
+        } else if (!personIds.isEmpty()) {
+            for (Contact person : [
+                SELECT Id
+                FROM Contact
+                WHERE Id IN :personIds
+                WITH USER_MODE
+                LIMIT 2000
+            ]) {
+                result.put(person.Id, null);
+            }
+        }
+        if (!accountIds.isEmpty()) {
+            for (Account record : [
+                SELECT Id, RecordTypeId
+                FROM Account
+                WHERE Id IN :accountIds
+                WITH USER_MODE
+                LIMIT 2000
+            ]) {
+                result.put(record.Id, record.RecordTypeId);
+            }
+        }
+        return result;
+    }
+
     // -------------------------------------------------------------------------------------
     // Organizations
     // -------------------------------------------------------------------------------------
 
+    /**
+     * Finds or creates each row's organization by the template's organization rule: its name,
+     * or the chosen matching field, among organization accounts only (R-IT2, R-IT8). A key
+     * several organizations hold is a several-matches case (R-IT9). A row whose organization
+     * has no key under the rule is not matched, and creates its own organization, which needs
+     * a name; rows naming one new organization by the same key share the first one's (R-IB4).
+     */
     private static void resolveOrganizations(
         List<Working> working,
-        String rule,
         Import_Batch__c batch,
         Boolean dryRun,
         Outcome outcome
     ) {
-        Set<String> names = new Set<String>();
+        Set<String> keys = new Set<String>();
+        Boolean namesOne = false;
         for (Working item : working) {
-            if (item.organizationKey != null) {
-                names.add(item.organizationKey);
+            if (!looksForOrganization(item)) {
+                continue;
             }
+            if (item.organizationKey != null) {
+                keys.add(item.organizationKey);
+            }
+            namesOne = true;
         }
-        if (names.isEmpty()) {
+        if (!namesOne) {
             return;
         }
         Id recordTypeId = recordTypeId(ORGANIZATION_RECORD_TYPE);
@@ -390,28 +696,62 @@ public with sharing class ImportRowProcessor {
             outcome.notes.add(Label.Core_Import_LogOrganizationRecordTypeMissing);
             return;
         }
-        Map<String, Id> existing = ImportMatcher.accountsByName(names, recordTypeId);
+        ImportMatcher.forgetHeldKeys();
+        Map<String, Id> existing = organizationsByField
+            ? ImportMatcher.byMatchField(
+                  Account.SObjectType,
+                  organizationMatchField,
+                  keys,
+                  new Set<Id>{ recordTypeId }
+              )
+            : ImportMatcher.accountsByName(keys, recordTypeId);
+        if (useDuplicateRules) {
+            matchOrganizationsByDuplicateRules(
+                working,
+                existing,
+                recordTypeId,
+                batch,
+                dryRun,
+                outcome
+            );
+        }
 
-        Map<String, Working> firstRowByName = new Map<String, Working>();
+        Map<String, Working> firstRowByKey = new Map<String, Working>();
         List<Account> toCreate = new List<Account>();
-        List<String> createdNames = new List<String>();
+        List<String> createdKeys = new List<String>();
         for (Working item : working) {
-            if (item.organizationKey == null) {
+            if (!looksForOrganization(item)) {
                 continue;
             }
-            Id found = existing.get(item.organizationKey);
+            Id found = item.organizationKey == null ? null : existing.get(item.organizationKey);
             if (found != null) {
+                if (ImportMatcher.isHeldByMany(item.organizationKey)) {
+                    item.severalMatches = true;
+                    if (!mostRecent) {
+                        item.error = Label.Core_Import_ErrorSeveralOrganizationsMatch;
+                        continue;
+                    }
+                }
                 item.organizationId = found;
                 continue;
             }
-            if (firstRowByName.containsKey(item.organizationKey)) {
+            if (batch.Match_Only__c == true) {
+                // A file that only matches creates no organization (R-IB15).
+                item.error = Label.Core_Import_ErrorMatchOnlyNoMatch;
+                continue;
+            }
+            if (item.organizationName == null) {
+                item.error = Label.Core_Import_ErrorOrganizationNameMissing;
+                continue;
+            }
+            if (firstRowByKey.containsKey(item.organizationGroup)) {
                 // A second row naming the same new organization waits for the first one's
                 // record, so one file never creates the same organization twice (R-IB4).
                 continue;
             }
-            firstRowByName.put(item.organizationKey, item);
+            firstRowByKey.put(item.organizationGroup, item);
             Account organization = new Account(
-                Name = attribute(item.byEntity, ImportMapping.ENTITY_ORGANIZATION, 'Name'),
+                Name = item.organizationName,
                 RecordTypeId = recordTypeId,
                 Created_By_Import_Batch__c = batch.Id
             );
@@ -423,34 +763,13 @@ public with sharing class ImportRowProcessor {
                 outcome
             );
             toCreate.add(organization);
-            createdNames.add(item.organizationKey);
+            createdKeys.add(item.organizationGroup);
         }
         if (toCreate.isEmpty()) {
             return;
         }
         if (dryRun) {
-            Set<String> digests = new Set<String>();
-            for (String name : firstRowByName.keySet()) {
-                digests.add(digest(ORGANIZATION_DIGEST, name));
-            }
-            Set<String> earlier = ImportRowSelector.createdDigestsWrittenEarlier(batch, digests);
-            for (Working item : working) {
-                if (item.organizationId != null || item.organizationKey == null) {
-                    continue;
-                }
-                // An organization an earlier chunk would create is found by the commit here,
-                // so the row is not one that creates it (R-IB12).
-                if (!earlier.contains(digest(ORGANIZATION_DIGEST, item.organizationKey))) {
-                    item.createdAnything = true;
-                }
-            }
-            // The first row naming each new organization carries its digest for later chunks.
-            for (String name : firstRowByName.keySet()) {
-                String digest = digest(ORGANIZATION_DIGEST, name);
-                if (!earlier.contains(digest)) {
-                    firstRowByName.get(name).row.Organization_Key__c = digest;
-                }
-            }
+            previewOrganizations(working, firstRowByKey, batch);
             return;
         }
         Map<String, Id> newIds = new Map<String, Id>();
@@ -460,24 +779,82 @@ public with sharing class ImportRowProcessor {
             AccessLevel.USER_MODE
         );
         for (Integer i = 0; i < results.size(); i++) {
-            Working owner = firstRowByName.get(createdNames[i]);
+            Working owner = firstRowByKey.get(createdKeys[i]);
             if (results[i].isSuccess()) {
-                newIds.put(createdNames[i], results[i].getId());
+                newIds.put(createdKeys[i], results[i].getId());
                 owner.createdAnything = true;
             } else {
                 owner.error = message(results[i]);
             }
         }
         for (Working item : working) {
-            if (item.organizationId != null || item.organizationKey == null) {
+            if (!createsOrganization(item)) {
                 continue;
             }
-            Id created = newIds.get(item.organizationKey);
+            Id created = newIds.get(item.organizationGroup);
             if (created != null) {
                 item.organizationId = created;
                 item.createdAnything = true;
             } else if (item.error == null) {
                 item.error = Label.Core_Import_ErrorOrganizationNotSaved;
+            }
+        }
+    }
+
+    /**
+     * Whether the row's organization is still to be found by its rule: it names one, was not
+     * given by record ID (R-IT10), and the row is not already rejected.
+     */
+    private static Boolean looksForOrganization(Working item) {
+        return item.error == null &&
+            item.organizationId == null &&
+            (item.organizationKey != null ||
+            item.organizationName != null);
+    }
+
+    /** Whether the row's organization is one this chunk creates. */
+    private static Boolean createsOrganization(Working item) {
+        return item.organizationId == null && item.error == null && item.organizationName != null;
+    }
+
+    /**
+     * In a dry run, counts the rows that would create an organization, except where an
+     * earlier chunk would create it, which the commit finds here (R-IB12), and writes each
+     * new organization's digest on its first row for later chunks. A row with no key creates
+     * its own organization and leaves nothing for a later chunk to find.
+     */
+    private static void previewOrganizations(
+        List<Working> working,
+        Map<String, Working> firstRowByKey,
+        Import_Batch__c batch
+    ) {
+        Set<String> digests = new Set<String>();
+        for (Working item : firstRowByKey.values()) {
+            if (item.organizationKey != null) {
+                digests.add(digest(ORGANIZATION_DIGEST, item.organizationKey));
+            }
+        }
+        Set<String> earlier = digests.isEmpty()
+            ? new Set<String>()
+            : ImportRowSelector.createdDigestsWrittenEarlier(batch, digests);
+        for (Working item : working) {
+            if (!createsOrganization(item)) {
+                continue;
+            }
+            if (
+                item.organizationKey == null ||
+                !earlier.contains(digest(ORGANIZATION_DIGEST, item.organizationKey))
+            ) {
+                item.createdAnything = true;
+            }
+        }
+        for (Working item : firstRowByKey.values()) {
+            if (item.organizationKey == null) {
+                continue;
+            }
+            String digest = digest(ORGANIZATION_DIGEST, item.organizationKey);
+            if (!earlier.contains(digest)) {
+                item.row.Organization_Key__c = digest;
             }
         }
     }
@@ -498,13 +875,9 @@ public with sharing class ImportRowProcessor {
         Set<String> emailKeys = new Set<String>();
         Set<String> namePostalKeys = new Set<String>();
         Set<String> externalIds = new Set<String>();
-        // The External ID rule matches on whatever field this org marked as its external
-        // identifier, so no field has to be invented for it and an org without one is told.
-        String externalIdField = ImportTemplateService.RULE_EXTERNAL_ID.equals(rule)
-            ? ImportMatcher.externalIdField(
-                  personAccounts ? Account.SObjectType : Contact.SObjectType
-              )
-            : null;
+        // The External ID rule matches on the field the template chose, or the first external
+        // identifier where it chose none (R-IT8); a rule with no field matches nobody.
+        String externalIdField = personMatchField;
         for (Working item : working) {
             item.personKey1 = personKey(
                 item,
@@ -518,6 +891,13 @@ public with sharing class ImportRowProcessor {
                 rule,
                 externalIdField
             );
+            // A person given by record ID is matched already, and no rule is asked (R-IT10).
+            if (item.givenPerson1) {
+                item.personKey1 = null;
+            }
+            if (item.givenPerson2) {
+                item.personKey2 = null;
+            }
             item.byName = !ImportTemplateService.RULE_EXTERNAL_ID.equals(rule);
             tellApartByFirstName(item, rule);
             collect(
@@ -561,7 +941,13 @@ public with sharing class ImportRowProcessor {
             : new Map<String, Integer>();
         findPerson(working, matches, earlier, true);
         findPerson(working, matches, earlier, false);
+        if (useDuplicateRules) {
+            matchPeopleByDuplicateRules(working, personAccounts, outcome);
+        }
         validate(working);
+        if (batch.Match_Only__c == true) {
+            rejectUnmatchedPeople(working);
+        }
 
         if (dryRun) {
             countUpdatesInPreview(working, personAccounts, rule);
@@ -571,6 +957,29 @@ public with sharing class ImportRowProcessor {
             return;
         }
         savePeople(working, batch, personAccounts, outcome);
+    }
+
+    /**
+     * In a file that only matches, rejects a row whose first or second person matched nobody,
+     * before anything is saved, so the dry run and the commit reject the same rows (R-IB15).
+     */
+    private static void rejectUnmatchedPeople(List<Working> working) {
+        for (Working item : working) {
+            if (item.error != null) {
+                continue;
+            }
+            Boolean newFirst =
+                item.person1Id == null &&
+                !item.comingPerson1 &&
+                describesPerson(item, ImportMapping.ENTITY_CONTACT_1);
+            Boolean newSecond =
+                item.person2Id == null &&
+                !item.comingPerson2 &&
+                describesPerson(item, ImportMapping.ENTITY_CONTACT_2);
+            if (newFirst || newSecond) {
+                item.error = Label.Core_Import_ErrorMatchOnlyNoMatch;
+            }
+        }
     }
 
     /**
@@ -588,10 +997,10 @@ public with sharing class ImportRowProcessor {
         ) {
             return;
         }
-        String first1 = ImportMatcher.nameKey(
+        String first1 = ImportMatcher.comparableFirstName(
             attribute(item.byEntity, ImportMapping.ENTITY_CONTACT_1, 'FirstName')
         );
-        String first2 = ImportMatcher.nameKey(
+        String first2 = ImportMatcher.comparableFirstName(
             attribute(item.byEntity, ImportMapping.ENTITY_CONTACT_2, 'FirstName')
         );
         if (first1 == first2) {
@@ -662,7 +1071,9 @@ public with sharing class ImportRowProcessor {
             }
             return ImportMatcher.nameAndPostalKey(held.get('LastName'), postal);
         }
-        return externalIdField == null ? null : ImportMatcher.nameKey(held.get(externalIdField));
+        return externalIdField == null
+            ? null
+            : ImportMatcher.nameKey(valueOf(held, externalIdField));
     }
 
     private static Map<String, Id> matchPeople(
@@ -686,12 +1097,13 @@ public with sharing class ImportRowProcessor {
                   )
                 : ImportMatcher.contactsByNameAndPostalCode(namePostalKeys);
         }
-        Schema.SObjectType type = personAccounts ? Account.SObjectType : Contact.SObjectType;
-        if (ImportMatcher.externalIdField(type) == null) {
-            outcome.notes.add(Label.Core_Import_LogNoExternalIdField);
-            return new Map<String, Id>();
-        }
-        return ImportMatcher.byExternalId(type, externalIds);
+        // A rule with no field to match on was named in the run log by readMatchingChoices.
+        return ImportMatcher.byMatchField(
+            personAccounts ? Account.SObjectType : Contact.SObjectType,
+            personMatchField,
+            externalIds,
+            personAccounts ? personRecordTypeIds() : null
+        );
     }
 
     /**
@@ -708,7 +1120,9 @@ public with sharing class ImportRowProcessor {
             return key;
         }
         String entity = isFirst ? ImportMapping.ENTITY_CONTACT_1 : ImportMapping.ENTITY_CONTACT_2;
-        String first = ImportMatcher.nameKey(attribute(item.byEntity, entity, 'FirstName'));
+        String first = ImportMatcher.comparableFirstName(
+            attribute(item.byEntity, entity, 'FirstName')
+        );
         return first == null ? null : ImportMatcher.firstNameKey(key, first);
     }
 
@@ -738,11 +1152,11 @@ public with sharing class ImportRowProcessor {
     /**
      * Finds one person of each row among those already there: in the org, and in a dry run
      * among the people earlier chunks would create, which the commit will have created by the
-     * time it reaches this chunk (R-IB12). The first name is asked first. The shared key alone
-     * finds a person only when one record holds it, or when the row gives no first name (the
-     * earliest then). A person the shared key cannot tell apart from another holding it, such
-     * as a partner, is not found here, and is created unless an earlier row of the chunk
-     * creates them. A row's two people sharing one key are found by first name only. In a
+     * time it reaches this chunk (R-IB12). A row giving a first name finds only a person with
+     * that first name: one holding the shared key under another first name, or under none, is
+     * taken to be somebody else, so the row's person is created unless an earlier row of the
+     * chunk creates them, and nobody is renamed. The shared key alone finds a person only when
+     * the row gives no first name (the earliest holder then), and a blank renames nobody. In a
      * dry run the earlier chunks' people are asked for by digest, for this chunk's keys only.
      */
     private static void findPerson(
@@ -763,21 +1177,42 @@ public with sharing class ImportRowProcessor {
                 (matches.containsKey(shared) ? (ImportMatcher.isHeldByMany(shared) ? 2 : 1) : 0) +
                 heldEarlier;
             Id found = named == null ? null : matches.get(named);
+            // Several records holding the key the row is looked for by (R-IT9).
+            Boolean several = found != null && ImportMatcher.isHeldByMany(named);
             Boolean coming =
                 found == null &&
                 named != null &&
                 count(earlier, digest(PERSON_DIGEST, named)) > 0;
-            // A key whose lookup stopped at the row cap may have a holder unseen: first name only.
+            // A row giving a first name is found by it or created, never given whoever else
+            // holds the shared key (R-IB12). A key whose lookup stopped at the row cap may have
+            // a holder unseen, so it finds nobody by itself either.
             if (
                 found == null &&
                 !coming &&
                 shared == key &&
-                !ImportMatcher.wasCutOff(shared) &&
-                (named == null ||
-                held == 1)
+                named == null &&
+                !ImportMatcher.wasCutOff(shared)
             ) {
                 found = matches.get(shared);
+                // In a dry run, a person an earlier chunk would create holds the key too, as
+                // the commit will find (R-IB12).
+                several =
+                    (found != null && (ImportMatcher.isHeldByMany(shared) || heldEarlier > 0)) ||
+                    (found == null &&
+                    heldEarlier > 1);
                 coming = found == null && heldEarlier > 0;
+            }
+            if (several) {
+                item.severalMatches = true;
+                if (!mostRecent) {
+                    // Rejected rather than guessed: a row loaded into the wrong one of two
+                    // records is harder to notice than a rejected row (R-IT9).
+                    found = null;
+                    coming = false;
+                    if (item.error == null) {
+                        item.error = Label.Core_Import_ErrorSeveralPeopleMatch;
+                    }
+                }
             }
             if (isFirst) {
                 item.person1Id = found;
@@ -793,9 +1228,9 @@ public with sharing class ImportRowProcessor {
 
     /**
      * Which person an earlier row of this chunk creates is this one, by the key to share, or
-     * null when this row creates them. By first name first; by the shared key alone only when
-     * nobody held it before the chunk and one person of the chunk holds it, or the row gives no
-     * first name. `created` counts the people of the chunk holding each key (R-IB12).
+     * null when this row creates them. A row giving a first name shares only a person of that
+     * first name; one giving none shares by the shared key alone, when nobody held it before
+     * the chunk. `created` counts the people of the chunk holding each key (R-IB12).
      */
     private static String keyToShare(Working item, Boolean isFirst, ChunkPeople chunk) {
         String key = isFirst ? item.personKey1 : item.personKey2;
@@ -803,15 +1238,12 @@ public with sharing class ImportRowProcessor {
             return null;
         }
         String named = namedKey(item, isFirst);
-        if (named != null && count(chunk.created, named) > 0) {
-            return named;
+        if (named != null) {
+            return count(chunk.created, named) > 0 ? named : null;
         }
         String shared = ImportMatcher.baseKey(key);
         Integer heldBefore = isFirst ? item.heldBefore1 : item.heldBefore2;
-        Boolean alone = named == null
-            ? count(chunk.created, shared) > 0
-            : count(chunk.created, shared) == 1 && chunk.holding(shared) == 1;
-        return shared == key && heldBefore == 0 && alone ? shared : null;
+        return shared == key && heldBefore == 0 && count(chunk.created, shared) > 0 ? shared : null;
     }
 
     /**
@@ -838,9 +1270,6 @@ public with sharing class ImportRowProcessor {
         List<String> finding = keysFinding(item, isFirst);
         for (String key : finding) {
             chunk.created.put(key, count(chunk.created, key) + 1);
-        }
-        if (!finding.isEmpty()) {
-            chunk.hold(finding[0], finding[1]);
         }
         return finding;
     }
@@ -881,6 +1310,8 @@ public with sharing class ImportRowProcessor {
         row.Person_2_Name_Key__c = null;
         row.Organization_Key__c = null;
         row.Processor_Key__c = null;
+        row.Several_Matches__c = false;
+        row.Duplicate_Rule_Match__c = false;
     }
 
     /** A row has to describe somebody. One that does not is rejected before anything is saved. */
@@ -893,11 +1324,14 @@ public with sharing class ImportRowProcessor {
                 item.error = Label.Core_Import_ErrorRowUnreadable;
                 continue;
             }
-            Boolean hasOrganization = item.organizationKey != null;
+            Boolean hasOrganization = item.organizationKey != null || item.organizationName != null;
             Boolean hasPerson1 = describesPerson(item, ImportMapping.ENTITY_CONTACT_1);
             Boolean hasPerson2 = describesPerson(item, ImportMapping.ENTITY_CONTACT_2);
             Boolean identifiesSomebody =
                 hasOrganization ||
+                item.organizationId != null ||
+                item.givenPerson1 ||
+                item.givenPerson2 ||
                 identifiesPerson(item, ImportMapping.ENTITY_CONTACT_1) ||
                 identifiesPerson(item, ImportMapping.ENTITY_CONTACT_2);
             if (!identifiesSomebody) {
@@ -929,7 +1363,7 @@ public with sharing class ImportRowProcessor {
      * address on its own cannot create a person and cannot match one either, which is exactly what
      * `Core_Import_ErrorRowIdentifiesNobody` tells the administrator: no name, no email and no
      * organization means there is nothing to create or match. The organization side of that
-     * sentence is `item.organizationKey`, which is already built from the organization name alone.
+     * sentence is the organization's name or its matching key.
      */
     private static Boolean identifiesPerson(Working item, String entity) {
         Map<String, String> held = item.byEntity.get(entity);
@@ -1360,10 +1794,10 @@ public with sharing class ImportRowProcessor {
             if (item.error != null) {
                 continue;
             }
-            if (item.person1Id != null && item.personKey1 != null) {
+            if (item.person1Id != null && (item.personKey1 != null || item.givenPerson1)) {
                 matchedIds.add(item.person1Id);
             }
-            if (item.person2Id != null && item.personKey2 != null) {
+            if (item.person2Id != null && (item.personKey2 != null || item.givenPerson2)) {
                 matchedIds.add(item.person2Id);
             }
         }
@@ -1542,19 +1976,22 @@ public with sharing class ImportRowProcessor {
         if (stored == null || held == null || held.isEmpty()) {
             return result;
         }
-        Map<String, Object> populated = new Map<String, Object>();
-        for (String name : stored.getPopulatedFieldsAsMap().keySet()) {
-            populated.put(name.toLowerCase(), stored.getPopulatedFieldsAsMap().get(name));
-        }
         for (String attributeName : held.keySet()) {
             String incoming = held.get(attributeName);
             String lookupKey = attributeName.toLowerCase();
-            // A field that was not selected cannot be compared, so it is not claimed as a
-            // change: saying "would update" about something unread would be a lie.
-            if (String.isBlank(incoming) || !populated.containsKey(lookupKey)) {
+            if (String.isBlank(incoming)) {
                 continue;
             }
-            Object current = populated.get(lookupKey);
+            // A field that was not selected cannot be compared, so it is not claimed as a
+            // change: saying "would update" about something unread would be a lie. Read with
+            // get, not getPopulatedFieldsAsMap, which leaves out a selected field that is
+            // blank, and a blank field is exactly the one an import fills in.
+            Object current;
+            try {
+                current = stored.get(attributeName);
+            } catch (SObjectException notSelected) {
+                continue;
+            }
             if (isCheckbox(stored, lookupKey)) {
                 // A checkbox is compared as the value the save would write: "Yes" in the file
                 // is the true already stored, not a change to journal on every re-import.
@@ -1913,6 +2350,165 @@ public with sharing class ImportRowProcessor {
     }
 
     // -------------------------------------------------------------------------------------
+    // The org's duplicate rules (R-IT16)
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Asks the org's duplicate rules about each person the rule found nobody for: not given by
+     * record ID, not created by an earlier chunk, on a row not already rejected. A person they
+     * match is loaded into that record; several follow Several Matches (R-IT9). A row whose two
+     * people they match to one record is rejected, since one record cannot be both.
+     */
+    private static void matchPeopleByDuplicateRules(
+        List<Working> working,
+        Boolean personAccounts,
+        Outcome outcome
+    ) {
+        Schema.SObjectType type = personAccounts ? Account.SObjectType : Contact.SObjectType;
+        Id recordTypeId = personAccounts ? anyPersonRecordTypeId() : null;
+        List<SObject> probes = new List<SObject>();
+        List<Working> owners = new List<Working>();
+        List<Boolean> isFirst = new List<Boolean>();
+        for (Working item : working) {
+            for (Integer which = 1; which <= 2; which++) {
+                String entity = which == 1
+                    ? ImportMapping.ENTITY_CONTACT_1
+                    : ImportMapping.ENTITY_CONTACT_2;
+                Boolean unmatched = which == 1
+                    ? item.person1Id == null && !item.comingPerson1
+                    : item.person2Id == null && !item.comingPerson2;
+                if (item.error != null || !unmatched || !describesPerson(item, entity)) {
+                    continue;
+                }
+                probes.add(
+                    ImportDuplicateRuleMatcher.probe(
+                        type,
+                        asStored(item.byEntity.get(entity), personAccounts),
+                        recordTypeId
+                    )
+                );
+                owners.add(item);
+                isFirst.add(which == 1);
+            }
+        }
+        if (probes.isEmpty()) {
+            return;
+        }
+        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
+            probes,
+            personAccounts ? personRecordTypeIds() : null
+        );
+        if (found == null) {
+            outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
+            return;
+        }
+        for (Integer i = 0; i < probes.size(); i++) {
+            Working item = owners[i];
+            Id matched = chosenByRule(item, found[i], Label.Core_Import_ErrorSeveralPeopleMatch);
+            if (matched == null) {
+                continue;
+            }
+            if (isFirst[i]) {
+                item.person1Id = matched;
+            } else {
+                item.person2Id = matched;
+            }
+            if (item.person1Id == item.person2Id) {
+                item.error = Label.Core_Import_ErrorDuplicateRuleOnePerson;
+            }
+        }
+    }
+
+    /**
+     * Asks the org's duplicate rules about each organization the rule found nobody for. In a
+     * dry run an organization an earlier chunk would create is left out, because the commit
+     * finds that one by its key (R-IB12).
+     */
+    private static void matchOrganizationsByDuplicateRules(
+        List<Working> working,
+        Map<String, Id> existing,
+        Id recordTypeId,
+        Import_Batch__c batch,
+        Boolean dryRun,
+        Outcome outcome
+    ) {
+        List<Working> owners = new List<Working>();
+        Set<String> digests = new Set<String>();
+        for (Working item : working) {
+            if (
+                looksForOrganization(item) &&
+                (item.organizationKey == null || !existing.containsKey(item.organizationKey))
+            ) {
+                owners.add(item);
+                if (dryRun && item.organizationKey != null) {
+                    digests.add(digest(ORGANIZATION_DIGEST, item.organizationKey));
+                }
+            }
+        }
+        Set<String> earlier = digests.isEmpty()
+            ? new Set<String>()
+            : ImportRowSelector.createdDigestsWrittenEarlier(batch, digests);
+        List<SObject> probes = new List<SObject>();
+        List<Working> asked = new List<Working>();
+        for (Working item : owners) {
+            if (
+                item.organizationKey != null &&
+                earlier.contains(digest(ORGANIZATION_DIGEST, item.organizationKey))
+            ) {
+                continue;
+            }
+            Map<String, String> values = new Map<String, String>(
+                item.byEntity.containsKey(ImportMapping.ENTITY_ORGANIZATION)
+                    ? item.byEntity.get(ImportMapping.ENTITY_ORGANIZATION)
+                    : new Map<String, String>()
+            );
+            values.put('Name', item.organizationName);
+            probes.add(ImportDuplicateRuleMatcher.probe(Account.SObjectType, values, recordTypeId));
+            asked.add(item);
+        }
+        if (probes.isEmpty()) {
+            return;
+        }
+        List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(
+            probes,
+            new Set<Id>{ recordTypeId }
+        );
+        if (found == null) {
+            outcome.notes.add(Label.Core_Import_LogNoDuplicateRuleOrganizations);
+            return;
+        }
+        for (Integer i = 0; i < asked.size(); i++) {
+            Id matched = chosenByRule(
+                asked[i],
+                found[i],
+                Label.Core_Import_ErrorSeveralOrganizationsMatch
+            );
+            if (matched != null) {
+                asked[i].organizationId = matched;
+            }
+        }
+    }
+
+    /**
+     * The record the duplicate rules matched for one person or organization, or null: none
+     * matched, or several did and Several Matches rejects the row (R-IT9).
+     */
+    private static Id chosenByRule(Working item, List<SObject> found, String severalError) {
+        if (found.isEmpty() || item.error != null) {
+            return null;
+        }
+        if (found.size() > 1) {
+            item.severalMatches = true;
+            if (!mostRecent) {
+                item.error = severalError;
+                return null;
+            }
+        }
+        item.duplicateRuleMatch = true;
+        return ImportDuplicateRuleMatcher.mostRecent(found).Id;
+    }
+
+    // -------------------------------------------------------------------------------------
     // Writing the rows back
     // -------------------------------------------------------------------------------------
 
@@ -1920,6 +2516,17 @@ public with sharing class ImportRowProcessor {
         List<Import_Row__c> rows = new List<Import_Row__c>();
         for (Working item : working) {
             Import_Row__c row = item.row;
+            // Ticked whether the row was rejected for it or not, so every such row can be
+            // listed (R-IT9); the run log says once that some were loaded anyway.
+            row.Several_Matches__c = item.severalMatches;
+            // Ticked so the rows a looser rule matched can be read before a commit (R-IT16).
+            row.Duplicate_Rule_Match__c = item.duplicateRuleMatch && item.error == null;
+            if (row.Duplicate_Rule_Match__c) {
+                outcome.notes.add(Label.Core_Import_LogDuplicateRuleMatches);
+            }
+            if (item.severalMatches && item.error == null) {
+                outcome.notes.add(Label.Core_Import_LogSeveralMatchesUsedRecent);
+            }
             if (item.error != null) {
                 row.Status__c = STATUS_REJECTED;
                 row.Error_Message__c = item.error.abbreviate(4000);
@@ -2003,6 +2610,10 @@ public with sharing class ImportRowProcessor {
                 continue;
             }
             String attribute = ImportMapping.attributeOf(target);
+            if ('Id'.equalsIgnoreCase(attribute)) {
+                // A record ID matches and is never written (R-IT10).
+                continue;
+            }
             // Only a person's attributes are contact names to translate; an organization's
             // are the account's own, whatever the person mode.
             if (!ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
@@ -2138,7 +2749,8 @@ public with sharing class ImportRowProcessor {
      * that resembles someone; the pair is left for the duplicate scan to find (R-DP3). A rule
      * the org set to block still blocks, and the row reports the rule's message.
      */
-    private static Database.DMLOptions saveOptions() {
+    @NamespaceAccessible
+    public static Database.DMLOptions saveOptions() {
         Database.DMLOptions options = new Database.DMLOptions();
         options.OptAllOrNone = false;
         options.DuplicateRuleHeader.AllowSave = true;
@@ -2146,7 +2758,8 @@ public with sharing class ImportRowProcessor {
     }
 
     /** The failure of a save, in the words the platform used, so nothing is lost in paraphrase. */
-    private static String message(Database.SaveResult result) {
+    @NamespaceAccessible
+    public static String message(Database.SaveResult result) {
         List<String> parts = new List<String>();
         for (Database.Error error : result.getErrors()) {
             parts.add(error.getMessage());

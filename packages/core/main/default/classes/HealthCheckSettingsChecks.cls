@@ -119,6 +119,43 @@ public with sharing class HealthCheckSettingsChecks {
         }
     }
 
+    public class NightlyJobsCheck implements HealthCheckService.Check {
+        public HealthCheckService.Finding run() {
+            return nightlyJobsFinding();
+        }
+    }
+
+    /**
+     * Every BarnCRM nightly job that is not scheduled, Core's and those modules register, in
+     * one finding with one fix that schedules them all (ADR-0075,
+     * health-check-schedules-every-nightly-job). Nothing is scheduled on install, so this is
+     * the one place an administrator is told.
+     */
+    private static HealthCheckService.Finding nightlyJobsFinding() {
+        List<String> waiting = HealthCheckService.fixScope(
+            HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
+        );
+        if (waiting.isEmpty()) {
+            return null;
+        }
+        return new HealthCheckService.Finding(
+                'nightly_jobs_not_scheduled',
+                System.Label.Core_HealthCheck_NightlyJobsTitle,
+                String.format(
+                    System.Label.Core_HealthCheck_NightlyJobsDetail,
+                    new List<Object>{ String.join(waiting, ', ') }
+                ),
+                HealthCheckService.SEVERITY_WARNING,
+                HealthCheckService.CATEGORY_SETTINGS
+            )
+            .withFix(
+                System.Label.Core_HealthCheck_NightlyJobsFix,
+                HealthCheckService.FIX_ACTION_PREFIX +
+                HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
+            )
+            .withScope(waiting);
+    }
+
     /**
      * One finding naming the package defaults that are missing, or null when none is. The
      * title and detail take the count as {0} and the names as {1}, so the finding says what
@@ -154,7 +191,8 @@ public with sharing class HealthCheckSettingsChecks {
      * Rollups set to recalculate in the nightly run while the run is not scheduled. A rollup
      * set to Scheduled alone is then never recalculated, which is a warning; one set to Both
      * still updates as records change and only misses the nightly correction, which is
-     * information.
+     * information. Its fix is the nightly jobs finding's, which schedules this run with the
+     * rest, so one cause has one button.
      */
     private static HealthCheckService.Finding nightlyRollupsFinding() {
         if (RollupScheduler.isScheduled()) {
@@ -177,22 +215,14 @@ public with sharing class HealthCheckSettingsChecks {
             String.valueOf(nightlyOnly)
         };
         return new HealthCheckService.Finding(
-                'nightly_rollups_not_scheduled',
-                System.Label.Core_HealthCheck_NightlyOffTitle,
-                String.format(System.Label.Core_HealthCheck_NightlyOffDetail, values),
-                nightlyOnly > 0
-                    ? HealthCheckService.SEVERITY_WARNING
-                    : HealthCheckService.SEVERITY_INFO,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(
-                System.Label.Core_HealthCheck_NightlyOffFix,
-                HealthCheckService.FIX_ACTION_PREFIX +
-                HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_ROLLUPS
-            )
-            .withScope(
-                HealthCheckService.fixScope(HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_ROLLUPS)
-            );
+            'nightly_rollups_not_scheduled',
+            System.Label.Core_HealthCheck_NightlyOffTitle,
+            String.format(System.Label.Core_HealthCheck_NightlyOffDetail, values),
+            nightlyOnly > 0
+                ? HealthCheckService.SEVERITY_WARNING
+                : HealthCheckService.SEVERITY_INFO,
+            HealthCheckService.CATEGORY_SETTINGS
+        );
     }
 
     private static HealthCheckService.Finding automationFinding() {

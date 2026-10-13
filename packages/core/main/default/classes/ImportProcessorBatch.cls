@@ -37,6 +37,10 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
+        // System mode, stated because API 67.0 would otherwise read in user mode: the staged
+        // rows are the package's own bookkeeping, written in system mode for the reason
+        // ADR-0021 gives, and this read only feeds that processing. The records a row makes
+        // are still written in user mode, and the class keeps the run's sharing.
         return Database.getQueryLocator(
             [
                 SELECT
@@ -56,6 +60,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                     Soft_Credit_Id__c
                 FROM Import_Row__c
                 WHERE Import_Batch__c = :owner
+                WITH SYSTEM_MODE
                 ORDER BY Row_Number__c ASC
             ]
         );
@@ -80,10 +85,12 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             if (batch == null || template == null) {
                 throw new ImportException(Label.Core_Import_ErrorTemplateGone);
             }
+            // The file's own values come before the template's defaults (R-IB14).
             ImportMapping mapping = ImportMapping.parse(
-                template.Column_Mapping_JSON__c,
-                template.Default_Values_JSON__c
-            );
+                    template.Column_Mapping_JSON__c,
+                    template.Default_Values_JSON__c
+                )
+                .withFileValues(batch.File_Values_JSON__c);
             ImportEntityProcessors.carriedState = processorState;
             ImportRowProcessor.Outcome outcome = ImportRowProcessor.process(
                 batch,

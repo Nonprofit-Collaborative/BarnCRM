@@ -3,7 +3,7 @@
   <fullName>Type__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>How the gift arrived.</inlineHelpText>
-  <label>Type</label>
+  <label>Payment Method</label>
   <required>true</required>
   <trackTrending>false</trackTrending>
   <type>Picklist</type>

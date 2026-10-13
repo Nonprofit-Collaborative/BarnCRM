@@ -1,19 +1,19 @@
 <template>
   <lightning-card title={labels.title} icon-name="standard:timeslot">
     <div class="slds-var-p-horizontal_medium">
-      <template if:true={loading}>
+      <template lwc:if={loading}>
         <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
       </template>
 
-      <template if:true={errorMessage}>
-        <p class="slds-text-color_error" data-id="error">{errorMessage}</p>
+      <template lwc:if={errorMessage}>
+        <p role="alert" class="slds-text-color_error" data-id="error">{errorMessage}</p>
       </template>
 
-      <template if:true={noticeMessage}>
-        <p class="slds-text-color_success" data-id="notice">{noticeMessage}</p>
+      <template lwc:if={noticeMessage}>
+        <p role="status" class="slds-text-color_success" data-id="notice">{noticeMessage}</p>
       </template>
 
-      <template if:true={isEmpty}>
+      <template lwc:if={isEmpty}>
         <p data-id="empty">{labels.empty}</p>
         <lightning-button
           label={labels.generateNow}
@@ -24,9 +24,9 @@
         ></lightning-button>
       </template>
 
-      <template if:true={hasActions}>
+      <template lwc:if={hasActions}>
         <div class="slds-var-m-bottom_small" data-id="actions">
-          <template if:true={canPause}>
+          <template lwc:if={canPause}>
             <lightning-button
               label={labels.pause}
               data-id="pause"
@@ -35,7 +35,7 @@
               onclick={handleStatusChange}
             ></lightning-button>
           </template>
-          <template if:true={canResume}>
+          <template lwc:if={canResume}>
             <lightning-button
               label={labels.resume}
               data-id="resume"
@@ -44,7 +44,7 @@
               onclick={handleStatusChange}
             ></lightning-button>
           </template>
-          <template if:true={canEnd}>
+          <template lwc:if={canEnd}>
             <lightning-button
               label={labels.complete}
               data-id="complete"
@@ -62,7 +62,7 @@
         </div>
       </template>
 
-      <template if:true={hasInstallments}>
+      <template lwc:if={hasInstallments}>
         <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="schedule">
           <thead>
             <tr class="slds-line-height_reset">

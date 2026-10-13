@@ -1,6 +1,9 @@
 # ADR-0011: Evaluate vendoring a proven Apex rollup library before building one
 
-**Status:** Accepted
+**Status:** Accepted; amended for rollups by `0082-barncrm-owns-its-rollup-engine.md` (owner
+decision, 2026-10-12): the evaluation was done (ADR-0015), and for the rollup aggregation core
+the owner's independence goal now outweighs the reuse-first rule. The engine requirements under
+Consequences still hold.
 **Date:** 2026-09-06
 **Source:** plan Section 12, decision D-11
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Field Utilization panel in the Health section of the BarnCRM Settings console: the weekly
+    count's schedule, the objects it covers, and the share of records with each field filled in,
+    with the change since the count before.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Field Utilization</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__HomePage</target>
+  </targets>
+</LightningComponentBundle>

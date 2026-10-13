@@ -11,7 +11,7 @@ away: a refund is a separate, linked gift (see the Refunds page).
 Everything the board and the bookkeeper ask for comes off these records: donor totals, fund
 balances, appeal results, and the receipt.
 
-A gift of goods or services rather than money is entered here too, with the type **In-kind**.
+A gift of goods or services rather than money is entered here too, with the payment method **In-kind**.
 It works differently in two ways that catch people out: its amount is always zero and its
 worth goes in **Fair market value**, and its receipt describes what arrived without stating
 what it was worth. [In-kind gifts](in-kind-gifts.md) is the page for that.
@@ -43,13 +43,16 @@ You are David, and a check from Maria's neighbour arrived this morning.
 3. Open the **Gifts** tab and click **New**.
 4. In **Donor Contact**, choose a person who belongs to a household. Leave **Donor Account**
    empty: a gift has one donor, either a person or an organization, never both.
-5. Enter an **Amount** of 250, choose the **Type** `Check`, and leave **Gift Date** empty.
+5. Enter an **Amount** of 250, choose the **Payment Method** `Check`, and leave **Gift Date** empty.
    (Had this been a gift of goods you would choose `In-kind` here instead, leave the amount
    at zero, and describe the goods: [In-kind gifts](in-kind-gifts.md).)
 6. Choose `Spring appeal` in **Appeal** and save.
 7. Look at the saved gift. **Gift Date** is today, because you left it blank. **Household**
-   shows the donor's household, filled in by BarnCRM rather than by you, which is what
-   keeps household totals right after somebody moves house or marries.
+   shows the donor's household, filled in by BarnCRM rather than by you. The gift stays
+   with that household: if the donor later moves to another household, this gift still
+   counts for the household it was given from, and only their new gifts count for the new
+   one. Merging two households is different: the gifts of both come with the household you
+   keep.
 8. Scroll to **Gift Allocations**. There is one allocation, for the whole 250, designated to
    `General`. You never asked for it: a gift with no designation is allocated in full to the
    default fund, so no money is missing from fund reporting.

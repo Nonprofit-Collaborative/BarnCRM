@@ -136,4 +136,188 @@
     <shortDescription>Void needs a reason</shortDescription>
     <value>Say why this receipt is being voided. A void needs a reason and a date.</value>
   </labels>
+  <labels>
+    <fullName>Giving_Receipt_PanelTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: card title</shortDescription>
+    <value>Receipts</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnNumber</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: column, receipt number</shortDescription>
+    <value>Number</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnStatus</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts: column, status</shortDescription>
+    <value>Status</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnAmount</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: column, amount</shortDescription>
+    <value>Amount</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnIssued</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts: column, issued date or count</shortDescription>
+    <value>Issued</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnVoidReason</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: column, why it was voided</shortDescription>
+    <value>Void reason</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ColumnFile</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: column, the PDF</shortDescription>
+    <value>File</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NoneYet</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: the gift has no receipt</shortDescription>
+    <value>No receipt has been issued for this gift yet.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_IssueButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: button, issue a receipt</shortDescription>
+    <value>Issue receipt</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_VoidReasonField</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: field, the reason for a void</shortDescription>
+    <value>Why is this receipt being voided?</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_VoidAndReissueButton</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: button, void and reissue</shortDescription>
+    <value>Void and reissue</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_VoidNote</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: what a void does and does not change</shortDescription>
+    <value>The receipt the donor already has is never changed or deleted. Voiding records why, and the replacement takes the next number.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ViewPdf</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: link, open the receipt PDF</shortDescription>
+    <value>View PDF</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ViewPdfOf</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: link title, open the PDF of one receipt</shortDescription>
+    <value>Open the PDF of receipt {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_IssuedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast title, receipt issued</shortDescription>
+    <value>Receipt issued</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_IssuedMessage</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast, receipt issued, with its number</shortDescription>
+    <value>Receipt {0} has been issued. Click View PDF beside it to open the file.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NotIssuedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast title, receipt not issued</shortDescription>
+    <value>Receipt not issued</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ReasonNeededTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast title, a void needs a reason</shortDescription>
+    <value>Reason needed</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ReissuedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast title, receipt reissued</shortDescription>
+    <value>Receipt reissued</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_ReissuedMessage</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast, voided number and replacement number</shortDescription>
+    <value>Receipt {0} has been voided and reissued as {1}. The original file is unchanged.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_NotReissuedTitle</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts panel: toast title, receipt not reissued</shortDescription>
+    <value>Receipt not reissued</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_UnexpectedError</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Receipts: an unexpected failure with no message</shortDescription>
+    <value>That did not work. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Receipt_LogoUnreadable</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Error Log warning: the receipt logo file cannot be read</shortDescription>
+    <value>The receipt logo file {0} could not be read, so documents are being produced without a logo. Check that the file still exists and that the people who issue receipts can see it.</value>
+  </labels>
 </CustomLabels>

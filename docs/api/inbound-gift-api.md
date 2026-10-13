@@ -3,7 +3,10 @@
 For developers connecting a payment processor, online giving page or integration platform
 to BarnCRM (feature X-03). The administrator's side, including the user and sign-in
 setup, is in the admin guide: [Inbound Gift API](../admin-guide/inbound-gift-api.md). The
-decisions behind this shape are in ADR-0051.
+decisions behind this shape are in ADR-0051. The same contract as an OpenAPI 3.1 document,
+for code generators and API tools, is
+[`inbound-gift-api.openapi.yaml`](../architecture/reference/inbound-gift-api.openapi.yaml);
+CI checks it against the Apex.
 
 This contract is permanent once the Connect package is released as a managed package: new
 optional fields may be added, and nothing below will be removed or renamed.
@@ -120,3 +123,8 @@ Accounting Code, Fund Id, Appeal Id) and its outputs are Outcome, Gift Id, Error
 Message, with the same values and the same rules. A rejected gift does not fail the flow:
 check Outcome in a Decision element. One flow run can send many gifts; each gets its own
 result, and one gift's refusal does not stop the others.
+
+The action's descriptions are written so that a customer's own AI assistant (their
+Agentforce agent, or their own Hosted MCP server) can choose and fill it in as well. BarnCRM
+ships no AI and calls no AI service; see
+[Using BarnCRM actions with your own AI assistant](../admin-guide/using-barncrm-actions-with-ai.md).

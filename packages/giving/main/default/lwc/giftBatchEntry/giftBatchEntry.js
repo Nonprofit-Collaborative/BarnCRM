@@ -1,6 +1,7 @@
 import { LightningElement, api, wire } from 'lwc';
 import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import FORM_FACTOR from '@salesforce/client/formFactor';
 
 import CONTROL_TOTAL from '@salesforce/schema/Gift_Batch__c.Control_Total__c';
 import STATUS from '@salesforce/schema/Gift_Batch__c.Status__c';
@@ -10,6 +11,13 @@ import APPEAL_OBJECT from '@salesforce/schema/Appeal__c';
 import getBatch from '@salesforce/apex/GiftBatchController.getBatch';
 import saveLines from '@salesforce/apex/GiftBatchController.saveLines';
 import postBatch from '@salesforce/apex/GiftBatchController.postBatch';
+import getPaymentChoices from '@salesforce/apex/GiftBatchController.getPaymentChoices';
+import columnPays from '@salesforce/label/c.Giving_GiftBatch_ColumnPays';
+import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
+import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
+import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
+import paysNoLongerOpen from '@salesforce/label/c.Giving_GiftEntryPays_NoLongerOpen';
+import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
 
 import title from '@salesforce/label/c.Giving_GiftBatch_Title';
 import controlTotalLabel from '@salesforce/label/c.Giving_GiftBatch_ControlTotalLabel';
@@ -34,6 +42,9 @@ import person from '@salesforce/label/c.Giving_GiftBatch_Person';
 import organization from '@salesforce/label/c.Giving_GiftBatch_Organization';
 import donorPlaceholder from '@salesforce/label/c.Giving_GiftBatch_DonorPlaceholder';
 import removeLine from '@salesforce/label/c.Giving_GiftBatch_RemoveLine';
+import cellLabel from '@salesforce/label/c.Giving_GiftBatch_CellLabel';
+import donorKind from '@salesforce/label/c.Giving_GiftBatch_DonorKind';
+import useComputer from '@salesforce/label/c.Giving_GiftBatch_UseComputer';
 import addLine from '@salesforce/label/c.Giving_GiftBatch_AddLine';
 import saveButton from '@salesforce/label/c.Giving_GiftBatch_Save';
 import postButton from '@salesforce/label/c.Giving_GiftBatch_Post';
@@ -50,6 +61,8 @@ import errorPostFailed from '@salesforce/label/c.Giving_GiftBatch_ErrorPostFaile
 const FIELDS = [CONTROL_TOTAL, STATUS];
 const PERSON = 'person';
 const ORGANIZATION = 'organization';
+/** How long typing has to pause before the payments of the lines changed are looked up. */
+const PAYMENT_LOOKUP_DELAY_MS = 300;
 
 let nextKey = 0;
 
@@ -76,16 +89,18 @@ export default class GiftBatchEntry extends LightningElement {
     columnMethod,
     columnFund,
     columnAppeal,
+    columnPays,
     columnGift,
     fromBatchHelp,
+    paysErrorLoad,
     donorPlaceholder,
-    removeLine,
     addLine,
     saveButton,
     postButton,
     working,
     noLines,
-    unsaved
+    unsaved,
+    useComputer
   };
 
   fundObject = FUND_OBJECT.objectApiName;
@@ -98,6 +113,15 @@ export default class GiftBatchEntry extends LightningElement {
   formError;
   dirty = false;
   busy = false;
+  /** Each line's payment choices, by line key, as the controller last described them. */
+  paymentsByKey = {};
+  paymentLoadFailed = false;
+  pendingPaymentKeys = new Set();
+  paymentTimer;
+
+  disconnectedCallback() {
+    clearTimeout(this.paymentTimer);
+  }
 
   @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
   wiredBatch({ data }) {
@@ -113,18 +137,98 @@ export default class GiftBatchEntry extends LightningElement {
       if (!this.dirty) {
         this.lines = view.lines.map((line) => this.toLocal(line));
         this.removedIds = [];
+        this.lookUpAllPayments();
       }
     } catch (error) {
       this.formError = messageOf(error, errorLoadBatch);
     }
   }
 
+  /**
+   * A saved line keeps the payment it was saved with, None included: nothing is chosen for it
+   * in advance again, because the person may already have looked at it (R-GR5).
+   */
   toLocal(line) {
     return {
       ...line,
       key: line.id || `new-${nextKey++}`,
-      kind: line.donorAccountId && !line.donorContactId ? ORGANIZATION : PERSON
+      kind: line.donorAccountId && !line.donorContactId ? ORGANIZATION : PERSON,
+      installmentId: line.installmentId || '',
+      paymentPicked: Boolean(line.id)
     };
+  }
+
+  /** Every line with a donor, once the grid is open and may be typed into. */
+  lookUpAllPayments() {
+    if (!this.editable) {
+      return;
+    }
+    this.lines.forEach((line) => this.pendingPaymentKeys.add(line.key));
+    this.lookUpPayments();
+  }
+
+  /** Waits for typing to pause, then looks up the payments of every line changed meanwhile. */
+  schedulePaymentLookup(line) {
+    this.pendingPaymentKeys.add(line.key);
+    clearTimeout(this.paymentTimer);
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.paymentTimer = setTimeout(() => {
+      this.lookUpPayments();
+    }, PAYMENT_LOOKUP_DELAY_MS);
+  }
+
+  async lookUpPayments() {
+    const keys = [...this.pendingPaymentKeys];
+    this.pendingPaymentKeys = new Set();
+    const wanted = this.lines.filter(
+      (line) => keys.includes(line.key) && (line.donorContactId || line.donorAccountId)
+    );
+    keys.forEach((key) => {
+      if (!wanted.some((line) => line.key === key)) {
+        delete this.paymentsByKey[key];
+      }
+    });
+    this.paymentsByKey = { ...this.paymentsByKey };
+    if (wanted.length === 0) {
+      return;
+    }
+    try {
+      const answers = await getPaymentChoices({
+        batchId: this.recordId,
+        lines: wanted.map((line) => ({
+          key: line.key,
+          donorContactId: line.donorContactId,
+          donorAccountId: line.donorAccountId,
+          amount: line.amount,
+          giftDate: line.giftDate
+        }))
+      });
+      this.paymentLoadFailed = false;
+      const byKey = { ...this.paymentsByKey };
+      (answers || []).forEach((answer) => {
+        byKey[answer.key] = answer;
+        const line = this.lines.find((candidate) => candidate.key === answer.key);
+        if (line) {
+          this.applyPaymentChoices(line, answer);
+        }
+      });
+      this.paymentsByKey = byKey;
+      this.lines = [...this.lines];
+    } catch {
+      // The controller logged the cause; the lines can still post as gifts on their own.
+      this.paymentLoadFailed = true;
+    }
+  }
+
+  /**
+   * Never applies a payment unseen (R-DM8): a line keeps what it was saved with or what the
+   * person chose; otherwise a payment is chosen only when it is the only suggestion.
+   */
+  applyPaymentChoices(line, answer) {
+    if (line.paymentPicked) {
+      return;
+    }
+    line.installmentId = answer.suggestedId || '';
   }
 
   get loaded() {
@@ -197,6 +301,11 @@ export default class GiftBatchEntry extends LightningElement {
     ];
   }
 
+  /** The grid is ten columns wide, so a phone gets a note that a computer is easier. */
+  get isPhone() {
+    return FORM_FACTOR === 'Small';
+  }
+
   get showKind() {
     return this.loaded && !this.batch.hasPersonAccounts;
   }
@@ -215,8 +324,64 @@ export default class GiftBatchEntry extends LightningElement {
       methodValue: line.paymentMethod || '',
       giftUrl: line.giftId ? `/lightning/r/${line.giftId}/view` : null,
       errors: (this.lineErrors[line.id] || []).join(' '),
-      hasErrors: Boolean(this.lineErrors[line.id])
+      hasErrors: Boolean(this.lineErrors[line.id]),
+      cellLabels: this.cellLabelsFor(index + 1),
+      ...this.paysFor(line)
     }));
+  }
+
+  /**
+   * The Pays cell of one line: None first, the donor's payments, and a payment the line names
+   * that is no longer offered, kept and said so, because quietly dropping it would turn a
+   * pledge payment into a gift on its own. Posting refuses that line until it is chosen again.
+   */
+  paysFor(line) {
+    const answer = this.paymentsByKey[line.key];
+    const choices = answer ? answer.choices || [] : [];
+    const options = [
+      { label: paysNone, value: '' },
+      ...choices.map((choice) => ({ label: choice.label, value: choice.value }))
+    ];
+    if (line.installmentId && !choices.some((choice) => choice.value === line.installmentId)) {
+      options.push({ label: paysNoLongerOpen, value: line.installmentId });
+    }
+    let paysNote = '';
+    if (
+      !line.paymentPicked &&
+      answer &&
+      answer.suggestedId &&
+      line.installmentId === answer.suggestedId
+    ) {
+      paysNote = paysOneSuggested;
+    } else if (!line.paymentPicked && answer && answer.suggestedCount > 1) {
+      paysNote = paysSeveralSuggested.replace('{0}', answer.suggestedCount);
+    }
+    return {
+      showPays: options.length > 1 && !line.giftId,
+      payOptions: options,
+      payValue: line.installmentId || '',
+      paysNote
+    };
+  }
+
+  /**
+   * Every row repeats the same inputs, so each hidden label carries the line number: a
+   * screen reader then says "Amount, line 3" rather than "Amount" nine times over.
+   */
+  cellLabelsFor(number) {
+    const label = (column) => cellLabel.replace('{0}', column).replace('{1}', number);
+    return {
+      kind: label(donorKind),
+      donor: label(columnDonor),
+      amount: label(columnAmount),
+      reference: label(columnReference),
+      date: label(columnDate),
+      method: label(columnMethod),
+      fund: label(columnFund),
+      appeal: label(columnAppeal),
+      pays: label(columnPays),
+      remove: removeLine.replace('{0}', number)
+    };
   }
 
   lineFor(event) {
@@ -239,6 +404,7 @@ export default class GiftBatchEntry extends LightningElement {
       line.kind = detail.value;
       line.donorContactId = null;
       line.donorAccountId = null;
+      this.forgetPayment(line);
     });
   }
 
@@ -252,6 +418,7 @@ export default class GiftBatchEntry extends LightningElement {
         line.donorAccountId = id;
         line.donorContactId = null;
       }
+      this.forgetPayment(line);
     });
   }
 
@@ -263,7 +430,24 @@ export default class GiftBatchEntry extends LightningElement {
         value = value === '' || value === null ? null : Number(value);
       }
       line[field] = value === '' ? null : value;
+      if (field === 'amount' || field === 'giftDate') {
+        this.schedulePaymentLookup(line);
+      }
     });
+  }
+
+  handlePays(event) {
+    this.change(event, (line, detail) => {
+      line.installmentId = detail.value || '';
+      line.paymentPicked = true;
+    });
+  }
+
+  /** A new donor owes different payments: what the line named for the last one goes. */
+  forgetPayment(line) {
+    line.installmentId = '';
+    line.paymentPicked = false;
+    this.schedulePaymentLookup(line);
   }
 
   handleAdd() {
@@ -301,7 +485,8 @@ export default class GiftBatchEntry extends LightningElement {
           paymentMethod: line.paymentMethod,
           paymentReference: line.paymentReference,
           fundId: line.fundId,
-          appealId: line.appealId
+          appealId: line.appealId,
+          installmentId: line.installmentId || null
         })),
         removedLineIds: this.removedIds
       });
@@ -309,6 +494,8 @@ export default class GiftBatchEntry extends LightningElement {
       this.lines = view.lines.map((line) => this.toLocal(line));
       this.removedIds = [];
       this.dirty = false;
+      this.paymentsByKey = {};
+      this.lookUpAllPayments();
       return true;
     } catch (error) {
       this.formError = messageOf(error, errorSaveRows);

@@ -21,7 +21,9 @@ private class ReceiptBrandingTest {
 
     @TestSetup
     static void setUp() {
-        ReceiptTestDataFactory.setUpReceipting();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            ReceiptTestDataFactory.setUpReceipting();
+        }
     }
 
     private static String receiptFrom(String templateBody) {
@@ -63,110 +65,164 @@ private class ReceiptBrandingTest {
 
     @IsTest
     static void aTemplateThatNamesNoOrganizationStillProducesADocumentThatDoes() {
-        Test.startTest();
-        String html = receiptFrom(BARE_TEMPLATE);
-        Test.stopTest();
-
-        Assert.isTrue(
-            html.contains('<p class="orgname">Hope For Homes</p>'),
-            'The legal name is printed above the letter: ' + html
-        );
-        Assert.isTrue(html.contains('14 Bridge Street, Springfield'), 'So is the address: ' + html);
-        Assert.isTrue(
-            html.contains('12-3456789'),
-            'The tax identification number is on it, as it always was: ' + html
-        );
-    }
-
-    @IsTest
-    static void aTemplateThatNamesTheOrganizationIsNotGivenASecondCopyOfIt() {
-        Test.startTest();
-        String html = receiptFrom(ReceiptTestDataFactory.perGiftTemplateBody());
-        Test.stopTest();
-
-        Assert.isFalse(
-            html.contains('class="orgname"'),
-            'The package does not print a name the letter already printed: ' + html
-        );
-        Assert.isTrue(html.contains('Hope For Homes'), 'The letter still prints it: ' + html);
-    }
-
-    @IsTest
-    static void anOrganizationWithNoLogoGetsADocumentWithNoImage() {
-        Test.startTest();
-        String html = receiptFrom(BARE_TEMPLATE);
-        Test.stopTest();
-
-        Assert.isFalse(html.contains('<img'), 'No logo uploaded means no image: ' + html);
-    }
-
-    @IsTest
-    static void theShippedRouteAddressesTheFileByItsDownloadUrl() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            insertLogoFile();
-            setLogoDelivery(null, true);
-
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
             Test.startTest();
             String html = receiptFrom(BARE_TEMPLATE);
             Test.stopTest();
 
             Assert.isTrue(
-                html.contains('/sfc/servlet.shepherd/version/download/'),
-                'The shipped route is the file download URL (ADR-0016): ' + html
+                html.contains('<p class="orgname">Hope For Homes</p>'),
+                'The legal name is printed above the letter: ' + html
             );
-            Assert.isTrue(html.contains('width: 40mm'), 'The shipped width is used: ' + html);
+            Assert.isTrue(
+                html.contains('14 Bridge Street, Springfield'),
+                'So is the address: ' + html
+            );
+            Assert.isTrue(
+                html.contains('12-3456789'),
+                'The tax identification number is on it, as it always was: ' + html
+            );
+        }
+    }
+
+    /**
+     * A letter saved before the package printed the letterhead keeps its own block, and the
+     * package does not print the name a second time (ADR-0065 point 3).
+     */
+    @IsTest
+    static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            String html = receiptFrom(
+                '<div class="letterhead"><h1>{{OrganizationName}}</h1></div>' + BARE_TEMPLATE
+            );
+            Test.stopTest();
+
+            Assert.isFalse(
+                html.contains('class="orgname"'),
+                'The package does not print a name the letter already printed: ' + html
+            );
+            Assert.isTrue(
+                html.contains('<h1>Hope For Homes</h1>'),
+                'The letter prints it: ' + html
+            );
+        }
+    }
+
+    /**
+     * The letterhead is code, not template (ADR-0065 point 2). A letter that only mentions the
+     * organization in a sentence used to lose the letterhead, because the test was for the token.
+     */
+    @IsTest
+    static void aLetterThatMentionsTheOrganizationInASentenceStillGetsTheLetterhead() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            String html = receiptFrom(
+                '<p>Thank you for supporting {{OrganizationName}}, {{DonorName}}.</p>'
+            );
+            Test.stopTest();
+
+            Assert.isTrue(
+                html.contains('<p class="orgname">Hope For Homes</p>'),
+                'The letterhead prints above the letter: ' + html
+            );
+            Assert.isTrue(
+                html.contains('Thank you for supporting Hope For Homes'),
+                'And the sentence keeps its token: ' + html
+            );
+        }
+    }
+
+    @IsTest
+    static void anOrganizationWithNoLogoGetsADocumentWithNoImage() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            String html = receiptFrom(BARE_TEMPLATE);
+            Test.stopTest();
+
+            Assert.isFalse(html.contains('<img'), 'No logo uploaded means no image: ' + html);
+        }
+    }
+
+    @IsTest
+    static void theShippedRouteAddressesTheFileByItsDownloadUrl() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                insertLogoFile();
+                setLogoDelivery(null, true);
+
+                Test.startTest();
+                String html = receiptFrom(BARE_TEMPLATE);
+                Test.stopTest();
+
+                Assert.isTrue(
+                    html.contains('/sfc/servlet.shepherd/version/download/'),
+                    'The shipped route is the file download URL (ADR-0016): ' + html
+                );
+                Assert.isTrue(html.contains('width: 40mm'), 'The shipped width is used: ' + html);
+            }
+
         }
     }
 
     @IsTest
     static void theEmbeddedRouteInlinesTheBytes() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            insertLogoFile();
-            setLogoDelivery(ReceiptLogoSource.ROUTE_EMBEDDED_IMAGE, true);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                insertLogoFile();
+                setLogoDelivery(ReceiptLogoSource.ROUTE_EMBEDDED_IMAGE, true);
 
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+                Test.startTest();
+                String html = receiptFrom(BARE_TEMPLATE);
+                Test.stopTest();
 
-            Assert.isTrue(
-                html.contains('data:image/png;base64,'),
-                'The second route ADR-0016 names inlines the image: ' + html
-            );
+                Assert.isTrue(
+                    html.contains('data:image/png;base64,'),
+                    'The second route ADR-0016 names inlines the image: ' + html
+                );
+            }
+
         }
     }
 
     @IsTest
     static void theDocumentServerRouteAddressesTheImageServer() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            insertLogoFile();
-            setLogoDelivery(ReceiptLogoSource.ROUTE_DOCUMENT_SERVER, true);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                insertLogoFile();
+                setLogoDelivery(ReceiptLogoSource.ROUTE_DOCUMENT_SERVER, true);
 
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+                Test.startTest();
+                String html = receiptFrom(BARE_TEMPLATE);
+                Test.stopTest();
 
-            Assert.isTrue(
-                html.contains('servlet.ImageServer'),
-                'The third route ADR-0016 names is the image server: ' + html
-            );
+                Assert.isTrue(
+                    html.contains('servlet.ImageServer'),
+                    'The third route ADR-0016 names is the image server: ' + html
+                );
+            }
+
         }
     }
 
     @IsTest
     static void turningTheLogoOffProducesADocumentWithoutIt() {
-        System.runAs(ReceiptTestDataFactory.issuer()) {
-            insertLogoFile();
-            setLogoDelivery(null, false);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            System.runAs(ReceiptTestDataFactory.issuer()) {
+                insertLogoFile();
+                setLogoDelivery(null, false);
 
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+                Test.startTest();
+                String html = receiptFrom(BARE_TEMPLATE);
+                Test.stopTest();
 
-            Assert.isFalse(html.contains('<img'), 'Off means off: ' + html);
-            Assert.isTrue(
-                html.contains('Hope For Homes'),
-                'A receipt with no images is still a receipt: ' + html
-            );
+                Assert.isFalse(html.contains('<img'), 'Off means off: ' + html);
+                Assert.isTrue(
+                    html.contains('Hope For Homes'),
+                    'A receipt with no images is still a receipt: ' + html
+                );
+            }
+
         }
     }
 
@@ -176,17 +232,25 @@ private class ReceiptBrandingTest {
      */
     @IsTest
     static void aLogoThatCannotBeFoundStillProducesADocument() {
-        Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-        giving.SetupOwnerId = UserInfo.getOrganizationId();
-        giving.Receipt_Logo_Document_Id__c = '069000000000000AAA';
-        upsert giving;
-        ReceiptLogoSource.reset();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+            giving.SetupOwnerId = UserInfo.getOrganizationId();
+            giving.Receipt_Logo_Document_Id__c = FakeIds.of(ContentDocument.SObjectType, 0);
+            upsert giving;
+            ReceiptLogoSource.reset();
 
-        Test.startTest();
-        String html = receiptFrom(BARE_TEMPLATE);
-        Test.stopTest();
+            Test.startTest();
+            String html = receiptFrom(BARE_TEMPLATE);
+            Test.stopTest();
 
-        Assert.isFalse(html.contains('<img'), 'Nothing is printed for a file that is not there.');
-        Assert.isTrue(html.contains('Hope For Homes'), 'The document is produced anyway: ' + html);
+            Assert.isFalse(
+                html.contains('<img'),
+                'Nothing is printed for a file that is not there.'
+            );
+            Assert.isTrue(
+                html.contains('Hope For Homes'),
+                'The document is produced anyway: ' + html
+            );
+        }
     }
 }

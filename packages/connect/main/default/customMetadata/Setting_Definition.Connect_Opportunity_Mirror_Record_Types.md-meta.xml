@@ -20,7 +20,11 @@
     </values>
     <values>
         <field>Data_Type__c</field>
-        <value xsi:type="xsd:string">Text</value>
+        <value xsi:type="xsd:string">RecordTypeList</value>
+    </values>
+    <values>
+        <field>Record_Object__c</field>
+        <value xsi:type="xsd:string">Opportunity</value>
     </values>
     <values>
         <field>Sort_Order__c</field>
@@ -28,7 +32,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Opportunities to Gifts only: the record types, by API name and separated by commas, whose won Opportunities become gifts, for example Donation,Major_Gift. Empty means every record type.</value>
+        <value xsi:type="xsd:string">Opportunities to Gifts only: tick the record types whose won Opportunities become gifts. With none ticked, every record type counts.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

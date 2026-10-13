@@ -20,7 +20,11 @@
     </values>
     <values>
         <field>Data_Type__c</field>
-        <value xsi:type="xsd:string">Text</value>
+        <value xsi:type="xsd:string">Record</value>
+    </values>
+    <values>
+        <field>Record_Object__c</field>
+        <value xsi:type="xsd:string">Fund__c</value>
     </values>
     <values>
         <field>Sort_Order__c</field>
@@ -28,7 +32,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">The fund a gift is allocated to when nobody chooses one. It holds a fund record identifier, so the console renders a fund picker rather than a text box and the administrator never sees the identifier.</value>
+        <value xsi:type="xsd:string">The fund a gift goes to when nobody chooses one. Search for the fund by name.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

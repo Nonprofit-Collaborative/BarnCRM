@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Use_Duplicate_Rules__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>When ticked, people and organizations the matching rule found nobody for are also matched through the org's active duplicate rules (R-IT16).</description>
+  <inlineHelpText>Also match people and organizations with your org's duplicate rules.</inlineHelpText>
+  <label>Use Duplicate Rules</label>
+  <type>Checkbox</type>
+</CustomField>

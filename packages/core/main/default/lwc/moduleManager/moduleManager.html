@@ -1,0 +1,87 @@
+<template>
+    <template lwc:if={errorMessage}>
+        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert" data-id="error">{errorMessage}</p>
+    </template>
+    <template lwc:if={isReadOnly}>
+        <p class="slds-text-body_small slds-var-m-bottom_small" role="status" data-id="read-only">
+            {labels.readOnly}
+        </p>
+    </template>
+
+    <ul class="slds-has-dividers_bottom-space">
+        <template for:each={rows} for:item="module">
+            <li key={module.name} class="slds-item slds-var-p-vertical_x-small" data-module={module.name}>
+                <div>
+                    <span class="slds-text-heading_x-small">{module.name}</span>
+                    <span class={module.badgeClass} data-id="status">{module.statusText}</span>
+                    <a class="slds-var-m-left_small" href={module.docsUrl} target="_blank" rel="noopener noreferrer"
+                        >{labels.learnMore}<span class="slds-assistive-text">{module.name} {labels.newTab}</span></a
+                    >
+                </div>
+                <template lwc:if={canEdit}>
+                    <div class="slds-var-m-top_x-small">
+                        <template lwc:if={module.showInstall}>
+                            <a
+                                class="slds-button slds-button_neutral"
+                                href={module.installUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                data-id="install"
+                                >{labels.install}<span class="slds-assistive-text">{module.name} {labels.newTab}</span></a
+                            >
+                        </template>
+                        <template lwc:if={module.noInstallLink}>
+                            <p class="slds-text-body_small" data-id="no-install-link">{labels.noInstallLink}</p>
+                        </template>
+                        <template lwc:if={module.isOn}>
+                            <lightning-button
+                                label={labels.turnOff}
+                                data-id="turn-off"
+                                data-name={module.name}
+                                onclick={handleTurnOff}
+                            ></lightning-button>
+                        </template>
+                        <template lwc:if={module.isOff}>
+                            <lightning-button
+                                variant="brand"
+                                label={labels.turnOn}
+                                data-id="turn-on"
+                                data-name={module.name}
+                                onclick={handleTurnOn}
+                            ></lightning-button>
+                        </template>
+                        <template lwc:if={module.canSwitch}>
+                            <lightning-button
+                                class="slds-var-m-left_x-small"
+                                label={labels.report}
+                                data-id="report"
+                                data-name={module.name}
+                                onclick={handleReport}
+                            ></lightning-button>
+                        </template>
+                    </div>
+                </template>
+                <template lwc:if={module.hasReport}>
+                    <div class="slds-box slds-var-m-top_x-small" data-id="report-panel">
+                        <p class="slds-text-body_small">{labels.reportIntro}</p>
+                        <ul class="slds-list_dotted">
+                            <template for:each={module.report} for:item="line">
+                                <li key={line.objectLabel}>{line.objectLabel}: {line.countText}</li>
+                            </template>
+                        </ul>
+                        <template lwc:if={module.reportEmpty}>
+                            <p class="slds-text-body_small" data-id="report-empty">{labels.reportEmpty}</p>
+                        </template>
+                        <a href={installedPackagesUrl} data-id="installed-packages">{labels.installedPackages}</a>
+                    </div>
+                </template>
+            </li>
+        </template>
+    </ul>
+
+    <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">{labels.tabsNotice}</p>
+    <div class="slds-var-m-top_x-small">
+        <lightning-button label={labels.checkAgain} data-id="check-again" onclick={handleCheckAgain}></lightning-button>
+        <a class="slds-var-m-left_small" href={installedPackagesUrl}>{labels.installedPackages}</a>
+    </div>
+</template>

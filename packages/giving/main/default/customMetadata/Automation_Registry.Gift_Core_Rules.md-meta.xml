@@ -22,4 +22,8 @@
         <field>Description__c</field>
         <value xsi:type="xsd:string">Fills in the household from the donor, dates a gift that was saved without one, allocates a gift with no designation to the default fund, and keeps a gift and its allocations adding up. Switching it off leaves the receipt lock in place: that rule has its own automation (Gift: receipt lock), which always runs.</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

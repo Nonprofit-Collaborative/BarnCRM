@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Find's summary: count, total, lowest or highest of a query's records, grouped by a field
+    (canonical model R-SQ9). Nested in findRecords.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

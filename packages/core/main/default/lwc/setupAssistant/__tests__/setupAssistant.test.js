@@ -3,6 +3,7 @@ import SetupAssistant from 'c/setupAssistant';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
+import applySuite from '@salesforce/apex/SetupAssistantController.applySuite';
 import applyCoexistence from '@salesforce/apex/SetupAssistantController.applyCoexistence';
 import saveStepValues from '@salesforce/apex/SetupAssistantController.saveStepValues';
 import assignAccess from '@salesforce/apex/SetupAssistantController.assignAccess';
@@ -22,6 +23,9 @@ jest.mock('@salesforce/apex/SetupAssistantController.skipStep', () => ({ default
 jest.mock('@salesforce/apex/SetupAssistantController.reset', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/SetupAssistantController.applySuite', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/apex/SetupAssistantController.applyCoexistence',
   () => ({ default: jest.fn() }),
@@ -35,6 +39,28 @@ jest.mock(
 jest.mock(
   '@salesforce/apex/SetupAssistantController.assignAccess',
   () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel',
+  () => ({ default: 'Time taken: {0} minutes' }),
+  { virtual: true }
+);
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
   { virtual: true }
 );
 
@@ -111,6 +137,25 @@ function state(overrides = {}) {
     ],
     importAvailable: false,
     ...overrides
+  };
+}
+
+// Core's first step since C-30: the edition, ahead of the steps above.
+function withSuiteStep(suite, completed = false) {
+  const base = state();
+  const suiteStep = {
+    ...base.steps[0],
+    key: 'suite',
+    position: 1,
+    label: 'Choose your edition',
+    completed
+  };
+  return {
+    ...base,
+    steps: [suiteStep, ...base.steps.map((step) => ({ ...step, position: step.position + 1 }))],
+    stepsTotal: 9,
+    stepsCompleted: completed ? 1 : 0,
+    suite
   };
 }
 
@@ -451,7 +496,9 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(element.shadowRoot.querySelector('[data-id="complete-heading"]')).not.toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="elapsed"]').textContent).toContain('21');
+    expect(element.shadowRoot.querySelector('[data-id="elapsed"]').textContent.trim()).toBe(
+      'Time taken: 21 minutes'
+    );
     expect(element.shadowRoot.querySelectorAll('li')).toHaveLength(8);
 
     click(element, 'reopen');
@@ -497,5 +544,96 @@ describe('c-setup-assistant', () => {
     await settle();
 
     expect(element.shadowRoot.textContent).toContain('No luck today.');
+  });
+
+  it('saves the Community Suite through Apex and moves on', async () => {
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
+    applySuite.mockResolvedValue(
+      withSuiteStep({ currentSuite: 'Community', giving: { present: false } }, true)
+    );
+    const element = build();
+    await settle();
+
+    element.shadowRoot
+      .querySelector('c-setup-step-suite')
+      .dispatchEvent(new CustomEvent('confirm', { detail: { suite: 'Community' } }));
+    await settle();
+
+    expect(applySuite).toHaveBeenCalledWith({ suite: 'Community' });
+    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+      'Confirm how BarnCRM fits your existing org'
+    );
+  });
+
+  it('stays on the step when the Nonprofit Edition still needs Giving installed', async () => {
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
+    applySuite.mockResolvedValue(
+      withSuiteStep({ currentSuite: 'Impact', giving: { present: false } }, true)
+    );
+    const element = build();
+    await settle();
+
+    element.shadowRoot
+      .querySelector('c-setup-step-suite')
+      .dispatchEvent(new CustomEvent('confirm', { detail: { suite: 'Impact' } }));
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+      'Choose your edition'
+    );
+    expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.currentSuite).toBe(
+      'Impact'
+    );
+  });
+
+  it('checks again for Giving without leaving the step', async () => {
+    getState.mockResolvedValue(withSuiteStep({ currentSuite: 'Impact', giving: {} }));
+    const element = build();
+    await settle();
+    getState.mockResolvedValue(
+      withSuiteStep({ currentSuite: 'Impact', giving: { present: true } }, true)
+    );
+
+    element.shadowRoot
+      .querySelector('c-setup-step-suite')
+      .dispatchEvent(new CustomEvent('checkagain'));
+    await settle();
+
+    expect(getState).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelector('[data-id="step-label"]').textContent).toContain(
+      'Choose your edition'
+    );
+    expect(element.shadowRoot.querySelector('c-setup-step-suite').suite.giving.present).toBe(true);
+  });
+
+  it('opens the settings section a step belongs to by page reference, not by URL', async () => {
+    const element = build();
+    await settle();
+
+    click(element, 'section-link');
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'BarnCRM_Settings' },
+      state: { c__section: 'General' }
+    });
+  });
+
+  it('opens the Import tab by page reference from the data step', async () => {
+    getState.mockResolvedValue(
+      state({
+        importAvailable: true,
+        completedKeys: ['coexistence', 'naming', 'moduledefaults', 'access', 'identity', 'modules']
+      })
+    );
+    const element = build();
+    await settle();
+
+    click(element, 'import-link');
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Import' }
+    });
   });
 });

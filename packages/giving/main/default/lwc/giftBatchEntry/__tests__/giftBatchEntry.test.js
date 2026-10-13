@@ -7,6 +7,7 @@ import { getRecord, notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import getBatch from '@salesforce/apex/GiftBatchController.getBatch';
 import saveLines from '@salesforce/apex/GiftBatchController.saveLines';
 import postBatch from '@salesforce/apex/GiftBatchController.postBatch';
+import getPaymentChoices from '@salesforce/apex/GiftBatchController.getPaymentChoices';
 
 jest.mock('@salesforce/apex/GiftBatchController.getBatch', () => ({ default: jest.fn() }), {
   virtual: true
@@ -17,6 +18,24 @@ jest.mock('@salesforce/apex/GiftBatchController.saveLines', () => ({ default: je
 jest.mock('@salesforce/apex/GiftBatchController.postBatch', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/GiftBatchController.getPaymentChoices',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+
+// The two labels that carry a line number are given their real wording, so the tests can
+// read the number in them.
+jest.mock('@salesforce/label/c.Giving_GiftBatch_CellLabel', () => ({ default: '{0}, line {1}' }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/label/c.Giving_GiftBatch_RemoveLine',
+  () => ({ default: 'Remove line {0}' }),
+  {
+    virtual: true
+  }
+);
 
 const BATCH_ID = 'a0B000000000001AAA';
 const ANA = '003000000000001AAA';
@@ -82,6 +101,36 @@ describe('c-gift-batch-entry', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('names every input and remove button with its line number', async () => {
+    const element = await build(view({ lines: [line('a0C1', 100), line('a0C2', 25)] }));
+
+    const amounts = field(element, 'amount');
+    expect(amounts[0].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 1');
+    expect(amounts[1].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 2');
+    expect(field(element, 'fundId')[1].label).toBe('c.Giving_GiftBatch_ColumnFund, line 2');
+    expect(all(element, 'donor')[1].label).toBe('c.Giving_GiftBatch_ColumnDonor, line 2');
+    expect(all(element, 'kind')[0].label).toBe('c.Giving_GiftBatch_DonorKind, line 1');
+    const removes = all(element, 'remove');
+    expect(removes[0].alternativeText).toBe('Remove line 1');
+    expect(removes[1].alternativeText).toBe('Remove line 2');
+  });
+
+  it('renumbers the labels when a line is removed', async () => {
+    const element = await build(view({ lines: [line('a0C1', 100), line('a0C2', 25)] }));
+
+    all(element, 'remove')[0].click();
+    await settle();
+
+    expect(field(element, 'amount')[0].label).toBe('c.Giving_GiftBatch_ColumnAmount, line 1');
+    expect(all(element, 'remove')[0].alternativeText).toBe('Remove line 1');
+  });
+
+  it('shows no phone note on a computer', async () => {
+    const element = await build(view({ lines: [line('a0C1', 100)] }));
+
+    expect(pick(element, 'use-computer')).toBeNull();
   });
 
   it('opens an empty batch with its control total and says it is short', async () => {
@@ -229,5 +278,136 @@ describe('c-gift-batch-entry', () => {
     await settle();
 
     expect(pick(element, 'form-error').textContent).toBe('This batch could not be found.');
+  });
+
+  describe('Pays column', () => {
+    const MARCH = 'a01000000000001AAA';
+    const APRIL = 'a01000000000002AAA';
+    const answerFor = (key, suggested) => ({
+      key,
+      choices: [
+        {
+          value: MARCH,
+          label: 'Pledge CM-000001, payment 1',
+          suggested: suggested.includes(MARCH)
+        },
+        { value: APRIL, label: 'Pledge CM-000001, payment 2', suggested: suggested.includes(APRIL) }
+      ],
+      suggestedId: suggested.length === 1 ? suggested[0] : null,
+      suggestedCount: suggested.length
+    });
+
+    /** Answers every line asked about with the same two payments. */
+    function answerAll(suggested) {
+      getPaymentChoices.mockImplementation(({ lines }) =>
+        Promise.resolve(lines.map((asked) => answerFor(asked.key, suggested)))
+      );
+    }
+
+    async function typeANewLine(element) {
+      pick(element, 'add').click();
+      await settle();
+      const last = all(element, 'donor').length - 1;
+      change(all(element, 'donor')[last], { recordId: ANA });
+      change(field(element, 'amount')[last], { value: '100' });
+      jest.runOnlyPendingTimers();
+      await settle();
+      return last;
+    }
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('keeps what a saved line was saved with and chooses nothing for it again', async () => {
+      answerAll([MARCH]);
+      const element = await build(view({ lines: [line('a0C1', 100)] }));
+
+      expect(getPaymentChoices).toHaveBeenCalledWith({
+        batchId: BATCH_ID,
+        lines: [
+          {
+            key: 'a0C1',
+            donorContactId: ANA,
+            donorAccountId: null,
+            amount: 100,
+            giftDate: undefined
+          }
+        ]
+      });
+      const pays = pick(element, 'pays');
+      expect(pays.label).toBe('c.Giving_GiftBatch_ColumnPays, line 1');
+      expect(pays.value).toBe('');
+      expect(pays.options.map((option) => option.value)).toEqual(['', MARCH, APRIL]);
+    });
+
+    it('chooses the only suggestion for a new line, says so, and saves it', async () => {
+      answerAll([MARCH]);
+      const element = await build(view({ lines: [] }));
+      saveLines.mockResolvedValue(view({ lines: [line('a0C1', 100, { installmentId: MARCH })] }));
+
+      await typeANewLine(element);
+
+      expect(pick(element, 'pays').value).toBe(MARCH);
+      expect(pick(element, 'pays-note').textContent).toBe('c.Giving_GiftEntryPays_OneSuggested');
+
+      pick(element, 'save').click();
+      await settle();
+      expect(saveLines.mock.calls[0][0].lines[0].installmentId).toBe(MARCH);
+    });
+
+    it('chooses nothing when two payments are suggested', async () => {
+      answerAll([MARCH, APRIL]);
+      const element = await build(view({ lines: [] }));
+
+      await typeANewLine(element);
+
+      expect(pick(element, 'pays').value).toBe('');
+      expect(pick(element, 'pays-note').textContent).toBe(
+        'c.Giving_GiftEntryPays_SeveralSuggested'
+      );
+    });
+
+    it('keeps the person choice of None', async () => {
+      answerAll([MARCH]);
+      const element = await build(view({ lines: [] }));
+      saveLines.mockResolvedValue(view({ lines: [line('a0C1', 100)] }));
+      const last = await typeANewLine(element);
+
+      change(pick(element, 'pays'), { value: '' });
+      change(field(element, 'amount')[last], { value: '100.00' });
+      jest.runOnlyPendingTimers();
+      await settle();
+
+      expect(pick(element, 'pays').value).toBe('');
+      pick(element, 'save').click();
+      await settle();
+      expect(saveLines.mock.calls[0][0].lines[0].installmentId).toBeNull();
+    });
+
+    it('keeps a saved payment that is no longer open and says to choose again', async () => {
+      const PAID = 'a01000000000009AAA';
+      answerAll([]);
+      const element = await build(view({ lines: [line('a0C1', 100, { installmentId: PAID })] }));
+
+      const pays = pick(element, 'pays');
+      expect(pays.value).toBe(PAID);
+      expect(pays.options[pays.options.length - 1]).toEqual({
+        label: 'c.Giving_GiftEntryPays_NoLongerOpen',
+        value: PAID
+      });
+    });
+
+    it('says the payments could not be loaded', async () => {
+      getPaymentChoices.mockRejectedValue({ body: { message: 'boom' } });
+      const element = await build(view({ lines: [line('a0C1', 100)] }));
+
+      expect(pick(element, 'pays-error')).not.toBeNull();
+      expect(pick(element, 'pays')).toBeNull();
+    });
   });
 });

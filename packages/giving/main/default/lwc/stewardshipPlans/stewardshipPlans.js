@@ -24,8 +24,6 @@ import COLUMN_ACTIVE from '@salesforce/label/c.Giving_Stewardship_ColumnActive';
 import ACTIVE from '@salesforce/label/c.Giving_Stewardship_Active';
 import INACTIVE from '@salesforce/label/c.Giving_Stewardship_Inactive';
 import FIELD_NAME from '@salesforce/label/c.Giving_Stewardship_FieldName';
-import FIELD_KEY from '@salesforce/label/c.Giving_Stewardship_FieldKey';
-import FIELD_KEY_HELP from '@salesforce/label/c.Giving_Stewardship_FieldKeyHelp';
 import FIELD_EVENT from '@salesforce/label/c.Giving_Stewardship_FieldEvent';
 import FIELD_MINIMUM from '@salesforce/label/c.Giving_Stewardship_FieldMinimum';
 import FIELD_MINIMUM_HELP from '@salesforce/label/c.Giving_Stewardship_FieldMinimumHelp';
@@ -48,11 +46,12 @@ import SAVE from '@salesforce/label/c.Giving_Stewardship_Save';
 import CANCEL from '@salesforce/label/c.Giving_Stewardship_Cancel';
 import SAVED from '@salesforce/label/c.Giving_Stewardship_Saved';
 import ACTION_FAILED from '@salesforce/label/c.Giving_Stewardship_ErrorActionFailed';
+import SELECTED from '@salesforce/label/c.Giving_Stewardship_Selected';
+import COLUMN_ACTIONS from '@salesforce/label/c.Giving_Stewardship_ColumnActions';
 
 const EMPTY_TEMPLATE = {
   recordId: null,
   name: '',
-  planKey: '',
   triggerEvent: 'Manual',
   minimumAmount: null,
   description: '',
@@ -94,11 +93,11 @@ export default class StewardshipPlans extends LightningElement {
     columnSteps: COLUMN_STEPS,
     columnRunning: COLUMN_RUNNING,
     columnActive: COLUMN_ACTIVE,
+    columnActions: COLUMN_ACTIONS,
+    selected: SELECTED,
     active: ACTIVE,
     inactive: INACTIVE,
     fieldName: FIELD_NAME,
-    fieldKey: FIELD_KEY,
-    fieldKeyHelp: FIELD_KEY_HELP,
     fieldEvent: FIELD_EVENT,
     fieldMinimum: FIELD_MINIMUM,
     fieldMinimumHelp: FIELD_MINIMUM_HELP,
@@ -288,7 +287,6 @@ export default class StewardshipPlans extends LightningElement {
         template: {
           recordId: draft.recordId,
           name: draft.name,
-          planKey: draft.planKey,
           triggerEvent: draft.triggerEvent,
           minimumAmount: draft.minimumAmount === '' ? null : draft.minimumAmount,
           description: draft.description,

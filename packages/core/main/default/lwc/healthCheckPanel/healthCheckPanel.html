@@ -21,7 +21,7 @@
             <p class="slds-text-body_small slds-m-bottom_small">{labels.intro}</p>
 
             <template if:true={loading}>
-                <p data-id="loading">{labels.loading}</p>
+                <p role="status" data-id="loading">{labels.loading}</p>
             </template>
 
             <template if:true={errorMessage}>

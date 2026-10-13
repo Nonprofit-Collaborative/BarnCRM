@@ -3,19 +3,19 @@
     <div class="slds-var-p-horizontal_medium">
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
-      <template if:true={hasError}>
-        <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+      <template lwc:if={hasError}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
 
-      <template if:true={hasNotice}>
-        <p data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
+      <template lwc:if={hasNotice}>
+        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
           {noticeMessage}
         </p>
       </template>
 
-      <template if:true={showOffNotice}>
+      <template lwc:if={showOffNotice}>
         <p data-id="off-notice" class="slds-text-body_small slds-var-m-bottom_small">
           {labels.off}
         </p>
@@ -30,12 +30,12 @@
         </dd>
       </dl>
 
-      <template if:true={isEmpty}>
+      <template lwc:if={isEmpty}>
         <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
       </template>
 
-      <template if:true={hasLadder}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+      <template lwc:if={hasLadder}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
           <thead>
             <tr class="slds-line-height_reset">
               <th scope="col">{labels.columnLevel}</th>
@@ -48,7 +48,7 @@
           <tbody>
             <template for:each={rungs} for:item="rung">
               <tr key={rung.recordId} data-id="rung">
-                <td>
+                <td data-label={labels.columnLevel}>
                   <lightning-button
                     data-id="rung-link"
                     data-record-id={rung.recordId}
@@ -57,23 +57,23 @@
                     onclick={handleOpenRung}
                   ></lightning-button>
                 </td>
-                <td>
+                <td data-label={labels.columnFrom}>
                   <lightning-formatted-number
                     format-style="currency"
                     value={rung.minimumAmount}
                   ></lightning-formatted-number>
                 </td>
-                <td>
-                  <template if:true={rung.isTopOfLadder}>{labels.topOfLadder}</template>
-                  <template if:false={rung.isTopOfLadder}>
+                <td data-label={labels.columnUpTo}>
+                  <template lwc:if={rung.isTopOfLadder}>{labels.topOfLadder}</template>
+                  <template lwc:else>
                     <lightning-formatted-number
                       format-style="currency"
                       value={rung.maximumAmount}
                     ></lightning-formatted-number>
                   </template>
                 </td>
-                <td data-id="donor-count">{rung.donorCount}</td>
-                <td data-id="rung-active">{rung.activeText}</td>
+                <td data-id="donor-count" data-label={labels.columnDonors}>{rung.donorCount}</td>
+                <td data-id="rung-active" data-label={labels.columnActive}>{rung.activeText}</td>
               </tr>
             </template>
           </tbody>

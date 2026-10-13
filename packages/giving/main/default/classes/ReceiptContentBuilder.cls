@@ -13,8 +13,9 @@
  * through `@page` margin boxes.
  *
  * The organization's branding is printed the same way, and for the same reason (R-RC13): the legal
- * name and the address go above the letter when the template did not place them itself, so an
- * administrator cannot produce a document with no organization on it. The logo is optional and
+ * name and the address are a letterhead the package prints above every letter (ADR-0065,
+ * `0065-receipt-letters-are-edited-as-rich-text.md`), so an administrator cannot produce a
+ * document with no organization on it. The logo is optional and
  * comes from `ReceiptLogoSource`, whose delivery route is **unverified in an org**: ADR-0016's
  * second spike is open, and a receipt with no images at all is a valid receipt.
  */
@@ -58,6 +59,19 @@ public with sharing class ReceiptContentBuilder {
     private static final String TOKEN_OPEN = '{{';
     private static final String TOKEN_CLOSE = '}}';
     private static final Set<String> RAW_TOKENS = new Set<String>{ 'GiftLines' };
+
+    /**
+     * What marks a letter saved before the package printed the letterhead itself: the shipped
+     * letters opened with `<div class="letterhead">`. While a stored letter still has it, that
+     * block prints the name and the package prints the logo only (ADR-0065 point 3).
+     */
+    public static final String LEGACY_LETTERHEAD_MARKER = 'class="letterhead"';
+
+    /**
+     * The gift lines token as the rich text editor stores it, on a paragraph of its own. The
+     * table replaces the whole paragraph, because a table inside a paragraph is not valid HTML.
+     */
+    private static final String GIFT_LINES_PARAGRAPH = '<p>{{GiftLines}}</p>';
 
     public class ReceiptContentException extends Exception {
     }
@@ -321,7 +335,7 @@ public with sharing class ReceiptContentBuilder {
         if (String.isBlank(templateBody)) {
             throw new ReceiptContentException(Label.Giving_Receipt_NoActiveTemplate);
         }
-        String merged = templateBody;
+        String merged = templateBody.replace(GIFT_LINES_PARAGRAPH, '{{GiftLines}}');
         for (String name : tokens.keySet()) {
             // Everything a person typed is escaped on the way in. The gift lines are the one
             // exception, because the package built that markup itself, and it escaped every
@@ -360,22 +374,22 @@ public with sharing class ReceiptContentBuilder {
 
     /**
      * The letterhead the package prints above the letter (R-RC13): the logo, when the organization
-     * has one and has left it turned on, and the organization's name and address when the template
-     * did not place them itself.
+     * has one and has left it turned on, and the organization's name and address.
      *
-     * The template test is the one already used for the gift lines: an administrator who deleted
-     * the letterhead out of their template has not thereby issued a document with no organization
-     * on it, and one that kept it does not get the name twice.
+     * The letterhead is code, not template (ADR-0065): a letter that merely mentions
+     * `{{OrganizationName}}` in a sentence still gets it. The one exception is a letter saved
+     * before that decision, which still carries its own letterhead block; that block prints the
+     * name, so the package does not print it twice.
      */
     private static String brandingBlock(OrganizationDetails details, String templateBody) {
         String logo = ReceiptLogoSource.imageTag();
-        Boolean templateNamedOrganization =
-            templateBody != null && templateBody.contains('{{OrganizationName}}');
-        if (String.isBlank(logo) && templateNamedOrganization) {
+        Boolean templateHasOwnLetterhead =
+            templateBody != null && templateBody.contains(LEGACY_LETTERHEAD_MARKER);
+        if (String.isBlank(logo) && templateHasOwnLetterhead) {
             return '';
         }
         String block = '<div class="branding">' + logo;
-        if (!templateNamedOrganization) {
+        if (!templateHasOwnLetterhead) {
             block += '<p class="orgname">' + escape(details.legalName) + '</p>';
             if (String.isNotBlank(details.address)) {
                 block +=

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Find_ErrorRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a related record kind is unknown. {0} is its name.</shortDescription>
+        <value>"{0}" is not a kind of related record you can use here. Choose one from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorRelatedCount</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: too many related records conditions or columns.</shortDescription>
+        <value>A query can have at most two related records conditions and two related record columns.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorChildColumn</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a related record column has bad fields or count.</shortDescription>
+        <value>A related record column needs from 1 to 5 fields and shows from 1 to 10 records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorSummary</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a summary names no known function.</shortDescription>
+        <value>Choose what to summarize: count of records, total, lowest or highest.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorSummaryField</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a field cannot be measured. {0} is its label.</shortDescription>
+        <value>{0} cannot be measured this way. Totals take a number field; lowest and highest take a number or date field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorSummaryGroup</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: a field cannot be grouped by. {0} is its label.</shortDescription>
+        <value>Find cannot group by {0}. Choose another field, such as a picklist, a date or a text field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorSummaryTooMany</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: too many records to summarize. {0} is the limit.</shortDescription>
+        <value>More than {0} records match, the most a summary covers. Narrow the conditions, or use a report.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorEditTooMany</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: too many edited records in one save.</shortDescription>
+        <value>Save at most 200 changed records at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorEditRecord</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal: an edited row is not a record of the query object.</shortDescription>
+        <value>A changed row is not a record of this query's object. Run the query again and redo the change.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ErrorEditNotFound</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row error: an edited record cannot be read by the user.</shortDescription>
+        <value>This record could not be read with your access, so it was not saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_LogEdited</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Run log of a save from Find's grid. {0} user, {1} time, {2}-{5}.</shortDescription>
+        <value>Edited in Find by {0} on {1}: {2}, {3} saved, {4} already held the values, {5} refused.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Summarize</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button and heading: summarize the query's records.</shortDescription>
+        <value>Summarize</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SummaryFunction</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: what the summary works out.</shortDescription>
+        <value>Summary</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Count</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: count the records.</shortDescription>
+        <value>Count of records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Sum</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: total of a number field.</shortDescription>
+        <value>Total of</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Min</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: lowest value of a field.</shortDescription>
+        <value>Lowest</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Max</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary choice: highest value of a field.</shortDescription>
+        <value>Highest</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SummaryField</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the field a total, lowest or highest measures.</shortDescription>
+        <value>Field to measure</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_GroupBy</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the field a summary is grouped by.</shortDescription>
+        <value>Group by</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_NoGroup</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Group by choice: one line for every record.</shortDescription>
+        <value>No grouping (one line)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Group</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary table column: the group.</shortDescription>
+        <value>Group</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Result</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary table column: the count or total.</shortDescription>
+        <value>Result</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Blank</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Summary group for records with the field empty.</shortDescription>
+        <value>(blank)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_SummaryCapped</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Note: a summary has more groups than shown. {0} is the cap.</shortDescription>
+        <value>Showing the first {0} groups. Narrow the conditions to see the rest.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TypeQuery</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button and heading: type a query as text.</shortDescription>
+        <value>Type a query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_QueryText</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the typed query text box.</shortDescription>
+        <value>Query (SOQL)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_QueryTextHelp</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help: what a typed query is and what happens to it.</shortDescription>
+        <value>SELECT, FROM, WHERE, ORDER BY and LIMIT. Find reads the text into the builder and checks it like any built query; the text itself is never run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_UseQuery</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: read the typed query into the builder.</shortDescription>
+        <value>Use this query</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextSyntax</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal. {0} is the words Find stopped at.</shortDescription>
+        <value>Find could not read the query near: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextMixed</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: AND and OR mixed without brackets.</shortDescription>
+        <value>Add brackets where AND and OR are mixed, for example A AND (B OR C).</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextLike</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: a LIKE pattern. {0} is the pattern.</shortDescription>
+        <value>LIKE takes 'text%' (starts with) or '%text%' (contains), without _. Change {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: related records in the wrong place.</shortDescription>
+        <value>Write related records as Id IN (SELECT ...) or Id NOT IN (SELECT ...), joined to the other conditions with AND.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextUnsupported</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: unsupported words. {0} is the words.</shortDescription>
+        <value>Find queries do not support this: {0}. Use Summarize for totals and groups.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextOneSort</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: more than one sort field.</shortDescription>
+        <value>Sort by one field only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_TextEmpty</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Typed query refusal: the text box is empty.</shortDescription>
+        <value>Type a query first.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedRecords</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading: related records conditions.</shortDescription>
+        <value>Related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedHelp</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Help under the related records heading.</shortDescription>
+        <value>Keep only the records that have, or have no, related records matching conditions of their own.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_AddRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: add a related records condition.</shortDescription>
+        <value>Add related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Has</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Choice: keep records that have matching related records.</shortDescription>
+        <value>Has related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_HasNo</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Choice: keep records with no matching related records.</shortDescription>
+        <value>Has no related records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Which</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: has or has no related records.</shortDescription>
+        <value>Which records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedKind</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the kind of related record.</shortDescription>
+        <value>Kind of related record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ChooseRelated</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Placeholder: choose a kind of related record.</shortDescription>
+        <value>Choose a kind of related record</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedConditions</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label above the related records' own conditions.</shortDescription>
+        <value>Conditions on the related records (none means any related record)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedColumns</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading: related record columns.</shortDescription>
+        <value>Related record columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_AddRelatedColumn</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: add a related record column.</shortDescription>
+        <value>Add a related record column</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedFields</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: the related record fields a column shows.</shortDescription>
+        <value>Fields to show (up to 5)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RelatedRows</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label: how many related records a column shows.</shortDescription>
+        <value>Records per row (newest first)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_Remove</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: remove a related records condition or column.</shortDescription>
+        <value>Remove</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_ExportExcel</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: download the results as an Excel workbook.</shortDescription>
+        <value>Export to Excel</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_EditSaved</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice after table edits are saved. {0} saved count, {1} unchanged count.</shortDescription>
+        <value>Saved {0} records. {1} already held the values. Undo from the Bulk Update tab.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_EditFailed</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error after table edits when some rows failed. {0} failed count.</shortDescription>
+        <value>{0} records were not saved; each is marked in the table.</value>
+    </labels>
+</CustomLabels>

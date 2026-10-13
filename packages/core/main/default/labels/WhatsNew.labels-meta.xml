@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_WhatsNew_Title</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What's new card: heading.</shortDescription>
+        <value>What's new in BarnCRM</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhatsNew_Intro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What's new card: line under the heading.</shortDescription>
+        <value>Here is what changed since you last dismissed this card.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhatsNew_Version</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What's new card: release heading; {0} is a version such as 0.12.</shortDescription>
+        <value>Version {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhatsNew_Dismiss</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What's new card: button that hides the card until the next release.</shortDescription>
+        <value>Dismiss</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhatsNew_Failed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What's new card: loading or dismissing failed.</shortDescription>
+        <value>What's new could not be updated. Refresh the page and try again. The problem is recorded in the Error Log.</value>
+    </labels>
+</CustomLabels>

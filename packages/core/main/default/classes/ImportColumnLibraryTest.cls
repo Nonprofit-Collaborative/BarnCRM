@@ -2,6 +2,7 @@
  * Automatic column mapping: the headings an organization's file actually carries, and the
  * deliberate refusal to guess at one nobody recognizes.
  */
+// runs-as: deploying user (pure logic: matches column headings in memory, no DML or SOQL)
 @IsTest
 private class ImportColumnLibraryTest {
     @IsTest

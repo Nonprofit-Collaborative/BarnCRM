@@ -55,6 +55,8 @@ You are David, and you are setting up funds before your first gift entry session
   offered on new gifts and keeps its history.
 - **Two funds that mean the same thing.** "General" and "General Fund" split your reporting
   in half. Pick one, move any allocations, then deactivate the other.
-- **Expecting Total Raised to change the instant you save a gift.** The rollup engine
-  calculates the totals. **Rollups Last Calculated** on the fund tells you when the number
-  was worked out, so you always know whether you are looking at a fresh number.
+- **Expecting an import to move Total Raised the instant it finishes.** A gift saved by a
+  person updates its funds' totals in the same save, but the totals from an import or other
+  bulk change are queued and catch up within minutes. **Rollups Last Calculated** on the fund
+  tells you when the number was worked out, so you always know whether you are looking at a
+  fresh number.

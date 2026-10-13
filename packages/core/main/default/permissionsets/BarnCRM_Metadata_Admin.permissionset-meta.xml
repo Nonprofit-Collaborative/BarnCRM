@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>BarnCRM Metadata Admin</label>
+  <description>
+    Optional: the Custom metadata page in BarnCRM Settings, where saving changes the org's
+    metadata. For people who already administer the org. In no role on purpose.
+  </description>
+  <classAccesses>
+    <apexClass>CustomMetadataManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Manage_BarnCRM_Metadata</name>
+  </customPermissions>
+</PermissionSet>

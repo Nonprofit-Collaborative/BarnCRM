@@ -253,6 +253,16 @@ describe('c-duplicate-review', () => {
     });
   });
 
+  it('opens the dismiss box as a labelled region and moves focus to its heading', async () => {
+    const element = await mount(viewWith({ suggestions: [PEOPLE_PAIR] }));
+    q(element, 'dismiss-button').click();
+    await flush();
+    const box = q(element, 'dismiss-dialog');
+    expect(box.getAttribute('role')).toBe('region');
+    expect(box.hasAttribute('aria-modal')).toBe(false);
+    expect(element.shadowRoot.activeElement).toBe(q(element, 'dismiss-heading'));
+  });
+
   it('closes a dialog on cancel', async () => {
     const element = await mount(viewWith({ suggestions: [PEOPLE_PAIR] }));
     q(element, 'dismiss-button').click();

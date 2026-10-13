@@ -1,0 +1,94 @@
+<template>
+    <template if:true={allowed}>
+        <lightning-card title={labels.title} icon-name="utility:edit">
+            <lightning-button slot="actions" data-id="refresh" label={labels.refresh} onclick={handleRefresh}></lightning-button>
+            <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+                <template if:true={busy}>
+                    <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+                </template>
+                <p class="slds-var-m-bottom_small">{labels.intro}</p>
+
+                <template if:true={hasError}>
+                    <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+                        <span data-id="error-message">{errorMessage}</span>
+                    </div>
+                </template>
+                <template if:true={hasNotice}>
+                    <div
+                        class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        <span data-id="notice-message">{noticeMessage}</span>
+                    </div>
+                </template>
+
+                <template if:true={undoTarget}>
+                    <section class="slds-box slds-var-m-bottom_medium" data-id="undo-box">
+                        <p class="slds-var-m-bottom_x-small" data-id="undo-line">{undoLine}</p>
+                        <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <lightning-input
+                                    data-id="undo-confirm"
+                                    label={labels.confirm}
+                                    value={undoText}
+                                    onchange={handleUndoText}
+                                ></lightning-input>
+                            </div>
+                            <div class="slds-col slds-no-flex">
+                                <lightning-button label={labels.cancel} onclick={handleUndoCancel}></lightning-button>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    data-id="undo-start"
+                                    variant="destructive"
+                                    label={labels.undoButton}
+                                    disabled={undoDisabled}
+                                    onclick={handleUndoConfirm}
+                                ></lightning-button>
+                            </div>
+                        </div>
+                    </section>
+                </template>
+
+                <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.recent}</h2>
+                <template if:true={hasJobs}>
+                    <ul class="slds-has-dividers_bottom-space">
+                        <template for:each={jobRows} for:item="row">
+                            <li key={row.recordId} class="slds-item" data-id="job-row">
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <div class="slds-col">
+                                        <p class="slds-text-title_bold">{row.name}: {row.objectLabel}, {row.status}</p>
+                                        <p class="slds-text-body_small">{row.summary}</p>
+                                        <template if:true={row.showUndo}>
+                                            <p class="slds-text-body_small">
+                                                {labels.undoUntil}
+                                                <lightning-formatted-date-time
+                                                    class="slds-var-m-left_xx-small"
+                                                    value={row.undoDeadline}
+                                                    year="numeric"
+                                                    month="short"
+                                                    day="numeric"
+                                                ></lightning-formatted-date-time>
+                                            </p>
+                                        </template>
+                                    </div>
+                                    <template if:true={row.showUndo}>
+                                        <lightning-button
+                                            data-id={row.recordId}
+                                            label={labels.undo}
+                                            disabled={busy}
+                                            onclick={handleUndo}
+                                        ></lightning-button>
+                                    </template>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template if:false={hasJobs}>
+                    <p data-id="no-jobs">{labels.noJobs}</p>
+                </template>
+            </div>
+        </lightning-card>
+    </template>
+</template>

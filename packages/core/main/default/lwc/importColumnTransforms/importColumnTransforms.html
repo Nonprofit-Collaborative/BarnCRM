@@ -1,0 +1,86 @@
+<template>
+    <div class="slds-box slds-var-m-top_small" data-id="changes">
+        <template lwc:if={standalone}>
+            <h3 class="slds-text-heading_x-small">{heading}</h3>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.help}</p>
+        </template>
+        <template for:each={rows} for:item="step">
+            <div key={step.key} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small" data-id="step">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <lightning-combobox
+                        label={labels.kindLabel}
+                        data-key={step.key}
+                        data-name="op"
+                        value={step.op}
+                        options={operationOptions}
+                        onchange={handleInput}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12">
+                    <template lwc:if={step.isReplace}>
+                        <lightning-input label={labels.findLabel} data-key={step.key} data-name="text" value={step.text} max-length="255" onchange={handleInput}></lightning-input>
+                        <lightning-input label={labels.replaceWithLabel} data-key={step.key} data-name="replaceWith" value={step.replaceWith} max-length="255" onchange={handleInput}></lightning-input>
+                        <lightning-input type="checkbox" label={labels.matchCaseLabel} data-key={step.key} data-name="matchCase" checked={step.matchCase} onchange={handleInput}></lightning-input>
+                        <lightning-input type="checkbox" label={labels.wholeValueLabel} data-key={step.key} data-name="wholeValue" checked={step.wholeValue} onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isIfBlank}>
+                        <lightning-input label={labels.valueLabel} data-key={step.key} data-name="value" value={step.value} max-length="255" onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isAppend}>
+                        <lightning-checkbox-group label={columnsText} data-key={step.key} data-name="columns" options={otherColumnOptions} value={step.columns} onchange={handleInput}></lightning-checkbox-group>
+                        <lightning-input label={labels.separatorLabel} data-key={step.key} data-name="separator" value={step.separator} max-length="10" onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isDate}>
+                        <lightning-combobox label={labels.dateOrderLabel} data-key={step.key} data-name="dateOrder" value={step.dateOrder} options={orderOptions} onchange={handleInput}></lightning-combobox>
+                    </template>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-align-bottom">
+                    <lightning-button-icon
+                        icon-name="utility:delete"
+                        alternative-text={labels.removeLabel}
+                        title={labels.removeLabel}
+                        data-key={step.key}
+                        data-id="remove"
+                        onclick={handleRemove}
+                    ></lightning-button-icon>
+                </div>
+            </div>
+        </template>
+        <lightning-button label={labels.addLabel} data-id="add" disabled={cannotAdd} onclick={handleAdd}></lightning-button>
+        <template lwc:if={hasProblems}>
+            <p class="slds-text-color_error slds-text-body_small slds-var-m-top_x-small" data-id="problems" role="alert">
+                {problemText}
+            </p>
+        </template>
+        <template lwc:if={hasSamples}>
+            <h4 class="slds-text-title slds-var-m-top_small">{labels.previewHeading}</h4>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-top_xx-small">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col">{labels.rowNumberHeader}</th>
+                        <th scope="col">{labels.beforeHeader}</th>
+                        <th scope="col">{labels.afterHeader}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={samples} for:item="sample">
+                        <tr key={sample.key} data-id="sample">
+                            <td>{sample.rowNumber}</td>
+                            <td>{sample.before}</td>
+                            <td>{sample.after}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+        <template lwc:if={standalone}>
+            <lightning-button
+                class="slds-var-m-top_small"
+                variant="brand"
+                label={labels.doneLabel}
+                data-id="done"
+                onclick={handleDone}
+            ></lightning-button>
+        </template>
+    </div>
+</template>

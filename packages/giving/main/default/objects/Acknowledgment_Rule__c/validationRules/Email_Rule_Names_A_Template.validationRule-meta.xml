@@ -10,7 +10,7 @@
   </errorConditionFormula>
   <errorDisplayField>Email_Template__c</errorDisplayField>
   <errorMessage>
-    An email rule needs the developer name of the email template it sends. The Acknowledgments page
-    lists the templates your org has.
+    An email rule needs an email template. Edit the rule on the Acknowledgments page and choose one
+    from the list.
   </errorMessage>
 </ValidationRule>

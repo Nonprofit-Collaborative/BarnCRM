@@ -15,9 +15,11 @@ private class OpportunityMirrorServiceTest {
 
     @TestSetup
     static void setup() {
-        GivingTestDataFactory.ensureDefaultFund();
-        GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-        choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.ensureDefaultFund();
+            GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
+            choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
+        }
     }
 
     private static void choose(String direction) {
@@ -92,238 +94,309 @@ private class OpportunityMirrorServiceTest {
         ];
     }
 
+    /**
+     * The absent branch of every test that stops where the org has no Opportunity: the gifts
+     * saved, none was linked, and nothing was logged (R-OM1). `OpportunityMirrorUnavailableTest`
+     * runs this branch.
+     */
+    private static void assertNothingMirrored() {
+        Assert.areEqual(
+            0,
+            [SELECT COUNT() FROM Gift__c WHERE Opportunity_Id__c != NULL WITH SYSTEM_MODE],
+            'Without Opportunity no gift is linked (R-OM1).'
+        );
+        Assert.areEqual(0, warnings().size(), 'And nothing is logged.');
+    }
+
     @IsTest
     static void savingAGiftGivesItAWonOpportunityWithTheDonorAsPrimaryContact() {
-        Gift__c given = gift(100);
-        Test.startTest();
-        System.runAs(maria()) {
-            insert given;
-        }
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c given = gift(100);
+            Test.startTest();
+            System.runAs(maria()) {
+                insert given;
+            }
+            Test.stopTest();
 
-        Gift__c saved = reread(given.Id);
-        if (!OpportunityMirrorService.isAvailable()) {
-            Assert.isNull(saved.Opportunity_Id__c, 'Without Opportunity the mirror does nothing.');
-            return;
+            Gift__c saved = reread(given.Id);
+            if (!OpportunityMirrorService.isAvailable()) {
+                Assert.isNull(
+                    saved.Opportunity_Id__c,
+                    'Without Opportunity the mirror does nothing.'
+                );
+                return;
+            }
+            Assert.isNotNull(
+                saved.Opportunity_Id__c,
+                'The Opportunity is linked in the same save.'
+            );
+            SObject copy = opportunity(saved.Opportunity_Id__c);
+            Assert.areEqual(100, (Decimal) copy.get('Amount'), 'Amount is copied.');
+            Assert.areEqual(saved.Gift_Date__c, copy.get('CloseDate'), 'Gift Date is Close Date.');
+            Assert.areEqual(true, copy.get('IsWon'), 'A Received gift is won (R-OM3).');
+            Assert.areEqual(
+                saved.Household__c,
+                copy.get('AccountId'),
+                'The household is the Account.'
+            );
+            Assert.isTrue(
+                ((String) copy.get('Name')).contains('Luis Garcia'),
+                'The Opportunity is named after the donor: ' + copy.get('Name')
+            );
+            List<SObject> roles = primaryRoles(saved.Opportunity_Id__c);
+            Assert.areEqual(1, roles.size(), 'One primary contact role.');
+            Assert.areEqual(
+                luis().Id,
+                roles[0].get('ContactId'),
+                'The donor is the primary contact.'
+            );
+            Assert.areEqual(0, warnings().size(), 'Nothing to warn about.');
         }
-        Assert.isNotNull(saved.Opportunity_Id__c, 'The Opportunity is linked in the same save.');
-        SObject copy = opportunity(saved.Opportunity_Id__c);
-        Assert.areEqual(100, (Decimal) copy.get('Amount'), 'Amount is copied.');
-        Assert.areEqual(saved.Gift_Date__c, copy.get('CloseDate'), 'Gift Date is Close Date.');
-        Assert.areEqual(true, copy.get('IsWon'), 'A Received gift is won (R-OM3).');
-        Assert.areEqual(saved.Household__c, copy.get('AccountId'), 'The household is the Account.');
-        Assert.isTrue(
-            ((String) copy.get('Name')).contains('Luis Garcia'),
-            'The Opportunity is named after the donor: ' + copy.get('Name')
-        );
-        List<SObject> roles = primaryRoles(saved.Opportunity_Id__c);
-        Assert.areEqual(1, roles.size(), 'One primary contact role.');
-        Assert.areEqual(luis().Id, roles[0].get('ContactId'), 'The donor is the primary contact.');
-        Assert.areEqual(0, warnings().size(), 'Nothing to warn about.');
     }
 
     @IsTest
     static void aChangeToTheGiftFollowsItAndACancelledGiftLosesTheOpportunity() {
-        User admin = maria();
-        Gift__c given = gift(100);
-        System.runAs(admin) {
-            insert given;
-        }
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        String linked = reread(given.Id).Opportunity_Id__c;
-        Test.startTest();
-        System.runAs(admin) {
-            update new Gift__c(Id = given.Id, Amount__c = 150);
-            update new Gift__c(Id = given.Id, Status__c = 'Pending');
-            update new Gift__c(Id = given.Id, Status__c = 'Cancelled');
-        }
-        Test.stopTest();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User admin = maria();
+            Gift__c given = gift(100);
+            System.runAs(admin) {
+                insert given;
+            }
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingMirrored();
+                return;
+            }
+            String linked = reread(given.Id).Opportunity_Id__c;
+            Test.startTest();
+            System.runAs(admin) {
+                update new Gift__c(Id = given.Id, Amount__c = 150);
+                update new Gift__c(Id = given.Id, Status__c = 'Pending');
+                update new Gift__c(Id = given.Id, Status__c = 'Cancelled');
+            }
+            Test.stopTest();
 
-        Gift__c saved = reread(given.Id);
-        Assert.areEqual(linked, saved.Opportunity_Id__c, 'The same Opportunity, not a new one.');
-        SObject copy = opportunity(linked);
-        Assert.areEqual(150, (Decimal) copy.get('Amount'), 'The new amount followed it.');
-        Assert.areEqual(false, copy.get('IsWon'), 'A Cancelled gift is a lost Opportunity.');
-        Assert.areEqual(1, countOpportunities(), 'Nothing is ever deleted or duplicated.');
+            Gift__c saved = reread(given.Id);
+            Assert.areEqual(
+                linked,
+                saved.Opportunity_Id__c,
+                'The same Opportunity, not a new one.'
+            );
+            SObject copy = opportunity(linked);
+            Assert.areEqual(150, (Decimal) copy.get('Amount'), 'The new amount followed it.');
+            Assert.areEqual(false, copy.get('IsWon'), 'A Cancelled gift is a lost Opportunity.');
+            Assert.areEqual(1, countOpportunities(), 'Nothing is ever deleted or duplicated.');
+        }
     }
 
     @IsTest
     static void aPendingGiftGetsNoOpportunityUntilItIsReceived() {
-        User admin = maria();
-        Gift__c pledged = gift(80);
-        pledged.Status__c = 'Pending';
-        Test.startTest();
-        System.runAs(admin) {
-            insert pledged;
-            Assert.isNull(reread(pledged.Id).Opportunity_Id__c, 'Pending is not in the totals.');
-            update new Gift__c(Id = pledged.Id, Status__c = 'Received');
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User admin = maria();
+            Gift__c pledged = gift(80);
+            pledged.Status__c = 'Pending';
+            Test.startTest();
+            System.runAs(admin) {
+                insert pledged;
+                Assert.isNull(
+                    reread(pledged.Id).Opportunity_Id__c,
+                    'Pending is not in the totals.'
+                );
+                update new Gift__c(Id = pledged.Id, Status__c = 'Received');
+            }
+            Test.stopTest();
+            Assert.areEqual(
+                OpportunityMirrorService.isAvailable(),
+                reread(pledged.Id).Opportunity_Id__c != null,
+                'Received, it gets its Opportunity (R-OM2).'
+            );
         }
-        Test.stopTest();
-        Assert.areEqual(
-            OpportunityMirrorService.isAvailable(),
-            reread(pledged.Id).Opportunity_Id__c != null,
-            'Received, it gets its Opportunity (R-OM2).'
-        );
     }
 
     @IsTest
     static void aRefundIsItsOwnNegativeOpportunity() {
-        User admin = maria();
-        Gift__c original = gift(200);
-        System.runAs(admin) {
-            insert original;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User admin = maria();
+            Gift__c original = gift(200);
+            System.runAs(admin) {
+                insert original;
+            }
+            Id refundId;
+            Test.startTest();
+            System.runAs(admin) {
+                refundId = GiftService.refund(original.Id, 200, 'Charged twice');
+            }
+            Test.stopTest();
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingMirrored();
+                return;
+            }
+            SObject negative = opportunity(reread(refundId).Opportunity_Id__c);
+            Assert.areEqual(-200, (Decimal) negative.get('Amount'), 'The refund nets the total.');
+            Assert.areEqual(true, negative.get('IsWon'), 'A refund is in the totals, so won.');
+            Gift__c refunded = reread(original.Id);
+            Assert.areEqual('Refunded', refunded.Status__c, 'Giving marked the original.');
+            Assert.areEqual(
+                true,
+                opportunity(refunded.Opportunity_Id__c).get('IsWon'),
+                'A Refunded original is still won; its refund takes the money back.'
+            );
         }
-        Id refundId;
-        Test.startTest();
-        System.runAs(admin) {
-            refundId = GiftService.refund(original.Id, 200, 'Charged twice');
-        }
-        Test.stopTest();
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        SObject negative = opportunity(reread(refundId).Opportunity_Id__c);
-        Assert.areEqual(-200, (Decimal) negative.get('Amount'), 'The refund nets the total.');
-        Assert.areEqual(true, negative.get('IsWon'), 'A refund is in the totals, so won.');
-        Gift__c refunded = reread(original.Id);
-        Assert.areEqual('Refunded', refunded.Status__c, 'Giving marked the original.');
-        Assert.areEqual(
-            true,
-            opportunity(refunded.Opportunity_Id__c).get('IsWon'),
-            'A Refunded original is still won; its refund takes the money back.'
-        );
     }
 
     @IsTest
     static void aDeletedOpportunityIsReportedAndNotReplaced() {
-        User admin = maria();
-        Gift__c given = gift(100);
-        System.runAs(admin) {
-            insert given;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User admin = maria();
+            Gift__c given = gift(100);
+            System.runAs(admin) {
+                insert given;
+            }
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingMirrored();
+                return;
+            }
+            String linked = reread(given.Id).Opportunity_Id__c;
+            Database.delete(new List<Id>{ linked }, true, AccessLevel.SYSTEM_MODE);
+            Test.startTest();
+            System.runAs(admin) {
+                update new Gift__c(Id = given.Id, Amount__c = 120);
+            }
+            Test.stopTest();
+            Assert.areEqual(linked, reread(given.Id).Opportunity_Id__c, 'The link is kept.');
+            Assert.areEqual(0, countOpportunities(), 'No replacement is made (R-OM9).');
+            List<Error_Log__c> logged = warnings();
+            Assert.areEqual(1, logged.size(), 'One Warning.');
+            Assert.isTrue(
+                logged[0].Message__c.contains('deleted or is not visible to you'),
+                'Worded for a user mode read: ' + logged[0].Message__c
+            );
         }
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        String linked = reread(given.Id).Opportunity_Id__c;
-        Database.delete(new List<Id>{ linked }, true, AccessLevel.SYSTEM_MODE);
-        Test.startTest();
-        System.runAs(admin) {
-            update new Gift__c(Id = given.Id, Amount__c = 120);
-        }
-        Test.stopTest();
-        Assert.areEqual(linked, reread(given.Id).Opportunity_Id__c, 'The link is kept.');
-        Assert.areEqual(0, countOpportunities(), 'No replacement is made (R-OM9).');
-        List<Error_Log__c> logged = warnings();
-        Assert.areEqual(1, logged.size(), 'One Warning.');
-        Assert.isTrue(
-            logged[0].Message__c.contains('deleted or is not visible to you'),
-            'Worded for a user mode read: ' + logged[0].Message__c
-        );
     }
 
     @IsTest
     static void aTypedValueThatIsNotAnOpportunityIsRefused() {
-        Gift__c given = gift(100);
-        given.Opportunity_Id__c = UserInfo.getUserId();
-        Database.SaveResult saved;
-        Test.startTest();
-        System.runAs(maria()) {
-            saved = Database.insert(given, false);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Gift__c given = gift(100);
+            given.Opportunity_Id__c = UserInfo.getUserId();
+            Database.SaveResult saved;
+            Test.startTest();
+            System.runAs(maria()) {
+                saved = Database.insert(given, false);
+            }
+            Test.stopTest();
+            if (!OpportunityMirrorService.isAvailable()) {
+                Assert.isTrue(
+                    saved.isSuccess(),
+                    'Without Opportunity the value is not read (R-OM1).'
+                );
+                Assert.areEqual(0, warnings().size(), 'And nothing is logged.');
+                return;
+            }
+            Assert.isFalse(saved.isSuccess(), 'Another object\'s id is refused (R-OM10).');
         }
-        Test.stopTest();
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        Assert.isFalse(saved.isSuccess(), 'Another object\'s id is refused (R-OM10).');
     }
 
     @IsTest
     static void someoneWithoutThePermissionSetStillHasTheirGiftsCopied() {
-        // David enters gifts and may create Opportunities, but was not given the Opportunity
-        // Mirror permission set, so he cannot see the Opportunity ID field (R-OM5).
-        User david = TestDataFactory.createUser('David', new List<String>{ 'Giving_Admin' });
-        // David's profile sees only what he owns, so he is given a donor of his own.
-        Account household = new Account(Name = 'The Chen Household', OwnerId = david.Id);
-        insert household;
-        Contact mei = new Contact(
-            FirstName = 'Mei',
-            LastName = 'Chen',
-            AccountId = household.Id,
-            OwnerId = david.Id
-        );
-        insert mei;
-        Gift__c given = GivingTestDataFactory.buildGift(mei.Id, 10);
-        Test.startTest();
-        System.runAs(david) {
-            insert given;
-            update new Gift__c(Id = given.Id, Amount__c = 15);
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            // David enters gifts and may create Opportunities, but was not given the Opportunity
+            // Mirror permission set, so he cannot see the Opportunity ID field (R-OM5).
+            User david = TestDataFactory.createUser('David', new List<String>{ 'Giving_Admin' });
+            // David's profile sees only what he owns, so he is given a donor of his own.
+            Account household = new Account(Name = 'The Chen Household', OwnerId = david.Id);
+            insert household;
+            Contact mei = new Contact(
+                FirstName = 'Mei',
+                LastName = 'Chen',
+                AccountId = household.Id,
+                OwnerId = david.Id
+            );
+            insert mei;
+            Gift__c given = GivingTestDataFactory.buildGift(mei.Id, 10);
+            Test.startTest();
+            System.runAs(david) {
+                insert given;
+                update new Gift__c(Id = given.Id, Amount__c = 15);
+            }
+            Test.stopTest();
+            String linked = reread(given.Id).Opportunity_Id__c;
+            if (!OpportunityMirrorService.isAvailable()) {
+                Assert.isNull(linked, 'Without Opportunity the mirror does nothing.');
+                return;
+            }
+            Assert.isNotNull(linked, 'The link is written onto the gift being saved.');
+            Assert.areEqual(
+                15,
+                (Decimal) opportunity(linked).get('Amount'),
+                'His change followed.'
+            );
+            Assert.areEqual(0, warnings().size(), 'Nothing skipped.');
         }
-        Test.stopTest();
-        String linked = reread(given.Id).Opportunity_Id__c;
-        if (!OpportunityMirrorService.isAvailable()) {
-            Assert.isNull(linked, 'Without Opportunity the mirror does nothing.');
-            return;
-        }
-        Assert.isNotNull(linked, 'The link is written onto the gift being saved.');
-        Assert.areEqual(15, (Decimal) opportunity(linked).get('Amount'), 'His change followed.');
-        Assert.areEqual(0, warnings().size(), 'Nothing skipped.');
     }
 
     @IsTest
     static void aSaveTooLargeToCopyIsSavedUncopiedAndLoggedOnce() {
-        User admin = maria();
-        Assert.isTrue(OpportunityMirrorService.hasHeadroom(200), 'A fresh transaction has room.');
-        ConnectSync.simulatedCpuTimeUsed = Limits.getLimitCpuTime();
-        Gift__c first = gift(10);
-        Gift__c second = gift(20);
-        Test.startTest();
-        System.runAs(admin) {
-            insert first;
-            insert second;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User admin = maria();
+            Assert.isTrue(
+                OpportunityMirrorService.hasHeadroom(200),
+                'A fresh transaction has room.'
+            );
+            ConnectSync.simulatedCpuTimeUsed = Limits.getLimitCpuTime();
+            Gift__c first = gift(10);
+            Gift__c second = gift(20);
+            Test.startTest();
+            System.runAs(admin) {
+                insert first;
+                insert second;
+            }
+            Test.stopTest();
+            ConnectSync.simulatedCpuTimeUsed = null;
+            Assert.isNull(reread(first.Id).Opportunity_Id__c, 'The gift saves, uncopied.');
+            Assert.isNull(reread(second.Id).Opportunity_Id__c, 'So does the next one.');
+            Assert.areEqual(
+                OpportunityMirrorService.isAvailable() ? 1 : 0,
+                warnings().size(),
+                'One Warning for the transaction (R-OM6).'
+            );
         }
-        Test.stopTest();
-        ConnectSync.simulatedCpuTimeUsed = null;
-        Assert.isNull(reread(first.Id).Opportunity_Id__c, 'The gift saves, uncopied.');
-        Assert.isNull(reread(second.Id).Opportunity_Id__c, 'So does the next one.');
-        Assert.areEqual(
-            OpportunityMirrorService.isAvailable() ? 1 : 0,
-            warnings().size(),
-            'One Warning for the transaction (R-OM6).'
-        );
     }
 
     @IsTest
     static void twoHundredGiftsAreCopiedInOneSave() {
-        List<Gift__c> gifts = GivingTestDataFactory.buildGifts(luis().Id, 200, 25);
-        Test.startTest();
-        System.runAs(maria()) {
-            insert gifts;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<Gift__c> gifts = GivingTestDataFactory.buildGifts(luis().Id, 200, 25);
+            Test.startTest();
+            System.runAs(maria()) {
+                insert gifts;
+            }
+            Test.stopTest();
+            if (!OpportunityMirrorService.isAvailable()) {
+                assertNothingMirrored();
+                return;
+            }
+            Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Gift__c WHERE Opportunity_Id__c != NULL WITH SYSTEM_MODE],
+                'Every gift has its Opportunity (plan Section 7.2).'
+            );
+            Assert.areEqual(200, countOpportunities(), 'One each.');
         }
-        Test.stopTest();
-        if (!OpportunityMirrorService.isAvailable()) {
-            return;
-        }
-        Assert.areEqual(
-            200,
-            [SELECT COUNT() FROM Gift__c WHERE Opportunity_Id__c != NULL WITH SYSTEM_MODE],
-            'Every gift has its Opportunity (plan Section 7.2).'
-        );
-        Assert.areEqual(200, countOpportunities(), 'One each.');
     }
 
     @IsTest
     static void nothingIsCopiedUntilTheDirectionIsChosen() {
-        choose(OpportunityMirrorService.OFF);
-        Gift__c given = gift(100);
-        Test.startTest();
-        System.runAs(maria()) {
-            insert given;
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            choose(OpportunityMirrorService.OFF);
+            Gift__c given = gift(100);
+            Test.startTest();
+            System.runAs(maria()) {
+                insert given;
+            }
+            Test.stopTest();
+            Assert.isNull(reread(given.Id).Opportunity_Id__c, 'Off is off (R-OM1).');
+            choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
+            Assert.isFalse(OpportunityMirrorService.copiesGifts(), 'One direction at a time.');
         }
-        Test.stopTest();
-        Assert.isNull(reread(given.Id).Opportunity_Id__c, 'Off is off (R-OM1).');
-        choose(OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS);
-        Assert.isFalse(OpportunityMirrorService.copiesGifts(), 'One direction at a time.');
     }
 }

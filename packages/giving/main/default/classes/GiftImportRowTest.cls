@@ -2,6 +2,7 @@
  * Reading one import row's gift (R-GI1 to R-GI4): what is read, and every way a row is
  * refused before anything is looked up or saved.
  */
+// runs-as: deploying user (pure logic: reads an import row in memory, no DML or SOQL)
 @IsTest
 private class GiftImportRowTest {
     private static GiftImportRow read(Map<String, Map<String, String>> entities) {

@@ -27,11 +27,10 @@ title of whoever signs your letters. A receipt prints these. If you completed th
 Assistant they are already filled in. If your legal name is blank, receipts will not
 generate and BarnCRM tells you which field is missing.
 
-Your legal name and address print at the top of every document even if your letter does not
-ask for them, and your tax identification number prints at the bottom. That is deliberate:
-deleting the letterhead out of your template should not produce a receipt with no
-organization on it. If your letter does print the name itself, BarnCRM does not print it
-a second time.
+Your legal name and address print at the top of every document, under your logo, and your
+tax identification number prints at the bottom. That letterhead is not part of the letter you
+edit: BarnCRM prints it from these settings, so a receipt can never go out without your
+organization on it. To change it, change the settings, not the letter.
 
 ### 2. Set your numbering
 
@@ -63,10 +62,10 @@ Still in the Receipts section:
   no logo is a valid receipt**, so this costs you nothing legally.
 - **Logo width in millimetres.** Forty is about a third of the width of the page, which suits
   a wide wordmark. A tall square logo usually wants twenty five.
-- **Logo delivery route.** Leave it empty. It exists because how an image reaches the PDF has
+- **Logo delivery route.** Leave it empty or on File download, which is the same thing. It exists because how an image reaches the PDF has
   not been confirmed in a real org yet (see the last section of this page), and it lets you or
-  BarnCRM support try another route without waiting for a new version. The three values it
-  accepts are `File download`, `Embedded image` and `Document server`.
+  BarnCRM support try another route without waiting for a new version. Its dropdown offers
+  the three routes: File download, Embedded image and Document server.
 
 ### 4. Write your two letters
 
@@ -82,10 +81,21 @@ Both letters are created when the package is installed. If the list is empty, th
 not finish: click **Restore the shipped letters** and the two come back. Restoring is safe to
 run at any time, and it never touches a letter you have already edited.
 
-Pick a letter, edit the wording, keep the tokens (`{{DonorName}}`, `{{Amount}}`,
-`{{GiftDate}}` and the rest, listed under the editor), and click **Save**. If the letter you
-edited is not the one in use, **Use this letter** switches it on and switches the other one of
-its kind off. Only one letter of each kind is in use at a time.
+Pick a letter and edit the wording in the editor, the way you would in an email: bold,
+italic, lists, headings and links are there. Keep the tokens (`{{DonorName}}`, `{{Amount}}`,
+`{{GiftDate}}` and the rest, listed under the editor) exactly as written, with both pairs of
+braces; BarnCRM swaps each one for the real value. The letterhead (your name, address and
+logo) is not in the editor, because BarnCRM prints it on every document.
+
+Click **Preview** to see the letter filled in for a sample gift from a sample donor, with the
+tax sentences and signature BarnCRM adds. The preview is the wording, not the printed page:
+to check the PDF layout, issue a receipt for a test gift. Then click **Save**. If the letter
+you edited is not the one in use, **Use this letter** switches it on and switches the other
+one of its kind off. Only one letter of each kind is in use at a time.
+
+If you edited a letter before this editor existed and gave it your own header, the next time
+you open it check the top: the old shipped letterhead is removed for you, but a header you
+wrote yourself is not, and your name would then print twice. Delete it and save.
 
 **You cannot delete the tax sentences by deleting them from the template.** BarnCRM adds
 them to every document regardless of what the letter says. That is deliberate: those
@@ -129,8 +139,8 @@ Start from the sample data.
    You will see a receipt number appear on the gift, and a PDF in the Files list on the gift
    and on the receipt. Deliberately not on the donor's household: see "Give people access"
    above.
-4. Open the PDF. It states your organization's name and address at the top, the amount, the
-   date, your tax identification number, and the sentence "No goods or services were provided
+4. Click **View PDF** beside the receipt on the panel. It states your organization's name
+   and address at the top, the amount, the date, your tax identification number, and the sentence "No goods or services were provided
    in exchange for this contribution." If you have uploaded a logo, it is above the name; if
    it is missing, read the last section of this page before you go looking for a mistake.
 5. Now break it on purpose. Try to change the gift's amount. The save is refused with "This

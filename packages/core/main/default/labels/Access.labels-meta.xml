@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: shown when a role change fails for an unexpected reason</shortDescription>
-        <value>Something went wrong while changing this role. What happened is recorded in the Error Log on the Hub home page.</value>
+        <value>Something went wrong while changing this role. What happened is recorded in the Error Log (BarnCRM Settings, Error Log).</value>
     </labels>
     <labels>
         <fullName>Core_Access_ErrorUserNotFound</fullName>

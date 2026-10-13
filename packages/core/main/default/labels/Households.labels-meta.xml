@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Household screen: unexpected failure; the detail goes to the Error Log</shortDescription>
-        <value>Something went wrong and nothing was changed. What happened is recorded in the Error Log on the Hub home page.</value>
+        <value>Something went wrong and nothing was changed. What happened is recorded in the Error Log (BarnCRM Settings, Error Log).</value>
     </labels>
     <labels>
         <fullName>Core_Households_SkippedNativeDependents</fullName>

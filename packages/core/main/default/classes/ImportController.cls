@@ -46,6 +46,45 @@ public with sharing class ImportController {
         public Integer matchDateWindowDays;
         @AuraEnabled
         public Decimal matchAmountTolerance;
+        /** How this template matches (R-IT2, R-IT8, R-IT9). */
+        @AuraEnabled
+        public String personMatchField;
+        @AuraEnabled
+        public String organizationRule;
+        @AuraEnabled
+        public String organizationMatchField;
+        @AuraEnabled
+        public String severalMatches;
+        /** Whether the org's duplicate rules are asked too (R-IT16). */
+        @AuraEnabled
+        public Boolean useDuplicateRules;
+        /** For a template that loads one object (R-IT12, R-IT13). */
+        @AuraEnabled
+        public String targetObject;
+        @AuraEnabled
+        public String targetObjectLabel;
+        @AuraEnabled
+        public String loadOperation;
+        /** The operations this object allows: Update only for people (R-IT14). */
+        @AuraEnabled
+        public List<String> loadOperations;
+        @AuraEnabled
+        public String loadMatchField;
+        @AuraEnabled
+        public String lookupNotFound;
+    }
+
+    /** One field a column of a one-object template can be mapped to (R-IT12). */
+    public class FieldChoice {
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public Boolean isLookup = false;
+        /** For a lookup, the fields it can name its parent by, the record ID first (R-IT13). */
+        @AuraEnabled
+        public List<ImportMapping.Target> lookupFields = new List<ImportMapping.Target>();
     }
 
     /** One import as the wizard and the results screen show it. */
@@ -97,6 +136,46 @@ public with sharing class ImportController {
         public String paymentMatching;
         public Integer matchDateWindowDays;
         public Decimal matchAmountTolerance;
+        /** How people and organizations are matched, saved on the template when sent (R-IT2). */
+        public ImportTemplateService.MatchingChoices matching;
+        /** The values every row of this file takes where it has none (R-IB14). */
+        public List<ImportMapping.Assignment> fileValues;
+        /** True when the file only matches and creates nobody (R-IB15). */
+        public Boolean matchOnly;
+        /** A one-object template's load choices, saved on it when sent (R-IT12). */
+        public ImportTemplateService.LoadChoices load;
+    }
+
+    /** A field a row can be matched on, as the wizard lists it (R-IT8). */
+    public class MatchFieldView {
+        @AuraEnabled
+        public String value;
+        @AuraEnabled
+        public String label;
+    }
+
+    /** The fields each object offers for matching under External ID (R-IT8). */
+    public class MatchFieldsView {
+        /** Contact fields, for people stored as contacts. */
+        @AuraEnabled
+        public List<MatchFieldView> contact = new List<MatchFieldView>();
+        /** Account fields, for organizations and for people stored as person accounts. */
+        @AuraEnabled
+        public List<MatchFieldView> account = new List<MatchFieldView>();
+        /** The fields a person's column can be mapped to besides the fixed list (R-IT11). */
+        @AuraEnabled
+        public List<ImportMapping.Target> personFields = new List<ImportMapping.Target>();
+        /** The fields an organization's column can be mapped to besides the fixed list. */
+        @AuraEnabled
+        public List<ImportMapping.Target> organizationFields = new List<ImportMapping.Target>();
+        /**
+         * Whether contacts, and accounts, have an active duplicate rule the user can see; null
+         * when the user cannot read the rules (R-IT16).
+         */
+        @AuraEnabled
+        public Boolean contactRules;
+        @AuraEnabled
+        public Boolean accountRules;
     }
 
     /** One staged row as the exceptions table shows it. */
@@ -111,6 +190,30 @@ public with sharing class ImportController {
         public String errorMessage;
         @AuraEnabled
         public String values;
+    }
+
+    /** How many rows the changed values are shown for, in the wizard and after a dry run. */
+    @TestVisible
+    private static final Integer CHANGED_SAMPLE_ROWS = 5;
+
+    /** One cell before and after its column's changes (R-IT15). */
+    public class ChangedValue {
+        @AuraEnabled
+        public Integer rowNumber;
+        @AuraEnabled
+        public String column;
+        @AuraEnabled
+        public String before;
+        @AuraEnabled
+        public String after;
+    }
+
+    /** What a column's changes would do to the sample rows, and what stops them saving. */
+    public class ChangesPreview {
+        @AuraEnabled
+        public List<String> problems = new List<String>();
+        @AuraEnabled
+        public List<ChangedValue> samples = new List<ChangedValue>();
     }
 
     /** True when the running user may upload and commit an import. */
@@ -161,12 +264,171 @@ public with sharing class ImportController {
                     ? null
                     : template.Match_Date_Window_Days__c.intValue();
                 view.matchAmountTolerance = template.Match_Amount_Tolerance__c;
+                view.personMatchField = template.Person_Match_Field__c;
+                view.organizationRule = ImportTemplateService.normalizedOrganizationRule(
+                    template.Organization_Matching_Rule__c
+                );
+                view.organizationMatchField = template.Organization_Match_Field__c;
+                view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
+                    template.Several_Matches__c
+                );
+                view.useDuplicateRules = template.Use_Duplicate_Rules__c == true;
+                describeLoad(template, view);
                 result.add(view);
             }
             return result;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getTemplates');
         }
+    }
+
+    /**
+     * The fields a row can be matched on under External ID, for people and organizations
+     * (R-IT8): those marked External ID or Unique, holding text or an email, that the user
+     * may read. With them, the fields of people and organizations a column can be mapped to
+     * besides the fixed list (R-IT11).
+     */
+    @AuraEnabled
+    public static MatchFieldsView getMatchFields() {
+        try {
+            enforcePermission();
+            MatchFieldsView view = new MatchFieldsView();
+            view.contact = fieldViews(Contact.SObjectType);
+            view.account = fieldViews(Account.SObjectType);
+            view.personFields = ImportFieldCatalog.personFields();
+            view.organizationFields = ImportFieldCatalog.organizationFields();
+            view.contactRules = ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType);
+            view.accountRules = ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType);
+            return view;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getMatchFields');
+        }
+    }
+
+    private static List<MatchFieldView> fieldViews(Schema.SObjectType type) {
+        List<MatchFieldView> result = new List<MatchFieldView>();
+        for (Schema.DescribeFieldResult describe : ImportMatcher.matchableFields(type)) {
+            MatchFieldView field = new MatchFieldView();
+            field.value = describe.getName();
+            field.label = describe.getLabel();
+            result.add(field);
+        }
+        return result;
+    }
+
+    /** The objects a template may load (R-IT14), by label. */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getLoadableObjects() {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.loadableObjects();
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getLoadableObjects');
+        }
+    }
+
+    /** Creates a template that loads one object, and returns it as the wizard shows it. */
+    @AuraEnabled
+    public static TemplateView createObjectTemplate(String name, String objectName) {
+        try {
+            enforcePermission();
+            Import_Template__c template = ImportTemplateSelector.selectById(
+                ImportTemplateService.createObjectTemplate(name, objectName).Id
+            );
+            TemplateView view = new TemplateView();
+            view.id = template.Id;
+            view.name = template.Name;
+            view.description = template.Description__c;
+            view.matchingRule = template.Matching_Rule__c;
+            view.personMode = template.Person_Mode__c;
+            view.mapping = template.Column_Mapping_JSON__c;
+            view.isPackageDefault = false;
+            view.isRecurring = false;
+            view.organizationRule = ImportTemplateService.ORGANIZATION_RULE_NAME;
+            view.severalMatches = ImportTemplateService.SEVERAL_REJECT;
+            describeLoad(template, view);
+            return view;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.createObjectTemplate');
+        }
+    }
+
+    /**
+     * The fields a column of this one-object template can be mapped to (R-IT12): the record ID
+     * first, then the fields the user may write, and for each lookup the fields it can name its
+     * parent by (R-IT13).
+     */
+    @AuraEnabled
+    public static List<FieldChoice> getObjectFields(String templateId) {
+        try {
+            enforcePermission();
+            Schema.SObjectType type = ImportObjectSchema.typeOf(
+                ImportTemplateSelector.selectById(templateId)
+            );
+            List<FieldChoice> result = new List<FieldChoice>();
+            if (type == null) {
+                return result;
+            }
+            for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
+                FieldChoice choice = new FieldChoice();
+                choice.value = ImportMapping.ENTITY_RECORD + '.' + target.value;
+                choice.label = target.label;
+                Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
+                if (
+                    token != null &&
+                    token.getDescribe().getType() == Schema.DisplayType.REFERENCE
+                ) {
+                    choice.isLookup = true;
+                    choice.lookupFields = ImportObjectSchema.parentFields(type, target.value);
+                }
+                result.add(choice);
+            }
+            return result;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getObjectFields');
+        }
+    }
+
+    /** The external ID fields an upsert of this template's object can match on (R-IT12). */
+    @AuraEnabled
+    public static List<ImportMapping.Target> getKeyFields(String templateId) {
+        try {
+            enforcePermission();
+            return ImportObjectSchema.keyFields(
+                ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId))
+            );
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getKeyFields');
+        }
+    }
+
+    /** Fills in what a one-object template loads, and how. */
+    private static void describeLoad(Import_Template__c template, TemplateView view) {
+        Schema.SObjectType type = ImportObjectSchema.typeOf(template);
+        if (!ImportObjectSchema.loadsOneObject(template) || type == null) {
+            return;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        view.targetObject = described.getName();
+        view.targetObjectLabel = described.getLabel();
+        view.loadOperation = ImportObjectSchema.updatesOnly(type)
+            ? ImportObjectSchema.OPERATION_UPDATE
+            : ImportObjectSchema.operationOf(template);
+        view.loadOperations = ImportObjectSchema.operationsFor(type);
+        view.loadMatchField = template.Load_Match_Field__c;
+        view.lookupNotFound = ImportObjectSchema.leavesLookupEmpty(template)
+            ? ImportObjectSchema.LOOKUP_LEAVE_EMPTY
+            : ImportObjectSchema.LOOKUP_REJECT;
+    }
+
+    /** The parent field a saved column names its parent by, for the column with this source. */
+    private static String lookupFieldOf(ImportMapping saved, String sourceKey) {
+        for (ImportMapping.Column column : saved.columns) {
+            if (column != null && ImportMapping.key(column.source) == sourceKey) {
+                return column.lookupField;
+            }
+        }
+        return null;
     }
 
     /** Marks a template as the mapping for a file that arrives regularly, or not (R-IT6). */
@@ -189,8 +451,11 @@ public with sharing class ImportController {
     public static String suggestMapping(String templateId, List<String> headers) {
         try {
             enforcePermission();
-            ImportMapping suggested = ImportColumnLibrary.suggestMapping(headers);
             Import_Template__c template = ImportTemplateSelector.selectById(templateId);
+            // A one-object template suggests from its object's fields (R-IT12).
+            ImportMapping suggested = ImportObjectSchema.loadsOneObject(template)
+                ? ImportObjectSchema.suggestMapping(ImportObjectSchema.typeOf(template), headers)
+                : ImportColumnLibrary.suggestMapping(headers);
             if (template != null) {
                 ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
                 Map<String, String> known = saved.targetsBySourceKey();
@@ -200,6 +465,7 @@ public with sharing class ImportController {
                     String fromTemplate = known.get(source);
                     if (String.isNotBlank(fromTemplate)) {
                         column.target = fromTemplate;
+                        column.lookupField = lookupFieldOf(saved, source);
                     } else if (ignored.contains(source)) {
                         column.target = ImportMapping.TARGET_IGNORE;
                     }
@@ -237,13 +503,23 @@ public with sharing class ImportController {
                     options.matchAmountTolerance
                 );
             }
+            if (options.load != null) {
+                ImportTemplateService.saveLoad(templateId, options.load);
+            }
+            if (options.matching != null) {
+                // The wizard's rule for people is the one passed above; the rest is saved here.
+                options.matching.personRule = matchingRule;
+                ImportTemplateService.saveMatching(templateId, options.matching);
+            }
             return toView(
                 ImportBatchService.create(
                     templateId,
                     fileId,
                     fileName,
                     options.expectedCount,
-                    options.expectedAmount
+                    options.expectedAmount,
+                    options.fileValues,
+                    options.matchOnly == true
                 )
             );
         } catch (Exception e) {
@@ -402,6 +678,92 @@ public with sharing class ImportController {
             return result;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getRows');
+        }
+    }
+
+    /**
+     * What a column's changes do to the first rows of the file, and what is wrong with them
+     * (R-IT15). Nothing is saved: the wizard shows this while the admin edits the steps.
+     *
+     * @param source the column the steps belong to
+     * @param transformsJson the steps, as the mapping document holds them
+     * @param sampleRowsJson the first rows of the file, each a map of column name to value
+     */
+    @AuraEnabled
+    public static ChangesPreview previewChanges(
+        String source,
+        String transformsJson,
+        String sampleRowsJson
+    ) {
+        try {
+            enforcePermission();
+            ChangesPreview preview = new ChangesPreview();
+            List<DataTransform.Step> steps = DataTransform.parse(transformsJson);
+            preview.problems = DataTransform.problems(steps);
+            List<Object> rows = String.isBlank(sampleRowsJson)
+                ? new List<Object>()
+                : (List<Object>) JSON.deserializeUntyped(sampleRowsJson);
+            for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
+                Map<String, String> values = new Map<String, String>();
+                Map<String, Object> row = (Map<String, Object>) rows[i];
+                for (String column : row.keySet()) {
+                    Object value = row.get(column);
+                    values.put(
+                        ImportMapping.key(column),
+                        value == null ? null : String.valueOf(value).trim()
+                    );
+                }
+                ChangedValue sample = new ChangedValue();
+                sample.rowNumber = i + 2;
+                sample.column = source;
+                sample.before = values.get(ImportMapping.key(source));
+                sample.after = DataTransform.apply(steps, sample.before, values);
+                preview.samples.add(sample);
+            }
+            return preview;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.previewChanges');
+        }
+    }
+
+    /**
+     * Each changed value of the batch's first rows, before and after (R-IT15), for the results
+     * screen of a dry run. Empty when the mapping changes nothing.
+     */
+    @AuraEnabled
+    public static List<ChangedValue> getChangedValues(String batchId) {
+        try {
+            List<ChangedValue> result = new List<ChangedValue>();
+            Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
+            Import_Template__c template = batch == null
+                ? null
+                : ImportTemplateSelector.selectById(batch.Import_Template__c);
+            if (template == null) {
+                return result;
+            }
+            ImportMapping mapping = ImportMapping.parse(
+                template.Column_Mapping_JSON__c,
+                template.Default_Values_JSON__c
+            );
+            if (mapping.transformsBySourceKey().isEmpty()) {
+                return result;
+            }
+            List<Import_Row__c> rows = ImportRowSelector.selectByBatch(batchId, 0);
+            for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
+                for (List<String> cell : ImportRowProcessor.changedValues(rows[i], mapping)) {
+                    ChangedValue changed = new ChangedValue();
+                    changed.rowNumber = rows[i].Row_Number__c == null
+                        ? null
+                        : rows[i].Row_Number__c.intValue();
+                    changed.column = cell[0];
+                    changed.before = cell[1];
+                    changed.after = cell[2];
+                    result.add(changed);
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            throw auraError(e, 'ImportController.getChangedValues');
         }
     }
 

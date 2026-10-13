@@ -157,6 +157,9 @@
               <value>Edit</value>
             </valueListItems>
             <valueListItems>
+              <value>Account.Log_Interaction</value>
+            </valueListItems>
+            <valueListItems>
               <value>Account.Merge_Household</value>
               <visibilityRule>
                 <criteria>

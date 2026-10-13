@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionCalls>
+    <description>Keeps every BarnCRM rollup that counts this record up to date.</description>
+    <name>Recalculate_rollups</name>
+    <label>Recalculate rollups</label>
+    <locationX>176</locationX>
+    <locationY>323</locationY>
+    <actionName>RollupRecalcAction</actionName>
+    <actionType>apex</actionType>
+    <dataTypeMappings>
+      <typeName>T__priorRecord</typeName>
+      <typeValue>Contact</typeValue>
+    </dataTypeMappings>
+    <dataTypeMappings>
+      <typeName>T__record</typeName>
+      <typeValue>Contact</typeValue>
+    </dataTypeMappings>
+    <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+    <inputParameters>
+      <name>priorRecord</name>
+      <value>
+        <elementReference>$Record__Prior</elementReference>
+      </value>
+    </inputParameters>
+    <inputParameters>
+      <name>record</name>
+      <value>
+        <elementReference>$Record</elementReference>
+      </value>
+    </inputParameters>
+    <nameSegment>RollupRecalcAction</nameSegment>
+    <storeOutputAutomatically>true</storeOutputAutomatically>
+    <versionSegment>1</versionSegment>
+  </actionCalls>
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Template: makes BarnCRM rollups that count one of your own objects instant. Save As a new
+    flow, change the object in the Start element and in the Recalculate rollups action to your
+    object, then activate your copy. See the Rollups page of the admin guide.
+  </description>
+  <environments>Default</environments>
+  <interviewLabel>Recalculate rollups {!$Flow.CurrentDateTime}</interviewLabel>
+  <isTemplate>true</isTemplate>
+  <label>Recalculate rollups (template)</label>
+  <processMetadataValues>
+    <name>BuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>CanvasMode</name>
+    <value>
+      <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+    </value>
+  </processMetadataValues>
+  <processMetadataValues>
+    <name>OriginBuilderType</name>
+    <value>
+      <stringValue>LightningFlowBuilder</stringValue>
+    </value>
+  </processMetadataValues>
+  <processType>AutoLaunchedFlow</processType>
+  <start>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <connector>
+      <targetReference>Recalculate_rollups</targetReference>
+    </connector>
+    <filterFormula>NOT(ISBLANK({!$Record.Id}))</filterFormula>
+    <object>Contact</object>
+    <recordTriggerType>CreateAndUpdate</recordTriggerType>
+    <triggerType>RecordAfterSave</triggerType>
+  </start>
+  <status>Draft</status>
+</Flow>

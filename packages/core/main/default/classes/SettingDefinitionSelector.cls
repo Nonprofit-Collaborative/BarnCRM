@@ -36,6 +36,7 @@ public with sharing class SettingDefinitionSelector {
                 Module__c,
                 Data_Type__c,
                 Picklist_Values__c,
+                Record_Object__c,
                 Component__c,
                 Navigation_Target__c,
                 Description__c,

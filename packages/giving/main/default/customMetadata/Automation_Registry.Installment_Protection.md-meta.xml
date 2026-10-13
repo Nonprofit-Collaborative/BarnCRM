@@ -22,4 +22,8 @@
         <field>Execution_Order__c</field>
         <value xsi:type="xsd:double">10</value>
     </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Giving</value>
+    </values>
 </CustomMetadata>

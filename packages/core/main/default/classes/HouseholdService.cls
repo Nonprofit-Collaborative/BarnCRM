@@ -473,6 +473,90 @@ public with sharing class HouseholdService {
         return result;
     }
 
+    /** Who joined or left which households in one save, for `membershipChangeOf`. */
+    @NamespaceAccessible
+    public class MembershipChange {
+        /** The households on both sides of the change. */
+        @NamespaceAccessible
+        public Set<Id> householdIds = new Set<Id>();
+        /** The people who joined or left. */
+        @NamespaceAccessible
+        public Set<Id> personIds = new Set<Id>();
+    }
+
+    /**
+     * The households on both sides of a save of these people or membership rows, for the rollup
+     * engine: a total reached through a household token moves when somebody joins or leaves
+     * (canonical model R-R11). In contact mode the change is a contact added, moved to another
+     * account, deleted or restored; in junction mode it is a membership row added, changed,
+     * removed or restored. Records of the kind the mode in use does not read answer nothing.
+     *
+     * Any answer already given in this transaction about who belongs where is forgotten when
+     * something changed, so the totals that follow read the new households.
+     *
+     * @param records the saved records, or the deleted ones as they were
+     * @param oldRecords the same records before an update, or null for any other save
+     */
+    @NamespaceAccessible
+    public static MembershipChange membershipChangeOf(
+        List<SObject> records,
+        Map<Id, SObject> oldRecords
+    ) {
+        MembershipChange change = new MembershipChange();
+        if (records == null || records.isEmpty()) {
+            return change;
+        }
+        Schema.SObjectType changedType = records[0].getSObjectType();
+        Boolean junction = isJunctionMode();
+        if (changedType == Contact.SObjectType && !junction) {
+            for (Contact person : (List<Contact>) records) {
+                Contact before = oldRecords == null ? null : (Contact) oldRecords.get(person.Id);
+                if (before != null && before.AccountId == person.AccountId) {
+                    continue;
+                }
+                addIfSet(change.householdIds, person.AccountId);
+                addIfSet(change.householdIds, before?.AccountId);
+                addIfSet(change.personIds, person.Id);
+            }
+        } else if (changedType == Household_Member__c.SObjectType && junction) {
+            for (Household_Member__c row : (List<Household_Member__c>) records) {
+                Household_Member__c before = oldRecords == null
+                    ? null
+                    : (Household_Member__c) oldRecords.get(row.Id);
+                if (before != null && !membershipMoved(row, before)) {
+                    continue;
+                }
+                for (Household_Member__c version : new List<Household_Member__c>{ row, before }) {
+                    if (version != null) {
+                        addIfSet(change.householdIds, version.Household__c);
+                        addIfSet(
+                            change.personIds,
+                            version.Contact__c != null ? version.Contact__c : version.Account__c
+                        );
+                    }
+                }
+            }
+        }
+        if (!change.householdIds.isEmpty()) {
+            HOUSEHOLD_ID_BY_PERSON.clear();
+        }
+        return change;
+    }
+
+    private static Boolean membershipMoved(Household_Member__c row, Household_Member__c before) {
+        return row.Household__c != before.Household__c ||
+            row.Contact__c != before.Contact__c ||
+            row.Account__c != before.Account__c ||
+            row.Start_Date__c != before.Start_Date__c ||
+            row.End_Date__c != before.End_Date__c;
+    }
+
+    private static void addIfSet(Set<Id> ids, Id value) {
+        if (value != null) {
+            ids.add(value);
+        }
+    }
+
     /**
      * The people who currently belong to each household given, by household id. The
      * counterpart of getHouseholdIdsFor, for callers rolling values up to a household.
@@ -1844,6 +1928,10 @@ public with sharing class HouseholdService {
      * the master of that group, so deleting it would destroy the group rather than orphan it.
      * Such a household is left alone and the skip is reported, because a tidy-up that quietly
      * deletes somebody else's data is worse than a tidy-up left undone.
+     *
+     * A household that an installed package still credits records to is kept as well, asked
+     * through `HouseholdDependentsExtensions` because Core may not know what those records
+     * are (ADR-0070 `0070-empty-household-tidy-up-keeps-households-with-gifts.md`).
      */
     @NamespaceAccessible
     public static void deleteEmptyHouseholds(Set<Id> householdIds) {
@@ -1868,12 +1956,18 @@ public with sharing class HouseholdService {
             return;
         }
         // One probe for the whole batch, so a split of fifty households still asks once.
-        Set<Id> dependent = HouseholdSelector.getAccountsWithNativeDependents(
-            new Map<Id, Account>(empties).keySet()
-        );
+        Set<Id> emptyIds = new Map<Id, Account>(empties).keySet();
+        Set<Id> dependent = HouseholdSelector.getAccountsWithNativeDependents(emptyIds);
+        // Records another BarnCRM package still credits to the household, such as the gifts
+        // given from it, which keep that household when the donor moves (R-G2). Kept quietly:
+        // it is the ordinary outcome of a move, not something to act on.
+        Set<Id> credited = HouseholdDependentsExtensions.householdsWithDependents(emptyIds);
         List<Account> deletable = new List<Account>();
         List<String> skipped = new List<String>();
         for (Account household : empties) {
+            if (credited.contains(household.Id) && !dependent.contains(household.Id)) {
+                continue;
+            }
             if (dependent.contains(household.Id)) {
                 if (!REPORTED_KEPT_HOUSEHOLDS.add(household.Id)) {
                     continue;

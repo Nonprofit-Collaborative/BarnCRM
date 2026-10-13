@@ -2,6 +2,24 @@ import { createElement } from 'lwc';
 import QuickGiftEntry from 'c/quickGiftEntry';
 import getDefaults from '@salesforce/apex/QuickGiftEntryController.getDefaults';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
+import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/QuickGiftEntryController.getDefaults', () => ({ default: jest.fn() }), {
   virtual: true
@@ -10,6 +28,12 @@ jest.mock('@salesforce/apex/QuickGiftEntryController.getDefaults', () => ({ defa
 jest.mock('@salesforce/apex/QuickGiftEntryController.saveGift', () => ({ default: jest.fn() }), {
   virtual: true
 });
+
+jest.mock(
+  '@salesforce/apex/QuickGiftEntryController.getPaymentChoices',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 const DEFAULTS = {
   giftDate: '2026-09-07',
@@ -35,6 +59,13 @@ function build() {
 
 function pick(element, id) {
   return element.shadowRoot.querySelector(`[data-id="${id}"]`);
+}
+
+/** Records the messages a base component is given through its own validity methods. */
+function watchValidity(field) {
+  field.setCustomValidity = jest.fn();
+  field.reportValidity = jest.fn();
+  return field;
 }
 
 function change(target, detail) {
@@ -125,13 +156,67 @@ describe('c-quick-gift-entry', () => {
     });
     const element = build();
     await settle();
+    const donor = watchValidity(pick(element, 'donor-person'));
+    const amount = watchValidity(pick(element, 'amount'));
+    const giftDate = watchValidity(pick(element, 'gift-date'));
 
     pick(element, 'save').click();
     await settle();
 
-    expect(pick(element, 'error-donor').textContent).toContain('Choose the person');
-    expect(pick(element, 'error-amount').textContent).toContain('greater than zero');
+    expect(donor.setCustomValidity).toHaveBeenLastCalledWith(
+      'Choose the person or organization who gave this gift.'
+    );
+    expect(donor.reportValidity).toHaveBeenCalled();
+    expect(amount.setCustomValidity).toHaveBeenLastCalledWith(
+      'Enter an amount greater than zero. A refund is entered from the original gift, not here.'
+    );
+    expect(amount.reportValidity).toHaveBeenCalled();
+    expect(giftDate.setCustomValidity).toHaveBeenLastCalledWith('');
+    expect(giftDate.reportValidity).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id^="error-"]')).toBeNull();
     expect(pick(element, 'saved')).toBeNull();
+  });
+
+  it('takes the message off a field as soon as the person changes it', async () => {
+    saveGift.mockResolvedValue({
+      success: false,
+      fieldErrors: [{ field: 'amount', message: 'Enter an amount greater than zero.' }]
+    });
+    const element = build();
+    await settle();
+    const amount = watchValidity(pick(element, 'amount'));
+    pick(element, 'save').click();
+    await settle();
+    expect(amount.setCustomValidity).toHaveBeenLastCalledWith('Enter an amount greater than zero.');
+
+    change(amount, { value: '40' });
+    await settle();
+
+    expect(amount.setCustomValidity).toHaveBeenLastCalledWith('');
+    expect(amount.reportValidity).toHaveBeenCalledTimes(2);
+  });
+
+  it('opens the standard new person form and stays on this form after it saves', async () => {
+    const element = build();
+    await settle();
+
+    pick(element, 'new-person').click();
+
+    const pageReference = mockNavigate.mock.calls[0][0];
+    expect(pageReference.type).toBe('standard__objectPage');
+    expect(pageReference.attributes).toEqual({ objectApiName: 'Contact', actionName: 'new' });
+    expect(pageReference.state.navigationLocation).toBe('RELATED_LIST');
+  });
+
+  it('offers a new person only while the donor is a person', async () => {
+    const element = build();
+    await settle();
+    expect(pick(element, 'new-person')).not.toBeNull();
+
+    change(pick(element, 'donor-kind'), { value: 'organization' });
+    await settle();
+
+    expect(pick(element, 'new-person')).toBeNull();
   });
 
   it('saves the gift the person entered and confirms it with a link', async () => {
@@ -155,7 +240,8 @@ describe('c-quick-gift-entry', () => {
         fundId: DEFAULTS.defaultFundId,
         paymentReference: null,
         inKindDescription: null,
-        fairMarketValue: null
+        fairMarketValue: null,
+        installmentId: null
       }
     });
     expect(pick(element, 'saved')).not.toBeNull();
@@ -328,10 +414,12 @@ describe('c-quick-gift-entry', () => {
     change(pick(element, 'donor-person'), { recordId: CONTACT_ID });
     change(pick(element, 'gift-type'), { value: 'In-kind' });
     await settle();
+    const description = watchValidity(pick(element, 'in-kind-description'));
     pick(element, 'save').click();
     await settle();
 
-    expect(pick(element, 'error-in-kind-description').textContent).toBe('Describe what was given.');
+    expect(description.setCustomValidity).toHaveBeenLastCalledWith('Describe what was given.');
+    expect(description.reportValidity).toHaveBeenCalled();
   });
 
   it('says so when the gift saved but the fund chosen could not be applied', async () => {
@@ -351,5 +439,149 @@ describe('c-quick-gift-entry', () => {
 
     expect(pick(element, 'saved')).not.toBeNull();
     expect(pick(element, 'save-warning')).not.toBeNull();
+  });
+
+  describe('pays a scheduled payment', () => {
+    const MARCH = 'a01000000000001AAA';
+    const APRIL = 'a01000000000002AAA';
+    const choicesWith = (suggested) => ({
+      choices: [
+        {
+          value: MARCH,
+          label: 'Pledge CM-000001, payment 1, due 3/15/2026, 50.00 expected',
+          suggested: suggested.includes(MARCH)
+        },
+        {
+          value: APRIL,
+          label: 'Pledge CM-000001, payment 2, due 4/15/2026, 50.00 expected',
+          suggested: suggested.includes(APRIL)
+        }
+      ],
+      suggestedId: suggested.length === 1 ? suggested[0] : null,
+      suggestedCount: suggested.length
+    });
+
+    /** Lets the pause before a lookup pass, and the lookup answer. */
+    async function lookUp() {
+      jest.runOnlyPendingTimers();
+      await settle();
+    }
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+      getPaymentChoices.mockResolvedValue(choicesWith([MARCH]));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('shows no list until a donor who owes a payment is chosen', async () => {
+      getPaymentChoices.mockResolvedValue({ choices: [], suggestedId: null, suggestedCount: 0 });
+      const element = build();
+      await settle();
+      expect(pick(element, 'pays')).toBeNull();
+
+      await enterAGift(element);
+      await lookUp();
+
+      expect(getPaymentChoices).toHaveBeenCalledWith({
+        donorContactId: CONTACT_ID,
+        donorAccountId: null,
+        giftDate: '2026-09-07',
+        amount: 50
+      });
+      expect(pick(element, 'pays')).toBeNull();
+    });
+
+    it('chooses the only suggestion in advance, on screen, and says why', async () => {
+      const element = build();
+      await settle();
+
+      await enterAGift(element);
+      await lookUp();
+
+      const pays = pick(element, 'pays');
+      expect(pays.value).toBe(MARCH);
+      expect(pays.options[0].value).toBe('');
+      expect(pays.options.map((option) => option.value)).toEqual(['', MARCH, APRIL]);
+      expect(pick(element, 'pays-note').textContent).not.toBe('');
+
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBe(MARCH);
+    });
+
+    it('chooses nothing when two payments are suggested', async () => {
+      getPaymentChoices.mockResolvedValue(choicesWith([MARCH, APRIL]));
+      const element = build();
+      await settle();
+
+      await enterAGift(element);
+      await lookUp();
+
+      expect(pick(element, 'pays').value).toBe('');
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('keeps None once the person chose it, when the amount changes', async () => {
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+
+      change(pick(element, 'pays'), { value: '' });
+      change(pick(element, 'amount'), { value: '50.00' });
+      await lookUp();
+
+      expect(pick(element, 'pays').value).toBe('');
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('forgets the choice when the donor changes', async () => {
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+      getPaymentChoices.mockResolvedValue({ choices: [], suggestedId: null, suggestedCount: 0 });
+
+      change(pick(element, 'donor-person'), { recordId: '003000000000000BBB' });
+      await lookUp();
+
+      expect(pick(element, 'pays')).toBeNull();
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('sends no payment with a gift of goods', async () => {
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+
+      change(pick(element, 'gift-type'), { value: 'In-kind' });
+      await settle();
+      expect(pick(element, 'pays')).toBeNull();
+      change(pick(element, 'in-kind-description'), { value: 'Two chairs' });
+      pick(element, 'save').click();
+      await settle();
+      expect(saveGift.mock.calls[0][0].input.installmentId).toBeNull();
+    });
+
+    it('says the payments could not be loaded and still lets the gift be saved', async () => {
+      getPaymentChoices.mockRejectedValue({ body: { message: 'boom' } });
+      const element = build();
+      await settle();
+      await enterAGift(element);
+      await lookUp();
+
+      expect(pick(element, 'pays-error')).not.toBeNull();
+      expect(pick(element, 'save').disabled).toBe(false);
+    });
   });
 });

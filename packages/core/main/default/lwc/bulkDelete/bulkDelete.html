@@ -1,0 +1,109 @@
+<template>
+    <lightning-card title={labels.title} icon-name="utility:delete">
+        <lightning-button slot="actions" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
+        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
+            <template if:true={busy}>
+                <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+            </template>
+
+            <template if:true={hasError}>
+                <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
+                    <span data-id="error-message">{errorMessage}</span>
+                </div>
+            </template>
+            <template if:true={hasNotice}>
+                <div
+                    class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <span data-id="notice-message">{noticeMessage}</span>
+                </div>
+            </template>
+
+            <p class="slds-var-m-bottom_small">{labels.panelIntro}</p>
+            <lightning-button
+                class="slds-var-m-bottom_small"
+                data-id="preview"
+                variant="brand"
+                label={labels.preview}
+                disabled={previewDisabled}
+                onclick={handlePreview}
+            ></lightning-button>
+
+            <template if:true={preview}>
+                <section class="slds-box slds-var-m-vertical_medium" data-id="preview-box">
+                    <p class="slds-text-title_bold" data-id="preview-line" role="status">{previewLine}</p>
+                    <ul class="slds-list_dotted slds-var-m-vertical_x-small">
+                        <template for:each={preview.sample} for:item="record">
+                            <li key={record.recordId} data-id="sample-row">{record.name}</li>
+                        </template>
+                    </ul>
+                    <template if:true={hasCascades}>
+                        <div class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small" data-id="cascades">
+                            <p>{labels.cascades}</p>
+                            <ul class="slds-list_dotted">
+                                <template for:each={preview.cascades} for:item="cascade">
+                                    <li key={cascade}>{cascade}</li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                    <p class="slds-text-body_small slds-var-m-bottom_small">
+                        {labels.undoUntil}
+                        <lightning-formatted-date-time
+                            class="slds-var-m-left_xx-small"
+                            value={preview.undoDeadline}
+                            year="numeric"
+                            month="short"
+                            day="numeric"
+                        ></lightning-formatted-date-time>
+                    </p>
+                    <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                            <lightning-input
+                                data-id="confirm"
+                                label={labels.confirm}
+                                value={confirmText}
+                                onchange={handleConfirmText}
+                            ></lightning-input>
+                        </div>
+                        <div class="slds-col slds-no-flex">
+                            <lightning-button
+                                data-id="start"
+                                variant="destructive"
+                                label={deleteLabel}
+                                disabled={startDisabled}
+                                onclick={handleStart}
+                            ></lightning-button>
+                        </div>
+                    </div>
+                </section>
+            </template>
+
+            <template if:true={jobView}>
+                <section class="slds-box slds-var-m-vertical_medium" data-id="job">
+                    <p class="slds-text-title_bold">{jobView.name}: {jobView.status}</p>
+                    <template if:true={jobView.running}>
+                        <p class="slds-var-m-vertical_x-small" role="status" aria-live="polite">{jobView.progressLine}</p>
+                        <lightning-progress-bar value={jobView.progressValue} size="large"></lightning-progress-bar>
+                    </template>
+                    <template if:false={jobView.running}>
+                        <p data-id="job-summary">{jobView.summary}</p>
+                        <template if:true={jobView.hasFailures}>
+                            <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.failures}</h3>
+                            <ul class="slds-list_dotted">
+                                <template for:each={jobView.failures} for:item="failure">
+                                    <li key={failure.recordId}>{failure.recordId}: {failure.reason}</li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template if:true={jobView.showUndo}>
+                            <p class="slds-var-m-top_small" data-id="undo-from-tab">{labels.undoFromTab}</p>
+                        </template>
+                    </template>
+                </section>
+            </template>
+        </div>
+    </lightning-card>
+</template>

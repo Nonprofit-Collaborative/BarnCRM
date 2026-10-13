@@ -81,14 +81,34 @@
       <sortOrder>0</sortOrder>
     </platformActionListItems>
     <platformActionListItems>
-      <actionName>Account.Merge_Household</actionName>
+      <actionName>Account.Log_Interaction</actionName>
       <actionType>QuickAction</actionType>
       <sortOrder>1</sortOrder>
     </platformActionListItems>
     <platformActionListItems>
+      <actionName>Account.Merge_Household</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>2</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
       <actionName>Delete</actionName>
       <actionType>StandardButton</actionType>
-      <sortOrder>2</sortOrder>
+      <sortOrder>3</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>LogACall</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>4</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>NewTask</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>5</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>NewEvent</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>6</sortOrder>
     </platformActionListItems>
   </platformActionList>
   <relatedLists>

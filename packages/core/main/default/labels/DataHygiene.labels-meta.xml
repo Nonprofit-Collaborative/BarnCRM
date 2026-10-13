@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DataHygiene_PageTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data hygiene page title.</shortDescription>
+        <value>Data hygiene</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_Intro</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data hygiene page introduction.</shortDescription>
+        <value>Records that need tidying up, counted with your own access. Open a check in Find to read, export or change its records. Nothing here changes a record.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_HealthCheckNote</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>How data hygiene differs from Health Check.</shortDescription>
+        <value>Health Check says whether BarnCRM is set up right. This page is about the records themselves.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_Recount</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that runs every check again.</shortDescription>
+        <value>Recount</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_Loading</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown while the checks run.</shortDescription>
+        <value>Counting records</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_OpenInFind</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that opens a check in Find.</shortDescription>
+        <value>Open in Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_OpenInFindNamed</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Accessible name of the Open in Find button, {0} is the check.</shortDescription>
+        <value>Open {0} in Find</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_RecordsFound</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Caption under a check's count.</shortDescription>
+        <value>records found</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_OpenedNotice</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Toast after a check opens, {0} is the saved query name.</shortDescription>
+        <value>In Find, choose "{0}" from Saved queries.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_ErrorNoPermission</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal without the Find and Export Records permission.</shortDescription>
+        <value>Data hygiene needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_NotInFindYet</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Note on a check that Find cannot list yet.</shortDescription>
+        <value>Find cannot list these yet, because it cannot ask about a missing membership. Health Check links the first five.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_NoAccess</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown on a check whose records the person cannot read.</shortDescription>
+        <value>You cannot see the records this check reads. Ask whoever manages access in your org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_CheckFailed</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shown when a check fails unexpectedly.</shortDescription>
+        <value>This check could not run. The details are in the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_UnknownCheck</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refusal for a check key the page does not know.</shortDescription>
+        <value>That check does not exist. Reload the Data Hygiene page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_SavedQueryName</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the saved query a check opens, {0} is the check title.</shortDescription>
+        <value>Data hygiene: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_MoreThan</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Count past the cap, {0} is the cap.</shortDescription>
+        <value>More than {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_PeopleTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: people with no household.</shortDescription>
+        <value>People with no household</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_PeopleContactDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail, contact mode.</shortDescription>
+        <value>Contacts with no account. They are left out of household names, greetings, totals and mailings.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_PeopleJunctionDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail, junction mode.</shortDescription>
+        <value>People, contacts or person accounts, with no current household membership. They are left out of household names, greetings, totals and mailings.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_HouseholdsTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: households with nobody in them.</shortDescription>
+        <value>Households with nobody in them</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_HouseholdsDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: empty households.</shortDescription>
+        <value>Households whose Member Count is zero or empty. Add a member, merge the household into another, or delete it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_MembershipsTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: memberships that name nobody.</shortDescription>
+        <value>Memberships that name nobody</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_MembershipsDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: membership rows with no person.</shortDescription>
+        <value>Household membership records whose person was deleted while automation was off. They count for nobody and can be deleted.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_OwnerlessTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: addresses that belong to nobody.</shortDescription>
+        <value>Addresses that belong to nobody</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_OwnerlessDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: addresses with no owner.</shortDescription>
+        <value>Address records whose household, organization or person was deleted. Delete them, or give them an owner.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_IncompleteTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: default addresses with parts missing.</shortDescription>
+        <value>Default addresses with parts missing</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_IncompleteDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: incomplete default addresses.</shortDescription>
+        <value>The address each household, organization or person is mailed at, with no street, city or postal code. Mail sent there will not arrive.</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_FailedTitle</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check title: default addresses that failed verification.</shortDescription>
+        <value>Default addresses that failed verification</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataHygiene_FailedDetail</fullName>
+        <categories>DataHygiene</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Check detail: failed verification.</shortDescription>
+        <value>Default addresses an address verification app marked Failed. Without such an app this is always 0.</value>
+    </labels>
+</CustomLabels>

@@ -12,7 +12,8 @@ public with sharing class ImportBatchSelector {
         'File_Id__c, File_Name__c, Status__c, Is_Dry_Run__c, Row_Count__c, Rows_Created__c, ' +
         'Rows_Updated__c, Rows_Matched__c, Rows_Rejected__c, Run_Log__c, Started_At__c, ' +
         'Completed_At__c, Chunk_Size__c, Undo_Deadline__c, Committed_By__c, Expected_Count__c, ' +
-        'Expected_Amount__c, File_Amount__c, Processor_Settings_JSON__c, Pass_Number__c, Job_Id__c';
+        'Expected_Amount__c, File_Amount__c, Processor_Settings_JSON__c, Pass_Number__c, Job_Id__c, ' +
+        'File_Values_JSON__c, Match_Only__c, Operation__c';
 
     /** One batch, or null. */
     @NamespaceAccessible
@@ -28,13 +29,26 @@ public with sharing class ImportBatchSelector {
         return found.isEmpty() ? null : found[0];
     }
 
-    /** The most recent imports, newest first, for the results screen's history list. */
+    /**
+     * The most recent imports, newest first, for the results screen's history list. Bulk
+     * updates and bulk deletes are listed on their own page (canonical model Section 29E); a
+     * batch from before Operation existed has none, and is kept by the explicit null test.
+     */
     @NamespaceAccessible
     public static List<Import_Batch__c> selectRecent(Integer howMany) {
         Integer limitSize = howMany == null || howMany <= 0 ? 10 : Math.min(howMany, 200);
         return Database.queryWithBinds(
-            'SELECT ' + FIELDS + ' FROM Import_Batch__c ORDER BY CreatedDate DESC LIMIT :limitSize',
-            new Map<String, Object>{ 'limitSize' => limitSize },
+            'SELECT ' +
+                FIELDS +
+                ' FROM Import_Batch__c WHERE (Operation__c = NULL OR Operation__c NOT IN :notImports)' +
+                ' ORDER BY CreatedDate DESC LIMIT :limitSize',
+            new Map<String, Object>{
+                'limitSize' => limitSize,
+                'notImports' => new List<String>{
+                    BulkUpdateService.OPERATION_UPDATE,
+                    BulkDeleteService.OPERATION_DELETE
+                }
+            },
             AccessLevel.USER_MODE
         );
     }

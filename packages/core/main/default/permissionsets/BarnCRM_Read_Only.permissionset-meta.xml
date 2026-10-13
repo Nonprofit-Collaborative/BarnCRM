@@ -2,7 +2,7 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
   <label>BarnCRM Read Only</label>
-  <description>Tom and Jen, who look but do not change. Read access only, everywhere.</description>
+  <description>For people who look but do not change. Read access only, everywhere.</description>
   <applicationVisibilities>
     <application>BarnCRM</application>
     <visible>true</visible>
@@ -96,6 +96,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ModuleManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>NamespaceUtil</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -113,6 +117,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>PermissionSetGroupSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -185,6 +193,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>UserSelector</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>WhatsNewController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>
@@ -520,7 +532,7 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Error_Log__c.Technical_Detail__c</field>
-    <readable>true</readable>
+    <readable>false</readable>
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
@@ -629,6 +641,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Rollup_Definition__c.Delimiter__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Rollup_Definition__c.Filter_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -705,6 +722,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Setting_Change__c.Changed_By__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Setting_Change__c.Deployment_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

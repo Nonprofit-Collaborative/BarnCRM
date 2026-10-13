@@ -14,7 +14,9 @@ private class GivingSettingsFirstSaveTest {
     /** The console save needs Manage BarnCRM Settings, committed before a test runs. */
     @TestSetup
     static void grantPermission() {
-        SettingsTestPermissions.grantTo(PERMISSION_SET, UserInfo.getUserId());
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            SettingsTestPermissions.grantTo(PERMISSION_SET, UserInfo.getUserId());
+        }
     }
 
     private static void assertNoRecordYet() {
@@ -63,104 +65,124 @@ private class GivingSettingsFirstSaveTest {
 
     @IsTest
     static void anAcknowledgmentRunAsTheFirstSaveKeepsTheShippedDefaults() {
-        assertNoRecordYet();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
 
-        Test.startTest();
-        AcknowledgmentService.recordLastRun('Sent 3 thank yous.');
-        Test.stopTest();
+            Test.startTest();
+            AcknowledgmentService.recordLastRun('Sent 3 thank yous.');
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.areEqual(
-            'Sent 3 thank yous.',
-            saved.Acknowledgments_Last_Run_Summary__c,
-            'The run is recorded'
-        );
-        assertShippedOnKept(saved, 'AcknowledgmentService.recordLastRun');
+            Giving_Settings__c saved = stored();
+            Assert.areEqual(
+                'Sent 3 thank yous.',
+                saved.Acknowledgments_Last_Run_Summary__c,
+                'The run is recorded'
+            );
+            assertShippedOnKept(saved, 'AcknowledgmentService.recordLastRun');
+        }
     }
 
     @IsTest
     static void aDonorLevelStampAsTheFirstSaveKeepsTheShippedDefaults() {
-        assertNoRecordYet();
-        Datetime completedAt = System.now();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
+            Datetime completedAt = System.now();
 
-        Test.startTest();
-        DonorLevelWriter.stampRecalculation(completedAt);
-        Test.stopTest();
+            Test.startTest();
+            DonorLevelWriter.stampRecalculation(completedAt);
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.areEqual(
-            completedAt,
-            saved.Donor_Levels_Last_Recalculated__c,
-            'The recalculation is stamped'
-        );
-        assertShippedOnKept(saved, 'DonorLevelWriter.stampRecalculation');
+            Giving_Settings__c saved = stored();
+            Assert.areEqual(
+                completedAt,
+                saved.Donor_Levels_Last_Recalculated__c,
+                'The recalculation is stamped'
+            );
+            assertShippedOnKept(saved, 'DonorLevelWriter.stampRecalculation');
+        }
     }
 
     @IsTest
     static void closingAPeriodAsTheFirstSaveKeepsTheShippedDefaults() {
-        assertNoRecordYet();
-        Date closeDate = Date.today().addDays(-30);
-        Assert.isNull(
-            AccountingPeriodWriter.lockedClosedThrough(),
-            'No period is closed on an org that has never saved'
-        );
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
+            Date closeDate = Date.today().addDays(-30);
+            Assert.isNull(
+                AccountingPeriodWriter.lockedClosedThrough(),
+                'No period is closed on an org that has never saved'
+            );
 
-        Test.startTest();
-        AccountingPeriodWriter.saveClosedThrough(closeDate);
-        Test.stopTest();
+            Test.startTest();
+            AccountingPeriodWriter.saveClosedThrough(closeDate);
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.areEqual(closeDate, saved.Books_Closed_Through__c, 'The books are closed');
-        Assert.areEqual(
-            closeDate,
-            AccountingPeriodWriter.lockedClosedThrough(),
-            'And the locked read sees the stored date'
-        );
-        assertShippedOnKept(saved, 'AccountingPeriodWriter.saveClosedThrough');
+            Giving_Settings__c saved = stored();
+            Assert.areEqual(closeDate, saved.Books_Closed_Through__c, 'The books are closed');
+            Assert.areEqual(
+                closeDate,
+                AccountingPeriodWriter.lockedClosedThrough(),
+                'And the locked read sees the stored date'
+            );
+            assertShippedOnKept(saved, 'AccountingPeriodWriter.saveClosedThrough');
+        }
     }
 
     @IsTest
     static void aTopUpRunAsTheFirstSaveKeepsTheShippedDefaults() {
-        assertNoRecordYet();
-        Datetime completedAt = System.now();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
+            Datetime completedAt = System.now();
 
-        Test.startTest();
-        CommitmentService.recordTopUpRun(completedAt, 'Added 4 installments.');
-        Test.stopTest();
+            Test.startTest();
+            CommitmentService.recordTopUpRun(completedAt, 'Added 4 installments.');
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.areEqual(completedAt, saved.Installment_Top_Up_Last_Run__c, 'The run is recorded');
-        assertShippedOnKept(saved, 'CommitmentService.recordTopUpRun');
+            Giving_Settings__c saved = stored();
+            Assert.areEqual(
+                completedAt,
+                saved.Installment_Top_Up_Last_Run__c,
+                'The run is recorded'
+            );
+            assertShippedOnKept(saved, 'CommitmentService.recordTopUpRun');
+        }
     }
 
     @IsTest
     static void anOverdueRunAsTheFirstSaveKeepsTheShippedDefaults() {
-        assertNoRecordYet();
-        Datetime completedAt = System.now();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
+            Datetime completedAt = System.now();
 
-        Test.startTest();
-        CommitmentService.recordOverdueRun(completedAt, 'Nothing overdue.');
-        Test.stopTest();
+            Test.startTest();
+            CommitmentService.recordOverdueRun(completedAt, 'Nothing overdue.');
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.areEqual(completedAt, saved.Installment_Overdue_Last_Run__c, 'The run is recorded');
-        assertShippedOnKept(saved, 'CommitmentService.recordOverdueRun');
+            Giving_Settings__c saved = stored();
+            Assert.areEqual(
+                completedAt,
+                saved.Installment_Overdue_Last_Run__c,
+                'The run is recorded'
+            );
+            assertShippedOnKept(saved, 'CommitmentService.recordOverdueRun');
+        }
     }
 
     @IsTest
     static void aConsoleSaveAsTheFirstSaveKeepsTheShippedDefaults() {
-        assertNoRecordYet();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            assertNoRecordYet();
 
-        Test.startTest();
-        SettingsService.saveValues(
-            'Giving_Settings__c',
-            new Map<String, Object>{ 'Receipt_Number_Prefix__c' => 'R-' }
-        );
-        Test.stopTest();
+            Test.startTest();
+            SettingsService.saveValues(
+                'Giving_Settings__c',
+                new Map<String, Object>{ 'Receipt_Number_Prefix__c' => 'R-' }
+            );
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.areEqual('R-', saved.Receipt_Number_Prefix__c, 'The setting is saved');
-        assertShippedOnKept(saved, 'The settings console');
+            Giving_Settings__c saved = stored();
+            Assert.areEqual('R-', saved.Receipt_Number_Prefix__c, 'The setting is saved');
+            assertShippedOnKept(saved, 'The settings console');
+        }
     }
 
     /**
@@ -169,28 +191,34 @@ private class GivingSettingsFirstSaveTest {
      */
     @IsTest
     static void laterSavesLeaveADeliberateOffAlone() {
-        insert new Giving_Settings__c(
-            SetupOwnerId = UserInfo.getOrganizationId(),
-            Auto_Apply_Gifts_To_Installments__c = false,
-            Automatic_Household_Soft_Credits__c = false,
-            Receipt_Print_Logo__c = false,
-            Receipt_Number_Prefix__c = 'GIFT-'
-        );
-        Datetime completedAt = System.now();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insert new Giving_Settings__c(
+                SetupOwnerId = UserInfo.getOrganizationId(),
+                Auto_Apply_Gifts_To_Installments__c = false,
+                Automatic_Household_Soft_Credits__c = false,
+                Receipt_Print_Logo__c = false,
+                Receipt_Number_Prefix__c = 'GIFT-'
+            );
+            Datetime completedAt = System.now();
 
-        Test.startTest();
-        AcknowledgmentService.recordLastRun('Sent 1 thank you.');
-        DonorLevelWriter.stampRecalculation(completedAt);
-        AccountingPeriodWriter.saveClosedThrough(Date.today().addDays(-30));
-        CommitmentService.recordTopUpRun(completedAt, 'Added 1 installment.');
-        CommitmentService.recordOverdueRun(completedAt, 'Nothing overdue.');
-        Test.stopTest();
+            Test.startTest();
+            AcknowledgmentService.recordLastRun('Sent 1 thank you.');
+            DonorLevelWriter.stampRecalculation(completedAt);
+            AccountingPeriodWriter.saveClosedThrough(Date.today().addDays(-30));
+            CommitmentService.recordTopUpRun(completedAt, 'Added 1 installment.');
+            CommitmentService.recordOverdueRun(completedAt, 'Nothing overdue.');
+            Test.stopTest();
 
-        Giving_Settings__c saved = stored();
-        Assert.isFalse(saved.Auto_Apply_Gifts_To_Installments__c, 'A deliberate off stays off');
-        Assert.isFalse(saved.Automatic_Household_Soft_Credits__c, 'So does this one');
-        Assert.isFalse(saved.Receipt_Print_Logo__c, 'And this one');
-        Assert.areEqual('GIFT-', saved.Receipt_Number_Prefix__c, 'Other keys are untouched');
-        Assert.areEqual(completedAt, saved.Installment_Overdue_Last_Run__c, 'Each run recorded');
+            Giving_Settings__c saved = stored();
+            Assert.isFalse(saved.Auto_Apply_Gifts_To_Installments__c, 'A deliberate off stays off');
+            Assert.isFalse(saved.Automatic_Household_Soft_Credits__c, 'So does this one');
+            Assert.isFalse(saved.Receipt_Print_Logo__c, 'And this one');
+            Assert.areEqual('GIFT-', saved.Receipt_Number_Prefix__c, 'Other keys are untouched');
+            Assert.areEqual(
+                completedAt,
+                saved.Installment_Overdue_Last_Run__c,
+                'Each run recorded'
+            );
+        }
     }
 }

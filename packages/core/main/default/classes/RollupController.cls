@@ -28,6 +28,12 @@ public with sharing class RollupController {
         public String relationshipPath { get; set; }
         @AuraEnabled
         public String aggregate { get; set; }
+        /** The calculation by the name the Aggregate picklist gives it: Sum, Count distinct, Any. */
+        @AuraEnabled
+        public String aggregateLabel { get; set; }
+        /** What separates a text list's values, by its picklist name; blank for anything else. */
+        @AuraEnabled
+        public String delimiterLabel { get; set; }
         @AuraEnabled
         public String sourceField { get; set; }
         @AuraEnabled
@@ -64,8 +70,22 @@ public with sharing class RollupController {
         public String defaultMode { get; set; }
         @AuraEnabled
         public List<String> modes { get; set; }
+        /** The same modes with the names an administrator reads (R-R4): Instantly, and so on. */
+        @AuraEnabled
+        public List<ModeOption> modeOptions { get; set; }
         @AuraEnabled
         public List<RollupView> rollups { get; set; }
+        /** The Rollup Builder tab, with the package namespace when there is one. */
+        @AuraEnabled
+        public String builderTabApiName { get; set; }
+    }
+
+    /** One mode: the stored value and the name the picklist gives it. */
+    public class ModeOption {
+        @AuraEnabled
+        public String value { get; set; }
+        @AuraEnabled
+        public String label { get; set; }
     }
 
     @AuraEnabled(cacheable=true)
@@ -126,6 +146,7 @@ public with sharing class RollupController {
         try {
             requirePermission();
             require(definitionId);
+            refuseWhileAFullRunIsGoing();
             RollupService.recalculate(definitionId);
             return currentPage();
         } catch (Exception caught) {
@@ -138,6 +159,7 @@ public with sharing class RollupController {
     public static RollupPageView recalculateAll() {
         try {
             requirePermission();
+            refuseWhileAFullRunIsGoing();
             RollupScheduler.runNow();
             return currentPage();
         } catch (Exception caught) {
@@ -161,6 +183,89 @@ public with sharing class RollupController {
         }
     }
 
+    /** A rough rate for a full run, from the first measured runs; an org run refines it. */
+    @TestVisible
+    private static final Integer RECORDS_PER_MINUTE = 1650;
+
+    /** The moment the estimate treats as now, so a test can pick a weekday or a night. */
+    @TestVisible
+    private static Datetime estimatedAt = null;
+
+    /** What Recalculate all will go through, said before it starts (ADR decision 12, S12). */
+    public class FullRunEstimate {
+        @AuraEnabled
+        public String summary { get; set; }
+        @AuraEnabled
+        public Boolean workingHours { get; set; }
+    }
+
+    /**
+     * Counts the records the nightly run goes through: every record of each entity an active
+     * Scheduled or Both rollup writes. The time is a rough figure, and during working hours
+     * (8 AM to 6 PM, Monday to Friday, in the user's time zone) the Builder suggests tonight.
+     */
+    @AuraEnabled
+    public static FullRunEstimate estimateFullRun() {
+        try {
+            requirePermission();
+            Set<Schema.SObjectType> targets = new Set<Schema.SObjectType>();
+            for (
+                Rollup_Definition__c definition : RollupSelector.selectActiveForModes(
+                    RollupService.scheduledModes()
+                )
+            ) {
+                Schema.SObjectType target = SettingsService.typeByName(definition.Target_Object__c);
+                if (target != null) {
+                    targets.add(target);
+                }
+            }
+            Integer records = 0;
+            for (Schema.SObjectType target : targets) {
+                records += Database.countQueryWithBinds(
+                    'SELECT COUNT() FROM ' + String.valueOf(target),
+                    new Map<String, Object>(),
+                    AccessLevel.USER_MODE
+                );
+            }
+            Integer minutes = Math.max(
+                1,
+                (Integer) Math.ceil(records / (Decimal) RECORDS_PER_MINUTE)
+            );
+            Datetime moment = estimatedAt == null ? Datetime.now() : estimatedAt;
+            Integer weekday = Integer.valueOf(moment.format('u'));
+            Integer hour = Integer.valueOf(moment.format('H'));
+            FullRunEstimate estimate = new FullRunEstimate();
+            estimate.summary = String.format(
+                Label.Core_RollupBuilder_Estimate,
+                new List<String>{ records.format(), minutes.format() }
+            );
+            estimate.workingHours = weekday <= 5 && hour >= 8 && hour < 18;
+            return estimate;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Estimate the full recalculation');
+        }
+    }
+
+    /**
+     * Recalculate all, tonight: nothing extra when the nightly run is scheduled, since it
+     * recalculates every total at 2:00 AM; otherwise one run at 2:00 AM tonight.
+     *
+     * @return what to tell the administrator
+     */
+    @AuraEnabled
+    public static String runTonight() {
+        try {
+            requirePermission();
+            if (RollupScheduler.isScheduled()) {
+                return Label.Core_RollupBuilder_TonightAlreadyScheduled;
+            }
+            RollupScheduler.scheduleTonight();
+            return Label.Core_RollupBuilder_TonightScheduled;
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Recalculate all rollups tonight');
+        }
+    }
+
     private static RollupPageView currentPage() {
         RollupPageView page = new RollupPageView();
         page.canManage = canManage();
@@ -174,11 +279,35 @@ public with sharing class RollupController {
             RollupService.MODE_SCHEDULED,
             RollupService.MODE_BOTH
         };
+        page.modeOptions = modeOptions(page.modes);
+        page.builderTabApiName = NamespaceUtil.qualify('Rollup_Builder');
         page.rollups = new List<RollupView>();
+        Map<String, String> aggregateLabels = labelsOf(Rollup_Definition__c.Aggregate__c);
+        Map<String, String> delimiterLabels = labelsOf(Rollup_Definition__c.Delimiter__c);
         for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
-            page.rollups.add(toView(definition));
+            RollupView view = toView(definition);
+            String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c;
+            view.aggregateLabel = aggregateLabels.containsKey(aggregate)
+                ? aggregateLabels.get(aggregate)
+                : aggregate;
+            if (aggregate.startsWith('TEXT_LIST')) {
+                String delimiter = String.isBlank(definition.Delimiter__c)
+                    ? 'Comma'
+                    : definition.Delimiter__c;
+                view.delimiterLabel = delimiterLabels.get(delimiter);
+            }
+            page.rollups.add(view);
         }
         return page;
+    }
+
+    /** A picklist's labels by stored value, in the running user's language. */
+    private static Map<String, String> labelsOf(Schema.SObjectField picklist) {
+        Map<String, String> labelByValue = new Map<String, String>();
+        for (Schema.PicklistEntry entry : picklist.getDescribe().getPicklistValues()) {
+            labelByValue.put(entry.getValue(), entry.getLabel());
+        }
+        return labelByValue;
     }
 
     private static RollupView toView(Rollup_Definition__c definition) {
@@ -204,6 +333,19 @@ public with sharing class RollupController {
         return view;
     }
 
+    /** The modes in the order given, each named by the Mode picklist's own label. */
+    private static List<ModeOption> modeOptions(List<String> modes) {
+        Map<String, String> labelByValue = labelsOf(Rollup_Definition__c.Mode__c);
+        List<ModeOption> options = new List<ModeOption>();
+        for (String mode : modes) {
+            ModeOption option = new ModeOption();
+            option.value = mode;
+            option.label = labelByValue.containsKey(mode) ? labelByValue.get(mode) : mode;
+            options.add(option);
+        }
+        return options;
+    }
+
     private static Boolean isKnownMode(String mode) {
         return RollupService.MODE_REAL_TIME.equals(mode) ||
             RollupService.MODE_SCHEDULED.equals(mode) ||
@@ -218,6 +360,15 @@ public with sharing class RollupController {
             );
         }
         return definition;
+    }
+
+    /** R-R14: one full run at a time, and the admin is told so rather than left guessing. */
+    private static void refuseWhileAFullRunIsGoing() {
+        if (RollupFullRecalcBatch.runningJobId() != null) {
+            throw new RollupService.RollupServiceException(
+                Label.Core_Rollups_FullRunAlreadyRunning
+            );
+        }
     }
 
     private static Boolean canManage() {

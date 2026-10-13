@@ -3,30 +3,30 @@
     <div class="slds-var-p-horizontal_medium">
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
-      <template if:true={hasError}>
-        <p data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
+      <template lwc:if={hasError}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
           {errorMessage}
         </p>
       </template>
 
-      <template if:true={hasNotice}>
-        <p data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
+      <template lwc:if={hasNotice}>
+        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
           {noticeMessage}
         </p>
       </template>
 
-      <template if:true={showReadOnlyNotice}>
+      <template lwc:if={showReadOnlyNotice}>
         <p data-id="read-only-notice" class="slds-text-body_small slds-var-m-bottom_small">
           {labels.readOnlyNotice}
         </p>
       </template>
 
-      <template if:true={isEmpty}>
+      <template lwc:if={isEmpty}>
         <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
       </template>
 
-      <template if:true={hasTemplates}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+      <template lwc:if={hasTemplates}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
           <thead>
             <tr class="slds-line-height_reset">
               <th scope="col">{labels.columnPlan}</th>
@@ -34,13 +34,13 @@
               <th scope="col">{labels.columnSteps}</th>
               <th scope="col">{labels.columnRunning}</th>
               <th scope="col">{labels.columnActive}</th>
-              <th scope="col"></th>
+              <th scope="col"><span class="slds-assistive-text">{labels.columnActions}</span></th>
             </tr>
           </thead>
           <tbody>
             <template for:each={templates} for:item="plan">
               <tr key={plan.recordId} data-id="plan-row" class={plan.rowClass}>
-                <td>
+                <td data-label={labels.columnPlan}>
                   <lightning-button
                     data-id="plan-link"
                     data-record-id={plan.recordId}
@@ -48,11 +48,14 @@
                     label={plan.name}
                     onclick={handleSelect}
                   ></lightning-button>
+                  <template lwc:if={plan.isSelected}>
+                    <span class="slds-assistive-text" data-id="plan-selected">{labels.selected}</span>
+                  </template>
                 </td>
-                <td data-id="plan-event">{plan.triggerEvent}</td>
-                <td data-id="plan-steps">{plan.stepCount}</td>
-                <td data-id="plan-running">{plan.runningPlans}</td>
-                <td data-id="plan-active">{plan.activeText}</td>
+                <td data-id="plan-event" data-label={labels.columnEvent}>{plan.triggerEvent}</td>
+                <td data-id="plan-steps" data-label={labels.columnSteps}>{plan.stepCount}</td>
+                <td data-id="plan-running" data-label={labels.columnRunning}>{plan.runningPlans}</td>
+                <td data-id="plan-active" data-label={labels.columnActive}>{plan.activeText}</td>
                 <td>
                   <lightning-button
                     data-id="edit-plan"
@@ -86,21 +89,13 @@
         ></lightning-button>
       </div>
 
-      <template if:true={showTemplateForm}>
+      <template lwc:if={showTemplateForm}>
         <div data-id="plan-form" class="slds-box slds-var-m-top_medium">
           <lightning-input
             data-id="plan-name"
             data-field="name"
             label={labels.fieldName}
             value={templateDraft.name}
-            onchange={handleTemplateField}
-          ></lightning-input>
-          <lightning-input
-            data-id="plan-key"
-            data-field="planKey"
-            label={labels.fieldKey}
-            field-level-help={labels.fieldKeyHelp}
-            value={templateDraft.planKey}
             onchange={handleTemplateField}
           ></lightning-input>
           <lightning-combobox
@@ -160,17 +155,9 @@
           {labels.runningNotice}
         </p>
 
-        <template if:false={hasSelection}>
-          <p data-id="select-plan" class="slds-text-body_regular">{labels.selectPlan}</p>
-        </template>
-
-        <template if:true={hasSelection}>
-          <template if:false={hasSteps}>
-            <p data-id="no-steps" class="slds-text-body_regular">{labels.noSteps}</p>
-          </template>
-
-          <template if:true={hasSteps}>
-            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <template lwc:if={hasSelection}>
+          <template lwc:if={hasSteps}>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
               <thead>
                 <tr class="slds-line-height_reset">
                   <th scope="col">{labels.columnSteps}</th>
@@ -178,17 +165,17 @@
                   <th scope="col">{labels.stepDays}</th>
                   <th scope="col">{labels.stepAssign}</th>
                   <th scope="col">{labels.stepPriority}</th>
-                  <th scope="col"></th>
+                  <th scope="col"><span class="slds-assistive-text">{labels.columnActions}</span></th>
                 </tr>
               </thead>
               <tbody>
                 <template for:each={steps} for:item="step">
                   <tr key={step.recordId} data-id="step-row">
-                    <td data-id="step-position">{step.position}</td>
-                    <td data-id="step-subject">{step.subject}</td>
-                    <td data-id="step-days">{step.daysAfterStart}</td>
-                    <td data-id="step-assignee">{step.assigneeText}</td>
-                    <td data-id="step-priority">{step.priority}</td>
+                    <td data-id="step-position" data-label={labels.columnSteps}>{step.position}</td>
+                    <td data-id="step-subject" data-label={labels.stepSubject}>{step.subject}</td>
+                    <td data-id="step-days" data-label={labels.stepDays}>{step.daysAfterStart}</td>
+                    <td data-id="step-assignee" data-label={labels.stepAssign}>{step.assigneeText}</td>
+                    <td data-id="step-priority" data-label={labels.stepPriority}>{step.priority}</td>
                     <td>
                       <lightning-button
                         data-id="move-up"
@@ -227,6 +214,9 @@
               </tbody>
             </table>
           </template>
+          <template lwc:else>
+            <p data-id="no-steps" class="slds-text-body_regular">{labels.noSteps}</p>
+          </template>
 
           <div class="slds-var-m-top_small">
             <lightning-button
@@ -237,7 +227,7 @@
             ></lightning-button>
           </div>
 
-          <template if:true={showStepForm}>
+          <template lwc:if={showStepForm}>
             <div data-id="step-form" class="slds-box slds-var-m-top_medium">
               <lightning-input
                 data-id="step-subject-input"
@@ -304,6 +294,9 @@
               </div>
             </div>
           </template>
+        </template>
+        <template lwc:else>
+          <p data-id="select-plan" class="slds-text-body_regular">{labels.selectPlan}</p>
         </template>
       </div>
     </div>

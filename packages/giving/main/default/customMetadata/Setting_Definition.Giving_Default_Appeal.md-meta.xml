@@ -20,7 +20,11 @@
     </values>
     <values>
         <field>Data_Type__c</field>
-        <value xsi:type="xsd:string">Text</value>
+        <value xsi:type="xsd:string">Record</value>
+    </values>
+    <values>
+        <field>Record_Object__c</field>
+        <value xsi:type="xsd:string">Appeal__c</value>
     </values>
     <values>
         <field>Sort_Order__c</field>
@@ -28,7 +32,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">The appeal proposed on a new gift when the entry form does not name one. It holds an appeal record identifier, so the console renders an appeal picker rather than a text box.</value>
+        <value xsi:type="xsd:string">The appeal proposed on a new gift when the entry form does not name one. Search for the appeal by name, or leave it empty.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

@@ -24,6 +24,13 @@ public with sharing class ImportMapping {
     @NamespaceAccessible
     public static final String ENTITY_ORGANIZATION = 'Organization';
 
+    /**
+     * The one entity of a template that loads one object (R-IT12): its attributes are the
+     * target object's field API names, and `Record.Id` names an existing record.
+     */
+    @NamespaceAccessible
+    public static final String ENTITY_RECORD = 'Record';
+
     /** The row entities Core stages but does not write (R-IR6). */
     @NamespaceAccessible
     public static final Set<String> DEFERRED_ENTITIES = new Set<String>{
@@ -52,6 +59,15 @@ public with sharing class ImportMapping {
         public String source;
         @AuraEnabled
         public String target;
+        /**
+         * For a lookup column of a one-object template, the parent field its values name the
+         * parent by (R-IT13); empty or `Id` for the record ID.
+         */
+        @AuraEnabled
+        public String lookupField;
+        /** The steps that change this column's values before they are used (R-IT15). */
+        @AuraEnabled
+        public List<DataTransform.Step> transforms;
 
         // JSON.deserialize requires a no-arg constructor to build this class from the stored
         // mapping document (see parse below); the fields it fills in are set afterward by the
@@ -60,6 +76,8 @@ public with sharing class ImportMapping {
         public Column() {
             this.source = null;
             this.target = null;
+            this.lookupField = null;
+            this.transforms = null;
         }
 
         @NamespaceAccessible
@@ -164,6 +182,73 @@ public with sharing class ImportMapping {
         return result;
     }
 
+    /**
+     * Puts a file's values (R-IB14) before this mapping's defaults, in place, and returns
+     * this mapping. A file value replaces the template's default for the same target, and
+     * the row's own value still wins over both, because defaults only fill blanks. A blank or
+     * unreadable document changes nothing.
+     */
+    @NamespaceAccessible
+    public ImportMapping withFileValues(String fileValuesDocument) {
+        ImportMapping file = parse(fileValuesDocument);
+        if (file.defaults.isEmpty()) {
+            return this;
+        }
+        List<Assignment> merged = new List<Assignment>();
+        Set<String> given = new Set<String>();
+        for (Assignment assignment : file.defaults) {
+            if (assignment != null && !isIgnored(assignment.target)) {
+                merged.add(assignment);
+                given.add(assignment.target.trim().toLowerCase());
+            }
+        }
+        for (Assignment assignment : defaults) {
+            if (
+                assignment != null &&
+                assignment.target != null &&
+                !given.contains(assignment.target.trim().toLowerCase())
+            ) {
+                merged.add(assignment);
+            }
+        }
+        defaults = merged;
+        return this;
+    }
+
+    /**
+     * True when a target names or finds a person: either person's first, last or full name,
+     * their email, their record ID (R-IT10), or the field people are matched on (null when the
+     * rule uses none). A value
+     * for every row of a file may not be one of these, since every row would then be one
+     * person (R-IB14).
+     */
+    @NamespaceAccessible
+    public static Boolean namesAPerson(String target, String personMatchField) {
+        String entity = entityOf(target);
+        String attribute = attributeOf(target);
+        if (
+            attribute == null ||
+            !(ENTITY_CONTACT_1.equalsIgnoreCase(entity) ||
+            ENTITY_CONTACT_2.equalsIgnoreCase(entity))
+        ) {
+            return false;
+        }
+        for (
+            String identifying : new List<String>{
+                'FirstName',
+                'LastName',
+                'Email',
+                'Id',
+                ATTRIBUTE_FULL_NAME
+            }
+        ) {
+            if (identifying.equalsIgnoreCase(attribute)) {
+                return true;
+            }
+        }
+        return personMatchField != null && personMatchField.equalsIgnoreCase(attribute);
+    }
+
     /** The document, as it is stored on the template. */
     @NamespaceAccessible
     public String serialize() {
@@ -234,6 +319,52 @@ public with sharing class ImportMapping {
         return result;
     }
 
+    /**
+     * The steps of each column that has any (R-IT15), keyed as `targetsBySourceKey` keys
+     * them. A column set to Do not load is left out, since nothing of it is used.
+     */
+    @NamespaceAccessible
+    public Map<String, List<DataTransform.Step>> transformsBySourceKey() {
+        Map<String, List<DataTransform.Step>> result = new Map<String, List<DataTransform.Step>>();
+        for (Column column : columns) {
+            if (
+                column == null ||
+                String.isBlank(column.source) ||
+                isIgnored(column.target) ||
+                column.transforms == null ||
+                column.transforms.isEmpty()
+            ) {
+                continue;
+            }
+            result.put(key(column.source), column.transforms);
+        }
+        return result;
+    }
+
+    /**
+     * What is wrong with the columns' steps, one sentence per column naming it, or an empty
+     * list. A mapping is not saved while this is not empty (R-IT15).
+     */
+    @NamespaceAccessible
+    public List<String> transformProblems() {
+        List<String> result = new List<String>();
+        for (Column column : columns) {
+            if (column == null || column.transforms == null || column.transforms.isEmpty()) {
+                continue;
+            }
+            List<String> problems = DataTransform.problems(column.transforms);
+            if (!problems.isEmpty()) {
+                result.add(
+                    String.format(
+                        Label.Core_Import_ErrorColumnChanges,
+                        new List<String>{ column.source, String.join(problems, ' ') }
+                    )
+                );
+            }
+        }
+        return result;
+    }
+
     /** Every entity this mapping names, in no particular order. */
     @NamespaceAccessible
     public Set<String> mappedEntities() {
@@ -289,6 +420,50 @@ public with sharing class ImportMapping {
             }
         }
         return false;
+    }
+
+    /**
+     * The parent field each `Record` lookup column names its parent by (R-IT13), keyed by the
+     * attribute folded to lower case. A column with no `lookupField`, or with `Id`, is left out:
+     * it names its parent by record ID.
+     */
+    @NamespaceAccessible
+    public Map<String, String> lookupFieldsByAttribute() {
+        Map<String, String> result = new Map<String, String>();
+        for (Column column : columns) {
+            if (
+                column == null ||
+                isIgnored(column.target) ||
+                String.isBlank(column.lookupField) ||
+                'Id'.equalsIgnoreCase(column.lookupField.trim()) ||
+                !ENTITY_RECORD.equalsIgnoreCase(entityOf(column.target))
+            ) {
+                continue;
+            }
+            result.put(attributeOf(column.target).toLowerCase(), column.lookupField.trim());
+        }
+        return result;
+    }
+
+    /**
+     * Every `Record` attribute this mapping writes, from its columns and its values for every
+     * row, folded to lower case (R-IT12).
+     */
+    @NamespaceAccessible
+    public Set<String> recordAttributes() {
+        Set<String> result = new Set<String>();
+        List<String> targets = new List<String>(targetsBySourceKey().values());
+        for (Assignment assignment : defaults) {
+            if (assignment != null && !isIgnored(assignment.target)) {
+                targets.add(assignment.target);
+            }
+        }
+        for (String target : targets) {
+            if (ENTITY_RECORD.equalsIgnoreCase(entityOf(target))) {
+                result.add(attributeOf(target).toLowerCase());
+            }
+        }
+        return result;
     }
 
     /** The lookup key of a column name: trimmed and folded to lower case. */
