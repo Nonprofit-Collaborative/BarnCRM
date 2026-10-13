@@ -210,14 +210,15 @@ public with sharing class AutomationControl {
      */
     @NamespaceAccessible
     public static Boolean resumeExpiredPause(Datetime expectedEnd) {
-        Datetime stored = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
+        BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
+        Datetime stored = locked?.Automation_Paused_Until__c;
         if (stored == null || stored > System.now()) {
             return false;
         }
         if (expectedEnd != null && !sameSecond(stored, expectedEnd)) {
             return false;
         }
-        AutomationSettingsWriter.savePausedUntil(null);
+        AutomationSettingsWriter.savePausedUntil(locked, null);
         SettingsService.clearCache();
         SettingsService.logChange(PAUSE_SETTING_NAME, String.valueOf(stored), '');
         return true;
@@ -262,8 +263,9 @@ public with sharing class AutomationControl {
         requirePermission();
         // Read under the lock the save below also takes, so the audit row's old value is the
         // one stored, not one another person replaced a moment ago.
-        Datetime previous = OrgSettingsSystemWriter.lockStored()?.Automation_Paused_Until__c;
-        AutomationSettingsWriter.savePausedUntil(until);
+        BarnCRM_Settings__c locked = OrgSettingsSystemWriter.lockStored();
+        Datetime previous = locked?.Automation_Paused_Until__c;
+        AutomationSettingsWriter.savePausedUntil(locked, until);
         SettingsService.clearCache();
         SettingsService.logChange(
             PAUSE_SETTING_NAME,

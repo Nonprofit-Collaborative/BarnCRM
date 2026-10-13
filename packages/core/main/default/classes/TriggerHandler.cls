@@ -6,12 +6,13 @@
  * bypassable and pausable (plan Section 7.2, canonical model rule R-A1).
  *
  * THE CONTRACT. Every context method takes no arguments, and a handler body reads the records
- * from the trigger context itself: `Trigger.new`, `Trigger.old`, `Trigger.newMap`,
- * `Trigger.oldMap`. That is what every feature module is written against, so it is fixed here.
+ * through `newRecords()`, `newRecordsById()`, `oldRecords()`, and `oldRecordsById()`, which
+ * return the trigger context collections. That is what every feature module is written
+ * against, so it is fixed here.
  *
  *     public class ContactTriggerHandler extends TriggerHandler {
  *         public override void beforeInsert() {
- *             for (Contact person : (List<Contact>) Trigger.new) {
+ *             for (Contact person : (List<Contact>) newRecords()) {
  *                 person.Description = 'Seen by BarnCRM';
  *             }
  *         }
@@ -19,9 +20,7 @@
  *
  * Outside a trigger there is no `Trigger.new` to read, so a unit test that wants to drive a
  * handler without inserting records sets the `testNew`, `testNewMap`, `testOld`, and `testOldMap`
- * overrides below and has the handler read them through `newRecords()`, `newRecordsById()`,
- * `oldRecords()`, and `oldRecordsById()`, which return the override when there is one and the
- * trigger collection otherwise.
+ * overrides below, which those four accessors return in place of the trigger collections.
  *
  * The recursion guard is per transaction, per handler, per phase, and per record: `claimRunFor`
  * takes the record ids in front of it and hands back the ones this handler has not already
@@ -153,20 +152,6 @@ public virtual with sharing class TriggerHandler {
         }
         claimed.addAll(unclaimed);
         return unclaimed;
-    }
-
-    @NamespaceAccessible
-    public Boolean hasRunFor(String phase, Id recordId) {
-        return recordId != null && claimedFor(phase).contains(recordId);
-    }
-
-    /**
-     * Forgets what this handler has claimed for a phase, for the rare operation that means to run
-     * it again over the same records in one transaction.
-     */
-    @NamespaceAccessible
-    public void releaseRunFor(String phase) {
-        CLAIMED_RECORDS.remove(phaseKey(phase));
     }
 
     /**

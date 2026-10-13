@@ -26,8 +26,12 @@ the lines between the previous method and its annotation) to cover that method.
 """
 
 import glob
+import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from apex_source import strip  # noqa: E402
 
 SOURCES = [
     "packages/core/main/**/*.cls",
@@ -45,34 +49,6 @@ METHOD = re.compile(
 )
 LEGACY = re.compile(r"\b(?:static\s+testmethod|testmethod\s+static)\s+void\s+(\w+)\s*\(\s*\)\s*\{", re.I)
 RUN_AS = re.compile(r"\bSystem\s*\.\s*runAs\s*\(", re.I)
-
-
-def strip(source):
-    """Blank out comments and string literals, keeping offsets and line numbers."""
-    out = []
-    i, n = 0, len(source)
-    while i < n:
-        c = source[i]
-        if source.startswith("//", i):
-            j = source.find("\n", i)
-            j = n if j < 0 else j
-            out.append(" " * (j - i))
-            i = j
-        elif source.startswith("/*", i):
-            j = source.find("*/", i + 2)
-            j = n if j < 0 else j + 2
-            out.append(re.sub(r"[^\n]", " ", source[i:j]))
-            i = j
-        elif c == "'":
-            j = i + 1
-            while j < n and source[j] != "'":
-                j += 2 if source[j] == "\\" else 1
-            out.append("''" + " " * max(0, j - i - 1))
-            i = j + 1
-        else:
-            out.append(c)
-            i += 1
-    return "".join(out)
 
 
 def closing(text, start):

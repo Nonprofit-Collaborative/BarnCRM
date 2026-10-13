@@ -8,21 +8,21 @@
  */
 public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
     public override void afterInsert() {
-        refresh(householdIds((List<Household_Member__c>) Trigger.new), false);
+        refresh(householdIds((List<Household_Member__c>) newRecords()), false);
     }
 
     public override void afterUpdate() {
-        Set<Id> affected = householdIds((List<Household_Member__c>) Trigger.new);
-        affected.addAll(householdIds((List<Household_Member__c>) Trigger.old));
+        Set<Id> affected = householdIds((List<Household_Member__c>) newRecords());
+        affected.addAll(householdIds((List<Household_Member__c>) oldRecords()));
         refresh(affected, true);
     }
 
     public override void afterDelete() {
-        refresh(householdIds((List<Household_Member__c>) Trigger.old), true);
+        refresh(householdIds((List<Household_Member__c>) oldRecords()), true);
     }
 
     public override void afterUndelete() {
-        refresh(householdIds((List<Household_Member__c>) Trigger.new), false);
+        refresh(householdIds((List<Household_Member__c>) newRecords()), false);
     }
 
     private static Set<Id> householdIds(List<Household_Member__c> records) {

@@ -253,8 +253,6 @@ private class TriggerDispatcherTest {
                 new RecordingHandler(),
                 new TriggerDispatcher.Context(null, null, null, null, null)
             );
-            // Called outside a trigger, the one argument entry point does nothing at all.
-            TriggerDispatcher.run(new RecordingHandler());
 
             Assert.areEqual(
                 0,
@@ -450,7 +448,7 @@ private class TriggerDispatcherTest {
                 'A second claim hands back only what this handler has not seen.'
             );
             Assert.isTrue(
-                handler.hasRunFor('afterUpdate', records[0].Id),
+                handler.claimRunFor('afterUpdate', new Set<Id>{ records[0].Id }).isEmpty(),
                 'That record is claimed.'
             );
             Assert.isTrue(
@@ -461,19 +459,17 @@ private class TriggerDispatcherTest {
                 handler.claimRunFor('afterUpdate', null).isEmpty(),
                 'And neither does claiming null.'
             );
-            Assert.isFalse(
-                handler.hasRunFor('beforeUpdate', records[0].Id),
+            Assert.areEqual(
+                new Set<Id>{ records[0].Id },
+                handler.claimRunFor('beforeUpdate', new Set<Id>{ records[0].Id }),
                 'A claim is per phase, so another phase is untouched.'
             );
 
-            handler.releaseRunFor('afterUpdate');
-            Assert.isFalse(handler.hasRunFor('afterUpdate', records[0].Id), 'Releasing clears it.');
-
-            handler.claimRunFor('afterUpdate', first);
             TriggerHandler.clearRunClaims();
-            Assert.isFalse(
-                handler.hasRunFor('afterUpdate', records[0].Id),
-                'So does clearing all.'
+            Assert.areEqual(
+                first,
+                handler.claimRunFor('afterUpdate', first),
+                'Clearing all lets every record be claimed again.'
             );
         }
     }

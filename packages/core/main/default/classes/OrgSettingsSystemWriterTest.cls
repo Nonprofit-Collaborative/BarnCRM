@@ -29,7 +29,7 @@ private class OrgSettingsSystemWriterTest {
         System.runAs(TestUsers.admin()) {
             Datetime until = System.now().addHours(2);
             Test.startTest();
-            AutomationSettingsWriter.savePausedUntil(until);
+            AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), until);
             Test.stopTest();
 
             BarnCRM_Settings__c saved = stored();
@@ -62,8 +62,11 @@ private class OrgSettingsSystemWriterTest {
                 Coexistence_Mode__c = 'Standalone'
             );
             Test.startTest();
-            AutomationSettingsWriter.savePausedUntil(System.now().addHours(1));
-            AutomationSettingsWriter.savePausedUntil(null);
+            AutomationSettingsWriter.savePausedUntil(
+                OrgSettingsSystemWriter.lockStored(),
+                System.now().addHours(1)
+            );
+            AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), null);
             Test.stopTest();
 
             BarnCRM_Settings__c saved = stored();
@@ -92,7 +95,7 @@ private class OrgSettingsSystemWriterTest {
             Datetime until = System.now().addHours(2);
 
             Test.startTest();
-            AutomationSettingsWriter.savePausedUntil(until);
+            AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), until);
             Test.stopTest();
 
             Assert.areEqual(

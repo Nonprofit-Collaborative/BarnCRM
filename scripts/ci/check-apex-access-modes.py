@@ -24,8 +24,12 @@ purpose. The vendored rollup engine (packages/*/vendor) is not ours to edit.
 """
 
 import glob
+import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from apex_source import strip  # noqa: E402
 
 SOURCES = ["packages/*/main/**/*.cls", "packages/*/main/**/*.trigger"]
 
@@ -49,34 +53,6 @@ CLASS_DECL = re.compile(
 )
 SHARING = re.compile(r"\b(with|without|inherited)\s+sharing\b", re.I)
 MARKER = re.compile(r"//\s*Access mode:", re.I)
-
-
-def strip(source):
-    """Blank out comments and string literals, keeping offsets and line numbers."""
-    out = []
-    i, n = 0, len(source)
-    while i < n:
-        c = source[i]
-        if source.startswith("//", i):
-            j = source.find("\n", i)
-            j = n if j < 0 else j
-            out.append(" " * (j - i))
-            i = j
-        elif source.startswith("/*", i):
-            j = source.find("*/", i + 2)
-            j = n if j < 0 else j + 2
-            out.append(re.sub(r"[^\n]", " ", source[i:j]))
-            i = j
-        elif c == "'":
-            j = i + 1
-            while j < n and source[j] != "'":
-                j += 2 if source[j] == "\\" else 1
-            out.append("''" + " " * max(0, j - i - 1))
-            i = j + 1
-        else:
-            out.append(c)
-            i += 1
-    return "".join(out)
 
 
 def closing(text, start, open_char, close_char):

@@ -17,30 +17,6 @@
         <value>Every total BarnCRM keeps up to date for you, and when each one was last calculated.</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_GroupHousehold</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Heading for the group of rollups written on household records.</shortDescription>
-        <value>Households</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_GroupPerson</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Heading for the group of rollups written on person records.</shortDescription>
-        <value>People</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_GroupOrganization</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Heading for the group of rollups written on organization records.</shortDescription>
-        <value>Organizations</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_ColumnRollup</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -63,14 +39,6 @@
         <protected>false</protected>
         <shortDescription>Added to what a text list counts: {0} is the delimiter, such as semicolon.</shortDescription>
         <value>separated by {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_ColumnCalculation</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Column heading for the aggregate a rollup applies.</shortDescription>
-        <value>Calculation</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ColumnMode</fullName>
@@ -105,28 +73,12 @@
         <value>Recalculate all</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_Recalculating</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Status shown while a recalculation is running.</shortDescription>
-        <value>Recalculating</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_RecalculateStarted</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Message shown when a recalculation is started.</shortDescription>
         <value>Recalculation started. This page updates as it finishes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_RecalculateFinished</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Message shown when a recalculation completes.</shortDescription>
-        <value>Recalculation finished.</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ScheduleNightly</fullName>
@@ -305,28 +257,12 @@
         <value>This calculation reads a field on each record. Fill in Source Field with the field to read.</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ErrorRecalculateFailed</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error returned when a recalculation cannot start.</shortDescription>
-        <value>The recalculation could not be started. The Error Log has the details.</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_Recalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Recalculate one rollup</shortDescription>
         <value>Recalculate</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_RunNightlyNow</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Run the nightly rollups now</shortDescription>
-        <value>Run the nightly recalculation now</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_StopSchedule</fullName>
