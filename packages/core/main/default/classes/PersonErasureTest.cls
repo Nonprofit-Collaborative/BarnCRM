@@ -293,13 +293,18 @@ private class PersonErasureTest {
             }
             Assert.isTrue(
                 actions.contains(
-                    PersonErasure.CLEARED + ' ' + Contact.SObjectType.getDescribe().getLabel()
+                    PersonErasure.CLEARED +
+                        ' ' +
+                        Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
                 ),
                 'Lists the person'
             );
             Assert.isTrue(
                 actions.contains(
-                    PersonErasure.DELETED + ' ' + Address__c.SObjectType.getDescribe().getLabel()
+                    PersonErasure.DELETED +
+                        ' ' +
+                        Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                            .getLabel()
                 ),
                 'Lists the address'
             );
@@ -369,7 +374,10 @@ private class PersonErasureTest {
             } catch (PersonErasure.ErasureException refused) {
                 Assert.isTrue(
                     refused.getMessage()
-                        .contains(Contact.SObjectType.getDescribe().getLabelPlural()),
+                        .contains(
+                            Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                                .getLabelPlural()
+                        ),
                     'Names what is in the way'
                 );
             }
