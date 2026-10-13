@@ -103,8 +103,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Find | Major | A Find tab that builds a query over one object from lists (no typing a query), shows the matching records, and exports them to CSV. | Shipped | C-34 |
 | Load one object | Major | Inserts, updates or upserts any object, including custom ones, with the same dry run, journal and undo. | Shipped | C-33 |
 | Bulk update | Major | Sets, clears or copies up to five fields on the records a Find query returns, with a count preview, journal and undo. | Shipped | C-35 |
-| Bulk update with steps | Minor | Changes each record's own value in a bulk update with the import's transform steps (find and replace, tidy text, add other fields, read a date), previewed before and after. | Built, not merged (feature/c-37-bulk-transforms-delete-1 to -3) | C-37, ADR-0081 |
-| Bulk delete | Major | Deletes the records a Find query returns, behind its own permission set and a per-job run limit, with a count preview, cascade warning, typed confirmation, journal and undelete from the Recycle Bin. | Built, not merged (feature/c-37-bulk-transforms-delete-1, -4 to -9) | C-37, new ADR |
+| Bulk update with steps | Minor | Changes each record's own value in a bulk update with the import's transform steps (find and replace, tidy text, add other fields, read a date), previewed before and after. | Built, not merged (`landing/batch-7`, from `feature/c-37-bulk-transforms-delete-10`) | C-37, ADR-0081 |
+| Bulk delete | Major | Deletes the records a Find query returns, behind its own permission set and a per-job run limit, with a count preview, cascade warning, typed confirmation, journal and undelete from the Recycle Bin. | Built, not merged (`landing/batch-7`, from `feature/c-37-bulk-transforms-delete-10`) | C-37, ADR-NEXT (`NEXT-bulk-delete-from-a-find-query-with-undelete.md`) |
 | Shipped mappings | Minor | Generic donor list and generic gift list mappings that upgrades never overwrite once edited. | Shipped | C-14 |
 | Two people on one row | Minor | A row naming two people creates one household with both in it, in either membership model. | Shipped | C-14 |
 | Import tagging | Minor | Every record an import creates is tagged with the import it came from. | Shipped | C-14 |
@@ -129,7 +129,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Saved and shared queries | Minor | Save a Find query under a name to run again, and share it read only with everyone who uses Find. | Shipped | C-34 |
 | Find export | Minor | Exports every matching record (not only the rows on screen) to CSV, up to an export row limit set in the app; results follow each person's own access. | Shipped | C-34 |
 | Advanced Find | Minor | Typed queries checked through the same builder, child records, aggregates, XLSX export and inline edit. | Shipped | C-36, ADR-0078 |
-| Data transforms and duplicate-rule matching (part 1) | Minor | Import column changes (a declarative step list, no code evaluation) previewed before and after, a shared DataTransform engine for bulk update, and matching through the org's active duplicate rules with the template's several-matches policy. | Shipped (part 1); bulk update steps and bulk delete built, not merged (feature/c-37-bulk-transforms-delete-1 to -9) | C-37, ADR-0081 |
+| Data transforms and duplicate-rule matching (part 1) | Minor | Import column changes (a declarative step list, no code evaluation) previewed before and after, a shared DataTransform engine for bulk update, and matching through the org's active duplicate rules with the template's several-matches policy. | Shipped (part 1); bulk update steps and bulk delete built, not merged (`landing/batch-7`) | C-37, ADR-0081 |
 | Scheduled imports and external sources | Minor | Loads from SFTP, cloud storage or other systems on a schedule, committing only within admin-set limits. | Planned (1.x) | C-38 |
 
 ### 1.6 Automation and Rollups
