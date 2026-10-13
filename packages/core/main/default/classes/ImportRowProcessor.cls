@@ -2316,7 +2316,8 @@ public with sharing class ImportRowProcessor {
         List<Affiliation__c> toCreate = new List<Affiliation__c>();
         List<Working> owners = new List<Working>();
         for (Working item : linking) {
-            String pair = item.person1Id == null || item.organizationId == null
+            String pair = item.person1Id == null ||
+                item.organizationId == null
                 ? null
                 : String.valueOf(item.person1Id) + '>' + String.valueOf(item.organizationId);
             if (pair != null && linked.contains(pair)) {

@@ -124,7 +124,12 @@ private class ImportAffiliationTest {
             insert new Affiliation__c(Contact__c = ana.Id, Organization__c = employer.Id);
             given(
                 new List<Map<String, String>>{
-                    ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City'),
+                    ImportTestDataFactory.donorRow(
+                        'Ana',
+                        'Ramirez',
+                        'ana@example.org',
+                        'Rose City'
+                    ),
                     ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', 'Rose City'),
                     ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', 'Rose City')
                 }
