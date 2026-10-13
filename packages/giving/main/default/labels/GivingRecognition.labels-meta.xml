@@ -65,14 +65,6 @@
     <value>Type your own wording in Custom Role, or choose one of the roles in the list.</value>
   </labels>
   <labels>
-    <fullName>Giving_SoftCredit_Duplicate</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Duplicate automatic credit</shortDescription>
-    <value>This person already has an automatic credit for this gift in this role.</value>
-  </labels>
-  <labels>
     <fullName>Giving_SoftCredit_GiftRequired</fullName>
     <categories>Giving, Soft Credits</categories>
     <language>en_US</language>
