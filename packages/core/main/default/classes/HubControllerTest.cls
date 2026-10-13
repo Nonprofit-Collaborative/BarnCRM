@@ -91,8 +91,17 @@ private class HubControllerTest {
             Test.startTest();
             System.runAs(david) {
                 HubController.HomeModel model = HubController.getHomeModel();
-                Assert.areEqual(8, model.stepsTotal, 'David sees the same eight steps counted');
                 Assert.isFalse(model.canEdit, 'David may not change anything');
+                Assert.areEqual(
+                    0,
+                    model.stepsTotal,
+                    'The checklist is hidden from David, so its steps are not worked out for him'
+                );
+                Assert.areEqual(0, model.newErrorCount, 'Nor is the administrator error count');
+                Assert.isNull(model.installProblemCount, 'Nor the install problem count');
+                Assert.isFalse(model.rollupsStale, 'The admin tiles read as quiet, not broken');
+                Assert.isFalse(model.seasonalAddressStale, 'Both of them');
+                Assert.isNotNull(model.recurringSources, 'What staff do see still arrives');
             }
             Test.stopTest();
         }

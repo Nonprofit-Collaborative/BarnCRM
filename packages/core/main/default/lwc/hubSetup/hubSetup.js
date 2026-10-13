@@ -9,6 +9,9 @@ import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFor
  * The setup checklist on the BarnCRM home page: the Setup Assistant until setup is finished,
  * then a small Setup complete tile one click from reopening it. The assistant loads its own
  * steps, so a home model that fails to load still leaves the checklist working.
+ *
+ * Nothing is shown until the home model answers, so a finished setup (the everyday case) goes
+ * straight to the tile and the assistant never works its steps out a second time (ADMIN-10).
  */
 export default class HubSetup extends LightningElement {
   labels = {
@@ -20,12 +23,16 @@ export default class HubSetup extends LightningElement {
   stepsCompleted = 0;
   stepsTotal = 0;
   setupReopened = false;
+  modelAnswered = false;
 
   @wire(getHomeModel)
-  wiredModel({ data }) {
+  wiredModel({ data, error }) {
     if (data) {
       this.stepsCompleted = data.stepsCompleted || 0;
       this.stepsTotal = data.stepsTotal || 0;
+    }
+    if (data || error) {
+      this.modelAnswered = true;
     }
   }
 

@@ -39,7 +39,9 @@ person what they can act on:
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. Staff without it see a shorter page: the welcome, the
 **New household** button, and the quick links. They are not shown a checklist they cannot
-finish or an error count for a log they cannot open.
+finish or an error count for a log they cannot open. The page does not work those numbers
+out for staff at all, so it loads faster for them; if you edit the page to show an
+administrator tile to staff, it shows nothing to count.
 
 ## A five-minute walkthrough
 
