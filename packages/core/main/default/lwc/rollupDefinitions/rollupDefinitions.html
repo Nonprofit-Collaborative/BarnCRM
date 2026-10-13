@@ -3,13 +3,13 @@
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
-            <template if:true={isReadOnly}>
+            <template lwc:if={isReadOnly}>
                 <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small">
                     <p data-id="read-only-notice">{labels.readOnly}</p>
                 </div>
             </template>
 
-            <template if:true={hasError}>
+            <template lwc:if={hasError}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
                     role="alert"
@@ -18,7 +18,7 @@
                 </div>
             </template>
 
-            <template if:true={hasNotice}>
+            <template lwc:if={hasNotice}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
                     role="status"
@@ -31,7 +31,7 @@
             <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
                 <p>
                     <strong>{labels.freshnessTitle}:</strong>
-                    <template if:true={lastCalculated}>
+                    <template lwc:if={lastCalculated}>
                         <lightning-formatted-date-time
                             data-id="last-calculated"
                             value={lastCalculated}
@@ -42,11 +42,11 @@
                             minute="2-digit"
                         ></lightning-formatted-date-time>
                     </template>
-                    <template if:false={lastCalculated}>
+                    <template lwc:else>
                         <span data-id="never-calculated">{labels.neverCalculated}</span>
                     </template>
                 </p>
-                <template if:true={isStale}>
+                <template lwc:if={isStale}>
                     <p class="slds-text-color_error" data-id="stale-warning">
                         {labels.freshnessStale}
                     </p>
@@ -127,11 +127,11 @@
                 </template>
             </div>
 
-            <template if:true={isEmpty}>
+            <template lwc:if={isEmpty}>
                 <p data-id="empty-message">{labels.emptyList}</p>
             </template>
 
-            <template if:true={hasRows}>
+            <template lwc:if={hasRows}>
                 <div class="slds-scrollable_x">
                     <table
                         class="slds-table slds-table_cell-buffer slds-table_bordered"
@@ -171,7 +171,7 @@
                                         ></lightning-combobox>
                                     </td>
                                     <td>
-                                        <template if:true={row.hasLastCalculated}>
+                                        <template lwc:if={row.hasLastCalculated}>
                                             <lightning-formatted-date-time
                                                 value={row.lastCalculated}
                                                 year="numeric"
@@ -181,7 +181,7 @@
                                                 minute="2-digit"
                                             ></lightning-formatted-date-time>
                                         </template>
-                                        <template if:false={row.hasLastCalculated}>
+                                        <template lwc:else>
                                             {labels.neverCalculated}
                                         </template>
                                     </td>

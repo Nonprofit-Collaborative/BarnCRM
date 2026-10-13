@@ -2,16 +2,16 @@
     <lightning-card title={labels.title} icon-name="utility:edit">
         <lightning-button slot="actions" data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium slds-is-relative">
-            <template if:true={busy}>
+            <template lwc:if={busy}>
                 <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
             </template>
 
-            <template if:true={hasError}>
+            <template lwc:if={hasError}>
                 <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
                     <span data-id="error-message">{errorMessage}</span>
                 </div>
             </template>
-            <template if:true={hasNotice}>
+            <template lwc:if={hasNotice}>
                 <div
                     class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
                     role="status"
@@ -40,7 +40,7 @@
                                 onchange={handleChangeEdit}
                             ></lightning-combobox>
                         </div>
-                        <template if:true={change.hasField}>
+                        <template lwc:if={change.hasField}>
                             <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
                                 <lightning-combobox
                                     label={labels.action}
@@ -52,7 +52,7 @@
                                 ></lightning-combobox>
                             </div>
                             <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
-                                <template if:true={change.isBoolean}>
+                                <template lwc:if={change.isBoolean}>
                                     <lightning-combobox
                                         label={labels.newValue}
                                         options={change.booleanOptions}
@@ -62,7 +62,7 @@
                                         onchange={handleChangeEdit}
                                     ></lightning-combobox>
                                 </template>
-                                <template if:true={change.isPicklist}>
+                                <template lwc:if={change.isPicklist}>
                                     <lightning-combobox
                                         label={labels.newValue}
                                         options={change.picklistOptions}
@@ -72,7 +72,7 @@
                                         onchange={handleChangeEdit}
                                     ></lightning-combobox>
                                 </template>
-                                <template if:true={change.isMulti}>
+                                <template lwc:if={change.isMulti}>
                                     <lightning-checkbox-group
                                         label={labels.newValue}
                                         options={change.picklistOptions}
@@ -82,7 +82,7 @@
                                         onchange={handleChangeEdit}
                                     ></lightning-checkbox-group>
                                 </template>
-                                <template if:true={change.isRecord}>
+                                <template lwc:if={change.isRecord}>
                                     <lightning-record-picker
                                         label={labels.newValue}
                                         object-api-name={change.referenceTo}
@@ -92,7 +92,7 @@
                                         onchange={handleChangeEdit}
                                     ></lightning-record-picker>
                                 </template>
-                                <template if:true={change.isInput}>
+                                <template lwc:if={change.isInput}>
                                     <lightning-input
                                         data-id="value"
                                         type={change.inputType}
@@ -104,7 +104,7 @@
                                         onchange={handleChangeEdit}
                                     ></lightning-input>
                                 </template>
-                                <template if:true={change.isCopy}>
+                                <template lwc:if={change.isCopy}>
                                     <lightning-combobox
                                         label={labels.copyFrom}
                                         placeholder={labels.chooseField}
@@ -126,7 +126,7 @@
                                 onclick={handleRemoveChange}
                             ></lightning-button-icon>
                         </div>
-                        <template if:true={change.isTransform}>
+                        <template lwc:if={change.isTransform}>
                             <div class="slds-col slds-size_1-of-1" data-id="steps">
                                 <c-import-column-transforms
                                     embedded
@@ -158,7 +158,7 @@
                     ></lightning-button>
                 </div>
 
-                <template if:true={preview}>
+                <template lwc:if={preview}>
                     <section class="slds-box slds-var-m-bottom_medium" data-id="preview-box">
                         <p class="slds-text-title_bold" data-id="preview-line" role="status">{previewLine}</p>
                         <table
@@ -207,18 +207,18 @@
                     </section>
                 </template>
 
-                <template if:true={jobView}>
+                <template lwc:if={jobView}>
                     <section class="slds-box slds-var-m-bottom_medium" data-id="job">
                         <p class="slds-text-title_bold">{jobView.name}: {jobView.status}</p>
-                        <template if:true={jobView.running}>
+                        <template lwc:if={jobView.running}>
                             <p class="slds-var-m-vertical_x-small" role="status" aria-live="polite">
                                 {jobView.progressLine}
                             </p>
                             <lightning-progress-bar value={jobView.progressValue} size="large"></lightning-progress-bar>
                         </template>
-                        <template if:false={jobView.running}>
+                        <template lwc:else>
                             <p data-id="job-summary">{jobView.summary}</p>
-                            <template if:true={jobView.hasFailures}>
+                            <template lwc:if={jobView.hasFailures}>
                                 <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.failures}</h3>
                                 <ul class="slds-list_dotted">
                                     <template for:each={jobView.failures} for:item="failure">
@@ -226,7 +226,7 @@
                                     </template>
                                 </ul>
                             </template>
-                            <template if:true={jobView.showUndo}>
+                            <template lwc:if={jobView.showUndo}>
                                 <p class="slds-var-m-top_small" data-id="undo-from-tab">{labels.undoFromTab}</p>
                             </template>
                         </template>

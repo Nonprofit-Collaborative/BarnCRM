@@ -1,6 +1,6 @@
 <template>
     <div class="slds-is-relative">
-        <template if:true={busy}>
+        <template lwc:if={busy}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
         </template>
         <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
@@ -13,7 +13,7 @@
                     onchange={handleFunctionChange}
                 ></lightning-combobox>
             </div>
-            <template if:true={needsField}>
+            <template lwc:if={needsField}>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
                     <lightning-combobox
                         data-id="field"
@@ -44,12 +44,12 @@
                 ></lightning-button>
             </div>
         </div>
-        <template if:true={hasError}>
+        <template lwc:if={hasError}>
             <div class="slds-text-color_error slds-var-m-top_x-small" role="alert" data-id="summary-error">
                 {errorMessage}
             </div>
         </template>
-        <template if:true={hasLines}>
+        <template lwc:if={hasLines}>
             <div class="slds-var-m-top_small" role="region" aria-live="polite" aria-label={labels.summarize}>
                 <lightning-datatable
                     data-id="summary"
@@ -58,7 +58,7 @@
                     data={rows}
                     hide-checkbox-column
                 ></lightning-datatable>
-                <template if:true={capped}>
+                <template lwc:if={capped}>
                     <p class="slds-var-m-top_x-small" data-id="capped">{cappedNote}</p>
                 </template>
             </div>

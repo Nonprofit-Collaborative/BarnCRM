@@ -322,6 +322,18 @@ describe('c-household-members-panel', () => {
     expect(element.shadowRoot.querySelector('.member-list')).toBeNull();
   });
 
+  it('says a household has nobody in it, with no empty list for a screen reader to announce', async () => {
+    const element = build();
+    getRecord.emit(recordOfType('Household'));
+    getMembershipMode.emit('Contact');
+    getMembers.emit([]);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.empty-message')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('.member-list')).toBeNull();
+    expect(element.shadowRoot.querySelector('.not-a-household')).toBeNull();
+  });
+
   it('offers to add a member where a person belongs to one household', async () => {
     const element = build();
     getRecord.emit(recordOfType('Household'));

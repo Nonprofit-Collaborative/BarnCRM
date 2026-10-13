@@ -1,60 +1,57 @@
 <template>
     <lightning-card title={label.title} icon-name="standard:people">
         <div class="slds-var-m-around_medium slds-is-relative">
-            <template if:false={isHousehold}>
-                <p class="slds-text-color_weak not-a-household">{label.notAHousehold}</p>
-            </template>
-
-            <template if:true={isHousehold}>
-                <template if:true={isLoading}>
+            <template lwc:if={isHousehold}>
+                <template lwc:if={isLoading}>
                     <lightning-spinner alternative-text={label.loading} size="small"></lightning-spinner>
                 </template>
 
-                <template if:false={hasMembers}>
+                <template lwc:if={hasMembers}>
+                    <ul class="slds-has-dividers_bottom-space member-list">
+                        <template for:each={rows} for:item="member">
+                            <li key={member.personId} class="slds-item member-row">
+                                <span class="slds-text-body_regular member-name">{member.name}</span>
+                                <template lwc:if={member.role}>
+                                    <span class="slds-text-body_small slds-var-m-left_x-small member-role">
+                                        {member.role}
+                                    </span>
+                                </template>
+                                <template for:each={member.badges} for:item="badge">
+                                    <lightning-badge key={badge.key} label={badge.text}></lightning-badge>
+                                </template>
+                                <template lwc:if={member.canMakePrimary}>
+                                    <lightning-button
+                                        variant="base"
+                                        label={label.makePrimary}
+                                        aria-label={member.makePrimaryLabel}
+                                        title={member.makePrimaryLabel}
+                                        data-person-id={member.personId}
+                                        disabled={busy}
+                                        onclick={handleMakePrimary}
+                                        class="slds-var-m-left_x-small make-primary-button"
+                                    ></lightning-button>
+                                </template>
+                                <template lwc:if={member.canMove}>
+                                    <lightning-button
+                                        variant="base"
+                                        label={label.moveMember}
+                                        aria-label={member.moveLabel}
+                                        title={member.moveLabel}
+                                        data-person-id={member.personId}
+                                        disabled={busy}
+                                        onclick={handleMoveClick}
+                                        class="slds-var-m-left_x-small move-button"
+                                    ></lightning-button>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
                     <p class="slds-text-color_weak empty-message">{label.empty}</p>
                 </template>
 
-                <ul class="slds-has-dividers_bottom-space member-list">
-                    <template for:each={rows} for:item="member">
-                        <li key={member.personId} class="slds-item member-row">
-                            <span class="slds-text-body_regular member-name">{member.name}</span>
-                            <template if:true={member.role}>
-                                <span class="slds-text-body_small slds-var-m-left_x-small member-role">
-                                    {member.role}
-                                </span>
-                            </template>
-                            <template for:each={member.badges} for:item="badge">
-                                <lightning-badge key={badge.key} label={badge.text}></lightning-badge>
-                            </template>
-                            <template if:true={member.canMakePrimary}>
-                                <lightning-button
-                                    variant="base"
-                                    label={label.makePrimary}
-                                    aria-label={member.makePrimaryLabel}
-                                    title={member.makePrimaryLabel}
-                                    data-person-id={member.personId}
-                                    disabled={busy}
-                                    onclick={handleMakePrimary}
-                                    class="slds-var-m-left_x-small make-primary-button"
-                                ></lightning-button>
-                            </template>
-                            <template if:true={member.canMove}>
-                                <lightning-button
-                                    variant="base"
-                                    label={label.moveMember}
-                                    aria-label={member.moveLabel}
-                                    title={member.moveLabel}
-                                    data-person-id={member.personId}
-                                    disabled={busy}
-                                    onclick={handleMoveClick}
-                                    class="slds-var-m-left_x-small move-button"
-                                ></lightning-button>
-                            </template>
-                        </li>
-                    </template>
-                </ul>
-
-                <template if:true={isMoving}>
+                <template lwc:if={isMoving}>
                     <div class="slds-box slds-var-m-top_small move-box">
                         <p class="slds-var-m-bottom_x-small">{label.moveHelp}</p>
                         <lightning-record-picker
@@ -83,7 +80,7 @@
                     </div>
                 </template>
 
-                <template if:true={canAddMember}>
+                <template lwc:if={canAddMember}>
                     <div class="slds-var-m-top_small">
                         <lightning-button
                             label={label.addMember}
@@ -93,34 +90,9 @@
                     </div>
                 </template>
 
-                <template if:true={isAdding}>
+                <template lwc:if={isAdding}>
                     <div class="slds-box slds-var-m-top_small add-box">
-                        <template if:false={isJunctionMode}>
-                            <lightning-record-edit-form object-api-name="Contact" onsuccess={handleAddSuccess}>
-                                <lightning-messages></lightning-messages>
-                                <lightning-input-field field-name="Salutation"></lightning-input-field>
-                                <lightning-input-field field-name="FirstName"></lightning-input-field>
-                                <lightning-input-field field-name="LastName"></lightning-input-field>
-                                <div class="slds-hide">
-                                    <lightning-input-field field-name="AccountId" value={recordId}></lightning-input-field>
-                                </div>
-                                <div class="slds-var-m-top_x-small">
-                                    <lightning-button
-                                        variant="brand"
-                                        type="submit"
-                                        label={label.save}
-                                        class="slds-var-m-right_x-small add-save-button"
-                                    ></lightning-button>
-                                    <lightning-button
-                                        label={label.cancel}
-                                        onclick={handleAddCancel}
-                                        class="add-cancel-button"
-                                    ></lightning-button>
-                                </div>
-                            </lightning-record-edit-form>
-                        </template>
-
-                        <template if:true={isJunctionMode}>
+                        <template lwc:if={isJunctionMode}>
                             <div class="add-existing-section">
                                 <h3 class="slds-text-heading_small">{label.addExistingHeading}</h3>
                                 <lightning-input
@@ -131,7 +103,7 @@
                                     onchange={handleSearchInput}
                                     class="slds-var-m-top_x-small add-search-input"
                                 ></lightning-input>
-                                <template if:true={hasSearchResults}>
+                                <template lwc:if={hasSearchResults}>
                                     <ul class="slds-var-m-top_x-small search-results">
                                         <template for:each={searchResultRows} for:item="person">
                                             <li key={person.id} class="slds-item search-result-row">
@@ -149,7 +121,7 @@
                                         </template>
                                     </ul>
                                 </template>
-                                <template if:true={showNoSearchResults}>
+                                <template lwc:if={showNoSearchResults}>
                                     <p role="status" class="slds-text-color_weak slds-var-m-top_x-small no-results-message">
                                         {label.addExistingNoResults}
                                     </p>
@@ -193,11 +165,38 @@
                                 </div>
                             </div>
                         </template>
+                        <template lwc:else>
+                            <lightning-record-edit-form object-api-name="Contact" onsuccess={handleAddSuccess}>
+                                <lightning-messages></lightning-messages>
+                                <lightning-input-field field-name="Salutation"></lightning-input-field>
+                                <lightning-input-field field-name="FirstName"></lightning-input-field>
+                                <lightning-input-field field-name="LastName"></lightning-input-field>
+                                <div class="slds-hide">
+                                    <lightning-input-field field-name="AccountId" value={recordId}></lightning-input-field>
+                                </div>
+                                <div class="slds-var-m-top_x-small">
+                                    <lightning-button
+                                        variant="brand"
+                                        type="submit"
+                                        label={label.save}
+                                        class="slds-var-m-right_x-small add-save-button"
+                                    ></lightning-button>
+                                    <lightning-button
+                                        label={label.cancel}
+                                        onclick={handleAddCancel}
+                                        class="add-cancel-button"
+                                    ></lightning-button>
+                                </div>
+                            </lightning-record-edit-form>
+                        </template>
                     </div>
                 </template>
             </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak not-a-household">{label.notAHousehold}</p>
+            </template>
 
-            <template if:true={errorMessage}>
+            <template lwc:if={errorMessage}>
                 <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
             </template>
         </div>

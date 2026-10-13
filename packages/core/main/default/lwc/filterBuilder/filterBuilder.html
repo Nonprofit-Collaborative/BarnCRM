@@ -1,16 +1,16 @@
 <template>
     <div class="slds-is-relative">
-        <template if:true={loading}>
+        <template lwc:if={loading}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
         </template>
 
-        <template if:true={loadError}>
+        <template lwc:if={loadError}>
             <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
                 <span data-id="load-error">{loadError}</span>
             </div>
         </template>
 
-        <template if:true={showErrorSummary}>
+        <template lwc:if={showErrorSummary}>
             <div
                 class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
                 role="alert"
@@ -20,7 +20,7 @@
             </div>
         </template>
 
-        <template if:true={showEmpty}>
+        <template lwc:if={showEmpty}>
             <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="empty">{labels.empty}</p>
         </template>
 
@@ -61,7 +61,7 @@
                         ></lightning-combobox>
                     </div>
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
-                        <template if:true={row.isText}>
+                        <template lwc:if={row.isText}>
                             <lightning-input
                                 data-id="value"
                                 data-key={row.key}
@@ -72,7 +72,7 @@
                                 onchange={handleValueChange}
                             ></lightning-input>
                         </template>
-                        <template if:true={row.isNumber}>
+                        <template lwc:if={row.isNumber}>
                             <lightning-input
                                 data-id="value"
                                 data-key={row.key}
@@ -84,7 +84,7 @@
                                 onchange={handleValueChange}
                             ></lightning-input>
                         </template>
-                        <template if:true={row.isDate}>
+                        <template lwc:if={row.isDate}>
                             <lightning-input
                                 data-id="value"
                                 data-key={row.key}
@@ -95,7 +95,7 @@
                                 onchange={handleValueChange}
                             ></lightning-input>
                         </template>
-                        <template if:true={row.isDateTime}>
+                        <template lwc:if={row.isDateTime}>
                             <lightning-input
                                 data-id="value"
                                 data-key={row.key}
@@ -106,7 +106,7 @@
                                 onchange={handleValueChange}
                             ></lightning-input>
                         </template>
-                        <template if:true={row.isDays}>
+                        <template lwc:if={row.isDays}>
                             <lightning-input
                                 data-id="value"
                                 data-key={row.key}
@@ -120,7 +120,7 @@
                                 onchange={handleValueChange}
                             ></lightning-input>
                         </template>
-                        <template if:true={row.isBoolean}>
+                        <template lwc:if={row.isBoolean}>
                             <lightning-combobox
                                 data-id="value"
                                 data-key={row.key}
@@ -131,7 +131,7 @@
                                 onchange={handleValueChange}
                             ></lightning-combobox>
                         </template>
-                        <template if:true={row.isPick}>
+                        <template lwc:if={row.isPick}>
                             <lightning-combobox
                                 data-id="value"
                                 data-key={row.key}
@@ -142,7 +142,7 @@
                                 onchange={handleValueChange}
                             ></lightning-combobox>
                         </template>
-                        <template if:true={row.isLines}>
+                        <template lwc:if={row.isLines}>
                             <lightning-textarea
                                 data-id="value"
                                 data-key={row.key}
@@ -166,7 +166,7 @@
                         ></lightning-button-icon>
                     </div>
                 </div>
-                <template if:true={row.isPickList}>
+                <template lwc:if={row.isPickList}>
                     <lightning-dual-listbox
                         class="slds-var-m-top_x-small"
                         data-id="value"
@@ -180,7 +180,7 @@
                         onchange={handleValueChange}
                     ></lightning-dual-listbox>
                 </template>
-                <template if:true={row.error}>
+                <template lwc:if={row.error}>
                     <p class="slds-text-color_error slds-var-m-top_xx-small" data-id="row-error">{row.error}</p>
                 </template>
             </fieldset>
@@ -194,7 +194,7 @@
             onclick={handleAdd}
         ></lightning-button>
 
-        <template if:true={showLogicToggle}>
+        <template lwc:if={showLogicToggle}>
             <div class="slds-var-m-top_small">
                 <lightning-input
                     data-id="logic-toggle"
@@ -204,7 +204,7 @@
                     disabled={disabled}
                     onchange={handleLogicToggle}
                 ></lightning-input>
-                <template if:true={logicEnabled}>
+                <template lwc:if={logicEnabled}>
                     <lightning-input
                         data-id="logic"
                         type="text"
@@ -214,7 +214,7 @@
                         disabled={disabled}
                         onchange={handleLogicChange}
                     ></lightning-input>
-                    <template if:true={logicError}>
+                    <template lwc:if={logicError}>
                         <p class="slds-text-color_error slds-var-m-top_xx-small" data-id="logic-error" role="alert">
                             {logicError}
                         </p>
