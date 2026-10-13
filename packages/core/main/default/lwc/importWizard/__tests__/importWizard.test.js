@@ -247,6 +247,9 @@ describe('the import wizard', () => {
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     expect(rows).toHaveLength(3);
     expect(rows[0].textContent).toContain('Last Name');
+    expect(
+      element.shadowRoot.querySelector('[data-id="columns-table"]').getAttribute('aria-label')
+    ).toBe('c.Core_Import_StepColumns');
   });
 
   it('shows the first values of each column beside the choice', async () => {

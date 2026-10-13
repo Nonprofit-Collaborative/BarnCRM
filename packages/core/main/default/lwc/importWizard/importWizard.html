@@ -108,7 +108,11 @@
                         {labels.stepColumns}
                     </h2>
                     <div class="slds-scrollable_x">
-                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <table
+                            class="slds-table slds-table_bordered slds-table_cell-buffer"
+                            aria-label={labels.stepColumns}
+                            data-id="columns-table"
+                        >
                             <thead>
                                 <tr class="slds-line-height_reset">
                                     <th scope="col">{labels.columnHeader}</th>

@@ -92,6 +92,25 @@ describe('the import results view', () => {
     expect(none.shadowRoot.querySelectorAll('[data-id="changed-value"]')).toHaveLength(0);
   });
 
+  it('names each table for a screen reader and announces the counts as they change', () => {
+    const element = render({
+      batch: DRY_RUN,
+      rejectedRows: [{ id: 'r1', rowNumber: 4, errorMessage: 'Required value missing.' }],
+      changedValues: [{ rowNumber: 2, column: 'Email', before: 'a', after: 'b' }]
+    });
+    const root = element.shadowRoot;
+    expect(root.querySelector('[data-id="rejected-table"]').getAttribute('aria-label')).toBe(
+      'c.Core_Import_RejectedHeading'
+    );
+    expect(root.querySelector('[data-id="changed-values-table"]').getAttribute('aria-label')).toBe(
+      'c.Core_Import_ChangedValuesHeading'
+    );
+    expect(root.querySelector('[data-id="counts"]').getAttribute('aria-live')).toBe('polite');
+    root.querySelectorAll('th').forEach((header) => {
+      expect(header.getAttribute('scope')).toBe('col');
+    });
+  });
+
   it('renders with no batch at all', () => {
     const element = render({ batch: undefined, rejectedRows: [] });
     expect(element.shadowRoot.querySelector('[data-id="created"]').textContent).toContain('0');

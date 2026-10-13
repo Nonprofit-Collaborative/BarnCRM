@@ -54,7 +54,10 @@
         </template>
         <template lwc:if={hasSamples}>
             <h4 class="slds-text-title slds-var-m-top_small">{labels.previewHeading}</h4>
-            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-top_xx-small">
+            <table
+                class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-top_xx-small"
+                aria-label={labels.previewHeading}
+            >
                 <thead>
                     <tr class="slds-line-height_reset">
                         <th scope="col">{labels.rowNumberHeader}</th>

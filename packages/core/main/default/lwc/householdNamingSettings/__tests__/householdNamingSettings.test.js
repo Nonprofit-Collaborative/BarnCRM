@@ -98,6 +98,9 @@ describe('c-household-naming-settings', () => {
     expect(preview).toHaveBeenCalled();
     expect(rows.length).toBe(2);
     expect(rows[0].textContent).toContain('The Smith Family');
+    expect(element.shadowRoot.querySelector('table').getAttribute('aria-label')).toBe(
+      'c.Core_HouseholdNamingSettings_PreviewHeading'
+    );
   });
 
   it('waits 300 milliseconds after typing before asking for a new preview', async () => {

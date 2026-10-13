@@ -136,6 +136,9 @@ describe('c-bulk-update', () => {
       '200 records match.'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="sample-row"]')).toHaveLength(1);
+    expect(
+      element.shadowRoot.querySelector('[data-id="preview-table"]').getAttribute('aria-label')
+    ).toBeTruthy();
     const start = element.shadowRoot.querySelector('[data-id="start"]');
     expect(start.disabled).toBe(true);
 
