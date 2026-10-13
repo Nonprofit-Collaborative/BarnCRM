@@ -3,7 +3,7 @@
     <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
 
     <template lwc:if={loadError}>
-      <p class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
+      <p role="alert" class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
     </template>
 
     <lightning-radio-group

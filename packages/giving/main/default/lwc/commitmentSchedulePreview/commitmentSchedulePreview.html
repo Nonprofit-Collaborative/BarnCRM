@@ -6,11 +6,11 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error" data-id="error">{errorMessage}</p>
+        <p role="alert" class="slds-text-color_error" data-id="error">{errorMessage}</p>
       </template>
 
       <template lwc:if={noticeMessage}>
-        <p class="slds-text-color_success" data-id="notice">{noticeMessage}</p>
+        <p role="status" class="slds-text-color_success" data-id="notice">{noticeMessage}</p>
       </template>
 
       <template lwc:if={isEmpty}>

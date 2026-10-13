@@ -368,4 +368,20 @@
     <shortDescription>Stewardship: the page could not do what was asked</shortDescription>
     <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your administrator to check it.</value>
   </labels>
+  <labels>
+    <fullName>Giving_Stewardship_Selected</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Stewardship: screen reader text on the plan being edited</shortDescription>
+    <value>Selected</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Stewardship_ColumnActions</fullName>
+    <categories>Giving, Stewardship</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Stewardship: screen reader name of the buttons column</shortDescription>
+    <value>Actions</value>
+  </labels>
 </CustomLabels>

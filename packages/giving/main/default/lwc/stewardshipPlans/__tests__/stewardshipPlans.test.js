@@ -208,6 +208,19 @@ describe('c-stewardship-plans', () => {
     expect(subjects[1].textContent).toBe('Send the welcome packet');
   });
 
+  it('tells a screen reader which plan is chosen, not only by colour', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="plan-selected"]')).toBeNull();
+    await select(element, 0);
+
+    const rows = element.shadowRoot.querySelectorAll('[data-id="plan-row"]');
+    const marker = rows[0].querySelector('[data-id="plan-selected"]');
+    expect(marker.textContent).toBe('c.Giving_Stewardship_Selected');
+    expect(rows[1].querySelector('[data-id="plan-selected"]')).toBeNull();
+  });
+
   it('says a plan with no steps would start and lay nothing out', async () => {
     const element = createComponent();
     getPage.emit(PAGE);

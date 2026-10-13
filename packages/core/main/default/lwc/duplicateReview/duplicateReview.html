@@ -46,7 +46,7 @@
       </div>
 
       <template lwc:if={scanRunning}>
-        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="scan-running">
+        <p role="status" class="slds-text-body_small slds-var-m-top_x-small" data-id="scan-running">
           {labels.scanRunning}
         </p>
       </template>
@@ -148,14 +148,16 @@
     </template>
 
     <template lwc:if={showDismissDialog}>
+      <!-- An inline box, not a modal: role="region", and focus moves to its heading when it opens. -->
       <section
-        role="dialog"
-        aria-modal="true"
+        role="region"
         aria-label={labels.dismissHeading}
         class="slds-box slds-var-m-top_small"
         data-id="dismiss-dialog"
       >
-        <h3 class="slds-text-heading_x-small">{labels.dismissHeading}</h3>
+        <h3 class="slds-text-heading_x-small" tabindex="-1" data-id="dismiss-heading">
+          {labels.dismissHeading}
+        </h3>
         <p class="slds-text-body_small">{labels.dismissBody}</p>
         <lightning-input
           data-id="dismiss-reason"
@@ -182,14 +184,16 @@
     </template>
 
     <template lwc:if={showMergeDialog}>
+      <!-- An inline box, not a modal: role="region", and focus moves to its heading when it opens. -->
       <section
-        role="dialog"
-        aria-modal="true"
+        role="region"
         aria-label={labels.mergeHeading}
         class="slds-box slds-var-m-top_small"
         data-id="merge-dialog"
       >
-        <h3 class="slds-text-heading_x-small">{labels.mergeHeading}</h3>
+        <h3 class="slds-text-heading_x-small" tabindex="-1" data-id="merge-heading">
+          {labels.mergeHeading}
+        </h3>
         <p class="slds-text-body_small">{labels.mergeBody}</p>
         <lightning-combobox
           data-id="keep-choice"

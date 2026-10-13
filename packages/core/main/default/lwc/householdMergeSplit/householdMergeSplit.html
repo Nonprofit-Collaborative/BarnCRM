@@ -38,7 +38,7 @@
                         </div>
 
                         <template if:true={showNoResults}>
-                            <p class="slds-text-color_weak slds-var-m-top_small no-results">
+                            <p role="status" class="slds-text-color_weak slds-var-m-top_small no-results">
                                 {label.noResults}
                             </p>
                         </template>
@@ -210,7 +210,7 @@
                                 ></lightning-button>
 
                                 <template if:true={showSplitNoResults}>
-                                    <p class="slds-text-color_weak slds-var-m-top_small split-no-results">
+                                    <p role="status" class="slds-text-color_weak slds-var-m-top_small split-no-results">
                                         {label.noResults}
                                     </p>
                                 </template>

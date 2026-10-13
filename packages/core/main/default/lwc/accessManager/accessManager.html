@@ -107,13 +107,16 @@
             </template>
 
             <template if:true={showConfirmation}>
+                <!-- An inline box, not a modal: role="region", and focus moves to its heading when it opens. -->
                 <section
                     class="slds-box slds-var-m-top_medium"
-                    role="alertdialog"
+                    role="region"
                     aria-label={confirmationTitle}
                     data-id="confirmation"
                 >
-                    <h2 class="slds-text-heading_small">{confirmationTitle}</h2>
+                    <h2 class="slds-text-heading_small" tabindex="-1" data-id="confirmation-heading">
+                        {confirmationTitle}
+                    </h2>
                     <p class="slds-var-m-vertical_x-small">{confirmationMessage}</p>
                     <template if:true={showSelfRemovalWarning}>
                         <p class="slds-var-m-bottom_x-small" data-id="self-removal-warning">

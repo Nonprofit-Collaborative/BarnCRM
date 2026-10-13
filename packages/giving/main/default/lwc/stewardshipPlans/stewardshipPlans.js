@@ -46,6 +46,8 @@ import SAVE from '@salesforce/label/c.Giving_Stewardship_Save';
 import CANCEL from '@salesforce/label/c.Giving_Stewardship_Cancel';
 import SAVED from '@salesforce/label/c.Giving_Stewardship_Saved';
 import ACTION_FAILED from '@salesforce/label/c.Giving_Stewardship_ErrorActionFailed';
+import SELECTED from '@salesforce/label/c.Giving_Stewardship_Selected';
+import COLUMN_ACTIONS from '@salesforce/label/c.Giving_Stewardship_ColumnActions';
 
 const EMPTY_TEMPLATE = {
   recordId: null,
@@ -91,6 +93,8 @@ export default class StewardshipPlans extends LightningElement {
     columnSteps: COLUMN_STEPS,
     columnRunning: COLUMN_RUNNING,
     columnActive: COLUMN_ACTIVE,
+    columnActions: COLUMN_ACTIONS,
+    selected: SELECTED,
     active: ACTIVE,
     inactive: INACTIVE,
     fieldName: FIELD_NAME,

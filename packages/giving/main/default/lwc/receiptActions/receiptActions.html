@@ -2,7 +2,7 @@
   <lightning-card title={labels.title} icon-name="standard:document">
     <div class="slds-p-horizontal_medium">
       <template lwc:if={loadError}>
-        <p data-id="load-error" class="slds-text-color_error">{loadError}</p>
+        <p role="alert" data-id="load-error" class="slds-text-color_error">{loadError}</p>
       </template>
 
       <template lwc:if={hasReceipts}>
