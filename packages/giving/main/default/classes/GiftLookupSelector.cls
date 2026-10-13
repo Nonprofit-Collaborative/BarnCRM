@@ -50,6 +50,26 @@ public with sharing class GiftLookupSelector {
     }
 
     /**
+     * Which of these households have at least one gift (R-SC3): only their credits can need
+     * recomputing after a change of membership. A semi-join, so the households are the rows read,
+     * not their gifts, however long their giving histories are.
+     */
+    public static Set<Id> selectHouseholdsWithGifts(Set<Id> householdIds) {
+        if (householdIds == null || householdIds.isEmpty()) {
+            return new Set<Id>();
+        }
+        return new Map<Id, Account>(
+                [
+                    SELECT Id
+                    FROM Account
+                    WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Gift__c)
+                    WITH SYSTEM_MODE
+                ]
+            )
+            .keySet();
+    }
+
+    /**
      * Gifts as matching gift maintenance needs them: who gave, how much, what the donor account
      * is, and where the donor works.
      *
