@@ -231,6 +231,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Plainer wording | Minor | Import buttons read Preview, Import these rows and Download rejected rows; schedule times name the time zone; errors point to the Error Log; warning icons are announced to screen readers. | Shipped | UX review |
 | Activity actions on the fallback layout | Minor | The packaged account layout includes Log a Call, New Task and New Event, so its activity panel can create activities. | Shipped | C-08 |
 | Console tabs | Minor | In a console app, records opened from BarnCRM pages open as subtabs of the tab you are in; Settings, Import, Find and Rollup Builder name their tab for what is on screen; a household merge or split refreshes the household's tab. Outside a console nothing changes. | Built, not merged (feature/q-07-workspace-api) | Q-07 |
+| Cards read through the platform | Minor | The Addresses, Affiliations and Relationships cards read and save through Lightning Data Service: they show a loading state instead of "none on file" while they load, pick up edits made elsewhere on the page, refresh the record's own fields after Set as default or Make primary, and show picklist values in the reader's language. Settings pages reopen on what was last saved, and the import wizard opens with one wait instead of three. | Built, not merged (`feature/q-06-lds-graphql-1` to `-4`) | Q-06, ADR-NEXT (record reads through Lightning Data Service) |
 
 ---
 

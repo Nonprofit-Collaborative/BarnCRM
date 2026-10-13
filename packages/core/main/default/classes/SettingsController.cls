@@ -86,7 +86,9 @@ public with sharing class SettingsController {
         public Datetime changedAt;
     }
 
-    @AuraEnabled(cacheable=true)
+    // Not cacheable: the console calls it again after a save, and a cached answer would show
+    // the values from before the save (ADR-NEXT, record reads through Lightning Data Service).
+    @AuraEnabled
     public static ConsoleModel getConsoleModel() {
         try {
             return buildModel();
@@ -146,7 +148,8 @@ public with sharing class SettingsController {
         return hits;
     }
 
-    @AuraEnabled(cacheable=true)
+    // Not cacheable: read again right after a save, which must show that save.
+    @AuraEnabled
     public static List<ChangeModel> getRecentChanges(Integer limitCount) {
         List<ChangeModel> changes = new List<ChangeModel>();
         try {

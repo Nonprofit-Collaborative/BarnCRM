@@ -93,8 +93,22 @@ async function change(target, value) {
 
 describe('c-bulk-update', () => {
   beforeEach(() => {
-    getPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5, jobs: [] });
     getTargets.mockResolvedValue(TARGETS);
+  });
+
+  it('opens on one server read and allows five changes', async () => {
+    const element = await render(QUERY);
+    expect(getPage).not.toHaveBeenCalled();
+    expect(getTargets).toHaveBeenCalledTimes(1);
+
+    const add = element.shadowRoot.querySelector('[data-id="add-change"]');
+    for (let i = 0; i < 4; i++) {
+      expect(add.disabled).toBe(false);
+      add.click();
+      // eslint-disable-next-line no-await-in-loop
+      await flush();
+    }
+    expect(add.disabled).toBe(true);
   });
 
   afterEach(() => {

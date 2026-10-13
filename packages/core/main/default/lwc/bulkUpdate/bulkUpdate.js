@@ -1,5 +1,4 @@
 import { LightningElement, api } from 'lwc';
-import getPage from '@salesforce/apex/BulkUpdateController.getPage';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 import getCopySources from '@salesforce/apex/BulkUpdateController.getCopySources';
 import previewUpdate from '@salesforce/apex/BulkUpdateController.preview';
@@ -38,7 +37,8 @@ import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
 import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 
 const POLL_MILLISECONDS = 3000;
-const DEFAULT_MAX_CHANGES = 5;
+// BulkUpdateService.MAX_CHANGES. The server refuses more; this only disables Add change.
+const MAX_CHANGES = 5;
 const NUMBER_TYPES = new Set(['integer', 'double', 'currency', 'percent']);
 const INPUT_TYPES = {
   email: 'email',
@@ -90,7 +90,6 @@ export default class BulkUpdate extends LightningElement {
     loading: LOADING
   };
 
-  page;
   targets = [];
   changes = [];
   preview;
@@ -112,7 +111,6 @@ export default class BulkUpdate extends LightningElement {
 
   async load() {
     await this.work(async () => {
-      this.page = await getPage();
       this.targets = await getTargets({ objectName: JSON.parse(this.queryJson).object });
       this.changes = [this.newChange()];
     });
@@ -175,8 +173,7 @@ export default class BulkUpdate extends LightningElement {
   }
 
   get addDisabled() {
-    const most = (this.page && this.page.maxChanges) || DEFAULT_MAX_CHANGES;
-    return this.busy || this.changes.length >= most;
+    return this.busy || this.changes.length >= MAX_CHANGES;
   }
 
   get previewDisabled() {
