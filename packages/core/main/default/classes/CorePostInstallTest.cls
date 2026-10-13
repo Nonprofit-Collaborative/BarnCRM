@@ -441,6 +441,116 @@ private class CorePostInstallTest {
         }
     }
 
+    /** The keys of the import templates the installed packages ship. */
+    private static Set<String> shippedTemplateKeys() {
+        Set<String> keys = new Set<String>();
+        for (Import_Template_Default__mdt row : ImportTemplateSelector.selectShippedDefaults()) {
+            if (String.isNotBlank(row.Template_Key__c)) {
+                keys.add(row.Template_Key__c);
+            }
+        }
+        return keys;
+    }
+
+    /** The import templates in the org, by key. */
+    private static Map<String, Import_Template__c> templatesByKey() {
+        Map<String, Import_Template__c> result = new Map<String, Import_Template__c>();
+        for (Import_Template__c template : [
+            SELECT Id, Name, Template_Key__c, Active__c, Column_Mapping_JSON__c
+            FROM Import_Template__c
+            WITH SYSTEM_MODE
+        ]) {
+            result.put(template.Template_Key__c, template);
+        }
+        return result;
+    }
+
+    /** An install adds every shipped import template, so the wizard has them on day one. */
+    @IsTest
+    static void installAddsTheShippedImportTemplates() {
+        System.runAs(TestUsers.admin()) {
+            Id installer = newInstaller();
+
+            Test.startTest();
+            install(new CorePostInstall(), installer);
+            Test.stopTest();
+
+            Map<String, Import_Template__c> byKey = templatesByKey();
+            Assert.isTrue(
+                byKey.keySet().containsAll(shippedTemplateKeys()),
+                'Every shipped template is here after the install: ' + byKey.keySet()
+            );
+            Assert.isTrue(byKey.containsKey('generic_contact_list'), 'Core\'s own included.');
+            Assert.areEqual(
+                shippedTemplateKeys().size(),
+                byKey.size(),
+                'One each, and nothing else.'
+            );
+        }
+    }
+
+    /**
+     * An upgrade adds a template the org does not have, as one shipped in a later version is,
+     * and leaves one the administrator edited exactly as they left it, with no second copy.
+     */
+    @IsTest
+    static void upgradeAddsANewTemplateAndKeepsAnEditedOne() {
+        System.runAs(TestUsers.admin()) {
+            Id installer = newInstaller();
+            CorePostInstall handler = new CorePostInstall();
+            install(handler, installer);
+            Import_Template__c edited = templatesByKey().get('generic_contact_list');
+            edited.Name = 'Our contact list';
+            edited.Active__c = false;
+            edited.Column_Mapping_JSON__c = '{"version":1,"columns":[]}';
+            update as system edited;
+            // A shipped template the org lacks, as one first shipped in the new version is.
+            List<Import_Template__c> others = [
+                SELECT Id
+                FROM Import_Template__c
+                WHERE Template_Key__c != 'generic_contact_list'
+                WITH SYSTEM_MODE
+            ];
+            delete as system others;
+
+            Test.startTest();
+            upgrade(handler, installer);
+            Test.stopTest();
+
+            Map<String, Import_Template__c> byKey = templatesByKey();
+            Assert.areEqual(
+                shippedTemplateKeys().size(),
+                byKey.size(),
+                'The missing templates are added, and no second copy of the edited one.'
+            );
+            Import_Template__c kept = byKey.get('generic_contact_list');
+            Assert.areEqual(edited.Id, kept.Id, 'The same record.');
+            Assert.areEqual('Our contact list', kept.Name, 'Its name as the admin left it.');
+            Assert.isFalse(kept.Active__c, 'Still switched off.');
+            Assert.areEqual(
+                '{"version":1,"columns":[]}',
+                kept.Column_Mapping_JSON__c,
+                'And its mapping untouched.'
+            );
+        }
+    }
+
+    /** Adding the templates twice, as an install then an upgrade does, adds them once. */
+    @IsTest
+    static void addingTheTemplatesTwiceAddsThemOnce() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Integer created = ImportTemplateService.materializeDefaultsDuringInstall(
+                'CorePostInstall.ensureImportTemplates'
+            );
+            Integer again = ImportTemplateService.materializeDefaultsDuringInstall(null);
+            Test.stopTest();
+
+            Assert.areEqual(shippedTemplateKeys().size(), created, 'Created once.');
+            Assert.areEqual(0, again, 'And nothing the second time.');
+        }
+    }
+
     @IsTest
     static void anOrgWithoutTheModuleGetsNoneOfItsRollups() {
         System.runAs(TestUsers.admin()) {

@@ -1,7 +1,7 @@
 /**
  * What BarnCRM Core does for itself at install and at every upgrade.
  *
- * Four things. The first is to make sure the person who installed the package can open
+ * Five things. The first is to make sure the person who installed the package can open
  * BarnCRM Settings. Without it nobody in the org holds the Manage BarnCRM Settings
  * custom permission, so the console opens read only for everyone, including the System
  * Administrator who installed it, because a custom permission is not implied by Modify All
@@ -42,8 +42,13 @@
  * sees only its own registry rows at this point, and each module that ships automations calls
  * the same method from its own script.
  *
+ * The fifth is to add the import templates the packages ship (D-41), so the wizard and the
+ * migration guides find them from the first install, and a template shipped in a later
+ * version reaches an org that already has others. Core adds its own here; each module that
+ * ships templates calls the same method from its own script.
+ *
  * The whole thing runs twice safely: a person who already holds a permission set or a role
- * is left alone, and a rollup or a switch that already exists is left exactly as the
+ * is left alone, and a rollup, a switch or an import template that already exists is left exactly as the
  * administrator left it, so an upgrade is a no-op for an org that is already set up. Nothing here throws: an
  * install must never fail because of a bootstrap step, so every failure is written to the
  * Error Log instead.
@@ -53,6 +58,7 @@ public with sharing class CorePostInstall implements InstallHandler {
     private static final String ROLLUP_CONTEXT = 'CorePostInstall.ensureRollupDefaults';
     private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
+    private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
 
     /**
      * What every Error Log entry written by an install or upgrade starts with, including the
@@ -72,6 +78,7 @@ public with sharing class CorePostInstall implements InstallHandler {
         applyRecommendedMode();
         ensureRollupDefaults();
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+        ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
         Id installerId = context.installerId();
         if (installerId == null) {
             return;

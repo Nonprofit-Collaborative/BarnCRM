@@ -246,8 +246,10 @@ public with sharing class ImportTemplateService {
 
     /**
      * Creates an `Import_Template__c` for every shipped default this org does not have yet,
-     * and returns how many were created. Safe to call repeatedly: it is called on install
-     * and whenever the wizard opens with no templates.
+     * and returns how many were created. Safe to call repeatedly: a template is matched by its
+     * key, so one already here, edited or not, is left as it is. Called when the wizard opens
+     * with no templates and from Health Check's Restore; install and upgrade use
+     * `materializeDefaultsDuringInstall`.
      */
     @NamespaceAccessible
     public static Integer materializeDefaults() {
@@ -257,6 +259,36 @@ public with sharing class ImportTemplateService {
         }
         Database.insert(toCreate, AccessLevel.USER_MODE);
         return toCreate.size();
+    }
+
+    /** What an install's failure to add the templates is logged under, unless told otherwise. */
+    private static final String INSTALL_CONTEXT = 'ImportTemplateService.materializeDefaultsDuringInstall';
+
+    /**
+     * Adds the shipped templates this org does not have yet, at install and at every upgrade, so
+     * a template shipped in a later version reaches an org that already has others (D-41). Each
+     * package's post-install script calls it, because Core installs first and cannot see a
+     * module's templates yet. A template already here is matched by its key and left exactly as
+     * the administrator left it, edited or switched off; one they deleted comes back.
+     *
+     * The insert is in system mode: the post-install user holds no permission set, and every
+     * value written comes from packaged custom metadata (ADR-0021 condition 2). Nothing throws:
+     * an install must never fail over this, so a failure goes to the Error Log and Health Check
+     * still offers Restore.
+     */
+    @NamespaceAccessible
+    public static Integer materializeDefaultsDuringInstall(String context) {
+        try {
+            List<Import_Template__c> toCreate = missingDefaults();
+            if (toCreate.isEmpty()) {
+                return 0;
+            }
+            Database.insert(toCreate, AccessLevel.SYSTEM_MODE);
+            return toCreate.size();
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, String.isBlank(context) ? INSTALL_CONTEXT : context);
+            return 0;
+        }
     }
 
     /**

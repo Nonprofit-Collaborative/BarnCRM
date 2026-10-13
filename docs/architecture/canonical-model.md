@@ -1908,8 +1908,11 @@ contact custom field's `__pc` form, and otherwise the account field of the same 
 and never named in the source (Section 4.2 of the plan, ADR-0013).
 
 **R-IT4 Upgrade safety.** Templates with Is Package Default true are materialized from
-`Import_Template_Default__mdt` on install and on "Restore defaults", matched by Template
-Key, and are never overwritten once the admin has edited them (ADR-0006).
+`Import_Template_Default__mdt` on install, on every upgrade (each package's post-install
+script adds the templates it ships, D-41) and on "Restore defaults", matched by Template
+Key, and are never overwritten once the admin has edited them (ADR-0006). A shipped template
+the admin deleted is added again by the next upgrade; switching it off keeps it out of the
+list.
 
 **R-IT6 Recurring sources are shown, not fetched.** A template the administrator marks Is
 Recurring names its feed in Source Name, for example "Monthly processor export", and Source
@@ -6622,6 +6625,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-3). No object or field added. R-IB1: a row's organization is created only after its people are matched and validated, so a rejected row creates nothing and the dry run counts what the commit does; a rejected row points at what it saved. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-10, owner decision). No object or field added. R-AF5 states how a people import creates or matches the first person's affiliation with the row's organization, journaled as Created for undo; R-IR6: Core resolves the `Affiliation` entity. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-22, IMPORT-23). No object or field added. The wizard's fixed columns are served by the server with labels, adding Affiliation: role; File Reference is empty for a file over 2.5 MB. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-19, D-41). No object or field added. R-IT4: shipped import templates are added on install and on every upgrade by each package's post-install script. |
 
 ---
 ## 32. Entity ownership by package
