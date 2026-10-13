@@ -2,7 +2,7 @@
  * Tests for BarnCRMPermissions: the settings permission is held by BarnCRM Admin and not by
  * staff, so every page that asks it gets the same answer.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BarnCRMPermissions')
 private class BarnCRMPermissionsTest {
     @IsTest
     static void anAdministratorMayManageSettings() {

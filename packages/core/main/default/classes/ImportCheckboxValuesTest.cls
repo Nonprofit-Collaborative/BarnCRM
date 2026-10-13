@@ -4,8 +4,13 @@
  * read as cleared but skipped on its row and named in the run log while the rest of the row
  * loads.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportObjectSchema, ApexClass:ImportRowProcessor')
 private class ImportCheckboxValuesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 

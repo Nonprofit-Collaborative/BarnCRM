@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:HubController')
 private class HubControllerFailureTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** A module whose step is malformed, so that reading the checklist throws. */
     private class BrokenModule implements SetupAssistantExtension {
         public List<SetupAssistantService.Step> contributions() {

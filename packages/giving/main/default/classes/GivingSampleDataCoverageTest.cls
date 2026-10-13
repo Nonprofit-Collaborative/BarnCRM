@@ -5,6 +5,11 @@
  */
 @IsTest(testFor='ApexClass:GivingSampleData, ApexClass:GivingSampleDataQueueable')
 private class GivingSampleDataCoverageTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static final String PERSON_KEY = 'H001-1';
 
     private static void insertSamplePerson() {

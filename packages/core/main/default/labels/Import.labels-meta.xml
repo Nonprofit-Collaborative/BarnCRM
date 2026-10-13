@@ -173,7 +173,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a checkbox value that is neither yes nor no</shortDescription>
+        <shortDescription>Import run log: checkbox value not yes or no; {0} row, {1} column, {2} value</shortDescription>
         <value>Row {0}: &quot;{2}&quot; in the {1} column is not a yes or no value, so that checkbox was left as it was. The rest of the row was used. Correct the cell and import again.</value>
     </labels>
     <labels>

@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:HouseholdSoftCreditRecompute')
 private class HouseholdSoftCreditRecomputeTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Set<Id> fakeHouseholds(Integer howMany) {
         Set<Id> ids = new Set<Id>();
         for (Integer i = 1; i <= howMany; i++) {

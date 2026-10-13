@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:RollupChanges')
 private class RollupChangesCoverageTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Account household(String name) {
         return new Account(Name = name, RecordTypeId = HouseholdService.householdRecordTypeId());
     }

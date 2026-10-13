@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:SampleDataContactQueueable')
 private class SampleDataContactQueueableTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWithInstalledModules();
+    }
+
     private static String payload(Integer people) {
         List<Object> members = new List<Object>();
         for (Integer i = 0; i < people; i++) {

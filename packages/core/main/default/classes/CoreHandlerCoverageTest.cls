@@ -11,6 +11,11 @@
     testFor='ApexClass:AccountAddressHandler, ApexClass:AffiliationMaintenanceHandler, ApexClass:AffiliationValidationHandler, ApexClass:RelationshipMaintenanceHandler, ApexClass:RelationshipValidationHandler'
 )
 private class CoreHandlerCoverageTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final Integer TWO_HUNDRED = 200;
 
     private static User nobody() {

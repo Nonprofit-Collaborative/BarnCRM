@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:ReceiptController')
 private class ReceiptControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.adminWith('Giving_Admin');
+    }
+
     private static Gift__c insertGift(String familyName, Decimal amount) {
         Contact donor = GivingTestDataFactory.insertHouseholdContact(
             'The ' + familyName + ' Family',
