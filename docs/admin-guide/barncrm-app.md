@@ -26,6 +26,7 @@ person what they can act on:
 
 | Part of the home page | Who sees it |
 |---|---|
+| **What's new in BarnCRM**: what changed in the latest release, until you click **Dismiss** | Everyone, each person once per release |
 | **Welcome to BarnCRM**, the **New household** button, and the paused automation banner | Everyone |
 | **Setup checklist** (or the **Setup complete** tile once it is finished) | Administrators |
 | **Health Check** | Administrators |
