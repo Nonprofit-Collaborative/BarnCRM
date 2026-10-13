@@ -534,7 +534,8 @@ public with sharing class ImportBatchService {
     }
 
     /** AsyncApexJob statuses that mean a job has not finished yet. */
-    private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
+    @NamespaceAccessible
+    public static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
         'Holding',
         'Queued',
         'Preparing',

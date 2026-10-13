@@ -1860,8 +1860,13 @@ bookkeeping fields (the import batch tag, the sample data marks, the household f
 household automation writes), and not a field the fixed column list already offers. For people
 it lists Contact fields in contact terms, which R-IT3 translates in Person Accounts mode; for
 organizations it lists Account fields that are not person account fields. Values are written
-as the other attributes are (R-IB12): converted to the field's type, never clearing a stored
-value with a blank, and a field the user may not write is skipped and named in the run log.
+as the other attributes are (R-IB12): read as the field's type the one way every import reads
+it (ISO or the user's locale for dates and date times, numbers with separators, times), never
+clearing a stored value with a blank, and a field the user may not write is skipped and named in
+the run log. A value the field cannot take (unreadable, or text longer than the field) rejects
+the row with the field and value named, as a one-object load does (R-IT12). A matched record
+counts as changed only where a value differs as the field holds it (numbers as numbers, dates as
+dates) and text exactly: a correction of capitals is a change.
 A checkbox reads `true`, `yes`, `y`, `1`, `x`, `checked`, `on` or `t` as ticked and `false`,
 `no`, `n`, `0`, `off` or `f` as cleared, ignoring case and surrounding spaces; one reading
 serves every import, people and one-object alike. Any other value is never read as cleared: a
@@ -6828,6 +6833,7 @@ mirrors the primary member).
 | v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
 | v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
 | post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
+| v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 
 ---

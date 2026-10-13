@@ -331,6 +331,113 @@ private class ImportRowProcessorTest {
         }
     }
 
+    /** The donor mapping with a birthdate and a title, for the value tests below. */
+    private static void givenWithBirthdateAndTitle(List<Map<String, String>> values) {
+        TestDataFactory.defaultSettings();
+        ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
+        mapping.columns.add(new ImportMapping.Column('Born', 'Contact1.Birthdate'));
+        mapping.columns.add(new ImportMapping.Column('Title', 'Contact1.Title'));
+        template = ImportTestDataFactory.template(
+            mapping.serialize(),
+            ImportTemplateService.RULE_EMAIL
+        );
+        batch = ImportTestDataFactory.batch(template);
+        ImportTestDataFactory.rows(batch, values);
+    }
+
+    private static Map<String, String> bornRow(Integer i, String born, String title) {
+        Map<String, String> row = ImportTestDataFactory.donorRow(
+            'Person' + i,
+            'Surname' + i,
+            'person' + i + '@example.org',
+            null
+        );
+        row.put('Born', born);
+        row.put('Title', title);
+        return row;
+    }
+
+    /**
+     * People read dates as Load one object does (IMPORT-4): a date written in the user's
+     * locale loads, where it was dropped before with the row still counted a success, and a
+     * value that cannot be read rejects its row with the field and value named. Two hundred
+     * rows, a full default chunk.
+     */
+    @IsTest
+    static void aLocaleDateLoadsAndAnUnreadableValueRejectsItsRow() {
+        System.runAs(TestUsers.admin()) {
+            Date expected = Date.newInstance(1980, 4, 2);
+            String localeDate = expected.format();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 199; i++) {
+                values.add(bornRow(i, localeDate, 'Treasurer'));
+            }
+            values.add(bornRow(199, 'not a date', 'Treasurer'));
+            givenWithBirthdateAndTitle(values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(199, outcome.created, 'Every readable row loaded: ' + outcome.notes);
+            Assert.areEqual(
+                199,
+                [SELECT COUNT() FROM Contact WHERE Birthdate = :expected],
+                'With the birthdate as written in the user\'s locale.'
+            );
+            Assert.areEqual(1, outcome.rejected, 'The unreadable row is rejected.');
+            Import_Row__c rejected = ImportTestDataFactory.reload(batch.Id)[199];
+            Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.Status__c);
+            Assert.isTrue(
+                rejected.Error_Message__c.contains('not a date'),
+                'The reason names the value: ' + rejected.Error_Message__c
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE Email = 'person199@example.org'],
+                'Nobody was created for it.'
+            );
+        }
+    }
+
+    /**
+     * A re-import compares as the save would write (IMPORT-8): a date written differently is
+     * no change, while a correction of capitals is one, as in Load one object.
+     */
+    @IsTest
+    static void aReimportComparesTypedValuesAndAppliesCapitals() {
+        System.runAs(TestUsers.admin()) {
+            List<Contact> existing = new List<Contact>();
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                existing.add(
+                    new Contact(
+                        FirstName = 'Person' + i,
+                        LastName = 'Surname' + i,
+                        Email = 'person' + i + '@example.org',
+                        MailingCity = 'Portland',
+                        Birthdate = Date.newInstance(1980, 1, 5),
+                        Title = Math.mod(i, 2) == 0 ? 'treasurer' : 'Treasurer'
+                    )
+                );
+                values.add(bornRow(i, '1980-1-5', 'Treasurer'));
+            }
+            insert existing;
+            givenWithBirthdateAndTitle(values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(100, outcome.updated, 'Only the capitals corrections update.');
+            Assert.areEqual(100, outcome.matched, 'The same date, written another way, is none.');
+            for (Contact person : [SELECT Title FROM Contact]) {
+                // Compared in Apex: SOQL compares text without regard to capitals.
+                Assert.isTrue('Treasurer'.equals(person.Title), 'Corrected: ' + person.Title);
+            }
+        }
+    }
+
     @IsTest
     static void splitsAFullNameColumn() {
         System.runAs(TestUsers.admin()) {
