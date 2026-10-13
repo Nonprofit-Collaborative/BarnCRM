@@ -151,24 +151,17 @@ public with sharing class AddressService {
         }
         isPropagating = true;
         try {
+            // A changed address is always a new record (R-AD7): the old one is kept as
+            // history and loses the default flag below, rather than being overwritten.
             List<Address__c> toInsert = new List<Address__c>();
-            List<Address__c> toUpdate = new List<Address__c>();
             captureAccounts(accounts, toInsert);
-            captureContacts(contacts, toInsert, toUpdate);
-            if (!toUpdate.isEmpty()) {
-                Database.update(toUpdate, AccessLevel.USER_MODE);
-            }
-            if (!toInsert.isEmpty()) {
-                Database.insert(toInsert, AccessLevel.USER_MODE);
-            }
-            List<Address__c> touched = new List<Address__c>();
-            touched.addAll(toUpdate);
-            touched.addAll(toInsert);
-            if (touched.isEmpty()) {
+            captureContacts(contacts, toInsert);
+            if (toInsert.isEmpty()) {
                 return;
             }
-            clearOtherDefaults(touched);
-            applyToStandardFields(touched);
+            Database.insert(toInsert, AccessLevel.USER_MODE);
+            clearOtherDefaults(toInsert);
+            applyToStandardFields(toInsert);
         } finally {
             isPropagating = false;
         }
@@ -403,6 +396,30 @@ public with sharing class AddressService {
      * and be skipped, so the address would silently reach some of a household and not the
      * rest. The answer decides which fields a write may name and never reaches a screen.
      */
+    /**
+     * Moves an address that names a person account through `Account__c` over to
+     * `Person_Account__c`, before insert. Does nothing, and runs no query, in an org with
+     * no person accounts.
+     */
+    public static void ownPersonAccountsAsPeople(List<Address__c> addresses) {
+        Set<Id> accountIds = new Set<Id>();
+        for (Address__c address : addresses) {
+            if (address.Account__c != null && address.Person_Account__c == null) {
+                accountIds.add(address.Account__c);
+            }
+        }
+        Set<Id> people = personAccountIdsAmong(accountIds);
+        if (people.isEmpty()) {
+            return;
+        }
+        for (Address__c address : addresses) {
+            if (address.Person_Account__c == null && people.contains(address.Account__c)) {
+                address.Person_Account__c = address.Account__c;
+                address.Account__c = null;
+            }
+        }
+    }
+
     private static Set<Id> personAccountIdsAmong(Set<Id> accountIds) {
         Set<Id> found = new Set<Id>();
         if (accountIds == null || accountIds.isEmpty() || !personAccountFieldsAvailable()) {
@@ -561,11 +578,7 @@ public with sharing class AddressService {
         }
     }
 
-    private static void captureContacts(
-        List<Contact> contacts,
-        List<Address__c> toInsert,
-        List<Address__c> toUpdate
-    ) {
+    private static void captureContacts(List<Contact> contacts, List<Address__c> toInsert) {
         if (contacts == null || contacts.isEmpty()) {
             return;
         }
@@ -587,16 +600,15 @@ public with sharing class AddressService {
             return;
         }
         if (behavior() == BEHAVIOR_PERSONAL_ADDRESS) {
-            capturePersonalAddresses(withAddress, toInsert, toUpdate);
+            capturePersonalAddresses(withAddress, toInsert);
         } else {
-            captureHouseholdAddresses(withAddress, toInsert, toUpdate);
+            captureHouseholdAddresses(withAddress, toInsert);
         }
     }
 
     private static void captureHouseholdAddresses(
         List<Contact> contacts,
-        List<Address__c> toInsert,
-        List<Address__c> toUpdate
+        List<Address__c> toInsert
     ) {
         Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
         Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(contactIds);
@@ -627,19 +639,15 @@ public with sharing class AddressService {
         }
         for (Id householdId : sourceByHousehold.keySet()) {
             Contact source = sourceByHousehold.get(householdId);
-            Address__c existing = defaultByHousehold.get(householdId);
-            if (existing == null) {
+            if (!sameAddress(defaultByHousehold.get(householdId), source)) {
                 toInsert.add(newAddressFromContact(source, TYPE_HOME, householdId, null));
-            } else {
-                toUpdate.add(copyContactAddressOnto(new Address__c(Id = existing.Id), source));
             }
         }
     }
 
     private static void capturePersonalAddresses(
         List<Contact> contacts,
-        List<Address__c> toInsert,
-        List<Address__c> toUpdate
+        List<Address__c> toInsert
     ) {
         Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
         Map<Id, Address__c> defaultByContact = new Map<Id, Address__c>();
@@ -649,13 +657,30 @@ public with sharing class AddressService {
             }
         }
         for (Contact contact : contacts) {
-            Address__c existing = defaultByContact.get(contact.Id);
-            if (existing == null) {
+            if (!sameAddress(defaultByContact.get(contact.Id), contact)) {
                 toInsert.add(newAddressFromContact(contact, TYPE_HOME, null, contact.Id));
-            } else {
-                toUpdate.add(copyContactAddressOnto(new Address__c(Id = existing.Id), contact));
             }
         }
+    }
+
+    /**
+     * Whether the owner's default already holds exactly what the person typed, so that a
+     * second household member saved with the shared address, or a save that rewrites the
+     * same address, does not add a duplicate record.
+     */
+    private static Boolean sameAddress(Address__c existing, Contact source) {
+        return existing != null &&
+            sameText(existing.Street__c, source.MailingStreet) &&
+            sameText(existing.City__c, source.MailingCity) &&
+            sameText(existing.State__c, source.MailingState) &&
+            sameText(existing.Postal_Code__c, source.MailingPostalCode) &&
+            sameText(existing.Country__c, source.MailingCountry);
+    }
+
+    private static Boolean sameText(String left, String right) {
+        String a = left == null ? '' : left;
+        String b = right == null ? '' : right;
+        return a.equals(b);
     }
 
     private static Address__c newAddressFromContact(
