@@ -475,10 +475,6 @@
           <value>Gifts__r</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
           <name>relatedListDisplayType</name>
           <value>ADVGRID</value>
         </componentInstanceProperties>
@@ -538,10 +534,6 @@
         <componentInstanceProperties>
           <name>relatedListApiName</name>
           <value>Commitments__r</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>relatedListDisplayType</name>
@@ -606,10 +598,6 @@
         <componentInstanceProperties>
           <name>relatedListApiName</name>
           <value>Soft_Credits__r</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>relatedListComponentOverride</name>
-          <value>NONE</value>
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>relatedListDisplayType</name>
