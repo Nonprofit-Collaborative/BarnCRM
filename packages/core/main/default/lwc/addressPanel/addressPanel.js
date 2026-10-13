@@ -1,9 +1,11 @@
 import { LightningElement, api, wire } from 'lwc';
-import { refreshApex } from '@salesforce/apex';
 import Toast from 'lightning/toast';
+import { gql, graphql } from 'lightning/graphql';
+import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
+import LOCALE from '@salesforce/i18n/locale';
 
-import getAddresses from '@salesforce/apex/AddressController.getAddresses';
-import setDefault from '@salesforce/apex/AddressController.setDefault';
+import ID_FIELD from '@salesforce/schema/Address__c.Id';
+import IS_DEFAULT_FIELD from '@salesforce/schema/Address__c.Is_Default__c';
 
 import PANEL_TITLE from '@salesforce/label/c.Core_Address_PanelTitle';
 import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
@@ -12,6 +14,7 @@ import CANCEL_BUTTON from '@salesforce/label/c.Core_Address_CancelButton';
 import DEFAULT_BADGE from '@salesforce/label/c.Core_Address_DefaultBadge';
 import EMPTY_MESSAGE from '@salesforce/label/c.Core_Address_Empty';
 import LOAD_FAILED from '@salesforce/label/c.Core_Address_LoadFailed';
+import LOADING from '@salesforce/label/c.Core_Address_Loading';
 import SAVE_FAILED from '@salesforce/label/c.Core_Address_SaveFailed';
 import SAVE_SUCCESS from '@salesforce/label/c.Core_Address_SaveSuccess';
 import SEASONAL_RANGE from '@salesforce/label/c.Core_Address_SeasonalRange';
@@ -33,6 +36,110 @@ const FORM_FIELDS = [
   'Seasonal_End_Month__c',
   'Seasonal_End_Day__c'
 ];
+const SEASONAL_TYPE = 'Seasonal';
+
+/**
+ * The record's addresses, read as the user through the platform, so field security and
+ * sharing apply and the card picks up edits made elsewhere on the page. The record is a
+ * household or organization (Account__c), a person stored as a contact (Contact__c) or a
+ * person stored as an account (Person_Account__c); all three lookups exist in every org.
+ * At most 2,000, the most a query returns at once.
+ */
+const ADDRESSES_QUERY = gql`
+  query addressPanel($ownerId: ID) {
+    uiapi {
+      query {
+        Address__c(
+          where: {
+            or: [
+              { Account__c: { eq: $ownerId } }
+              { Contact__c: { eq: $ownerId } }
+              { Person_Account__c: { eq: $ownerId } }
+            ]
+          }
+          orderBy: { CreatedDate: { order: DESC } }
+          first: 2000
+        ) {
+          edges {
+            node {
+              Id
+              Type__c {
+                value
+                displayValue
+              }
+              Street__c {
+                value
+              }
+              City__c {
+                value
+              }
+              State__c {
+                value
+              }
+              Postal_Code__c {
+                value
+              }
+              Country__c {
+                value
+              }
+              Is_Default__c {
+                value
+              }
+              Seasonal_Start_Month__c {
+                value
+              }
+              Seasonal_Start_Day__c {
+                value
+              }
+              Seasonal_End_Month__c {
+                value
+              }
+              Seasonal_End_Day__c {
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+function read(field) {
+  return field ? field.value : null;
+}
+
+/** "January 1", in the reader's own language, from the two numbers we store. */
+function monthAndDay(month, day) {
+  if (!(month >= 1 && month <= 12 && day >= 1 && day <= 31)) {
+    return null;
+  }
+  const name = new Intl.DateTimeFormat(LOCALE, { month: 'long', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2001, Math.trunc(month) - 1, 1))
+  );
+  return `${name} ${Math.trunc(day)}`;
+}
+
+/** One address as the card draws it. */
+function toView(node) {
+  const type = node.Type__c || {};
+  return {
+    id: node.Id,
+    addressType: type.displayValue || type.value || null,
+    street: read(node.Street__c),
+    city: read(node.City__c),
+    state: read(node.State__c),
+    postalCode: read(node.Postal_Code__c),
+    country: read(node.Country__c),
+    isDefault: read(node.Is_Default__c) === true,
+    isSeasonal: type.value === SEASONAL_TYPE,
+    seasonalStart: monthAndDay(
+      read(node.Seasonal_Start_Month__c),
+      read(node.Seasonal_Start_Day__c)
+    ),
+    seasonalEnd: monthAndDay(read(node.Seasonal_End_Month__c), read(node.Seasonal_End_Day__c))
+  };
+}
 
 /**
  * Every address a household, an organization, or a person has on file, with the one in use
@@ -49,6 +156,7 @@ export default class AddressPanel extends LightningElement {
     cancelButton: CANCEL_BUTTON,
     defaultBadge: DEFAULT_BADGE,
     emptyMessage: EMPTY_MESSAGE,
+    loading: LOADING,
     setDefaultButton: SET_DEFAULT_BUTTON
   };
 
@@ -58,18 +166,32 @@ export default class AddressPanel extends LightningElement {
   errorMessage;
 
   addresses = [];
-  wiredResult;
+  loaded = false;
+  refreshAddresses;
 
-  @wire(getAddresses, { ownerId: '$recordId' })
+  get queryVariables() {
+    return this.recordId ? { ownerId: this.recordId } : undefined;
+  }
+
+  @wire(graphql, { query: ADDRESSES_QUERY, variables: '$queryVariables' })
   receiveAddresses(result) {
-    this.wiredResult = result;
-    if (result.data) {
-      this.addresses = result.data.map((address) => this.decorate(address));
-      this.errorMessage = undefined;
-    } else if (result.error) {
+    this.refreshAddresses = result.refresh;
+    if (result.errors && result.errors.length) {
       this.addresses = [];
       this.errorMessage = LOAD_FAILED;
+      this.loaded = true;
+    } else if (result.data) {
+      const views = result.data.uiapi.query.Address__c.edges.map((edge) => toView(edge.node));
+      // The address in use first, then newest first (a stable sort keeps the query's order).
+      views.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
+      this.addresses = views.map((address) => this.decorate(address));
+      this.errorMessage = undefined;
+      this.loaded = true;
     }
+  }
+
+  get isLoading() {
+    return !this.loaded;
   }
 
   get hasAddresses() {
@@ -77,7 +199,7 @@ export default class AddressPanel extends LightningElement {
   }
 
   get isEmpty() {
-    return !this.hasAddresses && !this.errorMessage;
+    return this.loaded && !this.hasAddresses && !this.errorMessage;
   }
 
   /** The lookup that ties a new address to the record the panel is sitting on. */
@@ -125,8 +247,11 @@ export default class AddressPanel extends LightningElement {
   async handleSetDefault(event) {
     const addressId = event.target.dataset.id;
     try {
-      const updated = await setDefault({ addressId });
-      this.addresses = updated.map((address) => this.decorate(address));
+      // Clearing the old default and copying this one into the record's own address fields
+      // is the trigger's work.
+      await updateRecord({
+        fields: { [ID_FIELD.fieldApiName]: addressId, [IS_DEFAULT_FIELD.fieldApiName]: true }
+      });
       this.errorMessage = undefined;
       this.notify(SET_DEFAULT_SUCCESS, 'success');
       this.refresh();
@@ -136,10 +261,16 @@ export default class AddressPanel extends LightningElement {
     }
   }
 
+  /**
+   * Reads the card again, and tells the record page its own address fields may have changed,
+   * since a new or moved default is copied into them by the trigger.
+   */
   refresh() {
-    if (this.wiredResult) {
-      refreshApex(this.wiredResult);
+    const reads = [notifyRecordUpdateAvailable([{ recordId: this.recordId }])];
+    if (this.refreshAddresses) {
+      reads.push(this.refreshAddresses());
     }
+    return Promise.all(reads);
   }
 
   notify(message, variant) {

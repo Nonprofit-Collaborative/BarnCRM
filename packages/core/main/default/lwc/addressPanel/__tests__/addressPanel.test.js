@@ -1,56 +1,56 @@
 import { createElement } from 'lwc';
 import AddressPanel from 'c/addressPanel';
-import getAddresses from '@salesforce/apex/AddressController.getAddresses';
-import setDefault from '@salesforce/apex/AddressController.setDefault';
+import { graphql } from 'lightning/graphql';
+import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 
-jest.mock(
-  '@salesforce/apex/AddressController.getAddresses',
-  () => {
-    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
-    return { default: createApexTestWireAdapter(jest.fn()) };
-  },
-  { virtual: true }
-);
+const RECORD_ID = '0011000000000001AA';
 
-jest.mock('@salesforce/apex/AddressController.setDefault', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+/** One address as the GraphQL query returns it. */
+function node({ id, type, street, city, state, postalCode, isDefault, season }) {
+  return {
+    Id: id,
+    Type__c: { value: type, displayValue: type },
+    Street__c: { value: street },
+    City__c: { value: city },
+    State__c: { value: state },
+    Postal_Code__c: { value: postalCode },
+    Country__c: { value: 'United States' },
+    Is_Default__c: { value: isDefault },
+    Seasonal_Start_Month__c: { value: season ? season[0] : null },
+    Seasonal_Start_Day__c: { value: season ? season[1] : null },
+    Seasonal_End_Month__c: { value: season ? season[2] : null },
+    Seasonal_End_Day__c: { value: season ? season[3] : null }
+  };
+}
 
-jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn() }), { virtual: true });
+function response(nodes) {
+  return { uiapi: { query: { Address__c: { edges: nodes.map((n) => ({ node: n })) } } } };
+}
 
-const HOME = {
+const HOME = node({
   id: 'a0100000000000AAAA',
-  addressNumber: 'AD-000001',
-  addressType: 'Home',
+  type: 'Home',
   street: '812 Willow Lane',
   city: 'Springfield',
   state: 'IL',
   postalCode: '62704',
-  country: 'United States',
-  isDefault: true,
-  isSeasonal: false,
-  seasonalStart: null,
-  seasonalEnd: null
-};
+  isDefault: true
+});
 
-const WINTER = {
+const WINTER = node({
   id: 'a0100000000000BBBB',
-  addressNumber: 'AD-000002',
-  addressType: 'Seasonal',
+  type: 'Seasonal',
   street: '4120 East Camelback Road',
   city: 'Phoenix',
   state: 'AZ',
   postalCode: '85018',
-  country: 'United States',
   isDefault: false,
-  isSeasonal: true,
-  seasonalStart: 'January 1',
-  seasonalEnd: 'March 31'
-};
+  season: [1, 1, 3, 31]
+});
 
 function build(objectApiName = 'Account') {
   const element = createElement('c-address-panel', { is: AddressPanel });
-  element.recordId = '0011000000000001AA';
+  element.recordId = RECORD_ID;
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
   return element;
@@ -68,33 +68,64 @@ describe('c-address-panel', () => {
     jest.clearAllMocks();
   });
 
-  it('shows a card for every address on file', async () => {
+  it('asks for the addresses of the record it sits on', async () => {
+    build();
+    await flush();
+    expect(graphql.getLastConfig().variables).toEqual({ ownerId: RECORD_ID });
+  });
+
+  it('shows a loading state, not "no addresses", until the addresses arrive', async () => {
     const element = build();
-    getAddresses.emit([HOME, WINTER]);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="loading"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="empty"]')).toBeNull();
+
+    graphql.emit(response([HOME]));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="loading"]')).toBeNull();
+  });
+
+  it('shows a card for every address on file, the one in use first', async () => {
+    const element = build();
+    graphql.emit(response([WINTER, HOME]));
     await flush();
 
     const cards = element.shadowRoot.querySelectorAll('[data-id="address-card"]');
     expect(cards.length).toBe(2);
     const streets = Array.from(
       element.shadowRoot.querySelectorAll('[data-id="address-street"]')
-    ).map((node) => node.textContent);
+    ).map((n) => n.textContent);
     expect(streets).toEqual(['812 Willow Lane', '4120 East Camelback Road']);
+    expect(element.shadowRoot.querySelector('[data-id="address-city"]').textContent).toBe(
+      'Springfield IL 62704'
+    );
+  });
+
+  it('shows the type in the reader language', async () => {
+    const element = build();
+    graphql.emit(response([{ ...HOME, Type__c: { value: 'Home', displayValue: 'Domicilio' } }]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="address-type"]').textContent).toBe(
+      'Domicilio'
+    );
   });
 
   it('badges the address in use and offers to move the badge to the others', async () => {
     const element = build();
-    getAddresses.emit([HOME, WINTER]);
+    graphql.emit(response([HOME, WINTER]));
     await flush();
 
     expect(element.shadowRoot.querySelectorAll('[data-id="default-badge"]').length).toBe(1);
     const buttons = element.shadowRoot.querySelectorAll('.set-default');
     expect(buttons.length).toBe(1);
-    expect(buttons[0].dataset.id).toBe(WINTER.id);
+    expect(buttons[0].dataset.id).toBe(WINTER.Id);
   });
 
   it('reads the seasonal range as dates rather than numbers', async () => {
     const element = build();
-    getAddresses.emit([WINTER]);
+    graphql.emit(response([WINTER]));
     await flush();
 
     const seasonal = element.shadowRoot.querySelector('[data-id="address-seasonal"]');
@@ -102,9 +133,17 @@ describe('c-address-panel', () => {
     expect(seasonal.textContent).toContain('March 31');
   });
 
+  it('shows no range when the stored month is not a month', async () => {
+    const element = build();
+    graphql.emit(response([{ ...WINTER, Seasonal_Start_Month__c: { value: 13 } }]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('[data-id="address-seasonal"]')).toBeNull();
+  });
+
   it('says so when the household has no addresses yet', async () => {
     const element = build();
-    getAddresses.emit([]);
+    graphql.emit(response([]));
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="empty"]')).not.toBeNull();
@@ -113,47 +152,58 @@ describe('c-address-panel', () => {
 
   it('shows a message when the addresses cannot be read', async () => {
     const element = build();
-    getAddresses.error();
+    graphql.emitErrors([{ message: 'no access' }]);
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="empty"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="loading"]')).toBeNull();
   });
 
-  it('moves the badge when an address is set as the default', async () => {
-    setDefault.mockResolvedValue([
-      { ...WINTER, isDefault: true },
-      { ...HOME, isDefault: false }
-    ]);
+  it('sets the default as the user, then reads the card and the record again', async () => {
+    const refresh = jest.fn().mockResolvedValue();
     const element = build();
-    getAddresses.emit([HOME, WINTER]);
+    graphql.emit(response([HOME, WINTER]), undefined, refresh);
     await flush();
 
     element.shadowRoot.querySelector('.set-default').click();
     await flush();
 
-    expect(setDefault).toHaveBeenCalledWith({ addressId: WINTER.id });
-    const badged = element.shadowRoot.querySelectorAll('[data-id="default-badge"]');
-    expect(badged.length).toBe(1);
+    expect(updateRecord).toHaveBeenCalledWith({
+      fields: { Id: WINTER.Id, Is_Default__c: true }
+    });
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([{ recordId: RECORD_ID }]);
+
+    graphql.emit(
+      response([
+        { ...WINTER, Is_Default__c: { value: true } },
+        { ...HOME, Is_Default__c: { value: false } }
+      ]),
+      undefined,
+      refresh
+    );
+    await flush();
     const buttons = element.shadowRoot.querySelectorAll('.set-default');
-    expect(buttons[0].dataset.id).toBe(HOME.id);
+    expect(buttons[0].dataset.id).toBe(HOME.Id);
   });
 
   it('shows a message when the default could not be changed', async () => {
-    setDefault.mockRejectedValue(new Error('no'));
+    updateRecord.mockRejectedValueOnce(new Error('no'));
     const element = build();
-    getAddresses.emit([HOME, WINTER]);
+    graphql.emit(response([HOME, WINTER]));
     await flush();
 
     element.shadowRoot.querySelector('.set-default').click();
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
+    expect(notifyRecordUpdateAvailable).not.toHaveBeenCalled();
   });
 
   it('opens and closes the new address form', async () => {
     const element = build();
-    getAddresses.emit([HOME]);
+    graphql.emit(response([HOME]));
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="add-form"]')).toBeNull();
@@ -168,19 +218,19 @@ describe('c-address-panel', () => {
 
   it('ties a new address to the household when it sits on an account', async () => {
     const element = build('Account');
-    getAddresses.emit([HOME]);
+    graphql.emit(response([HOME]));
     await flush();
     element.shadowRoot.querySelector('[data-id="add-address"]').click();
     await flush();
 
     const owner = element.shadowRoot.querySelector('lightning-input-field');
     expect(owner.fieldName).toBe('Account__c');
-    expect(owner.value).toBe('0011000000000001AA');
+    expect(owner.value).toBe(RECORD_ID);
   });
 
   it('ties a new address to the person when it sits on a contact', async () => {
     const element = build('Contact');
-    getAddresses.emit([HOME]);
+    graphql.emit(response([HOME]));
     await flush();
     element.shadowRoot.querySelector('[data-id="add-address"]').click();
     await flush();
@@ -189,9 +239,10 @@ describe('c-address-panel', () => {
     expect(owner.fieldName).toBe('Contact__c');
   });
 
-  it('closes the form and refreshes after a new address is saved', async () => {
+  it('closes the form and reads the card and the record again after a new address is saved', async () => {
+    const refresh = jest.fn().mockResolvedValue();
     const element = build();
-    getAddresses.emit([HOME]);
+    graphql.emit(response([HOME]), undefined, refresh);
     await flush();
     element.shadowRoot.querySelector('[data-id="add-address"]').click();
     await flush();
@@ -201,5 +252,7 @@ describe('c-address-panel', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="add-form"]')).toBeNull();
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([{ recordId: RECORD_ID }]);
   });
 });

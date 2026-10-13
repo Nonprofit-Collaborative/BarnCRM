@@ -88,37 +88,4 @@ public with sharing class AddressSelector {
             LIMIT 10000
         ];
     }
-
-    /** The given addresses, with every field the service and the panel read. */
-    public static List<Address__c> selectByIds(Set<Id> addressIds) {
-        if (addressIds == null || addressIds.isEmpty()) {
-            return new List<Address__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Name,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c,
-                Seasonal_Start_Month__c,
-                Seasonal_Start_Day__c,
-                Seasonal_End_Month__c,
-                Seasonal_End_Day__c,
-                Is_Default__c,
-                Verification_Status__c,
-                Latest_Verified_Date__c,
-                CreatedDate
-            FROM Address__c
-            WHERE Id IN :addressIds
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-    }
 }
