@@ -374,8 +374,13 @@ contact mirrors the primary member).
   Account accepts a person contact (verified in a person accounts org on 2026-09-23). The
   person contact is read only through dynamic Apex and only where the org has Person
   Accounts, so the model keeps no dependency on them.
-- With no current primary member, Primary Contact is empty (R-H10). With more than one,
-  which only a data load can produce, the first of them in R-H5 order is mirrored and no
+- With no current primary member, Primary Contact is empty (R-H10).
+- A save of one Household Member record, made by a person, that would make it a second
+  current primary member of its household is refused before the save (label
+  `Core_Households_ErrorSecondPrimary`), pointing to Make primary. A save of more than one
+  record, or one arriving through the APIs, the Bulk API or background Apex, is a load and
+  is not refused (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`): with
+  more than one current primary, the first of them in R-H5 order is mirrored and no
   membership row is changed.
 - `HouseholdService` is the only writer in junction mode. It settles the mirror on every
   membership change (a row added, changed, ended, removed or restored, a person deleted or
@@ -6609,6 +6614,7 @@ mirrors the primary member).
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
 | v0.11 | 2026-10-13 | Household Member integrity (PEOPLE-25). No object or field added. R-M4 is now enforced by the validation rule `Membership_Names_One_Person` on a save that creates a row or changes who it names. New R-M6: one current membership per person per household, refused before the save by the Household Member trigger (label `Core_Households_ErrorAlreadyCurrentMember`). R-M3's tolerance of two primaries from a data load is unchanged. |
+| v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
 
 ---
 ## 32. Entity ownership by package

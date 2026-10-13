@@ -113,6 +113,14 @@
         <value>A household could not be saved, so its name or its member count may be out of date.</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ErrorSecondPrimary</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Refuses a membership that would give a household a second current primary</shortDescription>
+        <value>This household already has a primary member. To change who it is, click Make primary on the right person in the household's Household Members panel.</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_ErrorUnexpected</fullName>
         <categories>Households</categories>
         <language>en_US</language>

@@ -139,6 +139,14 @@ in a household, so a second one for the same person and household is refused wit
 person is already a current member of this household." Edit the membership they already
 have instead. An ended membership beside a current one is history and is kept.
 
+**"Ticking Is Primary on a membership was refused."**
+A household has one primary member. Saving a membership record that would give it a second
+one is refused with "This household already has a primary member." Use **Make primary** on
+the **Household Members** panel, which moves the mark in one step. A load of many records
+(Data Loader, an import) is not refused: if it leaves a household with two primaries, the
+first in member order is used as the Primary Contact and nothing else is changed, so you
+can choose with **Make primary** afterward.
+
 **"I cannot move this person."**
 There is no **Move to another household** button on a person your org stores as an account
 while the org uses the simple way of belonging, because that move cannot be carried out.
