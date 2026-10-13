@@ -88,7 +88,9 @@ address match on nothing. Fill those in, or ask whoever manages your Salesforce 
 matching rule in Setup, and scan again.
 
 **An organization pair never appears.** The panel shows people and households only. Merge
-organizations with Salesforce's own tools.
+organizations with Salesforce's own tools. A scan checks households only when an account rule
+that compares organizations and households is switched on; a person account rule alone does
+not start that part of the scan.
 
 **A pair of person accounts never appears either.** If your org stores people as person
 accounts, merge two of them with Salesforce's own account merge. BarnCRM handles it as it

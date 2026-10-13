@@ -119,13 +119,20 @@ public with sharing class DuplicateSelector {
         );
     }
 
-    /** The objects among these that have at least one active rule. */
+    /**
+     * The objects among these that have at least one active rule. Account counts only for a
+     * rule that compares organizations and households: with a person account rule alone the
+     * households pass has nothing to ask, and the platform refuses every chunk of it.
+     */
     public static Set<String> objectsWithActiveRules(Set<String> objectNames) {
         Set<String> result = new Set<String>();
         for (DuplicateRule rule : rulesFor(objectNames)) {
             if (rule.IsActive == true) {
                 result.add(rule.SobjectType);
             }
+        }
+        if (result.contains('Account') && !hasActiveRuleFor('Account', false)) {
+            result.remove('Account');
         }
         return result;
     }

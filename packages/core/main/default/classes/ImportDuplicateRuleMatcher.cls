@@ -21,6 +21,7 @@ public with sharing class ImportDuplicateRuleMatcher {
     public static final Integer MAX_RECORDS_PER_CALL = 50;
 
     private static final String CONTEXT = 'Import: matching through duplicate rules';
+    private static final String NOT_A_PERSON_ACCOUNT = ' AND IsPersonAccount = false'; // detection-only: added only after isPersonAccountOrg found person accounts, so a contact match is never the contact half of a person account
 
     /** The field types copied onto a probe: text a duplicate rule can compare. */
     private static final Set<Schema.DisplayType> COMPARED_TYPES = new Set<Schema.DisplayType>{
@@ -289,18 +290,31 @@ public with sharing class ImportDuplicateRuleMatcher {
             return result;
         }
         Boolean byType = allowedRecordTypes != null;
-        String query =
-            'SELECT Id, CreatedDate, LastModifiedDate FROM ' +
-            type.getDescribe().getName() +
-            ' WHERE Id IN :ids' +
-            (byType ? ' AND RecordTypeId IN :types' : '');
         Map<String, Object> binds = new Map<String, Object>{ 'ids' => ids };
         if (byType) {
             binds.put('types', allowedRecordTypes);
         }
+        String query = visibleQuery(type, byType, HouseholdService.isPersonAccountOrg());
         for (SObject record : Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)) {
             result.put(record.Id, record);
         }
         return result;
+    }
+
+    /**
+     * The read-back query. In an org with person accounts a contact the rules match may be the
+     * contact half of a person account; a contact import never takes one of those as its person.
+     */
+    @TestVisible
+    private static String visibleQuery(
+        Schema.SObjectType type,
+        Boolean byType,
+        Boolean personAccountOrg
+    ) {
+        return 'SELECT Id, CreatedDate, LastModifiedDate FROM ' +
+            type.getDescribe().getName() +
+            ' WHERE Id IN :ids' +
+            (byType ? ' AND RecordTypeId IN :types' : '') +
+            (type == Contact.SObjectType && personAccountOrg ? NOT_A_PERSON_ACCOUNT : '');
     }
 }
