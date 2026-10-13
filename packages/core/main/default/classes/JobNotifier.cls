@@ -50,6 +50,7 @@ public with sharing class JobNotifier {
     private static Boolean typeLookedUp = false;
 
     /** One notification: who it is for, what it says, and what it opens. */
+    @NamespaceAccessible
     public class Notice {
         public Id recipientId;
         public String title;
@@ -61,6 +62,15 @@ public with sharing class JobNotifier {
     }
 
     private class RefusedException extends Exception {
+    }
+
+    /**
+     * What this transaction handed to the platform, for a module's tests: `sent` is test visible
+     * only inside Core once the namespace is registered.
+     */
+    @NamespaceAccessible
+    public static List<Notice> sentNotices() {
+        return sent;
     }
 
     /**

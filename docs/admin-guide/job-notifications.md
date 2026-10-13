@@ -5,7 +5,8 @@
 Some BarnCRM work takes longer than a page can wait for: an import, a bulk update or bulk
 delete, undoing one of those, loading the sample data, recalculating every rollup, the field
 utilization count, the seasonal address swap, a duplicate scan, or recomputing every household
-name. When you start one of these yourself, BarnCRM tells you when it is done. A notification
+name. With Giving installed, the year end statement run, sending acknowledgment emails and
+recalculating donor levels count too. When you start one of these yourself, BarnCRM tells you when it is done. A notification
 appears under the bell at the top of every Salesforce page (and in the Salesforce mobile app),
 saying what finished, how it went in numbers, and where to look. Click it to open the job's own
 record or the settings page the job belongs to.
@@ -46,7 +47,8 @@ Start with no sample data loaded.
 - **The person who started the job, and nobody else.** If Maria starts an import, Maria is told.
 - **Only jobs somebody started by hand.** The nightly rollup run, the nightly seasonal address
   swap and the weekly field utilization count run on a schedule and send nothing; their results
-  are on the Hub and the settings pages as before. Clicking **Run now** or **Recalculate** on
+  are on the Hub and the settings pages as before. With Giving, the nightly acknowledgment
+  send and the nightly donor level pass are quiet in the same way. Clicking **Run now** or **Recalculate** on
   those pages does send one, because you are waiting for it.
 - **One notification per job**, when the whole job is over: an import undo that runs in several
   passes, or a rollup recalculation across several kinds of record, sends one at the end.
@@ -63,6 +65,9 @@ Start with no sample data loaded.
 | Field utilization count (Run now) | BarnCRM Settings, Health |
 | Seasonal address swap (Run now) | BarnCRM Settings, Addresses |
 | Duplicate scan, household name recompute | BarnCRM Settings, Households |
+| With Giving: year end statement run | The statement run's record |
+| With Giving: acknowledgment email send (Send now) | The acknowledgment run's record |
+| With Giving: donor level recalculation (Recalculate now) | BarnCRM Settings, Giving |
 
 Removing the sample data happens while you wait, so it sends no notification.
 

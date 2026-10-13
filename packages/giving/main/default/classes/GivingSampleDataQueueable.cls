@@ -22,6 +22,9 @@ public with sharing class GivingSampleDataQueueable implements Queueable {
     }
 
     public void execute(QueueableContext context) {
+        // Core's finalizer tells the person who loaded the data when a stage stops (Q-04): a
+        // stage that throws rolls back, a notification sent from its catch included.
+        System.attachFinalizer(new SampleDataLoadFinalizer());
         try {
             GivingSampleDataSet data = GivingSampleDataSet.parse(
                 GivingSampleData.getSampleDataJson()

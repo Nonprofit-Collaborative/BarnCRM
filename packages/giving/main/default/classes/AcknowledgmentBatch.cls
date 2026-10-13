@@ -19,6 +19,8 @@ public with sharing class AcknowledgmentBatch implements Database.Batchable<SObj
     private Integer processed = 0;
     private Integer sent = 0;
     private Integer errors = 0;
+    /** Who pressed Send now, told when the send ends; null for the nightly send (Q-04). */
+    private Id notifyUserId = JobNotifier.starter();
 
     public AcknowledgmentBatch(Id runId) {
         this.runId = runId;
@@ -49,5 +51,15 @@ public with sharing class AcknowledgmentBatch implements Database.Batchable<SObj
 
     public void finish(Database.BatchableContext context) {
         AcknowledgmentRunService.finish(runId, processed, sent, errors);
+        JobNotifier.aboutRecord(
+            notifyUserId,
+            Label.Giving_JobNotice_Acknowledgments,
+            false,
+            String.format(
+                Label.Giving_JobNotice_AcknowledgmentsBody,
+                new List<Object>{ processed.format(), sent.format(), errors.format() }
+            ),
+            runId
+        );
     }
 }
