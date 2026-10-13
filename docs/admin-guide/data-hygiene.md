@@ -6,7 +6,8 @@
 
 ## 1. What it does
 
-**Data hygiene** is one page that answers "which of my records need tidying up?" It runs a
+**Data hygiene** is the **Data quality** section of [Org Optimizer](org-optimizer.md). It
+answers "which of my records need tidying up?" It runs a
 short list of checks over your data, shows how many records each one finds, and for each
 check offers **Open in Find**, which opens the matching records in Find so you can read them,
 export them, or change them.
@@ -29,7 +30,8 @@ cannot see says so instead of showing a number.
 1. Data hygiene uses the same permission as Find: **Find and Export Records**. The
    **BarnCRM Admin** role has it, and so does the **BarnCRM Find and Export** permission set
    (see [Find and export](find.md)).
-2. Open the **Data Hygiene** tab in the BarnCRM app. The checks run as the page opens.
+2. Open the **Org Optimizer** tab in the BarnCRM app (it used to be called **Data Hygiene**)
+   and choose **Data quality**. The checks run as the section opens.
 3. Press **Recount** whenever you want fresh numbers. Nothing is saved between visits.
 
 There is nothing to configure.
@@ -39,7 +41,7 @@ There is nothing to configure.
 Maria's organization loaded 3,000 people from a spreadsheet last month, with automation
 paused for the load. She wants to know what the load left behind.
 
-1. Maria opens the **Data Hygiene** tab. Six checks are listed, each with a number. **People
+1. Maria opens the **Org Optimizer** tab and chooses **Data quality**. Six checks are listed, each with a number. **People
    with no household** says **214**. **Default addresses with parts missing** says **38**. The
    others say **0**.
 2. Next to **People with no household** she presses **Open in Find**. The Find tab opens. Under
@@ -50,7 +52,7 @@ paused for the load. She wants to know what the load left behind.
    are all from last month's load.
 4. She presses **Export to CSV**, works through the file with the volunteer coordinator, and
    adds the people to households (see [Households](households.md)).
-5. Back on **Data Hygiene**, she presses **Recount**. **People with no household** says **0**.
+5. Back on **Data quality** in Org Optimizer, she presses **Recount**. **People with no household** says **0**.
 6. She does the same for **Default addresses with parts missing**: Find lists 38 addresses, each
    with its household or person, and she fills in the missing postal codes.
 

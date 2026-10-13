@@ -91,7 +91,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Duplicate Review permission set | Minor | Separate permission set for reviewing suggestions (assigned in Setup, because Salesforce limits it to Sales and Service Cloud licenses). | Shipped | C-20, ADR-0050 |
 | People without a household, empty households | Minor | Health Check counts and links people in no household and households with nobody in them, changing nothing. | Shipped | C-21 |
 | Data hygiene console | Minor | One page for orphans, missing households and bad addresses, built on saved queries. | Shipped | C-28 |
-| Org Optimizer | Major | The Data Hygiene tab becomes Org Optimizer: one page with lazily loaded sections for data quality, duplicates, field utilization and Health Check (run on demand), each shown only to people who may use it. Duplicate review moves here from BarnCRM Settings, which keeps a link. | Planned (`docs/org-optimizer-data-manager`) | ADR-NEXT org-optimizer-and-data-manager-pages |
+| Org Optimizer | Major | The Data Hygiene tab becomes Org Optimizer: one page with lazily loaded sections for data quality, duplicates, field utilization and Health Check (run on demand), each shown only to people who may use it. Duplicate review moves here from BarnCRM Settings, which keeps a link. | Built, not merged (`feature/org-optimizer-shell`) | ADR-NEXT org-optimizer-and-data-manager-pages |
 
 ### 1.5 Import and Data Management
 

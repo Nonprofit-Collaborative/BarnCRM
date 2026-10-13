@@ -6100,8 +6100,9 @@ third-party code (the same reasoning as ADR-0049).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
-- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data Hygiene tab
-  (app page `Data_Hygiene`, component `dataHygieneConsole`).
+- **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data quality section
+  of the Org Optimizer tab (app page `Data_Hygiene`, shell `orgOptimizer`, component
+  `dataHygieneConsole`).
 
 ---
 

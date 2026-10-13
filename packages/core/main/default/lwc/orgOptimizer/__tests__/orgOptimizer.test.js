@@ -1,0 +1,102 @@
+import { createElement } from 'lwc';
+import OrgOptimizer from 'c/orgOptimizer';
+import getReport from '@salesforce/apex/HealthCheckController.getReport';
+import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
+
+jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
+  virtual: true
+});
+jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ default: true }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/DataHygieneController.getChecks', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+
+// eslint-disable-next-line @lwc/lwc/no-async-operation
+const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+function one(element, selector) {
+  return element.shadowRoot.querySelector(selector);
+}
+
+async function render() {
+  const element = createElement('c-org-optimizer', { is: OrgOptimizer });
+  document.body.appendChild(element);
+  await flush();
+  return element;
+}
+
+async function activate(element, name) {
+  one(element, `lightning-tab[data-id="tab-${name}"]`).dispatchEvent(new CustomEvent('active'));
+  await flush();
+}
+
+describe('c-org-optimizer as an administrator', () => {
+  beforeEach(() => {
+    getReport.mockResolvedValue({ findings: [] });
+    getChecks.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  it('opens on the Overview and runs no section', async () => {
+    const element = await render();
+
+    expect(one(element, 'lightning-tabset').activeTabValue).toBe('overview');
+    expect(one(element, 'c-data-hygiene-console')).toBeNull();
+    expect(one(element, 'c-duplicate-review')).toBeNull();
+    expect(one(element, 'c-field-utilization')).toBeNull();
+    expect(one(element, 'c-health-check-panel')).toBeNull();
+    expect(getReport).not.toHaveBeenCalled();
+    expect(getChecks).not.toHaveBeenCalled();
+    const names = Array.from(
+      element.shadowRoot.querySelectorAll('lightning-button[data-section]')
+    ).map((button) => button.dataset.section);
+    expect(names).toEqual(['quality', 'duplicates', 'fieldUtilization', 'healthCheck']);
+  });
+
+  it('creates a section the first time its tab is opened, and keeps it', async () => {
+    const element = await render();
+
+    await activate(element, 'quality');
+    expect(one(element, 'c-data-hygiene-console')).not.toBeNull();
+
+    await activate(element, 'fieldUtilization');
+    expect(one(element, 'c-field-utilization')).not.toBeNull();
+    expect(one(element, 'c-data-hygiene-console')).not.toBeNull();
+    expect(one(element, 'c-duplicate-review')).toBeNull();
+  });
+
+  it('opens a section from the Overview', async () => {
+    const element = await render();
+
+    one(element, 'lightning-button[data-section="duplicates"]').click();
+    await flush();
+
+    expect(one(element, 'lightning-tabset').activeTabValue).toBe('duplicates');
+    expect(one(element, 'c-duplicate-review')).not.toBeNull();
+  });
+
+  it('runs Health Check only when asked', async () => {
+    const element = await render();
+
+    await activate(element, 'healthCheck');
+    expect(one(element, 'c-health-check-panel')).toBeNull();
+    expect(getReport).not.toHaveBeenCalled();
+
+    one(element, 'lightning-button[data-id="run-health-check"]').click();
+    await flush();
+
+    expect(one(element, 'c-health-check-panel')).not.toBeNull();
+    expect(getReport).toHaveBeenCalledTimes(1);
+  });
+});

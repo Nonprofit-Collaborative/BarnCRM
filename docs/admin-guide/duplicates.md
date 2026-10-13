@@ -28,8 +28,9 @@ as they type, but nobody can review or merge suggestions: not on this panel, and
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
 Platform user nothing usable.
 
-1. Open the **BarnCRM** app and choose **BarnCRM Settings**.
-2. In the left navigation choose **Households**, and scroll to **Duplicates**.
+1. Open the **BarnCRM** app and choose the **Org Optimizer** tab.
+2. Choose **Duplicates**. (In **BarnCRM Settings**, **Households**, the **Duplicates** row's
+   **Open** button brings you here too.)
 3. Under **Duplicate rules** each rule for people and accounts is listed with On or Off. At
    least one should say On. If none does, see Common mistakes below.
 4. Choose **Scan for duplicates**. The scan looks through the people and households you
@@ -49,7 +50,7 @@ on purpose: open any sample person, note their email address, and create a new c
 the same first name, last name and email. Salesforce warns you that a similar record exists;
 choose to save anyway.
 
-1. Open **BarnCRM Settings**, choose **Households**, and scroll to **Duplicates**.
+1. Open **Org Optimizer** and choose **Duplicates**.
 2. Choose **Scan for duplicates**. You see "Scan started. It runs in the background, and
    suggestions appear here as they are found."
 3. Wait a minute and refresh the page. Under **Possible duplicates** you see the pair you made,
@@ -97,10 +98,10 @@ from this panel or with **Merge or split** on the household's record page. That 
 the members, recalculates the totals and renames the household; Salesforce's own account merge
 does none of that, which is why the household record page does not offer it.
 
-**A colleague sees the panel but the buttons are missing.** Scanning, dismissing and merging
-from this panel need the Manage BarnCRM Settings permission, which the BarnCRM Admin
-permission set grants, and access to duplicate record sets, which the BarnCRM Duplicate Review
-permission set grants.
+**A colleague cannot find the panel, or sees it without buttons.** The Duplicates section of
+Org Optimizer, and scanning, dismissing and merging from it, need the Manage BarnCRM Settings
+permission, which the BarnCRM Admin permission set grants, and access to duplicate record sets,
+which the BarnCRM Duplicate Review permission set grants.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.

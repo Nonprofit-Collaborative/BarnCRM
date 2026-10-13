@@ -1,0 +1,69 @@
+<template>
+    <lightning-card title={labels.title} icon-name="standard:dashboard">
+        <p class="slds-var-p-horizontal_medium slds-var-p-bottom_small">{labels.intro}</p>
+        <div class="slds-var-p-horizontal_medium">
+            <lightning-tabset variant="vertical" active-tab-value={activeSection}>
+                <lightning-tab label={labels.overview} value="overview" onactive={handleActive} data-id="tab-overview">
+                    <ul class="slds-has-dividers_bottom-space" data-id="overview">
+                        <template for:each={overviewSections} for:item="section">
+                            <li key={section.name} class="slds-item" data-id={section.name}>
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <div class="slds-col">
+                                        <p class="slds-text-title_bold">{section.title}</p>
+                                        <p class="slds-text-body_small">{section.text}</p>
+                                    </div>
+                                    <lightning-button
+                                        label={labels.open}
+                                        data-section={section.name}
+                                        data-id={section.name}
+                                        onclick={handleOpenSection}
+                                    ></lightning-button>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </lightning-tab>
+
+                <template lwc:if={canSeeQuality}>
+                    <lightning-tab label={labels.quality} value="quality" onactive={handleActive} data-id="tab-quality">
+                        <template lwc:if={qualityOpened}>
+                            <c-data-hygiene-console></c-data-hygiene-console>
+                        </template>
+                    </lightning-tab>
+                </template>
+
+                <template lwc:if={isAdmin}>
+                    <lightning-tab label={labels.duplicates} value="duplicates" onactive={handleActive} data-id="tab-duplicates">
+                        <template lwc:if={duplicatesOpened}>
+                            <c-duplicate-review></c-duplicate-review>
+                        </template>
+                    </lightning-tab>
+                    <lightning-tab
+                        label={labels.fieldUtilization}
+                        value="fieldUtilization"
+                        onactive={handleActive}
+                        data-id="tab-fieldUtilization"
+                    >
+                        <template lwc:if={fieldUtilizationOpened}>
+                            <c-field-utilization></c-field-utilization>
+                        </template>
+                    </lightning-tab>
+                    <lightning-tab label={labels.healthCheck} value="healthCheck" onactive={handleActive} data-id="tab-healthCheck">
+                        <template lwc:if={showHealthCheck}>
+                            <c-health-check-panel></c-health-check-panel>
+                        </template>
+                        <template lwc:else>
+                            <p class="slds-var-m-bottom_small">{labels.healthCheckIntro}</p>
+                            <lightning-button
+                                variant="brand"
+                                label={labels.runHealthCheck}
+                                onclick={handleRunHealthCheck}
+                                data-id="run-health-check"
+                            ></lightning-button>
+                        </template>
+                    </lightning-tab>
+                </template>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

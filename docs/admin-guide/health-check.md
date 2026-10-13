@@ -168,7 +168,7 @@ a household with nobody in it.
 ## People with no household, and households with nobody in them
 
 Health Check finds these and links them; it never changes them. To see every one of them, and
-other record checks such as addresses with parts missing, use the **Data Hygiene** tab, which
+other record checks such as addresses with parts missing, use **Data quality** on the **Org Optimizer** tab, which
 opens each list in Find (see [Data hygiene](data-hygiene.md), which also says how the two
 pages differ). Health Check is about whether BarnCRM is set up right; Data hygiene is about
 the records themselves.
