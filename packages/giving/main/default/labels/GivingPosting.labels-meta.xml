@@ -168,4 +168,76 @@
         <shortDescription>Gift unposted notice</shortDescription>
         <value>Unposted. The reason is in the Error Log. Mark it posted again after your next export.</value>
     </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideRestored</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: gift restored</shortDescription>
+        <value>the gift was restored into the books</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideCreated</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: gift created</shortDescription>
+        <value>the gift was created in the books</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideEnteredBooks</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: gift entered a closed period</shortDescription>
+        <value>the gift entered the books dated {0}</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideDeleted</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: gift deleted</shortDescription>
+        <value>the gift was deleted</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideDonorDeleted</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: donor deleted</shortDescription>
+        <value>a donor named by a locked gift was deleted</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideAllocationAdded</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: allocation added</shortDescription>
+        <value>an allocation was added</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideAllocationChanged</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: allocation changed</shortDescription>
+        <value>an allocation was changed</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideAllocationDeleted</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: allocation deleted</shortDescription>
+        <value>an allocation was deleted</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Posting_OverrideAllocationRestored</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Posting lock override: allocation restored</shortDescription>
+        <value>an allocation was restored</value>
+    </labels>
 </CustomLabels>

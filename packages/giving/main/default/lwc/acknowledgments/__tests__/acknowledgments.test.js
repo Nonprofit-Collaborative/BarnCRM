@@ -51,6 +51,18 @@ jest.mock('@salesforce/label/c.Giving_Acknowledgments_Inactive', () => ({ defaul
 });
 
 jest.mock(
+  '@salesforce/label/c.Giving_Acknowledgments_MatchFromAmount',
+  () => ({ default: '{0} and up' }),
+  { virtual: true }
+);
+
+jest.mock(
+  '@salesforce/label/c.Giving_Acknowledgments_MatchUpToAmount',
+  () => ({ default: 'up to {0}' }),
+  { virtual: true }
+);
+
+jest.mock(
   '@salesforce/label/c.Giving_Acknowledgments_Off',
   () => ({
     default:

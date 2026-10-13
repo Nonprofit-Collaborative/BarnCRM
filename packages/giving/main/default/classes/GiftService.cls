@@ -233,7 +233,7 @@ public with sharing class GiftService {
                     new List<String>{
                         String.valueOf(gift.Id),
                         valueOrNone(gift.Receipt_Number__c),
-                        'the gift was created already carrying that receipt number'
+                        Label.Giving_Gift_OverrideCreatedWithNumber
                     }
                 )
             );
@@ -300,48 +300,37 @@ public with sharing class GiftService {
     private static String describeOverride(Gift__c previous, Gift__c gift) {
         List<String> changes = new List<String>();
         if (gift.Amount__c != previous.Amount__c) {
-            changes.add(
-                'amount ' + valueOrNone(previous.Amount__c) + ' to ' + valueOrNone(gift.Amount__c)
-            );
+            changes.add(change(Gift__c.Amount__c, previous.Amount__c, gift.Amount__c));
         }
         if (gift.Gift_Date__c != previous.Gift_Date__c) {
-            changes.add(
-                'gift date ' +
-                    valueOrNone(previous.Gift_Date__c) +
-                    ' to ' +
-                    valueOrNone(gift.Gift_Date__c)
-            );
+            changes.add(change(Gift__c.Gift_Date__c, previous.Gift_Date__c, gift.Gift_Date__c));
         }
         if (gift.Donor_Contact__c != previous.Donor_Contact__c) {
             changes.add(
-                'donor contact ' +
-                    valueOrNone(previous.Donor_Contact__c) +
-                    ' to ' +
-                    valueOrNone(gift.Donor_Contact__c)
+                change(Gift__c.Donor_Contact__c, previous.Donor_Contact__c, gift.Donor_Contact__c)
             );
         }
         if (gift.Donor_Account__c != previous.Donor_Account__c) {
             changes.add(
-                'donor account ' +
-                    valueOrNone(previous.Donor_Account__c) +
-                    ' to ' +
-                    valueOrNone(gift.Donor_Account__c)
+                change(Gift__c.Donor_Account__c, previous.Donor_Account__c, gift.Donor_Account__c)
             );
         }
         if (gift.In_Kind_Description__c != previous.In_Kind_Description__c) {
             changes.add(
-                'in-kind description ' +
-                    valueOrNone(previous.In_Kind_Description__c) +
-                    ' to ' +
-                    valueOrNone(gift.In_Kind_Description__c)
+                change(
+                    Gift__c.In_Kind_Description__c,
+                    previous.In_Kind_Description__c,
+                    gift.In_Kind_Description__c
+                )
             );
         }
         if (gift.Receipt_Number__c != previous.Receipt_Number__c) {
             changes.add(
-                'receipt number ' +
-                    valueOrNone(previous.Receipt_Number__c) +
-                    ' to ' +
-                    valueOrNone(gift.Receipt_Number__c)
+                change(
+                    Gift__c.Receipt_Number__c,
+                    previous.Receipt_Number__c,
+                    gift.Receipt_Number__c
+                )
             );
         }
         return String.format(
@@ -354,8 +343,23 @@ public with sharing class GiftService {
         );
     }
 
+    /**
+     * One moved value for a lock override log line: the field's label, what it was and what it
+     * became, in the order the translated label gives.
+     */
+    public static String change(Schema.SObjectField field, Object before, Object after) {
+        return String.format(
+            Label.Giving_Gift_OverrideChange,
+            new List<String>{
+                field.getDescribe().getLabel(),
+                valueOrNone(before),
+                valueOrNone(after)
+            }
+        );
+    }
+
     private static String valueOrNone(Object value) {
-        return value == null ? 'none' : String.valueOf(value);
+        return value == null ? Label.Giving_Gift_OverrideValueNone : String.valueOf(value);
     }
 
     /**
@@ -399,7 +403,7 @@ public with sharing class GiftService {
                     new List<String>{
                         String.valueOf(gift.Id),
                         valueOrNone(gift.Receipt_Number__c),
-                        'the gift was deleted'
+                        Label.Giving_Gift_OverrideDeleted
                     }
                 )
             );

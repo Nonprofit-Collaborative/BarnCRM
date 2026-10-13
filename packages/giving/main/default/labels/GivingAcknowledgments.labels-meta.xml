@@ -496,4 +496,36 @@
     <shortDescription>Acknowledgments page: a rule with no criteria</shortDescription>
     <value>Any gift</value>
   </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_MergeFileTitle</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Title of the downloadable letter merge file</shortDescription>
+    <value>Acknowledgment letters {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_MatchFromAmount</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Rules table: a rule's lowest amount</shortDescription>
+    <value>{0} and up</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_MatchUpToAmount</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Rules table: a rule's highest amount</shortDescription>
+    <value>up to {0}</value>
+  </labels>
+  <labels>
+    <fullName>Giving_Acknowledgments_MatchFirstGiftOnly</fullName>
+    <categories>Giving, Acknowledgments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Rules table: the rule matches a first gift only</shortDescription>
+    <value>first gift only</value>
+  </labels>
 </CustomLabels>

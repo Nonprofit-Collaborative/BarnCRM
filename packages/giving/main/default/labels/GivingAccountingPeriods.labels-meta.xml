@@ -104,4 +104,12 @@
         <shortDescription>Accounting periods unexpected error</shortDescription>
         <value>Something went wrong. The details are in the Error Log.</value>
     </labels>
+    <labels>
+        <fullName>Giving_Periods_NoDate</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reopened period log entry: no close date</shortDescription>
+        <value>no date</value>
+    </labels>
 </CustomLabels>

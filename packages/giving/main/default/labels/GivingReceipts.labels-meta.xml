@@ -312,4 +312,12 @@
     <shortDescription>Receipts: an unexpected failure with no message</shortDescription>
     <value>That did not work. Try again, and if it keeps happening, ask your administrator to check the Error Log.</value>
   </labels>
+  <labels>
+    <fullName>Giving_Receipt_LogoUnreadable</fullName>
+    <categories>Giving, Receipts</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Error Log warning: the receipt logo file cannot be read</shortDescription>
+    <value>The receipt logo file {0} could not be read, so documents are being produced without a logo. Check that the file still exists and that the people who issue receipts can see it.</value>
+  </labels>
 </CustomLabels>

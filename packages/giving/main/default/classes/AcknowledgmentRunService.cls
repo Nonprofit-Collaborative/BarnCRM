@@ -129,7 +129,10 @@ public with sharing class AcknowledgmentRunService {
 
             if (!inFile.isEmpty()) {
                 run.Merge_File_Document_Id__c = AcknowledgmentWriter.storeMergeFile(
-                    'Acknowledgment letters ' + String.valueOf(Date.today()),
+                    String.format(
+                        Label.Giving_Acknowledgments_MergeFileTitle,
+                        new List<String>{ String.valueOf(Date.today()) }
+                    ),
                     AcknowledgmentLetterMerge.csvFor(inFile, inFileMatches),
                     run.Id
                 );
