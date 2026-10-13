@@ -228,7 +228,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Clearer screens | Minor | Save buttons disable while saving, spinners say what they wait for, and errors use plain words. | Shipped | C-01 |
 | Plainer wording | Minor | Import buttons read Preview, Import these rows and Download rejected rows; schedule times name the time zone; errors point to the Error Log; warning icons are announced to screen readers. | Shipped | UX review |
 | Activity actions on the fallback layout | Minor | The packaged account layout includes Log a Call, New Task and New Event, so its activity panel can create activities. | Shipped | C-08 |
-| Console app with a barn logo | Major | The BarnCRM app opens records in tabs: households, organizations and people in their own tab, addresses, relationships, affiliations and household members as subtabs of their parent; it has a red barn logo and matching header color. | Built, not merged (`feature/console-app-icon`) | ADR-NEXT |
+| Console app with a barn logo | Major | The BarnCRM app opens records in tabs: households, organizations and people in their own tab, addresses, relationships, affiliations and household members as subtabs of their parent; it has a blue barn logo and a matching, darker blue header color. | Built, not merged (`feature/console-app-icon`) | ADR-NEXT |
 
 ---
 

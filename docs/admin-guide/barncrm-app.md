@@ -43,7 +43,7 @@ finish or an error count for a log they cannot open.
 
 ## How records open: tabs in a console
 
-The BarnCRM app is a console app, shown with a red barn logo in the app launcher. Instead of
+The BarnCRM app is a console app, shown with a blue barn logo in the app launcher. Instead of
 replacing the page each time you click, it keeps the records you are working on open side by
 side in tabs across the top.
 

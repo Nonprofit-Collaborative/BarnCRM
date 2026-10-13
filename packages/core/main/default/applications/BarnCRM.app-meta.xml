@@ -33,7 +33,7 @@
     <pageOrSobjectType>Contact</pageOrSobjectType>
   </actionOverrides>
   <brand>
-    <headerColor>#B3261E</headerColor>
+    <headerColor>#007A9E</headerColor>
     <logo>BarnCRM_Logo</logo>
     <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>

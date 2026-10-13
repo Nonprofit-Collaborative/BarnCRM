@@ -24,9 +24,12 @@ page.
    console's navigation is a menu, so the extra items cost little). A child record whose
    parent field is blank opens as its own workspace tab.
 3. **No utility bar.** No existing feature needs one.
-4. **Logo and brand color.** A flat red barn with a white X-braced door, shipped as the
-   ContentAsset `BarnCRM_Logo` and referenced from `<brand><logo>`; header color `#B3261E`
-   matches it. Giving's Fundraising app is unchanged (Core may not reference Giving objects,
+4. **Logo and brand color.** A flat blue barn with a white X-braced door, shipped as the
+   ContentAsset `BarnCRM_Logo` and referenced from `<brand><logo>`. The walls are `#00A8D9`,
+   a bright blue whose shade (only the shade) follows the Blue Bottle Coffee logo, per the
+   owner (2026-10-13). The header color is `#007A9E`, the same hue darkened, which is also
+   the roof color: Lightning puts white text on the header, and `#00A8D9` gives white text
+   only 2.76:1, while `#007A9E` gives 4.91:1 (WCAG AA needs 4.5:1). Giving's Fundraising app is unchanged (Core may not reference Giving objects,
    so Giving records keep their own app's behavior).
 
 ## Consequences
