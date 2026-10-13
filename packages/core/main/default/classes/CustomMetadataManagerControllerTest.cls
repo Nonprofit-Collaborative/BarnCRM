@@ -1,6 +1,10 @@
 /**
  * The custom metadata manager's Apex surface: a holder of Manage BarnCRM Metadata reads, saves
  * and waits on the outcome; anyone else is refused before anything is read.
+ *
+ * Maria holds BarnCRM Admin and BarnCRM Metadata Admin and the tests run as her: a permission
+ * set given to the running user during the test run is not seen by FeatureManagement until a
+ * new user context starts, and reads and saves are in her own mode from API version 67.0.
  */
 @IsTest
 private class CustomMetadataManagerControllerTest {
@@ -13,24 +17,10 @@ private class CustomMetadataManagerControllerTest {
         }
     }
 
-    @TestSetup
-    static void grantPermission() {
-        PermissionSet holder = new PermissionSet(
-            Name = 'Cmdt_Manager_Controller_Test',
-            Label = 'Cmdt Manager Controller Test'
-        );
-        insert holder;
-        List<CustomPermission> permissions = [
-            SELECT Id
-            FROM CustomPermission
-            WHERE DeveloperName = 'Manage_BarnCRM_Metadata'
-            LIMIT 1
-        ];
-        Assert.isFalse(permissions.isEmpty(), 'The package ships Manage BarnCRM Metadata');
-        insert new SetupEntityAccess(ParentId = holder.Id, SetupEntityId = permissions[0].Id);
-        insert new PermissionSetAssignment(
-            AssigneeId = UserInfo.getUserId(),
-            PermissionSetId = holder.Id
+    private static User maria() {
+        return TestDataFactory.createUserOnTheRunningUsersProfile(
+            'Maria',
+            new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Metadata_Admin' }
         );
     }
 
@@ -54,23 +44,28 @@ private class CustomMetadataManagerControllerTest {
 
     @IsTest
     static void mariaSavesAndWaitsForTheOutcome() {
+        User maria = maria();
         noRows();
+        List<CustomMetadataManagerService.TypeView> types;
+        String jobId;
+        CustomMetadataManagerController.Outcome pending;
+        CustomMetadataManagerController.Outcome done;
 
         Test.startTest();
-        List<CustomMetadataManagerService.TypeView> types = CustomMetadataManagerController.getTypes();
-        String jobId = CustomMetadataManagerController.saveRow(TYPE_NAME, closeFriend());
-        CustomMetadataManagerController.Outcome pending = CustomMetadataManagerController.getOutcome(
-            jobId
-        );
-        insert new Setting_Change__c(
-            Setting_Name__c = 'Relationship_Type.Org_Close_friend',
-            Changed_By__c = UserInfo.getUserId(),
-            Changed_At__c = System.now(),
-            Deployment_Id__c = jobId
-        );
-        CustomMetadataManagerController.Outcome done = CustomMetadataManagerController.getOutcome(
-            jobId
-        );
+        System.runAs(maria) {
+            types = CustomMetadataManagerController.getTypes();
+            jobId = CustomMetadataManagerController.saveRow(TYPE_NAME, closeFriend());
+            pending = CustomMetadataManagerController.getOutcome(jobId);
+            // What the deploy callback writes when the deployment succeeds, in system mode as
+            // the callback writes it: the audit row is the package's bookkeeping.
+            insert as system new Setting_Change__c(
+                Setting_Name__c = 'Relationship_Type.Org_Close_friend',
+                Changed_By__c = UserInfo.getUserId(),
+                Changed_At__c = System.now(),
+                Deployment_Id__c = jobId
+            );
+            done = CustomMetadataManagerController.getOutcome(jobId);
+        }
         Test.stopTest();
 
         Assert.areEqual(1, types.size(), 'One editable list');
@@ -81,7 +76,9 @@ private class CustomMetadataManagerControllerTest {
 
     @IsTest
     static void aFailedDeploymentComesBackWithItsMessage() {
+        User maria = maria();
         noRows();
+        CustomMetadataManagerController.Outcome failed;
 
         Test.startTest();
         ErrorLogger.logMessage(
@@ -92,15 +89,16 @@ private class CustomMetadataManagerControllerTest {
         );
         Test.stopTest();
 
-        CustomMetadataManagerController.Outcome failed = CustomMetadataManagerController.getOutcome(
-            String.valueOf(JOB)
-        );
+        System.runAs(maria) {
+            failed = CustomMetadataManagerController.getOutcome(String.valueOf(JOB));
+        }
         Assert.areEqual(CustomMetadataManagerController.FAILED, failed.status, 'Failed');
         Assert.areEqual('The change to Close friend was not saved: no.', failed.message, 'Why');
     }
 
     @IsTest
     static void aRefusalIsShownAsItIsAndArchiveUsesTheSamePath() {
+        User maria = maria();
         noRows();
         String saveMessage;
         String archiveMessage;
@@ -109,20 +107,22 @@ private class CustomMetadataManagerControllerTest {
         unnamed.label = '';
 
         Test.startTest();
-        try {
-            CustomMetadataManagerController.saveRow(TYPE_NAME, unnamed);
-        } catch (AuraHandledException e) {
-            saveMessage = e.getMessage();
-        }
-        try {
-            CustomMetadataManagerController.setArchived(TYPE_NAME, 'Org_Missing', true);
-        } catch (AuraHandledException e) {
-            archiveMessage = e.getMessage();
-        }
-        try {
-            CustomMetadataManagerController.getOutcome('not an id');
-        } catch (AuraHandledException e) {
-            outcomeMessage = e.getMessage();
+        System.runAs(maria) {
+            try {
+                CustomMetadataManagerController.saveRow(TYPE_NAME, unnamed);
+            } catch (AuraHandledException e) {
+                saveMessage = e.getMessage();
+            }
+            try {
+                CustomMetadataManagerController.setArchived(TYPE_NAME, 'Org_Missing', true);
+            } catch (AuraHandledException e) {
+                archiveMessage = e.getMessage();
+            }
+            try {
+                CustomMetadataManagerController.getOutcome('not an id');
+            } catch (AuraHandledException e) {
+                outcomeMessage = e.getMessage();
+            }
         }
         Test.stopTest();
 
