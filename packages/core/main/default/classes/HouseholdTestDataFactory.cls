@@ -103,27 +103,11 @@ public class HouseholdTestDataFactory {
 
     /**
      * A user with an ordinary standard profile and no packaged permission set at all: the
-     * shape of user that a household save must still work for.
+     * shape of user that a household save must still work for. Built by
+     * `TestUsers.standardUser`.
      */
     public static User standardUser(String nickname) {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        String unique = nickname + DateTime.now().getTime();
-        User result = new User(
-            ProfileId = standard.Id,
-            LastName = 'Tester',
-            Alias = 'tstr',
-            Email = unique + '@barncrm.test',
-            Username = unique + '@barncrm.test.invalid',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US',
-            LocaleSidKey = 'en_US',
-            TimeZoneSidKey = 'America/New_York'
-        );
-        // Saved on its own so that creating a user and creating records never mix.
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insert result;
-        }
-        return result;
+        return TestUsers.standardUser(nickname);
     }
 
     /**
@@ -165,7 +149,7 @@ public class HouseholdTestDataFactory {
             insert grant;
             insert new ObjectPermissions(
                 ParentId = grant.Id,
-                SobjectType = 'Household_Member__c',
+                SobjectType = String.valueOf(Household_Member__c.SObjectType),
                 PermissionsRead = true,
                 PermissionsCreate = mayCreate
             );
@@ -174,8 +158,10 @@ public class HouseholdTestDataFactory {
                 reads.add(
                     new FieldPermissions(
                         ParentId = grant.Id,
-                        SobjectType = 'Household_Member__c',
-                        Field = 'Household_Member__c.' + field,
+                        SobjectType = String.valueOf(Household_Member__c.SObjectType),
+                        Field = String.valueOf(Household_Member__c.SObjectType) +
+                            '.' +
+                            NamespaceUtil.qualify(field),
                         PermissionsRead = true,
                         PermissionsEdit = mayCreate
                     )

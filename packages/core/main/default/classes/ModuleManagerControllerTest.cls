@@ -77,22 +77,7 @@ private class ModuleManagerControllerTest {
     static void davidReadsTheListAndCannotSwitch() {
         System.runAs(TestUsers.admin()) {
             volunteersInstalled();
-            Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-            User david = new User(
-                FirstName = 'David',
-                LastName = 'Okonkwo',
-                Alias = 'davidm',
-                Email = 'david.modules@example.com',
-                Username = 'david.modules.' + DateTime.now().getTime() + '@example.com',
-                ProfileId = standard.Id,
-                TimeZoneSidKey = 'America/New_York',
-                LocaleSidKey = 'en_US',
-                EmailEncodingKey = 'UTF-8',
-                LanguageLocaleKey = 'en_US'
-            );
-            System.runAs(new User(Id = UserInfo.getUserId())) {
-                insert david;
-            }
+            User david = TestUsers.standardUser('Okonkwo');
             Integer refused = 0;
 
             Test.startTest();

@@ -19,19 +19,7 @@ private class SetupAssistantControllerTest {
     }
 
     private static User buildDavid() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        return new User(
-            FirstName = 'David',
-            LastName = 'Okonkwo',
-            Alias = 'davids',
-            Email = 'david.setup@example.com',
-            Username = 'david.setup.' + DateTime.now().getTime() + '@example.com',
-            ProfileId = standard.Id,
-            TimeZoneSidKey = 'America/New_York',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
+        return SettingsTestPermissions.buildStandardUser('David', 'Okonkwo', 'davids');
     }
 
     @IsTest
