@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-12.
+Last refreshed from BMemory 2026-10-13.
 
 ## Decision log (plan Section 12)
 
@@ -41,8 +41,14 @@ Last refreshed from BMemory 2026-10-12.
 | D-31 | 2026-10-12 | Rollup operations: count distinct its own operation, delimiter picklist, Any and None read no field, count distinct into plain numbers only, unfit target refused |
 | D-32 | 2026-10-12 | Rollup Builder estimate uses 1,650 records a minute until measured; S14 only if the scale test needs it |
 | D-33 | 2026-10-12 | Tests run as a permission-set user (`TestUsers`, on the running user's profile), checked by `check-tests-run-as.py` |
+| D-34 | 2026-10-13 | C-37 part 2: bulk delete run limit default 10,000 (at most 48,000); `Bulk_Delete_Records` only in its own `BarnCRM_Bulk_Delete` permission set; undo until the earlier of the import undo window and 15 days; bulk update refuses a transform result the field cannot take (ADR-0091) |
+| D-35 | 2026-10-13 | Merge survivors' real-time totals recalculated by a queueable just after the merge (ADR-0092) |
+| D-36 | 2026-10-13 | Import uses a Person Account record type available to the running user; with none, it creates nobody and logs one note (#221) |
+| D-37 | 2026-10-13 | Field utilization runs on demand from its own Field Utilization tab; no scheduled job, history or tracked list (supersedes those parts of ADR-0086 and D-26; ADR on `feature/field-utilization-on-demand`) |
+| D-38 | 2026-10-13 | Priority: a Core quality pass (test, optimize, improve, simplify, nothing removed) comes before C-38 and the non-core modules |
+| D-39 | 2026-10-13 | All 14 recommended platform features join the Core quality pass as Q-01 to Q-14, built in parallel now (`feature/q-NN-<slug>`; Q-14 optional, approved); C-38 on hold until Brandon is ready to start the next version |
 
-D-25 to D-33 were accepted under the owner's standing instruction "proceed as recommended" (2026-10-12); the owner may amend them.
+D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-39 are Brandon's own decisions.
 
 ## Open questions still open (plan Section 11.2)
 
@@ -61,7 +67,7 @@ D-25 to D-33 were accepted under the owner's standing instruction "proceed as re
 
 ## Parking lot (plan Section 11.3)
 
-Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap and 6 BarnCRM rename merged with #181; 5 small review items landing (#203 in #217); 2 (log unrecognized checkbox values in imports) has no branch yet. Work items from the 2026-10-12 landing (plan 11.3): rollup S9 after a clean comparison run; C-35 adopts the C-37 transforms, then bulk delete; "Data jobs" relabel; `FieldUtilizationJob` in `NightlyJobs`; test self-containment follow-ups; version for `v1.x-draft-advanced-find.md`; ADR-0088 still Proposed; org checks during the `barn-npc` deploy; `mwdbdevsb` real validation on hold.
+Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap and 6 BarnCRM rename merged with #181; 5 small review items landing (#203 in #217); 2 (log unrecognized checkbox values in imports) has no branch yet. Work items from the 2026-10-12 landing (plan 11.3): rollup S9 after a clean comparison run; C-35 adopting the C-37 transforms, then bulk delete (done, #219); "Data jobs" relabel; `FieldUtilizationJob` in `NightlyJobs` (dropped, D-37); test self-containment follow-ups; version for `v1.x-draft-advanced-find.md`; ADR-0088 still Proposed; org checks for `barn-npc` (`main` deployed there 2026-10-13 and passes; confirm the rest by hand); `mwdbdevsb` real validation on hold.
 
 ## Working agreements (owner instructions)
 

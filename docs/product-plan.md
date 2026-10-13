@@ -573,11 +573,33 @@ Each iteration targets about three major and five minor features, plus engineeri
 
 ### 6.0 Near-term queue (owner decisions, 2026-10-13)
 
-1. Core quality pass (review under way; D-38): existing Core features are thoroughly tested, optimized, improved and simplified, without removing functionality. It comes before scheduled imports and connections (C-38) and before the non-core modules (Volunteers, Programs, Funders, X-07 and so on).
-2. In progress: the BarnCRM app becomes a Lightning console app with an app icon (owner request, `feature/console-app-icon`).
-3. In progress: field utilization on demand from its own Field Utilization tab (D-37, `feature/field-utilization-on-demand`).
-4. Rollup S9 after a clean engine comparison run; S14 only if the scale test needs it; S15 to S17 spike.
-5. After the Core quality pass: C-38 and the non-core modules, in the order of Section 6.
+1. Core quality pass (D-38, D-39): existing Core features are thoroughly tested, optimized, improved and simplified, without removing functionality. It comes before the non-core modules (Volunteers, Programs, Funders, X-07 and so on). In the pass, built in parallel:
+   - Seven Core reviews; their findings become fix batches.
+   - Q-01 to Q-14, the recommended platform features (D-39; table below), each on its own branch `feature/q-NN-<slug>`.
+   - SLDS 2 linter gate (PR #223; every component passes).
+   - The BarnCRM app becomes a Lightning console app with an app icon (owner request, `feature/console-app-icon`).
+   - Field utilization on demand from its own Field Utilization tab (D-37, `feature/field-utilization-on-demand`).
+   - Test self-containment (`fix/tests-self-contained`).
+   - Rollup S9 after a clean engine comparison run; S14 only if the scale test needs it; S15 to S17 spike.
+2. On hold: scheduled imports and connections (C-38) stay on hold until Brandon is ready to start the next version (D-39; stronger than D-38's "after the Core quality pass").
+3. After the Core quality pass: the non-core modules, in the order of Section 6.
+
+| ID | Platform feature in the Core quality pass (D-39) |
+|---|---|
+| Q-01 | Real-time rollups run off the save transaction |
+| Q-02 | RunRelevantTests and `isCritical`/`testFor` for fast gates |
+| Q-03 | Apex Cursors for large-volume jobs (also removes the 200-row cap on import exceptions) |
+| Q-04 | Custom Notifications when long jobs finish |
+| Q-05 | `lightning/modal`, toast, alert and confirm |
+| Q-06 | GraphQL and Lightning Data Service reads |
+| Q-07 | Workspace API in the console app |
+| Q-08 | Dynamic Forms, Related Lists and Actions on every record page |
+| Q-09 | User Access Policies |
+| Q-10 | In-App Guidance |
+| Q-11 | Platform Cache |
+| Q-12 | Scratch org snapshots |
+| Q-13 | ApexGuru and Scale Center |
+| Q-14 | Agentforce-ready invocable actions (optional; approved) |
 
 ### 6.1 Post-1.0 themes (parking, ordered by expected demand)
 
@@ -982,6 +1004,7 @@ Adding any package dependency; adding a standard-object reference outside Connec
 | D-36 | Import chooses a Person Account record type available to the running user; if there is none it creates nobody and logs one note (#221; accepted under the owner's standing instruction 'proceed as recommended', 2026-10-13; owner may amend) | Using a record type the user cannot use and failing every row | One clear note beats a flood of identical row errors, and no record is created under a record type the user cannot see |
 | D-37 | Field utilization runs on demand from its own Field Utilization tab (owner decision, Brandon, 2026-10-13; a new ADR on `feature/field-utilization-on-demand`, numbered when it lands, records it): pick an object, and its fields and their utilization are shown; there is no nightly or weekly job. Supersedes the schedule, batch, tracked-list and retention parts of ADR-0086 and the weekly run in D-26. `FieldUtilizationJob` is not registered in `NightlyJobs` | The weekly user-mode snapshot job with 13 months of history (D-26) | One question asked on demand needs no scheduled job, stored history or tracked-object list |
 | D-38 | Priority (owner decision, Brandon, 2026-10-13): existing Core features are thoroughly tested, optimized, improved and simplified, without removing functionality, before work moves to scheduled imports and connections (C-38) or other non-core modules (Volunteers, Programs, Funders, X-07 and so on). A Core quality pass (review under way) comes first and C-38 stays after it (Section 6.0) | Continuing with new modules and C-38 while the Core review runs | Core is what every other module stands on; defects and complexity found now cost less than after more modules depend on it |
+| D-39 | Platform features in the Core quality pass, and C-38 on hold (owner decision, Brandon, 2026-10-13; extends D-38 and D-23): all 14 recommended platform features are part of the Core quality pass and are built in parallel now as Q-01 to Q-14 (Section 6.0), each on its own branch `feature/q-NN-<slug>`; Q-14 (Agentforce-ready invocable actions) is optional and approved. Scheduled imports and connections (C-38) stay on hold until Brandon is ready to start the next version, which is stronger than D-38's "after the Core quality pass" | Adopting the features one at a time after the pass; starting C-38 as soon as the pass ends | Standard platform features replace custom code and speed up the gates while Core is already being tested and simplified; the next version's start stays an owner call |
 
 ---
 

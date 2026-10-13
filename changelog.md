@@ -6,8 +6,14 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ## 2026-10-13
 
+### Claude sessions
+
+- Q-01 to Q-14 started: the 14 recommended platform features, built in parallel as part of the Core quality pass, each on `feature/q-NN-<slug>` (D-39).
+- BMemory plan updated (commits ba5273a1, 4e5a5ffb): Section 6.0 lists Q-01 to Q-14 and the in-flight Core quality pass work, and C-38 is on hold until Brandon is ready to start the next version; decision D-39 recorded. `docs/product-plan.md`, `roadmap.md` and `memory.md` refreshed from it (branch `docs/q-pass-plan`).
+
 ### Merged to main
 
+- Plan mirror (#222, squash 55e6b3d9): `docs/product-plan.md` refreshed with status after #219 to #221, BarnCRM names, and decisions D-34 to D-38.
 - Landing batch 7 (#219, squash fe05faa3): everything that was built but not merged, batches 2 to 6 (including the Rollup Builder), org test fixes, test self-containment (`TestUsers`), v0.11 hardening, security follow-ups, C-37 part 2 and the merge survivors recalculation (ADR-0092). PRs #201 to #218 closed as landed through #219. Not landed: `feature/rollup-s9-remove-vendored`; rollup S14 is unbuilt.
 - Batch 5 org test fixes: dates no longer shift a day for users west of GMT; merged records' totals recalculated just after the merge (ADR-0092); import bookkeeping fields written in system mode; blank selected fields filled on import; `Setting_Change__c.Deployment_Id__c` readable; `TestUsers.adminWithInstalledModules`.
 - v0.11 hardening: accessibility in 20 LWCs; Error Log technical detail admin only; user search and receipt preview permission gated; translation of Giving messages; security checklist.
