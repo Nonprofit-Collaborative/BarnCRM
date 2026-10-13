@@ -115,6 +115,28 @@ public virtual with sharing class TriggerHandler {
     }
 
     /**
+     * Records a failure in the Error Log (R-E1) and puts the given message on every record
+     * that does not already carry one: a record already refused with a message that tells the
+     * person what to change keeps it, and a second message would bury it.
+     */
+    protected void reportFailure(
+        Exception thrown,
+        List<SObject> records,
+        String context,
+        String message
+    ) {
+        ErrorLogger.log(thrown, context);
+        if (records == null) {
+            return;
+        }
+        for (SObject record : records) {
+            if (!record.hasErrors()) {
+                record.addError(message);
+            }
+        }
+    }
+
+    /**
      * The stable name of this automation, matching its Automation Setting row and its entry in
      * the shipped registry. A handler may override it; by default it is the class name.
      *

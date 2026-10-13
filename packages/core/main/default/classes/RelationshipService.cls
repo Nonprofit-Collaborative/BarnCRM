@@ -43,8 +43,6 @@ public with sharing class RelationshipService {
     public static final String VALIDATION_AUTOMATION_NAME = 'Relationship_Validation';
 
     @TestVisible
-    private static final String STATUS_CURRENT = 'Current';
-    @TestVisible
     private static final String TYPE_OTHER = 'Other';
 
     private static Map<String, String> reciprocalByType;
@@ -426,7 +424,9 @@ public with sharing class RelationshipService {
             Related_Person_Account__c = record.Person_Account__c,
             Type__c = otherSideTypeOf(record),
             Reciprocal_Type__c = record.Type__c,
-            Status__c = String.isBlank(record.Status__c) ? STATUS_CURRENT : record.Status__c,
+            Status__c = String.isBlank(record.Status__c)
+                ? ConnectionStatus.CURRENT
+                : record.Status__c,
             Start_Date__c = record.Start_Date__c,
             End_Date__c = record.End_Date__c,
             Description__c = record.Description__c,

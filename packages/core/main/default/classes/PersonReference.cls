@@ -73,4 +73,19 @@ public with sharing class PersonReference {
         String second = keyOf(secondContactId, secondAccountId);
         return first != null && first == second;
     }
+
+    /**
+     * The name to show for a person held as a contact or as a person account, whichever
+     * record is present with a name, or the given fallback (the caller's "unnamed" label).
+     */
+    @NamespaceAccessible
+    public static String nameOf(Contact asContact, Account asAccount, String fallback) {
+        if (asContact != null && String.isNotBlank(asContact.Name)) {
+            return asContact.Name;
+        }
+        if (asAccount != null && String.isNotBlank(asAccount.Name)) {
+            return asAccount.Name;
+        }
+        return fallback;
+    }
 }

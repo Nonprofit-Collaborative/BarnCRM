@@ -15,11 +15,6 @@
  * so the mirror is built already valid rather than validated on the way in.
  */
 public with sharing class RelationshipDomain {
-    @TestVisible
-    private static final String STATUS_CURRENT = 'Current';
-    @TestVisible
-    private static final String STATUS_FORMER = 'Former';
-
     /**
      * The two computed values: what this person is to the other one (R-RL3), and a status
      * that agrees with the dates (R-RL5).
@@ -49,16 +44,11 @@ public with sharing class RelationshipDomain {
             if (String.isBlank(record.Reciprocal_Type__c) || typeChanged) {
                 record.Reciprocal_Type__c = RelationshipService.reciprocalOf(record.Type__c);
             }
-            if (String.isBlank(record.Status__c)) {
-                record.Status__c = STATUS_CURRENT;
-            }
-            if (record.End_Date__c != null) {
-                record.Status__c = STATUS_FORMER;
-                continue;
-            }
-            if (previous != null && previous.End_Date__c != null) {
-                record.Status__c = STATUS_CURRENT;
-            }
+            record.Status__c = ConnectionStatus.settle(
+                record.Status__c,
+                record.End_Date__c,
+                previous?.End_Date__c
+            );
         }
     }
 
@@ -205,8 +195,16 @@ public with sharing class RelationshipDomain {
         return String.format(
             Label.Core_Relationship_Duplicate,
             new List<String>{
-                nameOf(existing.Contact__r, existing.Person_Account__r),
-                nameOf(existing.Related_Contact__r, existing.Related_Person_Account__r),
+                PersonReference.nameOf(
+                    existing.Contact__r,
+                    existing.Person_Account__r,
+                    Label.Core_Relationship_UnnamedPerson
+                ),
+                PersonReference.nameOf(
+                    existing.Related_Contact__r,
+                    existing.Related_Person_Account__r,
+                    Label.Core_Relationship_UnnamedPerson
+                ),
                 existing.Name
             }
         );
@@ -214,15 +212,5 @@ public with sharing class RelationshipDomain {
 
     private static String duplicateMessageWithin() {
         return Label.Core_Relationship_DuplicateInSave;
-    }
-
-    private static String nameOf(Contact asContact, Account asAccount) {
-        if (asContact != null && String.isNotBlank(asContact.Name)) {
-            return asContact.Name;
-        }
-        if (asAccount != null && String.isNotBlank(asAccount.Name)) {
-            return asAccount.Name;
-        }
-        return Label.Core_Relationship_UnnamedPerson;
     }
 }

@@ -40,9 +40,6 @@ public with sharing class AffiliationService {
     private static final String CONTACT_ADDRESS_HANDLER = 'Contact_Address_Capture';
     private static final String ACCOUNT_ADDRESS_HANDLER = 'Account_Address_Capture';
 
-    @TestVisible
-    private static final String STATUS_FORMER = 'Former';
-
     /**
      * Settles the primary affiliation of every person any of these records touches. The old
      * copies are passed in as well so that a person who has just lost an affiliation, or has
@@ -143,7 +140,10 @@ public with sharing class AffiliationService {
         Affiliation__c fromThisSave;
         Affiliation__c newest;
         for (Affiliation__c affiliation : affiliations) {
-            if (affiliation.Is_Primary__c != true || affiliation.Status__c == STATUS_FORMER) {
+            if (
+                affiliation.Is_Primary__c != true ||
+                affiliation.Status__c == ConnectionStatus.FORMER
+            ) {
                 continue;
             }
             if (justSaved != null && justSaved.contains(affiliation.Id)) {

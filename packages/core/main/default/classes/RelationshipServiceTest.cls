@@ -505,14 +505,14 @@ private class RelationshipServiceTest {
             BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
             settings.Relationship_Auto_Reciprocal__c = false;
             upsert settings;
-            SettingsService.clearCache();
+            SettingsService.clearCaches();
             update new Relationship__c(
                 Id = otherSideOf(people[1].Id).Id,
                 Description__c = 'Typed while the upkeep was off'
             );
             settings.Relationship_Auto_Reciprocal__c = true;
             upsert settings;
-            SettingsService.clearCache();
+            SettingsService.clearCaches();
 
             Test.startTest();
             update new Relationship__c(Id = saved.Id);
