@@ -288,6 +288,183 @@ private class DataTransformTest {
         }
     }
 
+    private static DataTransform.Step mapStep(String otherwise, Boolean matchCase) {
+        DataTransform.Step result = step(DataTransform.OP_MAP);
+        result.pairs = new List<DataTransform.Pair>{
+            new DataTransform.Pair('CA', 'California'),
+            new DataTransform.Pair('NY', 'New York'),
+            new DataTransform.Pair('ca', 'Small ca')
+        };
+        result.otherwise = otherwise;
+        result.matchCase = matchCase;
+        return result;
+    }
+
+    private static DataTransform.Step ifThenStep(String test, String text, String value) {
+        DataTransform.Step result = step(DataTransform.OP_IF_THEN);
+        result.test = test;
+        result.text = text;
+        result.value = value;
+        return result;
+    }
+
+    private static DataTransform.Step partStep(
+        String separator,
+        Integer position,
+        Boolean fromEnd
+    ) {
+        DataTransform.Step result = step(DataTransform.OP_PART);
+        result.separator = separator;
+        result.position = position;
+        result.fromEnd = fromEnd;
+        return result;
+    }
+
+    private static DataTransform.Step shiftStep(Integer amount, String unit) {
+        DataTransform.Step result = step(DataTransform.OP_SHIFT_DATE);
+        result.amount = amount;
+        result.unit = unit;
+        return result;
+    }
+
+    @IsTest
+    static void mapsValuesFromATable() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual(
+                'California',
+                one(mapStep(null, false), ' ca '),
+                'Trimmed, any capitals.'
+            );
+            Assert.areEqual('New York', one(mapStep(null, false), 'NY'));
+            Assert.areEqual('TX', one(mapStep(null, false), 'TX'), 'Not listed is kept.');
+            Assert.areEqual(
+                'Other',
+                one(mapStep('Other', false), 'TX'),
+                'Or becomes anything else.'
+            );
+            Assert.areEqual('', one(mapStep('Other', false), ''), 'An empty value stays empty.');
+            Assert.areEqual(
+                'Small ca',
+                one(mapStep(null, true), 'ca'),
+                'Match capitals tells ca from CA.'
+            );
+        }
+    }
+
+    @IsTest
+    static void writesAValueWhenATestHolds() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual('', one(ifThenStep('equals', 'N/A', ''), ' n/a '), 'Equals clears.');
+            Assert.areEqual('Ana', one(ifThenStep('equals', 'N/A', ''), 'Ana'), 'Else kept.');
+            Assert.areEqual('Test', one(ifThenStep('contains', 'test', 'Test'), 'a TEST row'));
+            Assert.areEqual('Unknown', one(ifThenStep('blank', null, 'Unknown'), '  '));
+            DataTransform.Step otherwise = ifThenStep('contains', '@', 'Has email');
+            otherwise.otherwise = 'No email';
+            Assert.areEqual('No email', one(otherwise, 'Ana'), 'Otherwise when it fails.');
+            Assert.areEqual('Has email', one(otherwise, 'ana@example.org'));
+        }
+    }
+
+    @IsTest
+    static void keepsOnePart() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual('example.org', one(partStep('@', 2, false), 'ana@example.org'));
+            Assert.areEqual('Ramirez', one(partStep(' ', 1, true), 'Ana M Ramirez'));
+            Assert.areEqual('John', one(partStep(',', 2, false), 'Smith, John'), 'Trimmed.');
+            Assert.areEqual('', one(partStep('@', 3, false), 'ana@example.org'), 'No part 3.');
+            Assert.areEqual('a.b', one(partStep('.*', 1, false), 'a.b.*c'), 'Literal separator.');
+        }
+    }
+
+    @IsTest
+    static void keepsFirstOrLastCharacters() {
+        System.runAs(TestUsers.admin()) {
+            DataTransform.Step first = step(DataTransform.OP_FIRST);
+            first.count = 5;
+            DataTransform.Step last = step(DataTransform.OP_LAST);
+            last.count = 4;
+            Assert.areEqual('97201', one(first, '97201-1234'));
+            Assert.areEqual('1234', one(last, '97201-1234'));
+            Assert.areEqual('972', one(first, '972'), 'A shorter value is kept whole.');
+            Assert.isNull(one(first, null));
+        }
+    }
+
+    @IsTest
+    static void shiftsADateAndWritesToday() {
+        System.runAs(TestUsers.admin()) {
+            Assert.areEqual('2025-02-28', one(shiftStep(1, 'months'), '2025-01-31'));
+            Assert.areEqual('2025-12-01', one(shiftStep(-30, 'days'), '2025-12-31'));
+            Assert.areEqual(
+                '2026-01-05',
+                one(shiftStep(4, 'days'), '2026-01-01 00:00:00'),
+                'A stored date with a time reads.'
+            );
+            Assert.areEqual('soon', one(shiftStep(4, 'days'), 'soon'), 'Not a date is kept.');
+            Assert.areEqual(
+                '3999-12-31',
+                one(shiftStep(1200, 'months'), '3999-12-31'),
+                'Past 4000 is kept.'
+            );
+            String today = String.valueOf(Date.today()).left(10);
+            DataTransform.Step always = step(DataTransform.OP_TODAY);
+            Assert.areEqual(today, one(always, 'Ana'));
+            DataTransform.Step whenBlank = step(DataTransform.OP_TODAY);
+            whenBlank.whenBlank = true;
+            Assert.areEqual('2020-01-01', one(whenBlank, '2020-01-01'), 'Only when empty.');
+            Assert.areEqual(today, one(whenBlank, ''));
+        }
+    }
+
+    @IsTest
+    static void namesWhatIsWrongWithTheNewerSteps() {
+        System.runAs(TestUsers.admin()) {
+            DataTransform.Step emptyMap = step(DataTransform.OP_MAP);
+            DataTransform.Step noTest = ifThenStep(null, 'x', 'y');
+            DataTransform.Step noText = ifThenStep('equals', '', 'y');
+            DataTransform.Step noSeparator = partStep('', 1, false);
+            DataTransform.Step partZero = partStep('@', 0, false);
+            DataTransform.Step noCount = step(DataTransform.OP_FIRST);
+            DataTransform.Step tooFar = shiftStep(5000, 'months');
+            DataTransform.Step noUnit = shiftStep(1, 'weeks');
+            for (
+                DataTransform.Step broken : new List<DataTransform.Step>{
+                    emptyMap,
+                    noTest,
+                    noText,
+                    noSeparator,
+                    partZero,
+                    noCount,
+                    tooFar,
+                    noUnit
+                }
+            ) {
+                Assert.isNotNull(DataTransform.problemWith(broken), 'Refused: ' + broken.op);
+                Assert.areEqual('kept', one(broken, 'kept'), 'Skipped on read: ' + broken.op);
+            }
+            Assert.isNull(DataTransform.problemWith(ifThenStep('blank', null, 'x')));
+            Assert.isNull(DataTransform.problemWith(step(DataTransform.OP_TODAY)));
+            Assert.areEqual(2, DataTransform.DOCUMENT_VERSION, 'The step document is version 2.');
+        }
+    }
+
+    @IsTest
+    static void readsTheNewerStepsFromTheStoredDocument() {
+        System.runAs(TestUsers.admin()) {
+            List<DataTransform.Step> steps = DataTransform.parse(
+                '[{"op":"map","pairs":[{"text":"M","value":"Monthly"}],"otherwise":"Once"},' +
+                '{"op":"shiftDate","amount":-1,"unit":"days"},{"op":"futureOp"}]'
+            );
+            Assert.areEqual('Monthly', steps[0].pairs[0].value);
+            Assert.areEqual(-1, steps[1].amount);
+            Assert.areEqual(
+                'Monthly',
+                DataTransform.apply(new List<DataTransform.Step>{ steps[0], steps[2] }, 'm', null),
+                'An operation this version does not know is skipped.'
+            );
+        }
+    }
+
     @IsTest
     static void changesTwoHundredRowsOfValues() {
         System.runAs(TestUsers.admin()) {

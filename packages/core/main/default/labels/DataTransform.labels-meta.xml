@@ -64,4 +64,44 @@
         <shortDescription>Import wizard: a column&apos;s changes cannot be saved</shortDescription>
         <value>The changes to column {0} cannot be saved. {1}</value>
     </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorNeedsPairs</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: map values has no usable rows</shortDescription>
+        <value>Map values needs 1 to {0} rows, each with the value to look for (at most 255 characters).</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorNeedsTest</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: if then has no test</shortDescription>
+        <value>If, then needs a test: equals, contains or is empty.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorPart</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: keep part has no separator or part</shortDescription>
+        <value>Keep part needs a separator (at most 10 characters) and a part from 1 to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorCount</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: first or last characters has no count</shortDescription>
+        <value>First or last characters needs a number of characters from 1 to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Transform_ErrorShift</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column changes: shift a date has no amount or unit</shortDescription>
+        <value>Shift a date needs days or months and a whole number of them (at most 36600 days or 1200 months either way).</value>
+    </labels>
 </CustomLabels>

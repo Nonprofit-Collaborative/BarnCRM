@@ -125,6 +125,12 @@ in the order listed:
 | **Value when empty** | Gives an empty field a value. | empty becomes `Unknown` |
 | **Add other fields** | Adds the values of other fields of the same record after this one, with a separator you choose (a space unless you type another). An empty one is left out. | First Name with Last Name becomes `Ana Ramirez` |
 | **Read as a date** | Reads a date written month first, day first or year first and writes it the way Salesforce reads it. | day first: `31/12/2025` becomes `2025-12-31` |
+| **Map values** | Changes each value listed in a table (up to 100 rows) to the value beside it. A value not in the table is kept, or becomes the value in **Anything else** if you give one. | `M` becomes `Monthly` |
+| **If, then** | When the value equals some text, contains it, or is empty, writes the value you give (empty clears the field); **Otherwise** is written when the test fails, or the value is kept. | contains `test`: becomes `Do not mail` |
+| **Keep part** | Splits the value at a separator and keeps one part, from the start or the end. | separator `@`, part 2: `ana@example.org` becomes `example.org` |
+| **First characters**, **Last characters** | Keeps the first or last number of characters you give. | first 5: `97201-1234` becomes `97201` |
+| **Shift a date** | Adds or takes away days or months. Use it on date fields: a date and time field refuses the result, record by record. | minus 30 days: `2025-12-31` becomes `2025-12-01` |
+| **Today's date** | Writes today's date, or only into empty fields if you tick **Only when empty**. | empty becomes today |
 
 The steps work on the value as text, and the result is then saved as the field's type: a
 number field takes `1,250.00` as 1250, a checkbox takes `true`, `yes` or `1` as ticked, and a

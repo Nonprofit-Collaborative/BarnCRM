@@ -140,6 +140,46 @@ private class BulkUpdateTransformTest {
     }
 
     @IsTest
+    static void newerStepsChangeTwoHundredRecords() {
+        System.runAs(TestUsers.admin()) {
+            makeVolunteers(200);
+            Map<String, Object> mapValues = step(DataTransform.OP_MAP);
+            mapValues.put(
+                'pairs',
+                new List<Object>{
+                    new Map<String, Object>{ 'text' => 'volunteer', 'value' => 'Helper, Events' }
+                }
+            );
+            Map<String, Object> keepPart = step(DataTransform.OP_PART);
+            keepPart.putAll(new Map<String, Object>{ 'separator' => ',', 'position' => 2 });
+            Map<String, Object> ifThen = step(DataTransform.OP_IF_THEN);
+            ifThen.putAll(
+                new Map<String, Object>{
+                    'test' => 'equals',
+                    'text' => 'events',
+                    'value' => 'Event lead'
+                }
+            );
+            Import_Batch__c job = run(
+                transform('Title', new List<Map<String, Object>>{ mapValues, keepPart, ifThen }),
+                200
+            );
+
+            System.Assert.areEqual(
+                ImportBatchService.STATUS_COMPLETE,
+                job.Status__c,
+                job.Run_Log__c
+            );
+            System.Assert.areEqual(200, job.Rows_Updated__c, 'Every record is changed');
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Contact WHERE Title = 'Event lead'],
+                'Mapped, split and tested in order'
+            );
+        }
+    }
+
+    @IsTest
     static void aChangeOnlyInCapitalsIsStillWritten() {
         System.runAs(TestUsers.admin()) {
             makeVolunteers(200);

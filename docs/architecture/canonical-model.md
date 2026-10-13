@@ -1854,6 +1854,16 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 | `ifBlank` | `value` (required, at most 255) | The value, when the value so far is blank. |
 | `append` | `columns` (1 to 5 source column names of the same row), `separator` (at most 10, default one space) | Adds the named columns' values after the value so far, leaving blank ones out, joined by the separator. |
 | `date` | `dateOrder`: `MDY`, `DMY` or `YMD` | Reads the first three numbers, separated by any characters that are not digits, in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
+| `map` | `pairs`: 1 to 100 of `{ "text", "value" }` (`text` required, each at most 255), `otherwise` (at most 255), `matchCase` (default false) | The `value` of the first pair whose `text` equals the trimmed value; an unmatched value that is not blank becomes `otherwise` when it is not blank, and is kept otherwise. A blank value stays blank. |
+| `ifThen` | `test`: `equals`, `contains` or `blank`; `text` (required unless `blank`, at most 255), `value` (at most 255, empty clears), `otherwise` (at most 255), `matchCase` | When the trimmed value equals `text`, contains it, or is blank, the value becomes `value`; when not, it becomes `otherwise` if that is not blank, and is kept otherwise. Only the value so far is tested, never another column. |
+| `part` | `separator` (required, 1 to 10), `position` (1 to 50), `fromEnd` (default false) | Splits the value on the literal separator and keeps part `position`, counted from the start or the end, trimmed; blank when there is no such part. |
+| `first`, `last` | `count` (1 to 255) | The first or last `count` characters; a shorter value is kept whole. |
+| `shiftDate` | `amount` (a whole number, at most 36,600 days or 1,200 months either way), `unit`: `days` or `months` | Reads the first three numbers year first (so `2025-12-31` and a stored date with a time both read), adds the amount and writes `YYYY-MM-DD`; adding months keeps the day where the month has it, otherwise the month's last day. A value that is not a date, or a result outside the years 1700 to 4000, is left unchanged. |
+| `today` | `whenBlank` (default false) | Today's date as `YYYY-MM-DD` in the running user's time zone; under `whenBlank`, only when the value so far is blank. |
+
+The steps from `map` on were added by ADR-NEXT (`NEXT-more-transform-steps.md`); a document
+whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
+update definition of R-BU1). A reader that does not know an `op` skips that step, as below.
 
 Steps run in order, before values for every row (R-IB14): a step's output that is blank is
 filled by a file or template value like any blank cell. A document is checked when it is saved
@@ -6589,6 +6599,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-NEXT, `NEXT-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
 
 ---
 ## 32. Entity ownership by package

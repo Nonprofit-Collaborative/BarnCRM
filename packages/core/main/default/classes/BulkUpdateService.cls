@@ -24,7 +24,8 @@ public with sharing class BulkUpdateService {
     public static final Integer MAX_RUN_LIMIT = 48000;
     /** Query rows left free for the reads around a count. */
     private static final Integer COUNT_MARGIN = 100;
-    private static final Integer DEFINITION_VERSION = 1;
+    /** Version 2: a change with steps may use every DataTransform operation (ADR-NEXT). */
+    private static final Integer DEFINITION_VERSION = DataTransform.DOCUMENT_VERSION;
 
     /** One change, as checked: the field it writes and the value or field it takes. */
     public class Change {
