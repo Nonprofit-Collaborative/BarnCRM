@@ -39,3 +39,4 @@ apexcov.json
 # Output of scripts/org/run-org-tests.sh. Kept out of git because that script refuses a dirty
 # tree, so its own results must not make the next run look dirty.
 test-results/
+apexguru-results/

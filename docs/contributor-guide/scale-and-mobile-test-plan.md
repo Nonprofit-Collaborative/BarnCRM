@@ -31,6 +31,9 @@ does not fit in any scratch org. Run it in two tiers:
 Tier 1 is the v0.11 exit evidence unless the owner provides a tier 2 org. Report the
 extrapolation, not a pass, for anything only tier 1 measured.
 
+On tier 2, also read Salesforce Scale Center and run ApexGuru for the run window; see
+[ApexGuru and Scale Center](apexguru-and-scale-center.md).
+
 ### Data shape
 
 Generate CSV files with a script under `scripts/data/` (not committed with real names: use

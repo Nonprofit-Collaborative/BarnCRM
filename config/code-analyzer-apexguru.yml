@@ -1,0 +1,7 @@
+# Code Analyzer configuration for the optional ApexGuru run (scripts/org/run-apexguru.sh).
+# Not auto-loaded: the required CI run uses no config file, and this file is only read when
+# passed with --config-file. Guide: docs/contributor-guide/apexguru-and-scale-center.md
+engines:
+  apexguru:
+    # Wait up to 10 minutes for the ApexGuru service (default 5) so a large workspace finishes.
+    api_timeout_ms: 600000
