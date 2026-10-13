@@ -3,6 +3,7 @@ import OrgOptimizer from 'c/orgOptimizer';
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
 import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
+import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFindings';
 
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
@@ -15,6 +16,11 @@ jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: 
 });
 jest.mock(
   '@salesforce/apex/OrgOptimizerStorageController.getStorage',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/OrgOptimizerSetupController.getFindings',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -73,7 +79,8 @@ describe('c-org-optimizer as an administrator', () => {
       'fieldUtilization',
       'healthCheck',
       'errors',
-      'storage'
+      'storage',
+      'setup'
     ]);
   });
 
@@ -111,6 +118,16 @@ describe('c-org-optimizer as an administrator', () => {
 
     await activate(element, 'errors');
     expect(one(element, 'c-error-log-tile')).not.toBeNull();
+  });
+
+  it('reads unused setup only when its section is opened', async () => {
+    getFindings.mockResolvedValue({ countCap: 1000, findings: [] });
+    const element = await render();
+    expect(getFindings).not.toHaveBeenCalled();
+
+    await activate(element, 'setup');
+    expect(one(element, 'c-optimizer-setup')).not.toBeNull();
+    expect(getFindings).toHaveBeenCalledTimes(1);
   });
 
   it('runs Health Check only when asked', async () => {

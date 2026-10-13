@@ -72,6 +72,11 @@
                             <c-optimizer-storage></c-optimizer-storage>
                         </template>
                     </lightning-tab>
+                    <lightning-tab label={labels.setup} value="setup" onactive={handleActive} data-id="tab-setup">
+                        <template lwc:if={setupOpened}>
+                            <c-optimizer-setup></c-optimizer-setup>
+                        </template>
+                    </lightning-tab>
                 </template>
             </lightning-tabset>
         </div>

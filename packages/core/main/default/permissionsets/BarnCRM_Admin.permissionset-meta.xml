@@ -216,6 +216,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>OrgOptimizerSetupController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>OrgOptimizerStorageController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

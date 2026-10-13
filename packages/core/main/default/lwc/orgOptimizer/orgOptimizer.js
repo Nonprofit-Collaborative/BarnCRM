@@ -17,6 +17,8 @@ import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import ERRORS_TEXT from '@salesforce/label/c.Core_OrgOptimizer_ErrorsText';
 import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
 import STORAGE_TEXT from '@salesforce/label/c.Core_OrgOptimizer_StorageText';
+import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
+import SETUP_TEXT from '@salesforce/label/c.Core_OrgOptimizer_SetupText';
 import OPEN from '@salesforce/label/c.Core_OrgOptimizer_Open';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_INTRO from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckIntro';
@@ -41,6 +43,7 @@ export default class OrgOptimizer extends LightningElement {
     healthCheck: HEALTH_CHECK,
     errors: ERRORS,
     storage: STORAGE,
+    setup: SETUP,
     open: OPEN,
     runHealthCheck: RUN_HEALTH_CHECK,
     healthCheckIntro: HEALTH_CHECK_INTRO
@@ -71,7 +74,8 @@ export default class OrgOptimizer extends LightningElement {
         { name: 'fieldUtilization', title: FIELD_UTILIZATION, text: FIELD_UTILIZATION_TEXT },
         { name: 'healthCheck', title: HEALTH_CHECK, text: HEALTH_CHECK_TEXT },
         { name: 'errors', title: ERRORS, text: ERRORS_TEXT },
-        { name: 'storage', title: STORAGE, text: STORAGE_TEXT }
+        { name: 'storage', title: STORAGE, text: STORAGE_TEXT },
+        { name: 'setup', title: SETUP, text: SETUP_TEXT }
       );
     }
     return sections;
@@ -95,6 +99,10 @@ export default class OrgOptimizer extends LightningElement {
 
   get storageOpened() {
     return Boolean(this.opened.storage);
+  }
+
+  get setupOpened() {
+    return Boolean(this.opened.setup);
   }
 
   get showHealthCheck() {

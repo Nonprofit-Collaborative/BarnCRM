@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Org Optimizer's Unused setup section: users, permission sets, reports, email templates,
+    flows and scheduled jobs nobody seems to use, with links to Setup. Read only, admin only.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
