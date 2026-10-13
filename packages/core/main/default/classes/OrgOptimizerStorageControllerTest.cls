@@ -2,8 +2,13 @@
  * OrgOptimizerStorageController: the Storage and limits section reads the org's limits and
  * counts BarnCRM's own objects, capped, and refuses a person without Manage BarnCRM Settings.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OrgOptimizerStorageController')
 private class OrgOptimizerStorageControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void readsTheLimitsAndCountsOwnObjects() {
         System.runAs(TestUsers.admin()) {

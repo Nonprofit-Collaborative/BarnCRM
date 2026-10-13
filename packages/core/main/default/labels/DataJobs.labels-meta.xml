@@ -85,7 +85,7 @@
         <categories>DataJobs</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data job history: an import's counts; {0} rows to {4} rejected</shortDescription>
+        <shortDescription>Import counts: {0} rows, {1} created, {2} updated, {3} matched, {4} rejected</shortDescription>
         <value>{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.</value>
     </labels>
     <labels>

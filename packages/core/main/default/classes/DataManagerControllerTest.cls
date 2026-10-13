@@ -3,8 +3,13 @@
  * name order, with their recurring source and last import date, and nothing for a person who
  * cannot import.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataManagerController')
 private class DataManagerControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static List<Import_Template__c> templates(Integer howMany) {
         List<Import_Template__c> result = new List<Import_Template__c>();
         for (Integer index = 0; index < howMany; index++) {

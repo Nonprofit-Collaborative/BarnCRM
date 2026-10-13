@@ -3,8 +3,13 @@
  * set nobody is assigned, reports a check that cannot run as failed without hiding the others,
  * and refuses a person without Manage BarnCRM Settings.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OrgOptimizerSetupController')
 private class OrgOptimizerSetupControllerTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final List<String> KEYS = new List<String>{
         'inactiveUsers',
         'unassignedPermissionSets',

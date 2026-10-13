@@ -2,8 +2,13 @@
  * OrgOptimizerObjectChecks: objects near their custom field limit and record types no record
  * uses, over BarnCRM's own objects plus Account and Contact, read as the person.
  */
-@IsTest
+@IsTest(testFor='ApexClass:OrgOptimizerObjectChecks')
 private class OrgOptimizerObjectChecksTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void listsAnObjectAtItsFieldLimitAndNotOneFarBelowIt() {
         System.runAs(TestUsers.admin()) {
