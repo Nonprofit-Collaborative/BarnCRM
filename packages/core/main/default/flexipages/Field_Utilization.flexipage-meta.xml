@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Field utilization: choose a kind of record, count how many records have each field filled
+    in, and save the counts.
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>fieldUtilization</componentName>
+        <identifier>fieldUtilization</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Field Utilization</masterLabel>
+  <template>
+    <name>flexipage:defaultAppHomeTemplate</name>
+  </template>
+  <type>AppPage</type>
+</FlexiPage>

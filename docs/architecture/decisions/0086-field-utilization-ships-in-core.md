@@ -1,6 +1,10 @@
 # ADR-0086: Field utilization ships in Core, counts in user mode, and keeps weekly snapshots
 
 **Status:** Accepted (builder decision, accepted as recommended under the owner standing instruction, 2026-10-12)
+**Superseded in part by ADR-0101** `0101-field-utilization-on-demand.md` (owner decision,
+2026-10-13): the count runs on demand from its own tab. The batch, weekly schedule, tracked list,
+run stamps, 13-month retention and Health Check registration (decisions 5, 6 and 7, the tracked
+list in 3, the run stamps in 2) are replaced; decisions 1, 3 and 4 otherwise stand.
 **Date:** 2026-10-12
 **Source:** plan Section 6.1 item 10 (Analytics module, field utilization first; Brandon,
 2026-09-23), plan Section 6.2 rule 5, ADR-0003, ADR-0038, ADR-0047

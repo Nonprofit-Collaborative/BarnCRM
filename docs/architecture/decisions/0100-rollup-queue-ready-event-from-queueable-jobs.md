@@ -15,8 +15,8 @@ Queueable does not, so its totals waited for the next processor a later save hap
 or for the nightly run. That breaks the promise of the Instantly and Both modes for every change
 made in the background.
 
-The Q-01 decision (`NEXT-real-time-rollups-recalculated-just-after-the-save.md` on
-`feature/q-01-async-rollups-2`) rejected a platform event subscriber as the main mechanism for
+The Q-01 decision (ADR-0098, `0098-real-time-rollups-recalculated-just-after-the-save.md`)
+rejected a platform event subscriber as the main mechanism for
 real-time rollups: it needs its own failure store and publish allocations, and its backlog is
 invisible. That reasoning stands. This decision is narrower.
 

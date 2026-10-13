@@ -38,10 +38,6 @@ public with sharing class NightlyJobs {
             new SeasonalAddressJob(),
             new ErrorDigestJob()
         };
-        // The weekly count is expected only once an administrator has chosen what it counts.
-        if (!FieldUtilizationService.trackedObjects().isEmpty()) {
-            jobs.add(new FieldUtilizationJob());
-        }
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
         }
@@ -157,24 +153,6 @@ public with sharing class NightlyJobs {
 
         public void schedule() {
             ErrorDigestScheduler.start();
-        }
-    }
-
-    /**
-     * The weekly field utilization count, started and stopped on the Health page; listed only
-     * once at least one object is chosen for it.
-     */
-    public class FieldUtilizationJob implements NightlyJob {
-        public String label() {
-            return System.Label.Core_FieldUtilization_JobLabel;
-        }
-
-        public Boolean isScheduled() {
-            return FieldUtilizationScheduler.isScheduled();
-        }
-
-        public void schedule() {
-            FieldUtilizationScheduler.start();
         }
     }
 }

@@ -89,14 +89,6 @@
         <value>Rollup recalculation</value>
     </labels>
     <labels>
-        <fullName>Core_JobNotice_FieldUtilization</fullName>
-        <categories>Job Notifications</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Job notification: name of the field utilization count</shortDescription>
-        <value>Field utilization count</value>
-    </labels>
-    <labels>
         <fullName>Core_JobNotice_SeasonalAddress</fullName>
         <categories>Job Notifications</categories>
         <language>en_US</language>

@@ -244,19 +244,15 @@ private class JobNotificationPathsTest {
     }
 
     @IsTest
-    static void fieldUtilizationRunNowOpensHealth() {
+    static void fieldUtilizationOnDemandSendsNothing() {
         System.runAs(TestUsers.admin()) {
             notifications(true);
 
-            new FieldUtilizationBatch(new List<String>()).finish(null);
+            // Field utilization counts on demand on its own tab (ADR-0101): the count runs while
+            // the person watches the page, so no job is left to tell them about.
+            FieldUtilizationController.countFields('Contact', new List<String>{ 'LastName' });
 
-            assertOneAboutSection(
-                JobNotifier.SECTION_HEALTH,
-                title(
-                    System.Label.Core_JobNotice_Finished,
-                    System.Label.Core_JobNotice_FieldUtilization
-                )
-            );
+            Assert.areEqual(0, JobNotifier.sent.size(), 'An on-demand count sends no notice');
         }
     }
 

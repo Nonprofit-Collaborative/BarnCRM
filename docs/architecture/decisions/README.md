@@ -94,7 +94,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0082](0082-barncrm-owns-its-rollup-engine.md) | BarnCRM owns its rollup engine (supersedes ADR-0015, amends ADR-0011) | Accepted (owner decision) |
 | [0084](0084-gift-entry-pays-a-scheduled-payment.md) | Gift entry screens suggest the scheduled payment a gift pays, and a person decides | Accepted (owner decision) |
 | [0085](0085-custom-metadata-manager-edits-only-types-read-directly.md) | The custom metadata manager edits only types BarnCRM reads directly, and never a shipped row | Accepted (owner, as recommended) |
-| [0086](0086-field-utilization-ships-in-core.md) | Field utilization ships in Core, counts in user mode, and keeps weekly snapshots | Accepted (builder decision, as recommended) |
+| [0086](0086-field-utilization-ships-in-core.md) | Field utilization ships in Core, counts in user mode, and keeps weekly snapshots | Accepted (builder decision, as recommended); superseded in part by ADR-0101 (field utilization on demand) |
 | [0087](0087-whats-new-from-packaged-release-notes.md) | What's new is read from packaged release notes and remembered per person | Accepted (builder decision) |
 | [0088](0088-unlocked-to-managed-migration-kit.md) | Pilots move from unlocked to managed packages with a command-line kit that reimports through the REST API | Accepted |
 | [0089](0089-interaction-notes-are-completed-tasks.md) | Interaction notes are completed tasks logged through one packaged action | Accepted (builder decision) |
@@ -109,6 +109,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0098](0098-real-time-rollups-recalculated-just-after-the-save.md) | Real-time rollups are recalculated just after the save, by default (modifies ADR-0082 decision 4) | Proposed (builder decision) |
 | [0099](0099-rollups-recalculate-only-what-a-save-changed.md) | A save recalculates only the rollups its change can affect (narrows ADR-0082 decision 2) | Accepted (owner decision D-48) |
 | [0100](0100-rollup-queue-ready-event-from-queueable-jobs.md) | A platform event starts the Rollup Queue after a save inside a Queueable | Accepted (builder decision) |
+| [0101](0101-field-utilization-on-demand.md) | Field utilization runs on demand from its own tab (supersedes ADR-0086 in part) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
