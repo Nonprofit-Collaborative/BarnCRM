@@ -1,6 +1,6 @@
 # ADR-0006: Settings storage: custom settings, custom objects, and custom metadata
 
-**Status:** Accepted
+**Status:** Accepted; the Platform Cache clause of decision 1 is superseded by ADR-NEXT
 **Date:** 2026-09-06
 **Source:** plan Section 12, decision D-06
 

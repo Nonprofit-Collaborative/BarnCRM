@@ -136,7 +136,7 @@ public with sharing class RollupEngineComparison {
     private static Report compareAll(Set<String> keys, Set<Id> named, Integer sample) {
         Report report = new Report();
         List<Rollup_Definition__c> definitions = definitionsFor(keys, report);
-        for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectAll()) {
+        for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForFramework()) {
             AutomationControl.bypass(entry.DeveloperName);
         }
         try {

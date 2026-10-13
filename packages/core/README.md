@@ -18,12 +18,12 @@ object references: those live only in the Connect module, behind dynamic Apex.
   `Setting_Definition__mdt`, so a feature adds its settings to the console by shipping rows
   rather than by editing the console.
 
-  **Platform Cache is optional.** `SettingsService` uses an org cache partition named
-  `BarnCRMSettings` when one exists and a per-transaction static cache when it does not,
-  so Core runs unchanged on an org with no cache allocation. The package ships no partition
-  file: an org that wants the cross-transaction cache creates the partition in Setup and
-  allocates it a few megabytes. Either way a change takes effect on the next transaction,
-  because every write clears both caches.
+  **No Platform Cache.** Settings and the shipped custom metadata are read through the
+  platform's own caches (`getOrgDefaults()` and custom metadata `getAll()`), which cost no
+  query and are refreshed when a save commits, plus a per-transaction static cache that every
+  write clears. Core ships no cache partition and needs no cache allocation (ADR-NEXT). A
+  `BarnCRMSettings` partition created for an earlier version is no longer used and can be
+  deleted.
 - **Trigger framework**: one trigger per object, bypassable handlers, a pause-all switch.
 - **Error Log** (`Error_Log__c`): every caught exception with context, user, record, and a
   plain-language message, published as a platform event so the entry survives the rollback it
