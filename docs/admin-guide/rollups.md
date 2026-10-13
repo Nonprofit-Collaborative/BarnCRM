@@ -336,7 +336,8 @@ the way to do that is the **Recalculate rollups** Flow template, which needs no 
    is never active and an upgrade may change it; your copy is yours.
 2. In your copy, open the **Start** element and change the object from **Contact** to your
    object, for example **Shift**. Leave it on **A record is created or updated** and
-   **Actions and Related Records**.
+   **Actions and Related Records**. Leave its entry condition as it is: the formula is met by
+   every saved record, so no change a rollup depends on is missed.
 3. Open the **Recalculate rollups** action and set its object to the same object. Leave
    **Record** set to the triggering record and **Record before the change** set to the
    prior values of the triggering record.
