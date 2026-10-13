@@ -55,16 +55,18 @@ to Salesforce, not to BarnCRM.
    that answers people outside your organization acts as its own agent user. Never give that
    agent user more than it needs.
 2. **Give that user what the actions need.** Each action needs the same access as doing the
-   job by hand. **BarnCRM Staff** covers finding people, reading households and creating
-   people; reading data jobs needs the access the import results screen needs. Recording a
-   gift needs **Giving Staff**. The user also needs access to the actions themselves: create
-   a permission set of your own (for example "AI: BarnCRM people"), add **Apex Class Access**
-   to the classes of the actions you want the assistant to have, and assign it only to the
-   users who may use them through an assistant. The classes are `FindPeopleAction`,
-   `GetHouseholdSummaryAction`, `CreatePersonAction`, `GetDataJobStatusAction` and
-   `InboundGiftAction`. Leave out `CreatePersonAction` and `InboundGiftAction` for an assistant
-   that should only look things up. BarnCRM's own permission sets include none of them, so no
-   one gets them without your decision.
+   job by hand, and BarnCRM's own permission sets already include the four Core actions, so
+   there is no Apex Class Access to add:
+   - **BarnCRM Staff** and **BarnCRM Admin** (and so Program Staff, Volunteer Coordinator and
+     BarnCRM Admin Group) give Find People, Get Household Summary, Create Person and Get Data
+     Job Status.
+   - **BarnCRM Read Only** (and so the Read Only group) gives Find People and Get Household
+     Summary. For an assistant that should only look things up, use a user with Read Only.
+   - Record Inbound Gift needs **Giving Staff** and an Apex Class Access grant to
+     `InboundGiftAction` in a permission set of your own, assigned only to the users who may
+     use it through an assistant.
+   The actions run with the user's own access, so what each user can find or change is still
+   decided by their object and field access.
 3. **Add the actions to your assistant.**
    - *Agentforce:* either start from the example topic (next section), or in Agent Builder add
      a new action to a topic, choose **Apex** as the reference action type, and pick the
@@ -175,13 +177,14 @@ twice records the gift once.
 
 ## Common mistakes
 
-**The assistant does not offer the action.** Its user is missing **Apex Class Access** to the
-action's class (for example `FindPeopleAction` or `InboundGiftAction`), or the action was not
-added to the agent's topic or the MCP server. Check step 2 and step 3 above.
+**The assistant does not offer the action.** Its user has none of the BarnCRM permission sets
+that include the action (see step 2; Read Only has no Create Person or Get Data Job Status),
+or, for Record Inbound Gift, lacks **Apex Class Access** to `InboundGiftAction`, or the action
+was not added to the agent's topic or the MCP server. Check step 2 and step 3 above.
 
 **"You do not have access to the records this action reads or changes."** The assistant's user
 is missing a BarnCRM permission set, for example **BarnCRM Staff**. The action itself ran, so
-Apex Class Access is in place; give the user the same access they would need to do the job by
+class access is in place; give the user the same access they would need to do the job by
 hand.
 
 **Find People returns nobody you know is there.** The assistant's user cannot see that
