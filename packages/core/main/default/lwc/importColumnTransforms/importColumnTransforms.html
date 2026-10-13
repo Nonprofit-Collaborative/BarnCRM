@@ -33,6 +33,48 @@
                     <template lwc:if={step.isDate}>
                         <lightning-combobox label={labels.dateOrderLabel} data-key={step.key} data-name="dateOrder" value={step.dateOrder} options={orderOptions} onchange={handleInput}></lightning-combobox>
                     </template>
+                    <template lwc:if={step.isMap}>
+                        <template for:each={step.pairRows} for:item="pair">
+                            <div key={pair.key} class="slds-grid slds-gutters_x-small" data-id="pair">
+                                <div class="slds-col">
+                                    <lightning-input label={labels.mapFromLabel} data-key={step.key} data-index={pair.index} data-name="text" value={pair.text} max-length="255" onchange={handlePair}></lightning-input>
+                                </div>
+                                <div class="slds-col">
+                                    <lightning-input label={labels.mapToLabel} data-key={step.key} data-index={pair.index} data-name="value" value={pair.value} max-length="255" onchange={handlePair}></lightning-input>
+                                </div>
+                                <div class="slds-col slds-grow-none slds-align-bottom">
+                                    <lightning-button-icon icon-name="utility:close" alternative-text={labels.mapRemoveRowLabel} title={labels.mapRemoveRowLabel} data-key={step.key} data-index={pair.index} data-id="remove-pair" onclick={handleRemovePair}></lightning-button-icon>
+                                </div>
+                            </div>
+                        </template>
+                        <lightning-button class="slds-var-m-top_xx-small" label={labels.mapAddRowLabel} data-key={step.key} data-id="add-pair" disabled={step.cannotAddPair} onclick={handleAddPair}></lightning-button>
+                        <lightning-input label={labels.mapOtherwiseLabel} data-key={step.key} data-name="otherwise" value={step.otherwise} max-length="255" onchange={handleInput}></lightning-input>
+                        <lightning-input type="checkbox" label={labels.matchCaseLabel} data-key={step.key} data-name="matchCase" checked={step.matchCase} onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isIfThen}>
+                        <lightning-combobox label={labels.testLabel} data-key={step.key} data-name="test" value={step.test} options={testOptions} onchange={handleInput}></lightning-combobox>
+                        <template lwc:if={step.needsTestText}>
+                            <lightning-input label={labels.testTextLabel} data-key={step.key} data-name="text" value={step.text} max-length="255" onchange={handleInput}></lightning-input>
+                            <lightning-input type="checkbox" label={labels.matchCaseLabel} data-key={step.key} data-name="matchCase" checked={step.matchCase} onchange={handleInput}></lightning-input>
+                        </template>
+                        <lightning-input label={labels.thenValueLabel} data-key={step.key} data-name="value" value={step.value} max-length="255" onchange={handleInput}></lightning-input>
+                        <lightning-input label={labels.otherwiseLabel} data-key={step.key} data-name="otherwise" value={step.otherwise} max-length="255" onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isPart}>
+                        <lightning-input label={labels.splitAtLabel} data-key={step.key} data-name="separator" value={step.separator} max-length="10" required onchange={handleInput}></lightning-input>
+                        <lightning-input type="number" label={labels.positionLabel} data-key={step.key} data-name="position" value={step.position} min="1" max="50" step="1" onchange={handleInput}></lightning-input>
+                        <lightning-input type="checkbox" label={labels.fromEndLabel} data-key={step.key} data-name="fromEnd" checked={step.fromEnd} onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isCount}>
+                        <lightning-input type="number" label={labels.countLabel} data-key={step.key} data-name="count" value={step.count} min="1" max="255" step="1" onchange={handleInput}></lightning-input>
+                    </template>
+                    <template lwc:if={step.isShiftDate}>
+                        <lightning-input type="number" label={labels.amountLabel} data-key={step.key} data-name="amount" value={step.amount} step="1" onchange={handleInput}></lightning-input>
+                        <lightning-combobox label={labels.unitLabel} data-key={step.key} data-name="unit" value={step.unit} options={unitOptions} onchange={handleInput}></lightning-combobox>
+                    </template>
+                    <template lwc:if={step.isToday}>
+                        <lightning-input type="checkbox" label={labels.whenBlankLabel} data-key={step.key} data-name="whenBlank" checked={step.whenBlank} onchange={handleInput}></lightning-input>
+                    </template>
                 </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-align-bottom">
                     <lightning-button-icon
