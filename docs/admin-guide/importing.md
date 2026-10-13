@@ -285,6 +285,12 @@ without that role. Ask your Salesforce administrator for edit access to the fiel
 the file again: the second import matches the people it already created and adds the
 missing values.
 
+**The run log says a value "is not a yes or no value".** A checkbox column held something
+BarnCRM does not read as ticked or cleared (for example "maybe", or "Yes." with a full stop), so
+that one checkbox was left as it was on that row, and the rest of the row loaded. The run log
+names the row, the column and the value. The values BarnCRM reads are listed under "Checkbox
+columns" in section 8. Correct the cells and import the file again.
+
 **The run log says "Not matched on" a field.** Your user may not read the field your
 matching rule uses (for example Email under **Email exact**), so nobody in the file could be
 found by it, and a person your org holds only by that field counts as new. Where people
@@ -418,8 +424,23 @@ duplicate rule, so the commit can match a few more rows than the dry run did.
 and organizations (accounts), and the standard ones not already listed, wherever you may edit
 them. Fields Salesforce calculates (formulas, roll-ups, auto numbers), lookups to other records
 and the fields BarnCRM keeps for itself are not listed. A value is converted to the field's
-type (a checkbox takes Yes, True or 1; a date is written 2026-10-12), and a value the field
-cannot take is skipped and named in the run log.
+type (a date is written 2026-10-12; checkboxes are below), and a value the field cannot take
+is skipped and named in the run log.
+
+**Checkbox columns.** Capitals and spaces around the value do not matter.
+
+| The file says | The checkbox is |
+|---|---|
+| true, yes, y, 1, x, checked, on, t | Ticked |
+| false, no, n, 0, off, f | Cleared |
+| Nothing (an empty cell) | Left as it is |
+| Anything else (for example "maybe") | Left as it is, and named in the run log |
+
+A value BarnCRM cannot read never clears a box. In a people import that one field is skipped on
+that row, the run log names the row, the column and the value, and the rest of the row still
+loads. In a one-object load (section 9) the row is rejected with the value named, as for any
+value the field cannot take. Fix the cell and import again; the second import matches the
+records the first one created or updated.
 
 ## 9. Loading one object
 

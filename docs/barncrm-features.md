@@ -116,6 +116,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | "Do not load" remembered | Minor | A column set to Do not load stays that way on the next upload. | Shipped | C-14 |
 | Duplicate-safe new donors | Minor | A new donor appearing on several rows is created once, and the dry run counts them once. | Shipped | C-19 |
 | Person account import | Minor | Imports email, address, opt-outs, birthdate and title onto person accounts and re-finds them on a second load. | Shipped | C-14 |
+| Checkbox values in imports | Minor | Reads yes, y, x, checked, on and their opposites in any case as ticked or cleared; any other value leaves the box as it was and is named by row, column and value in the run log. | Built, not merged (`fix/import-unrecognized-checkbox`) | C-14, R-IT11 |
 | First-name matching guard | Minor | A row whose first name differs from the only match at the same key creates a new person instead of renaming the existing one. | Shipped | C-14 (plan 11.2 item 17) |
 | Neutral import wizard | Minor | Without Giving installed, the wizard offers no gift columns, and the gift templates live in Giving. | Shipped | C-29 |
 | Match by an ID field you choose | Minor | Pick which external ID field a file matches on, for people and for organizations. | Shipped | C-32 |

@@ -217,6 +217,7 @@ public with sharing class ImportRowProcessor {
         noteFieldsWithoutAccess(mapping, personAccounts, outcome);
 
         List<Working> working = read(batch, rows, mapping, outcome);
+        skipUnreadableCheckboxes(working, checkboxColumns(mapping, personAccounts), outcome);
         resolveGivenIds(working, personAccounts);
         resolveOrganizations(working, batch, dryRun, outcome);
         resolvePeople(working, rule, batch, personAccounts, dryRun, outcome);
@@ -1994,8 +1995,11 @@ public with sharing class ImportRowProcessor {
             }
             if (isCheckbox(stored, lookupKey)) {
                 // A checkbox is compared as the value the save would write: "Yes" in the file
-                // is the true already stored, not a change to journal on every re-import.
-                if ((Boolean) convertCheckbox(incoming) != (current == true)) {
+                // is the true already stored, not a change to journal on every re-import. A
+                // value that is neither ticked nor cleared is no change (R-IT11); the row's
+                // reading already took it out and noted it.
+                Boolean checked = convertCheckbox(incoming);
+                if (checked != null && checked != (current == true)) {
                     result.put(attributeName, incoming);
                 }
                 continue;
@@ -2593,33 +2597,8 @@ public with sharing class ImportRowProcessor {
                 targets.add(assignment.target.trim());
             }
         }
-        Schema.SObjectType personType = personAccounts ? Account.SObjectType : Contact.SObjectType;
         for (String target : targets) {
-            String entity = ImportMapping.entityOf(target);
-            Schema.SObjectType type;
-            if (ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
-                type = Account.SObjectType;
-            } else if (
-                ImportMapping.ENTITY_CONTACT_1.equals(entity) ||
-                ImportMapping.ENTITY_CONTACT_2.equals(entity)
-            ) {
-                type = personType;
-            } else {
-                // A household takes only its name from a row, and the rest of a row is the
-                // entity processor's to report (R-IR6).
-                continue;
-            }
-            String attribute = ImportMapping.attributeOf(target);
-            if ('Id'.equalsIgnoreCase(attribute)) {
-                // A record ID matches and is never written (R-IT10).
-                continue;
-            }
-            // Only a person's attributes are contact names to translate; an organization's
-            // are the account's own, whatever the person mode.
-            if (!ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
-                attribute = storedName(attribute, personAccounts);
-            }
-            Schema.SObjectField field = fieldsOf(type).get(attribute.toLowerCase());
+            Schema.SObjectField field = writtenField(target, personAccounts);
             if (field == null) {
                 // An attribute the object does not have is reported by applyValues.
                 continue;
@@ -2627,6 +2606,109 @@ public with sharing class ImportRowProcessor {
             Schema.DescribeFieldResult describe = field.getDescribe();
             if (!describe.isCreateable() && !describe.isUpdateable()) {
                 outcome.notes.add(noAccessNote(describe));
+            }
+        }
+    }
+
+    /**
+     * The field of a person or an organization a mapped target writes, or null for any other
+     * target, a record ID, or an attribute the object does not have.
+     */
+    private static Schema.SObjectField writtenField(String target, Boolean personAccounts) {
+        String entity = ImportMapping.entityOf(target);
+        Schema.SObjectType type;
+        if (ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
+            type = Account.SObjectType;
+        } else if (
+            ImportMapping.ENTITY_CONTACT_1.equals(entity) ||
+            ImportMapping.ENTITY_CONTACT_2.equals(entity)
+        ) {
+            type = personAccounts ? Account.SObjectType : Contact.SObjectType;
+        } else {
+            // A household takes only its name from a row, and the rest of a row is the
+            // entity processor's to report (R-IR6).
+            return null;
+        }
+        String attribute = ImportMapping.attributeOf(target);
+        if (attribute == null || 'Id'.equalsIgnoreCase(attribute)) {
+            // A record ID matches and is never written (R-IT10).
+            return null;
+        }
+        // Only a person's attributes are contact names to translate; an organization's
+        // are the account's own, whatever the person mode.
+        if (!ImportMapping.ENTITY_ORGANIZATION.equals(entity)) {
+            attribute = storedName(attribute, personAccounts);
+        }
+        return fieldsOf(type).get(attribute.toLowerCase());
+    }
+
+    /**
+     * The mapped targets that fill a checkbox of a person or an organization, each with the
+     * column the run log names it by: the file's heading, or the target itself for a value
+     * given for every row (R-IB14).
+     */
+    private static Map<String, String> checkboxColumns(
+        ImportMapping mapping,
+        Boolean personAccounts
+    ) {
+        Map<String, String> headings = new Map<String, String>();
+        for (ImportMapping.Assignment assignment : mapping.defaults) {
+            if (assignment != null && !ImportMapping.isIgnored(assignment.target)) {
+                headings.put(assignment.target.trim(), assignment.target.trim());
+            }
+        }
+        for (ImportMapping.Column column : mapping.columns) {
+            if (
+                column != null &&
+                String.isNotBlank(column.source) &&
+                !ImportMapping.isIgnored(column.target)
+            ) {
+                headings.put(column.target.trim(), column.source.trim());
+            }
+        }
+        Map<String, String> result = new Map<String, String>();
+        for (String target : headings.keySet()) {
+            Schema.SObjectField field = writtenField(target, personAccounts);
+            if (field != null && field.getDescribe().getType() == Schema.DisplayType.BOOLEAN) {
+                result.put(target, headings.get(target));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Takes out of each row a checkbox value that is neither ticked nor cleared (R-IT11), so it
+     * is never saved as cleared nor counted as a change, and names the row, the column and the
+     * value in the run log. The rest of the row still loads.
+     */
+    private static void skipUnreadableCheckboxes(
+        List<Working> working,
+        Map<String, String> columns,
+        Outcome outcome
+    ) {
+        if (columns.isEmpty()) {
+            return;
+        }
+        for (Working item : working) {
+            for (String target : columns.keySet()) {
+                Map<String, String> held = item.byEntity.get(ImportMapping.entityOf(target));
+                String attribute = ImportMapping.attributeOf(target);
+                String value = held == null ? null : held.get(attribute);
+                if (String.isBlank(value) || convertCheckbox(value) != null) {
+                    continue;
+                }
+                held.remove(attribute);
+                Integer row = rowNumber(item.row);
+                outcome.notes.add(
+                    String.format(
+                        Label.Core_Import_LogCheckboxValueUnreadable,
+                        new List<String>{
+                            row == null ? '' : String.valueOf(row),
+                            columns.get(target),
+                            value.abbreviate(80)
+                        }
+                    )
+                );
             }
         }
     }
@@ -2711,16 +2793,24 @@ public with sharing class ImportRowProcessor {
         return field != null && field.getDescribe().getType() == Schema.DisplayType.BOOLEAN;
     }
 
-    /** A checkbox column's value as the save writes it; the one reading for both. */
+    /**
+     * A checkbox column's value as the save writes it, the one reading for the save and the
+     * comparison alike (R-IT11): null when it is neither ticked nor cleared.
+     */
     private static Boolean convertCheckbox(String value) {
-        return 'true'.equalsIgnoreCase(value) || 'yes'.equalsIgnoreCase(value) || '1'.equals(value);
+        return ImportObjectSchema.checkbox(value);
     }
 
     /** A column value as the field's type, for the few types a spreadsheet carries. */
     private static Object convert(String value, Schema.DescribeFieldResult describe) {
         Schema.DisplayType kind = describe.getType();
         if (kind == Schema.DisplayType.BOOLEAN) {
-            return convertCheckbox(value);
+            Boolean checked = convertCheckbox(value);
+            if (checked == null) {
+                // Never written as cleared: applyValues skips it and names it (R-IT11).
+                throw new ImportException(value);
+            }
+            return checked;
         }
         if (
             kind == Schema.DisplayType.CURRENCY ||
