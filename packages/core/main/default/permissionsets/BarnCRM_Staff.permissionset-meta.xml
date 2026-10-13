@@ -27,10 +27,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>AffiliationController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>AffiliationDomain</apexClass>
     <enabled>true</enabled>
   </classAccesses>

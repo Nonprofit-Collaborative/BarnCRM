@@ -43,6 +43,11 @@ connected to it, and an **Affiliations** tab in the BarnCRM app for reporting an
 views. Every person also carries a **Primary Affiliation** field holding the one organization
 they are chiefly associated with, which you can put on a list view or a mail merge.
 
+The card reads and saves affiliations as the person using it, through Salesforce's own record
+service, so it shows exactly what their object and field access allows. An affiliation
+edited elsewhere on the page shows on the card without a reload, and after **Make primary**
+the person's **Primary Affiliation** field refreshes too.
+
 ## A five-minute walkthrough
 
 You are Maria. A colleague is planning an outreach to local employers and needs to know who
