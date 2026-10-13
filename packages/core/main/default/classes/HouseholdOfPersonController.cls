@@ -146,8 +146,8 @@ public with sharing class HouseholdOfPersonController {
     }
 
     /**
-     * Creates a new contact and joins them to this household, in the flexible way of
-     * belonging. The contact is created with this user's own access (ADR-0021 does not cover
+     * Creates a new person and joins them to this household: a contact, or a person account
+     * where the org stores people that way (see newPerson). The person is created with this user's own access (ADR-0021 does not cover
      * an ordinary Contact save, only package-owned data), so the save succeeds exactly when
      * the user could have created the contact by hand. The join that follows is the same one
      * addExistingPerson uses.
@@ -163,15 +163,11 @@ public with sharing class HouseholdOfPersonController {
             if (householdId == null || String.isBlank(lastName)) {
                 throw new HouseholdException(Label.Core_HouseholdPanel_AddMemberMissingName);
             }
-            Contact person = new Contact(
-                Salutation = salutation,
-                FirstName = firstName,
-                LastName = lastName
-            );
+            SObject person = newPerson(salutation, firstName, lastName);
             if (!HouseholdService.isJunctionMode()) {
                 // In contact mode the household is the contact's own account, so the person
                 // is created straight into it.
-                person.AccountId = householdId;
+                person.put('AccountId', householdId);
             }
             // The person is joining this household, so automatic creation must not give
             // them one of their own first: that would leave an empty household behind in
@@ -194,6 +190,27 @@ public with sharing class HouseholdOfPersonController {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /**
+     * The new person, stored the way this org stores people (PEOPLE-4): a person account
+     * where the org has them, belongs to households by the flexible way, and gives the user
+     * a person record type to create with; a contact otherwise. The person fields of an
+     * account exist only in such an org, so they are set by name.
+     */
+    @TestVisible
+    private static SObject newPerson(String salutation, String firstName, String lastName) {
+        Id personType = HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode()
+            ? OrgShapeDetector.creatablePersonRecordTypeId()
+            : null;
+        if (personType == null) {
+            return new Contact(Salutation = salutation, FirstName = firstName, LastName = lastName);
+        }
+        Account person = new Account(RecordTypeId = personType);
+        person.put('Salutation', salutation); // detection-only: person field, set by name
+        person.put('FirstName', firstName); // detection-only: person field, set by name
+        person.put('LastName', lastName); // detection-only: person field, set by name
+        return person;
+    }
 
     /**
      * The household a contact points at, when it is one. A person stored as an account has

@@ -52,8 +52,12 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     public override void afterInsert() {
         // Junction mode first: a person saved into it with no household gets one here,
         // because the membership row that joins them to it needs an id the contact did not
-        // have before insert (R-H2, ADR-0037). Contact mode did its half before insert.
+        // have before insert (R-H2, ADR-0037). Contact mode did its half before insert, and
+        // names the person the new household's Primary Contact here. A person saved against
+        // a household in junction mode joins it first, so creation then leaves them alone.
+        HouseholdService.joinHouseholdsNamedOnNewContacts((List<Contact>) Trigger.new);
         HouseholdService.createHouseholdsForNewContacts((List<Contact>) Trigger.new);
+        HouseholdService.seedPrimaryContactsOfNewHouseholds((List<Contact>) Trigger.new);
         refresh(householdIds((List<Contact>) Trigger.new), false);
     }
 

@@ -57,6 +57,13 @@ public with sharing class HouseholdService {
      */
     private static Boolean writingPrimaryContacts = false;
 
+    /**
+     * Households ensureHouseholds created before insert in contact mode, waiting for the id
+     * of the person they were made for, so that person can be named their Primary Contact
+     * after insert (R-H2 in contact mode, PEOPLE-27).
+     */
+    private static final Set<Id> HOUSEHOLDS_AWAITING_PRIMARY = new Set<Id>();
+
     /** The trigger handlers stood down by `moveMembersWithoutUpkeep`. */
     private static final String CONTACT_HANDLER = 'ContactTriggerHandler';
     private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
@@ -894,8 +901,11 @@ public with sharing class HouseholdService {
     }
 
     /**
-     * A person in more than one household is answered with the household they are marked
-     * primary in. Where they are in exactly one, that one is the answer.
+     * A person's household (R-M3, PEOPLE-12): the one they are the primary member of, and
+     * when they are the primary member of none, the one they joined earliest (a membership
+     * with no start date counts as earliest, then the oldest row). A person with a current
+     * membership is never answered with null. Where they are the primary member of more than
+     * one, the earliest of those wins, so the answer is the same every time.
      */
     private static void resolveThroughJunction(Set<Id> personIds, Map<Id, Id> result) {
         Map<Id, List<Household_Member__c>> byPerson = new Map<Id, List<Household_Member__c>>();
@@ -914,18 +924,37 @@ public with sharing class HouseholdService {
             byPerson.get(personId).add(membership);
         }
         for (Id personId : byPerson.keySet()) {
-            List<Household_Member__c> memberships = byPerson.get(personId);
-            if (memberships.size() == 1) {
-                result.put(personId, memberships[0].Household__c);
-                continue;
-            }
-            for (Household_Member__c membership : memberships) {
-                if (membership.Is_Primary__c == true) {
-                    result.put(personId, membership.Household__c);
-                    break;
+            Household_Member__c chosen;
+            for (Household_Member__c membership : byPerson.get(personId)) {
+                if (comesFirst(membership, chosen)) {
+                    chosen = membership;
                 }
             }
+            result.put(personId, chosen.Household__c);
         }
+    }
+
+    /**
+     * Whether `candidate` is a better answer for a person's household than `held`: primary
+     * before not, then earlier start (no start date first), then the row read first, which
+     * the selector orders oldest first.
+     */
+    private static Boolean comesFirst(Household_Member__c candidate, Household_Member__c held) {
+        if (held == null) {
+            return true;
+        }
+        Boolean candidatePrimary = candidate.Is_Primary__c == true;
+        Boolean heldPrimary = held.Is_Primary__c == true;
+        if (candidatePrimary != heldPrimary) {
+            return candidatePrimary;
+        }
+        if (candidate.Start_Date__c == held.Start_Date__c) {
+            return false;
+        }
+        if (candidate.Start_Date__c == null) {
+            return true;
+        }
+        return held.Start_Date__c != null && candidate.Start_Date__c < held.Start_Date__c;
     }
 
     /**
@@ -1050,6 +1079,7 @@ public with sharing class HouseholdService {
         for (Integer i = 0; i < created.size(); i++) {
             if (created[i].isSuccess()) {
                 waiting[i].AccountId = created[i].getId();
+                HOUSEHOLDS_AWAITING_PRIMARY.add(created[i].getId());
             } else {
                 failPersonSave(waiting[i], created[i]);
             }
@@ -1148,6 +1178,62 @@ public with sharing class HouseholdService {
         }
         List<Contact> waiting = withoutAHousehold(contacts);
         createHouseholdsAndMemberships(toPersons(waiting), byId(waiting));
+    }
+
+    /**
+     * Contact mode: the person a household was just created for is its Primary Contact, as
+     * junction mode already does by marking them the primary member (R-H2, PEOPLE-27).
+     * Called after insert, once the person has an id.
+     */
+    @NamespaceAccessible
+    public static void seedPrimaryContactsOfNewHouseholds(List<Contact> contacts) {
+        if (contacts == null || HOUSEHOLDS_AWAITING_PRIMARY.isEmpty()) {
+            return;
+        }
+        List<Account> updates = new List<Account>();
+        for (Contact record : contacts) {
+            if (record.Id != null && HOUSEHOLDS_AWAITING_PRIMARY.remove(record.AccountId)) {
+                updates.add(new Account(Id = record.AccountId, Primary_Contact__c = record.Id));
+            }
+        }
+        writePrimaryContacts(updates);
+    }
+
+    /**
+     * Junction mode: a contact saved with its account set to a household joins that household
+     * with a membership row, so the person is counted, named and found there (PEOPLE-10). An
+     * account that is an organization (an employer, in this mode) or a native Nonprofit Cloud
+     * household is left alone. The person joins as an ordinary member: who is primary stays a
+     * decision somebody makes (R-H10). Runs before automatic creation, which then sees the
+     * membership and creates nothing.
+     */
+    @NamespaceAccessible
+    public static void joinHouseholdsNamedOnNewContacts(List<Contact> contacts) {
+        if (contacts == null || contacts.isEmpty() || creatingAutomaticHouseholds) {
+            return;
+        }
+        if (!isJunctionMode()) {
+            return;
+        }
+        Set<Id> accountIds = new Set<Id>();
+        for (Contact record : contacts) {
+            if (record.Id != null && record.AccountId != null) {
+                accountIds.add(record.AccountId);
+            }
+        }
+        Set<Id> households = householdsAmong(accountIds);
+        households.removeAll(HouseholdSelector.nativeHouseholdAccountsAmong(households));
+        if (households.isEmpty()) {
+            return;
+        }
+        List<Household_Member__c> memberships = new List<Household_Member__c>();
+        for (Contact record : contacts) {
+            if (record.Id != null && households.contains(record.AccountId)) {
+                memberships.add(newMembership(record.Id, record.AccountId, null, false));
+            }
+        }
+        HouseholdWriter.createMemberships(memberships);
+        HOUSEHOLD_ID_BY_PERSON.clear();
     }
 
     /** The records themselves, by id, so that a failure can be put back on the right one. */
@@ -1917,7 +2003,11 @@ public with sharing class HouseholdService {
             return;
         }
         Id recordTypeId = householdRecordTypeId();
-        if (recordTypeId == null || !isJunctionMode()) {
+        if (recordTypeId == null) {
+            return;
+        }
+        if (!isJunctionMode()) {
+            refuseNonMemberPrimaryContacts(records, previousById, recordTypeId);
             return;
         }
         for (Account record : records) {
@@ -1929,6 +2019,48 @@ public with sharing class HouseholdService {
             if (record.Primary_Contact__c != before) {
                 record.Primary_Contact__c.addError(
                     Label.Core_Households_PrimaryContactFollowsMembers
+                );
+            }
+        }
+    }
+
+    /**
+     * Contact mode: a household's Primary Contact must be one of its members, a contact whose
+     * account is this household (R-H10, PEOPLE-27). Checked only when the field is set or
+     * changed to somebody, so clearing it, or saving a household whose primary has since
+     * left, is never blocked. One read for the whole save, in system mode under ADR-0021: the
+     * question is about the household's membership, not about what the saver can see.
+     */
+    private static void refuseNonMemberPrimaryContacts(
+        List<Account> records,
+        Map<Id, Account> previousById,
+        Id recordTypeId
+    ) {
+        List<Account> checked = new List<Account>();
+        Set<Id> contactIds = new Set<Id>();
+        for (Account record : records) {
+            if (record.RecordTypeId != recordTypeId || record.Primary_Contact__c == null) {
+                continue;
+            }
+            Account previous = previousById == null ? null : previousById.get(record.Id);
+            if (previous != null && previous.Primary_Contact__c == record.Primary_Contact__c) {
+                continue;
+            }
+            checked.add(record);
+            contactIds.add(record.Primary_Contact__c);
+        }
+        if (checked.isEmpty()) {
+            return;
+        }
+        Map<Id, Id> accountByContact = new Map<Id, Id>();
+        for (Contact person : HouseholdSelector.getContactsWithHouseholds(contactIds)) {
+            accountByContact.put(person.Id, person.AccountId);
+        }
+        for (Account record : checked) {
+            Id householdOfPrimary = accountByContact.get(record.Primary_Contact__c);
+            if (record.Id == null || householdOfPrimary != record.Id) {
+                record.Primary_Contact__c.addError(
+                    Label.Core_Households_PrimaryContactMustBeMember
                 );
             }
         }

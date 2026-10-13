@@ -151,6 +151,8 @@ no Account creates a Household Account named per the naming rules, in the same
 transaction, and attaches the Contact to it. This is controlled by the
 `Auto_Create_Households__c` setting, default on. Bulk safety is required: 200 Contacts
 inserted in one DML operation create their households without exceeding platform limits.
+The person a household is created for is named its Primary Contact (R-H10), as junction
+mode marks them the primary member.
 
 **R-H2 Automatic creation in junction mode.** In junction mode, saving a new person who
 belongs to no household creates a Household Account named per the naming rules and a
@@ -161,6 +163,11 @@ or, in an org shaped that way, as a person record on Account: both take this pat
 person a Household Member record already joins to a household is left alone. Bulk safety
 is required here too: 200 people inserted in one DML operation get their households and
 their membership records without exceeding platform limits.
+
+A Contact inserted in junction mode with its Account set to a household joins that
+household: one Household Member record is created for it, as an ordinary member, and
+automatic creation then leaves it alone. An Account that is an organization (an employer,
+in this mode) or a native Nonprofit Cloud household gets no membership record.
 
 This rule previously said that a person stored as an account got no household unless a
 second setting asked for it. ADR-0037 retires that setting and records why.
@@ -228,7 +235,10 @@ flags are independent.
 must be a current member of the household. When the primary contact leaves the
 household, the reference is cleared and the next member by ordering is proposed, not
 silently assigned. In contact mode that is the Primary Contact field itself; in junction
-mode it is the membership marked Is Primary, which Primary Contact mirrors (R-M3).
+mode it is the membership marked Is Primary, which Primary Contact mirrors (R-M3). In
+contact mode, setting or changing Primary Contact to a Contact whose Account is not that
+household is refused before save; clearing it, or saving a household whose primary has
+since left, is never refused.
 
 **R-H11 Member count.** Member Count is recomputed on every membership change (insert,
 update, delete, undelete, reparent, merge) and counts current members only. The field
@@ -388,6 +398,12 @@ contact mirrors the primary member).
 - A membership whose End Date is in the future stops being current on that date with no
   save to react to; the mirror follows at that household's next membership change, as
   Member Count does (R-H11).
+- **A person's household** in junction mode, wherever one household has to be named for a
+  person (rollups to the person's household, imports, addresses, donation matching),
+  is the household of their current primary membership, and with none, of their earliest
+  current membership: earliest Start Date, a membership with no Start Date counting as
+  earliest, then the row created first. Where a person is primary in more than one, the
+  earliest of those is the answer. A person with any current membership always has one.
 
 **R-M4 Person representation.** Exactly one of Contact or Account identifies the person:
 Contact where the person is a Contact, the person's own Person Account where Person
@@ -6589,6 +6605,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-12 | Accounting export custom permission. No object or field added. Connect gains the custom permission `Export_Accounting`, held by the `Accounting_Export` permission set and no other. `AccountingExportController.exportGifts` and `markPosted` refuse in words (label `Connect_AccountingExport_NoExportPermission`) a user without it, checked with `FeatureManagement.checkPermission`. `Post_Gifts` is unchanged. |
 | 1.x (built ahead) | 2026-10-12 | C-37 bulk update steps and bulk delete (ADR-0091, `0091-bulk-delete-from-a-find-query-with-undelete.md`; ADR-0081). Section 29E: R-BU1 gains the `transform` change, new R-BU7 (change with steps through `DataTransform`), and a Bulk delete subsection, rules R-BD1 to R-BD6. `Import_Batch__c.Operation__c` gains Delete and `Import_Batch__c` gains `Rows_Deleted__c`. R-IJ2 and R-IJ3: the journal gains the Deleted entry. BarnCRM Settings gains `Bulk_Delete_Run_Limit__c` (Section 12, v0.7 keys). New custom permission `Bulk_Delete_Records` and permission set `BarnCRM_Bulk_Delete`, in no role. |
 | v0.6 | 2026-10-13 | Merge survivors recalculated after the merge (ADR-0092, `0092-merge-survivors-recalculated-after-the-merge.md`). No object or field added. R-R4 gains the merge exception: the platform refuses a trigger's write to a record mid-merge, so the survivors' real-time totals are recalculated by the `SurvivorRecalculation` queued job just after the merge, falling back to the Rollup Queue for more than 50 survivors or when no job can be queued. |
+| v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
 
 ---
 ## 32. Entity ownership by package

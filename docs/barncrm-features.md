@@ -48,8 +48,9 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Exclude from name or greetings | Minor | Per-person boxes to leave someone out of the household name, or out of the greetings, while still counting them as a member. | Shipped | C-02 |
 | Custom name lock | Minor | A "custom name" box on a household stops BarnCRM recalculating its name and greetings. | Shipped | C-02 |
 | Different surnames and hyphenated names | Minor | Naming handles couples with different surnames, hyphenated names and member ordering. | Shipped | C-02 |
-| Primary contact follows the primary member | Minor | The household's primary contact mirrors whoever is marked primary on its members, including person accounts; nobody is promoted automatically when the primary leaves. | Shipped | C-22, ADR-0044 |
-| Household Members panel | Minor | Panel on the household page listing members, marking the primary, with Make primary and Add member (search for or create a person). | Shipped | C-01 |
+| Primary contact follows the primary member | Minor | The household's primary contact mirrors whoever is marked primary on its members, including person accounts; nobody is promoted automatically when the primary leaves. In the simple model the primary contact must be a member, and a new household names its first person. | Shipped | C-22, ADR-0044, ADR-NEXT (people-9) |
+| Household Members panel | Minor | Panel on the household page listing members, marking the primary, with Make primary and Add member (search for or create a person; a person account where the org stores people that way). | Shipped | C-01, ADR-NEXT (people-9) |
+| A contact saved into a household joins it | Minor | In the flexible model, a new contact whose account is a household gets a membership there, so it is counted and named and not given a second household. | Shipped | ADR-NEXT (people-9) |
 | Household panel on a person | Minor | Panel on each person's page naming their household and other members, with a link back. | Shipped | C-01 |
 | New household button | Minor | One click on the Hub home opens a new household with a placeholder name that is replaced once a member is added. | Shipped | C-01 |
 | Households follow person changes | Minor | Renaming, deleting or restoring a person recounts and renames their households in both membership models. | Shipped | C-01 |
