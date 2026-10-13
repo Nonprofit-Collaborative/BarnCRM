@@ -410,6 +410,15 @@ private class HouseholdMergeServiceTest {
                 saved.Anniversary__c,
                 'The chosen anniversary survives'
             );
+            // Both households had a default address; the merge settlement (PEOPLE-15) keeps
+            // the one matching the chosen billing address.
+            List<Address__c> defaults = [
+                SELECT City__c
+                FROM Address__c
+                WHERE Account__c = :survivor.Id AND Is_Default__c = TRUE
+            ];
+            Assert.areEqual(1, defaults.size(), 'The survivor has one default address');
+            Assert.areEqual('Berkeley', defaults[0].City__c, 'The chosen one');
         }
     }
 

@@ -146,6 +146,39 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         HouseholdService.afterMembershipChange(mayTidy, true);
         HouseholdService.afterMembershipChange(keptByMerge, false);
         recalculateSurvivors(gone, survivorByMerged);
+        settleSurvivors(gone, survivorByMerged);
+    }
+
+    /**
+     * What the merge moved onto the survivors without running their children's triggers,
+     * settled once the merge is saved (PEOPLE-15, MergeSettlement): a household that took in
+     * another household's members is recounted and renamed, every survivor keeps one default
+     * address, and a surviving person's relationships and primary affiliation are settled.
+     */
+    private static void settleSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
+        if (survivorByMerged.isEmpty()) {
+            return;
+        }
+        // People in either membership mode: relationships and affiliations do not depend on it.
+        Set<Id> mergedPeople = new Set<Id>();
+        if (HouseholdService.isPersonAccountOrg()) {
+            mergedPeople = new Map<Id, SObject>(PersonRecordSelector.filterPeople(gone)).keySet();
+        }
+        Id householdType = HouseholdService.householdRecordTypeId();
+        Set<Id> households = new Set<Id>();
+        Set<Id> people = new Set<Id>();
+        for (Account record : gone) {
+            Id survivorId = survivorByMerged.get(record.Id);
+            if (survivorId == null) {
+                continue;
+            }
+            if (mergedPeople.contains(record.Id)) {
+                people.add(survivorId);
+            } else if (householdType != null && record.RecordTypeId == householdType) {
+                households.add(survivorId);
+            }
+        }
+        MergeSettlement.afterMerge(households, new Set<Id>(survivorByMerged.values()), people);
     }
 
     /**
