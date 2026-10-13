@@ -394,6 +394,7 @@ deploy_stage "Core (Apex)" \
   "packages/core/main/default/classes" \
   "packages/core/main/default/triggers" || exit $?
 deploy_stage "Core (UI and permissions)" \
+  "packages/core/main/default/contentassets" \
   "packages/core/main/default/permissionsets" \
   "packages/core/main/default/permissionsetgroups" \
   "packages/core/main/default/layouts" \
