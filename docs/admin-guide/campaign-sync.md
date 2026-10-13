@@ -39,8 +39,8 @@ You need the Connect module installed, and a Salesforce edition that has Campaig
 Cloud, Service Cloud, or Nonprofit Cloud). An org on Salesforce Platform licenses only has no
 Campaigns, and the Campaign sync page says so.
 
-1. Give yourself the **Campaign Sync** permission set. Until the Module Manager arrives,
-   module permission sets are assigned in Setup.
+1. Give yourself the **Campaign Sync** permission set, in Setup: the roles on the Access page
+   do not include a module's permission sets.
 2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.
 3. Still in **Giving**, open **Campaign sync**. It shows how many appeals have a Campaign.

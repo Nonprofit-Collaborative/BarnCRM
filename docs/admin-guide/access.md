@@ -10,11 +10,13 @@ change our settings?" in a few seconds.
 
 Roles ship with BarnCRM and are kept up to date for you.
 
-One thing they do not do yet. A role today carries what Core provides, and nothing a
+One thing they do not do. A role carries what Core provides, and nothing a
 module adds: a module ships its own permission sets (Giving, for example, ships **Giving
-Admin**, **Giving Staff** and **Giving Read Only**), and no role includes them. Until the
-Module Manager in version 0.7 joins the two up, somebody with a role sees households and
-people but nothing the module adds, and a Salesforce administrator has to assign the
+Admin**, **Giving Staff** and **Giving Read Only**), and no role includes them. The
+[Module Manager](module-manager.md) does not join them up either: turning a module on gives
+the module's admin set (for Giving, **Giving Admin**) only to you, the person who turned it
+on. Anyone else with a role sees households and people but nothing the module adds until a
+Salesforce administrator assigns the
 module's permission set in Setup alongside the role. That is the one place BarnCRM still sends
 you to Setup for access, and it is a gap rather than a design.
 

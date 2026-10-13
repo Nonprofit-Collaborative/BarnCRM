@@ -31,7 +31,8 @@ Then give your fundraising staff the **Giving Staff** permission set, and give y
 
 Those three are assigned in Salesforce Setup, which is the one step here that BarnCRM
 cannot yet do for you: the roles on the Access page carry what Core provides and do not
-include a module's permission sets until the Module Manager arrives in version 0.7.
+include a module's permission sets. The one exception is **Giving Admin**, which the Module
+Manager gives you when you turn Giving on there.
 
 ## A five-minute walkthrough
 

@@ -53,8 +53,7 @@ the schedule.
 
 There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
 does not ask you to do that: the button on this page is the supported way to schedule the
-swap, now and after the Module Manager arrives in a later release. The Module Manager will
-switch whole modules on and off; the seasonal swap belongs to Core, which is always on, so it
+swap. The Module Manager switches whole modules on and off; the seasonal swap belongs to Core, which is always on, so it
 is scheduled here.
 
 Two things to know about the schedule.

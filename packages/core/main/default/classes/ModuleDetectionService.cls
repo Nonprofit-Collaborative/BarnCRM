@@ -168,22 +168,12 @@ public with sharing class ModuleDetectionService {
     }
 
     /**
-     * The API name an object actually has in this org, matching the unqualified name so that
-     * the same probe works before and after a namespace is assigned (Decision D-01), or null
-     * when no object matches.
+     * The API name a BarnCRM object has in this org, with whatever prefix the package carries
+     * (Decision D-01), or null when the package's object is not here. Another package's object
+     * with the same name, such as another package's `Fund__c`, does not count.
      */
     public static String resolveObject(String unqualifiedName) {
-        String wanted = unqualifiedName.toLowerCase();
-        Map<String, Schema.SObjectType> describes = Schema.getGlobalDescribe();
-        if (describes.containsKey(wanted)) {
-            return describes.get(wanted).getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-        }
-        String suffix = '__' + wanted;
-        for (String name : describes.keySet()) {
-            if (name.endsWith(suffix)) {
-                return describes.get(name).getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-            }
-        }
-        return null;
+        Schema.SObjectType type = NamespaceUtil.packagedObjectType(unqualifiedName);
+        return type == null ? null : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
     }
 }

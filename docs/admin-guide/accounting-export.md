@@ -44,8 +44,8 @@ already exported turns up in her next file instead of being missed.
 
 The Connect module has to be installed. Then give the person who runs the export the
 **Accounting Export** permission set, next to a Giving permission set that lets them see
-gifts (**Giving Read Only** is enough). Until the Module Manager arrives, module permission
-sets are assigned in Setup.
+gifts (**Giving Read Only** is enough). Both are assigned in Setup: the roles on the Access
+page do not include a module's permission sets.
 
 **The file holds the gifts the person running it can see**, the same as any report. Gifts
 are private by default, so check that Jen can see all of them: export the same month once
