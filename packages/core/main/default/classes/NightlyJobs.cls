@@ -36,7 +36,8 @@ public with sharing class NightlyJobs {
         List<NightlyJob> jobs = new List<NightlyJob>{
             new RollupJob(),
             new SeasonalAddressJob(),
-            new ErrorDigestJob()
+            new ErrorDigestJob(),
+            new ImportRowPurgeJob()
         };
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
@@ -174,6 +175,24 @@ public with sharing class NightlyJobs {
 
         public void schedule() {
             ErrorDigestScheduler.start();
+        }
+    }
+
+    /**
+     * The nightly Import row cleanup (R-IR5, D-40). How long rows are kept is an Import
+     * setting, and 0 keeps them, so the job always belongs on the list.
+     */
+    public class ImportRowPurgeJob implements NightlyJob {
+        public String label() {
+            return System.Label.Core_HealthCheck_JobImportRows;
+        }
+
+        public Boolean isScheduled() {
+            return ImportRowPurgeScheduler.isScheduled();
+        }
+
+        public void schedule() {
+            ImportRowPurgeScheduler.start();
         }
     }
 }

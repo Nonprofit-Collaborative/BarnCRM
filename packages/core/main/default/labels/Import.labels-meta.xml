@@ -209,6 +209,22 @@
         <value>Chunk {0} failed and its rows were rejected: {1}</value>
     </labels>
     <labels>
+        <fullName>Core_Import_ErrorRowsRemoved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: a pass refused because the nightly cleanup removed the batch rows</shortDescription>
+        <value>The rows of this import were removed because it finished longer ago than BarnCRM keeps them. Upload the file again to run it.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogRowsNotRemoved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: rows the import row cleanup could not delete, and the first reason</shortDescription>
+        <value>The import row cleanup could not remove {0} rows. The first: {1}</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_TargetHouseholdField</fullName>
         <categories>Import</categories>
         <language>en_US</language>

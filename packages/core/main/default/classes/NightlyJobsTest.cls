@@ -72,6 +72,7 @@ private class NightlyJobsTest {
             Assert.isTrue(jobs[0] instanceof NightlyJobs.RollupJob, 'Rollups first.');
             Assert.isTrue(jobs[1] instanceof NightlyJobs.SeasonalAddressJob, 'Then addresses.');
             Assert.isTrue(jobs[2] instanceof NightlyJobs.ErrorDigestJob, 'Then the digest.');
+            Assert.isTrue(jobs[3] instanceof NightlyJobs.ImportRowPurgeJob, 'Then the rows.');
             Assert.areEqual(moduleJob, jobs[jobs.size() - 1], 'A registered job is counted last.');
             Assert.areEqual(
                 System.Label.Core_HealthCheck_JobSeasonalAddresses,
@@ -97,7 +98,7 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.areEqual(4, jobs.size(), 'Core three, plus the module that answered.');
+            Assert.areEqual(5, jobs.size(), 'Core four, plus the module that answered.');
         }
     }
 

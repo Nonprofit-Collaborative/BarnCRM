@@ -342,6 +342,10 @@ public with sharing class ImportBatchService {
         if (batch.Row_Count__c == null || batch.Row_Count__c <= 0) {
             throw new ImportException(Label.Core_Import_ErrorNoRows);
         }
+        // A batch whose rows the nightly cleanup removed would run over nothing (R-IR5).
+        if (!hasRows(batch.Id)) {
+            throw new ImportException(Label.Core_Import_ErrorRowsRemoved);
+        }
         if (
             !oneObject &&
             ImportTemplateService.isPersonAccountMode(template) &&
@@ -623,6 +627,49 @@ public with sharing class ImportBatchService {
         } catch (Exception ignored) {
             return UNDO_WINDOW_DAYS;
         }
+    }
+
+    /** How long a finished import's rows are kept when the org has not said (R-IR5, D-40). */
+    @NamespaceAccessible
+    public static final Integer ROW_RETENTION_DAYS = 90;
+
+    /** The longest an org may keep rows, so a mistyped number cannot stand. */
+    private static final Integer MAX_ROW_RETENTION_DAYS = 3650;
+
+    /**
+     * How many days after an import finished its rows are kept, or 0 for for ever (R-IR5).
+     * Nothing, a negative number or an unreadable value falls back to the shipped ninety days,
+     * and anything over ten years is held at ten years.
+     */
+    @NamespaceAccessible
+    public static Integer rowRetentionDays() {
+        Object configured = SettingsService.hasKey('Import_Row_Retention_Days__c')
+            ? SettingsService.getValue('Import_Row_Retention_Days__c')
+            : null;
+        if (configured == null) {
+            return ROW_RETENTION_DAYS;
+        }
+        try {
+            Integer days = Decimal.valueOf(String.valueOf(configured)).intValue();
+            return days < 0 ? ROW_RETENTION_DAYS : Math.min(days, MAX_ROW_RETENTION_DAYS);
+        } catch (Exception ignored) {
+            return ROW_RETENTION_DAYS;
+        }
+    }
+
+    /**
+     * Whether the batch still has staged rows. Read in system mode: the rows are the package's
+     * own staging, and whether they are there is the same answer for every user (ADR-0021).
+     */
+    private static Boolean hasRows(Id batchId) {
+        return ![
+                SELECT Id
+                FROM Import_Row__c
+                WHERE Import_Batch__c = :batchId
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ]
+            .isEmpty();
     }
 
     /** The org's chunk size, clamped to something the platform will accept. */

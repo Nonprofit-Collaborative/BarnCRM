@@ -353,6 +353,14 @@
         <value>Error digest email</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_JobImportRows</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that removes the rows of old imports.</shortDescription>
+        <value>Import row cleanup</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_JobRollups</fullName>
         <categories>Core</categories>
         <language>en_US</language>
