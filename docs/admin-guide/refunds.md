@@ -75,10 +75,11 @@ was meant for another organization, and the donor has asked for it back.
 5. Look at that refund gift's allocations: one allocation for minus 100 against `General`,
    mirroring the original's designation, so the fund's total corrects itself.
 6. Go back to `G-000001`. It still shows 250 and its **Status** is still `Received`, because
-   only part of it came back. The refund is visible in its **Refunds** related list.
+   only part of it came back. The refund is visible in its **Refunds and Write-offs** list.
 7. Now refund the rest: click **Refund or Write Off** on `G-000001` again. The amount starts
    at 150, which is what is left. Give a reason and click **Record it**. This time the
-   original's **Status** changes to `Refunded`, because the whole gift has now gone back.
+   original's **Status** changes to `Refunded`, because the whole gift has now gone back,
+   and the **Refund or Write Off** button leaves the page: nothing is left to refund.
 8. To see a write-off instead, enter a new gift for 500, open it, click **Refund or Write
    Off**, and choose **Write off what is left of this gift** with the reason "Check returned
    unpaid by the bank". There is no amount to type: a write-off is always what is left. BarnCRM creates a linked gift for minus 500 and sets the original's **Status** to
@@ -113,12 +114,13 @@ made it.
 - **Refunding a gift that is posted to accounting or in a closed period.** That works: the
   refund is a new gift dated today, so it lands in an open period and in Jen's next export.
   See [Posting and Closed Periods](posting-and-closed-periods.md).
-- **Writing off or refunding a Pending gift.** The action is refused with "Only a received gift
-  can be refunded or written off": nothing was received. Set its **Status** to **Cancelled**
-  instead.
+- **Looking for Refund or Write Off on a Pending gift.** On the packaged Gift Record Page the
+  button shows only on a `Received` gift: nothing was received on a Pending one. Set its
+  **Status** to **Cancelled** instead. On a page your organization built, the action is
+  there but refused with "Only a received gift can be refunded or written off".
 - **Refunding more than is left.** The action is refused with "This refund is larger than
-  the amount left on the gift." Check the gift's **Refunds** related list: part of it may
-  have gone back already.
+  the amount left on the gift." Check the gift's **Refunds and Write-offs** list: part of it
+  may have gone back already.
 - **Typing a negative gift by hand instead of using the action.** You cannot: **Original
   Gift** and **Refund Reason** are filled in by the action and are read only on the page. The
   action is what mirrors the original's designation and updates its status, and a hand-typed

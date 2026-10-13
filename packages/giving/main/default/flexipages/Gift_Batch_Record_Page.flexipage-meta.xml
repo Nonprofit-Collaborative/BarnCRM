@@ -88,6 +88,33 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentInstanceProperties>
+          <name>actionNames</name>
+          <valueList>
+            <valueListItems>
+              <value>Edit</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Delete</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsConfiguration</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
         <componentName>force:highlightsPanel</componentName>
         <identifier>giftBatchHighlightsPanel</identifier>
       </componentInstance>

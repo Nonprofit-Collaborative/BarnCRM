@@ -84,10 +84,12 @@ the BarnCRM Admin permission set. Somebody who has the Giving Admin permission s
 it can open the page and see whether the jobs are running; the buttons are disabled.
 
 The **payment schedule** card lives on a commitment's record page, and BarnCRM ships a
-page called **Commitment Record Page** with the card already on it. Assign it once, as your
-org default for Commitment, and every commitment shows the schedule from then on. If your
-organization has built a commitment record page of its own, add the **Commitment Payment
-Schedule** component to that page instead.
+page called **Commitment Record Page** with the card already on it. The Fundraising app
+opens every commitment on it, with nothing to assign. The same page lists the **Gifts**
+received against the commitment, newest first, and its action bar carries **Edit**,
+**Change Owner**, **Sharing** and **Delete**. If your organization has built a commitment record page of
+its own, add the **Commitment Payment Schedule** component to that page, and a **Dynamic
+Related List - Single** for Gifts.
 
 ## A five-minute walkthrough
 
@@ -116,7 +118,8 @@ Start from the sample data. The first part is David's work, the last step is Jen
     same date. In **Commitment** choose the pledge you just made, and in **Installment**
     choose the first payment.
 11. Choose **Save**, then go back to the commitment. The first payment now reads **Paid**,
-    paid to date reads 100, and the balance reads 1,100.
+    paid to date reads 100, and the balance reads 1,100. The gift is at the top of the
+    commitment's **Gifts** list.
 
 If David had left **Installment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.

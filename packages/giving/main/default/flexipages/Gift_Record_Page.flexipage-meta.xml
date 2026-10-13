@@ -292,6 +292,43 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentInstanceProperties>
+          <name>actionNames</name>
+          <valueList>
+            <valueListItems>
+              <value>Edit</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift__c.Refund_Gift</value>
+              <visibilityRule>
+                <criteria>
+                  <leftValue>{!Record.Status__c}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>Received</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
+              <value>Delete</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsConfiguration</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
         <componentName>force:highlightsPanel</componentName>
         <identifier>giftHighlightsPanel</identifier>
       </componentInstance>
@@ -385,8 +422,118 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
-        <componentName>force:relatedListContainer</componentName>
-        <identifier>giftRelatedLists</identifier>
+        <componentInstanceProperties>
+          <name>adminFilters</name>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>maxRecordsToDisplay</name>
+          <value>10</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>parentFieldApiName</name>
+          <value>Gift__c.Id</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListApiName</name>
+          <value>Gift_Allocations__r</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListDisplayType</name>
+          <value>ADVGRID</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListFieldAliases</name>
+          <valueList>
+            <valueListItems>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Fund__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Percent__c</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListLabel</name>
+          <value>Gift Allocations</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showActionBar</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldAlias</name>
+          <value>Amount__c</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldOrder</name>
+          <value>Descending</value>
+        </componentInstanceProperties>
+        <componentName>lst:dynamicRelatedList</componentName>
+        <identifier>giftAllocationsList</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>adminFilters</name>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>maxRecordsToDisplay</name>
+          <value>10</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>parentFieldApiName</name>
+          <value>Gift__c.Id</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListApiName</name>
+          <value>Refunds__r</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListDisplayType</name>
+          <value>ADVGRID</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListFieldAliases</name>
+          <valueList>
+            <valueListItems>
+              <value>NAME</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift_Date__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Amount__c</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Refund_Reason__c</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>relatedListLabel</name>
+          <value>Refunds and Write-offs</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showActionBar</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldAlias</name>
+          <value>Gift_Date__c</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>sortFieldOrder</name>
+          <value>Descending</value>
+        </componentInstanceProperties>
+        <componentName>lst:dynamicRelatedList</componentName>
+        <identifier>giftRefundsList</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

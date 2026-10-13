@@ -63,6 +63,22 @@ You are David, and a check from Maria's neighbour arrived this morning.
    in your fund reports is never more or less than the money you received.
 10. Now refund part of the gift: follow the Refunds page from step 1.
 
+## What the gift page shows
+
+In the Fundraising app a gift opens on the packaged **Gift Record Page**. Its action bar
+carries **Edit**, **Refund or Write Off** and **Delete**. **Refund or Write Off** shows only
+while the gift's **Status** is `Received`, because only a received gift can be refunded. The
+**Gift Allocations** list (largest first) and the **Refunds and Write-offs** list (newest
+first) are part of the page itself, so they look the same whichever page layout your
+profiles use. The
+**Activity** panel can log a call, create a task or create an event.
+
+To add another list, such as one your organization built, open the page in the Lightning
+App Builder and drag in the **Dynamic Related List - Single** component. Adding it to the
+Gift page layout alone does not put it on this page: the layout is what Salesforce shows
+when a gift is opened outside the Fundraising app, or on a record page your organization
+built that still uses the related list component.
+
 ## Lifting the receipt lock
 
 Sooner or later an organization holds a receipted gift that is wrong in a way that voiding

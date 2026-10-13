@@ -186,6 +186,10 @@
           <name>enableActionsInNative</name>
           <value>true</value>
         </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
         <componentName>force:highlightsPanel</componentName>
         <identifier>force_highlightsPanel</identifier>
       </componentInstance>

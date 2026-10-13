@@ -105,6 +105,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-no-platform-cache-partition.md) | Configuration reads use the platform's own caches; Core ships no Platform Cache partition (amends ADR-0006 decision 1) | Accepted (builder decision) |
 | [NEXT](NEXT-user-access-policies-documented-not-packaged.md) | User access policies are documented definitions, not packaged components | Proposed (builder decision) |
 | [NEXT](NEXT-in-app-guidance-prompts.md) | First-visit tips are packaged In-App Guidance prompts, single step, managed in Setup | Proposed (builder decision) |
+| [NEXT](NEXT-record-pages-own-their-actions-and-lists.md) | Every packaged record page places its own actions, and Giving's own pages their own related lists (amends ADR-0043) | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
