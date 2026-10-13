@@ -193,6 +193,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Package labels renamed to BarnCRM | Minor | Renames the app, settings ("BarnCRM Settings"), roles, folders, templates and API names from the old working title to BarnCRM. | Shipped (PR #181) | plan 11.3 item 6 |
 | Faster, safer settings saves | Minor | A settings save writes only the keys that changed, under a lock, so two admins saving at once do not undo each other. | Shipped | plan 11.3 |
 | What's new after upgrade | Minor | A "What's new" card on the home page summarizes what changed after an upgrade, hidden once read and when nothing is new. | Shipped | C-27, ADR-0087 |
+| What's new kept current | Minor | A release checklist step writes each release's What's new entries from its release notes, and a CI check warns (and fails at release) when the newest release notes have none. | Built, not merged (fix/admin-6) | ADMIN-28 |
 | Unlocked-to-managed migration kit | Minor | Moves a production pilot from unlocked to managed packages: check, export, reimport with every record link translated, and verify record by record. | Shipped | C-31, ADR-0088 |
 | Telemetry (opt-in) | Minor | Anonymous, opt-in usage counts (installed modules, org shape, error counts), off by default. | Planned (v0.11) | C-26 |
 | CMDT Manager | Minor | A Custom metadata page in BarnCRM Settings (General) where holders of the BarnCRM Metadata Admin permission set add, edit and archive the org's own relationship types; shipped types are read only. | Shipped | plan 6.1 item 9, ADR-0085 |
@@ -204,6 +205,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Error Log | Major | Records every caught failure in plain language with the record, user and what to do, and lets you mark entries reviewed or fixed. | Shipped | C-05 |
 | Health Check | Major | Checks org shape, licenses, coexistence fit, access gaps, paused automation, unread errors and data problems, each with a plain explanation and a button. | Shipped | C-11, C-21 |
 | Error digest email | Minor | Optional daily or weekly email counting new Error Log entries by source and severity; sends nothing when nothing is new. | Shipped | C-23 |
+| Error Log retention | Minor | The daily Error Log run deletes entries older than 180 days, whatever their status; the number of days is a BarnCRM Setting, and 0 keeps everything. | Built, not merged (fix/admin-6) | ADMIN-26, R-E6 |
 | Errors survive rollback | Minor | Entries are published as events so an error is kept even when the failed work is rolled back. | Shipped | C-05 |
 | Errors tile | Minor | Hub home tile counts errors to review that the user may see. | Shipped | C-05 |
 | Fix buttons that ask first | Minor | Health Check fixes show what they will do, wait for Confirm, only add (never delete or overwrite), and are recorded in settings history. | Shipped | C-21, ADR-0048 |
@@ -394,6 +396,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Donor record pages with giving | Major | Giving ships person and household or organization pages with a Giving section, related lists for gifts, commitments and soft credits, and a New Gift action. | Shipped | ADR-0064 (UX pass) |
 | Gift, Commitment and Gift Batch record pages | Minor | Packaged record pages for Giving records, opened automatically in the Fundraising app. | Shipped | ADR-0043 |
 | Giving permission sets | Minor | Giving Admin, Giving Staff and Giving Read Only (assigned in Setup until the Module Manager joins them to roles). | Shipped | C-06 |
+| Fundraising Staff includes Giving Staff | Minor | Assigning the Fundraising Staff role on the Access page also gives Giving Staff, so gift entry needs no separate Setup step. | Built, not merged (fix/admin-6) | owner decision 2026-10-13 |
 | Giving sample data | Minor | With Giving installed, sample data adds about 700 gifts over three years, funds, appeals, commitments, soft credits, tributes and in-kind gifts, dated relative to load. | Shipped | C-10 |
 | Giving settings pages | Minor | Acknowledgments, receipts, donor levels, stewardship plans, nightly jobs and accounting periods are all set in the settings console. | Shipped | ADR-0020 |
 | Fundraising app navigation and fallback layouts | Minor | Adds Contacts, Households, Organizations and Commitments tabs, plain list view names, and a fallback layout for each object. | Shipped | UX pass |

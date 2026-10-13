@@ -85,6 +85,24 @@ Sending the digest does not use up your organization's daily email allowance: it
 users of your own Salesforce, which the platform does not count. At most 50 people receive
 it.
 
+## How long entries are kept
+
+Each entry can hold a long technical detail, so an Error Log that is never emptied slowly
+fills your organization's data storage. BarnCRM deletes entries older than **180 days**, whatever
+their status, every morning when the daily Error Log run starts (the same 7:00 AM run that
+sends the digest).
+
+1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
+2. In **Days to keep Error Log entries**, type how many days to keep them, from 30 to
+   3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
+   anything older; nothing is deleted when you save.
+3. Make sure the daily run is scheduled: the **Error digest** panel says so, and Health
+   Check lists it under **Nightly jobs are not scheduled** when it is not. Old entries are
+   deleted only while it runs, whether or not anyone receives the digest.
+
+Deleted entries go to the Recycle Bin for 15 days, like any record you delete. If you need
+an entry for longer, export the Error Log list or build a report on it before it ages out.
+
 ## A five-minute walkthrough
 
 Maria has heard from a colleague that "something did not save this morning."

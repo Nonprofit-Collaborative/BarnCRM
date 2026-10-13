@@ -127,6 +127,7 @@ ALLOWED = {
     "PermissionSet": "the packaged permission sets, plan Section 4.8.",
     "PermissionSetAssignment": "assigning them, and asserting the assignment in tests.",
     "PermissionSetGroup": "the packaged groups, C-06.",
+    "PermissionSetGroupComponent": "what a packaged group contains, asserted in tests.",
     "ObjectPermissions": "read back by the access checks in C-06.",
     "FieldPermissions": "same.",
     "SetupEntityAccess": "class and custom permission grants inside a permission set.",

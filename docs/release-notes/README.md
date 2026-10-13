@@ -18,6 +18,20 @@ part of its definition of done (plan Section 7.4).
 **`v0.1.md` is written at the end of v0.1**, after the last feature meets the definition
 of done and before any v0.2 work begins (plan Section 9.1 item 7).
 
+## Before a release
+
+The What's New card on BarnCRM Home shows the shipped `Release_Note` custom metadata records
+of the newest version (canonical model R-WN2), not these files. So before a package version
+is created (plan Section 7.5 item 2):
+
+1. From this version's draft lines (`v0.N-draft-*.md`), write the few changes an administrator
+   should hear about as `Release_Note.<Name>.md-meta.xml` records, with `Version__c` set to
+   `0.N`, a headline, two or three lines of detail, a sort order, and the module that ships
+   them (Core's in `packages/core`, a module's in its own package). See
+   `packages/core/main/default/customMetadata/Release_Note.V0_6_Whats_New_Card.md-meta.xml`.
+2. Run `python3 scripts/ci/check-whats-new.py --release`. It must pass. In ordinary builds the
+   same check only warns, because drafts arrive before the entries are written.
+
 ## Template
 
 Copy the skeleton below into `v0.N.md` and fill in every section. An empty section is

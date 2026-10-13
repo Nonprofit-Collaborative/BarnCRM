@@ -24,7 +24,7 @@ so it is listed only where Giving is installed, which makes five:
 | Role | Who it is for | What it gives |
 |---|---|---|
 | BarnCRM Admin | The person who configures the app, usually you | Everything, including BarnCRM Settings |
-| Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving |
+| Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
 | Program Staff | Program and services staff | Day to day work with people, households, and program records |
 | Volunteer Coordinator | Whoever schedules and tracks volunteers | Day to day work with people, households, and volunteer records |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
@@ -38,7 +38,7 @@ to, not through the record it is about.
 | Person | What they hold | Can they open a receipt PDF |
 |---|---|---|
 | Maria, who configures BarnCRM | BarnCRM Admin, plus Giving Admin | Yes |
-| David, who enters the gifts | Fundraising Staff, plus Giving Staff | Yes |
+| David, who enters the gifts | Fundraising Staff, which includes Giving Staff | Yes |
 | Tom, on the board | Read Only, plus Giving Read Only | Yes, read only |
 | Priya, who coordinates volunteers | Volunteer Coordinator, and no Giving set | No |
 | Sam, in programs | Program Staff, and no Giving set | No |

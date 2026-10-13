@@ -15,6 +15,13 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
     private static final String DAILY_CRON = '0 0 7 * * ?';
 
     public void execute(SchedulableContext context) {
+        // The daily Error Log run also deletes entries past their retention (R-E6). Its own
+        // try, so neither half stops the other.
+        try {
+            ErrorLogRetention.start();
+        } catch (Exception failed) {
+            ErrorLogger.log(failed, 'Error Log retention');
+        }
         try {
             ErrorDigestService.runScheduled();
         } catch (Exception failed) {
