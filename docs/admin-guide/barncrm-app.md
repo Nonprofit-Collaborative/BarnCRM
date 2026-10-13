@@ -26,7 +26,9 @@ person what they can act on:
 
 | Part of the home page | Who sees it |
 |---|---|
-| **Welcome to BarnCRM**, the **New household** button, and the paused automation banner | Everyone |
+| **What's new** card, until the person dismisses it for this release | Everyone |
+| **Welcome to BarnCRM** and the paused automation banner | Everyone |
+| **New household** button | People who can create accounts with the Household record type |
 | **Setup checklist** (or the **Setup complete** tile once it is finished) | Administrators |
 | **Health Check** | Administrators |
 | **Errors to review** | Administrators |

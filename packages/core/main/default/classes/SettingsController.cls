@@ -146,7 +146,9 @@ public with sharing class SettingsController {
         return hits;
     }
 
-    @AuraEnabled(cacheable=true)
+    // Not cacheable: the console calls it again right after a save, and a cached answer would
+    // show the rows from before the save (ADMIN-14).
+    @AuraEnabled
     public static List<ChangeModel> getRecentChanges(Integer limitCount) {
         List<ChangeModel> changes = new List<ChangeModel>();
         try {
@@ -243,7 +245,34 @@ public with sharing class SettingsController {
             }
             section.settings.add(setting);
         }
+        model.sections = inShippedOrder(model.sections);
         return model;
+    }
+
+    /**
+     * Sections in the order SettingSections.all() gives, so the console opens on General
+     * (ADMIN-6). A section no package declared there keeps its place after the known ones.
+     */
+    private static List<SectionModel> inShippedOrder(List<SectionModel> sections) {
+        Map<String, Integer> rank = new Map<String, Integer>();
+        List<String> shipped = SettingSections.all();
+        for (Integer i = 0; i < shipped.size(); i++) {
+            rank.put(shipped[i].deleteWhitespace().toLowerCase(), i);
+        }
+        List<List<SectionModel>> slots = new List<List<SectionModel>>();
+        for (Integer i = 0; i <= shipped.size(); i++) {
+            slots.add(new List<SectionModel>());
+        }
+        for (SectionModel section : sections) {
+            String name = section.name == null ? '' : section.name.deleteWhitespace().toLowerCase();
+            Integer slot = rank.containsKey(name) ? rank.get(name) : shipped.size();
+            slots[slot].add(section);
+        }
+        List<SectionModel> ordered = new List<SectionModel>();
+        for (List<SectionModel> slot : slots) {
+            ordered.addAll(slot);
+        }
+        return ordered;
     }
 
     /**

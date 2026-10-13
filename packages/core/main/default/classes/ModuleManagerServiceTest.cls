@@ -203,6 +203,36 @@ private class ModuleManagerServiceTest {
     }
 
     @IsTest
+    static void countsShareTheQueryRowLimitSoTheReportAlwaysOpens() {
+        System.runAs(TestUsers.admin()) {
+            volunteersInstalled();
+            ModuleManagerService.ownedObjects = new Map<String, List<String>>{
+                MODULE => new List<String>{ 'Error_Log__c', 'Setting_Change__c', 'Error_Log__c' }
+            };
+            TestDataFactory.insertErrorLogs(200, ErrorLogger.STATUS_NEW);
+
+            Test.startTest();
+            // Together the counts would need 400 rows; the transaction may read only 300.
+            ModuleManagerService.rowLimit = 300;
+            ModuleManagerService.rowMargin = 0;
+            List<ModuleManagerService.RecordCount> report = ModuleManagerService.uninstallReport(
+                MODULE
+            );
+            Integer rowsRead = Limits.getQueryRows();
+            Test.stopTest();
+
+            Assert.isTrue(rowsRead <= 300, 'The counts stay inside the row limit: ' + rowsRead);
+            Assert.areEqual(3, report.size(), 'Every object is still reported');
+            Assert.isTrue(report[0].capped, 'A count that ran out of room says so');
+            Assert.isFalse(report[1].capped, 'A small object is counted exactly');
+            Assert.isTrue(
+                report[2].count > report[0].count,
+                'The room a small object leaves passes to the next one: ' + report[2].count
+            );
+        }
+    }
+
+    @IsTest
     static void givesThePersonWhoTurnedItOnTheModuleAdminSet() {
         System.runAs(TestUsers.admin()) {
             volunteersInstalled();

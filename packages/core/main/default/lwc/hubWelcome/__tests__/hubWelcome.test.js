@@ -54,12 +54,14 @@ const ACCOUNT_INFO = {
     [HOUSEHOLD_RECORD_TYPE_ID]: {
       recordTypeId: HOUSEHOLD_RECORD_TYPE_ID,
       developerName: 'Household',
-      name: 'Household'
+      name: 'Household',
+      available: true
     },
     '012000000000002AAA': {
       recordTypeId: '012000000000002AAA',
       developerName: 'Organization',
-      name: 'Organization'
+      name: 'Organization',
+      available: true
     }
   }
 };
@@ -149,6 +151,16 @@ describe('c-hub-welcome', () => {
   it('hides the New household button when the user cannot create accounts', async () => {
     const element = build();
     getObjectInfo.emit({ ...ACCOUNT_INFO, createable: false });
+    await settle();
+
+    expect(element.shadowRoot.querySelector('[data-id="new-household"]')).toBeNull();
+  });
+
+  it('hides the New household button when the user may not use the household record type', async () => {
+    const element = build();
+    const infos = { ...ACCOUNT_INFO.recordTypeInfos };
+    infos[HOUSEHOLD_RECORD_TYPE_ID] = { ...infos[HOUSEHOLD_RECORD_TYPE_ID], available: false };
+    getObjectInfo.emit({ ...ACCOUNT_INFO, recordTypeInfos: infos });
     await settle();
 
     expect(element.shadowRoot.querySelector('[data-id="new-household"]')).toBeNull();

@@ -50,10 +50,13 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
       return;
     }
     const infos = data.recordTypeInfos || {};
+    // Only a record type this user may use: without it the New form fails or opens with
+    // another record type (as for people in #221).
     this.householdRecordTypeId = Object.keys(infos).find(
       (id) =>
-        infos[id].developerName === HOUSEHOLD_RECORD_TYPE ||
-        infos[id].name === HOUSEHOLD_RECORD_TYPE
+        infos[id].available === true &&
+        (infos[id].developerName === HOUSEHOLD_RECORD_TYPE ||
+          infos[id].name === HOUSEHOLD_RECORD_TYPE)
     );
     this.accountCreatable = Boolean(data.createable);
   }
