@@ -873,4 +873,25 @@ private class SettingsServiceTest {
             }
         }
     }
+
+    @IsTest
+    static void aDateSettingReadsAsTheSameDayNotAMidnightDateTime() {
+        System.runAs(TestUsers.admin()) {
+            Date closedThrough = Date.newInstance(2026, 9, 30);
+            Datetime pausedUntil = Datetime.newInstanceGmt(2026, 10, 1, 14, 30, 0);
+
+            Test.startTest();
+            String dateText = SettingsService.asText(closedThrough);
+            String datetimeText = SettingsService.asText(pausedUntil);
+            Test.stopTest();
+
+            Assert.areEqual(
+                '2026-09-30',
+                dateText,
+                'A Date is also instanceof Datetime, so it must be read as a date first'
+            );
+            Assert.areEqual('2026-10-01T14:30:00Z', datetimeText, 'A date-time keeps its GMT form');
+            Assert.areEqual('', SettingsService.asText(null), 'Unset reads as empty');
+        }
+    }
 }

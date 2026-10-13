@@ -694,6 +694,11 @@ public with sharing class SettingsService {
         if (value == null) {
             return '';
         }
+        // A Date is also `instanceof Datetime` in Apex, so test for Date first: a date setting
+        // reads as YYYY-MM-DD, the form a date input takes, not as a midnight GMT date-time.
+        if (value instanceof Date) {
+            return String.valueOf((Date) value);
+        }
         if (value instanceof Datetime) {
             return ((Datetime) value).formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'');
         }
