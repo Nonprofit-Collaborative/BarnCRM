@@ -304,6 +304,9 @@
               <value>Edit</value>
             </valueListItems>
             <valueListItems>
+              <value>Account.Log_Interaction</value>
+            </valueListItems>
+            <valueListItems>
               <value>Account.Merge_Household</value>
               <visibilityRule>
                 <criteria>
@@ -331,6 +334,10 @@
         </componentInstanceProperties>
         <componentInstanceProperties>
           <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
           <value>true</value>
         </componentInstanceProperties>
         <componentName>force:highlightsPanel</componentName>

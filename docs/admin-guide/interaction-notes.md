@@ -22,9 +22,9 @@ Interaction notes work as soon as Core is installed. There is nothing to switch 
 
 **Where the button is.** **Log an interaction** sits in the action bar at the top of the
 packaged person page and the packaged household and organization page, in the **BarnCRM**
-app, on the desktop and on the phone. If you do not see it, you are probably looking at the
-record outside the **BarnCRM** app, or somebody has assigned a different record page in the
-Lightning App Builder.
+app and, with Giving installed, the **Fundraising** app, on the desktop and on the phone. If
+you do not see it, you are probably looking at the record outside those apps, or somebody
+has assigned a different record page in the Lightning App Builder.
 
 **Who can log one.** Anyone who can see the record and whose Salesforce user can create
 tasks, which most users can. BarnCRM's permission sets do not change that: it comes with the
