@@ -942,4 +942,38 @@ private class ImportProcessorBatchTest {
             );
         }
     }
+
+    /**
+     * The run log puts chunk failures before the notes, so the field's length never cuts them
+     * off, and keeps a bounded number of notes however many distinct ones the chunks raise.
+     */
+    @IsTest
+    static void chunkFailuresComeFirstAndNotesAreCapped() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = staged(1);
+            ImportProcessorBatch run = new ImportProcessorBatch(batch.Id, true);
+            ImportRowProcessor.Outcome outcome = new ImportRowProcessor.Outcome();
+            for (Integer i = 0; i < ImportProcessorBatch.MAX_NOTES + 50; i++) {
+                outcome.notes.add('Note number ' + i);
+            }
+            run.addNotes(outcome);
+            run.addLog('Chunk 7 failed for the test.');
+
+            Test.startTest();
+            run.finish(null);
+            Test.stopTest();
+
+            String log = ImportBatchSelector.selectById(batch.Id).Run_Log__c;
+            Assert.isTrue(
+                log.indexOf('Chunk 7 failed') < log.indexOf('Note number'),
+                'The chunk failure comes before the notes.'
+            );
+            Assert.areEqual(
+                ImportProcessorBatch.MAX_NOTES,
+                log.countMatches('Note number '),
+                'Notes past the cap are left out.'
+            );
+            Assert.isTrue(log.contains(Label.Core_Import_LogNotesCut), 'And the run log says so.');
+        }
+    }
 }

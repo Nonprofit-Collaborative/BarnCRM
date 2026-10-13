@@ -209,6 +209,46 @@
         <value>Chunk {0} failed and its rows were rejected: {1}</value>
     </labels>
     <labels>
+        <fullName>Core_Import_LogRowsNotSaved</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: staged rows whose result could not be saved</shortDescription>
+        <value>{0} rows could not record their result, so they still show an earlier one. The first was row {1}: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogNotesCut</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: more notes than the run log keeps</shortDescription>
+        <value>There were more notes than the run log keeps. The rest were left out.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorEntitiesNotLoaded</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row error: the module columns failed to load</shortDescription>
+        <value>The people on this row were saved, but its {0} columns were not loaded: {1}. Import this row again once the problem is fixed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorStagingClosed</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: rows added after the import has run</shortDescription>
+        <value>Rows can be added to an import only before its preview starts. Start a new import for these rows.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRowTooLong</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import error: one row of the file is too long to stage</shortDescription>
+        <value>Row {0} of the file is too long to import (over 32,768 characters). A quotation mark that is never closed is the usual cause. Fix the row in your spreadsheet and upload the file again.</value>
+    </labels>
+    <labels>
         <fullName>Core_Import_CardTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>

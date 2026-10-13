@@ -812,9 +812,7 @@ public with sharing class ImportObjectLoader {
                 : null;
             rows.add(row);
         }
-        if (!rows.isEmpty()) {
-            Database.update(rows, false, AccessLevel.SYSTEM_MODE);
-        }
+        ImportRowProcessor.saveRows(rows, outcome, 'ImportObjectLoader.writeBack');
     }
 
     // -------------------------------------------------------------------------------------

@@ -14,12 +14,16 @@
 public with sharing class ImportProcessorBatch implements Database.Batchable<SObject>, Database.Stateful {
     /** How many lines of the run log are kept. A chunk failure is worth more than a note. */
     private static final Integer MAX_LOG_LINES = 200;
+    /** How many distinct notes are kept, so a file of odd values cannot swell the state. */
+    @TestVisible
+    private static final Integer MAX_NOTES = 200;
 
     private final Id batchId;
     private final Boolean dryRun;
     private Boolean failed = false;
     private List<String> log = new List<String>();
     private Set<String> notes = new Set<String>();
+    private Boolean notesCut = false;
     private Integer chunksRun = 0;
     /** The gift amounts the entity processor read, added up over the chunks (R-IB10). */
     private Decimal fileAmount;
@@ -104,7 +108,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             }
             // Kept only from a chunk that finished: a chunk that died saved nothing.
             processorState = ImportEntityProcessors.carriedState;
-            notes.addAll(outcome.notes);
+            addNotes(outcome);
             if (outcome.fileAmount != null) {
                 fileAmount = (fileAmount == null ? 0 : fileAmount) + outcome.fileAmount;
             }
@@ -133,8 +137,12 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             lines.add(
                 dryRun ? Label.Core_Import_LogDryRunHeader : Label.Core_Import_LogCommitHeader
             );
-            lines.addAll(new List<String>(notes));
+            // Chunk failures first: the run log is cut at its field's length, and they matter most.
             lines.addAll(log);
+            lines.addAll(new List<String>(notes));
+            if (notesCut) {
+                lines.add(Label.Core_Import_LogNotesCut);
+            }
             ImportBatchService.finish(
                 batchId,
                 dryRun,
@@ -164,11 +172,25 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 : reason.abbreviate(4000);
             rows.add(rejected);
         }
-        if (!rows.isEmpty()) {
-            Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+        ImportRowProcessor.Outcome saved = new ImportRowProcessor.Outcome();
+        ImportRowProcessor.saveRows(rows, saved, 'ImportProcessorBatch.rejectChunk');
+        for (String line : saved.notes) {
+            addLog(line);
         }
     }
 
+    @TestVisible
+    private void addNotes(ImportRowProcessor.Outcome outcome) {
+        for (String note : outcome.notes) {
+            if (notes.size() < MAX_NOTES) {
+                notes.add(note);
+            } else if (!notes.contains(note)) {
+                notesCut = true;
+            }
+        }
+    }
+
+    @TestVisible
     private void addLog(String line) {
         if (log.size() < MAX_LOG_LINES) {
             log.add(line);

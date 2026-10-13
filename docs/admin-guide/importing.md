@@ -279,6 +279,21 @@ throw away the rest of the file. The failed rows are counted as rejected, each c
 reason, and none of them wrote anything. Fix those rows in your spreadsheet, save them as
 a smaller file, and import that file on its own.
 
+**Rows rejected with "The people on this row were saved, but its ... columns were not
+loaded".** A module (Giving, for a gift file) failed while loading its columns for part of
+the file. Everything it had saved for those rows was undone, so no half-loaded gifts remain,
+but the people on them were already saved. The run log and the Error Log give the reason.
+Fix it, then import the rejected rows again: the people are matched, not created twice.
+
+**The run log says some rows "could not record their result".** The import ran, but those
+staged rows could not be updated with what happened to them, so they still show an earlier
+result. The Error Log has the same line. Check the Error Log for the cause and preview the
+file again.
+
+**"Row ... of the file is too long to import".** One row is longer than an import row can
+hold, usually because a quotation mark opens a value and is never closed, so the rest of
+the file reads as one value. Fix the row in your spreadsheet and upload the file again.
+
 **Salesforce warned about duplicates, and the import saved the people anyway.** An import
 saves past a duplicate rule set to alert, as a bulk load does, so a couple at one address or
 a person resembling someone already here is not rejected. Afterwards run the duplicate scan

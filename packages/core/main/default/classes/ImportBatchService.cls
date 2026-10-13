@@ -38,6 +38,10 @@ public with sharing class ImportBatchService {
     private static final Integer MIN_CHUNK_SIZE = 1;
     private static final Integer MAX_CHUNK_SIZE = 2000;
 
+    /** The length of Raw Values JSON, the longest row a file may have. */
+    @TestVisible
+    private static final Integer MAX_ROW_LENGTH = 32768;
+
     /** How long after a commit a batch may still be undone, when the org has not said (R-IB7). */
     @NamespaceAccessible
     public static final Integer UNDO_WINDOW_DAYS = 30;
@@ -203,17 +207,33 @@ public with sharing class ImportBatchService {
         if (batch == null) {
             throw new ImportException(Label.Core_Import_ErrorBatchGone);
         }
+        // Rows join a file only while it is being read in: staging into a batch that has run
+        // would flip it back to Parsing, hiding a running job and an undoable commit.
+        if (batch.Status__c != STATUS_DRAFT && batch.Status__c != STATUS_PARSING) {
+            throw new ImportException(Label.Core_Import_ErrorStagingClosed);
+        }
         if (rows == null || rows.isEmpty()) {
             return batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue();
         }
         Integer start = firstRowNumber == null || firstRowNumber < 1 ? 1 : firstRowNumber;
         List<Import_Row__c> staged = new List<Import_Row__c>();
         for (Integer i = 0; i < rows.size(); i++) {
+            String raw = JSON.serialize(rows[i]);
+            // Cut short, the row would no longer be readable and would be rejected for the
+            // wrong reason, so the page is refused with the row's number instead.
+            if (raw.length() > MAX_ROW_LENGTH) {
+                throw new ImportException(
+                    String.format(
+                        Label.Core_Import_ErrorRowTooLong,
+                        new List<String>{ String.valueOf(start + i) }
+                    )
+                );
+            }
             staged.add(
                 new Import_Row__c(
                     Import_Batch__c = batch.Id,
                     Row_Number__c = start + i,
-                    Raw_Values_JSON__c = JSON.serialize(rows[i]).abbreviate(32768),
+                    Raw_Values_JSON__c = raw,
                     Status__c = ImportRowProcessor.STATUS_PENDING
                 )
             );
