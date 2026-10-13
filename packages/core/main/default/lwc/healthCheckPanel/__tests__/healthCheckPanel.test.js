@@ -5,8 +5,12 @@ import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRe
 import applyJunctionMembership from '@salesforce/apex/HealthCheckController.applyJunctionMembership';
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
+import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 
 jest.mock('@salesforce/apex/HealthCheckController.getReport', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/HealthCheckController.getLastRun', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -498,5 +502,74 @@ describe('c-health-check-panel', () => {
 
     const error = element.shadowRoot.querySelector('[data-id="error"]');
     expect(error.textContent).toBe('Health Check could not read your org.');
+  });
+
+  describe('with the last result first, as on BarnCRM Home (ADMIN-7)', () => {
+    function createHomePanel() {
+      const element = createElement('c-health-check-panel', { is: HealthCheckPanel });
+      element.lastResultFirst = true;
+      document.body.appendChild(element);
+      return element;
+    }
+
+    it('shows the last result without running any check', async () => {
+      getLastRun.mockResolvedValue({
+        ranAt: '2026-10-13T14:05:00.000Z',
+        result: '1 to fix, 2 to be aware of, 3 for your information.',
+        errors: 1,
+        warnings: 2,
+        infos: 3
+      });
+      const element = createHomePanel();
+      await flush();
+
+      expect(getReport).not.toHaveBeenCalled();
+      expect(element.shadowRoot.querySelector('[data-id="last-result"]').textContent).toBe(
+        '1 to fix, 2 to be aware of, 3 for your information.'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="last-run-at"]').value).toBe(
+        '2026-10-13T14:05:00.000Z'
+      );
+      expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
+        'c.Core_HealthCheck_RunNowButton'
+      );
+    });
+
+    it('says when Health Check has never run', async () => {
+      getLastRun.mockResolvedValue({ ranAt: null, result: null });
+      const element = createHomePanel();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="never-run"]')).not.toBeNull();
+      expect(element.shadowRoot.querySelector('[data-id="last-result"]')).toBeNull();
+    });
+
+    it('runs every check on Run now and shows the full report in place', async () => {
+      getLastRun.mockResolvedValue({ ranAt: null, result: null });
+      getReport.mockResolvedValue(agentforceReport());
+      const element = createHomePanel();
+      await flush();
+
+      element.shadowRoot.querySelector('[data-id="rerun"]').click();
+      await flush();
+
+      expect(getReport).toHaveBeenCalledTimes(1);
+      expect(element.shadowRoot.querySelector('[data-id="last-run"]')).toBeNull();
+      expect(element.shadowRoot.querySelectorAll('[data-id="finding"]').length).toBe(6);
+      expect(element.shadowRoot.querySelector('[data-id="rerun"]').label).toBe(
+        'c.Core_HealthCheck_RerunButton'
+      );
+    });
+
+    it('shows the message when the last result cannot be read', async () => {
+      getLastRun.mockRejectedValue({ body: { message: 'Health Check could not read your org.' } });
+      const element = createHomePanel();
+      await flush();
+
+      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+        'Health Check could not read your org.'
+      );
+      expect(getReport).not.toHaveBeenCalled();
+    });
   });
 });

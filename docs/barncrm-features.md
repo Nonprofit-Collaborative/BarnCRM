@@ -215,6 +215,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Module findings extension | Minor | Lets installed modules add their own Health Check findings without Core knowing about them. | Shipped | ADR-0057 |
 | Schedule all nightly jobs | Minor | One Health Check finding lists every nightly job that is not scheduled (rollups, seasonal addresses, error digest, and those Giving and Connect add), and one fix schedules them all. | Shipped | C-21, ADR-0075 |
 | Capped error count | Minor | The unread error count reads "999+" on the home page and "1,000 or more" in Health Check past a cap. | Shipped | plan 11.3 |
+| Health Check last result on Home | Minor | BarnCRM Home shows when Health Check last ran in full and how many findings it had, with Run now, instead of running every check on each load. Any page can do the same through one panel setting. | Built, not merged (fix/admin-5) | ADMIN-7, ADR-NEXT |
 
 ### 1.9 Record Pages and App Experience
 

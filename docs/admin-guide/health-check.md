@@ -23,12 +23,20 @@ nothing to configure.
 1. Open the **BarnCRM** app.
 2. Click the **BarnCRM Settings** tab.
 3. Choose **Health** in the left navigation. The report is there.
-4. Click **Re-run** whenever you want a fresh look. Health Check reads your org each time;
-   it never shows you a saved result.
+4. Click **Re-run** whenever you want a fresh look. On this page Health Check reads your
+   org each time it opens.
 
-An administrator also finds the same report on the BarnCRM home page, under the setup
-checklist. The settings console is the way in that always works, including for staff who
-do not see the home page copy and for an org where someone removed it from the page.
+An administrator also finds Health Check on the BarnCRM home page, under the setup
+checklist. Home does not run every check each time it opens, because a full run reads a lot
+of your org and Home is the page everyone opens first. Instead it shows the last result: when
+Health Check last ran in full for an administrator, and how many findings it had to fix, to
+be aware of and for your information. Click **Run now** to run it in full there and see the
+whole report. Until Health Check has run once, Home says so and offers **Run now**. A run by
+someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
+because it skips the access checks.
+
+The settings console is the way in that always works, including for staff who do not see
+the home page copy and for an org where someone removed it from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says

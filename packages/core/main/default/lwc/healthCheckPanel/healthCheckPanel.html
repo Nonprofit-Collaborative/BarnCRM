@@ -2,7 +2,7 @@
     <lightning-card title={labels.title} icon-name="utility:health_check">
         <div slot="actions">
             <lightning-button
-                label={labels.rerun}
+                label={rerunLabel}
                 onclick={handleRerun}
                 class="slds-m-right_x-small"
                 data-id="rerun"
@@ -26,6 +26,29 @@
 
             <template if:true={errorMessage}>
                 <p class="slds-text-color_error" data-id="error" role="alert">{errorMessage}</p>
+            </template>
+
+            <template if:true={showLastRun}>
+                <div class="slds-m-bottom_small" data-id="last-run">
+                    <template if:true={hasLastRun}>
+                        <p>
+                            <span class="slds-text-title">{labels.lastRun}</span>&nbsp;
+                            <lightning-formatted-date-time
+                                value={lastRunAt}
+                                year="numeric"
+                                month="short"
+                                day="numeric"
+                                hour="numeric"
+                                minute="2-digit"
+                                data-id="last-run-at"
+                            ></lightning-formatted-date-time>
+                        </p>
+                        <p data-id="last-result">{lastRunResult}</p>
+                    </template>
+                    <template if:false={hasLastRun}>
+                        <p data-id="never-run">{labels.neverRun}</p>
+                    </template>
+                </div>
             </template>
 
             <template if:true={fixOutcome}>

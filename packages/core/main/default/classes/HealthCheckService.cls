@@ -551,6 +551,12 @@ public with sharing class HealthCheckService {
             logQuietly(e);
         }
 
+        try {
+            HealthCheckLastRun.record(report);
+        } catch (Exception e) {
+            logQuietly(e);
+        }
+
         return report;
     }
 

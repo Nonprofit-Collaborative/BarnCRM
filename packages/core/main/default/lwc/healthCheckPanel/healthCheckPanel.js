@@ -2,6 +2,7 @@ import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 
 import getReport from '@salesforce/apex/HealthCheckController.getReport';
+import getLastRun from '@salesforce/apex/HealthCheckController.getLastRun';
 import applyRecommendedMode from '@salesforce/apex/HealthCheckController.applyRecommendedMode';
 import applyJunctionMembership from '@salesforce/apex/HealthCheckController.applyJunctionMembership';
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
@@ -18,6 +19,9 @@ import CONFIRM_INTRO from '@salesforce/label/c.Core_HealthCheck_ConfirmIntro';
 import CONFIRM_MODE_DETAIL from '@salesforce/label/c.Core_HealthCheck_ConfirmModeDetail';
 import CURRENT_MODE from '@salesforce/label/c.Core_HealthCheck_CurrentModeLabel';
 import INTRO from '@salesforce/label/c.Core_HealthCheck_Intro';
+import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
+import NEVER_RUN from '@salesforce/label/c.Core_HealthCheck_NeverRun';
+import RUN_NOW from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
 import LOAD_FAILED from '@salesforce/label/c.Core_HealthCheck_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_HealthCheck_Loading';
 import NO_FINDINGS from '@salesforce/label/c.Core_HealthCheck_NoFindings';
@@ -61,9 +65,17 @@ const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
  * closes it and returns focus to that button. The fix request carries the finding's fix
  * scope, so Apex runs it only if it would still change exactly what the box showed. When a
  * fix fails for any reason the panel runs Health Check again, so what it shows is current.
+ *
+ * With lastResultFirst set (BarnCRM Home sets it), the panel does not run Health Check when it
+ * opens: it shows when Health Check last ran in full and how many findings it had, and its
+ * button reads Run now (ADMIN-7). Any page that wants that behavior sets the same property.
  */
 export default class HealthCheckPanel extends NavigationMixin(LightningElement) {
+  /** Show the last stored result and Run now, instead of running every check on open. */
+  @api lastResultFirst = false;
+
   report;
+  lastRun;
   loading = false;
   errorMessage;
   pendingFix;
@@ -85,11 +97,53 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     loading: LOADING,
     noFindings: NO_FINDINGS,
     currentMode: CURRENT_MODE,
-    recommendedMode: RECOMMENDED_MODE
+    recommendedMode: RECOMMENDED_MODE,
+    lastRun: LAST_RUN,
+    neverRun: NEVER_RUN
   };
 
   connectedCallback() {
-    this.load();
+    if (this.lastResultFirst) {
+      this.loadLastRun();
+    } else {
+      this.load();
+    }
+  }
+
+  /** Read the last stored result without running any check. */
+  async loadLastRun() {
+    this.loading = true;
+    this.errorMessage = undefined;
+    try {
+      this.lastRun = await getLastRun();
+    } catch (error) {
+      this.lastRun = undefined;
+      this.errorMessage = this.messageFrom(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  /** The last result shows until a full report replaces it. */
+  get showLastRun() {
+    return this.lastResultFirst && !this.hasReport && !this.loading && !this.errorMessage;
+  }
+
+  get hasLastRun() {
+    return !!(this.lastRun && this.lastRun.ranAt);
+  }
+
+  get lastRunAt() {
+    return this.hasLastRun ? this.lastRun.ranAt : undefined;
+  }
+
+  get lastRunResult() {
+    return this.hasLastRun ? this.lastRun.result : '';
+  }
+
+  /** Run now before the first full run where the last result shows; Re-run after. */
+  get rerunLabel() {
+    return this.lastResultFirst && !this.hasReport ? RUN_NOW : RERUN;
   }
 
   renderedCallback() {
