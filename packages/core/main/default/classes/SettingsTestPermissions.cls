@@ -39,7 +39,7 @@ public class SettingsTestPermissions {
         }
         insert new ObjectPermissions(
             ParentId = permissionSet.Id,
-            SobjectType = 'Setting_Change__c',
+            SobjectType = String.valueOf(Setting_Change__c.SObjectType),
             PermissionsRead = true,
             PermissionsCreate = true
         );
@@ -48,8 +48,10 @@ public class SettingsTestPermissions {
             fields.add(
                 new FieldPermissions(
                     ParentId = permissionSet.Id,
-                    SobjectType = 'Setting_Change__c',
-                    Field = 'Setting_Change__c.' + field,
+                    SobjectType = String.valueOf(Setting_Change__c.SObjectType),
+                    Field = String.valueOf(Setting_Change__c.SObjectType) +
+                        '.' +
+                        NamespaceUtil.qualify(field),
                     PermissionsRead = true,
                     PermissionsEdit = true
                 )
@@ -64,21 +66,15 @@ public class SettingsTestPermissions {
         insert new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = build(name).Id);
     }
 
-    /** A user on the Standard User profile, so a test can prove a non-administrator can save. */
+    /**
+     * A user on the Standard User profile, not yet inserted, so a test can prove a
+     * non-administrator can save. Built by `TestUsers.newStandardUser`.
+     */
     public static User buildStandardUser(String firstName, String lastName, String alias) {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        return new User(
-            FirstName = firstName,
-            LastName = lastName,
-            Alias = alias,
-            Email = alias + '.barncrm@example.com',
-            Username = alias + '.barncrm.' + DateTime.now().getTime() + '@example.com',
-            ProfileId = standard.Id,
-            TimeZoneSidKey = 'America/New_York',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
+        User person = TestUsers.newStandardUser(lastName);
+        person.FirstName = firstName;
+        person.Alias = alias;
+        return person;
     }
 
     private static List<CustomPermission> getCustomPermissions() {

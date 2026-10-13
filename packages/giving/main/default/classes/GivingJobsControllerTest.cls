@@ -273,21 +273,6 @@ private class GivingJobsControllerTest {
 
     /** A user holding no packaged permission set, so the custom permission is genuinely absent. */
     private static User readOnlyUser() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        User reader = new User(
-            Alias = 'oijobs',
-            Email = 'nightly.jobs.reader@barncrm.invalid',
-            EmailEncodingKey = 'UTF-8',
-            LastName = 'Reader',
-            LanguageLocaleKey = 'en_US',
-            LocaleSidKey = 'en_US',
-            ProfileId = standard.Id,
-            TimeZoneSidKey = 'America/Chicago',
-            UserName = 'nightly.jobs.reader.' + Datetime.now().getTime() + '@barncrm.invalid'
-        );
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insert reader;
-        }
-        return reader;
+        return TestUsers.standardUser('Reader');
     }
 }

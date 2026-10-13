@@ -61,19 +61,7 @@ private class SampleDataControllerTest {
 
     /** A Standard User, used for the permission-denied path. */
     private static User buildStandardUser() {
-        Profile standard = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1];
-        String suffix = String.valueOf(Datetime.now().getTime());
-        return new User(
-            ProfileId = standard.Id,
-            LastName = 'Sample',
-            Email = 'sample.tester@example.org',
-            Username = 'sample.tester.' + suffix + '@example.org.invalid',
-            Alias = 'smpl',
-            TimeZoneSidKey = 'America/New_York',
-            LocaleSidKey = 'en_US',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US'
-        );
+        return TestUsers.newStandardUser('Sample');
     }
 
     @IsTest

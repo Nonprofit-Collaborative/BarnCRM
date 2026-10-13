@@ -43,6 +43,7 @@ public class TestUsers {
     private static final String PREFIX = 'barn-test.';
 
     private static Map<String, User> usersByKey = new Map<String, User>();
+    private static Id cachedStandardProfileId;
 
     /**
      * A user holding BarnCRM Admin: the access Core's tests need, given to the test user
@@ -121,19 +122,124 @@ public class TestUsers {
     }
 
     private static User create(String usernameStart, List<String> names) {
-        List<PermissionSet> packaged = packagedPermissionSets(names);
-        User person = new User(
-            Alias = 'barntest',
+        User person = newUser('Test User', UserInfo.getProfileId(), usernameStart);
+        person.Alias = 'barntest';
+        person.FirstName = 'BarnCRM';
+        return insertWith(person, names);
+    }
+
+    /**
+     * A user on the least privileged standard profile holding no permission set, inserted:
+     * for a test that proves what a person without BarnCRM access gets.
+     *
+     * @param lastName the user's last name, also the start of the alias and username
+     * @return the inserted user
+     */
+    @NamespaceAccessible
+    public static User standardUser(String lastName) {
+        return standardUserWith(lastName, new List<String>());
+    }
+
+    /**
+     * A user on the least privileged standard profile holding only the packaged permission
+     * sets named here, inserted, so a test proves what those sets grant rather than what an
+     * administrator's profile allows.
+     *
+     * @param lastName the user's last name, also the start of the alias and username
+     * @param permissionSetNames the bare API names of the packaged permission sets
+     * @return the inserted user
+     */
+    @NamespaceAccessible
+    public static User standardUserWith(String lastName, List<String> permissionSetNames) {
+        return insertWith(newStandardUser(lastName), permissionSetNames);
+    }
+
+    /**
+     * A user on the running user's own profile holding the packaged permission sets named
+     * here, inserted: a person of their own, with the access the profile gives.
+     *
+     * @param lastName the user's last name, also the start of the alias and username
+     * @param permissionSetNames the bare API names of the packaged permission sets
+     * @return the inserted user
+     */
+    @NamespaceAccessible
+    public static User onRunningProfileWith(String lastName, List<String> permissionSetNames) {
+        return insertWith(
+            newUser(lastName, UserInfo.getProfileId(), usernameStart(lastName)),
+            permissionSetNames
+        );
+    }
+
+    /**
+     * A user on the least privileged standard profile, not yet inserted, with a username no
+     * other call can produce: for a test that sets more fields before inserting it.
+     *
+     * @param lastName the user's last name, also the start of the alias and username
+     * @return the unsaved user
+     */
+    @NamespaceAccessible
+    public static User newStandardUser(String lastName) {
+        return newUser(lastName, standardProfileId(), usernameStart(lastName));
+    }
+
+    /**
+     * The least privileged standard profile: Standard User, or when the org does not call it
+     * that (Profile.Name is the translated label), the first standard profile that is not System
+     * Administrator. Never "any standard profile", which also matches System Administrator and
+     * would silently disarm a test about a denied user.
+     *
+     * @return the profile Id
+     */
+    @NamespaceAccessible
+    public static Id standardProfileId() {
+        if (cachedStandardProfileId == null) {
+            List<Profile> named = [
+                SELECT Id
+                FROM Profile
+                WHERE Name = 'Standard User'
+                WITH SYSTEM_MODE
+                LIMIT 1
+            ];
+            if (named.isEmpty()) {
+                named = [
+                    SELECT Id
+                    FROM Profile
+                    WHERE UserType = 'Standard' AND Name != 'System Administrator'
+                    WITH SYSTEM_MODE
+                    ORDER BY Name
+                    LIMIT 1
+                ];
+            }
+            Assert.isFalse(
+                named.isEmpty(),
+                'This org has no standard profile other than System Administrator, so the ' +
+                'tests cannot build a user who lacks administrator access.'
+            );
+            cachedStandardProfileId = named[0].Id;
+        }
+        return cachedStandardProfileId;
+    }
+
+    private static String usernameStart(String lastName) {
+        return PREFIX + lastName.replaceAll('[^A-Za-z0-9]', '').toLowerCase() + '.';
+    }
+
+    private static User newUser(String lastName, Id profileId, String usernameStart) {
+        return new User(
+            Alias = lastName.deleteWhitespace().left(8),
             Email = 'barn-test' + DOMAIN,
             EmailEncodingKey = 'UTF-8',
-            FirstName = 'BarnCRM',
-            LastName = 'Test User',
+            LastName = lastName,
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_US',
-            ProfileId = UserInfo.getProfileId(),
+            ProfileId = profileId,
             TimeZoneSidKey = 'GMT',
             Username = usernameStart + System.now().getTime() + Crypto.getRandomInteger() + DOMAIN
         );
+    }
+
+    private static User insertWith(User person, List<String> names) {
+        List<PermissionSet> packaged = packagedPermissionSets(names);
         // A user and its assignments are setup objects: written in their own context, so the
         // data the test writes next does not break the mixed DML rule.
         System.runAs(new User(Id = UserInfo.getUserId())) {
