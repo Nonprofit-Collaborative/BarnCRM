@@ -62,7 +62,15 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: the list of relationships could not be read</shortDescription>
-        <value>BarnCRM could not read this person's relationships. The Error Log has the details.</value>
+        <value>BarnCRM could not read this person's relationships. Refresh the page, and if it happens again ask your administrator to check that you can read relationships.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Relationship_Loading</fullName>
+        <categories>Relationships</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Relationship card: what a screen reader hears while the card loads</shortDescription>
+        <value>Loading relationships</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_PanelTitle</fullName>
@@ -102,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Relationship card: the relationship could not be deleted</shortDescription>
-        <value>BarnCRM could not remove that relationship. The Error Log has the details.</value>
+        <value>BarnCRM could not remove that relationship. Check that you can delete relationships, and if it happens again ask your administrator to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_RemoveSuccess</fullName>
