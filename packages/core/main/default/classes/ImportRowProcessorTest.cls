@@ -948,6 +948,118 @@ private class ImportRowProcessorTest {
             .getRecordTypeId();
     }
 
+    /** Two hundred rows, each naming its own organization; the last has no last name. */
+    private static List<Map<String, String>> organizationRows() {
+        List<Map<String, String>> values = new List<Map<String, String>>();
+        for (Integer i = 0; i < 199; i++) {
+            values.add(
+                ImportTestDataFactory.donorRow(
+                    'Person' + i,
+                    'Surname' + i,
+                    'person' + i + '@example.org',
+                    'Employer ' + i
+                )
+            );
+        }
+        values.add(ImportTestDataFactory.donorRow('Lonely', '', 'lonely@example.org', 'Lonely Employer'));
+        return values;
+    }
+
+    /**
+     * A row rejected for its person creates no organization (IMPORT-3, R-IB1), so the preview
+     * and the commit agree, and re-importing the fixed row creates it once.
+     */
+    @IsTest
+    static void aRowRejectedForItsPersonCreatesNoOrganization() {
+        System.runAs(TestUsers.admin()) {
+            given(organizationRows());
+
+            Test.startTest();
+            ImportRowProcessor.Outcome preview = run(true);
+            ImportRowProcessor.Outcome committed = run(false);
+            Test.stopTest();
+
+            Assert.areEqual(1, preview.rejected, 'The preview rejects the row.');
+            Assert.areEqual(preview.created, committed.created, 'The commit does what it showed.');
+            Assert.areEqual(preview.rejected, committed.rejected);
+            Id organizationType = organizationRecordTypeId();
+            Assert.areEqual(
+                199,
+                [SELECT COUNT() FROM Account WHERE RecordTypeId = :organizationType],
+                'One organization per clean row.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Account WHERE Name = 'Lonely Employer'],
+                'None for the rejected row.'
+            );
+            Import_Row__c rejected = ImportTestDataFactory.reload(batch.Id)[199];
+            Assert.areEqual(Label.Core_Import_ErrorLastNameMissing, rejected.Error_Message__c);
+            Assert.isNull(rejected.Organization__c, 'Pointing at nothing it did not create.');
+        }
+    }
+
+    /**
+     * The heaviest chunk (IMPORT-9): two hundred rows, two people each, an organization and a
+     * household name, committed in one transaction within stated budgets. The budgets leave
+     * room for an org's own automation; an org run reports the real figures.
+     */
+    @IsTest
+    static void aFullChunkOfCouplesWithOrganizationsStaysWithinBudget() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.defaultSettings();
+            ImportMapping mapping = new ImportMapping();
+            mapping.columns.add(new ImportMapping.Column('Household', 'Household.Name'));
+            mapping.columns.add(new ImportMapping.Column('First 1', 'Contact1.FirstName'));
+            mapping.columns.add(new ImportMapping.Column('Last 1', 'Contact1.LastName'));
+            mapping.columns.add(new ImportMapping.Column('Email 1', 'Contact1.Email'));
+            mapping.columns.add(new ImportMapping.Column('First 2', 'Contact2.FirstName'));
+            mapping.columns.add(new ImportMapping.Column('Last 2', 'Contact2.LastName'));
+            mapping.columns.add(new ImportMapping.Column('Email 2', 'Contact2.Email'));
+            mapping.columns.add(new ImportMapping.Column('Employer', 'Organization.Name'));
+            template = ImportTestDataFactory.template(
+                mapping.serialize(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            batch = ImportTestDataFactory.batch(template);
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 200; i++) {
+                values.add(
+                    new Map<String, String>{
+                        'Household' => 'The Family ' + i,
+                        'First 1' => 'Ana' + i,
+                        'Last 1' => 'Family' + i,
+                        'Email 1' => 'ana' + i + '@example.org',
+                        'First 2' => 'Ben' + i,
+                        'Last 2' => 'Family' + i,
+                        'Email 2' => 'ben' + i + '@example.org',
+                        'Employer' => 'Employer ' + Math.mod(i, 20)
+                    }
+                );
+            }
+            ImportTestDataFactory.rows(batch, values);
+
+            Test.startTest();
+            ImportRowProcessor.Outcome outcome = run(false);
+            Integer queries = Limits.getQueries();
+            Integer statements = Limits.getDmlStatements();
+            Integer cpu = Limits.getCpuTime();
+            Test.stopTest();
+
+            Assert.areEqual(200, outcome.created, 'Every row loaded: ' + outcome.notes);
+            Assert.areEqual(400, [SELECT COUNT() FROM Contact], 'Two people a row.');
+            Id organizationType = organizationRecordTypeId();
+            Assert.areEqual(
+                20,
+                [SELECT COUNT() FROM Account WHERE RecordTypeId = :organizationType],
+                'Each employer once.'
+            );
+            Assert.isTrue(queries <= 60, 'Queries within budget: ' + queries);
+            Assert.isTrue(statements <= 60, 'DML statements within budget: ' + statements);
+            Assert.isTrue(cpu <= 8000, 'CPU within budget (ms): ' + cpu);
+        }
+    }
+
     // -------------------------------------------------------------------------------------
     // The entity processor seam (R-IR6, R-IR7)
     // -------------------------------------------------------------------------------------

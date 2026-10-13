@@ -220,7 +220,7 @@ public with sharing class ImportRowProcessor {
         skipUnreadableCheckboxes(working, checkboxColumns(mapping, personAccounts), outcome);
         rejectUnreadableValues(working, personAccounts);
         resolveGivenIds(working, personAccounts);
-        resolveOrganizations(working, batch, dryRun, outcome);
+        matchOrganizations(working, batch, dryRun, outcome);
         resolvePeople(working, rule, batch, personAccounts, dryRun, outcome);
         tagAndNameHouseholds(working, batch, dryRun, outcome);
         offerToEntityProcessor(batch, template, mapping, working, dryRun, outcome);
@@ -658,13 +658,13 @@ public with sharing class ImportRowProcessor {
     // -------------------------------------------------------------------------------------
 
     /**
-     * Finds or creates each row's organization by the template's organization rule: its name,
-     * or the chosen matching field, among organization accounts only (R-IT2, R-IT8). A key
-     * several organizations hold is a several-matches case (R-IT9). A row whose organization
-     * has no key under the rule is not matched, and creates its own organization, which needs
-     * a name; rows naming one new organization by the same key share the first one's (R-IB4).
+     * Finds each row's organization by the template's organization rule: its name, or the
+     * chosen matching field, among organization accounts only (R-IT2, R-IT8). A key several
+     * organizations hold is a several-matches case (R-IT9). Writes nothing: an organization the
+     * file names and Salesforce does not have is created by `createOrganizations`, once the
+     * people on its rows have been matched and checked, so a rejected row creates nothing.
      */
-    private static void resolveOrganizations(
+    private static void matchOrganizations(
         List<Working> working,
         Import_Batch__c batch,
         Boolean dryRun,
@@ -708,10 +708,6 @@ public with sharing class ImportRowProcessor {
                 outcome
             );
         }
-
-        Map<String, Working> firstRowByKey = new Map<String, Working>();
-        List<Account> toCreate = new List<Account>();
-        List<String> createdKeys = new List<String>();
         for (Working item : working) {
             if (!looksForOrganization(item)) {
                 continue;
@@ -735,6 +731,29 @@ public with sharing class ImportRowProcessor {
             }
             if (item.organizationName == null) {
                 item.error = Label.Core_Import_ErrorOrganizationNameMissing;
+            }
+        }
+    }
+
+    /**
+     * Creates the organizations the rows still clean name and Salesforce does not have, after
+     * their people were matched and checked (R-IB1): a row rejected for its person creates no
+     * organization, in the preview as in the commit. Rows naming one new organization by the
+     * same key share the first clean row's record (R-IB4).
+     */
+    private static void createOrganizations(
+        List<Working> working,
+        Import_Batch__c batch,
+        Boolean dryRun,
+        Outcome outcome
+    ) {
+        Map<String, Working> firstRowByKey = new Map<String, Working>();
+        List<Account> toCreate = new List<Account>();
+        List<String> createdKeys = new List<String>();
+        // Without the record type the match step already said so, and nothing is created.
+        Id recordTypeId = recordTypeId(ORGANIZATION_RECORD_TYPE);
+        for (Working item : working) {
+            if (recordTypeId == null || !createsOrganization(item)) {
                 continue;
             }
             if (firstRowByKey.containsKey(item.organizationGroup)) {
@@ -941,6 +960,9 @@ public with sharing class ImportRowProcessor {
         if (batch.Match_Only__c == true) {
             rejectUnmatchedPeople(working);
         }
+        // Only now, with every rejection a row can get before a save made, are its new
+        // organizations created (or, in a preview, counted).
+        createOrganizations(working, batch, dryRun, outcome);
 
         if (dryRun) {
             countUpdatesInPreview(working, personAccounts, rule);
@@ -2558,13 +2580,15 @@ public with sharing class ImportRowProcessor {
             if (item.severalMatches && item.error == null) {
                 outcome.notes.add(Label.Core_Import_LogSeveralMatchesUsedRecent);
             }
+            // A rejected row still points at whatever it matched or saved before it failed
+            // (a person whose save went through, say), so nothing it left is untraceable.
+            stampResolved(item);
             if (item.error != null) {
                 row.Status__c = STATUS_REJECTED;
                 row.Error_Message__c = item.error.abbreviate(4000);
                 outcome.rejected++;
             } else {
                 row.Error_Message__c = null;
-                stampResolved(item);
                 if (item.createdAnything) {
                     row.Status__c = STATUS_CREATED;
                     outcome.created++;
