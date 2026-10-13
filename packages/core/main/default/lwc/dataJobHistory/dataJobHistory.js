@@ -1,5 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
+import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
+import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
 import getRecentBatches from '@salesforce/apex/ImportController.getRecentBatches';
 import previewImportUndo from '@salesforce/apex/ImportController.previewUndo';
 import startImportUndo from '@salesforce/apex/ImportController.startUndo';
@@ -119,9 +121,10 @@ function newestFirst(left, right) {
  * Every data job in one list: imports, bulk updates and bulk deletes, newest first, with the
  * undo of each (ADR-NEXT org-optimizer-and-data-manager-pages, admin guide data-manager.md).
  *
- * Each kind is read from its own controller, which keeps its own permission check: imports
- * only for a holder of Manage BarnCRM Settings, the bulk kinds when their page says the person
- * is allowed. Undo uses each tool's own confirmation unchanged: the import undo shows what it
+ * Each kind is read from its own controller, which keeps its own permission check, and only
+ * for a holder of that tool's custom permission (whose permission set also grants the
+ * controller): imports for Manage BarnCRM Settings, bulk updates for Bulk Update Records, bulk
+ * deletes for Bulk Delete Records; a bulk kind is listed when its page says allowed. Undo uses each tool's own confirmation unchanged: the import undo shows what it
  * would remove and put back (canonical model R-IB8); a bulk undo is confirmed by typing the
  * number it acts on (R-BU5, R-BD5).
  */
@@ -175,8 +178,8 @@ export default class DataJobHistory extends LightningElement {
         wanted.includes(IMPORT) && canManageSettings
           ? getRecentBatches({ howMany: IMPORTS_SHOWN })
           : null,
-        wanted.includes(UPDATE) ? getUpdatePage() : null,
-        wanted.includes(DELETE) ? getDeletePage() : null
+        wanted.includes(UPDATE) && canBulkUpdate ? getUpdatePage() : null,
+        wanted.includes(DELETE) && canBulkDelete ? getDeletePage() : null
       ]);
       const allowed = [];
       let jobs = [];
