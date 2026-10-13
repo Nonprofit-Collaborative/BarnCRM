@@ -226,6 +226,11 @@ browser too old to open a workbook says so; save the sheet as CSV instead. So do
 too large to open in the browser (more than 500,000 rows or 1,000 columns, or a sheet over
 100 MB once unpacked).
 
+**A phone number from a Find export starts with a single quote.** Find puts one quote before a
+value that starts with = + - or @, so a spreadsheet does not run it as a formula. The import
+takes that one quote off, so `'+44 20 7946 0000` loads as `+44 20 7946 0000`. A value that
+starts with a quote followed by anything else loads as it is.
+
 **"This import is already running a preview or an import."** Only one run of an import goes
 at a time. Wait for the one running to finish (its results appear when it does), then start
 again. While it runs, rows it has not reached yet still show the previous run's result.

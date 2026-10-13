@@ -4,12 +4,17 @@
  * reader to reading). A pure module: it takes rows and returns bytes, and touches nothing else.
  *
  * The workbook holds a header row of labels in bold, then one row per record: numbers as
- * numbers, booleans as TRUE and FALSE, dates and date-times as Excel dates (date-times in the
- * browser's own time zone, as the person saw them), and everything else as text. The zip is
- * deflated with the browser's CompressionStream where it has one, and stored otherwise.
+ * numbers, booleans as TRUE and FALSE, dates and date-times as Excel dates (date-times as the
+ * clock reads in the time zone it is given, the person's Salesforce one), and everything else
+ * as text. The sheet is encoded a piece at a time, and the zip is deflated with the browser's
+ * CompressionStream where it has one, and stored otherwise.
  */
 
+import { zonedParts } from 'c/findCsv';
+
 const DAY_MS = 86400000;
+/** About how many characters of sheet XML are encoded at a time, so no one string holds it all. */
+const PIECE_SIZE = 1 << 20;
 const EXCEL_EPOCH = Date.UTC(1899, 11, 30);
 /** The most characters one Excel cell holds. */
 export const MAX_CELL_TEXT = 32767;
@@ -30,12 +35,6 @@ export function canCompress() {
   return typeof CompressionStream === 'function';
 }
 
-/** A file name such as `Gift__c-2026-10-12.xlsx`. */
-export function xlsxFileName(objectApiName, today = new Date()) {
-  const day = today.toISOString().slice(0, 10);
-  return `${String(objectApiName || 'export').replace(/[^A-Za-z0-9_]/g, '_')}-${day}.xlsx`;
-}
-
 /** The letters of a zero-based column: 0 is A, 26 is AA. */
 export function columnName(index) {
   let name = '';
@@ -45,23 +44,26 @@ export function columnName(index) {
   return name;
 }
 
-/** An Excel date serial for `YYYY-MM-DD`, or for a date-time in the browser's time zone. */
-export function toSerial(value, type) {
+/**
+ * An Excel date serial for `YYYY-MM-DD`, or for a date-time as the clock reads in `timeZone`
+ * (the person's Salesforce time zone, so the workbook agrees with the grid and the CSV).
+ */
+export function toSerial(value, type, timeZone) {
   if (type === CELL_TYPES.DATE) {
     const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value));
     return parts ? (Date.UTC(+parts[1], parts[2] - 1, +parts[3]) - EXCEL_EPOCH) / DAY_MS : null;
   }
-  const moment = new Date(value);
-  if (Number.isNaN(moment.getTime())) {
+  const clock = zonedParts(value, timeZone);
+  if (!clock) {
     return null;
   }
   const local = Date.UTC(
-    moment.getFullYear(),
-    moment.getMonth(),
-    moment.getDate(),
-    moment.getHours(),
-    moment.getMinutes(),
-    moment.getSeconds()
+    clock.year,
+    clock.month - 1,
+    clock.day,
+    clock.hour,
+    clock.minute,
+    clock.second
   );
   return (local - EXCEL_EPOCH) / DAY_MS;
 }
@@ -93,7 +95,7 @@ function textCell(reference, text, style) {
   return `<c r="${reference}" t="inlineStr"${style ? ` s="${style}"` : ''}><is><t xml:space="preserve">${escapeXml(fitCell(text))}</t></is></c>`;
 }
 
-function cell(reference, value, type) {
+function cell(reference, value, type, timeZone) {
   if (value === undefined || value === null || value === '') {
     return '';
   }
@@ -104,7 +106,7 @@ function cell(reference, value, type) {
     return `<c r="${reference}" t="b"><v>${value ? 1 : 0}</v></c>`;
   }
   if (type === CELL_TYPES.DATE || type === CELL_TYPES.DATETIME) {
-    const serial = toSerial(value, type);
+    const serial = toSerial(value, type, timeZone);
     if (serial !== null) {
       return `<c r="${reference}" s="${type === CELL_TYPES.DATE ? 1 : 2}"><v>${serial}</v></c>`;
     }
@@ -112,23 +114,48 @@ function cell(reference, value, type) {
   return textCell(reference, typeof value === 'object' ? JSON.stringify(value) : value);
 }
 
-/** The sheet's XML: a bold header row of labels, then the rows. */
-export function sheetXml(columns, rows) {
-  const lines = [
-    `<row r="1">${columns.map((column, index) => textCell(`${columnName(index)}1`, column.label, 3)).join('')}</row>`
-  ];
+/**
+ * The sheet's XML, a bold header row of labels then the rows, handed to `emit` in pieces of
+ * about `pieceSize` characters.
+ */
+function eachSheetPiece(columns, rows, emit, timeZone, pieceSize = PIECE_SIZE) {
+  const letters = columns.map((column, index) => columnName(index));
+  let piece =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>' +
+    `<row r="1">${columns.map((column, index) => textCell(`${letters[index]}1`, column.label, 3)).join('')}</row>`;
   rows.forEach((values, rowIndex) => {
     const number = rowIndex + 2;
-    const cells = columns
-      .map((column, index) => cell(`${columnName(index)}${number}`, values[index], column.type))
-      .join('');
-    lines.push(`<row r="${number}">${cells}</row>`);
+    let cells = '';
+    columns.forEach((column, index) => {
+      cells += cell(`${letters[index]}${number}`, values[index], column.type, timeZone);
+    });
+    piece += `<row r="${number}">${cells}</row>`;
+    if (piece.length >= pieceSize) {
+      emit(piece);
+      piece = '';
+    }
   });
-  return (
-    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
-    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
-    `<sheetData>${lines.join('')}</sheetData></worksheet>`
-  );
+  emit(`${piece}</sheetData></worksheet>`);
+}
+
+/** The sheet's XML as one string, for a small sheet or a test. */
+export function sheetXml(columns, rows, timeZone) {
+  const pieces = [];
+  eachSheetPiece(columns, rows, (piece) => pieces.push(piece), timeZone);
+  return pieces.join('');
+}
+
+/**
+ * The sheet's XML as UTF-8 byte chunks, each piece encoded as soon as it is written: a large
+ * export never builds the whole sheet as one string, which a browser cannot hold past about
+ * 500 million characters.
+ */
+export function sheetChunks(columns, rows, timeZone, pieceSize = PIECE_SIZE) {
+  const encoder = new TextEncoder();
+  const chunks = [];
+  eachSheetPiece(columns, rows, (piece) => chunks.push(encoder.encode(piece)), timeZone, pieceSize);
+  return chunks;
 }
 
 const STATIC_PARTS = {
@@ -183,8 +210,11 @@ function workbookXml(sheetName) {
 
 let crcTable;
 
-/** The CRC-32 a zip entry carries. */
-export function crc32(bytes) {
+/**
+ * The CRC-32 a zip entry carries. Pass the CRC of the bytes before as `previous` to carry it
+ * across chunks: `crc32(b, crc32(a))` is the CRC of `a` then `b`.
+ */
+export function crc32(bytes, previous = 0) {
   if (!crcTable) {
     crcTable = new Uint32Array(256);
     for (let n = 0; n < 256; n++) {
@@ -195,16 +225,27 @@ export function crc32(bytes) {
       crcTable[n] = c >>> 0;
     }
   }
-  let crc = 0xffffffff;
+  let crc = (previous ^ 0xffffffff) >>> 0;
   for (let i = 0; i < bytes.length; i++) {
     crc = crcTable[(crc ^ bytes[i]) & 0xff] ^ (crc >>> 8);
   }
   return (crc ^ 0xffffffff) >>> 0;
 }
 
-async function deflateInBrowser(bytes) {
-  const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+/** Raw-deflates byte chunks as one stream, without joining them first. */
+async function deflateInBrowser(chunks) {
+  const stream = new Blob(chunks).stream().pipeThrough(new CompressionStream('deflate-raw'));
   return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+function joined(chunks) {
+  const result = new Uint8Array(chunks.reduce((total, part) => total + part.length, 0));
+  let at = 0;
+  for (const part of chunks) {
+    result.set(part, at);
+    at += part.length;
+  }
+  return result;
 }
 
 function header(size) {
@@ -212,18 +253,26 @@ function header(size) {
   return { bytes, view: new DataView(bytes.buffer) };
 }
 
-/** A zip of the given parts: entries deflated by `deflate`, or stored when it is null. */
+/**
+ * A zip of the given parts, each text or a list of byte chunks: entries deflated by `deflate`
+ * (which takes a list of chunks), or stored when it is null.
+ */
 async function zip(parts, deflate) {
   const encoder = new TextEncoder();
   const chunks = [];
   const central = [];
   let offset = 0;
-  for (const [name, text] of parts) {
+  for (const [name, content] of parts) {
     const nameBytes = encoder.encode(name);
-    const raw = encoder.encode(text);
+    const rawChunks = typeof content === 'string' ? [encoder.encode(content)] : content;
+    let crc = 0;
+    let rawLength = 0;
+    for (const part of rawChunks) {
+      crc = crc32(part, crc);
+      rawLength += part.length;
+    }
     // eslint-disable-next-line no-await-in-loop
-    const data = deflate ? await deflate(raw) : raw;
-    const crc = crc32(raw);
+    const data = deflate ? await deflate(rawChunks) : joined(rawChunks);
     const method = deflate ? 8 : 0;
     const local = header(30);
     local.view.setUint32(0, 0x04034b50, true);
@@ -232,7 +281,7 @@ async function zip(parts, deflate) {
     local.view.setUint16(8, method, true);
     local.view.setUint32(14, crc, true);
     local.view.setUint32(18, data.length, true);
-    local.view.setUint32(22, raw.length, true);
+    local.view.setUint32(22, rawLength, true);
     local.view.setUint16(26, nameBytes.length, true);
     chunks.push(local.bytes, nameBytes, data);
 
@@ -244,7 +293,7 @@ async function zip(parts, deflate) {
     entry.view.setUint16(10, method, true);
     entry.view.setUint32(16, crc, true);
     entry.view.setUint32(20, data.length, true);
-    entry.view.setUint32(24, raw.length, true);
+    entry.view.setUint32(24, rawLength, true);
     entry.view.setUint16(28, nameBytes.length, true);
     entry.view.setUint32(42, offset, true);
     central.push(entry.bytes, nameBytes);
@@ -257,14 +306,7 @@ async function zip(parts, deflate) {
   end.view.setUint16(10, parts.length, true);
   end.view.setUint32(12, centralSize, true);
   end.view.setUint32(16, offset, true);
-  const all = [...chunks, ...central, end.bytes];
-  const result = new Uint8Array(all.reduce((total, part) => total + part.length, 0));
-  let at = 0;
-  for (const part of all) {
-    result.set(part, at);
-    at += part.length;
-  }
-  return result;
+  return joined([...chunks, ...central, end.bytes]);
 }
 
 /**
@@ -272,14 +314,15 @@ async function zip(parts, deflate) {
  *
  * @param {Array<{label: string, type: string}>} columns header labels and CELL_TYPES
  * @param {Array<Array<*>>} rows values in column order
- * @param {object} [options] `sheetName`; `deflate(bytes)` returning a promise of raw-deflated
- *   bytes, or `deflate: null` to store, for a test where CompressionStream is missing
+ * @param {object} [options] `sheetName`; `timeZone`, the zone date-times are written in (the
+ *   person's Salesforce one; UTC when absent); `deflate(bytes)` returning a promise of
+ *   raw-deflated bytes, or `deflate: null` to store, for a test where CompressionStream is missing
  * @returns {Promise<Uint8Array>}
  */
 export function writeXlsx(columns, rows, options = {}) {
   let deflate = canCompress() ? deflateInBrowser : null;
   if (Object.prototype.hasOwnProperty.call(options, 'deflate')) {
-    deflate = options.deflate;
+    deflate = options.deflate ? (chunks) => options.deflate(joined(chunks)) : null;
   }
   const sheetName = String(options.sheetName || 'Find')
     .slice(0, 31)
@@ -291,7 +334,7 @@ export function writeXlsx(columns, rows, options = {}) {
       ['xl/workbook.xml', workbookXml(sheetName)],
       ['xl/_rels/workbook.xml.rels', STATIC_PARTS['xl/_rels/workbook.xml.rels']],
       ['xl/styles.xml', STATIC_PARTS['xl/styles.xml']],
-      ['xl/worksheets/sheet1.xml', sheetXml(columns, rows)]
+      ['xl/worksheets/sheet1.xml', sheetChunks(columns, rows, options.timeZone)]
     ],
     deflate
   );

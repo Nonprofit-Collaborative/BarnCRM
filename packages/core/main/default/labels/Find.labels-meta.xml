@@ -249,6 +249,14 @@
         <value>Exported {0} rows.</value>
     </labels>
     <labels>
+        <fullName>Core_Find_HiddenColumns</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Notice: an opened query had columns left out. {0}: their paths.</shortDescription>
+        <value>Left out columns you do not have access to: {0}.</value>
+    </labels>
+    <labels>
         <fullName>Core_Find_ExportStopped</fullName>
         <categories>Find</categories>
         <language>en_US</language>

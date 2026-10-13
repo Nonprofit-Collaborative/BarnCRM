@@ -95,7 +95,9 @@ export function toRecords(rows) {
     const record = {};
     headers.forEach((heading, index) => {
       const value = rows[i][index];
-      record[heading] = value === undefined || value === null ? '' : String(value).trim();
+      record[heading] = withoutFormulaGuard(
+        value === undefined || value === null ? '' : String(value).trim()
+      );
     });
     records.push(record);
   }
@@ -114,6 +116,15 @@ export function toCsv(headers, records) {
 function quote(value) {
   const text = value === undefined || value === null ? '' : String(value);
   return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+/**
+ * A value without the single quote a Find export puts before = + - or @ so a spreadsheet never
+ * runs it as a formula (c/findCsv). Only that one quote is taken, so `'+44 20 7946 0000` loads
+ * as `+44 20 7946 0000` and any other value loads as it is.
+ */
+export function withoutFormulaGuard(text) {
+  return /^'[=+\-@]/.test(text) ? text.slice(1) : text;
 }
 
 function isBlankRow(row) {
