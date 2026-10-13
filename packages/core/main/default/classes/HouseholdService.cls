@@ -789,6 +789,40 @@ public with sharing class HouseholdService {
     }
 
     /**
+     * Ends every current membership these people have, today, and takes away the primary flag:
+     * what erasing a person does to their households (canonical model R-ER3). A membership that
+     * starts in the future starts and ends today. Saved with the user's own access, so the
+     * membership trigger recounts, renames and tidies the households as on any ended
+     * membership. Answers the rows ended; empty outside junction mode.
+     */
+    @NamespaceAccessible
+    public static List<Household_Member__c> endMembershipsFor(Set<Id> personIds) {
+        List<Household_Member__c> ending = new List<Household_Member__c>();
+        if (personIds == null || personIds.isEmpty() || !isJunctionMode()) {
+            return ending;
+        }
+        Date today = Date.today();
+        for (
+            Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)
+        ) {
+            Household_Member__c ended = new Household_Member__c(
+                Id = membership.Id,
+                End_Date__c = today,
+                Is_Primary__c = false
+            );
+            if (membership.Start_Date__c != null && membership.Start_Date__c > today) {
+                ended.Start_Date__c = today;
+            }
+            ending.add(ended);
+        }
+        if (!ending.isEmpty()) {
+            Database.update(ending, true, AccessLevel.USER_MODE);
+        }
+        HOUSEHOLD_ID_BY_PERSON.clear();
+        return ending;
+    }
+
+    /**
      * Puts back the membership rows that were removed when these people were deleted, and
      * answers with the households that has changed.
      *
