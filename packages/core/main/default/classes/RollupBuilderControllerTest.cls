@@ -330,6 +330,101 @@ private class RollupBuilderControllerTest {
         }
     }
 
+    /** ROLLUPS-3: the window's bounds are dates, which SOQL refuses against a date and time. */
+    @IsTest
+    static void aFiscalWindowIsMeasuredOnADateFieldOnly() {
+        System.runAs(TestUsers.admin()) {
+            RollupBuilderController.Draft onDatetime = childCount();
+            onDatetime.fiscalYearAware = true;
+            onDatetime.fiscalYearOffset = 0;
+            onDatetime.fiscalDateField = 'CreatedDate';
+            RollupBuilderController.Draft onDate = childCount();
+            onDate.fiscalYearAware = true;
+            onDate.fiscalYearOffset = 0;
+            onDate.fiscalDateField = 'Anniversary__c';
+
+            System.Assert.areEqual(
+                Label.Core_RollupBuilder_ErrorWindowNeedsDate,
+                RollupBuilderController.problemWith(onDatetime),
+                'A date and time field is refused'
+            );
+            System.Assert.isNull(RollupBuilderController.problemWith(onDate), 'A date field');
+        }
+    }
+
+    /**
+     * ROLLUPS-8: a total that moves with the date is right only when every record is
+     * recalculated, which Instantly alone never does.
+     */
+    @IsTest
+    static void anInstantlyTotalThatMovesWithTheDateIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            RollupBuilderController.Draft fiscal = childCount();
+            fiscal.mode = RollupService.MODE_REAL_TIME;
+            fiscal.fiscalYearAware = true;
+            fiscal.fiscalYearOffset = 0;
+            fiscal.fiscalDateField = 'Anniversary__c';
+            RollupBuilderController.Draft recent = childCount();
+            recent.mode = RollupService.MODE_REAL_TIME;
+            recent.filterJson = JSON.serialize(
+                new Map<String, Object>{
+                    'version' => 1,
+                    'conditions' => new List<Object>{
+                        new Map<String, Object>{
+                            'id' => 1,
+                            'field' => 'Anniversary__c',
+                            'operator' => 'last n days',
+                            'value' => 30
+                        }
+                    }
+                }
+            );
+            RollupBuilderController.Draft nightly = childCount();
+            nightly.fiscalYearAware = true;
+            nightly.fiscalYearOffset = 0;
+            nightly.fiscalDateField = 'Anniversary__c';
+
+            String fiscalRefusal;
+            String recentRefusal;
+            String nightlyRefusal;
+            System.runAs(maria()) {
+                fiscalRefusal = saveRefusal(fiscal);
+                recentRefusal = saveRefusal(recent);
+                nightlyRefusal = saveRefusal(nightly);
+            }
+
+            System.Assert.areEqual(
+                Label.Core_RollupBuilder_ErrorInstantMovesWithDate,
+                fiscalRefusal,
+                'A fiscal year window'
+            );
+            System.Assert.areEqual(
+                Label.Core_RollupBuilder_ErrorInstantMovesWithDate,
+                recentRefusal,
+                'A last n days condition'
+            );
+            System.Assert.isNull(nightlyRefusal, 'Both mode is saved');
+            System.Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Definition__c], 'Only that one');
+        }
+    }
+
+    /** ROLLUPS-14: the preview calculates in system mode, so it needs what a save needs. */
+    @IsTest
+    static void someoneWithoutTheSettingsPermissionCannotPreview() {
+        System.runAs(TestUsers.admin()) {
+            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
+            String message;
+            System.runAs(david) {
+                try {
+                    RollupBuilderController.preview(childCount(), null);
+                } catch (AuraHandledException refused) {
+                    message = refused.getMessage();
+                }
+            }
+            System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
+        }
+    }
+
     @IsTest
     static void aSecondRollupOnTheSameFieldForTheSameRecordsIsRefused() {
         System.runAs(TestUsers.admin()) {

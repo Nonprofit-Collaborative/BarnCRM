@@ -51,6 +51,8 @@ import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord
 const NUMBERS = new Set(['double', 'integer', 'long']);
 const MONEY = new Set(['currency', 'percent']);
 const DATES = new Set(['date', 'datetime']);
+/** A fiscal year window is bounded by dates, so it is measured on a date field only. */
+const FISCAL_DATES = new Set(['date']);
 const TEXT = new Set(['string', 'textarea']);
 const READS_NO_FIELD = new Set(['COUNT', 'ANY', 'NONE']);
 const ORDERED = new Set(['FIRST', 'LAST']);
@@ -237,7 +239,7 @@ export default class RollupWizard extends LightningElement {
 
   get dateFieldOptions() {
     return this.sourceFields
-      .filter((field) => DATES.has(field.type))
+      .filter((field) => FISCAL_DATES.has(field.type))
       .map((field) => ({ value: field.value, label: field.label }));
   }
 
@@ -442,7 +444,7 @@ export default class RollupWizard extends LightningElement {
 
   sourceIsDate() {
     const field = this.sourceFields.find((entry) => entry.value === this.current.sourceField);
-    return !!field && DATES.has(field.type);
+    return !!field && FISCAL_DATES.has(field.type);
   }
 
   handleNext() {

@@ -126,8 +126,10 @@ on the records.
 Three settings on the same page change how every rollup behaves:
 
 - **Fiscal year start month** decides where "this year", "last year", and "two years ago"
-  begin. Choose the month your fiscal year starts from the list. Changing it and recalculating is
-  all that is needed to correct every year based total in the org.
+  begin. Choose the month your fiscal year starts from the list. Changing it and clicking
+  **Recalculate all** corrects every year based total in **Every night** or **Both** mode,
+  which is every year based total the Builder saves (see
+  [What the Builder will not save](#what-the-builder-will-not-save)).
 - **Default rollup mode** decides how a newly created rollup starts out: **Instantly**,
   **Every night**, or **Both (recommended)**. The next section says what each one means.
 - **When instant totals are calculated** decides when a save updates the totals in
@@ -284,13 +286,17 @@ to change, before it lets you go on.
    [What a rollup can calculate](#what-a-rollup-can-calculate) that the field from step 1 can
    hold, the field it reads, for First and Last the field that decides which record comes
    first, and the time window: all time, this fiscal year, last fiscal year, or two fiscal
-   years ago, with the date that decides which year a record falls in.
+   years ago, with the date that decides which year a record falls in (a date field, not a
+   date and time field).
 4. **Which records count?** Conditions you pick from lists (a field, a comparison and a
    value), read back as a sentence: "Gifts whose Status is Received, Refunded or Written off".
    Add a condition for each thing that must be true; to mix "and" and "or", type the
    condition numbers in **Combine conditions**, for example `1 AND (2 OR 3)`. **Only for
    some records** holds the same kind of conditions on the record that shows the total, for
-   two rollups that fill one field for different records.
+   two rollups that fill one field for different records. The comparisons **is this year** and
+   **is last year** in a condition mean the calendar year (January to December); for your fiscal
+   year, use the time window in step 3. **Contains** and **starts with** match what you type
+   exactly, so `%` and `_` are ordinary characters.
 5. **Check and save.** The whole rollup read back as one sentence. Pick a real record to see
    what the total would be next to what the record shows now, and how many records the
    rollup will maintain. Then give it a name, choose its mode, and click **Save**, or **Save
@@ -307,7 +313,12 @@ It says what to change instead of saving:
 - A sum or average of something that is not a number or an amount, and a minimum or maximum
   of something that is not a number, an amount or a date.
 - First or Last without the field that decides which record comes first.
-- A fiscal year window without a date to measure it on.
+- A fiscal year window without a date to measure it on, or measured on a date and time field.
+  Choose a date field, such as the gift date.
+- An **Instantly** total with a fiscal year window, or with an **is this year**, **is last year** or
+  **is in the last N days** condition. Such a total changes when the date moves on, with no record
+  saved, so only the nightly run can keep it right. Choose **Both (recommended)** or **Every
+  night**. Changing the mode on the Rollups list refuses it too.
 - Conditions that name a field the records do not have.
 - A field another active rollup already fills for some of the same records. Two rollups may
   fill one field only when their **Only for some records** conditions never pick the same
