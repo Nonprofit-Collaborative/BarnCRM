@@ -339,7 +339,10 @@ private class OrgShapeDetectorTest {
         System.runAs(TestUsers.admin()) {
             Id available;
             for (
-                Schema.RecordTypeInfo info : Account.SObjectType.getDescribe().getRecordTypeInfos()
+                Schema.RecordTypeInfo info : Account.SObjectType.getDescribe(
+                        SObjectDescribeOptions.DEFERRED
+                    )
+                    .getRecordTypeInfos()
             ) {
                 if (info.isAvailable() && !info.isMaster()) {
                     available = info.getRecordTypeId();
@@ -382,7 +385,7 @@ private class OrgShapeDetectorTest {
                 'A person type.'
             );
             Assert.isTrue(
-                Account.SObjectType.getDescribe()
+                Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                     .getRecordTypeInfosById()
                     .get(chosen)
                     .isAvailable(),
@@ -392,7 +395,9 @@ private class OrgShapeDetectorTest {
     }
 
     private static Boolean noneAvailable(Set<Id> recordTypeIds) {
-        Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe()
+        Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
             .getRecordTypeInfosById();
         for (Id recordTypeId : recordTypeIds) {
             if (infos.containsKey(recordTypeId) && infos.get(recordTypeId).isAvailable()) {
