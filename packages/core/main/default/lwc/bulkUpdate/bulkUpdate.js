@@ -15,6 +15,7 @@ import ACTION from '@salesforce/label/c.Core_BulkUpdate_Action';
 import ACTION_SET from '@salesforce/label/c.Core_BulkUpdate_ActionSet';
 import ACTION_CLEAR from '@salesforce/label/c.Core_BulkUpdate_ActionClear';
 import ACTION_COPY from '@salesforce/label/c.Core_BulkUpdate_ActionCopy';
+import ACTION_TRANSFORM from '@salesforce/label/c.Core_BulkUpdate_ActionTransform';
 import NEW_VALUE from '@salesforce/label/c.Core_BulkUpdate_NewValue';
 import COPY_FROM from '@salesforce/label/c.Core_BulkUpdate_CopyFrom';
 import REMOVE from '@salesforce/label/c.Core_BulkUpdate_Remove';
@@ -147,7 +148,10 @@ export default class BulkUpdate extends LightningElement {
         actionOptions: [
           { label: ACTION_SET, value: 'set' },
           ...(target && target.nillable ? [{ label: ACTION_CLEAR, value: 'clear' }] : []),
-          { label: ACTION_COPY, value: 'copy' }
+          { label: ACTION_COPY, value: 'copy' },
+          ...(target && type !== 'reference'
+            ? [{ label: ACTION_TRANSFORM, value: 'transform' }]
+            : [])
         ],
         isBoolean,
         isMulti,
@@ -155,6 +159,8 @@ export default class BulkUpdate extends LightningElement {
         isRecord,
         isInput: isSet && !isBoolean && !isMulti && !isPicklist && !isRecord,
         isCopy: change.action === 'copy',
+        isTransform: change.action === 'transform',
+        stepList: change.transforms || [],
         inputType: NUMBER_TYPES.has(type) ? 'number' : INPUT_TYPES[type] || 'text',
         referenceTo: target ? target.referenceTo : undefined,
         picklistOptions: target ? target.picklistValues : [],
@@ -190,7 +196,8 @@ export default class BulkUpdate extends LightningElement {
           name: record.name,
           label: change.label,
           before: shown(change.before),
-          after: shown(change.after)
+          after: change.problem ? change.problem : shown(change.after),
+          afterClass: change.problem ? 'slds-text-color_error' : ''
         });
       });
     }
@@ -267,16 +274,27 @@ export default class BulkUpdate extends LightningElement {
           action: 'set',
           value: '',
           source: undefined,
-          sources: undefined
+          sources: undefined,
+          transforms: undefined
         };
       }
       return { ...change, [part === 'record' ? 'value' : part]: value };
     });
     this.invalidate();
     const edited = this.changes.find((change) => change.key === key);
-    if (edited && edited.action === 'copy' && !edited.sources) {
+    if (edited && (edited.action === 'copy' || edited.action === 'transform') && !edited.sources) {
       await this.loadSources(edited);
     }
+  }
+
+  /** A change with steps (C-37): the steps as the step editor last sent them. */
+  handleStepsChange(event) {
+    const key = event.currentTarget.dataset.key;
+    const transforms = event.detail.transforms;
+    this.changes = this.changes.map((change) => {
+      return change.key === key ? { ...change, transforms } : change;
+    });
+    this.invalidate();
   }
 
   async loadSources(change) {
@@ -302,6 +320,9 @@ export default class BulkUpdate extends LightningElement {
           }
           if (change.action === 'copy') {
             entry.source = change.source;
+          }
+          if (change.action === 'transform') {
+            entry.transforms = change.transforms || [];
           }
           return entry;
         })

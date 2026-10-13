@@ -126,6 +126,18 @@
                                 onclick={handleRemoveChange}
                             ></lightning-button-icon>
                         </div>
+                        <template if:true={change.isTransform}>
+                            <div class="slds-col slds-size_1-of-1" data-id="steps">
+                                <c-import-column-transforms
+                                    embedded
+                                    source={change.field}
+                                    column-options={change.sourceOptions}
+                                    transforms={change.stepList}
+                                    data-key={change.key}
+                                    onchange={handleStepsChange}
+                                ></c-import-column-transforms>
+                            </div>
+                        </template>
                     </div>
                 </template>
                 <div class="slds-var-m-vertical_small">
@@ -164,7 +176,7 @@
                                         <th scope="row">{row.name}</th>
                                         <td>{row.label}</td>
                                         <td>{row.before}</td>
-                                        <td>{row.after}</td>
+                                        <td class={row.afterClass}>{row.after}</td>
                                     </tr>
                                 </template>
                             </tbody>

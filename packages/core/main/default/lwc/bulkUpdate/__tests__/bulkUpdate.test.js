@@ -179,6 +179,83 @@ describe('c-bulk-update', () => {
     ]);
   });
 
+  it('changes a field with steps, sends them, and shows a record the field cannot take', async () => {
+    getCopySources.mockResolvedValue([
+      { label: 'Last Name', value: 'LastName' },
+      { label: 'Title', value: 'Title' }
+    ]);
+    previewUpdate.mockResolvedValue({
+      count: 2,
+      runLimit: 48000,
+      objectLabel: 'Contacts',
+      sample: [
+        {
+          recordId: '003000000000001',
+          name: 'Ana Ramirez',
+          changes: [{ label: 'Title', before: 'volunteer', after: 'Volunteer Ramirez' }]
+        },
+        {
+          recordId: '003000000000002',
+          name: 'Ben Okafor',
+          changes: [{ label: 'Title', before: 'x', problem: 'Title cannot take the value.' }]
+        }
+      ]
+    });
+    const element = await render(QUERY);
+
+    await change(byPart(element, 'field'), 'Title');
+    const actions = byPart(element, 'action').options.map((option) => option.value);
+    expect(actions).toContain('transform');
+    await change(byPart(element, 'action'), 'transform');
+    await flush();
+
+    const editor = element.shadowRoot.querySelector('c-import-column-transforms');
+    expect(editor).not.toBeNull();
+    expect(editor.embedded).toBe(true);
+    expect(editor.source).toBe('Title');
+    expect(editor.columnOptions).toEqual([
+      { label: 'Last Name', value: 'LastName' },
+      { label: 'Title', value: 'Title' }
+    ]);
+    const steps = [{ op: 'proper' }, { op: 'append', columns: ['LastName'] }];
+    editor.dispatchEvent(
+      new CustomEvent('change', { detail: { source: 'Title', transforms: steps } })
+    );
+    await flush();
+    element.shadowRoot.querySelector('[data-id="preview"]').click();
+    await flush();
+
+    expect(previewUpdate).toHaveBeenCalledWith({
+      queryJson: QUERY,
+      changesJson: JSON.stringify([{ field: 'Title', action: 'transform', transforms: steps }])
+    });
+    const rows = element.shadowRoot.querySelectorAll('[data-id="sample-row"]');
+    expect(rows).toHaveLength(2);
+    expect(rows[0].textContent).toContain('Volunteer Ramirez');
+    const refused = rows[1].querySelectorAll('td')[2];
+    expect(refused.textContent).toBe('Title cannot take the value.');
+    expect(refused.className).toContain('slds-text-color_error');
+  });
+
+  it('does not offer steps for a lookup', async () => {
+    getTargets.mockResolvedValue([
+      {
+        apiName: 'ReportsToId',
+        label: 'Reports To',
+        dataType: 'reference',
+        nillable: true,
+        referenceTo: 'Contact',
+        picklistValues: []
+      }
+    ]);
+    const element = await render(QUERY);
+
+    await change(byPart(element, 'field'), 'ReportsToId');
+
+    const actions = byPart(element, 'action').options.map((option) => option.value);
+    expect(actions).not.toContain('transform');
+  });
+
   it('shows the server refusal as it is', async () => {
     previewUpdate.mockRejectedValue({ body: { message: 'No records match this query.' } });
     const element = await render(QUERY);
