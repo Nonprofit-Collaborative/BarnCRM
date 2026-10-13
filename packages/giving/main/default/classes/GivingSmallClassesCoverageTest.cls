@@ -1,0 +1,239 @@
+/**
+ * The small Giving classes whose edges no other test reaches: the receipt renderer's refusal of
+ * an empty document, the nightly overdue and top up jobs when they find nothing or cannot run,
+ * the stewardship starter when it cannot read its templates, the donor delete guard's name, and
+ * the mail sender's answers.
+ *
+ * A nightly job that fails must say so on the Nightly Jobs page and never throw, because a
+ * scheduled job's exception goes nowhere anyone looks.
+ */
+@IsTest(
+    testFor='ApexClass:BlobToPdfReceiptRenderer, ApexClass:InstallmentSchedulable, ApexClass:InstallmentTopUpSchedulable, ApexClass:StewardshipTriggerHandler, ApexClass:GiftDonorDeleteGuardHandler, ApexClass:MessagingAcknowledgmentSender'
+)
+private class GivingSmallClassesCoverageTest {
+    @TestSetup
+    static void setUp() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            GivingTestDataFactory.insertDefaultFund();
+        }
+    }
+
+    // ---------------------------------------------------------------------- receipt renderer
+
+    @IsTest
+    static void theShippedRendererRefusesAnEmptyDocumentAndDescribesItself() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            BlobToPdfReceiptRenderer renderer = new BlobToPdfReceiptRenderer();
+            String blank;
+            String empty;
+            try {
+                renderer.render('  ');
+            } catch (BlobToPdfReceiptRenderer.ReceiptRendererException refused) {
+                blank = refused.getMessage();
+            }
+            try {
+                renderer.render(null);
+            } catch (BlobToPdfReceiptRenderer.ReceiptRendererException refused) {
+                empty = refused.getMessage();
+            }
+
+            Assert.areEqual(
+                Label.Giving_Receipt_NothingToRender,
+                blank,
+                'White space is nothing to render'
+            );
+            Assert.areEqual(
+                Label.Giving_Receipt_NothingToRender,
+                empty,
+                'So is no document at all'
+            );
+            Assert.isTrue(
+                renderer.describe().contains('Blob.toPdf'),
+                'It says which service it uses'
+            );
+        }
+    }
+
+    @IsTest
+    static void theShippedRendererMakesAPdfFromHtml() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Blob pdf = new BlobToPdfReceiptRenderer().render('<p>Thank you for your gift.</p>');
+
+            Assert.isNotNull(pdf, 'A document comes back');
+            Assert.isTrue(pdf.size() > 0, 'And it has content');
+        }
+    }
+
+    // ----------------------------------------------------------------------- nightly overdue
+
+    @IsTest
+    static void theOverdueJobSaysSoWhenNothingWasOverdue() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            new InstallmentSchedulable().execute(null);
+            Test.stopTest();
+
+            Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+            Assert.areEqual(
+                System.Label.Giving_NightlyJobs_OverdueNoneFound,
+                settings.Installment_Overdue_Last_Run_Summary__c,
+                'The page says the pass ran and found nothing'
+            );
+            Assert.isNotNull(settings.Installment_Overdue_Last_Run__c, 'With the time it ran');
+        }
+    }
+
+    @IsTest
+    static void theOverdueJobSavesTheNightSummaryEvenWhenItsOwnWorkFails() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            User outsider = TestDataFactory.createUser('NoAccess', new List<String>());
+
+            System.runAs(outsider) {
+                Test.startTest();
+                new InstallmentSchedulable().execute(null);
+                Test.stopTest();
+            }
+
+            Assert.areEqual(
+                System.Label.Giving_NightlyJobs_RunFailed,
+                Giving_Settings__c.getOrgDefaults().Installment_Overdue_Last_Run_Summary__c,
+                'A pass that could not read the payments says it failed rather than claiming none were late'
+            );
+        }
+    }
+
+    // --------------------------------------------------------------------------- top up job
+
+    @IsTest
+    static void theTopUpJobStartsItsBatch() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Test.startTest();
+            new InstallmentTopUpSchedulable().execute(null);
+            Test.stopTest();
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM AsyncApexJob
+                    WHERE ApexClass.Name = 'InstallmentTopUpBatch' AND JobType = 'BatchApex'
+                ],
+                'The nightly job hands the work to the top up batch'
+            );
+        }
+    }
+
+    // ---------------------------------------------------------------------------- stewardship
+
+    @IsTest
+    static void aStewardshipStarterThatCannotReadItsTemplatesLeavesTheGiftsAlone() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Contact donor = new Contact(LastName = 'Ramirez');
+            insert donor;
+            List<Gift__c> gifts = new List<Gift__c>();
+            for (Integer i = 0; i < 200; i++) {
+                gifts.add(GivingTestDataFactory.buildGift(donor.Id, 10 + i));
+            }
+            insert gifts;
+            User outsider = TestDataFactory.createUser('NoAccess', new List<String>());
+
+            System.runAs(outsider) {
+                TriggerHandler.testNew = gifts;
+                try {
+                    new StewardshipTriggerHandler().afterInsert();
+                } finally {
+                    TriggerHandler.testNew = null;
+                }
+            }
+
+            for (Gift__c gift : gifts) {
+                Assert.isFalse(
+                    gift.hasErrors(),
+                    'A plan that could not start never stops a gift being saved'
+                );
+            }
+            Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'And no plan was made');
+        }
+    }
+
+    @IsTest
+    static void aStewardshipStarterGivenNothingDoesNothing() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            TriggerHandler.testNew = null;
+            new StewardshipTriggerHandler().afterInsert();
+            TriggerHandler.testNew = new List<SObject>();
+            new StewardshipTriggerHandler().afterInsert();
+            TriggerHandler.testNew = null;
+
+            Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'No gifts, no plans');
+        }
+    }
+
+    // ------------------------------------------------------------------------- donor delete
+
+    @IsTest
+    static void theDonorDeleteGuardIsNamedForTheAutomationRegistry() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Assert.areEqual(
+                'GiftDonorDeleteGuardHandler',
+                new GiftDonorDeleteGuardHandler().getName(),
+                'The registry rows that switch the guard on and off find it by this name'
+            );
+        }
+    }
+
+    @IsTest
+    static void aDonorWithNoGiftsIsDeletedWithTheGuardOn() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<Contact> people = new List<Contact>();
+            for (Integer i = 0; i < 200; i++) {
+                people.add(new Contact(FirstName = 'Donor' + i, LastName = 'Nobody'));
+            }
+            insert people;
+
+            Test.startTest();
+            delete people;
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Contact WHERE LastName = 'Nobody'],
+                'Two hundred people with no gifts are deleted in one save: the guard only refuses donors the books name'
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------------- mail sender
+
+    @IsTest
+    static void theMailSenderAnswersOncePerMessageAndExplainsEachFailure() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            MessagingAcknowledgmentSender sender = new MessagingAcknowledgmentSender();
+            Assert.isTrue(sender.send(null).isEmpty(), 'No messages, no answers');
+            Assert.isTrue(
+                sender.send(new List<Messaging.SingleEmailMessage>()).isEmpty(),
+                'An empty list is the same'
+            );
+
+            Messaging.SingleEmailMessage noRecipient = new Messaging.SingleEmailMessage();
+            noRecipient.setSubject('Thank you');
+            noRecipient.setPlainTextBody('Thank you for your gift.');
+            Messaging.SingleEmailMessage reachable = new Messaging.SingleEmailMessage();
+            reachable.setSubject('Thank you');
+            reachable.setPlainTextBody('Thank you for your gift.');
+            reachable.setToAddresses(new List<String>{ 'donor@example.org' });
+
+            List<AcknowledgmentSendOutcome> outcomes = sender.send(
+                new List<Messaging.SingleEmailMessage>{ noRecipient, reachable }
+            );
+
+            Assert.areEqual(2, outcomes.size(), 'One answer for each message, in order');
+            Assert.isFalse(outcomes[0].sent, 'A message with nobody to send to did not go');
+            Assert.isTrue(
+                String.isNotBlank(outcomes[0].failureReason) &&
+                outcomes[0].failureReason.length() <= 255,
+                'And says why in no more than 255 characters'
+            );
+        }
+    }
+}
