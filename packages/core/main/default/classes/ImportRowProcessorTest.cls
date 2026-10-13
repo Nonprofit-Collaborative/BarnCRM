@@ -961,7 +961,9 @@ private class ImportRowProcessorTest {
                 )
             );
         }
-        values.add(ImportTestDataFactory.donorRow('Lonely', '', 'lonely@example.org', 'Lonely Employer'));
+        values.add(
+            ImportTestDataFactory.donorRow('Lonely', '', 'lonely@example.org', 'Lonely Employer')
+        );
         return values;
     }
 
@@ -1029,10 +1031,14 @@ private class ImportRowProcessorTest {
                         'Household' => 'The Family ' + i,
                         'First 1' => 'Ana' + i,
                         'Last 1' => 'Family' + i,
-                        'Email 1' => 'ana' + i + '@example.org',
+                        'Email 1' => 'ana' +
+                        i +
+                        '@example.org',
                         'First 2' => 'Ben' + i,
                         'Last 2' => 'Family' + i,
-                        'Email 2' => 'ben' + i + '@example.org',
+                        'Email 2' => 'ben' +
+                        i +
+                        '@example.org',
                         'Employer' => 'Employer ' + Math.mod(i, 20)
                     }
                 );
