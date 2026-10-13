@@ -75,6 +75,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Address records | Major | Keeps many addresses per household, organization or person, with one default copied into the standard address fields so mail merges and other apps keep working. The first address added is the default, the address in use cannot be unticked on its own, and a deleted default is replaced by a non-seasonal address first. | Shipped | C-17 |
 | Seasonal address swap | Major | A nightly job swaps in a seasonal address on its start date and puts the previous one back when the season ends, with its last run shown in the app. | Shipped | C-18 |
 | Household or personal address setting | Minor | Decides whether editing one person's address moves the whole household (default) or gives that person an address of their own. | Shipped | C-17 |
+| Person account address capture | Minor | A person held as a person account who is saved with a mailing address, or whose mailing address changes, gets an address record of their own. | Built, not merged (fix/people-21) | PEOPLE-17 |
 | Seasons that cross New Year | Minor | A season such as November to March is handled as one range. | Shipped | C-17, C-18 |
 | Overlapping season report | Minor | Two seasonal addresses covering the same day are reported rather than silently chosen. | Shipped | C-18 |
 | Swap scheduling in the app | Minor | Schedule, unschedule and "Run the swap now" from settings, with a "not run in 36 hours" warning. | Shipped | C-18 |

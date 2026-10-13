@@ -14,6 +14,12 @@ its year round one, an old address stays on file so a mailing sent last year can
 explained, and one person can have an address of their own without moving the rest of
 their household.
 
+In an org that stores people as person accounts, a person saved with a mailing address, or
+whose mailing address is changed afterwards, also gets an address of their own (type Home,
+marked default), and an address that is already on file for them, with the same words, is not
+added a second time. This is the same as it is for a person held as a contact, except that a
+person account never moves a household: the address is theirs alone.
+
 A winter address does not have to be moved by hand. A **seasonal** address carries the dates
 it is used, and a nightly job makes it the address in use on the day its season starts and
 puts the previous address back on the day the season ends. The job records when it last ran
