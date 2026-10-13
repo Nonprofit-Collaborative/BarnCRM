@@ -12,14 +12,6 @@ ADR-0013, plan Section 4.2) is that Core installs on a Platform-only org, so the
 protects it has to be shaped the other way round: everything is forbidden unless it is
 listed, and an unrecognized name fails loudly.
 
-The vendored rollup engine (packages/core/vendor, ADR-0015) is inside this gate, not
-outside it. It is third party source the project does not write, but it deploys inside
-Core's package and a standard object it names is Core's deployment risk exactly like one
-Core wrote itself. What the vendor tree gets is its own allowlist section, VENDOR_ONLY
-below, with a reason recorded per name. The effect is that today's vendored references are
-accepted deliberately and a future upstream upgrade that introduces a new standard object
-fails this check instead of being discovered in a subscriber org.
-
 What is scanned, and what is not
 --------------------------------
 Apex (`*.cls`, `*.trigger`) under every package directory, plus the names of the folders
@@ -146,31 +138,6 @@ ALLOWED = {
     "DuplicateRecordItems": "not an object: the child relationship a subquery from DuplicateRecordSet names, C-20.",
 }
 
-# Standard objects only the vendored rollup engine names (ADR-0015,
-# packages/core/vendor/apex-rollup/VENDOR.md). Everything here is upstream's own test
-# fixture, never reached from BarnCRM code: RollupAdapter is the only caller of the
-# engine and it names none of these. They are listed rather than excluded so that an
-# upstream upgrade introducing a new one fails this check.
-#
-# All of them compile and accept DML in a bare Developer edition scratch org with no
-# features requested, which is the shape config/scratch-defs/platform-only.json creates.
-# The evidence is in VENDOR.md, "Platform-only deployability of the vendored tests".
-VENDOR_ONLY = {
-    "ContactPointAddress": "upstream's default test calc item after patch E moved the Sales Cloud objects off.",
-    "ContactPointAddressChangeEvent": "upstream's change data capture rollup test, RollupTests.",
-    "ContactPointAddressHistory": "upstream's negative test for a field that does not exist, RollupFlowTests.",
-    "ContactPointConsent": "upstream's second test object, used for parent and grandparent paths.",
-    "ContactPointEmail": "same.",
-    "ContactPointPhone": "same.",
-    "Name": "the polymorphic Name entity, used by RollupRelationshipFieldFinder to spot a polymorphic parent. Present on every org.",
-    "Individual": "upstream's grandparent test target, reached through Contact.Individual.",
-    "QuickText": "upstream's multi select picklist fixture, RollupCalculatorTests.",
-    "Event": "upstream's polymorphic activity fixture.",
-    "Asset": "the second child in RollupTests' grouping test, which needs a child that names its Account lookup AccountId as Contact does (patch E).",
-    "CurrencyType": "named in a dynamic SOQL string, guarded by the multicurrency check in RollupCurrencyInfo.",
-    "DatedConversionRate": "same, and only reached when dated conversion is on.",
-}
-
 APEX_SUFFIXES = ("__c", "__mdt", "__e", "__x", "__b", "__Share", "__History", "__r", "__ChangeEvent")
 
 PATTERNS = [
@@ -212,10 +179,6 @@ def repo_types(files):
     return names
 
 
-def is_vendor(path):
-    return os.sep + "vendor" + os.sep in path
-
-
 def main():
     files = sorted(apex_files())
     defined = repo_types(files)
@@ -225,13 +188,6 @@ def main():
         if name.endswith(APEX_SUFFIXES) or name in defined or name in SYSTEM_TYPES:
             return
         if name in ALLOWED:
-            return
-        if name in VENDOR_ONLY:
-            if is_vendor(path):
-                return
-            findings.setdefault(name, set()).add(
-                os.path.relpath(path, ROOT) + " (allowed only under packages/core/vendor)"
-            )
             return
         findings.setdefault(name, set()).add(os.path.relpath(path, ROOT))
 
@@ -265,9 +221,7 @@ def main():
         print("A standard object that a subscriber org may not have is a compile error,", file=sys.stderr)
         print("and one compile error refuses the whole package (ADR-0013).", file=sys.stderr)
         print("If the object is present on every org BarnCRM supports, add it to", file=sys.stderr)
-        print("ALLOWED in scripts/ci/check-object-allowlist.py with the reason. If it", file=sys.stderr)
-        print("arrived with an upstream vendor upgrade, add it to VENDOR_ONLY and record", file=sys.stderr)
-        print("it in packages/core/vendor/apex-rollup/VENDOR.md.", file=sys.stderr)
+        print("ALLOWED in scripts/ci/check-object-allowlist.py with the reason.", file=sys.stderr)
         print("check-object-allowlist.py: FAILED", file=sys.stderr)
         return 1
 

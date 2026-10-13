@@ -50,12 +50,7 @@ Salesforce org is needed for this job. Steps:
    metadata only, because a component's JavaScript cannot reference an SObject and several of
    our own component names are the same words. This half was added after an audit found the
    gate matched `GiftTransaction` alone, so Core could have named the two objects Nonprofit
-   Cloud households are made of and the build would have passed. The vendored rollup engine is
-   excluded from that half, because it names `ContactPointAddress` and `Individual` in its
-   own test classes and is not source this project rewrites line by line. It is not
-   unguarded: check 7 below covers the vendored tree with an allowlist, and the objects it
-   names are recorded, with the evidence that they are present on the Platform-only shape,
-   in `packages/core/vendor/apex-rollup/VENDOR.md`.
+   Cloud households are made of and the build would have passed.
    It also checks Connect's object and field declarations (everything under
    `packages/connect/**/objects/`): Connect's Apex may name Campaign or Opportunity as strings,
    but a lookup, formula or field declared on one of those objects is resolved at deploy time
@@ -65,7 +60,7 @@ Salesforce org is needed for this job. Steps:
    The next workflow step, `scripts/ci/check-person-account-fields.py`, closes the gap both
    gates leave: a static reference to a Person Account field (`IsPersonAccount`,
    `PersonEmail`, `PersonMailingPostalCode`, any `__pc` or `__pr` field) anywhere under
-   `packages/`, outside the vendored tree. Apex comments and string literals are ignored,
+   `packages/`. Apex comments and string literals are ignored,
    because holding the name as text and resolving it through describe is the allowed seam
    (`dynamic-apex.md`); a token such as `Account.PersonEmail`, a static SOQL query naming one,
    an `@salesforce/schema` import, a `field-name` attribute, or a metadata reference such as a
@@ -79,12 +74,7 @@ Salesforce org is needed for this job. Steps:
    subscriber org does not have is a compile error, and one compile error in one class
    refuses the whole package, so the promise that Core installs on a Platform-only org
    (ADR-0009, ADR-0013) needs a gate where everything is forbidden unless it is listed.
-   Each allowed name carries its reason on its own line in the script. The vendored rollup
-   engine is inside this gate rather than excluded from it, with its own `VENDOR_ONLY`
-   section: the tree is third party source, but it ships inside Core's package, so a
-   standard object it names is Core's deployment risk. The practical effect is that an
-   upstream upgrade introducing a new standard object fails here instead of in a
-   subscriber org. Names are read only from positions where a bare identifier can be an
+   Each allowed name carries its reason on its own line in the script. Names are read only from positions where a bare identifier can be an
    SObject (`new X(`, `List<X>`, `X.SObjectType`, `FROM X`); the docstring says why that is
    narrower than every possible reference, and an unrecognized name always fails, so
    widening the patterns is safe.
@@ -172,9 +162,7 @@ Salesforce org is needed for this job. Steps:
    `packages/*/main/default/objects/` is named in the model, and every custom field shipped
    in it is named in backticks in a top-level section that also names that object. Until
    2026-10 only the first direction ran, so this line claimed more than the script did, and
-   four custom metadata fields had shipped with no API name in the model. The vendored
-   rollup engine (`packages/core/vendor/`) is not BarnCRM's data model and is outside the
-   path it reads.
+   four custom metadata fields had shipped with no API name in the model.
    `scripts/ci/check-openapi.js` (`npm run check:openapi`) fails the build if
    `docs/architecture/reference/inbound-gift-api.openapi.yaml` does not parse as YAML, is
    not OpenAPI 3.1, has a `$ref` that resolves to nothing, an operation without a unique
@@ -201,8 +189,8 @@ Salesforce org is needed for this job. Steps:
    keeps the value it first stored. The rename of the default to `BarnCRM_Settings__c` left
    such orgs pointed at the old object and every save refused with "That setting does not
    exist in this org".
-   `scripts/ci/check-apex-access-modes.py` fails the build if packaged Apex (tests and
-   `vendor/` excepted) leaves its sharing or access mode to the platform default: a class
+   `scripts/ci/check-apex-access-modes.py` fails the build if packaged Apex (tests
+   excepted) leaves its sharing or access mode to the platform default: a class
    with no `with`, `without` or `inherited sharing` keyword (an inner class only when it
    touches the database), an inline query with no `WITH USER_MODE` or `WITH SYSTEM_MODE`, a
    DML statement with no `as user` or `as system`, or a `Database` or `Search` method with no
@@ -513,8 +501,7 @@ between the package and that mistake, and it is a grep. Testing the Platform-onl
 means a second org and a second secret; until then, treat every green org test as evidence
 about one shape and no other.
 
-The deploy goes in stages through `scripts/org/deploy-packages.sh`: the vendored rollup
-engine, then Core (one stage per object under `packages/core/main/default/objects`, then
+The deploy goes in stages through `scripts/org/deploy-packages.sh`: Core (one stage per object under `packages/core/main/default/objects`, then
 custom metadata, then labels, then static resources with custom permissions, then Apex, then
 everything that wires the two together: permission sets and groups, layouts, flexipages,
 applications, tabs, quick actions, Lightning components), then Giving. A failed stage asks the
@@ -528,8 +515,7 @@ That is not tidiness. The first deploy this project ever attempted sent all 982 
 one request and came back with `UNKNOWN_EXCEPTION`, zero components deployed, zero component
 errors, and a Salesforce ErrorId. A failure with nothing attached to it tells you nothing
 about which of 982 things caused it. In stages, the same failure names a stage. The order also
-matches how the packages depend on each other: the vendored engine is self contained, Core
-does not call it yet, and Giving depends on Core.
+matches how the packages depend on each other: Giving depends on Core.
 
 An `UNKNOWN_EXCEPTION` with zero component errors is a Salesforce side failure rather than
 something wrong with a component. Quote the ErrorId to Salesforce support.
