@@ -2,7 +2,8 @@
  * The work of one bulk delete (C-37, canonical model R-BD3), run as the person who started it.
  *
  * - **Only what was confirmed.** The query reads at most the confirmed number of records, in Id
- *   order, in user mode.
+ *   order, in user mode. A delete by file (R-BD7) reads at most that many of its dry run's
+ *   Matched rows instead, and each chunk reads the records they name again as the person.
  * - **Only records that still match.** Each chunk reads its records again with the query's
  *   filter, so a record changed since the job started so that it no longer matches is left
  *   alone and counted.
@@ -50,6 +51,21 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
         .Operation_JSON__c;
         try {
             BulkDeleteService.Plan checked = BulkDeleteService.planFromDefinition(definition);
+            if (checked.fromFile) {
+                // A delete by file (R-BD7): the dry run's Matched rows, the package's own
+                // bookkeeping, read in system mode; each chunk reads their records as the person.
+                return Database.getQueryLocatorWithBinds(
+                    'SELECT Gift_Id__c FROM Import_Row__c WHERE Import_Batch__c = :owner' +
+                        ' AND Status__c = :matched AND Gift_Id__c != NULL' +
+                        ' ORDER BY Row_Number__c LIMIT :confirmed',
+                    new Map<String, Object>{
+                        'owner' => owner,
+                        'matched' => ImportRowProcessor.STATUS_MATCHED,
+                        'confirmed' => BulkDeleteService.confirmedCountOf(definition)
+                    },
+                    AccessLevel.SYSTEM_MODE
+                );
+            }
             QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
                 checked.queryJson,
                 new Set<String>{ 'Id' },
@@ -86,10 +102,14 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
         List<Map<String, Object>> journal = new List<Map<String, Object>>();
         try {
             BulkDeleteService.Plan checked = BulkDeleteService.planFromDefinition(definition);
-            Set<Id> ids = new Map<Id, SObject>(records).keySet();
-            List<SObject> current = QueryCompiler.run(
-                QueryCompiler.compileSelection(checked.queryJson, checked.readFields(), ids)
-            );
+            Set<Id> ids = checked.fromFile
+                ? resultingRecords(records)
+                : new Map<Id, SObject>(records).keySet();
+            List<SObject> current = checked.fromFile
+                ? BulkDeleteService.readAgain(checked, ids)
+                : QueryCompiler.run(
+                      QueryCompiler.compileSelection(checked.queryJson, checked.readFields(), ids)
+                  );
             noLongerMatching += ids.size() - current.size();
             remove(checked, current, journal);
         } catch (BulkDeleteService.BulkDeleteException refused) {
@@ -222,6 +242,15 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
             LIMIT 1
         ];
         return !jobs.isEmpty() && jobs[0].NumberOfErrors != null && jobs[0].NumberOfErrors > 0;
+    }
+
+    /** The records a chunk of a delete by file's rows name (R-BD7). */
+    private static Set<Id> resultingRecords(List<SObject> rows) {
+        Set<Id> ids = new Set<Id>();
+        for (SObject row : rows) {
+            ids.add(Id.valueOf((String) row.get('Gift_Id__c')));
+        }
+        return ids;
     }
 
     private static String message(List<Database.Error> errors) {

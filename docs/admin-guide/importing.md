@@ -444,6 +444,7 @@ the same dry run, results, journal and undo as any import.
 | **Insert** | Creates a new record for every row. | Loading the same file twice creates every record twice. |
 | **Update by record ID** | Changes the record whose Salesforce record ID is in the row's ID column. Map that column to **Salesforce record ID**. | A row whose ID is wrong, of another object, or not one you can see is rejected; nothing is created for it. |
 | **Upsert by external ID** | Finds the record by the ID field you choose (one marked External ID) and changes it, or creates a record when none has that value. | A value typed into the wrong row changes the wrong record. |
+| **Delete by record ID** | Deletes the record whose Salesforce record ID is in the row's ID column, as a bulk delete does. Listed only for people with **Bulk Delete Records**, and only for objects a bulk delete may delete. | Every record the file names goes, with the related records Salesforce deletes with it. See "Deleting the records a file lists" below. |
 
    Also choose what happens when a lookup finds no record: **Reject the row** (the default) or
    **Leave it empty** and load the rest of the row. When a lookup or an upsert finds more than
@@ -465,7 +466,7 @@ may create or edit records. Never listed, whatever your access:
 **People and organizations load by Update only.** Contacts and accounts can be updated by record
 ID, for example to load back an export you corrected in Excel, but not inserted or upserted
 here: new people, households and organizations come in through a people mapping, which builds
-their households.
+their households. They can also be deleted by record ID, below, as a bulk delete deletes them.
 
 **Fields that are never written**, even when listed in your file: fields Salesforce fills in
 (created and modified dates, IDs), formulas, roll-ups and auto numbers, every field a BarnCRM
@@ -482,6 +483,28 @@ cannot be the record ID or the upsert ID field.
 
 **Undo** works as in section 5. It deletes the records the import created (keeping any that
 someone has edited or added a record to since) and puts back the values it changed.
+
+**Deleting the records a file lists.** **Delete by record ID** deletes the records a file names,
+for example an export of test records somebody loaded by mistake. It needs the **Bulk Delete
+Records** permission (see [Bulk delete](bulk-delete.md), section 2) as well as import access,
+and the object must be one a bulk delete may delete. Map the ID column to **Salesforce record
+ID**; every other column is ignored.
+
+1. Select **Dry run**. Nothing is deleted. A row is **Matched** (would be deleted) when its ID
+   names a record of the object that you can see; a row whose ID is wrong, of another object,
+   repeats an earlier row, or names a record you cannot see is rejected.
+2. Instead of **Commit**, the results show how many records would be deleted and the kinds of
+   related record Salesforce deletes with them. Type that number into **Type the number of
+   records to confirm**, then press **Delete**.
+3. The delete runs as a bulk delete: in chunks of up to 200, as you, with each record listed in
+   the journal. A record deleted or hidden from you since the dry run is left alone and counted;
+   a record Salesforce refuses is listed with the reason.
+4. Once it starts, the job moves from the import history to **Recent bulk deletes** on the
+   **Bulk Update** tab, where **Undo** brings the records back from the Recycle Bin within the
+   bulk delete's undo window (at most 15 days). The import's own **Undo** refuses it.
+
+A file naming more records than the **Bulk delete run limit** (default 10,000) is refused at
+the confirm step: split the file.
 
 ## 10. Changing values as they load
 

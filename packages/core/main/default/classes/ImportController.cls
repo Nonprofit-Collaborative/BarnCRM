@@ -411,9 +411,7 @@ public with sharing class ImportController {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         view.targetObject = described.getName();
         view.targetObjectLabel = described.getLabel();
-        view.loadOperation = ImportObjectSchema.updatesOnly(type)
-            ? ImportObjectSchema.OPERATION_UPDATE
-            : ImportObjectSchema.operationOf(template);
+        view.loadOperation = ImportObjectSchema.operationFor(type, template);
         view.loadOperations = ImportObjectSchema.operationsFor(type);
         view.loadMatchField = template.Load_Match_Field__c;
         view.lookupNotFound = ImportObjectSchema.leavesLookupEmpty(template)

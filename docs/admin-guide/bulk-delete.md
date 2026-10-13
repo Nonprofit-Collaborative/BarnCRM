@@ -6,6 +6,10 @@
 clearing out what should not be there: a test load, a list of contacts a partner sent twice,
 last year's event sign-ups.
 
+To delete the records a file lists by their record IDs instead, use **Load one object** with
+**Delete by record ID** on the Import tab ([Importing](importing.md), section 9). It needs
+**Bulk Delete Records** but not Find, and runs, journals and undoes exactly as below.
+
 Before anything is deleted, BarnCRM counts the records that match and shows the first five by
 name, with the kinds of related records Salesforce deletes with them. You type that number to
 confirm. The delete then runs in the background, in chunks of up to 200 records, and the page
@@ -28,7 +32,8 @@ refused is listed with the reason; the rest are still deleted.
    even BarnCRM Admin**: assign the **BarnCRM Bulk Delete** permission set to the few people
    who should have it (Setup, Users, choose the person, Permission Set Assignments), with
    **BarnCRM Find and Export** if they do not have it already. Neither grants access to any
-   record.
+   record. Seeing the list of recent bulk deletes, and undoing one, needs only **Bulk Delete
+   Records**, as does deleting by file from the Import tab.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk delete run limit**
    (default 10,000). A bulk delete that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just
