@@ -305,6 +305,22 @@
         <value>does not equal</value>
     </labels>
     <labels>
+        <fullName>Core_Filter_OpIsExactly</fullName>
+        <categories>Filter</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Operator: a multi-select field holds exactly the chosen values.</shortDescription>
+        <value>is exactly</value>
+    </labels>
+    <labels>
+        <fullName>Core_Filter_OpIsNotExactly</fullName>
+        <categories>Filter</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Operator: a multi-select field does not hold exactly the chosen values.</shortDescription>
+        <value>is not exactly</value>
+    </labels>
+    <labels>
         <fullName>Core_Filter_OpLessThan</fullName>
         <categories>Filter</categories>
         <language>en_US</language>

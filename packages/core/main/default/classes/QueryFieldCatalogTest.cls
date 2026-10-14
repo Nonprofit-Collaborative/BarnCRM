@@ -123,6 +123,38 @@ private class QueryFieldCatalogTest {
         }
     }
 
+    /** Describes are read once per object in a transaction, and give the same answers after. */
+    @IsTest
+    static void anObjectIsDescribedOnceAndAnswersTheSameAfter() {
+        System.runAs(TestUsers.admin()) {
+            Schema.DescribeSObjectResult first = QueryFieldCatalog.describeObject('Affiliation__c');
+            System.Assert.areEqual(
+                first,
+                QueryFieldCatalog.describeObject('AFFILIATION__C'),
+                'The second read, in any case, is the first describe'
+            );
+            for (Integer index = 0; index < 200; index++) {
+                System.Assert.areEqual(
+                    'Name',
+                    QueryFieldCatalog.resolvePath('Affiliation__c', 'contact__r.ACCOUNT.Name')
+                        .getName(),
+                    'Every path crossing the same lookups resolves the same way'
+                );
+            }
+            for (Integer attempt = 0; attempt < 2; attempt++) {
+                try {
+                    QueryFieldCatalog.describeObject('No_Such_Object__c');
+                    System.Assert.fail('An unknown object is refused every time');
+                } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+                    System.Assert.isTrue(
+                        refused.getMessage().contains('No_Such_Object__c'),
+                        'A refusal is never cached as an answer'
+                    );
+                }
+            }
+        }
+    }
+
     /** One rule for the platform's own tables, standard and custom, and for settings. */
     @IsTest
     static void tellsThePlatformsOwnTablesFromRecords() {

@@ -50,6 +50,8 @@ import SUMMARY_ALL from '@salesforce/label/c.Core_Filter_SummaryAll';
 import SUMMARY_LOGIC from '@salesforce/label/c.Core_Filter_SummaryLogic';
 import OP_EQUALS from '@salesforce/label/c.Core_Filter_OpEquals';
 import OP_NOT_EQUALS from '@salesforce/label/c.Core_Filter_OpNotEquals';
+import OP_IS_EXACTLY from '@salesforce/label/c.Core_Filter_OpIsExactly';
+import OP_IS_NOT_EXACTLY from '@salesforce/label/c.Core_Filter_OpIsNotExactly';
 import OP_LESS_THAN from '@salesforce/label/c.Core_Filter_OpLessThan';
 import OP_LESS_OR_EQUAL from '@salesforce/label/c.Core_Filter_OpLessOrEqual';
 import OP_GREATER_THAN from '@salesforce/label/c.Core_Filter_OpGreaterThan';
@@ -84,6 +86,20 @@ const OPERATOR_LABELS = {
   [OPERATORS.LAST_YEAR]: OP_LAST_YEAR,
   [OPERATORS.LAST_N_DAYS]: OP_LAST_N_DAYS
 };
+
+/**
+ * A multi-select field's equals matches the whole set of values, not one of them, so it reads
+ * "is exactly" rather than "equals".
+ */
+const MULTI_PICKLIST_LABELS = {
+  [OPERATORS.EQUALS]: OP_IS_EXACTLY,
+  [OPERATORS.NOT_EQUALS]: OP_IS_NOT_EXACTLY
+};
+
+function operatorLabel(field, operator) {
+  const special = field && field.dataType === 'multipicklist' && MULTI_PICKLIST_LABELS[operator];
+  return special || OPERATOR_LABELS[operator] || '';
+}
 
 const VALUE_PROBLEM_LABELS = {
   valueRequired: ERROR_VALUE_REQUIRED,
@@ -253,7 +269,7 @@ export default class FilterBuilder extends LightningElement {
         removeLabel: format(REMOVE_CONDITION, number),
         segments: this.segmentViews(row),
         operatorOptions: operatorsFor(field, !this.hideRelativeDates).map((operator) => ({
-          label: OPERATOR_LABELS[operator],
+          label: operatorLabel(field, operator),
           value: operator
         })),
         operator: row.operator,
@@ -540,7 +556,7 @@ export default class FilterBuilder extends LightningElement {
         text = format(LAST_N_DAYS_VALUE, String(row.inputValue));
       } else {
         const valueText = this.valueText(field, kind, row.inputValue);
-        text = [OPERATOR_LABELS[row.operator] || '', valueText].filter((part) => part).join(' ');
+        text = [operatorLabel(field, row.operator), valueText].filter((part) => part).join(' ');
       }
       const condition = `${this.fieldLabelPath(row)} ${text}`.trim();
       return this.logicEnabled ? `${index + 1}. ${condition}` : condition;
