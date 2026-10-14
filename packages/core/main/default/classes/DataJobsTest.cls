@@ -44,8 +44,8 @@ private class DataJobsTest {
                 Operation__c = BulkUpdateService.OPERATION_UPDATE,
                 Status__c = ImportBatchService.STATUS_COMMITTING,
                 Is_Dry_Run__c = false,
-                Job_Id__c = AsyncApexJob.SObjectType.getDescribe().getKeyPrefix() +
-                    '000000000001AAA',
+                Job_Id__c = AsyncApexJob.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+                        .getKeyPrefix() + '000000000001AAA',
                 Undo_Deadline__c = Datetime.now().addDays(1)
             );
             insert job;
