@@ -1772,7 +1772,7 @@ Maria load the same payment processor export every month without rebuilding the 
 | Match Date Window Days | integer | no | How many days either side of a scheduled payment's due date a gift may fall and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Match Amount Tolerance | decimal | no | How far a gift's amount may differ from a scheduled payment's expected amount and still match it; empty means the org's default (R-IT7, Section 21A). |
 | Target Object | text | no | The API name of the one object this template loads, as describe gives it; empty for a template that loads people and organizations (R-IT12). |
-| Load Operation | picklist(Insert, Update by record Id, Update by a matching field, Upsert by external ID) | no | What a row of a one-object template does; empty means Insert (R-IT12). |
+| Load Operation | picklist(Insert, Update by record Id, Update by a matching field, Upsert by external ID, Delete by record Id) | no | What a row of a one-object template does; empty means Insert (R-IT12, R-BD7). |
 | Load Match Field | text | conditional | Under Upsert by external ID, the API name of the target object's External ID field rows are found by; under Update by a matching field, the API name of the text, email or phone field they are found by; required under both (R-IT12). |
 | Lookup Not Found | picklist(Reject the row, Leave it empty) | no | What a row of a one-object template does when a lookup column finds no record; empty means Reject the row (R-IT13). |
 | Related Object | text | no | The API name of the object a one-object template also creates related records of, as describe gives it; empty for none (R-IT17). |
@@ -1900,6 +1900,8 @@ in every chunk. Load Operation decides what a row does:
   compared ignoring case; it changes that record, or creates one when none holds the value. A
   row with no value in the field is rejected. A value several records hold follows Several
   Matches (R-IT9).
+- **Delete by record Id** deletes the record named by the row's `Record.Id`, through the bulk
+  delete job rather than the loader's save (R-BD7).
 
 The loader reads the existing records itself, in user mode, and never calls the platform's
 upsert, so the dry run decides exactly as the commit will and the journal holds each value
@@ -1952,7 +1954,8 @@ from describe at run time, so a new object is judged without a code change:
    either Update, or both for Upsert.
 
 Account and Contact may be loaded only by Update by record Id or Update by a matching field: people, households and
-organizations are created by a people template, which builds households (R-IR1a).
+organizations are created by a people template, which builds households (R-IR1a). Delete by
+record Id (R-BD7) is not a load and follows the bulk delete's rules instead.
 
 These fields are never written, whatever the file holds: the fields the platform keeps (Id,
 created and modified stamps, system mod stamp, last activity, viewed and referenced dates),
@@ -2168,7 +2171,7 @@ from Nonprofit Cloud", section 5).
 | Match Date Window Days | `Match_Date_Window_Days__c` | Number (3, 0) |
 | Match Amount Tolerance | `Match_Amount_Tolerance__c` | Currency (16, 2) |
 | Target Object | `Target_Object__c` | Text (255) |
-| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Update by a matching field, Upsert by external ID |
+| Load Operation | `Load_Operation__c` | Picklist: Insert, Update by record Id, Update by a matching field, Upsert by external ID, Delete by record Id |
 | Load Match Field | `Load_Match_Field__c` | Text (255) |
 | Lookup Not Found | `Lookup_Not_Found__c` | Picklist: Reject the row, Leave it empty |
 | Related Object | `Related_Object__c` | Text (255) |
@@ -6538,7 +6541,31 @@ NotRestored with the reason, and the Run Log says how many were restored, purged
 
 **R-BD6 Permission.** Every bulk delete action requires the `Bulk_Delete_Records` custom
 permission and `Find_And_Export_Records`. `Bulk_Delete_Records` is in its own permission set
-only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access.
+only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access. What reads no query
+needs only `Bulk_Delete_Records`: the list of jobs, a job's progress, the undo, and a delete by
+file (R-BD7), which needs import access instead of Find.
+
+**R-BD7 Delete by file** (ADR-NEXT, `NEXT-delete-by-file.md`). A one-object template (R-IT12)
+whose Load Operation is Delete by record Id names, in each row's `Record.Id`, a record to
+delete; every other column is ignored. The operation is offered only to a person holding
+`Bulk_Delete_Records`, for an object R-BD4 allows (people included), and the template is refused
+without them.
+
+- **Dry run.** The file is staged and dry run as any import. A row is Matched, with the record
+  in its Resulting Record, when its ID is a valid ID of the target object naming a record the
+  person can see in user mode; otherwise it is Rejected, as is a row naming the same record as
+  an earlier row (R-IT12's Processor Key digest). Nothing is deleted.
+- **Confirmed start.** The import commit is replaced by a start that takes the confirmed
+  count: refused unless the dry run completed, the count typed equals the Matched rows, and
+  that count is within the run limit (R-BD2). The preview names the cascade kinds as R-BD2.
+  The start turns the same `Import_Batch__c` into a bulk delete: Operation Delete, a definition
+  `{ "version": 1, "source": "file", "object": "...", "confirmedCount": 112 }`, the Undo
+  Deadline of R-BD2, so it leaves the import history and is listed, undone and refused by the
+  import undo as any bulk delete (R-BD5).
+- **The job.** `BulkDeleteBatch` reads at most the confirmed number of the batch's Matched
+  rows in system mode (they are bookkeeping, ADR-0021), and each chunk reads their Resulting
+  Records again in user mode: a record gone or hidden since the dry run is counted as no longer
+  matching. Deleting, journaling, Rows Deleted and the undo are as R-BD3 and R-BD5.
 
 ### Salesforce implementation
 

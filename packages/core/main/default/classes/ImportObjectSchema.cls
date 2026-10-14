@@ -19,6 +19,9 @@ public with sharing class ImportObjectSchema {
     public static final String OPERATION_UPDATE_BY_FIELD = 'Update by a matching field';
     @NamespaceAccessible
     public static final String OPERATION_UPSERT = 'Upsert by external ID';
+    /** Deletes the records a file names, through the bulk delete job (R-BD7). */
+    @NamespaceAccessible
+    public static final String OPERATION_DELETE = 'Delete by record Id';
 
     /**
      * The most records an object may hold, counted in the user's access, for a field it does not
@@ -116,7 +119,8 @@ public with sharing class ImportObjectSchema {
             String known : new List<String>{
                 OPERATION_UPDATE,
                 OPERATION_UPDATE_BY_FIELD,
-                OPERATION_UPSERT
+                OPERATION_UPSERT,
+                OPERATION_DELETE
             }
         ) {
             if (known.equalsIgnoreCase(chosen)) {
@@ -124,6 +128,18 @@ public with sharing class ImportObjectSchema {
             }
         }
         return OPERATION_INSERT;
+    }
+
+    /**
+     * The template's operation as this object allows it: people and organizations keep the two
+     * updates (R-IT14) and a delete by record Id (R-BD7); anything else becomes Update by record Id.
+     */
+    @NamespaceAccessible
+    public static String operationFor(Schema.SObjectType type, Import_Template__c template) {
+        String chosen = operationOf(template);
+        return updatesOnly(type) && !neverCreates(chosen) && chosen != OPERATION_DELETE
+            ? OPERATION_UPDATE
+            : chosen;
     }
 
     /** Whether a lookup that finds no record leaves the lookup empty rather than rejecting. */
@@ -198,10 +214,13 @@ public with sharing class ImportObjectSchema {
         return sortedValues(byLabel);
     }
 
-    /** The operations a load of this object may use: the two updates only for people (R-IT14). */
+    /**
+     * The operations a load of this object may use: the two updates only for people (R-IT14),
+     * and Delete by record Id for a person who may bulk delete records of it (R-BD7).
+     */
     @NamespaceAccessible
     public static List<String> operationsFor(Schema.SObjectType type) {
-        return updatesOnly(type)
+        List<String> result = updatesOnly(type)
             ? new List<String>{ OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD }
             : new List<String>{
                   OPERATION_INSERT,
@@ -209,6 +228,29 @@ public with sharing class ImportObjectSchema {
                   OPERATION_UPDATE_BY_FIELD,
                   OPERATION_UPSERT
               };
+        if (deleteRefusal(type) == null) {
+            result.add(OPERATION_DELETE);
+        }
+        return result;
+    }
+
+    /**
+     * Why the running user may not delete records of this object by file, or null (R-BD7): the
+     * bulk delete permission and the bulk delete's object rules (R-BD4).
+     */
+    @NamespaceAccessible
+    public static String deleteRefusal(Schema.SObjectType type) {
+        if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
+            return Label.Core_Import_ErrorDeleteNeedsPermission;
+        }
+        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+        String reason = BulkDeleteService.objectReason(described);
+        return reason == null
+            ? null
+            : String.format(
+                  Label.Core_BulkDelete_ErrorObject,
+                  new List<String>{ described.getLabelPlural(), reason }
+              );
     }
 
     /**
@@ -520,7 +562,13 @@ public with sharing class ImportObjectSchema {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         List<String> plural = new List<String>{ described.getLabelPlural() };
         String operation = operationOf(template);
-        if (updatesOnly(type) && !neverCreates(operation)) {
+        Boolean byId = operation == OPERATION_UPDATE || operation == OPERATION_DELETE;
+        if (operation == OPERATION_DELETE) {
+            String cannotDelete = deleteRefusal(type);
+            if (cannotDelete != null) {
+                return cannotDelete;
+            }
+        } else if (updatesOnly(type) && !neverCreates(operation)) {
             return String.format(Label.Core_Import_ErrorPeopleUpdateOnly, plural);
         }
         if (!canRun(described, operation)) {
@@ -531,8 +579,8 @@ public with sharing class ImportObjectSchema {
         if (attributes.isEmpty()) {
             return Label.Core_Import_ErrorNothingMapped;
         }
-        String key = operation == OPERATION_UPDATE ? ID_ATTRIBUTE : null;
-        if (operation == OPERATION_UPDATE && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
+        String key = byId ? ID_ATTRIBUTE : null;
+        if (byId && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
             return Label.Core_Import_ErrorIdColumnMissing;
         }
         if (operation == OPERATION_UPSERT || operation == OPERATION_UPDATE_BY_FIELD) {
@@ -728,6 +776,9 @@ public with sharing class ImportObjectSchema {
         }
         if (neverCreates(operation)) {
             return described.isUpdateable();
+        }
+        if (operation == OPERATION_DELETE) {
+            return described.isDeletable();
         }
         return described.isCreateable() && described.isUpdateable();
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Load_Operation__c</fullName>
-  <description>What a row of a template that loads one object does: insert a record, update the record its record Id names, update the record a chosen field finds, or upsert by an external ID field. Empty means Insert (canonical model R-IT12).</description>
+  <description>What a row of a template that loads one object does: insert a record, update the record its record Id names, update the record a chosen field finds, upsert by an external ID field, or delete the record its record Id names through a bulk delete. Empty means Insert (canonical model R-IT12, R-BD7).</description>
   <inlineHelpText>What each row of a mapping that loads one object does.</inlineHelpText>
   <label>Load Operation</label>
   <required>false</required>
@@ -30,6 +30,11 @@
         <fullName>Upsert by external ID</fullName>
         <default>false</default>
         <label>Upsert by external ID</label>
+      </value>
+      <value>
+        <fullName>Delete by record Id</fullName>
+        <default>false</default>
+        <label>Delete by record Id</label>
       </value>
     </valueSetDefinition>
   </valueSet>

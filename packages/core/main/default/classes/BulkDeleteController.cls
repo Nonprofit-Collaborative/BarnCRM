@@ -2,8 +2,9 @@
  * What the bulk delete panel and its list on the Bulk Update tab read and write (C-37,
  * canonical model R-BD1 to R-BD6, ADR-0091).
  *
- * Every method requires the Bulk Delete Records custom permission and, because every bulk
- * delete starts from a Find query, Find and Export Records (R-BD6). Neither grants record
+ * Every method requires the Bulk Delete Records custom permission and, where a bulk delete
+ * starts from a Find query, Find and Export Records (R-BD6); the list, progress and undo read no
+ * query, and a delete by file (R-BD7) starts from an import's dry run. Neither grants record
  * access: the query is compiled and counted as the person, and every record is deleted in their
  * own mode. A person sees and undoes their own bulk deletes; one who manages BarnCRM Settings
  * may also list and undo everyone's (`DataJobs`). Jobs are read in user mode; the progress of a
@@ -73,7 +74,7 @@ public with sharing class BulkDeleteController {
     public static BulkDeletePage getPage(Boolean everyone) {
         try {
             BulkDeletePage page = new BulkDeletePage();
-            page.allowed = hasPermission();
+            page.allowed = mayDelete();
             page.jobs = new List<JobView>();
             if (!page.allowed) {
                 return page;
@@ -119,11 +120,40 @@ public with sharing class BulkDeleteController {
         }
     }
 
+    /**
+     * What deleting the records a delete by file's dry run Matched would do (R-BD7): the count
+     * the person confirms, five by name, and what goes with them.
+     */
+    @AuraEnabled
+    public static BulkDeleteService.Preview previewFile(String batchId) {
+        try {
+            requireDeletePermission();
+            return BulkDeleteService.filePreview(Id.valueOf(batchId));
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Delete by file preview');
+        }
+    }
+
+    /** Starts deleting the records a delete by file's dry run Matched, once confirmed (R-BD7). */
+    @AuraEnabled
+    public static JobView startFile(String batchId, Integer confirmedCount) {
+        try {
+            requireDeletePermission();
+            Import_Batch__c started = BulkDeleteService.startFromFile(
+                Id.valueOf(batchId),
+                confirmedCount
+            );
+            return toView(requireJob(started.Id), true);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Start a delete by file');
+        }
+    }
+
     /** One bulk delete with its progress and the first refusals, for polling while it runs. */
     @AuraEnabled
     public static JobView getJob(String jobId) {
         try {
-            requirePermission();
+            requireDeletePermission();
             return toView(requireJob(jobId), true);
         } catch (Exception caught) {
             throw asUserError(caught, 'Read a bulk delete');
@@ -134,7 +164,7 @@ public with sharing class BulkDeleteController {
     @AuraEnabled
     public static JobView undo(String jobId, Integer confirmedRecords) {
         try {
-            requirePermission();
+            requireDeletePermission();
             Import_Batch__c job = requireJob(jobId);
             BulkDeleteService.undo(job.Id, confirmedRecords);
             return toView(requireJob(job.Id), false);
@@ -151,6 +181,20 @@ public with sharing class BulkDeleteController {
 
     private static void requirePermission() {
         if (!hasPermission()) {
+            throw new BulkDeleteService.BulkDeleteException(
+                System.Label.Core_BulkDelete_ErrorNoPermission
+            );
+        }
+    }
+
+    /** Whether the running user holds Bulk Delete Records, which every action needs. */
+    public static Boolean mayDelete() {
+        return FeatureManagement.checkPermission(PERMISSION);
+    }
+
+    /** For what reads no query: the list, progress, undo and a delete by file (R-BD6, R-BD7). */
+    private static void requireDeletePermission() {
+        if (!mayDelete()) {
             throw new BulkDeleteService.BulkDeleteException(
                 System.Label.Core_BulkDelete_ErrorNoPermission
             );

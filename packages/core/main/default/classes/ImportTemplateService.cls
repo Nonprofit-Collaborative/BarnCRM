@@ -175,11 +175,13 @@ public with sharing class ImportTemplateService {
         LoadChoices given = choices == null ? new LoadChoices() : choices;
         Schema.SObjectType type = ImportObjectSchema.typeOf(template);
         template.Load_Operation__c = given.operation;
-        String operation = ImportObjectSchema.operationOf(template);
-        template.Load_Operation__c = ImportObjectSchema.updatesOnly(type) &&
-            !ImportObjectSchema.neverCreates(operation)
-            ? ImportObjectSchema.OPERATION_UPDATE
-            : operation;
+        template.Load_Operation__c = ImportObjectSchema.operationFor(type, template);
+        if (template.Load_Operation__c == ImportObjectSchema.OPERATION_DELETE) {
+            String refused = ImportObjectSchema.deleteRefusal(type);
+            if (refused != null) {
+                throw new ImportException(refused);
+            }
+        }
         template.Load_Match_Field__c = null;
         Boolean byKey = template.Load_Operation__c == ImportObjectSchema.OPERATION_UPSERT;
         if (

@@ -372,6 +372,14 @@ public with sharing class ImportBatchService {
         if (!isRetrying(batch) && !controlTotalsAgree(batch)) {
             throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
         }
+        if (
+            ImportObjectSchema.operationOf(
+                ImportTemplateSelector.selectById(batch.Import_Template__c)
+            ) == ImportObjectSchema.OPERATION_DELETE
+        ) {
+            // A delete by file starts as a bulk delete, with the count confirmed (R-BD7).
+            throw new ImportException(Label.Core_Import_ErrorDeleteNeedsConfirm);
+        }
         return start(batchId, false);
     }
 

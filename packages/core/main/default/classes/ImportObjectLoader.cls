@@ -112,6 +112,12 @@ public with sharing class ImportObjectLoader {
         }
         Schema.SObjectType type = ImportObjectSchema.typeOf(template);
         String operation = ImportObjectSchema.operationOf(template);
+        if (operation == ImportObjectSchema.OPERATION_DELETE) {
+            // Delete by record Id (R-BD7) only checks each row; the bulk delete job deletes.
+            checkDeletes(batch, type, items);
+            writeBack(items, outcome);
+            return outcome;
+        }
         Boolean mostRecent = ImportTemplateService.usesMostRecent(template);
         Boolean related = ImportObjectSchema.loadsRelated(template);
         // With related records only a key's first row loads the parent (R-IT17).
@@ -594,6 +600,36 @@ public with sharing class ImportObjectLoader {
         }
     }
 
+    /**
+     * Checks each row of a delete by record Id (R-BD7): an ID of the object, not named by an
+     * earlier row, of a record the user can see now. A row that passes is Matched, with the
+     * record as its Resulting Record, which the bulk delete job reads.
+     */
+    private static void checkDeletes(
+        Import_Batch__c batch,
+        Schema.SObjectType type,
+        List<Item> items
+    ) {
+        for (Item item : items) {
+            if (item.error == null) {
+                keyOf(item, type, ImportObjectSchema.OPERATION_DELETE, null);
+            }
+        }
+        rejectRepeats(batch, items);
+        Set<Id> ids = new Set<Id>();
+        for (Item item : items) {
+            if (item.error == null) {
+                ids.add(item.recordId);
+            }
+        }
+        Set<Id> visible = ids.isEmpty() ? new Set<Id>() : visibleIds(type, ids);
+        for (Item item : items) {
+            if (item.error == null && !visible.contains(item.recordId)) {
+                item.error = Label.Core_Import_ErrorRecordNotFound;
+            }
+        }
+    }
+
     /** The row's record key: its record ID under Update, its upsert value under Upsert. */
     private static void keyOf(
         Item item,
@@ -601,7 +637,10 @@ public with sharing class ImportObjectLoader {
         String operation,
         String keyField
     ) {
-        if (operation == ImportObjectSchema.OPERATION_UPDATE) {
+        if (
+            operation == ImportObjectSchema.OPERATION_UPDATE ||
+            operation == ImportObjectSchema.OPERATION_DELETE
+        ) {
             String value = item.held.get(ImportObjectSchema.ID_ATTRIBUTE.toLowerCase());
             Id candidate = ImportValues.idOrNull(value);
             if (candidate == null) {
