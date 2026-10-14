@@ -140,11 +140,14 @@ private class GivingPersonErasureExtensionTest {
             PersonErasure.erase(jordan.Id, 'Jordan Lee', null);
             Test.stopTest();
 
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Tribute__c WHERE Message__c != NULL],
-                'Every message emptied'
-            );
+            // A long text area cannot be filtered in SOQL, so the kept messages are counted here.
+            Integer kept = 0;
+            for (Tribute__c tribute : [SELECT Message__c FROM Tribute__c]) {
+                if (tribute.Message__c != null) {
+                    kept++;
+                }
+            }
+            Assert.areEqual(0, kept, 'Every message emptied');
             Assert.areEqual(
                 200,
                 [SELECT COUNT() FROM Gift__c WHERE Donor_Contact__c = :jordan.Id],
