@@ -480,13 +480,7 @@ private class RollupQueueTest {
                 RollupQueue.readyEventsPublished,
                 'The Ready event starts a fresh chain instead of a sixth link'
             );
-            List<Error_Log__c> logged = infoLogs();
-            Assert.areEqual(1, logged.size(), 'The hand-off is logged once, at Info');
-            Assert.areEqual(
-                System.Label.Core_Rollups_QueueHandedOff,
-                logged[0].Message__c,
-                'Saying why'
-            );
+            Assert.areEqual(0, infoLogs().size(), 'Routine: not logged');
         }
     }
 

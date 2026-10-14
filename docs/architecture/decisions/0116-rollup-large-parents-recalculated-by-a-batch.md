@@ -34,15 +34,26 @@ showed them as failed.
    partial answers into one, which merges exactly as path alternatives already do (R-R1). When
    an entity's queries are all read it writes once through `RollupEngine.writeCalculated`: the
    same target filters, currency handling and write as every other recalculation. One run at a
-   time; entries routed while one runs wait two minutes.
+   time; entries routed while one runs wait two minutes. A run starts only under a row lock on
+   the org-level record of `Rollup_Run_Lock__c` (a protected custom setting with no fields,
+   created the first time), taken before the check for a running batch: two or three
+   processors at once (parallel saves start them) otherwise both found none running and both
+   started one, as the scale rerun showed. The lock is held from that check to the processor's
+   commit, a few statements; a run that cannot take it in time waits two minutes as when busy.
 2. **What goes there, and only that.** Before a queue run recalculates its slice it estimates
    each record's source rows: its largest stored COUNT total times the planned queries, as the
    full run weighs a record. A filtered or fiscal year COUNT is a floor, and a record with no
    COUNT to go by (none defined, or never calculated) is unknown, ten rows per query, not one.
-   A record estimated at a fifth of the query row limit (10,000 rows) or more moves to a new
+   A record estimated at 40 percent of the query row limit (20,000 rows) or more moves to a new
    entry for the batch. The others are taken in order up to a row budget for the whole run (60
    percent of the limit, as the full run's chunk budget); the rest go back to the queue as fresh
-   entries for the next run, uncharged. A run that stops anyway while recalculating a single
+   entries for the next run, uncharged, and the first record a run takes always runs, so a
+   record under the threshold is recalculated alone if it must be. The gap between the two
+   leaves room for the queue's own queries, the target records' triggers and flows, and a
+   filtered or stale COUNT that makes the estimate low, so a record just under the threshold
+   does not stop a run and charge the records it shares it with. (The threshold was a fifth of
+   the limit at first; on the scale rerun that sent a donor with about 2,000 soft credits to the
+   batch on every change, one batch job per planned query, when a run could hold it.) A run that stops anyway while recalculating a single
    record, on the query row limit, hands that record to the batch. Every other failure stays
    with the queue (decision 3).
 3. **A stopped run narrows down to the record that stops it.** The finalizer charges only the
@@ -67,6 +78,11 @@ showed them as failed.
 6. **Bounded state.** COUNT_DISTINCT and TEXT_LIST_DISTINCT keep one entry per distinct value
    while rows are folded, so the batch's state grows with distinct values, not rows.
 
+7. **Quiet hand-offs.** A processor at the chain depth limit hands off to the Ready event without
+   an Error Log entry: on a busy org that happens every few runs (31 Info entries in ten minutes
+   on the scale rerun) and needs nothing doing. Health Check still reports entries waiting over
+   an hour.
+
 ## Alternatives considered
 
 - **Keep halving, fix the chain.** Halving to one record still fails for the fund itself.
@@ -83,6 +99,14 @@ showed them as failed.
   the same way.
 - **A field on the queue entry marking the route.** Not needed: the batch holds the entries by
   Id and the Next Attempt lease keeps the queue off them.
+- **Lock Core's settings record instead of a dedicated one.** An org that never saved its
+  settings has no record, and creating one from a rollup run would store first-save defaults
+  nobody chose; admin saves would also wait on rollup runs.
+- **The same lock around every processor run.** A processor holds its transaction for seconds of
+  recalculation, so a second one would wait on the lock and fail on the platform's ten second
+  lock timeout, which the finalizer then charges as a stopped run. Concurrent processors stay
+  harmless (recalculation recomputes); only the batch start, which is expensive and should be
+  single, is locked.
 
 ## Consequences
 

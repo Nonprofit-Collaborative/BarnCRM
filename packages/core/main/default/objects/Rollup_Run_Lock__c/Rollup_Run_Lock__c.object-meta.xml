@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customSettingsType>Hierarchy</customSettingsType>
+  <description>
+    No values: its one org-level record is the row the Rollup Queue locks so that only one large
+    parent run starts at a time (canonical model R-RQ6). Created by the code the first time it is
+    needed. Protected, so it never appears in subscriber Setup.
+  </description>
+  <enableFeeds>false</enableFeeds>
+  <label>Rollup Run Lock</label>
+  <visibility>Protected</visibility>
+</CustomObject>

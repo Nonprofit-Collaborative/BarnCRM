@@ -193,10 +193,72 @@ private class RollupLargeParentBatchTest {
                 'Never calculated: unknown, not one row'
             );
             Assert.areEqual(
-                Limits.getLimitQueryRows() / 5,
+                Limits.getLimitQueryRows() * 2 / 5,
                 RollupLargeParentBatch.largeParentRows(),
-                'A fifth of what a transaction may read, by default'
+                'Two fifths of what a transaction may read, by default'
             );
+            Assert.isTrue(
+                RollupLargeParentBatch.largeParentRows() < RollupLargeParentBatch.sliceRowBudget(),
+                'Below the run budget, leaving headroom'
+            );
+        }
+    }
+
+    @IsTest
+    static void startingARunTakesTheRunLockCreatingItTheFirstTime() {
+        System.runAs(TestUsers.admin()) {
+            insertDefinitions();
+            Account parent = parentWith(1, 0);
+
+            Test.startTest();
+            Boolean started = RollupLargeParentBatch.begin(
+                new List<Rollup_Queue__c>{ entryFor(parent.Id, 0) },
+                true
+            );
+            Boolean again = RollupLargeParentBatch.lockRuns();
+            Test.stopTest();
+
+            Assert.isTrue(started, 'Started under the lock');
+            Assert.isTrue(again, 'The same transaction holds it already');
+            Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Run_Lock__c], 'One lock record');
+        }
+    }
+
+    @IsTest
+    static void aLockRecordAnotherRunCreatedFirstIsWaitedFor() {
+        System.runAs(TestUsers.admin()) {
+            RollupLargeParentBatch.competingLockForTest = true;
+
+            Test.startTest();
+            Boolean locked = RollupLargeParentBatch.lockRuns();
+            Test.stopTest();
+
+            Assert.isTrue(locked, 'Locked the record the other run created');
+            Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Run_Lock__c], 'Still one record');
+        }
+    }
+
+    /** A record under the large record threshold stays in the queue; one at it goes here. */
+    @IsTest
+    static void onlyARecordAtTheLargeRecordThresholdGoesToTheBatch() {
+        System.runAs(TestUsers.admin()) {
+            insertDefinitions();
+            Account fits = parentWith(1, 20);
+            Account over = parentWith(2, 25);
+            RollupLargeParentBatch.largeParentRowsForTest = 25;
+            RollupLargeParentBatch.sliceRowBudgetForTest = 40;
+
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ fits.Id } });
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ over.Id } });
+            Test.stopTest();
+
+            Assert.areEqual(1, totalsOf(fits.Id).NumberOfEmployees, 'Twenty rows: in the run');
+            Assert.areEqual(25, totalsOf(over.Id).NumberOfEmployees, 'The threshold: the batch');
+            Assert.isTrue(RollupLargeParentBatch.startedForTest, 'A batch run was started');
+            List<Rollup_Queue__c> held = entries();
+            Assert.areEqual(1, held.size(), 'Only the record at the threshold waits');
+            Assert.areEqual(String.valueOf(over.Id), held[0].Record_Ids__c, 'Held by the batch');
         }
     }
 

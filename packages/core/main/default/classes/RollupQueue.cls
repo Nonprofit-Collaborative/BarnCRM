@@ -756,13 +756,9 @@ public without sharing class RollupQueue implements Queueable {
         if (atChainDepthLimit()) {
             // The platform would refuse the next link, the refusal kills this run, and the
             // entries would stay Pending with nothing to process them. The Ready event starts a
-            // fresh chain after this run commits instead (ADR-0100's doorbell).
+            // fresh chain after this run commits instead (ADR-0100's doorbell). Not logged: on a
+            // busy org it happens every few runs and needs nothing doing (ADR-0116).
             announceReady();
-            ErrorLogger.logMessage(
-                System.Label.Core_Rollups_QueueHandedOff,
-                LOG_CONTEXT,
-                ErrorLogger.SEVERITY_INFO
-            );
             return;
         }
         if (Test.isRunningTest() && chainInTests != true) {
