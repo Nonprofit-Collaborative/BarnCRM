@@ -33,7 +33,7 @@ It exists for three reasons (plan Section 4.4):
 5. Labels use plain language, not Salesforce language, and Core's labels are neutral: no
    Core label, help text, option, message or seeded record says "nonprofit" or uses
    nonprofit-only vocabulary (gift, donor, donation, grant, fundraising, receipt, pledge,
-   appeal), because Core alone is the Community Suite. The exceptions are text shown only
+   appeal), because Core alone is the Standard Edition. The exceptions are text shown only
    when Giving (or another module) is installed; the names of Salesforce products (NPSP,
    Nonprofit Cloud, Gift Transaction) shown only when Core detects that product in the org;
    import column aliases that only match file headers; and the Nonprofit Edition choice
@@ -1008,7 +1008,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 
 | Key | Type | Default | Definition |
 |---|---|---|---|
-| `Suite__c` | picklist(Community, Impact) | empty | Which suite the administrator chose in the Setup Assistant's first step: the Community Suite (Core alone) or the Nonprofit Edition (Impact Suite, Core with Giving). Any org may choose either; empty until chosen. Shown as Community Suite and Nonprofit Edition (Impact Suite). When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). |
+| `Suite__c` | picklist(Community, Impact) | empty | Which edition the administrator chose in the Setup Assistant's first step: the Standard Edition (Core alone, the full core suite of tools) or the Nonprofit Edition (Core with Giving). Any org may choose either; empty until chosen. Shown as Standard Edition and Nonprofit Edition. When `Impact`, the modules step and the Module Manager offer the nonprofit modules; it installs and hides nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). |
 | `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
 
 ### Field utilization keys
@@ -7281,7 +7281,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
 
-**Components that are not entities (C-29, ADR-0059).** Core is the Community Suite on its own,
+**Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,
 so nothing below that is nonprofit-specific ships in Core.
 
 | Component | Package | Mechanism |

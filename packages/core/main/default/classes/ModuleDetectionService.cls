@@ -44,7 +44,7 @@ public with sharing class ModuleDetectionService {
     };
 
     /**
-     * The modules every organization is offered (ADR-0046: the Community Suite is Core with
+     * The modules every organization is offered (ADR-0046: the Standard Edition is Core with
      * the modules that fit). The others are offered once the Nonprofit Edition is chosen
      * (C-30) or Giving is installed (ADR-0062).
      */

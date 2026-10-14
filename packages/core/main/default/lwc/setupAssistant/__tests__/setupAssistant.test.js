@@ -559,7 +559,7 @@ describe('c-setup-assistant', () => {
     expect(element.shadowRoot.textContent).toContain('No luck today.');
   });
 
-  it('saves the Community Suite through Apex and moves on', async () => {
+  it('saves the Standard Edition through Apex and moves on', async () => {
     getState.mockResolvedValue(withSuiteStep({ currentSuite: null, giving: {} }));
     applySuite.mockResolvedValue(
       withSuiteStep({ currentSuite: 'Community', giving: { present: false } }, true)

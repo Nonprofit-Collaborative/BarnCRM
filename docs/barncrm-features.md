@@ -14,20 +14,20 @@ BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for 
 - **Planned**: in the product plan roadmap (iteration shown where the plan gives one). "Proposed" marks an idea recorded for consideration, not approved or scheduled.
 - **Feature ID**: the product plan ID (C = Core, G = Giving, X = Connect, V = Volunteers, P = Programs, L = Logic Models, F = Funders), or an ADR where the capability came from a decision rather than a numbered feature. "new ADR" is a decision record still on its branch; it gets a number when it merges.
 
-**Editions and suites**
+**Editions**
 
-| Suite | What it is | Packages |
+| Edition | What it is | Packages |
 |---|---|---|
-| Community Suite | For businesses, clubs and any organization that is not a nonprofit | Core alone, plus modules that fit (Volunteers; Events later) |
-| Impact Suite (Nonprofit Edition) | For nonprofits; a choice any organization can make | Core plus Giving, with Connect, Volunteers, Programs, Logic Models and Funders offered as further modules |
+| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone, plus modules that fit (Volunteers; Events later) |
+| Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Connect, Volunteers, Programs, Logic Models and Funders offered as further modules |
 
-An admin installs Core, then turns on the Nonprofit Edition, which opens Salesforce's installer for Giving; other modules are offered the same way. A module that is never installed leaves nothing in the org.
+BarnCRM is one suite of tools in two editions, and both editions include the full core suite of tools; the Nonprofit Edition adds the nonprofit tools (Giving and the other nonprofit modules). An admin installs Core, then turns on the Nonprofit Edition, which opens Salesforce's installer for Giving; other modules are offered the same way. A module that is never installed leaves nothing in the org.
 
 ---
 
 ## 1. Core
 
-**Suite:** both. Core is neutral: households, relationships, addresses, import, rollups, settings, Health Check and the Setup Assistant carry no nonprofit wording (C-29, merged in PR #163). The BarnCRM names landed in PR #181. Core installed alone is the Community Suite.
+**Edition:** both. Core is neutral: households, relationships, addresses, import, rollups, settings, Health Check and the Setup Assistant carry no nonprofit wording (C-29, merged in PR #163). The BarnCRM names landed in PR #181. Core installed alone is the Standard Edition.
 
 ### 1.1 People and Households
 
@@ -222,8 +222,8 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Coexistence mode | Major | Detects whether the org also runs NPSP or Nonprofit Cloud, proposes the matching mode (Standalone, NPSP, Nonprofit Cloud) and records it. | Shipped | C-07 |
 | Rearrangeable home page | Major | The home page is built from separate tiles (welcome, setup checklist, errors, Health Check, rollups, seasonal addresses, regular files, quick links) in standard regions, so an admin can rearrange or hide them in App Builder. | Shipped | C-03 |
 | Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. | Shipped | C-24 |
-| Suite choice | Major | The Setup Assistant's first step asks Impact Suite or Community Suite and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
-| Neutral Core | Major | Moves nonprofit wording, the giving and receipt settings and the nonprofit setup steps out of Core into Giving, so Core alone is the Community Suite. | Shipped | C-29, ADR-0059 |
+| Edition choice | Major | The Setup Assistant's first step asks Nonprofit Edition or Standard Edition and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
+| Neutral Core | Major | Moves nonprofit wording, the giving and receipt settings and the nonprofit setup steps out of Core into Giving, so Core alone is the Standard Edition. | Shipped | C-29, ADR-0059 |
 | Analytics module: field utilization | Major | An on-demand count, in Org Optimizer's Field utilization section (no tab or app page of its own), of how often each field of a chosen object is filled in, per record type, with saved counts for trends and reports. | Shipped (#377) | plan 6.1 item 10, ADR-0086, ADR-0101 field-utilization-on-demand |
 | Packaged roles | Minor | Five roles: Admin, Fundraising Staff, Program Staff, Volunteer Coordinator and Read Only; packaged sets are never cloned. | Shipped | C-06 |
 | Manage settings permission | Minor | Only holders of the manage-settings permission can change settings; everyone else sees a read-only view with a notice. | Shipped | C-03 |
@@ -295,7 +295,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ## 2. Giving
 
-**Suite:** Impact Suite (Nonprofit Edition). Depends on Core. Adds gifts, funds, pledges, receipts and the nonprofit wording; any organization may choose it.
+**Edition:** Nonprofit Edition. Depends on Core. Adds gifts, funds, pledges, receipts and the nonprofit wording; any organization may choose it.
 
 ### 2.1 Gift Processing
 
@@ -467,7 +467,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ## 3. Connect
 
-**Suite:** Impact Suite. Depends on Core and Giving. Holds every link to standard Salesforce objects (Opportunity, Campaign) and outside systems, so the rest of BarnCRM runs on a Platform-only org. Each feature has its own permission set.
+**Edition:** Nonprofit Edition. Depends on Core and Giving. Holds every link to standard Salesforce objects (Opportunity, Campaign) and outside systems, so the rest of BarnCRM runs on a Platform-only org. Each feature has its own permission set.
 
 ### 3.1 Integrations
 
@@ -499,7 +499,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ## 4. Volunteers
 
-**Suite:** both (offered in the Community Suite and the Impact Suite). Depends on Core. Package is an empty placeholder on main; an early draft from 2026-09-09 sits on a stale branch and is not active work.
+**Edition:** both (offered in the Standard Edition and the Nonprofit Edition). Depends on Core. Package is an empty placeholder on main; an early draft from 2026-09-09 sits on a stale branch and is not active work.
 
 ### 4.1 Volunteer Management
 
@@ -519,7 +519,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ## 5. Programs
 
-**Suite:** Impact Suite. Depends on Core. Package is an empty placeholder on main.
+**Edition:** Nonprofit Edition. Depends on Core. Package is an empty placeholder on main.
 
 ### 5.1 Program Delivery
 
@@ -536,7 +536,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ### 5.2 Logic Models (separate package)
 
-**Suite:** Impact Suite. Depends on Core only; works alongside Programs without referencing it. No package directory exists yet.
+**Edition:** Nonprofit Edition. Depends on Core only; works alongside Programs without referencing it. No package directory exists yet.
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
@@ -551,7 +551,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 ## 6. Funders
 
-**Suite:** Impact Suite. Depends on Core and Giving. Package is an empty placeholder on main.
+**Edition:** Nonprofit Edition. Depends on Core and Giving. Package is an empty placeholder on main.
 
 ### 6.1 Grants and Funders
 
@@ -570,7 +570,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Events package | Major | Simple event registration and attendance for non-fundraising events (both suites). | Planned (post-1.0) | plan 6.1 item 2 |
+| Events package | Major | Simple event registration and attendance for non-fundraising events (both editions). | Planned (post-1.0) | plan 6.1 item 2 |
 
 ---
 

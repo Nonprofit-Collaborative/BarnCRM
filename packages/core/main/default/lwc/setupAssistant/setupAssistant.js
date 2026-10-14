@@ -403,7 +403,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     }
   }
 
-  // The Community Suite, or the Nonprofit Edition with Giving already here, moves on. The
+  // The Standard Edition, or the Nonprofit Edition with Giving already here, moves on. The
   // Nonprofit Edition without Giving stays on the step, which now links to the installer.
   handleSuiteConfirm(event) {
     this.call(applySuite, { suite: event.detail.suite }, false, () => {

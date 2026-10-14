@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Suite__c</fullName>
-  <description>Which suite the administrator chose in the Setup Assistant's first step: Community (Core alone) or Impact (the Nonprofit Edition, Core with Giving). Empty until chosen. Held as text because a custom setting field cannot be a picklist (ADR-0019). Installs and hides nothing (C-30).</description>
+  <description>Which edition the administrator chose in the Setup Assistant's first step: Community (the Standard Edition, Core alone) or Impact (the Nonprofit Edition, Core with Giving). Empty until chosen. Held as text because a custom setting field cannot be a picklist (ADR-0019). Installs and hides nothing (C-30).</description>
   <externalId>false</externalId>
   <inlineHelpText>The edition you chose in the Setup Assistant.</inlineHelpText>
   <label>Suite</label>

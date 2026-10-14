@@ -5,7 +5,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: the name of the first step, the suite choice</shortDescription>
+        <shortDescription>Setup assistant: the name of the first step, the edition choice</shortDescription>
         <value>Choose your edition</value>
     </labels>
     <labels>
@@ -13,16 +13,16 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: what the suite choice step asks</shortDescription>
-        <value>Choose the Community Suite for BarnCRM Core on its own, or the Nonprofit Edition, which adds the Giving module. Any organization can choose either, and you can change it later.</value>
+        <shortDescription>Setup assistant: what the edition choice step asks</shortDescription>
+        <value>Both editions include BarnCRM's full core suite of tools. Choose the Standard Edition for the core suite on its own, or the Nonprofit Edition, which adds the nonprofit tools, starting with the Giving module. Any organization can choose either, and you can change it later.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: refusal when no known suite was chosen</shortDescription>
-        <value>Choose the Community Suite or the Nonprofit Edition, then click Confirm and continue.</value>
+        <shortDescription>Setup assistant: refusal when no known edition was chosen</shortDescription>
+        <value>Choose the Standard Edition or the Nonprofit Edition, then click Confirm and continue.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_EditionLabel</fullName>
@@ -37,8 +37,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: the Community Suite option</shortDescription>
-        <value>Community Suite: BarnCRM Core on its own</value>
+        <shortDescription>Setup assistant: the Standard Edition option</shortDescription>
+        <value>Standard Edition: the full core suite of BarnCRM tools</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ImpactOption</fullName>
@@ -46,7 +46,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the Nonprofit Edition option</shortDescription>
-        <value>Nonprofit Edition (Impact Suite): adds the Giving module</value>
+        <value>Nonprofit Edition: the core suite plus the nonprofit tools, starting with the Giving module</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_GivingInstalled</fullName>

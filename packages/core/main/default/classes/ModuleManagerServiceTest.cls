@@ -71,7 +71,7 @@ private class ModuleManagerServiceTest {
             Assert.isTrue(after.canSwitch, 'An installed module can be switched');
             Assert.areEqual(ModuleManagerService.STATUS_ON, core.status, 'Core is always on');
             Assert.isFalse(core.canSwitch, 'And cannot be switched');
-            Assert.isNull(row('Giving'), 'The Community Suite is not offered Giving');
+            Assert.isNull(row('Giving'), 'The Standard Edition is not offered Giving');
         }
     }
 

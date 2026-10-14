@@ -20,7 +20,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value xsi:type="xsd:string">Community:Community Suite;Impact:Nonprofit Edition (Impact Suite)</value>
+    <value xsi:type="xsd:string">Community:Standard Edition;Impact:Nonprofit Edition</value>
   </values>
   <values>
     <field>Component__c</field>
@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The edition you chose in the Setup Assistant. Community Suite is BarnCRM Core on its own. Nonprofit Edition adds the Giving module, which you install yourself from the Setup Assistant. Any organization can choose either. Changing it installs, removes and hides nothing: it decides which modules the Setup Assistant offers.</value>
+    <value xsi:type="xsd:string">The edition you chose in the Setup Assistant. Both editions include BarnCRM's full core suite of tools. Standard Edition is the core suite on its own. Nonprofit Edition adds the nonprofit tools, starting with the Giving module, which you install yourself from the Setup Assistant. Any organization can choose either. Changing it installs, removes and hides nothing: it decides which modules the Setup Assistant offers.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
