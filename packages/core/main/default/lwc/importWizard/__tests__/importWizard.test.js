@@ -19,6 +19,8 @@ import createObjectTemplate from '@salesforce/apex/ImportController.createObject
 import getObjectFields from '@salesforce/apex/ImportController.getObjectFields';
 import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 import getRowMatchFields from '@salesforce/apex/ImportController.getRowMatchFields';
+import getRelatedOptions from '@salesforce/apex/ImportController.getRelatedOptions';
+import getRelatedFields from '@salesforce/apex/ImportController.getRelatedFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
@@ -97,6 +99,12 @@ jest.mock('@salesforce/apex/ImportController.getKeyFields', () => ({ default: je
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getRowMatchFields', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getRelatedOptions', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.getRelatedFields', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getChangedValues', () => ({ default: jest.fn() }), {
@@ -1756,5 +1764,66 @@ describe('the import wizard loading one object', () => {
       global.Blob = RealBlob;
       HTMLAnchorElement.prototype.click.mockRestore();
     }
+  });
+
+  it('offers the related record fields and sends the related records under a key', async () => {
+    getTemplates.mockResolvedValue([
+      {
+        ...OBJECT_TEMPLATE,
+        loadOperation: 'Upsert by external ID',
+        loadMatchField: 'Session_Key__c',
+        related: 'Attendance__c.Session__c'
+      }
+    ]);
+    getRelatedOptions.mockResolvedValue([
+      { value: 'Attendance__c.Session__c', label: 'Attendance (Session)' }
+    ]);
+    getRelatedFields.mockResolvedValue([
+      { value: 'Related.Status__c', label: 'Attendance: Status', isLookup: false, lookupFields: [] }
+    ]);
+    const element = await toColumnsStep();
+    expect(getRelatedFields).toHaveBeenCalledWith({
+      templateId: 'a05',
+      related: 'Attendance__c.Session__c'
+    });
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    const picker = rows[2].querySelector('lightning-combobox');
+    expect(picker.options.map((o) => o.value)).toContain('Related.Status__c');
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Related.Status__c' } }));
+    await flush();
+    click(element, 'next');
+    await flush();
+    const options = loadOptions(element);
+    expect(options.related).toBe('Attendance__c.Session__c');
+    expect(options.relatedOptions).toEqual([
+      { value: 'Attendance__c.Session__c', label: 'Attendance (Session)' }
+    ]);
+    click(element, 'dry-run');
+    await flush();
+    const call = createBatch.mock.calls[0][0];
+    expect(JSON.parse(call.optionsJson).load.related).toBe('Attendance__c.Session__c');
+    expect(JSON.parse(call.mappingDocument).columns[2].target).toBe('Related.Status__c');
+  });
+
+  it('drops the related records under Insert, which has no parent key', async () => {
+    getRelatedOptions.mockResolvedValue([]);
+    getRelatedFields.mockResolvedValue([]);
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: {
+          operation: 'Insert',
+          matchField: '',
+          lookupNotFound: 'Reject the row',
+          related: 'Attendance__c.Session__c'
+        }
+      })
+    );
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).load.related).toBeUndefined();
   });
 });
