@@ -2,8 +2,13 @@
  * A people import links each row's first person to the row's organization with an affiliation,
  * or finds the one they already have (R-AF5), counted in the preview and journaled for undo.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowProcessor')
 private class ImportAffiliationTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Import_Template__c template;
     private static Import_Batch__c batch;
 

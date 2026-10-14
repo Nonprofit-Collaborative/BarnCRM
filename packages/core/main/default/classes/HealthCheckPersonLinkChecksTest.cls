@@ -4,8 +4,13 @@
  * so these tests delete people and then run Health Check as Maria, who holds the permission the
  * findings are shown under.
  */
-@IsTest
+@IsTest(testFor='ApexClass:HealthCheckHouseholdChecks, ApexClass:PersonLinkOrphanSelector')
 private class HealthCheckPersonLinkChecksTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String RELATIONSHIP_KEY = 'relationships_without_person';
     private static final String AFFILIATION_KEY = 'affiliations_without_person';
 

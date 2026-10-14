@@ -5,7 +5,7 @@
  * A test may start one batch job, so each test starts one part through the service and drives
  * the other through the processor itself, the way the platform would.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportBatchService, ApexClass:ImportProcessorBatch')
 private class ImportTrialRunTest {
     private static final Integer FILE_ROWS = 200;
     private static final Integer TRIAL = 25;

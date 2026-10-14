@@ -2,7 +2,7 @@
  * The Erase person action's controller: a refusal reaches the screen as its own message, and a
  * preview and an erasure pass straight through to `PersonErasure`.
  */
-@IsTest
+@IsTest(testFor='ApexClass:PersonErasureController')
 private class PersonErasureControllerTest {
     private static Contact jordan() {
         HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);

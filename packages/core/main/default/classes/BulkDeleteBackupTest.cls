@@ -3,8 +3,13 @@
  * read page by page in Id order as the person, with every field they may read, and nothing
  * deleted. The delete by file's download is tested in `DeleteByFileTest`.
  */
-@IsTest
+@IsTest(testFor='ApexClass:BulkDeleteService, ApexClass:BulkDeleteController')
 private class BulkDeleteBackupTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,

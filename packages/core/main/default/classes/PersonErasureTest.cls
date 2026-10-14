@@ -3,8 +3,13 @@
  * happens to the households they leave, the preview, the refusals, the module seam, and two
  * hundred records at a time. Core's own tests see no installed module (`noneForTest`).
  */
-@IsTest
+@IsTest(testFor='ApexClass:PersonErasure, ApexClass:PersonErasureExtensions')
 private class PersonErasureTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String ERASE_SET = 'BarnCRM_Erase_People';
 
     private static User eraser() {

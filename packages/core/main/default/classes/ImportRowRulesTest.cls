@@ -7,7 +7,9 @@
  * Duplicate dismissals stand for an org's own object, as in `ImportObjectLoaderTest`. Every test
  * runs as a minimal-profile user holding only BarnCRM Admin.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:ImportRowFilter, ApexClass:ImportMapping, ApexClass:ImportProcessorBatch'
+)
 private class ImportRowRulesTest {
     static {
         DataProtectedFields.ordinaryForTest.add('duplicate_dismissal__c');

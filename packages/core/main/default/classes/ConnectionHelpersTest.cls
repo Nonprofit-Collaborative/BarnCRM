@@ -2,8 +2,13 @@
  * The helpers the relationship and affiliation code share: the status rule, the person name,
  * the trigger-failure report and the Aura message.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ConnectionStatus, ApexClass:PersonReference, ApexClass:ControllerErrors')
 private class ConnectionHelpersTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private class ReportingHandler extends TriggerHandler {
         public void fail(List<SObject> records, String message) {
             reportFailure(new DmlException('boom'), records, 'ConnectionHelpersTest', message);

@@ -10,8 +10,15 @@
  * named only as text and written with put, so this class compiles on that shape too. The
  * last two tests run in every shape.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:AccountAddressHandler, ApexClass:AccountTriggerHandler, ApexTrigger:AccountTrigger'
+)
 private class AccountPersonAddressCaptureTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static Account person(String lastName, String street) {
         Account record = new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId());
         record.put('FirstName', 'Pat');

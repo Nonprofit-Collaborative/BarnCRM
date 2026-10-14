@@ -2,8 +2,13 @@
  * The tidy-up after a Salesforce merge (PEOPLE-15): the platform moves the children without
  * running their triggers, and this settles the survivors once the merge is saved.
  */
-@IsTest
+@IsTest(testFor='ApexClass:MergeSettlement')
 private class MergeSettlementTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String ADDRESS_PROPAGATION = 'Address_Default_Propagation';
 
     /** Both sides of each relationship are written here, so the automation is stood down. */

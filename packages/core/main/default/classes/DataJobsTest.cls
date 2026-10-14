@@ -4,8 +4,13 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest
+@IsTest(testFor='ApexClass:DataJobs')
 private class DataJobsTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void theChunkSizeIsTwoHundredUntilSetAndHeldBetweenTenAndTwoHundred() {
         System.runAs(TestUsers.admin()) {

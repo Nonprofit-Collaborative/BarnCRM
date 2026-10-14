@@ -11,8 +11,15 @@
  * Private sharing cannot be set from a test, so these prove the object and field access half
  * of the change. The sharing half is confirmed by an org run under a private sharing model.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:AffiliationUpkeepWriter, ApexClass:AffiliationMaintenanceHandler, ApexClass:AffiliationService'
+)
 private class AffiliationUpkeepTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String ENTRY_PERMISSION_SET = 'Barn_Affiliation_Entry_Test';
     private static final String READ_ONLY_PERMISSION_SET = 'BarnCRM_Read_Only';
 

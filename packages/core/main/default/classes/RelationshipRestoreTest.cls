@@ -3,8 +3,13 @@
  * with it, rather than building a new one (PEOPLE-21). However the two sides come back, one at
  * a time, one after the other, or together, the result is the one pair there was before.
  */
-@IsTest
+@IsTest(testFor='ApexClass:RelationshipMaintenanceHandler, ApexClass:RelationshipService')
 private class RelationshipRestoreTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void restoringOneSideBringsBackItsOtherSide() {
         System.runAs(TestUsers.admin()) {

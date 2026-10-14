@@ -7,8 +7,15 @@
  * Every test runs as a minimal-profile user holding BarnCRM Admin and, where it deletes,
  * BarnCRM Bulk Delete.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:BulkDeleteService, ApexClass:BulkDeleteController, ApexClass:BulkDeleteBatch, ApexClass:ImportObjectSchema, ApexClass:ImportObjectLoader'
+)
 private class DeleteByFileTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final Integer MANY = 200;
 
     private static User deleter() {

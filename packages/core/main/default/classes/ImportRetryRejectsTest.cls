@@ -6,7 +6,9 @@
  * A test may start one batch job, so each test starts at most one pass through the service
  * and drives the others through the processor itself, the way the platform would.
  */
-@IsTest
+@IsTest(
+    testFor='ApexClass:ImportBatchService, ApexClass:ImportProcessorBatch, ApexClass:ImportController'
+)
 private class ImportRetryRejectsTest {
     private static final Integer FILE_ROWS = 200;
     /** Every tenth row of the file has no last name, so 20 rows are rejected. */

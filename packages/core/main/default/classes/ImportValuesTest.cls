@@ -1,8 +1,13 @@
 /**
  * The value helpers every import path shares: one comparison, one digest, one slicing.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportValues')
 private class ImportValuesTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     @IsTest
     static void comparesValuesAsTheSaveWouldWriteThem() {
         System.runAs(TestUsers.admin()) {

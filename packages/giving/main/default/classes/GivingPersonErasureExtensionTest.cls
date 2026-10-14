@@ -3,7 +3,7 @@
  * the household their gifts were given from is kept and anonymized, and the text Giving holds
  * about them is emptied. Runs through Core's `PersonErasure`, which finds this extension by name.
  */
-@IsTest
+@IsTest(testFor='ApexClass:GivingPersonErasureExtension')
 private class GivingPersonErasureExtensionTest {
     private static User eraser() {
         return TestUsers.withPermissionSets(

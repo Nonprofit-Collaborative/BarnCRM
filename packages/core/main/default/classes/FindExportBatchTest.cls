@@ -7,8 +7,13 @@
  * the controller test, which runs it at Test.stopTest. These tests have not been executed: no
  * org in this environment.
  */
-@IsTest
+@IsTest(testFor='ApexClass:FindExportBatch, ApexClass:FindController')
 private class FindExportBatchTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     private static final String VOLUNTEERS = JSON.serialize(
         new Map<String, Object>{
             'version' => 1,

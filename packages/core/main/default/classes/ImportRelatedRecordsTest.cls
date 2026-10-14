@@ -11,7 +11,7 @@
  * parent carries an External ID. Every test runs as a minimal-profile user holding only BarnCRM
  * Admin, since every read and save is in that user's own mode.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportObjectLoader, ApexClass:ImportUndoService')
 private class ImportRelatedRecordsTest {
     private static final Integer MANY = 200;
 

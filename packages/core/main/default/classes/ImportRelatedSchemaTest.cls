@@ -8,7 +8,7 @@
  * Organizations stand for the parent and affiliations for the related object. Every test runs
  * as a minimal-profile user holding only BarnCRM Admin.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportObjectSchema, ApexClass:ImportTemplateService')
 private class ImportRelatedSchemaTest {
     static {
         // Dismissals are the package's bookkeeping, which an import refuses; here they stand in

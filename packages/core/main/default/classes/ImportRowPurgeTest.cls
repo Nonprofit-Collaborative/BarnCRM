@@ -3,8 +3,13 @@
  * than the org keeps them are removed, the import keeps its counts, 0 keeps every row, and a
  * batch whose rows are gone is refused rather than run over nothing.
  */
-@IsTest
+@IsTest(testFor='ApexClass:ImportRowPurgeBatch, ApexClass:ImportRowPurgeScheduler')
 private class ImportRowPurgeTest {
+    @TestSetup
+    static void createTestUser() {
+        TestUsers.admin();
+    }
+
     /** A batch with a full chunk of rows, its last pass completed the given days ago. */
     private static Import_Batch__c finishedBatch(Import_Template__c template, Integer daysAgo) {
         Import_Batch__c batch = ImportTestDataFactory.batch(template);
