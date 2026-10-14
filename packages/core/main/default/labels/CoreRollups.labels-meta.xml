@@ -337,14 +337,6 @@
         <value>These records have too many rows behind their totals for one background run, so a separate background job is recalculating them a few thousand rows at a time. If they are still waiting an hour after that job last made progress, it stopped before it finished, and BarnCRM tries again.</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_QueueHandedOff</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log: the processor reached the chain depth limit and restarted</shortDescription>
-        <value>The Rollup Queue processor reached the platform's limit on chained background jobs, so a fresh processor was started to work through the entries still waiting. Nothing needs doing.</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_QueueRunSummary</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

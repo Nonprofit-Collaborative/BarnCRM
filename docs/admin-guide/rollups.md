@@ -346,11 +346,12 @@ Under the list, **Needs attention** shows what the engine has not finished:
   Then click **Start now** to recalculate them now; the nightly run also picks them up.
   A long queue is worked through in a series of background runs. Salesforce limits how long
   such a series may be (five runs in Developer Edition, trial and scratch orgs), so at that
-  point BarnCRM starts a fresh series and notes it in the Error Log as Info. Nothing to do.
+  point BarnCRM starts a fresh series. Nothing to do.
   A record with a very large number of gifts or allocations behind its totals (a General Fund
   most gifts go to, an organization with tens of thousands of gifts) has more rows than one
   background run may read. BarnCRM recalculates such a record in a separate background job that
   reads its rows a few thousand at a time, so its totals take a few minutes rather than seconds.
+  One such job runs at a time. A record a single run can still read stays in the queue.
   While that job runs, the record shows among the records waiting. Nothing to do. If a run ever
   stops partway (often an automation of yours failing on one record), the records it was
   working on are counted as one try and retried in ever smaller groups, then one at a time,

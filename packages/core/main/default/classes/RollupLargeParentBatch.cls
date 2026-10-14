@@ -23,8 +23,8 @@
  * saves each record on its own (partial success), so one record the platform refuses never
  * stops the others; it is queued again as any refused save is.
  *
- * One run at a time: while one is going, the entries routed here wait two minutes and are routed
- * again, so a fund touched by every gift is not read by a pile of runs at once.
+ * One run at a time (`lockRuns`): while one is going, the entries routed here wait two minutes
+ * and are routed again, so a fund touched by every gift is not read by a pile of runs at once.
  *
  * DOCUMENTED EXCEPTION to user mode reads and writes (plan Section 4.13, ADR-0021, as in
  * `RollupQueue` and `RollupAggregator`): a total must not depend on who saved the gift.
@@ -109,11 +109,14 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 
     // ---------------------------------------------------------------------------- the route
 
-    /** The source rows above which a record's totals are calculated here. */
+    /**
+     * The source rows from which a record's totals are calculated here: what one queue run may
+     * read in all. A record below it fits a run on its own (the first record a run takes always
+     * runs), so it stays in the queue; one at or above it cannot, so it comes here. An estimate
+     * that falls short is caught when the record stops a run of its own (R-RQ6).
+     */
     public static Integer largeParentRows() {
-        return largeParentRowsForTest != null
-            ? largeParentRowsForTest
-            : Limits.getLimitQueryRows() / 5;
+        return largeParentRowsForTest != null ? largeParentRowsForTest : sliceRowBudget();
     }
 
     /** The source rows one queue run may expect to read across its whole slice. */
@@ -181,6 +184,58 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
     }
 
     /**
+     * Takes the run lock until this transaction ends: the org-level `Rollup_Run_Lock__c` record,
+     * created the first time. Two processors routing records here at the same moment both found
+     * no run going and both started one (the scale rerun had two or three at once); with the
+     * lock the second waits for the first to commit, then sees its run. Only the start is
+     * locked, never a save, and the processor commits soon after.
+     *
+     * @return false when the lock could not be taken in time, so the entries wait as when busy
+     */
+    @TestVisible
+    private static Boolean lockRuns() {
+        Id org = UserInfo.getOrganizationId();
+        try {
+            if (lockedRow(org).isEmpty()) {
+                try {
+                    if (competingLockForTest) {
+                        Database.insert(
+                            new Rollup_Run_Lock__c(SetupOwnerId = org),
+                            AccessLevel.SYSTEM_MODE
+                        );
+                    }
+                    Database.insert(
+                        new Rollup_Run_Lock__c(SetupOwnerId = org),
+                        AccessLevel.SYSTEM_MODE
+                    );
+                } catch (DmlException collided) {
+                    // Another run created it first: wait for it as for any holder.
+                    lockedRow(org);
+                }
+            }
+            return true;
+        } catch (QueryException unavailable) {
+            ErrorLogger.log(unavailable, LOG_CONTEXT);
+            return false;
+        }
+    }
+
+    private static List<Rollup_Run_Lock__c> lockedRow(Id org) {
+        return [
+            SELECT Id
+            FROM Rollup_Run_Lock__c
+            WHERE SetupOwnerId = :org
+            WITH SYSTEM_MODE
+            LIMIT 1
+            FOR UPDATE
+        ];
+    }
+
+    /** Test seam: another run creates the lock record just before this one's first insert. */
+    @TestVisible
+    private static Boolean competingLockForTest = false;
+
+    /**
      * Starts a run over these queue entries, which then wait an hour while it holds them, or,
      * when a run is already going or none can start, leaves them to wait two minutes and be
      * routed again.
@@ -196,7 +251,9 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
             return false;
         }
         Boolean started = false;
-        if (runningJobId() == null) {
+        // Locked first, so a second processor deciding at the same moment waits for this one to
+        // commit and then sees the run it started.
+        if (lockRuns() && runningJobId() == null) {
             List<Rollup_Queue__c> held = hold(entries, charge);
             List<Target> targets = targetsFor(held);
             try {

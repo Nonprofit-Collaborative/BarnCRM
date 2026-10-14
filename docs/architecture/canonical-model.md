@@ -1720,7 +1720,7 @@ starts, the one a BarnCRM job starts itself when its chain ends, or the nightly 
 processor's own chain respects the platform's chain depth limit: a run as deep as its chain may
 go (the chain's own maximum when one is set, otherwise five, the Developer Edition, trial and
 scratch org limit) publishes the same event instead of queuing the next run, so a fresh chain
-starts after it commits, and writes an Info entry to the Error Log. Before this the refused
+starts after it commits. It logs nothing: on a busy org it happens every few runs. Before this the refused
 link stopped the chain and left Pending entries until the nightly run. A run that stops on
 something it cannot catch, such as a governor limit, is handled by its finalizer, which logs it
 to the Error Log. Only the records the run was recalculating are charged: they move to a new
@@ -1755,8 +1755,9 @@ the processor at any slice size (ADR-0116,
 `0116-rollup-large-parents-recalculated-by-a-batch.md`). A record's source rows are estimated
 as its largest stored COUNT total times the queries its definitions plan; a filtered or fiscal
 year COUNT is a floor, and a record with no COUNT to go by is taken as ten rows per query.
-Before a run recalculates its slice, a record estimated at a fifth of that limit or more is
-moved to a new entry and handed to the large parent batch; so is a single record that stopped
+Before a run recalculates its slice, a record estimated at the run's whole row budget or more
+(R-RQ3), which no run can hold, is moved to a new entry and handed to the large parent batch; a
+record below it stays in the queue, alone in a run if it must be; so is a single record that stopped
 its run on the query row limit (R-RQ3). No other failure goes there. The batch reads each
 planned query's source rows in chunks, runs the query over each chunk's rows only and folds the
 partial answers together, which merge exactly as path alternatives do (R-R1; a distinct count or
@@ -1765,8 +1766,11 @@ through the same target filters, currency handling and write as any other recalc
 R-R13). It owns the entries it was given: it charges each one attempt as it takes them (Failed
 after the fifth), holds them with Next Attempt an hour ahead, renewed with every chunk, deletes
 them when the totals are written and releases them with the reason when a chunk stops, so a run
-that dies leaves them due again rather than lost. One batch runs at a time; entries routed while
-one runs wait two minutes, uncharged, and are routed again.
+that dies leaves them due again rather than lost. One batch runs at a time: a run starts only
+under a lock on the org-level `Rollup_Run_Lock__c` record (created the first time), so two
+processors routing records at the same moment cannot both find none running and both start one.
+Entries routed while one runs, or when the lock cannot be taken in time, wait two minutes,
+uncharged, and are routed again.
 
 ### Salesforce implementation
 
@@ -1788,6 +1792,9 @@ one runs wait two minutes, uncharged, and are routed again.
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
+- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, no fields. Its one org-level
+  record is the row a large parent run locks before it starts (R-RQ6); the code creates it the
+  first time and nothing else reads or writes it.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
@@ -7113,6 +7120,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Tier 1 scale test findings. No object or field added. R-H4: a name or greeting fits its field, a long list naming the first members and counting the rest. R-RQ3: the processor hands off to `Rollup_Queue_Ready__e` at the chain depth limit instead of queuing a run the platform refuses. |
 | v0.6 | 2026-10-14 | Large rollup parents (ADR-0116, `0116-rollup-large-parents-recalculated-by-a-batch.md`, tier 1 scale test). No object or field added. New R-RQ6: a record whose source rows are more than one transaction may read is recalculated by `RollupLargeParentBatch`, chunk by chunk over its source rows, with one write at the end; records are routed there by an estimate from stored counts, or as a lone record that stopped its run on the query row limit. R-RQ3: a run takes records up to a row budget; a run that stops charges only the records it was recalculating, which are retried alone and a quarter as many at a time so only the record that keeps stopping runs ends Failed; and the finalizer starts the next processor through `Rollup_Queue_Ready__e` instead of halving the slice and queuing it, which the platform stopped after five failed jobs in a row and left 826 entries Pending. |
 | v0.6 | 2026-10-14 | Rollup Queue enqueue race (ADR-0117, `0117-rollup-queue-asks-again-after-commit.md`, tier 1 scale rerun). No object or field added. R-RQ3: a transaction that inserted entries and queued no processor publishes `Rollup_Queue_Ready__e`, so the check runs again after it commits; before this a processor waiting at the save could finish before the save committed, and a parallel Bulk API load left 47 entries Pending with no processor. |
+| v0.6 | 2026-10-14 | Large parent route efficiency (ADR-0116, tier 1 scale rerun). New protected hierarchy custom setting `Rollup_Run_Lock__c` (no fields, Section 14A implementation). R-RQ6: a record goes to the batch only when its estimate reaches the run's whole row budget (was a fifth of the query row limit), and a run starts only under a lock on that setting's org-level record, so concurrent processors no longer start batches side by side. R-RQ3: the hand-off at the chain depth limit is no longer logged. |
 
 ---
 ## 32. Entity ownership by package
@@ -7133,6 +7141,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Automation Registry (shipped default) | Core | v0.1 | 13 |
 | Rollup Definition | Core | v0.2 | 14 |
 | Rollup Queue | Core | v0.6 (rollup engine) | 14A |
+| Rollup Run Lock | Core | v0.6 (rollup engine) | 14A |
 | Rollup Definition Default (shipped default) | Core | v0.2 | 13 |
 | Import Template | Core | v0.2 | 15 |
 | Import Template Default (shipped default) | Core | v0.2 | 13 |
