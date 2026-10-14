@@ -11,6 +11,11 @@ public with sharing class SampleDataSelector {
         'SampleDataStageBatch'
     };
 
+    /** The batch class that runs every removal, Core's stages and each module's. */
+    private static final Set<String> REMOVE_JOB_CLASS_NAMES = new Set<String>{
+        'SampleDataRemoveBatch'
+    };
+
     /** AsyncApexJob statuses that mean a job has not finished yet. */
     private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
         'Queued',
@@ -178,7 +183,15 @@ public with sharing class SampleDataSelector {
      * and load and remove can refuse to run against an in-flight chain.
      */
     public Boolean hasRunningLoadJob() {
-        Set<String> classNames = LOAD_JOB_CLASS_NAMES;
+        return hasRunningJob(LOAD_JOB_CLASS_NAMES);
+    }
+
+    /** True while the sample data removal's batch (SampleDataRemoveBatch) is queued or running. */
+    public Boolean hasRunningRemoveJob() {
+        return hasRunningJob(REMOVE_JOB_CLASS_NAMES);
+    }
+
+    private Boolean hasRunningJob(Set<String> classNames) {
         Set<String> runningStatuses = RUNNING_JOB_STATUSES;
         return ![
                 SELECT Id

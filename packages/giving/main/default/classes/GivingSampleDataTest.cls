@@ -417,13 +417,22 @@ private class GivingSampleDataTest {
             loadEverything();
 
             Test.startTest();
-            Integer removed = GivingSampleDataLoader.removeAll();
+            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            Integer stageCount = stages.stageCount();
+            for (Integer stage = 0; stage < stageCount; stage++) {
+                stages.runStage(stage);
+            }
             Test.stopTest();
 
             System.assertEquals(
-                10,
-                removed,
-                'five gifts, one commitment, two appeals and two funds are the ten rows deleted by name'
+                5,
+                stageCount,
+                'the reversal, the four other gifts, the commitment, the appeals and the funds: one chunk each'
+            );
+            System.assertEquals(
+                0,
+                GivingSampleDataLoader.removeNext(),
+                'nothing is left for another stage to delete'
             );
             System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'no sample gift is left');
             System.assertEquals(
@@ -470,7 +479,11 @@ private class GivingSampleDataTest {
             insert ownGift;
 
             Test.startTest();
-            GivingSampleDataLoader.removeAll();
+            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            Integer stageCount = stages.stageCount();
+            for (Integer stage = 0; stage < stageCount; stage++) {
+                stages.runStage(stage);
+            }
             Test.stopTest();
 
             System.assertEquals(
@@ -487,6 +500,98 @@ private class GivingSampleDataTest {
                 0,
                 [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
                 'every sample gift is gone'
+            );
+        }
+    }
+
+    @IsTest
+    static void testRemovalChunksRemoveGiftsBeforePeopleAndLeaveThePeople() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            loadEverything();
+            GivingSampleDataLoader.removeChunkSize = 2;
+
+            GivingSampleDataRemoveStages stages = new GivingSampleDataRemoveStages();
+            Integer total = stages.stageCount();
+            System.assertEquals(
+                6,
+                total,
+                'one reversal, four other gifts in two chunks, a commitment, the appeals and the funds'
+            );
+
+            stages.runStage(0);
+            System.assertEquals(
+                4,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'stage 0: the refund goes before any gift it points back at'
+            );
+            stages.runStage(1);
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'stage 1: the first two gifts only'
+            );
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM Commitment__c WHERE Sample_Data__c = TRUE],
+                'the commitment waits for every gift to go'
+            );
+            for (Integer stage = 2; stage < total; stage++) {
+                stages.runStage(stage);
+            }
+
+            System.assertEquals(0, [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE]);
+            System.assertEquals(0, [SELECT COUNT() FROM Commitment__c WHERE Sample_Data__c = TRUE]);
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE],
+                'the people are Core\'s, removed after the gifts'
+            );
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Account WHERE Sample_Data__c = TRUE],
+                'and so are the household and the organization'
+            );
+        }
+    }
+
+    @IsTest
+    static void testFinishHandsOverToCoresRemoval() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            loadEverything();
+
+            Test.startTest();
+            new GivingSampleDataRemoveStages().finish();
+            Test.stopTest();
+
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'],
+                'with no module before Giving, the batch that follows is Core\'s own removal'
+            );
+        }
+    }
+
+    @IsTest
+    static void testEnqueueRemoveStartsTheRemovalBatchForGiving() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            insertSamplePeople();
+            loadEverything();
+
+            Test.startTest();
+            new GivingSampleData().enqueueRemove();
+            Test.stopTest();
+
+            System.assertEquals(
+                1,
+                [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'],
+                'the module removal runs in the removal batch'
+            );
+            System.assertEquals(
+                4,
+                [SELECT COUNT() FROM Gift__c WHERE Sample_Data__c = TRUE],
+                'the test context ran the first stage, which removes the refund'
             );
         }
     }

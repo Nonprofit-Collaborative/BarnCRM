@@ -45,9 +45,13 @@ export function toCsv(columns, rows) {
   return BYTE_ORDER_MARK + lines.join('\r\n') + '\r\n';
 }
 
-/** A file name such as `Gift__c-2026-10-12.csv`, or `.xlsx` with that extension. */
+/**
+ * A file name such as `Gift__c-2026-10-12.csv`, or `.xlsx` with that extension. The date is the
+ * person's local one (the UTC date names an evening export in a US time zone for tomorrow).
+ */
 export function fileName(objectApiName, today = new Date(), extension = 'csv') {
-  const day = today.toISOString().slice(0, 10);
+  const two = (number) => String(number).padStart(2, '0');
+  const day = `${today.getFullYear()}-${two(today.getMonth() + 1)}-${two(today.getDate())}`;
   return `${String(objectApiName || 'export').replace(/[^A-Za-z0-9_]/g, '_')}-${day}.${extension}`;
 }
 

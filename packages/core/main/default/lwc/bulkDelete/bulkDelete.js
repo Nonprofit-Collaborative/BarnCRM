@@ -7,6 +7,7 @@ import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import FILE_INTRO from '@salesforce/label/c.Core_BulkDelete_FileIntro';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 import { toCsv, fileName } from 'c/findCsv';
+import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
 import BACKUP_HELP from '@salesforce/label/c.Core_BulkDelete_BackupHelp';
 import BACKING_UP from '@salesforce/label/c.Core_BulkDelete_BackingUp';
@@ -27,8 +28,6 @@ import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
 import FAILURES from '@salesforce/label/c.Core_BulkUpdate_Failures';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
-
-const POLL_MILLISECONDS = 3000;
 
 function format(template, ...values) {
   return values.reduce((text, value, index) => text.split(`{${index}}`).join(value), template);
@@ -74,7 +73,7 @@ export default class BulkDelete extends LightningElement {
   busy = false;
   errorMessage;
   noticeMessage;
-  timer;
+  stopTimer;
 
   disconnectedCallback() {
     this.stopPolling();
@@ -192,30 +191,33 @@ export default class BulkDelete extends LightningElement {
     });
   }
 
+  /** Slows down after the first minute and retries once on an error (c/jobPoller, FINDB-19). */
   startPolling() {
     this.stopPolling();
-    // eslint-disable-next-line @lwc/lwc/no-async-operation
-    this.timer = setInterval(() => this.poll(), POLL_MILLISECONDS);
+    this.stopTimer = startPolling(
+      () => this.poll(),
+      (error) => {
+        this.errorMessage = messageFrom(error);
+      }
+    );
   }
 
   stopPolling() {
-    if (this.timer) {
-      clearInterval(this.timer);
-      this.timer = undefined;
+    if (this.stopTimer) {
+      this.stopTimer();
+      this.stopTimer = undefined;
     }
   }
 
+  /** One read of the job; true once it has finished. */
   async poll() {
-    try {
-      this.job = await getJob({ jobId: this.job.recordId });
-      if (!this.job.running) {
-        this.stopPolling();
-        this.noticeMessage = undefined;
-      }
-    } catch (error) {
+    this.job = await getJob({ jobId: this.job.recordId });
+    if (!this.job.running) {
       this.stopPolling();
-      this.errorMessage = messageFrom(error);
+      this.noticeMessage = undefined;
+      return true;
     }
+    return false;
   }
 
   handleClose() {

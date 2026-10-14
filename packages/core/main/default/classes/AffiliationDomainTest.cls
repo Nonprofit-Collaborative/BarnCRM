@@ -209,4 +209,109 @@ private class AffiliationDomainTest {
             Assert.isFalse(redated.isSuccess(), 'A date change is still checked');
         }
     }
+
+    /**
+     * PEOPLE-23, visible case unchanged: the existing row is one the saver can see, so the
+     * message still names the record to open.
+     */
+    @IsTest
+    static void anOverlapTheSaverCanSeeStillNamesTheRecord() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            insert RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member');
+
+            Test.startTest();
+            Database.SaveResult result = Database.insert(
+                RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member'),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'The overlap is refused');
+            Assert.isTrue(
+                result.getErrors()[0].getMessage().contains('AF-'),
+                'The message names the record to open'
+            );
+        }
+    }
+
+    /**
+     * PEOPLE-23. Private sharing cannot be set from a test, so the row is treated as invisible
+     * through the test seam. The existence check comes from AffiliationUpkeepSelector, which
+     * returns the row regardless of the user, and the message must carry nothing of it.
+     */
+    @IsTest
+    static void anOverlapTheSaverCannotSeeIsStillRefusedWithAGenericMessage() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            Affiliation__c hidden = RelationshipTestDataFactory.affiliation(
+                people[0],
+                orgs[0],
+                'Board member'
+            );
+            insert hidden;
+            Assert.areEqual(
+                1,
+                AffiliationUpkeepSelector.selectForOverlap(new Set<Id>{ people[0].Id }).size(),
+                'The system mode selector finds the row'
+            );
+            AffiliationDomain.hiddenForTest = new Set<Id>{ hidden.Id };
+
+            Test.startTest();
+            Database.SaveResult result = Database.insert(
+                RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Board member'),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'A hidden overlap is still refused');
+            String message = result.getErrors()[0].getMessage();
+            Assert.areEqual(Label.Core_Affiliation_OverlapHidden, message, 'The generic message');
+            Assert.isFalse(message.contains('AF-'), 'No record number');
+            Assert.isFalse(message.contains('Garcia'), 'No name');
+            Assert.isFalse(message.contains('Union Foundation'), 'No organization');
+        }
+    }
+
+    @IsTest
+    static void twoHundredOverlapsWithRowsTheSaverCannotSeeAreAllRefused() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(200, 'Garcia');
+            List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+            List<Affiliation__c> existing = new List<Affiliation__c>();
+            List<Affiliation__c> incoming = new List<Affiliation__c>();
+            for (Contact person : people) {
+                existing.add(
+                    RelationshipTestDataFactory.affiliation(person, orgs[0], 'Board member')
+                );
+                incoming.add(
+                    RelationshipTestDataFactory.affiliation(person, orgs[0], 'Board member')
+                );
+            }
+            insert existing;
+            Set<Id> hiddenIds = new Set<Id>();
+            for (Affiliation__c row : existing) {
+                hiddenIds.add(row.Id);
+            }
+            AffiliationDomain.hiddenForTest = hiddenIds;
+
+            Test.startTest();
+            List<Database.SaveResult> results = Database.insert(incoming, false);
+            Test.stopTest();
+
+            for (Database.SaveResult result : results) {
+                Assert.isFalse(result.isSuccess(), 'Every hidden overlap is refused');
+                Assert.areEqual(
+                    Label.Core_Affiliation_OverlapHidden,
+                    result.getErrors()[0].getMessage(),
+                    'With the generic message'
+                );
+            }
+        }
+    }
 }

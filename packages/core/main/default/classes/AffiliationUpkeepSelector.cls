@@ -1,5 +1,9 @@
 /**
- * The reads behind primary affiliation upkeep (C-16, R-AF2), and nothing else.
+ * The reads behind primary affiliation upkeep (C-16, R-AF2) and the overlap existence check
+ * (PEOPLE-23), and nothing else. The overlap read follows the same category 2 reasoning: an
+ * overlap owned by someone else is invisible to the saver under private sharing, and the rule
+ * must still refuse it. `selectForOverlap` returns no names, and the caller never shows a
+ * hidden row's detail.
  *
  * ADR-0021 (system mode writes for package owned data), category 2, is the authority for this
  * class: it allows a read whose only purpose is to compute a package owned value to run in
@@ -41,6 +45,31 @@ public without sharing class AffiliationUpkeepSelector {
             WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
             WITH SYSTEM_MODE
             ORDER BY Status__c, Is_Primary__c DESC, CreatedDate DESC
+            LIMIT 10000
+        ];
+    }
+
+    /**
+     * Every affiliation of these people with only the fields the overlap rule reads: person,
+     * organization, role and dates, and no names. Only the existence of a clash comes from
+     * here; its detail is shown only when a user mode read also returns the row.
+     */
+    public static List<Affiliation__c> selectForOverlap(Set<Id> personIds) {
+        if (personIds == null || personIds.isEmpty()) {
+            return new List<Affiliation__c>();
+        }
+        return [
+            SELECT
+                Id,
+                Contact__c,
+                Person_Account__c,
+                Organization__c,
+                Role__c,
+                Start_Date__c,
+                End_Date__c
+            FROM Affiliation__c
+            WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
+            WITH SYSTEM_MODE
             LIMIT 10000
         ];
     }

@@ -33,6 +33,14 @@
         <value>{0} already has this relationship with {1}. Open {2} to change it.</value>
     </labels>
     <labels>
+        <fullName>Core_Relationship_DuplicateHidden</fullName>
+        <categories>Relationships</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save refused: relationship on file that this user cannot see</shortDescription>
+        <value>This relationship already exists. Ask an administrator to look at the existing one.</value>
+    </labels>
+    <labels>
         <fullName>Core_Relationship_DuplicateInSave</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>

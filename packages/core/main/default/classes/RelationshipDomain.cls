@@ -15,6 +15,16 @@
  * so the mirror is built already valid rather than validated on the way in.
  */
 public with sharing class RelationshipDomain {
+    /** The relationships the saving user can see, by id, for the current save (PEOPLE-23). */
+    private static Map<Id, Relationship__c> visibleById = new Map<Id, Relationship__c>();
+
+    /**
+     * Test seam: ids treated as invisible to the saving user, because private sharing cannot
+     * be set from a test. Empty in production.
+     */
+    @TestVisible
+    private static Set<Id> hiddenForTest;
+
     /**
      * The two computed values: what this person is to the other one (R-RL3), and a status
      * that agrees with the dates (R-RL5).
@@ -130,7 +140,18 @@ public with sharing class RelationshipDomain {
                 beingSaved.add(record.Id);
             }
         }
-        for (Relationship__c existing : RelationshipSelector.selectByFromPersonIds(fromPeople)) {
+        // The existence check reads in system mode (ADR-0021 category 2, through the upkeep
+        // selector) so a duplicate the saver cannot see is still refused. The detail of a row
+        // is shown only when the user mode read also returns it.
+        visibleById = new Map<Id, Relationship__c>();
+        for (Relationship__c shown : RelationshipSelector.selectByFromPersonIds(fromPeople)) {
+            if (hiddenForTest == null || !hiddenForTest.contains(shown.Id)) {
+                visibleById.put(shown.Id, shown);
+            }
+        }
+        for (
+            Relationship__c existing : RelationshipUpkeepSelector.selectByFromPersonIds(fromPeople)
+        ) {
             // A record in this same save is compared as it is about to be, not as it was.
             if (beingSaved.contains(existing.Id)) {
                 continue;
@@ -191,7 +212,12 @@ public with sharing class RelationshipDomain {
      * it can open the record instead of guessing which one it means. Both names are taken from
      * the record that already exists, which is the only one in this transaction that has them.
      */
-    private static String duplicateMessage(Relationship__c existing) {
+    private static String duplicateMessage(Relationship__c clash) {
+        Relationship__c existing = visibleById.get(clash.Id);
+        if (existing == null) {
+            // The row on file is not visible to this user: say only that it exists.
+            return Label.Core_Relationship_DuplicateHidden;
+        }
         return String.format(
             Label.Core_Relationship_Duplicate,
             new List<String>{

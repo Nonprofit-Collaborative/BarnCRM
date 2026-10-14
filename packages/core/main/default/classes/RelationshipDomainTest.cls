@@ -211,4 +211,76 @@ private class RelationshipDomainTest {
             }
         }
     }
+
+    /**
+     * PEOPLE-23. Private sharing cannot be set from a test, so the row on file is treated as
+     * invisible through the test seam. The existence check comes from
+     * RelationshipUpkeepSelector, which returns it regardless of the user, and the message must
+     * carry nothing of it.
+     */
+    @IsTest
+    static void aDuplicateTheSaverCannotSeeIsStillRefusedWithAGenericMessage() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+            Relationship__c onFile = RelationshipTestDataFactory.between(
+                people[0],
+                people[1],
+                'Spouse'
+            );
+            insert onFile;
+            Assert.isFalse(
+                RelationshipUpkeepSelector.selectByFromPersonIds(new Set<Id>{ people[0].Id })
+                    .isEmpty(),
+                'The system mode selector finds the row'
+            );
+            RelationshipDomain.hiddenForTest = new Set<Id>{ onFile.Id };
+
+            Test.startTest();
+            Database.SaveResult result = Database.insert(
+                RelationshipTestDataFactory.between(people[0], people[1], 'Spouse'),
+                false
+            );
+            Test.stopTest();
+
+            Assert.isFalse(result.isSuccess(), 'A hidden duplicate is still refused');
+            String message = result.getErrors()[0].getMessage();
+            Assert.areEqual(Label.Core_Relationship_DuplicateHidden, message, 'Generic message');
+            Assert.isFalse(message.contains('RL-'), 'No record number');
+            Assert.isFalse(message.contains('Garcia'), 'No name');
+        }
+    }
+
+    @IsTest
+    static void twoHundredDuplicatesOfRowsTheSaverCannotSeeAreAllRefused() {
+        System.runAs(TestUsers.admin()) {
+            RelationshipTestDataFactory.quietOtherAutomations();
+            List<Contact> people = RelationshipTestDataFactory.contacts(201, 'Garcia');
+            List<Relationship__c> onFile = new List<Relationship__c>();
+            List<Relationship__c> incoming = new List<Relationship__c>();
+            for (Integer i = 0; i < 200; i++) {
+                onFile.add(RelationshipTestDataFactory.between(people[i], people[200], 'Friend'));
+                incoming.add(RelationshipTestDataFactory.between(people[i], people[200], 'Friend'));
+            }
+            insert onFile;
+            Set<Id> hiddenIds = new Set<Id>();
+            for (Relationship__c row : onFile) {
+                hiddenIds.add(row.Id);
+            }
+            RelationshipDomain.hiddenForTest = hiddenIds;
+
+            Test.startTest();
+            List<Database.SaveResult> results = Database.insert(incoming, false);
+            Test.stopTest();
+
+            for (Database.SaveResult result : results) {
+                Assert.isFalse(result.isSuccess(), 'Every hidden duplicate is refused');
+                Assert.areEqual(
+                    Label.Core_Relationship_DuplicateHidden,
+                    result.getErrors()[0].getMessage(),
+                    'With the generic message'
+                );
+            }
+        }
+    }
 }

@@ -91,6 +91,23 @@ const FINISHED = {
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+/**
+ * Holds the poll timers c/jobPoller sets (3 or 10 seconds) so a test runs them by hand; every
+ * other timer, such as flush, runs for real. `next()` returns the callback of the latest poll.
+ */
+function capturePolls() {
+  const pending = [];
+  const realSetTimeout = window.setTimeout;
+  jest.spyOn(window, 'setTimeout').mockImplementation((callback, delay, ...args) => {
+    if (delay === 3000 || delay === 10000) {
+      pending.push(callback);
+      return pending.length;
+    }
+    return realSetTimeout.call(window, callback, delay, ...args);
+  });
+  return { next: () => pending.pop() };
+}
+
 function one(element, id) {
   return element.shadowRoot.querySelector(`[data-id="${id}"]`);
 }
@@ -136,12 +153,7 @@ describe('c-bulk-delete', () => {
     previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
     startDelete.mockResolvedValue(RUNNING);
     getJob.mockResolvedValue(FINISHED);
-    let poll;
-    jest.spyOn(window, 'setInterval').mockImplementation((callback) => {
-      poll = callback;
-      return 1;
-    });
-    jest.spyOn(window, 'clearInterval').mockImplementation(() => {});
+    const polls = capturePolls();
     const element = await render();
     one(element, 'preview').click();
     await flush();
@@ -159,7 +171,7 @@ describe('c-bulk-delete', () => {
     expect(one(element, 'preview-box')).toBeNull();
     expect(one(element, 'notice-message')).not.toBeNull();
 
-    poll();
+    polls.next()();
     await flush();
     expect(getJob).toHaveBeenCalledWith({ jobId: 'a0B000000000001' });
     expect(one(element, 'job-summary').textContent).toBe('200 matched: 199 deleted, 1 refused.');
@@ -167,6 +179,28 @@ describe('c-bulk-delete', () => {
     expect(element.shadowRoot.querySelector('[data-id="job"] li').textContent).toBe(
       '003000000000009: Has gifts'
     );
+  });
+
+  it('retries one failed progress read, and reports the error after a second (FINDB-19)', async () => {
+    previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
+    startDelete.mockResolvedValue(RUNNING);
+    getJob.mockRejectedValue({ body: { message: 'Connection lost' } });
+    const polls = capturePolls();
+    const element = await render();
+    one(element, 'preview').click();
+    await flush();
+    await change(one(element, 'confirm'), '200');
+    one(element, 'start').click();
+    await flush();
+
+    polls.next()();
+    await flush();
+    expect(one(element, 'error-message')).toBeNull();
+
+    polls.next()();
+    await flush();
+    expect(getJob).toHaveBeenCalledTimes(2);
+    expect(one(element, 'error-message').textContent).toBe('Connection lost');
   });
 
   it('deletes what a delete by file dry run found, sending the batch and the count', async () => {

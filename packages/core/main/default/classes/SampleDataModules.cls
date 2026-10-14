@@ -67,15 +67,36 @@ public with sharing class SampleDataModules {
     }
 
     /**
-     * Deletes every installed module's sample records and returns how many rows went.
-     * Runs before Core deletes its own records, because a module's records point at them.
+     * Starts the removal with the last installed module, or with Core's own when there is none.
+     * Modules go in the reverse of their load order, and Core's records last, because a
+     * module's records point at the ones loaded before them (ADMIN-3).
      */
-    public static Integer removeAll() {
-        Integer removed = 0;
-        for (SampleDataModule module : installed()) {
-            removed += module.removeAll();
+    public static void startRemoval() {
+        removeFrom(installed().size() - 1);
+    }
+
+    /**
+     * Starts the removal of the module before the named one, or Core's own once none is left.
+     * Called by a module removal's own last stage, so Core does not need to know which modules
+     * exist.
+     */
+    @NamespaceAccessible
+    public static void removeAfter(String moduleName) {
+        List<SampleDataModule> modules = installed();
+        for (Integer index = 0; index < modules.size(); index++) {
+            if (modules[index].moduleName() == moduleName) {
+                removeFrom(index - 1);
+                return;
+            }
         }
-        return removed;
+    }
+
+    private static void removeFrom(Integer index) {
+        if (index < 0) {
+            SampleDataRemoveBatch.startRemoval(new SampleDataRemoveStages());
+            return;
+        }
+        installed()[index].enqueueRemove();
     }
 
     /** One count per installed module, for the status card. */

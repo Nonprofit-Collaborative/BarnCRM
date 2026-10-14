@@ -32,6 +32,10 @@
         </ul>
     </template>
 
+    <template lwc:if={failed}>
+        <p class="slds-p-top_small slds-text-color_error" role="alert">{labels.searchError}</p>
+    </template>
+
     <template lwc:if={showNoResults}>
         <p class="slds-p-top_small slds-text-color_weak" role="status">{labels.noResults}</p>
     </template>

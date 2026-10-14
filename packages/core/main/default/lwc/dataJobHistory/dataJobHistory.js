@@ -9,6 +9,7 @@ import getUpdatePage from '@salesforce/apex/BulkUpdateController.getPage';
 import undoUpdate from '@salesforce/apex/BulkUpdateController.undo';
 import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
+import { startPolling } from 'c/jobPoller';
 
 import HEADING from '@salesforce/label/c.Core_DataJobs_Heading';
 import EMPTY from '@salesforce/label/c.Core_DataJobs_Empty';
@@ -63,6 +64,9 @@ function errorText(error) {
   return (error && error.message) || String(error);
 }
 
+// ImportBatchService.STATUS_UNDOING
+const IMPORT_UNDOING = 'Undoing';
+
 /** One import, in the shape every row of the list shares. */
 function fromImport(batch) {
   return {
@@ -83,7 +87,9 @@ function fromImport(batch) {
     ),
     startedAt: batch.startedAt,
     undoDeadline: batch.undoDeadline,
-    canUndo: Boolean(batch.canUndo)
+    canUndo: Boolean(batch.canUndo),
+    // An undo shows as Undoing until it ends; the list keeps reading until it does.
+    running: batch.status === IMPORT_UNDOING
   };
 }
 
@@ -104,6 +110,7 @@ function fromBulkJob(job, kind) {
     startedAt: job.startedAt,
     undoDeadline: job.undoDeadline,
     canUndo: Boolean(job.canUndo && !job.running),
+    running: Boolean(job.running),
     undoCount: isUpdate ? job.updatesToUndo : job.recordsToUndo
   };
 }
@@ -161,9 +168,50 @@ export default class DataJobHistory extends LightningElement {
   undoTarget;
   importPreview;
   undoText = '';
+  stopTimer;
 
   connectedCallback() {
     this.load();
+  }
+
+  disconnectedCallback() {
+    this.stopPolling();
+  }
+
+  get anyRunning() {
+    return this.jobs.some((job) => job.running);
+  }
+
+  /**
+   * While a job in the list is running (a bulk job, or an undo still Undoing), reads the list
+   * again without the spinner, slowing down after a minute and retrying once on an error
+   * (c/jobPoller), so a row does not stay Undoing until the person presses Refresh (FINDB-19).
+   */
+  pollWhileRunning() {
+    if (this.stopTimer || !this.anyRunning) {
+      return;
+    }
+    this.stopTimer = startPolling(
+      async () => {
+        await this.fetchJobs();
+        if (!this.anyRunning) {
+          this.stopPolling();
+          return true;
+        }
+        return false;
+      },
+      (error) => {
+        this.stopPolling();
+        this.errorMessage = errorText(error);
+      }
+    );
+  }
+
+  stopPolling() {
+    if (this.stopTimer) {
+      this.stopTimer();
+      this.stopTimer = undefined;
+    }
   }
 
   get wantedKinds() {
@@ -177,42 +225,46 @@ export default class DataJobHistory extends LightningElement {
   async load() {
     this.loading = true;
     this.errorMessage = undefined;
-    const wanted = this.wantedKinds;
     try {
-      const [imports, updates, deletes] = await Promise.all([
-        wanted.includes(IMPORT) && canManageSettings
-          ? getRecentBatches({ howMany: IMPORTS_SHOWN })
-          : null,
-        wanted.includes(UPDATE) && canBulkUpdate
-          ? getUpdatePage({ everyone: this.everyone })
-          : null,
-        wanted.includes(DELETE) && canBulkDelete ? getDeletePage({ everyone: this.everyone }) : null
-      ]);
-      this.canSeeEveryone = Boolean(
-        (updates && updates.allowed && updates.canSeeEveryone) ||
-        (deletes && deletes.allowed && deletes.canSeeEveryone)
-      );
-      const allowed = [];
-      let jobs = [];
-      if (imports) {
-        allowed.push(IMPORT);
-        jobs = jobs.concat(imports.map(fromImport));
-      }
-      if (updates && updates.allowed) {
-        allowed.push(UPDATE);
-        jobs = jobs.concat((updates.jobs || []).map((job) => fromBulkJob(job, UPDATE)));
-      }
-      if (deletes && deletes.allowed) {
-        allowed.push(DELETE);
-        jobs = jobs.concat((deletes.jobs || []).map((job) => fromBulkJob(job, DELETE)));
-      }
-      this.allowedKinds = allowed;
-      this.jobs = jobs.sort(newestFirst);
+      await this.fetchJobs();
     } catch (error) {
       this.errorMessage = errorText(error);
     } finally {
       this.loading = false;
     }
+    this.pollWhileRunning();
+  }
+
+  /** Reads every list this placement shows and replaces the rows; throws when a read fails. */
+  async fetchJobs() {
+    const wanted = this.wantedKinds;
+    const [imports, updates, deletes] = await Promise.all([
+      wanted.includes(IMPORT) && canManageSettings
+        ? getRecentBatches({ howMany: IMPORTS_SHOWN })
+        : null,
+      wanted.includes(UPDATE) && canBulkUpdate ? getUpdatePage({ everyone: this.everyone }) : null,
+      wanted.includes(DELETE) && canBulkDelete ? getDeletePage({ everyone: this.everyone }) : null
+    ]);
+    this.canSeeEveryone = Boolean(
+      (updates && updates.allowed && updates.canSeeEveryone) ||
+      (deletes && deletes.allowed && deletes.canSeeEveryone)
+    );
+    const allowed = [];
+    let jobs = [];
+    if (imports) {
+      allowed.push(IMPORT);
+      jobs = jobs.concat(imports.map(fromImport));
+    }
+    if (updates && updates.allowed) {
+      allowed.push(UPDATE);
+      jobs = jobs.concat((updates.jobs || []).map((job) => fromBulkJob(job, UPDATE)));
+    }
+    if (deletes && deletes.allowed) {
+      allowed.push(DELETE);
+      jobs = jobs.concat((deletes.jobs || []).map((job) => fromBulkJob(job, DELETE)));
+    }
+    this.allowedKinds = allowed;
+    this.jobs = jobs.sort(newestFirst);
   }
 
   /** Nothing renders for a person who may see none of the kinds this placement lists. */
@@ -388,6 +440,7 @@ export default class DataJobHistory extends LightningElement {
         this.jobs = this.jobs.map((job) => (job.id === row.id ? row : job));
       }
       this.finishUndo(BULK_UNDO_STARTED);
+      this.pollWhileRunning();
     });
   }
 

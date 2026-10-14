@@ -248,4 +248,20 @@
         <shortDescription>Not loaded status badge</shortDescription>
         <value>Not loaded</value>
     </labels>
+    <labels>
+        <fullName>Core_SampleData_StatusRemoving</fullName>
+        <categories>Sample Data</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Removing status badge</shortDescription>
+        <value>Removing</value>
+    </labels>
+    <labels>
+        <fullName>Core_SampleData_RemoveInProgress</fullName>
+        <categories>Sample Data</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Remove already running error</shortDescription>
+        <value>Sample data is still being removed. Wait for it to finish before loading or removing sample data.</value>
+    </labels>
 </CustomLabels>
