@@ -189,7 +189,7 @@
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>The tidy-up after a merge could not be started</shortDescription>
+        <shortDescription>The tidy-up after a merge could not start; {0} is the kept records</shortDescription>
         <value>A merge finished, but BarnCRM could not start the tidy-up it runs afterwards, because the merge ran inside another background job. These kept records may have a stale member count or name, two default addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
     </labels>
 </CustomLabels>

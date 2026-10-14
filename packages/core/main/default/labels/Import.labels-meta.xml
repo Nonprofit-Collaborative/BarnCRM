@@ -221,7 +221,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error Log: rows the import row cleanup could not delete, and the first reason</shortDescription>
+        <shortDescription>Error Log: rows cleanup could not delete; {0} is the count, {1} first reason</shortDescription>
         <value>The import row cleanup could not remove {0} rows. The first: {1}</value>
     </labels>
     <labels>
@@ -373,7 +373,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: the original file could not be kept, with the reason</shortDescription>
+        <shortDescription>Import wizard: the original file was not kept; {0} is the reason</shortDescription>
         <value>The original file was not kept with the import: {0}</value>
     </labels>
     <labels>
@@ -381,7 +381,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: staged rows whose result could not be saved</shortDescription>
+        <shortDescription>Run log: rows not saved; {0} is the count, {1} the first row, {2} its reason</shortDescription>
         <value>{0} rows could not record their result, so they still show an earlier one. The first was row {1}: {2}</value>
     </labels>
     <labels>
@@ -397,7 +397,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import row error: the module columns failed to load</shortDescription>
+        <shortDescription>Row error: module columns not loaded; {0} is the module, {1} the reason</shortDescription>
         <value>The people on this row were saved, but its {0} columns were not loaded: {1}. Import this row again once the problem is fixed.</value>
     </labels>
     <labels>
@@ -413,7 +413,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import error: one row of the file is too long to stage</shortDescription>
+        <shortDescription>Import error: a file row is too long to stage; {0} is the row number</shortDescription>
         <value>Row {0} of the file is too long to import (over 32,768 characters). A quotation mark that is never closed is the usual cause. Fix the row in your spreadsheet and upload the file again.</value>
     </labels>
     <labels>

@@ -5,7 +5,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import: too many skip rules or key columns</shortDescription>
+        <shortDescription>Import: too many skip rules or key columns; {0} is the most of each</shortDescription>
         <value>A mapping can have at most {0} Skip rows rules and {0} One row per columns.</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import row: skipped by a skip rule</shortDescription>
+        <shortDescription>Import row: skipped by a skip rule; {0} is the column</shortDescription>
         <value>Skipped: the {0} column matched a Skip rows rule.</value>
     </labels>
     <labels>
@@ -37,7 +37,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import row: skipped as a repeat of an earlier row</shortDescription>
+        <shortDescription>Import row: skipped as a repeat; {0} is the earlier row, {1} the key columns</shortDescription>
         <value>Skipped: row {0} has the same {1}, and only the first row loads.</value>
     </labels>
     <labels>
@@ -45,7 +45,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: rows skipped by the row rules</shortDescription>
+        <shortDescription>Import run log: rows skipped by the row rules; {0} is the count</shortDescription>
         <value>{0} rows were skipped by Skip rows or One row per. They are listed with the file&apos;s rows, not as rejected.</value>
     </labels>
     <labels>
@@ -53,7 +53,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: values a commit would clear</shortDescription>
+        <shortDescription>Import run log: values a commit would clear; {0} is the count</shortDescription>
         <value>Empty cells would clear {0} values. The commit journals each one, so undo puts them back.</value>
     </labels>
     <labels>
@@ -61,7 +61,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: values the commit cleared</shortDescription>
+        <shortDescription>Import run log: values the commit cleared; {0} is the count</shortDescription>
         <value>Empty cells cleared {0} values. Undo puts them back.</value>
     </labels>
     <labels>
@@ -69,7 +69,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import run log: a field that cannot be cleared</shortDescription>
+        <shortDescription>Import run log: a field that cannot be cleared; {0} is the field</shortDescription>
         <value>{0} cannot be cleared (it is required or a checkbox), so its empty cells leave it as it is.</value>
     </labels>
 </CustomLabels>

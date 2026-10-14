@@ -5,7 +5,7 @@
         <categories>BulkUpdate</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Run log line: confirmed records a stopped job never reached.</shortDescription>
+        <shortDescription>Run log: confirmed records a stopped job never reached; {0} is the count</shortDescription>
         <value>Up to {0} of the confirmed records were not reached, because Salesforce stopped part of the job (often a limit reached by automation on many records at once). They were left as they were; run a new job over them.</value>
     </labels>
     <labels>

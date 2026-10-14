@@ -69,7 +69,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: map values has no usable rows</shortDescription>
+        <shortDescription>Column changes: map values has no usable rows; {0} is the most rows</shortDescription>
         <value>Map values needs 1 to {0} rows, each with the value to look for (at most 255 characters).</value>
     </labels>
     <labels>
@@ -85,7 +85,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: keep part has no separator or part</shortDescription>
+        <shortDescription>Column changes: keep part has no separator or part; {0} is the top part</shortDescription>
         <value>Keep part needs a separator (at most 10 characters) and a part from 1 to {0}.</value>
     </labels>
     <labels>
@@ -93,7 +93,7 @@
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Column changes: first or last characters has no count</shortDescription>
+        <shortDescription>Column changes: first or last characters has no count; {0} is the most</shortDescription>
         <value>First or last characters needs a number of characters from 1 to {0}.</value>
     </labels>
     <labels>
