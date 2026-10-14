@@ -60,7 +60,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 | v0.8 | Volunteers | V-01 to V-08; C-24 and C-30 | C-24, C-30 landed (#219); V-items planned |
 | v0.9 | Programs and Logic Models | P-01, P-02, P-04 to P-08, L-01 to L-04; C-39; G-19 if capacity | C-39 landed (#219); rest planned |
 | v0.10 | Funders and Nonprofit Cloud mirror | F-01 to F-08, X-07, L-06; X-05 | Planned |
-| v0.11 | Hardening | Security review, scale test, C-31 (C-26 deferred indefinitely, D-24); tests run as permission-set users; vendored rollup tests removed by S9 | C-31 landed (ADR-0088 accepted, D-64); tests as permission-set users and S9 landed; accessibility static pass and translation sweep landed (#377); device mobile run, scale test and security review open |
+| v0.11 | Hardening | Security review, scale test, C-31 (C-26 deferred indefinitely, D-24); tests run as permission-set users; vendored rollup tests removed by S9 | C-31 landed (ADR-0088 accepted, D-64); tests as permission-set users and S9 landed; accessibility static pass and translation sweep landed (#377); device mobile run and security review open; scale test done except the 25,000-row import run, which the owner wants finished before marking it done (2026-10-14) |
 | v0.12 | Beta | Beta cohort, C-27 | C-27 landed (#219) |
 | v0.13 | AppExchange | Listing, v1.0 on approval | Planned |
 
@@ -83,7 +83,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 | Field utilization (plan 6.1 item 10) | D-26, D-37, D-63 | Landed: on demand, inside Org Optimizer only (#377) |
 | Tests run as permission-set users | D-33 | Landed (#219, self-containment #377) |
 | "Data Job" relabel | ADR-0047, D-45, D-51 | Landed (#377): object label Data Job, tab "Import" |
-| Deleting people keeps their household | D-88 | Landed (#377); open option: tidy later, after the Recycle Bin window |
+| Deleting people keeps their household | D-88 | Landed (#377); the tidy-later option was decided by D-89 (2026-10-14), in progress: a nightly Core job moves empty households to the Recycle Bin once their former members can no longer be restored |
 | Namespace registration, first package version | D-01, ADR-0001, D-87 | After a v1.0 pilot |
 
 ## Post-1.0 (plan 6.1, parked)

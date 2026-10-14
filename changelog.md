@@ -8,6 +8,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- BMemory plan D-89 recorded (commits 11193a9d, 60bb9222): empty households move to the Recycle Bin by a nightly Core job after their former members can no longer be restored (amends D-88; decided 2026-10-14, in progress); v0.11 row notes the scale test is done except the 25,000-row import run. Mirrored to `docs/product-plan.md`, `roadmap.md` and `memory.md`.
 - Tier 1 scale rerun on `oi-test` at 1238b859: 3,691 households, 8,672 contacts, 26,102 gifts, 52,786 soft credits and 27,413 allocations loaded; the Rollup Queue drained 331 entries in about 7 minutes with none Failed; default fund totals verified (26,102 gifts, 2,081,063.69). Known test-data limit: about 8% of households and 6% of contacts were refused by the standard duplicate rules (fuzzy name matching).
 - BMemory plan Section 11.5 Giving notes added (commit c7d0272f): deleting the default fund leaves new gifts refused; no supported way to re-split an existing gift's allocations. Mirrored to `docs/product-plan.md` and `memory.md`.
 
