@@ -110,13 +110,17 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
     // ---------------------------------------------------------------------------- the route
 
     /**
-     * The source rows from which a record's totals are calculated here: what one queue run may
-     * read in all. A record below it fits a run on its own (the first record a run takes always
-     * runs), so it stays in the queue; one at or above it cannot, so it comes here. An estimate
-     * that falls short is caught when the record stops a run of its own (R-RQ6).
+     * The source rows from which a record's totals are calculated here: two fifths of what a
+     * transaction may read. A record below it fits a run on its own (the first record a run takes
+     * always runs, within the run budget of three fifths), with the rest left for the queue's own
+     * queries and the target records' triggers and flows, and for a filtered or stale COUNT that
+     * makes the estimate low. A record at or above it comes here. An estimate that still falls
+     * short is caught when the record stops a run of its own (R-RQ6).
      */
     public static Integer largeParentRows() {
-        return largeParentRowsForTest != null ? largeParentRowsForTest : sliceRowBudget();
+        return largeParentRowsForTest != null
+            ? largeParentRowsForTest
+            : Limits.getLimitQueryRows() * 2 / 5;
     }
 
     /** The source rows one queue run may expect to read across its whole slice. */

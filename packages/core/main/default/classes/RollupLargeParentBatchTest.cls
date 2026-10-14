@@ -193,9 +193,13 @@ private class RollupLargeParentBatchTest {
                 'Never calculated: unknown, not one row'
             );
             Assert.areEqual(
-                RollupLargeParentBatch.sliceRowBudget(),
+                Limits.getLimitQueryRows() * 2 / 5,
                 RollupLargeParentBatch.largeParentRows(),
-                'What one run may read in all, by default'
+                'Two fifths of what a transaction may read, by default'
+            );
+            Assert.isTrue(
+                RollupLargeParentBatch.largeParentRows() < RollupLargeParentBatch.sliceRowBudget(),
+                'Below the run budget, leaving headroom'
             );
         }
     }
@@ -234,14 +238,15 @@ private class RollupLargeParentBatchTest {
         }
     }
 
-    /** A record a run can hold on its own stays in the queue; only one it cannot goes here. */
+    /** A record under the large record threshold stays in the queue; one at it goes here. */
     @IsTest
-    static void onlyARecordTheRunBudgetCannotHoldGoesToTheBatch() {
+    static void onlyARecordAtTheLargeRecordThresholdGoesToTheBatch() {
         System.runAs(TestUsers.admin()) {
             insertDefinitions();
             Account fits = parentWith(1, 20);
             Account over = parentWith(2, 25);
-            RollupLargeParentBatch.sliceRowBudgetForTest = 25;
+            RollupLargeParentBatch.largeParentRowsForTest = 25;
+            RollupLargeParentBatch.sliceRowBudgetForTest = 40;
 
             Test.startTest();
             RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ fits.Id } });
@@ -249,10 +254,10 @@ private class RollupLargeParentBatchTest {
             Test.stopTest();
 
             Assert.areEqual(1, totalsOf(fits.Id).NumberOfEmployees, 'Twenty rows: in the run');
-            Assert.areEqual(25, totalsOf(over.Id).NumberOfEmployees, 'The budget: the batch');
+            Assert.areEqual(25, totalsOf(over.Id).NumberOfEmployees, 'The threshold: the batch');
             Assert.isTrue(RollupLargeParentBatch.startedForTest, 'A batch run was started');
             List<Rollup_Queue__c> held = entries();
-            Assert.areEqual(1, held.size(), 'Only the record over the budget waits');
+            Assert.areEqual(1, held.size(), 'Only the record at the threshold waits');
             Assert.areEqual(String.valueOf(over.Id), held[0].Record_Ids__c, 'Held by the batch');
         }
     }

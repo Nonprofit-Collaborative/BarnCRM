@@ -44,12 +44,15 @@ showed them as failed.
    each record's source rows: its largest stored COUNT total times the planned queries, as the
    full run weighs a record. A filtered or fiscal year COUNT is a floor, and a record with no
    COUNT to go by (none defined, or never calculated) is unknown, ten rows per query, not one.
-   A record estimated at the row budget for a whole run (60 percent of the query row limit, as
-   the full run's chunk budget) or more, which no run can hold, moves to a new entry for the
-   batch. The others are taken in order up to that budget; the rest go back to the queue as
-   fresh entries for the next run, uncharged, and the first record a run takes always runs, so a
-   record under the budget is recalculated alone if it must be. (The threshold was a fifth of the
-   limit at first; on the scale rerun that sent a donor with about 2,000 soft credits to the
+   A record estimated at 40 percent of the query row limit (20,000 rows) or more moves to a new
+   entry for the batch. The others are taken in order up to a row budget for the whole run (60
+   percent of the limit, as the full run's chunk budget); the rest go back to the queue as fresh
+   entries for the next run, uncharged, and the first record a run takes always runs, so a
+   record under the threshold is recalculated alone if it must be. The gap between the two
+   leaves room for the queue's own queries, the target records' triggers and flows, and a
+   filtered or stale COUNT that makes the estimate low, so a record just under the threshold
+   does not stop a run and charge the records it shares it with. (The threshold was a fifth of
+   the limit at first; on the scale rerun that sent a donor with about 2,000 soft credits to the
    batch on every change, one batch job per planned query, when a run could hold it.) A run that stops anyway while recalculating a single
    record, on the query row limit, hands that record to the batch. Every other failure stays
    with the queue (decision 3).
