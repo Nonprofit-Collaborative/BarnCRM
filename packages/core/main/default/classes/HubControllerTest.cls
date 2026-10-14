@@ -158,6 +158,7 @@ private class HubControllerTest {
     @IsTest
     static void aTileThatCannotAnswerIsLostNotThePage() {
         System.runAs(TestUsers.admin()) {
+            SetupAssistantTestExtension.useNone();
             TestDataFactory.defaultSettings();
             SeasonalAddressWriter.recordRun(Datetime.now(), 'Nothing to swap.');
             HubController.failingPartsForTest = new Set<String>{

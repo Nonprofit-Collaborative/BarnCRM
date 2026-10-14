@@ -343,9 +343,12 @@ public with sharing class RollupFilterParser {
             .replace('_', '\\_');
     }
 
-    /** A LIKE pattern, already escaped, quoted as text. */
+    /**
+     * A LIKE pattern, already escaped, quoted as text. Only quotes are escaped here:
+     * String.escapeSingleQuotes also doubles backslashes, which turns \% back into a wildcard.
+     */
     private static String likeValue(String pattern) {
-        return '\'' + String.escapeSingleQuotes(pattern) + '\'';
+        return '\'' + pattern.replace('\'', '\\\'') + '\'';
     }
 
     /**

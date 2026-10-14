@@ -53,20 +53,31 @@ public with sharing class GiftLookupSelector {
      * Which of these households have at least one gift (R-SC3): only their credits can need
      * recomputing after a change of membership. A semi-join, so the households are the rows read,
      * not their gifts, however long their giving histories are.
+     *
+     * Without sharing as well as in system mode (ADR-0021): whether a household has gifts is a
+     * fact about the org, not about what the person changing its membership may see. A gift that
+     * person cannot see would otherwise read as absent and its credits would never be put right.
+     * It returns identifiers only and elevates nothing else.
      */
     public static Set<Id> selectHouseholdsWithGifts(Set<Id> householdIds) {
         if (householdIds == null || householdIds.isEmpty()) {
             return new Set<Id>();
         }
-        return new Map<Id, Account>(
-                [
-                    SELECT Id
-                    FROM Account
-                    WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Gift__c)
-                    WITH SYSTEM_MODE
-                ]
-            )
-            .keySet();
+        return new HouseholdsWithGifts().among(householdIds);
+    }
+
+    private without sharing class HouseholdsWithGifts {
+        private Set<Id> among(Set<Id> householdIds) {
+            return new Map<Id, Account>(
+                    [
+                        SELECT Id
+                        FROM Account
+                        WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Gift__c)
+                        WITH SYSTEM_MODE
+                    ]
+                )
+                .keySet();
+        }
     }
 
     /**
