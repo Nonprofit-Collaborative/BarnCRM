@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-88).
+Last refreshed from BMemory 2026-10-14 (through D-89).
 
 ## Decision log (plan Section 12)
 
@@ -95,7 +95,8 @@ Last refreshed from BMemory 2026-10-13 (through D-88).
 | D-85 | 2026-10-13 | Working agreement: implement recommendations and tell the owner what is being changed, unless really important or contrary to his instructions. Module reviews or audits already in flight can finish; their findings are not processed with him now unless they relate to Core |
 | D-86 | 2026-10-13 | Erase a person: the preview lists activities and files for manual deletion (not erased automatically); Health Check skips erased people; PR #282 accepted at its size |
 | D-87 | 2026-10-13 | Release prerequisites after a v1.0 pilot: namespace registration, the Dev Hub and the steward entity (Section 11.2 items 1, 3, 4) settled after piloting v1.0; no package version until then; upgrade-path tests wait for the first version |
-| D-88 | 2026-10-13 | Deleting people never deletes their household, in every membership mode (R-H12, #377); moving people still tidies it. Reason: deleting a parent purges children deleted before it from the Recycle Bin, so deleted people could not be restored. Open option: tidy later, after the Recycle Bin window |
+| D-88 | 2026-10-13 | Deleting people never deletes their household, in every membership mode (R-H12, #377); moving people still tidies it. Reason: deleting a parent purges children deleted before it from the Recycle Bin, so deleted people could not be restored. Open option, tidy later after the Recycle Bin window: decided by D-89 |
+| D-89 | 2026-10-14 | A household left with no members after its people are deleted moves to the Recycle Bin, but only after its former members can no longer be restored from the Recycle Bin: a nightly Core job, on by default, switchable in Nonprofit Settings; households with other child records are kept and reported. Amends D-88, which protects restoring deleted people. In progress |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
