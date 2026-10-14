@@ -253,11 +253,15 @@ public with sharing class ImportUndoService {
         ) {
             return Label.Core_Import_UndoErrorAlreadyUndone;
         }
+        // A committed import keeps Is Dry Run cleared while it retries its rejected rows, so its
+        // retry's staging and finished preview can be undone like the commit (R-IB17).
         if (
             !(ImportBatchService.STATUS_COMPLETE.equals(status) ||
             ImportBatchService.STATUS_TRIAL_COMPLETE.equals(status) ||
             ImportBatchService.STATUS_FAILED.equals(status) ||
-            ImportBatchService.STATUS_UNDO_FAILED.equals(status)) ||
+            ImportBatchService.STATUS_UNDO_FAILED.equals(status) ||
+            ImportBatchService.STATUS_RETRYING.equals(status) ||
+            ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(status)) ||
             batch.Undo_Deadline__c == null ||
             (batch.Completed_At__c == null &&
             !ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))

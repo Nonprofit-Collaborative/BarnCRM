@@ -23,6 +23,7 @@ import getRelatedOptions from '@salesforce/apex/ImportController.getRelatedOptio
 import getRelatedFields from '@salesforce/apex/ImportController.getRelatedFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
+import openRetry from '@salesforce/apex/ImportController.openRetry';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
 
@@ -111,6 +112,9 @@ jest.mock('@salesforce/apex/ImportController.getChangedValues', () => ({ default
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.previewChanges', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.openRetry', () => ({ default: jest.fn() }), {
   virtual: true
 });
 // The workbook reader runs for real (jsdom has no DecompressionStream, so a real workbook
@@ -1825,5 +1829,89 @@ describe('the import wizard loading one object', () => {
     click(element, 'dry-run');
     await flush();
     expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).load.related).toBeUndefined();
+  });
+
+  /** Commits the default file into an import with one rejected row the user may retry. */
+  async function toRetryableResults() {
+    startCommit.mockResolvedValue({
+      ...DRY_RUN_BATCH,
+      status: 'Complete',
+      isDryRun: false,
+      rejected: 1,
+      canRetry: true,
+      retrying: false
+    });
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    click(element, 'commit');
+    await flush();
+    return element;
+  }
+
+  async function chooseRetryFile(element, text) {
+    const input = element.shadowRoot.querySelector('[data-id="retry-file"]');
+    const file = new File([text], 'fixed.csv', { type: 'text/csv' });
+    Object.defineProperty(input, 'files', { value: [file], configurable: true });
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+  }
+
+  it('retries the fixed rejected rows into the same import and previews only them', async () => {
+    const retrying = { ...DRY_RUN_BATCH, retrying: true, canRetry: true };
+    openRetry.mockResolvedValue({ ...retrying, status: 'Retrying', isFinished: false });
+    startDryRun.mockResolvedValue(retrying);
+    const element = await toRetryableResults();
+    stageRows.mockClear();
+    startDryRun.mockClear();
+
+    await chooseRetryFile(element, 'Row,Last Name,Email,Notes,Reason\n3,Okafor,ben@example.org,,x');
+
+    expect(openRetry).toHaveBeenCalledWith({ batchId: 'a02' });
+    expect(stageRows).toHaveBeenCalledTimes(1);
+    expect(stageRows.mock.calls[0][0].batchId).toBe('a02');
+    expect(stageRows.mock.calls[0][0].firstRowNumber).toBe(2);
+    expect(JSON.parse(stageRows.mock.calls[0][0].rowsJson)).toHaveLength(1);
+    expect(startDryRun).toHaveBeenCalledWith({ batchId: 'a02' });
+    expect(element.shadowRoot.querySelector('[data-id="commit"]').disabled).toBe(false);
+    // The retry belongs to a committed import, so there is no earlier step to go back to.
+    expect(element.shadowRoot.querySelector('[data-id="back"]')).toBeNull();
+  });
+
+  it('refuses a fixed rows file missing a column of the original, and opens no retry', async () => {
+    const element = await toRetryableResults();
+    await chooseRetryFile(element, 'Last Name,Notes\nOkafor,');
+    expect(openRetry).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      'c.Core_Import_RetryColumnsMissing'
+    );
+  });
+
+  it('offers no retry when the import cannot take one', async () => {
+    startCommit.mockResolvedValue({
+      ...DRY_RUN_BATCH,
+      status: 'Complete',
+      isDryRun: false,
+      canRetry: false
+    });
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    click(element, 'commit');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="start-over"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="retry-file"]')).toBeNull();
   });
 });

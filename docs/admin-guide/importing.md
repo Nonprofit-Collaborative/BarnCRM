@@ -128,6 +128,20 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    next file by record ID. Like the exceptions file it opens cleanly in Excel and holds up to
    100,000 rows in one download; for a larger import the screen says how many it holds.
 
+**Fixing the rejected rows.** You do not need a new import for the rows that were rejected.
+Select **Download rejected rows**, fix those rows in your spreadsheet (keep the same column
+headings; the Row and Reason columns are ignored), and save the file. Then, still on the
+results screen, choose the fixed file under **Retry fixed rows**. BarnCRM previews only
+those rows, against the same mapping, and shows the counts for them; select **Import these
+rows** to load them into the same import. Every earlier rejected row is marked **Retried**,
+so keep in the file each rejected row you still want loaded, even one you did not change.
+The earlier rejected rows no longer count,
+so the import's rejected count and its exceptions are now the fixed rows' results, and its
+one **Undo** removes everything both runs created. Only the person who ran the import can
+retry it, only while it can still be undone, and a retry file may hold up to 10,000 rows.
+You can retry again if some fixed rows are still rejected. Row numbers in a retry carry on
+after the original file's, so the first fixed row of an import of 200 rows is row 202.
+
 To check the tag, open one of the new households and look at **Created By Import Batch**.
 It links back to the import.
 
@@ -195,6 +209,7 @@ An import you regret can be undone for 30 days after you import it. Undo removes
 people, households and organizations that import created (and, with Giving, its gifts), and
 puts back the values it changed on records you already had. An import that loaded one object
 (section 9) has the records it created removed the same way, counted under that object's name.
+An import whose rejected rows you retried (section 3) is undone as one, both runs together.
 It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).

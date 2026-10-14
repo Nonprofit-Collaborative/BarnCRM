@@ -2182,7 +2182,7 @@ unchanged.
 | Import Template | reference(Import Template) | yes | The mapping this batch was read with. |
 | File Reference | text | yes | The identifier of the uploaded file stored as a Salesforce File, so the original can be downloaded again. Empty when the file was over 2.5 MB or could not be saved; the import still runs. |
 | File Name | text | yes | The name of the file as the admin uploaded it. |
-| Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. |
+| Status | picklist(Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Retrying, Failed, Undoing, Undone, Undo failed) | yes | Where this batch has got to. Retrying: a committed import is taking in its fixed rejected rows (R-IB17). |
 | Is Dry Run | boolean | yes (defaults true) | Whether this pass only previewed what would happen; a committed batch has run at least one dry run first. |
 | Row Count | integer | computed | How many rows the file contained. |
 | Rows Created | integer | computed | How many rows created at least one new record. |
@@ -2208,6 +2208,7 @@ unchanged.
 | Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 | Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
+| Retry After Row | integer | computed | While a retry of the import's rejected rows is open, the highest row number before it: the fixed rows are numbered after it, and the retry's dry run and commit read only them (R-IB17). Empty otherwise. |
 
 ### Relationships
 
@@ -2505,6 +2506,24 @@ created for it. The dry run and the commit reject the same rows. Matched records
 in any import, and an entity processor still loads the rest of a matched row (R-IR6). The
 choice belongs to the file, not the template, and is set again for each upload.
 
+**R-IB17 Retrying the rejected rows.** A committed import's rejected rows can be fixed and
+loaded into the same batch, so one undo still covers everything the import created. A retry
+opens only on an import (not a bulk update or delete) that is Complete with rejected rows, or
+that already has a retry open; only for the user who committed it; only while its undo is
+allowed (R-IB8) and its staged rows are kept (R-IR5); and never while a pass runs. Opening one
+sets Status to Retrying and Retry After Row to the batch's highest row number, discarding the
+rows of an earlier unfinished retry. The fixed file is staged into the batch while it is
+Retrying (staging is otherwise closed once a batch has run), at most 10,000 rows, each numbered
+Retry After Row plus its file row number less one. The retry's dry run reads only rows after
+Retry After Row, counts only them, and keeps the batch a commit: Is Dry Run, Started At,
+Completed At, File Amount and Committed By are left as the commit set them, its log is added
+after the commit's, and the control totals are not checked again. The retry's commit runs
+under the template the commit ran with (R-IB1), keeps Started At so undo covers both runs,
+reads the retry's rows and the earlier Rejected rows, marks each earlier Rejected row Retried
+without processing it, and processes the rest; its finish counts every row (a Retried row
+counts as nothing), clears Retry After Row and re-stamps the undo deadline. Undo is allowed
+while a retry is open, as for the commit (R-IB8).
+
 ### Salesforce implementation
 
 - **Object:** `Import_Batch__c`, auto-number Name with format `IB-{000000}`.
@@ -2514,7 +2533,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Import Template | `Import_Template__c` | Lookup to `Import_Template__c` |
 | File Reference | `File_Id__c` | Text (18) |
 | File Name | `File_Name__c` | Text |
-| Status | `Status__c` | Picklist: Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Failed, Undoing, Undone, Undo failed |
+| Status | `Status__c` | Picklist: Draft, Parsing, Dry run, Dry run complete, Committing, Trial complete, Complete, Retrying, Failed, Undoing, Undone, Undo failed |
 | Is Dry Run | `Is_Dry_Run__c` | Checkbox |
 | Row Count | `Row_Count__c` | Number |
 | Rows Created | `Rows_Created__c` | Number |
@@ -2540,6 +2559,7 @@ choice belongs to the file, not the template, and is set again for each upload.
 | Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 | Trial Rows | `Trial_Rows__c` | Number (9, 0) |
+| Retry After Row | `Retry_After_Row__c` | Number (9, 0) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -2576,7 +2596,7 @@ processor resolves those in dependency order.
 | Import Batch | reference(Import Batch) | yes | The upload this row came from. |
 | Row Number | integer | yes | The row's position in the file, so a message can name it. |
 | Raw Values | long text | yes | The row's original column values exactly as uploaded, held as a document keyed by column name. |
-| Status | picklist(Pending, Matched, Created, Updated, Rejected, Skipped) | yes | What the processor did with this row, or would do in a dry run. |
+| Status | picklist(Pending, Matched, Created, Updated, Rejected, Skipped, Retried) | yes | What the processor did with this row, or would do in a dry run. Retried: a rejected row a retry's commit replaced with its fixed row (R-IB17). |
 | Error Message | long text | no | Why the row was rejected, in language an administrator can act on. |
 | Household | reference(Household) | computed | The household this row resolved to. |
 | Contact 1 | reference(Contact) | computed | The first person, where people are Contacts. |
@@ -2706,7 +2726,7 @@ when the corrected row is loaded again.
 | Import Batch | `Import_Batch__c` | Master-Detail to `Import_Batch__c` |
 | Row Number | `Row_Number__c` | Number |
 | Raw Values | `Raw_Values_JSON__c` | Long Text Area |
-| Status | `Status__c` | Picklist: Pending, Matched, Created, Updated, Rejected, Skipped |
+| Status | `Status__c` | Picklist: Pending, Matched, Created, Updated, Rejected, Skipped, Retried |
 | Error Message | `Error_Message__c` | Long Text Area |
 | Household | `Household__c` | Lookup to Account |
 | Contact 1 | `Contact_1__c` | Lookup to Contact |
@@ -6942,6 +6962,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Load one object lookups by any field (data tools parity). No object or field added. R-IT13: a lookup may name its parent by any text, email or phone field the user may read and filter on, and the large object guard refuses an unindexed field on an object over 100,000 records. |
 | v0.6 | 2026-10-13 | Load one object updates by a field you choose (data tools parity). `Import_Template__c.Load_Operation__c` gains Update by a matching field, and Load Match Field serves it. R-IT12 gains that operation, which finds each row's record by any text, email or phone field, rejects a row it finds nothing for, and follows Several Matches; Account and Contact may use it (R-IT14). |
 | v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-NEXT, `NEXT-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
+| v0.6 | 2026-10-13 | Retrying the rejected rows (data tools parity). `Import_Batch__c` gains `Retry_After_Row__c` and the Status value Retrying; `Import_Row__c.Status__c` gains Retried. New rule R-IB17: a committed import's fixed rejected rows are staged, previewed and committed into the same batch, and one undo covers both runs. |
 
 ---
 ## 32. Entity ownership by package

@@ -143,6 +143,11 @@ import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCo
 import ruleExternalId from '@salesforce/label/c.Core_Import_RuleExternalId';
 import ruleNameExact from '@salesforce/label/c.Core_Import_RuleNameExact';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
+import openRetry from '@salesforce/apex/ImportController.openRetry';
+import retryHeading from '@salesforce/label/c.Core_Import_RetryHeading';
+import retryHelp from '@salesforce/label/c.Core_Import_RetryHelp';
+import retryFileLabel from '@salesforce/label/c.Core_Import_RetryFileLabel';
+import retryColumnsMissing from '@salesforce/label/c.Core_Import_RetryColumnsMissing';
 import { INSERT, UPDATE, UPDATE_BY_FIELD, UPSERT, LOOKUP_REJECT } from 'c/importLoadOptions';
 
 /** How many of the file's rows the column changes are previewed on (R-IT15). */
@@ -409,7 +414,10 @@ export default class ImportWizard extends LightningElement {
     trialHelp,
     trialRowsLabel,
     trialButton,
-    remainingButton
+    remainingButton,
+    retryHeading,
+    retryHelp,
+    retryFileLabel
   };
 
   async connectedCallback() {
@@ -1405,9 +1413,17 @@ export default class ImportWizard extends LightningElement {
     return this.batch && this.batch.defaultTrialRows ? String(this.batch.defaultTrialRows) : '';
   }
 
-  /** A trial is offered on a finished preview that could commit, of a file of several rows. */
+  /**
+   * A trial is offered on a finished preview that could commit, of a file of several rows, and
+   * not on a retry, whose fixed rows are committed whole (R-IB17).
+   */
   get showTrialChoice() {
-    return this.isStepPreview && !this.cannotCommit && (this.batch.rowCount || 0) > 1;
+    return (
+      this.isStepPreview &&
+      !this.cannotCommit &&
+      !this.batch.retrying &&
+      (this.batch.rowCount || 0) > 1
+    );
   }
 
   get cannotTrial() {
@@ -1425,6 +1441,52 @@ export default class ImportWizard extends LightningElement {
     return trialDone
       .replace('{0}', tried.toLocaleString())
       .replace('{1}', remaining.toLocaleString());
+  }
+
+  /**
+   * Retries the import's fixed rejected rows into it (R-IB17): the file must carry every
+   * column of the original, its rows are staged after the import's own and previewed, and
+   * the commit then replaces the rejected rows with them.
+   */
+  async handleRetryFile(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file || !this.batch) {
+      return;
+    }
+    this.message = undefined;
+    this.loading = true;
+    try {
+      const rows = isXlsx(file.name)
+        ? await this.readWorkbook(file)
+        : this.readRetryText(await this.readText(file));
+      const { headers, records } = toRecords(rows);
+      if (headers.length === 0 || records.length === 0) {
+        this.message = noHeaderRow;
+        return;
+      }
+      const missing = this.headers.filter((heading) => !headers.includes(heading));
+      if (missing.length > 0) {
+        this.message = format(retryColumnsMissing, missing.join(', '));
+        return;
+      }
+      this.batch = await openRetry({ batchId: this.batch.id });
+      this.records = records;
+      await this.stageAllRows();
+      this.batch = await startDryRun({ batchId: this.batch.id });
+      this.rejectedRows = [];
+      this.changedValues = [];
+      this.step = 5;
+      this.startPolling();
+    } catch (error) {
+      this.message = this.errorText(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  /** A fixed-rows file's rows, split on its own separator, which may differ from the original's. */
+  readRetryText(text) {
+    return parseCsv(text, detectDelimiter(text));
   }
 
   startPolling() {
@@ -1704,8 +1766,14 @@ export default class ImportWizard extends LightningElement {
   get canGoBack() {
     return (
       (this.step > 1 && this.step < 5) ||
-      (this.step === 5 && Boolean(this.batch && this.batch.isFinished))
+      // A retry's preview belongs to a committed import, so there is no step to go back to.
+      (this.step === 5 && Boolean(this.batch && this.batch.isFinished && !this.batch.retrying))
     );
+  }
+
+  /** A finished import whose fixed rejected rows may be retried into it (R-IB17). */
+  get showRetry() {
+    return this.step === 6 && Boolean(this.batch && this.batch.isFinished && this.batch.canRetry);
   }
 
   get cannotLeaveTemplateStep() {
