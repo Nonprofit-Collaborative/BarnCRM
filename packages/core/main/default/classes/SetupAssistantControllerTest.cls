@@ -43,9 +43,9 @@ private class SetupAssistantControllerTest {
                 'The organization step carries the fields it is going to edit'
             );
             Assert.areEqual(
-                2,
+                1,
                 state.modules.size(),
-                'Core alone is offered Core and Volunteers, not the modules that need Giving'
+                'Before an edition is chosen, only Core is listed, no nonprofit module'
             );
             Assert.isNotNull(state.roles, 'The access step needs the roles it can give out');
             Assert.isFalse(state.isComplete, 'A fresh org has not finished setup');

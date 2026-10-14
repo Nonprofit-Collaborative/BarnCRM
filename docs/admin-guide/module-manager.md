@@ -23,9 +23,10 @@ Everyone who can open BarnCRM Settings sees the list. You need the **Manage Barn
 Settings** permission to install, turn on, turn off, or check what an uninstall would delete.
 
 Which modules are listed depends on the edition chosen in the first step of the
-[Setup Assistant](setup-assistant.md). The Standard Edition lists Core and Volunteers. The
-Nonprofit Edition, or an org that already has Giving, lists all six: Core, Giving,
-Volunteers, Programs, Funders and Connect. A module that is installed is always listed.
+[Setup Assistant](setup-assistant.md). The Standard Edition (or no edition chosen yet) lists
+Core only. The Nonprofit Edition lists all six: Core, Giving, Volunteers, Programs, Funders
+and Connect. A module that is installed is always listed, whatever the edition. See
+[Editions](editions.md).
 
 ## A five-minute walkthrough
 

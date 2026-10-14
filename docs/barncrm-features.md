@@ -18,10 +18,10 @@ BarnCRM is a free, open source suite of Salesforce packages: a neutral Core for 
 
 | Edition | What it is | Packages |
 |---|---|---|
-| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone, plus modules that fit (Volunteers; Events later) |
+| Standard Edition | For any other Salesforce org: businesses, clubs and any organization that is not a nonprofit. Includes the full core suite of tools | Core alone (Events later); no nonprofit module is shown or offered |
 | Nonprofit Edition | For nonprofits; a choice any organization can make. The full core suite of tools plus the nonprofit tools | Core plus Giving, with Connect, Volunteers, Programs, Logic Models and Funders offered as further modules |
 
-BarnCRM is one suite of tools in two editions, and both editions include the full core suite of tools; the Nonprofit Edition adds the nonprofit tools (Giving and the other nonprofit modules). An admin installs Core, then turns on the Nonprofit Edition, which opens Salesforce's installer for Giving; other modules are offered the same way. A module that is never installed leaves nothing in the org.
+BarnCRM is one suite of tools in two editions, and both editions include the full core suite of tools; the Nonprofit Edition adds the nonprofit tools (Giving and the other nonprofit modules). An admin installs Core, then chooses the edition once in the Setup Assistant; the Nonprofit Edition opens Salesforce's installer for Giving, and other modules are offered the same way. The Standard Edition shows no nonprofit module anywhere in Core; one already installed keeps working. A module that is never installed leaves nothing in the org. Changing the edition later: [editions.md](admin-guide/editions.md).
 
 ---
 
@@ -223,6 +223,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Rearrangeable home page | Major | The home page is built from separate tiles (welcome, setup checklist, errors, Health Check, rollups, seasonal addresses, regular files, quick links) in standard regions, so an admin can rearrange or hide them in App Builder. | Shipped | C-03 |
 | Module Manager | Major | A page in settings listing every module with its status and installer link, Turn off and Turn on for a module's automation, and a count of what an uninstall would delete. | Shipped | C-24 |
 | Edition choice | Major | The Setup Assistant's first step asks Nonprofit Edition or Standard Edition and, when the Nonprofit Edition is chosen and Giving is missing, links to Salesforce's installer for Giving with Check again. | Shipped | C-30 |
+| Edition gates visibility | Major | The Standard Edition (or no edition chosen) shows no nonprofit module that is not installed: not in the Setup Assistant's module step, the Module Manager, the home Modules card or the Health Check Connect hint. The edition is chosen once: afterwards the Setup Assistant shows it read-only, and BarnCRM Settings, General shows it read-only with a low-key Change edition control and a confirmation; Setup, Custom Settings also works. | In progress | ADR-NEXT |
 | Neutral Core | Major | Moves nonprofit wording, the giving and receipt settings and the nonprofit setup steps out of Core into Giving, so Core alone is the Standard Edition. | Shipped | C-29, ADR-0059 |
 | Analytics module: field utilization | Major | An on-demand count, in Org Optimizer's Field utilization section (no tab or app page of its own), of how often each field of a chosen object is filled in, per record type, with saved counts for trends and reports. | Shipped (#377) | plan 6.1 item 10, ADR-0086, ADR-0101 field-utilization-on-demand |
 | Packaged roles | Minor | Five roles: Admin, Fundraising Staff (with Giving), Team Member, Coordinator and Read Only; the Core role names are neutral so they fit any organization (API names unchanged); packaged sets are never cloned. | Shipped | C-06, ADR-0123 |
@@ -499,7 +500,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 4. Volunteers
 
-**Edition:** both (offered in the Standard Edition and the Nonprofit Edition). Depends on Core. Package is an empty placeholder on main; an early draft from 2026-09-09 sits on a stale branch and is not active work.
+**Edition:** Nonprofit Edition (not shown in the Standard Edition, ADR-NEXT). Depends on Core. Package is an empty placeholder on main; an early draft from 2026-09-09 sits on a stale branch and is not active work.
 
 ### 4.1 Volunteer Management
 

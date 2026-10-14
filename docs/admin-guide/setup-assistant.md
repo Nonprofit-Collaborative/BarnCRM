@@ -17,7 +17,8 @@ Without Giving, the steps after step three move up by one.
 
 Nothing it asks is permanent. Every answer is a setting you can change later on the
 BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
-changes.
+changes. The edition is the one answer you give once: after step one the assistant shows it
+read-only, and [Editions](editions.md) says how to change it later.
 
 ## How to turn it on
 
@@ -68,7 +69,8 @@ ready than to go and find:
 ### Step 1: Choose your edition
 
 BarnCRM comes in two editions built from the same parts, and both include the full core suite of tools. Any organization can choose either
-one, and the choice can be changed later.
+one. You choose once: the edition decides which modules BarnCRM shows and offers everywhere
+(see [Editions](editions.md)).
 
 - **Standard Edition**: the full core suite of tools, including households, people, organizations, relationships, addresses,
   importing and everything else in BarnCRM Core. Nothing more to install.
@@ -93,9 +95,14 @@ you should see and approve what goes into your org. If the step says "The Giving
 link is not published yet.", there is no installable version of Giving to link to yet: click
 **Read about Giving**, and ask whoever gave you BarnCRM for the install link.
 
-Choosing an edition loads no sample data and changes no records. The **Edition** setting, in
-the General section of BarnCRM Settings, holds the same choice. With the Nonprofit Edition,
-step seven also offers the modules that are only for nonprofits.
+Choosing an edition loads no sample data and changes no records. With the Nonprofit Edition,
+step seven also offers the nonprofit modules; with the Standard Edition, BarnCRM shows none of
+them.
+
+Once an edition is saved, this step shows it read-only ("Edition: Standard Edition", for
+example) instead of the choice, even after **Start again**. The **Edition** setting, in the
+General section of BarnCRM Settings, shows the same choice; to change it later, follow
+[Editions](editions.md).
 
 **What Maria sees:** both editions, with **Nonprofit Edition** already selected because Giving
 is installed in her org. She clicks **Confirm and continue**, reads "Giving is installed",
@@ -243,10 +250,10 @@ installed**, with a **Learn more** link to that package's description (its READM
 GitHub). A module that is not installed and has a published version also has an
 **Install** link, which opens Salesforce's installer for it in a new tab.
 
-- With the Standard Edition chosen in step one and Giving not installed, the list shows Core
-  and Volunteers, plus any other module already installed.
-- With the Nonprofit Edition chosen, or Giving installed, it shows all six: Core, Giving,
-  Volunteers, Programs, Funders, and Connect.
+- With the Standard Edition chosen in step one (or no edition chosen), the list shows Core,
+  plus any module that is already installed. It offers no nonprofit modules.
+- With the Nonprofit Edition chosen, it shows all six: Core, Giving, Volunteers, Programs,
+  Funders, and Connect.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means
@@ -317,6 +324,8 @@ finished, because it is.
 - **Choosing the Nonprofit Edition and closing the installer tab before it finishes.** The
   edition is saved, but Giving is not installed until Salesforce's install email arrives.
   Open the installer again from step one, or from step seven.
+- **Looking for the edition choice after step one.** The step shows the saved edition
+  read-only. Change it in BarnCRM Settings, as [Editions](editions.md) describes.
 - **Re-running setup to fix one thing.** You do not have to. Every answer is on the
   BarnCRM Settings page, grouped by section, with a search box. Reopen the assistant when
   something big changes, such as a new fiscal year or a merger, not to correct a typo.

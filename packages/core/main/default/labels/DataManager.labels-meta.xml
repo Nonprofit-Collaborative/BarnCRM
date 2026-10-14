@@ -38,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: what the import card does</shortDescription>
-        <value>Load people, organizations, gifts or one kind of record from a spreadsheet, with a preview first.</value>
+        <value>Load people, organizations or one kind of record from a spreadsheet, with a preview first.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_FindTitle</fullName>

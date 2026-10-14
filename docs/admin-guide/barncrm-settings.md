@@ -40,7 +40,10 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation, Error Log,
    Access, Import, and Health. You only see the ones that have something in them: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
-   Organization section, so BarnCRM Core on its own shows fewer.
+   Organization section, so BarnCRM Core on its own shows fewer. General starts with
+   **Edition**, shown read-only: it is chosen once in the Setup Assistant, and the
+   **Change edition** link under it is the way to change it later (see
+   [Editions](editions.md)).
 3. Click in the **Search settings** box and type `greeting`. Results appear as you type. If
    the search cannot run, the box says so and asks you to try again, instead of saying nothing
    matches.

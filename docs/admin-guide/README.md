@@ -113,6 +113,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-03 BarnCRM app and setup checklist | [barncrm-app.md](barncrm-app.md) | Core | v0.1 |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core | v0.1 |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
+| C-30 Editions | [editions.md](editions.md) | Core | Core quality pass |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core | v0.8 |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core | Shipped |
 | C-13 Rollups | [rollups.md](rollups.md) | Core | v0.2 |

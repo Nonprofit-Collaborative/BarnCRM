@@ -360,10 +360,30 @@ private class HealthCheckServiceTest {
     }
 
     @IsTest
+    static void connectIsNotSuggestedOutsideTheNonprofitEdition() {
+        System.runAs(TestUsers.admin()) {
+            OrgShapeDetector.overrideShape = shape(false, false, true, false);
+            HealthCheckOrgShapeChecks.connectInstalledOverride = false;
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_COMMUNITY }
+            );
+
+            System.assertEquals(
+                null,
+                find(HealthCheckService.run(), 'connect_module_absent'),
+                'Connect is a nonprofit module, so the Standard Edition is not told about it.'
+            );
+        }
+    }
+
+    @IsTest
     static void industriesObjectsWithoutConnectAreReported() {
         System.runAs(TestUsers.admin()) {
             OrgShapeDetector.overrideShape = shape(false, false, true, false);
             HealthCheckOrgShapeChecks.connectInstalledOverride = false;
+            SettingsService.saveValues(
+                new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_IMPACT }
+            );
 
             HealthCheckService.Finding finding = find(
                 HealthCheckService.run(),

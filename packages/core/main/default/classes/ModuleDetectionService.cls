@@ -44,14 +44,10 @@ public with sharing class ModuleDetectionService {
     };
 
     /**
-     * The modules every organization is offered (ADR-0046: the Standard Edition is Core with
-     * the modules that fit). The others are offered once the Nonprofit Edition is chosen
-     * (C-30) or Giving is installed (ADR-0062).
+     * The modules every organization is offered. Every other module is a nonprofit module,
+     * offered only once the Nonprofit Edition is chosen (ADR-NEXT, edition gates visibility).
      */
-    private static final Set<String> OFFERED_TO_EVERY_ORG = new Set<String>{
-        MODULE_CORE,
-        'Volunteers'
-    };
+    private static final Set<String> OFFERED_TO_EVERY_ORG = new Set<String>{ MODULE_CORE };
 
     /** Stands in for the Giving probe in tests, whose answer otherwise depends on the org. */
     @TestVisible
@@ -97,10 +93,26 @@ public with sharing class ModuleDetectionService {
         return objectExists(IMPORT_BATCH_OBJECT);
     }
 
-    /** The suite the administrator chose, `Community` or `Impact`, or null before anyone chose. */
+    /**
+     * The edition the administrator chose, `Community` or `Impact`, or null before anyone
+     * chose. A value typed in Setup that is neither counts as no choice.
+     */
     public static String chosenSuite() {
         String suite = SettingsService.getSettings().Suite__c;
-        return String.isBlank(suite) ? null : suite.trim();
+        if (String.isBlank(suite)) {
+            return null;
+        }
+        for (String known : new List<String>{ SUITE_COMMUNITY, SUITE_IMPACT }) {
+            if (known.equalsIgnoreCase(suite.trim())) {
+                return known;
+            }
+        }
+        return null;
+    }
+
+    /** True only when the Nonprofit Edition is chosen: the one switch for nonprofit modules. */
+    public static Boolean isNonprofitEdition() {
+        return chosenSuite() == SUITE_IMPACT;
     }
 
     /** The Giving module alone, for the suite step: whether it is here, and where to read and install it. */
@@ -119,14 +131,14 @@ public with sharing class ModuleDetectionService {
 
     /**
      * The BarnCRM packages this org is offered, each saying whether it is here. Every org sees
-     * Core and Volunteers; the rest are listed once the Nonprofit Edition is chosen or Giving
-     * is installed, and any module that is already installed is always listed.
+     * Core; the nonprofit modules are listed only once the Nonprofit Edition is chosen, and a
+     * module that is already installed is always listed (ADR-NEXT).
      */
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
         Boolean givingPresent =
             givingPresent(announced) || announced.contains(MODULE_GIVING.toLowerCase());
-        Boolean offerAll = givingPresent || chosenSuite() == SUITE_IMPACT;
+        Boolean offerAll = isNonprofitEdition();
         List<ModuleInfo> all = new List<ModuleInfo>{
             module(MODULE_CORE, true, 'core'),
             module(MODULE_GIVING, givingPresent, 'giving'),
