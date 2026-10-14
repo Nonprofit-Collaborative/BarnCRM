@@ -88,6 +88,13 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private static final Integer SETTLE_MINUTES = 10;
 
     /**
+     * How long after a commit completes a rollup it set off may still be saved by the Rollup
+     * Queue: the queue drains in minutes (about seven for 25,000 rows) but waits behind the
+     * rest of the org's work. A rollup stamped later may hide a real edit (ADR-NEXT).
+     */
+    private static final Integer ROLLUP_SETTLE_MINUTES = 60;
+
+    /**
      * Set only by tests: the error count a job reports when the platform stopped a chunk,
      * which a test cannot bring about for real.
      */
@@ -1022,7 +1029,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             Boolean importsOwnRollup =
                 byARollup &&
                 completedAt != null &&
-                stamp <= completedAt.addMinutes(SETTLE_MINUTES);
+                stamp <= completedAt.addMinutes(ROLLUP_SETTLE_MINUTES);
             Boolean edited;
             if (!judging() && duringUndo && (byTheUndo || byARollup)) {
                 // Saved since the undo began, by the undo or by a rollup its work set off:

@@ -28,8 +28,9 @@ Process save as safe would hide edits made by flows and integrations that run as
    totals, stamped just before the save. A record whose `LastModifiedDate` falls within five
    seconds after its stamp was last saved by a rollup. Any later save of another kind leaves the
    stamp behind it. The stamp is read by its name through describe, so Core names no module.
-   Such a save is the import's own when the stamp is no later than ten minutes after the commit
-   completed (the import's follow-on work). A later rollup save (a nightly run, a total that
+   Such a save is the import's own when the stamp is no later than sixty minutes after the
+   commit completed (the import's follow-on work; other saves keep the ten minute window). A
+   later rollup save (a nightly run, a total that
    depends on the date) may hide a real edit, so it keeps the record. `RollupWriter` writes the
    stamp whenever the field exists and is not calculated, never by the running user's access:
    the queue runs as the Automated Process user.
@@ -53,10 +54,16 @@ Process save as safe would hide edits made by flows and integrations that run as
   the record. Core ships no rollup targets without it; an administrator's own rollup onto an
   object without the stamp keeps the safe answer.
 - An edit made within five seconds after a rollup's save is read as that save.
-- A rollup save stamped more than ten minutes after the commit completed keeps the record, even
-  when nobody edited it: the import's own rollups still being worked through a long queue, a
-  nightly run, or a total that depends on the date. Keeping is the safe answer; the journal
-  says why.
+- The sixty minutes are a fixed window, not the moment the import's rollups drained. The Rollup
+  Queue deletes its entries once processed and keeps no per-record history, so knowing when a
+  batch's own entries drained would need new state written on every queue run; and a busy org's
+  queue is never empty, so "the queue had nothing pending" is no signal. The 25,000 row scale
+  test drained in about seven minutes, so sixty leaves room for imports several times larger
+  or a queue behind other work.
+- The trade-off: an edit made within sixty minutes after the commit and then hidden by a rollup
+  save in that hour is not seen. A rollup save stamped later keeps the record even when nobody
+  edited it: the import's rollups stuck behind more than an hour of other work, a nightly run,
+  or a total that depends on the date. Keeping is the safe answer; the journal says why.
 
 ## Alternatives considered
 
