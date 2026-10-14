@@ -1,5 +1,5 @@
 /**
- * The nightly empty household tidy-up's schedule (R-H12a, ADR-NEXT). Health Check lists it among
+ * The nightly empty household tidy-up's schedule (R-H12a, ADR-0120). Health Check lists it among
  * the nightly jobs and its Schedule all nightly jobs fix starts it (`NightlyJobs`, ADR-0075).
  * Whether it removes anything is the Households setting Keep the households of deleted people,
  * so the job needs no stop button of its own.

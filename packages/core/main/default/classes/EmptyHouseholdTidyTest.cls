@@ -1,5 +1,5 @@
 /**
- * The nightly empty household tidy-up (R-H12a, ADR-NEXT, D-89): a household emptied by deleting
+ * The nightly empty household tidy-up (R-H12a, ADR-0120, D-89): a household emptied by deleting
  * people is stamped, kept while any of its former members can still be restored, kept for good
  * while anything points at it, and otherwise moved to the Recycle Bin; nothing happens when the
  * org keeps those households.

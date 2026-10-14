@@ -1,5 +1,5 @@
 /**
- * The nightly empty household tidy-up (canonical model R-H12a, ADR-NEXT, decision D-89): moves
+ * The nightly empty household tidy-up (canonical model R-H12a, ADR-0120, decision D-89): moves
  * to the Recycle Bin each household that deleting people left empty, once those people can no
  * longer be restored, and only when nothing else points at the household.
  *

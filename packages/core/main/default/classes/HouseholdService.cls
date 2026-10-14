@@ -47,7 +47,7 @@ public with sharing class HouseholdService {
     /**
      * Set while settling the households a person delete (not a merge) left, so that a
      * household left empty is stamped `Emptied_By_Deletion__c` for the nightly tidy-up
-     * (R-H12a, ADR-NEXT).
+     * (R-H12a, ADR-0120).
      */
     private static Boolean settlingAfterPeopleDeleted = false;
 
@@ -960,7 +960,7 @@ public with sharing class HouseholdService {
      * The settle-up after people (not a merge) were deleted: never tidies a household away
      * (R-H12), and stamps each household left empty with the day, so the nightly tidy-up can
      * move it to the Recycle Bin once its former members can no longer be restored (R-H12a,
-     * ADR-NEXT).
+     * ADR-0120).
      */
     @NamespaceAccessible
     public static void afterPeopleDeleted(Set<Id> householdIds) {

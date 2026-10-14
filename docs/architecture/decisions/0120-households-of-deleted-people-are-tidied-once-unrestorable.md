@@ -1,4 +1,4 @@
-# ADR-NEXT: A household emptied by deleting people is tidied once they cannot be restored
+# ADR-0120: A household emptied by deleting people is tidied once they cannot be restored
 
 **Status:** Accepted
 **Date:** 2026-10-14
