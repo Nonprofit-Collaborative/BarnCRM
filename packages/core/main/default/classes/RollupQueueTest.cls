@@ -504,4 +504,92 @@ private class RollupQueueTest {
             Assert.areEqual(0, infoLogs().size(), 'Nothing to log');
         }
     }
+
+    /**
+     * The race the scale load hit: a save queues entries while a processor waits to start, so it
+     * queues none; the waiting one starts and finishes before the save commits. The save's Ready
+     * event, delivered after it commits, starts the processor that reads them.
+     */
+    @IsTest
+    static void aSaveWhileAProcessorWaitsAsksAgainAfterItCommits() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.waitingForTest = 1;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
+            Assert.areEqual(0, processorsQueued(), 'One waits already');
+            Assert.areEqual(1, RollupQueue.readyEventsPublished, 'Asks again after commit');
+
+            // The waiting processor ran without these entries; the subscriber is a new transaction.
+            RollupQueue.newTransactionForTest();
+            RollupQueue.waitingForTest = 0;
+            Test.getEventBus().deliver();
+
+            Assert.areEqual(1, processorsQueued(), 'The subscriber starts one for them');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'And asks nothing more');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void theSubscriberLeavesEntriesToAProcessorStillWaiting() {
+        System.runAs(TestUsers.admin()) {
+            insert new Rollup_Queue__c(
+                Target_Object__c = 'Account',
+                Record_Ids__c = String.join(new List<Id>(fakeAccountIds(1)), ','),
+                Record_Count__c = 1,
+                Attempts__c = 0,
+                Status__c = RollupQueue.STATUS_PENDING
+            );
+            Test.startTest();
+            RollupQueue.waitingForTest = 1;
+            RollupService.startQueuedRecalculation();
+            Test.stopTest();
+
+            Assert.areEqual(0, processorsQueued(), 'The waiting one reads them');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'No event loop');
+        }
+    }
+
+    @IsTest
+    static void entriesQueuedAfterAnEarlierAskStillGetAProcessor() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            // A background job asks first, with nothing pending, then saves records.
+            RollupService.startQueuedRecalculation();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+            Test.stopTest();
+
+            Assert.areEqual(0, processorsQueued(), 'Asked already this transaction');
+            Assert.areEqual(1, RollupQueue.readyEventsPublished, 'So it asks after commit');
+        }
+    }
+
+    @IsTest
+    static void aSaveSeeingOnlyARunningProcessorQueuesItsOwn() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            // A processor already running is not waiting: it may have read the queue already.
+            RollupQueue.waitingForTest = 0;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+            Assert.areEqual(1, processorsQueued(), 'Queues its own');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'No event needed');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void aSaveWithNoQueueableJobLeftAsksAfterItCommits() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.noQueueableJobsLeftForTest = true;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+            Assert.areEqual(0, processorsQueued(), 'None it could queue');
+            Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The subscriber starts one');
+            Test.stopTest();
+        }
+    }
 }
