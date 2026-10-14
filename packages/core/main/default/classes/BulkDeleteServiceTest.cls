@@ -185,7 +185,7 @@ private class BulkDeleteServiceTest {
             BulkDeleteService.Plan checked = BulkDeleteService.plan(VOLUNTEERS);
             String definition = checked.definition(37);
             BulkDeleteService.Plan again = BulkDeleteService.planFromDefinition(definition);
-            System.Assert.areEqual(37, BulkDeleteService.confirmedCountOf(definition));
+            System.Assert.areEqual(37, DataJobs.confirmedCountOf(definition));
             System.Assert.areEqual('Contact', again.objectName, 'The object');
             System.Assert.areEqual('Name', again.nameField, 'Read for the journal');
 

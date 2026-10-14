@@ -113,7 +113,7 @@ public with sharing class BulkDeleteService {
         result.queryJson = queryJson;
         result.objectType = described.getSObjectType();
         result.objectName = described.getName();
-        result.nameField = nameField(described);
+        result.nameField = DataJobs.nameField(described);
         return result;
     }
 
@@ -123,14 +123,6 @@ public with sharing class BulkDeleteService {
             definitionJson
         );
         return plan(JSON.serialize(definition.get('query')));
-    }
-
-    /** The confirmed count a job's definition holds. */
-    public static Integer confirmedCountOf(String definitionJson) {
-        Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-            definitionJson
-        );
-        return Integer.valueOf(definition.get('confirmedCount'));
     }
 
     /** Why no record of this object may be bulk deleted, or null when its records may be. */
@@ -224,10 +216,8 @@ public with sharing class BulkDeleteService {
      * so the caller can say which limit it passed.
      */
     public static Integer countWithin(Plan checked, Integer ceiling) {
-        Integer headroom = Limits.getLimitQueryRows() - Limits.getQueryRows() - COUNT_MARGIN;
-        Integer cap = Math.min(ceiling + 1, headroom);
-        Integer count = QueryCompiler.count(checked.queryJson, cap);
-        if (count >= cap && cap <= ceiling) {
+        Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
+        if (count == null) {
             throw new BulkDeleteException(System.Label.Core_BulkUpdate_ErrorTooManyToCount);
         }
         if (count == 0) {
@@ -263,13 +253,7 @@ public with sharing class BulkDeleteService {
             );
         }
         Import_Batch__c job = createJob(checked, count, confirmedCount);
-        Id jobId = Database.executeBatch(new BulkDeleteBatch(job.Id), job.Chunk_Size__c.intValue());
-        job.Job_Id__c = jobId;
-        Database.update(
-            new Import_Batch__c(Id = job.Id, Job_Id__c = jobId),
-            AccessLevel.SYSTEM_MODE
-        );
-        return job;
+        return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
     }
 
     /**
@@ -413,18 +397,12 @@ public with sharing class BulkDeleteService {
 
     /** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BD2). */
     public static Integer runLimit() {
-        Object configured = SettingsService.hasKey('Bulk_Delete_Run_Limit__c')
-            ? SettingsService.getValue('Bulk_Delete_Run_Limit__c')
-            : null;
-        if (configured == null) {
-            return DEFAULT_RUN_LIMIT;
-        }
-        try {
-            Integer records = Decimal.valueOf(String.valueOf(configured)).intValue();
-            return Math.max(1, Math.min(records, MAX_RUN_LIMIT));
-        } catch (Exception ignored) {
-            return DEFAULT_RUN_LIMIT;
-        }
+        return DataJobs.wholeNumberSetting(
+            'Bulk_Delete_Run_Limit__c',
+            DEFAULT_RUN_LIMIT,
+            1,
+            MAX_RUN_LIMIT
+        );
     }
 
     public static String overLimit(Integer ceiling) {
@@ -432,16 +410,5 @@ public with sharing class BulkDeleteService {
             System.Label.Core_BulkDelete_ErrorOverLimit,
             new List<Object>{ ceiling.format() }
         );
-    }
-
-    /** The object's name field, when the person may read it. */
-    private static String nameField(Schema.DescribeSObjectResult described) {
-        for (Schema.SObjectField token : described.fields.getMap().values()) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            if (field.isNameField() && field.isAccessible()) {
-                return field.getName();
-            }
-        }
-        return null;
     }
 }

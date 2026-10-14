@@ -247,11 +247,7 @@ private class BulkUpdateServiceTest {
                 );
                 String definition = checked.definition(200);
                 BulkUpdateService.Plan again = BulkUpdateService.planFromDefinition(definition);
-                System.Assert.areEqual(
-                    200,
-                    BulkUpdateService.confirmedCountOf(definition),
-                    'Count'
-                );
+                System.Assert.areEqual(200, DataJobs.confirmedCountOf(definition), 'Count');
                 System.Assert.areEqual('Contact', again.objectName, 'The object');
                 System.Assert.areEqual(2, again.changes.size(), 'Both changes');
                 System.Assert.areEqual('Coordinator', again.changes[0].value, 'The value to set');
