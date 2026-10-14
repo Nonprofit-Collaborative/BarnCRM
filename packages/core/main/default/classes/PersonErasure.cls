@@ -682,9 +682,13 @@ public with sharing class PersonErasure {
         Clearing result = new Clearing();
         result.record = type.newSObject(record.Id);
         Boolean named = false;
+        // A household or other business account may not carry person account fields.
+        Boolean businessAccount =
+            type == Account.SObjectType && !PersonRecordSelector.isPersonRecord(record);
         for (Schema.DescribeFieldResult field : fieldsOf(type).values()) {
             String name = field.getName().toLowerCase();
             if (
+                (businessAccount && (name.startsWith('person') || name.endsWith('__pc'))) ||
                 NEVER_CLEARED.contains(name) ||
                 keep.contains(tokens.get(name)) ||
                 (!ERASED_THOUGH_KEPT.contains(name) &&

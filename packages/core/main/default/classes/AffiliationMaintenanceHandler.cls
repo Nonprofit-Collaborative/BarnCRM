@@ -19,6 +19,13 @@
  * accessors on TriggerHandler, which is the contract every packaged handler is written to.
  */
 public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
+    /**
+     * Set by a test to make the upkeep fail, so the report a person sees can be exercised:
+     * the upkeep runs in system mode (PEOPLE-26), so no user's access makes it fail.
+     */
+    @TestVisible
+    private static Exception upkeepFailureForTest;
+
     public override void afterInsert() {
         refresh(
             (List<Affiliation__c>) newRecords(),
@@ -32,10 +39,14 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
      * decide eligibility, or either end. A role or description edit settles nothing (PEOPLE-39).
      */
     public override void afterUpdate() {
+        List<Affiliation__c> records = (List<Affiliation__c>) newRecords();
+        if (records == null) {
+            return;
+        }
         List<Affiliation__c> changed = new List<Affiliation__c>();
         List<Affiliation__c> before = new List<Affiliation__c>();
         Map<Id, SObject> previousById = oldRecordsById();
-        for (Affiliation__c record : (List<Affiliation__c>) newRecords()) {
+        for (Affiliation__c record : records) {
             Affiliation__c previous = previousById == null
                 ? null
                 : (Affiliation__c) previousById.get(record.Id);
@@ -86,6 +97,9 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
             return;
         }
         try {
+            if (upkeepFailureForTest != null) {
+                throw upkeepFailureForTest;
+            }
             AffiliationService.refreshPrimaries(records, previous);
         } catch (Exception thrown) {
             reportFailure(

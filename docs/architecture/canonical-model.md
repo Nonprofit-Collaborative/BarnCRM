@@ -6795,7 +6795,8 @@ their description; an affiliation also loses its role and primary flag.
 contact mode, and each current membership is ended in junction mode
 (`HouseholdService.endMembershipsFor`). Upkeep then recounts, renames and tidies away as on any
 move (R-H11, R-H12). A household left empty and kept is anonymized as in R-ER1, named "Erased
-household", with Custom Name on and its addresses deleted.
+household", with Custom Name on and its addresses deleted. Where the org stores people as
+accounts, the person account fields a household (a business account) cannot carry are left alone.
 
 **R-ER4 Platform privacy records.** The linked Individual, where the org has one, is emptied as
 in R-ER1 and marked Forget this Individual. Field history of the person and the Individual is

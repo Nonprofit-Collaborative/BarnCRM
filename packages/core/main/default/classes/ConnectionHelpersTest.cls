@@ -49,7 +49,12 @@ private class ConnectionHelpersTest {
     @IsTest
     static void aPersonIsNamedByTheContactThenTheAccountThenTheFallback() {
         System.runAs(TestUsers.admin()) {
-            Contact contact = new Contact(LastName = 'Garcia');
+            // A contact's Name is the read-only compound callers query; an unsaved contact
+            // built from its parts has none, so it is built as a query would hand it back.
+            Contact contact = (Contact) JSON.deserialize(
+                '{"attributes":{"type":"Contact"},"Name":"Garcia"}',
+                Contact.class
+            );
             Account account = new Account(Name = 'Garcia Household');
             Assert.areEqual('Garcia', PersonReference.nameOf(contact, account, 'Unnamed'));
             Assert.areEqual('Garcia Household', PersonReference.nameOf(null, account, 'Unnamed'));

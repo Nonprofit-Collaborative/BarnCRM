@@ -301,13 +301,9 @@ private class RollupChangesTest {
             Account nolan = household('The Nolan Family');
             Account riverbend = organization('Riverbend');
             insert new List<Account>{ nolan, riverbend };
-            Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan');
-            insert ana;
-            insert new Household_Member__c(
-                Household__c = nolan.Id,
-                Contact__c = ana.Id,
-                Account__c = riverbend.Id
-            );
+            // A membership names one person, a contact or an account, never both: this one
+            // names the account side, the field the definition totals into.
+            insert new Household_Member__c(Household__c = nolan.Id, Account__c = riverbend.Id);
             List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
                 definition('Household_Member__c', 'Account__c', null)
             };

@@ -185,6 +185,67 @@ public class TestUsers {
     }
 
     /**
+     * A user who may read every account and contact but edit none of them, whatever the org's
+     * sharing model, holding the packaged permission sets named here: for a test about a person
+     * who can see someone and may not change them.
+     *
+     * The profile edits nothing (Read Only, or Minimum Access - Salesforce where the org has
+     * no Read Only), and a permission set built here adds Read and View All on accounts and
+     * contacts. Under private sharing the people a test creates as another user are otherwise
+     * invisible, and a record the user cannot see cannot even be named in a lookup.
+     *
+     * @param lastName the user's last name, also the start of the alias and username
+     * @param permissionSetNames the bare API names of the packaged permission sets
+     * @return the inserted user
+     */
+    @NamespaceAccessible
+    public static User peopleReaderWith(String lastName, List<String> permissionSetNames) {
+        Map<String, Id> byName = new Map<String, Id>();
+        for (Profile candidate : [
+            SELECT Id, Name
+            FROM Profile
+            WHERE Name IN ('Read Only', 'Minimum Access - Salesforce')
+            WITH SYSTEM_MODE
+        ]) {
+            byName.put(candidate.Name, candidate.Id);
+        }
+        Id profileId = byName.containsKey('Read Only')
+            ? byName.get('Read Only')
+            : byName.get('Minimum Access - Salesforce');
+        Assert.isNotNull(
+            profileId,
+            'This org has no standard profile without edit access, so a user who may read ' +
+            'people but not edit them cannot be built.'
+        );
+        User person = insertWith(
+            newUser(lastName, profileId, usernameStart(lastName)),
+            permissionSetNames
+        );
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            String name = 'Barn_Read_All_People_' + Math.abs(Crypto.getRandomInteger());
+            PermissionSet readAll = new PermissionSet(Name = name, Label = name);
+            insert as system readAll;
+            List<ObjectPermissions> grants = new List<ObjectPermissions>();
+            for (String objectName : new List<String>{ 'Account', 'Contact' }) {
+                grants.add(
+                    new ObjectPermissions(
+                        ParentId = readAll.Id,
+                        SobjectType = objectName,
+                        PermissionsRead = true,
+                        PermissionsViewAllRecords = true
+                    )
+                );
+            }
+            insert as system grants;
+            insert as system new PermissionSetAssignment(
+                AssigneeId = person.Id,
+                PermissionSetId = readAll.Id
+            );
+        }
+        return person;
+    }
+
+    /**
      * The least privileged standard profile: Standard User, or when the org does not call it
      * that (Profile.Name is the translated label), the first standard profile that is not System
      * Administrator. Never "any standard profile", which also matches System Administrator and

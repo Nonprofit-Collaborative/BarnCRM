@@ -60,9 +60,16 @@ public with sharing class HouseholdMergeController {
         return HouseholdSelector.getEditableIds(new Set<Id>{ householdId }).contains(householdId);
     }
 
+    /** Set by a test to make the preview fail as an unexpected platform error would. */
+    @TestVisible
+    private static Exception previewFailureForTest;
+
     @AuraEnabled(cacheable=true)
     public static HouseholdMergeService.MergePreview preview(Id survivorId, Id victimId) {
         try {
+            if (previewFailureForTest != null) {
+                throw previewFailureForTest;
+            }
             return HouseholdMergeService.preview(survivorId, victimId);
         } catch (Exception e) {
             throw asUserError(e, survivorId);

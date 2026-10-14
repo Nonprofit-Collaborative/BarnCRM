@@ -20,6 +20,25 @@ private class PersonErasureTest {
         PersonErasureExtensions.noneForTest = true;
     }
 
+    /**
+     * Real person accounts, named as RelationshipTestDataFactory.peopleAsAccounts names its
+     * stand-ins. Fails, naming the fix, where the org has person accounts but gives the
+     * running user no person record type (PersonAccountTestShape).
+     */
+    private static List<Account> personAccounts(Integer howMany, String lastName) {
+        Assert.isNull(PersonAccountTestShape.skipReason(), 'Person accounts can be created');
+        Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
+        List<Account> people = new List<Account>();
+        for (Integer i = 0; i < howMany; i++) {
+            Account person = new Account(RecordTypeId = personType);
+            person.put('FirstName', 'Person' + i); // person field, set by name
+            person.put('LastName', lastName); // person field, set by name
+            people.add(person);
+        }
+        insert people;
+        return people;
+    }
+
     /** Jordan and Sam Lee in one household, in contact mode. Answers Jordan. */
     private static Contact coupleInContactMode(Boolean deleteEmpty) {
         BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
@@ -229,7 +248,12 @@ private class PersonErasureTest {
             isolate();
             HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
             RelationshipTestDataFactory.quietOtherAutomations();
-            List<Account> people = RelationshipTestDataFactory.peopleAsAccounts(2, 'Okafor');
+            // Real person accounts where the org has them: an ordinary account standing in
+            // for one there would be refused the person fields the erasure empties.
+            Boolean realPeople = OrgShapeDetector.hasPersonAccounts();
+            List<Account> people = realPeople
+                ? personAccounts(2, 'Okafor')
+                : RelationshipTestDataFactory.peopleAsAccounts(2, 'Okafor');
             Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
             insert RelationshipTestDataFactory.affiliation(people[0], employer, 'Trustee');
             insert RelationshipTestDataFactory.between(people[0], people[1], 'Sibling');
@@ -243,8 +267,10 @@ private class PersonErasureTest {
                 Phone = '555-0102',
                 Description = 'Prefers calls'
             );
-            // An ordinary account stands in for a person account (RelationshipTestDataFactory).
-            PersonRecordSelector.personRecordOverride = true;
+            if (!realPeople) {
+                // An ordinary account stands in for a person account (RelationshipTestDataFactory).
+                PersonRecordSelector.personRecordOverride = true;
+            }
 
             PersonErasure.Result result = PersonErasure.erase(people[0].Id, 'Person0 Okafor', null);
 
@@ -422,7 +448,11 @@ private class PersonErasureTest {
         System.runAs(TestUsers.admin()) {
             jordan = coupleInContactMode(true);
         }
-        System.runAs(TestUsers.withPermissionSets(
+        // A user who sees Jordan and may not edit him: a user on the running profile would be
+        // an administrator, and under private sharing one who cannot see him is told he is not
+        // a person.
+        System.runAs(TestUsers.peopleReaderWith(
+            'Reader',
             new List<String>{ 'BarnCRM_Read_Only', ERASE_SET }
         )) {
             isolate();

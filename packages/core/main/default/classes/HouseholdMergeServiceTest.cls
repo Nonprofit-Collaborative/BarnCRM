@@ -262,17 +262,20 @@ private class HouseholdMergeServiceTest {
     static void aChosenNameThatNamingWouldGiveAnywayStaysAnOrdinaryName() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            insert maria;
-            Id victimId = householdOf(maria.Id);
+            // The primary member's surname comes first (R-H5): Sam leads the other household
+            // and Wei the survivor, so both read Lee first and the chosen name is the one
+            // naming gives the merged household.
+            Contact sam = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Lee');
+            insert sam;
+            Id victimId = householdOf(sam.Id);
             Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
             insert wei;
             Id survivorId = householdOf(wei.Id);
-            Contact sam = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Lee');
-            sam.AccountId = victimId;
-            insert sam;
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            maria.AccountId = victimId;
+            insert maria;
             Assert.areEqual(
-                'Garcia and Lee Household',
+                'Lee and Garcia Household',
                 [SELECT Name FROM Account WHERE Id = :victimId].Name,
                 'The other household is named from both surnames before the merge'
             );
@@ -288,7 +291,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Account survivor = [SELECT Name, Custom_Name__c FROM Account WHERE Id = :survivorId];
-            Assert.areEqual('Garcia and Lee Household', survivor.Name, 'The chosen name stands');
+            Assert.areEqual('Lee and Garcia Household', survivor.Name, 'The chosen name stands');
             Assert.isFalse(
                 survivor.Custom_Name__c,
                 'Naming gives that name anyway, so the household keeps following its members'

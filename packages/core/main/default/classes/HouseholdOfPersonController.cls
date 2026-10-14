@@ -301,22 +301,26 @@ public with sharing class HouseholdOfPersonController {
     }
 
     /**
-     * People this org stores as accounts, matched by name. The field that tells such an
-     * account apart from an organization exists on the account object only in an org shaped
-     * that way, exactly as PersonRecordSelector reads it, so the query is built as text and
-     * never names that field at compile time.
+     * People this org stores as accounts, matched by name. Such an account is told apart
+     * from an organization by its person record type, exactly as PersonRecordSelector reads
+     * it. A surname filter cannot: the platform matches LastName != NULL on business
+     * accounts too.
      */
     private static List<PersonResult> searchPersonAccounts(String likeTerm) {
         List<PersonResult> result = new List<PersonResult>();
-        if (!Schema.SObjectType.Account.isAccessible()) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        if (!Schema.SObjectType.Account.isAccessible() || personTypes.isEmpty()) {
             return result;
         }
-        String query =
-            'SELECT Id, Name FROM Account WHERE Name LIKE :likeTerm AND LastName != NULL ' +
-            'ORDER BY Name LIMIT 10';
-        Map<String, Object> binds = new Map<String, Object>{ 'likeTerm' => likeTerm };
-        for (SObject record : Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)) {
-            result.add(toPersonResult(record.Id, (String) record.get('Name')));
+        for (Account record : [
+            SELECT Id, Name
+            FROM Account
+            WHERE Name LIKE :likeTerm AND RecordTypeId IN :personTypes
+            WITH USER_MODE
+            ORDER BY Name
+            LIMIT 10
+        ]) {
+            result.add(toPersonResult(record.Id, record.Name));
         }
         return result;
     }

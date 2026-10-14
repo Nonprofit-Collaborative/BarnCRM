@@ -197,8 +197,8 @@ global with sharing class FindPeopleAction {
      * The id each found contact is known by. A person the org stores as an account is known
      * by that account (PersonReference); every other person by their contact. Such an
      * account is told apart from an organization the way PersonRecordSelector does it, by
-     * its surname, which exists on the account object only in an org shaped that way, so
-     * the query is text and runs only there.
+     * its person record type. A surname filter cannot: the platform matches LastName != NULL
+     * on business accounts too.
      */
     private static Map<Id, Id> personIdsOf(List<Contact> contacts) {
         Map<Id, Id> result = new Map<Id, Id>();
@@ -209,17 +209,17 @@ global with sharing class FindPeopleAction {
                 accountIds.add(record.AccountId);
             }
         }
-        if (accountIds.isEmpty() || !HouseholdService.isPersonAccountOrg()) {
+        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+        if (accountIds.isEmpty() || personTypes.isEmpty()) {
             return result;
         }
         Set<Id> personAccounts = new Set<Id>();
-        for (
-            SObject account : Database.queryWithBinds(
-                'SELECT Id FROM Account WHERE Id IN :accountIds AND LastName != NULL',
-                new Map<String, Object>{ 'accountIds' => accountIds },
-                AccessLevel.USER_MODE
-            )
-        ) {
+        for (Account account : [
+            SELECT Id
+            FROM Account
+            WHERE Id IN :accountIds AND RecordTypeId IN :personTypes
+            WITH USER_MODE
+        ]) {
             personAccounts.add(account.Id);
         }
         for (Contact record : contacts) {
