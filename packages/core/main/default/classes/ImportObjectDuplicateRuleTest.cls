@@ -443,6 +443,50 @@ private class ImportObjectDuplicateRuleTest {
         }
     }
 
+    /** Without the import permission, nothing that offers the box answers. */
+    @IsTest
+    static void theTemplateAndFieldListsNeedThePermission() {
+        System.runAs(TestUsers.admin()) {
+            ImportController.permissionOverride = false;
+            Integer refused = 0;
+            for (Integer call = 0; call < 11; call++) {
+                try {
+                    if (call == 7) {
+                        ImportController.getRelatedOptions(null);
+                    } else if (call == 8) {
+                        ImportController.getRelatedFields(null, null);
+                    } else if (call == 9) {
+                        ImportController.getEntityTargets();
+                    } else if (call == 10) {
+                        ImportController.saveRecurring(null, false, null);
+                    } else if (call == 0) {
+                        ImportController.getTemplates();
+                    } else if (call == 1) {
+                        ImportController.getMatchFields();
+                    } else if (call == 2) {
+                        ImportController.getLoadableObjects();
+                    } else if (call == 3) {
+                        ImportController.createObjectTemplate('Sessions', OBJECT_NAME);
+                    } else if (call == 4) {
+                        ImportController.getObjectFields(null);
+                    } else if (call == 5) {
+                        ImportController.getKeyFields(null);
+                    } else {
+                        ImportController.getRowMatchFields(null);
+                    }
+                } catch (AuraHandledException expected) {
+                    Assert.areEqual(
+                        Label.Core_Import_ErrorNoPermission,
+                        expected.getMessage(),
+                        'Saying so.'
+                    );
+                    refused++;
+                }
+            }
+            Assert.areEqual(11, refused, 'Every call is refused.');
+        }
+    }
+
     @IsTest
     static void theMatcherStubAnswersForEveryObjectOrNone() {
         System.runAs(TestUsers.admin()) {
