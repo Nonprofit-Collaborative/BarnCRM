@@ -371,6 +371,43 @@ private class RollupLargeParentBatchTest {
         }
     }
 
+    /**
+     * A run whose first entity reads more than its stored count said leaves less for the next:
+     * the parent's count says one row but it has thirty children, so after it the second
+     * entity's record (ten rows, unknown) no longer fits a budget of twenty and waits for the
+     * next run, uncharged. Taken on estimates alone it would have run.
+     */
+    @IsTest
+    static void rowsAnEntityReadDeferTheNextEntityWhenTheyExceedItsEstimate() {
+        System.runAs(TestUsers.admin()) {
+            insertDefinitions();
+            Account understated = parentWith(30, 1);
+            Id contactId = Id.valueOf('003000000000001');
+            RollupLargeParentBatch.sliceRowBudgetForTest = 20;
+
+            Test.startTest();
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ understated.Id } });
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Contact' => new Set<Id>{ contactId } });
+            Test.stopTest();
+
+            Assert.areEqual(
+                30,
+                totalsOf(understated.Id).NumberOfEmployees,
+                'The first entity ran, reading all thirty rows'
+            );
+            List<Rollup_Queue__c> waiting = [
+                SELECT Record_Ids__c, Status__c, Attempts__c, Next_Attempt__c
+                FROM Rollup_Queue__c
+                WHERE Target_Object__c = 'Contact'
+            ];
+            Assert.areEqual(1, waiting.size(), 'The second entity waits in an entry');
+            Assert.areEqual(String.valueOf(contactId), waiting[0].Record_Ids__c, 'Its record');
+            Assert.areEqual(RollupQueue.STATUS_PENDING, waiting[0].Status__c, 'Pending');
+            Assert.areEqual(0, waiting[0].Attempts__c, 'Deferred, not charged');
+            Assert.isNull(waiting[0].Next_Attempt__c, 'Due straight away');
+        }
+    }
+
     /** What a run's recalculations read counts against its budget, not what was estimated. */
     @IsTest
     static void rowsARunReadLeaveLessOfItsBudgetThanTheEstimatesSaid() {

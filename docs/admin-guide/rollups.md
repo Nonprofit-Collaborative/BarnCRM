@@ -352,7 +352,8 @@ Under the list, **Needs attention** shows what the engine has not finished:
   background run may read. BarnCRM recalculates such a record in a separate background job that
   reads its rows a few thousand at a time, so its totals take a few minutes rather than seconds.
   One such job runs at a time. A record with fewer than about 20,000 rows behind its totals
-  stays in the queue.
+  stays in the queue. BarnCRM sizes a record from its active count rollups (such as a fund's
+  gift count), so switching off a count rollup on an object leaves it out of that sizing.
   While that job runs, the record shows among the records waiting. Nothing to do. If a run ever
   stops partway (often an automation of yours failing on one record), the records it was
   working on are counted as one try and retried in ever smaller groups, then one at a time,

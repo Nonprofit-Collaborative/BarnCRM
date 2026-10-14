@@ -11,9 +11,12 @@
  * (R-RQ3). Records the platform refused to save come back as a new entry, tried later each time
  * and Failed after the fifth attempt (R-RQ4). A run takes records up to a row budget estimated
  * from their entity's stored counts, less what its recalculations have already read beyond
- * those estimates, and leaves the rest for the next run. A run that stops on an error it
- * cannot catch has the records it held charged by its finalizer, which retries them alone and a
- * quarter as many at a time, so only a record that stops every run reaches Failed. Records whose
+ * those estimates, and leaves the rest for the next run. What was read is measured per entity
+ * (all of an entity's records are recalculated in one call), so it protects only the entities
+ * after the one that read more than estimated, never that entity's own records. A run that
+ * stops on an error it cannot catch has the records it held charged by its finalizer, which
+ * retries them alone and a quarter as many at a time, so only a record that stops every run
+ * reaches Failed. Records whose
  * source rows are more than a Queueable may read go to `RollupLargeParentBatch` instead (R-RQ6,
  * ADR-0116): those whose stored counts say so before the run, and a lone record that stopped its
  * run on the query row limit.
@@ -484,7 +487,8 @@ public without sharing class RollupQueue implements Queueable {
                 slice.idsByTarget.get(target)
             );
             // What earlier entities' recalculations read counts as read, not as estimated: one
-            // that read more than its stored counts said leaves less for this one.
+            // that read more than its stored counts said leaves less for this one. Only later
+            // entities are protected: this entity's records are recalculated in one call below.
             budget = rowsLeft(budget, recalculationRows);
             Set<Id> ids = new Set<Id>();
             Set<Id> oversized = new Set<Id>();

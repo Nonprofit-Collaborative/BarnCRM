@@ -1773,7 +1773,9 @@ too large for any slice left every entry Pending with nothing to process it. A r
 records only up to a row budget (60 percent of the rows a transaction may read), estimated as in
 R-RQ6, and returns the rest to the queue for the next run uncharged. Rows its recalculation of
 one target entity actually read count against the budget in place of their estimate, so an
-entity that read more than its estimate leaves less for the entities after it.
+entity that read more than its estimate leaves less for the entities after it. This protects only
+the later entities: an entity's records are recalculated in one call, so its own records are
+taken on their estimates alone.
 
 **R-RQ4 Failures are visible.** A Failed entry stays until someone presses Retry (which sets it
 back to Pending with Attempts 0) or the nightly full run recalculates its records successfully
