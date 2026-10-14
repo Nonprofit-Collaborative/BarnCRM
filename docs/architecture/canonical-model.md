@@ -2016,6 +2016,16 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 | `ifBlank` | `value` (required, at most 255) | The value, when the value so far is blank. |
 | `append` | `columns` (1 to 5 source column names of the same row), `separator` (at most 10, default one space) | Adds the named columns' values after the value so far, leaving blank ones out, joined by the separator. |
 | `date` | `dateOrder`: `MDY`, `DMY` or `YMD` | Reads the first three numbers, separated by any characters that are not digits, in that order (a two-digit year below 50 is 20xx, otherwise 19xx) and writes the date as `YYYY-MM-DD`; a value that is not a real date under the order is left unchanged. |
+| `map` | `pairs`: 1 to 100 of `{ "text", "value" }` (`text` required, each at most 255), `otherwise` (at most 255), `matchCase` (default false) | The `value` of the first pair whose `text` equals the trimmed value; an unmatched value that is not blank becomes `otherwise` when it is not blank, and is kept otherwise. A blank value stays blank. |
+| `ifThen` | `test`: `equals`, `contains` or `blank`; `text` (required unless `blank`, at most 255), `value` (at most 255, empty clears), `otherwise` (at most 255), `matchCase` | When the trimmed value equals `text`, contains it, or is blank, the value becomes `value`; when not, it becomes `otherwise` if that is not blank, and is kept otherwise. Only the value so far is tested, never another column. |
+| `part` | `separator` (required, 1 to 10), `position` (1 to 50), `fromEnd` (default false) | Splits the value on the literal separator and keeps part `position`, counted from the start or the end, trimmed; blank when there is no such part. |
+| `first`, `last` | `count` (1 to 255) | The first or last `count` characters; a shorter value is kept whole. |
+| `shiftDate` | `amount` (a whole number, at most 36,600 days or 1,200 months either way), `unit`: `days` or `months` | Reads the first three numbers year first (so `2025-12-31` and a stored date with a time both read), adds the amount and writes `YYYY-MM-DD`; adding months keeps the day where the month has it, otherwise the month's last day. A value that is not a date, or a result outside the years 1700 to 4000, is left unchanged. |
+| `today` | `whenBlank` (default false) | Today's date as `YYYY-MM-DD` in the running user's time zone; under `whenBlank`, only when the value so far is blank. |
+
+The steps from `map` on were added by ADR-NEXT (`NEXT-more-transform-steps.md`); a document
+whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
+update definition of R-BU1). A reader that does not know an `op` skips that step, as below.
 
 Steps run in order, before values for every row (R-IB14): a step's output that is blank is
 filled by a file or template value like any blank cell. A document is checked when it is saved
@@ -6963,6 +6973,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Load one object updates by a field you choose (data tools parity). `Import_Template__c.Load_Operation__c` gains Update by a matching field, and Load Match Field serves it. R-IT12 gains that operation, which finds each row's record by any text, email or phone field, rejects a row it finds nothing for, and follows Several Matches; Account and Contact may use it (R-IT14). |
 | v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-NEXT, `NEXT-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
 | v0.6 | 2026-10-13 | Retrying the rejected rows (data tools parity). `Import_Batch__c` gains `Retry_After_Row__c` and the Status value Retrying; `Import_Row__c.Status__c` gains Retried. New rule R-IB17: a committed import's fixed rejected rows are staged, previewed and committed into the same batch, and one undo covers both runs. |
+| 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-NEXT, `NEXT-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
 
 ---
 ## 32. Entity ownership by package

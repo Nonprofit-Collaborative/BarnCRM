@@ -716,6 +716,12 @@ file of the same kind is fixed too.
 | **Value when empty** | Gives the cell a value when it is empty. | an empty cell becomes `Unknown` |
 | **Add other columns** | Adds the values of other columns of the same row after this one, with a separator you choose (a space unless you type another). An empty one is left out. | `Ana` with Middle and Last becomes `Ana M Ramirez` |
 | **Read as a date** | Reads a date written month first, day first or year first, with any separator, and writes it the way Salesforce reads it. A two-digit year below 50 is in the 2000s. | day first: `31/12/2025` becomes `2025-12-31` |
+| **Map values** | Changes each value listed in a table (up to 100 rows) to the value beside it. A value not in the table is kept, or becomes the value in **Anything else** if you give one; an empty cell stays empty. Spaces around the value are ignored, and capitals too unless you tick **Match capitals**. | `CA` becomes `California`, `NY` becomes `New York` |
+| **If, then** | When the value equals some text, contains it, or is empty, writes the value you give (leave it empty to clear the cell). **Otherwise** is written when the test fails; leave it empty to keep the value. | equals `N/A`: `N/A` becomes empty |
+| **Keep part** | Splits the value at a separator you type and keeps one part, counted from the start, or from the end if you tick **Count from the end**. No such part leaves the cell empty. | separator `@`, part 2: `ana@example.org` becomes `example.org` |
+| **First characters**, **Last characters** | Keeps the first or last number of characters you give. | first 5: `97201-1234` becomes `97201` |
+| **Shift a date** | Adds or takes away days or months (type a minus sign to go back). It reads a date written year first, so put **Read as a date** before it for other orders. Adding a month to the 31st gives the month's last day. | plus 1 month: `2025-01-31` becomes `2025-02-28` |
+| **Today's date** | Writes today's date, or, if you tick **Only when empty**, fills only empty cells with it. | an empty cell becomes `2026-10-13` |
 
 3. The panel shows the first values of the column before and after your changes. Select
    **Done**. The column shows how many changes it has.

@@ -118,6 +118,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-relationship-mirror-upkeep-in-system-mode.md) | Relationship and affiliation upkeep run in system mode (extends ADR-0021) | Accepted (owner decision D-85) |
 | [NEXT](NEXT-erase-a-person-anonymizes-in-place.md) | Erase a person anonymizes the record in place, as the user, with a module seam | Proposed (builder decision) |
 | [NEXT](NEXT-load-related-records.md) | Load one object loads related records from the same file, keyed by the record key | Proposed (builder decision) |
+| [ADR-NEXT](NEXT-more-transform-steps.md) | Six more transform steps (map values, if then, keep part, first or last characters, shift a date, today), still a closed list with no evaluation | Proposed (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

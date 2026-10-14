@@ -47,10 +47,48 @@ public with sharing class DataTransform {
     public static final String OP_APPEND = 'append';
     @NamespaceAccessible
     public static final String OP_DATE = 'date';
+    @NamespaceAccessible
+    public static final String OP_MAP = 'map';
+    @NamespaceAccessible
+    public static final String OP_IF_THEN = 'ifThen';
+    @NamespaceAccessible
+    public static final String OP_PART = 'part';
+    @NamespaceAccessible
+    public static final String OP_FIRST = 'first';
+    @NamespaceAccessible
+    public static final String OP_LAST = 'last';
+    @NamespaceAccessible
+    public static final String OP_SHIFT_DATE = 'shiftDate';
+    @NamespaceAccessible
+    public static final String OP_TODAY = 'today';
+
+    /**
+     * The version of a document whose steps may use the operations from `map` on (ADR-NEXT,
+     * `NEXT-more-transform-steps.md`). A reader that does not know an operation skips it.
+     */
+    @NamespaceAccessible
+    public static final Integer DOCUMENT_VERSION = 2;
+    /** The most rows a value map may have. */
+    @NamespaceAccessible
+    public static final Integer MAX_PAIRS = 100;
+    /** The highest part Keep part may keep. */
+    @NamespaceAccessible
+    public static final Integer MAX_POSITION = 50;
+    /** The furthest a date may be shifted, in days and in months. */
+    @NamespaceAccessible
+    public static final Integer MAX_SHIFT_DAYS = 36600;
+    @NamespaceAccessible
+    public static final Integer MAX_SHIFT_MONTHS = 1200;
 
     /** The orders a date may be written in: month first, day first, year first. */
     @NamespaceAccessible
     public static final Set<String> DATE_ORDERS = new Set<String>{ 'MDY', 'DMY', 'YMD' };
+    /** What If, then may test: the value equals the text, contains it, or is blank. */
+    @NamespaceAccessible
+    public static final Set<String> TESTS = new Set<String>{ 'equals', 'contains', 'blank' };
+    /** What Shift a date counts in. */
+    @NamespaceAccessible
+    public static final Set<String> UNITS = new Set<String>{ 'days', 'months' };
 
     /** Every operation, in the order the wizard offers them. */
     @NamespaceAccessible
@@ -62,7 +100,14 @@ public with sharing class DataTransform {
         OP_REPLACE,
         OP_IF_BLANK,
         OP_APPEND,
-        OP_DATE
+        OP_DATE,
+        OP_MAP,
+        OP_IF_THEN,
+        OP_PART,
+        OP_FIRST,
+        OP_LAST,
+        OP_SHIFT_DATE,
+        OP_TODAY
     };
 
     /** The separator `append` uses when the step names none. */
@@ -110,6 +155,33 @@ public with sharing class DataTransform {
         /** date: one of DATE_ORDERS. */
         @AuraEnabled
         public String dateOrder;
+        /** map: the from and to rows; the first match wins. */
+        @AuraEnabled
+        public List<Pair> pairs;
+        /** map, ifThen: the value when nothing matches; blank keeps the value. */
+        @AuraEnabled
+        public String otherwise;
+        /** ifThen: one of TESTS. */
+        @AuraEnabled
+        public String test;
+        /** part: which part to keep, from 1. */
+        @AuraEnabled
+        public Integer position;
+        /** part: whether parts are counted from the end. */
+        @AuraEnabled
+        public Boolean fromEnd;
+        /** first, last: how many characters to keep. */
+        @AuraEnabled
+        public Integer count;
+        /** shiftDate: how far; negative goes back. */
+        @AuraEnabled
+        public Integer amount;
+        /** shiftDate: one of UNITS. */
+        @AuraEnabled
+        public String unit;
+        /** today: only fill a blank value. */
+        @AuraEnabled
+        public Boolean whenBlank;
 
         // JSON.deserialize builds a step from the stored document; it needs this constructor.
         @NamespaceAccessible
@@ -120,6 +192,26 @@ public with sharing class DataTransform {
         @NamespaceAccessible
         public Step(String op) {
             this.op = op;
+        }
+    }
+
+    /** One row of a value map: a value that equals `text` becomes `value`. */
+    @NamespaceAccessible
+    public class Pair {
+        @AuraEnabled
+        public String text;
+        @AuraEnabled
+        public String value;
+
+        @NamespaceAccessible
+        public Pair() {
+            this.text = null;
+        }
+
+        @NamespaceAccessible
+        public Pair(String text, String value) {
+            this.text = text;
+            this.value = value;
         }
     }
 
@@ -177,7 +269,12 @@ public with sharing class DataTransform {
                 new List<String>{ op == null ? '' : op.abbreviate(40) }
             );
         }
-        if (tooLong(step.text) || tooLong(step.replaceWith) || tooLong(step.value)) {
+        if (
+            tooLong(step.text) ||
+            tooLong(step.replaceWith) ||
+            tooLong(step.value) ||
+            tooLong(step.otherwise)
+        ) {
             return Label.Core_Transform_ErrorTooLong;
         }
         if (step.separator != null && step.separator.length() > MAX_SEPARATOR) {
@@ -198,7 +295,79 @@ public with sharing class DataTransform {
         if (op == OP_DATE && (step.dateOrder == null || !DATE_ORDERS.contains(step.dateOrder))) {
             return Label.Core_Transform_ErrorDateOrder;
         }
-        return null;
+        return problemWithNewer(step);
+    }
+
+    /** The checks of the operations ADR-NEXT added (`NEXT-more-transform-steps.md`). */
+    private static String problemWithNewer(Step step) {
+        switch on step.op {
+            when 'map' {
+                return mapsValues(step.pairs)
+                    ? null
+                    : String.format(
+                          Label.Core_Transform_ErrorNeedsPairs,
+                          new List<String>{ String.valueOf(MAX_PAIRS) }
+                      );
+            }
+            when 'ifThen' {
+                if (step.test == null || !TESTS.contains(step.test)) {
+                    return Label.Core_Transform_ErrorNeedsTest;
+                }
+                return step.test != 'blank' && String.isEmpty(step.text)
+                    ? Label.Core_Transform_ErrorNeedsText
+                    : null;
+            }
+            when 'part' {
+                Boolean hasSeparator =
+                    String.isNotEmpty(step.separator) && step.separator.length() <= MAX_SEPARATOR;
+                return hasSeparator && within(step.position, 1, MAX_POSITION)
+                    ? null
+                    : String.format(
+                          Label.Core_Transform_ErrorPart,
+                          new List<String>{ String.valueOf(MAX_POSITION) }
+                      );
+            }
+            when 'first', 'last' {
+                return within(step.count, 1, MAX_TEXT)
+                    ? null
+                    : String.format(
+                          Label.Core_Transform_ErrorCount,
+                          new List<String>{ String.valueOf(MAX_TEXT) }
+                      );
+            }
+            when 'shiftDate' {
+                Integer limitFor = step.unit == 'days' ? MAX_SHIFT_DAYS : MAX_SHIFT_MONTHS;
+                return step.unit != null &&
+                    UNITS.contains(step.unit) &&
+                    within(step.amount, -limitFor, limitFor)
+                    ? null
+                    : Label.Core_Transform_ErrorShift;
+            }
+            when else {
+                return null;
+            }
+        }
+    }
+
+    private static Boolean within(Integer given, Integer low, Integer high) {
+        return given != null && given >= low && given <= high;
+    }
+
+    private static Boolean mapsValues(List<Pair> pairs) {
+        if (pairs == null || pairs.isEmpty() || pairs.size() > MAX_PAIRS) {
+            return false;
+        }
+        for (Pair pair : pairs) {
+            if (
+                pair == null ||
+                String.isBlank(pair.text) ||
+                tooLong(pair.text) ||
+                tooLong(pair.value)
+            ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static Boolean tooLong(String text) {
@@ -274,10 +443,140 @@ public with sharing class DataTransform {
             when 'append' {
                 return append(step, value, others);
             }
-            when else {
+            when 'date' {
                 return asDate(step.dateOrder, value);
             }
+            when else {
+                return applyNewer(step, value);
+            }
         }
+    }
+
+    private static String applyNewer(Step step, String value) {
+        switch on step.op {
+            when 'map' {
+                return mapValue(step, value);
+            }
+            when 'ifThen' {
+                return ifThen(step, value);
+            }
+            when 'part' {
+                return part(step, value);
+            }
+            when 'first' {
+                return value == null ? null : value.left(step.count);
+            }
+            when 'last' {
+                return value == null ? null : value.right(step.count);
+            }
+            when 'shiftDate' {
+                return shiftDate(step, value);
+            }
+            when else {
+                return step.whenBlank == true && String.isNotBlank(value)
+                    ? value
+                    : iso(Date.today());
+            }
+        }
+    }
+
+    /** Whether two texts are the same, ignoring capitals unless asked not to. */
+    private static Boolean same(String left, String right, Boolean matchCase) {
+        return matchCase == true ? left.equals(right) : left.equalsIgnoreCase(right);
+    }
+
+    /** The value of the first row whose text the trimmed value equals; else `otherwise`. */
+    private static String mapValue(Step step, String value) {
+        if (String.isBlank(value)) {
+            return value;
+        }
+        String trimmed = value.trim();
+        for (Pair pair : step.pairs) {
+            if (same(trimmed, pair.text.trim(), step.matchCase)) {
+                return pair.value == null ? '' : pair.value;
+            }
+        }
+        return String.isBlank(step.otherwise) ? value : step.otherwise;
+    }
+
+    /** `value` when the test holds for the value so far; else `otherwise`, or the value. */
+    private static String ifThen(Step step, String value) {
+        Boolean holds;
+        if (step.test == 'blank') {
+            holds = String.isBlank(value);
+        } else if (String.isBlank(value)) {
+            holds = false;
+        } else if (step.test == 'equals') {
+            holds = same(value.trim(), step.text.trim(), step.matchCase);
+        } else {
+            holds = step.matchCase == true
+                ? value.contains(step.text)
+                : value.toLowerCase().contains(step.text.toLowerCase());
+        }
+        if (holds) {
+            return step.value == null ? '' : step.value;
+        }
+        return String.isBlank(step.otherwise) ? value : step.otherwise;
+    }
+
+    /** Part `position` of the value split on the literal separator, trimmed; blank if none. */
+    private static String part(Step step, String value) {
+        if (String.isBlank(value)) {
+            return value;
+        }
+        List<String> parts = new List<String>();
+        Integer start = 0;
+        Integer found = value.indexOf(step.separator);
+        while (found >= 0) {
+            parts.add(value.substring(start, found));
+            start = found + step.separator.length();
+            found = value.indexOf(step.separator, start);
+        }
+        parts.add(value.substring(start));
+        if (step.position > parts.size()) {
+            return '';
+        }
+        Integer at = step.fromEnd == true ? parts.size() - step.position : step.position - 1;
+        return parts[at].trim();
+    }
+
+    /**
+     * The value read as a date year first, moved by the step's amount, as `YYYY-MM-DD`; the
+     * value unchanged when it is not a date or the result is outside the years 1700 to 4000.
+     */
+    private static String shiftDate(Step step, String value) {
+        String read = asDate('YMD', value);
+        // asDate gives back a real date as YYYY-MM-DD, and anything else unchanged.
+        Boolean isDate =
+            read != null &&
+            read.length() == 10 &&
+            read.mid(4, 1) == '-' &&
+            read.mid(7, 1) == '-' &&
+            read.remove('-').isNumeric();
+        if (!isDate) {
+            return value;
+        }
+        try {
+            Date day = Date.newInstance(
+                Integer.valueOf(read.left(4)),
+                Integer.valueOf(read.mid(5, 2)),
+                Integer.valueOf(read.right(2))
+            );
+            Date moved = step.unit == 'days'
+                ? day.addDays(step.amount)
+                : day.addMonths(step.amount);
+            return moved.year() < 1700 || moved.year() > 4000 ? value : iso(moved);
+        } catch (Exception outOfRange) {
+            return value;
+        }
+    }
+
+    private static String iso(Date day) {
+        return String.valueOf(day.year()).leftPad(4, '0') +
+            '-' +
+            String.valueOf(day.month()).leftPad(2, '0') +
+            '-' +
+            String.valueOf(day.day()).leftPad(2, '0');
     }
 
     /**

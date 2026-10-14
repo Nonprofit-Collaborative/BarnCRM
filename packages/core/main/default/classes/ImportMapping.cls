@@ -148,7 +148,8 @@ public with sharing class ImportMapping {
 
     @NamespaceAccessible
     public ImportMapping() {
-        this.version = 1;
+        // A new document may hold any step the engine knows (ADR-NEXT, more transform steps).
+        this.version = DataTransform.DOCUMENT_VERSION;
         this.columns = new List<Column>();
         this.defaults = new List<Assignment>();
     }
