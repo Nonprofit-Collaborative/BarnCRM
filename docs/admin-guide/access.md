@@ -70,16 +70,31 @@ The person who installs BarnCRM is given the BarnCRM Admin role automatically, a
 install and again at every upgrade, so there is always at least one person who can use this
 page. If that person was you, you can start straight away.
 
-Two things control who can use the page:
+Three things control who can use the page:
 
 1. You need the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin
    role. Anyone without it sees the page in read-only mode with a notice explaining why.
-2. The person you are giving a role to must already be a Salesforce user with a license.
+2. To give or remove a role or an extra permission you also need Salesforce's **Assign
+   Permission Sets** (or **Manage Users**) permission. A system administrator has it already. A BarnCRM Admin who is not a system
+   administrator gets it from the optional **BarnCRM Access Manager** permission set: in
+   Setup, open **Users**, choose the person, and under **Permission Set Assignments** add
+   **BarnCRM Access Manager**. Assign Permission Sets is a Salesforce-wide permission: whoever
+   holds it can also assign any permission set in Setup, not only the BarnCRM roles, so give
+   it only to people you trust with that. It is in no role because only a full Salesforce license can
+   hold it; a user with a **Salesforce Platform** license cannot be given it, so in that case
+   a colleague with a Salesforce license gives the roles. Everything else in BarnCRM Settings
+   works on a Platform license. The same permission lets the
+   [Module Manager](module-manager.md) give you a module's admin set when you turn it on.
+   Without it, the page shows who holds each role and extra permission, the **Give access**
+   button is disabled, the extra permission picker and the **Remove** buttons are hidden, and a
+   notice says why: "You can see who has each role and extra permission but not change
+   them.", followed by where the permission comes from.
+3. The person you are giving a role to must already be a Salesforce user with a license.
    Creating users is one of the few things Salesforce does not let an app do for you, so
    that step happens in Setup. See "What still needs Setup" below.
 
-Giving the extra permissions (see "Extra permissions" below) also needs the Salesforce
-permission Assign Permission Sets, which the BarnCRM Admin role carries.
+Giving the extra permissions (see "Extra permissions" below) needs the same two
+permissions as giving a role.
 
 ## A five-minute walkthrough
 
@@ -145,8 +160,9 @@ BarnCRM Admin has Find and Export) is not listed, and removing it here could not
 
 Who can give extra permissions: you need Manage BarnCRM Settings, as for roles, and also what
 Salesforce itself asks for to assign a permission set in Setup: **Assign Permission Sets** (or
-**Manage Users**). The BarnCRM Admin role carries both. Without the second, the cards are shown
-with a notice and no buttons: "You can see who has each extra permission but not change it."
+**Manage Users**). A system administrator has it; anyone else gets it from BarnCRM Access
+Manager (see "How to turn it on"). Without it, the cards are shown with no buttons, under the
+notice described there.
 
 If Salesforce refuses one person, usually because their license does not allow what the
 permission grants (Duplicate Review on a Salesforce Platform license, for example), the page says

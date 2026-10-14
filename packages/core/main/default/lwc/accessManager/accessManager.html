@@ -19,6 +19,12 @@
                 </div>
             </template>
 
+            <template lwc:if={showChangeReadOnly}>
+                <div class="slds-var-m-bottom_small" role="status" data-id="change-read-only">
+                    <lightning-formatted-text value={labels.changeReadOnlyNotice}></lightning-formatted-text>
+                </div>
+            </template>
+
             <template if:false={isReadOnly}>
                 <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_medium">
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
@@ -100,7 +106,7 @@
                     onclick={handleAddClick}
                 ></lightning-button>
 
-                <template lwc:if={showAddOnControls}>
+                <template lwc:if={showChangeControls}>
                     <template lwc:if={hasAddOns}>
                         <div class="slds-grid slds-wrap slds-gutters slds-var-m-top_medium">
                             <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
@@ -174,7 +180,7 @@
                                             data-id="role-member"
                                         >
                                             <span class="slds-truncate" title={person.email}>{person.name}</span>
-                                            <template if:false={isReadOnly}>
+                                            <template lwc:if={showChangeControls}>
                                                 <lightning-button
                                                     variant="base"
                                                     data-id="remove-button"
@@ -199,11 +205,6 @@
                 <section class="slds-var-m-top_medium" data-id="add-ons-section">
                     <h2 class="slds-text-heading_small">{labels.addOnsHeading}</h2>
                     <p class="slds-text-body_small slds-var-m-bottom_small">{labels.addOnsDescription}</p>
-                    <template lwc:if={showAddOnReadOnly}>
-                        <div class="slds-var-m-bottom_small" role="status" data-id="add-ons-read-only">
-                            <lightning-formatted-text value={labels.addOnsReadOnlyNotice}></lightning-formatted-text>
-                        </div>
-                    </template>
                     <div class="slds-grid slds-wrap slds-gutters">
                         <template for:each={addOnCards} for:item="addOn">
                             <div
@@ -229,7 +230,7 @@
                                                     data-id="add-on-member"
                                                 >
                                                     <span class="slds-truncate" title={person.email}>{person.name}</span>
-                                                    <template lwc:if={showAddOnControls}>
+                                                    <template lwc:if={showChangeControls}>
                                                         <lightning-button
                                                             variant="base"
                                                             data-id="add-on-remove-button"

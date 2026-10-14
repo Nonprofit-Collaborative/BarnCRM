@@ -286,16 +286,18 @@ public with sharing class AccessService {
     }
 
     /**
-     * Why the running user may not give or remove add-ons, or null when they may. They need
-     * Manage BarnCRM Settings, as for roles, and what Setup itself asks for.
+     * Why the running user may not give or remove roles and add-ons, or null when they may.
+     * They need Manage BarnCRM Settings and what Setup itself asks for, which BarnCRM Admin
+     * does not carry: a Salesforce Platform license cannot hold it, so it comes from the
+     * profile or from BarnCRM Access Manager (ADR-0121).
      *
      * @return the message to show, or null when both checks pass
      */
-    public static String addOnRefusal() {
+    public static String changeRefusal() {
         if (!BarnCRMPermissions.canManageSettings()) {
             return Label.Core_Access_ErrorNoPermission;
         }
-        return canAssignPermissionSets() ? null : Label.Core_Access_ErrorCannotAssignPermissionSets;
+        return canAssignPermissionSets() ? null : Label.Core_Access_ErrorNeedsAccessManager;
     }
 
     /**
@@ -493,7 +495,7 @@ public with sharing class AccessService {
      * what Setup itself asks for to assign a permission set.
      */
     private static void requireAssignPermission() {
-        String refusal = addOnRefusal();
+        String refusal = changeRefusal();
         if (refusal != null) {
             throw new AccessException(refusal);
         }
