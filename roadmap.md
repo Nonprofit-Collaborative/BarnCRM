@@ -2,7 +2,7 @@
 
 Purpose: planned work with status. Mirrors Section 6 of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 on `oi-test`). #219 landed batches 2 to 7; #377 landed batches 8a to 8e: the Core quality pass fix batches, Q-01 to Q-14, rollup S9, data tools parity, Erase a person, the console app and the gate fixes. `main` (at #221) deployed to `barn-npc` 2026-10-13 and passes. "Landed" means in `main`.
+Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 on `oi-test`). #219 landed batches 2 to 7; #377 landed batches 8a to 8e: the Core quality pass fix batches, Q-01 to Q-14, rollup S9, data tools parity, Erase a person, the console app and the gate fixes. `main` (at #221) deployed to `barn-npc` 2026-10-13 and passes. 2026-10-14: #401 to #408 landed (Core cleanups, Access add-on permission sets, merge settlement, coverage floor, import undo, Platform-license permission split, duplicate rule matching for Load one object, empty household tidy); the D-47 inventory is done. "Landed" means in `main`.
 
 ## Near-term queue (plan 6.0, owner decisions 2026-10-13)
 
@@ -14,7 +14,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
    - Field utilization on demand (D-37, D-63). Landed (#377).
    - Test self-containment. Landed (#377).
    - Rollup S9 (vendored apex-rollup removed). Landed (#377). S14 only if the scale test needs it; S15 spike built; S16 and S17 deferred to after v1 (D-64).
-   - Inventory of unfinished Core work (D-47): duplicate rule matching and anything else unfinished in Core finished before version 1 (not post-1.0 themes or C-38).
+   - Inventory of unfinished Core work (D-47). Done 2026-10-14 (#401 to #408, including duplicate rule matching for any object, #405). Related-records import stays insert-only (post-1.0); one org check of a parent and child file import is still to run.
    - Find, bulk update and duplicates fix batch. Landed (#377).
    - Approved review recommendations (D-48). Fix batches landed (#377); remainder per the feature catalog.
    - Affiliations in Core people imports, restored (D-49; C-32). Landed (#377).
@@ -83,7 +83,7 @@ Status as of 2026-10-13 (main at PR #377, squash 272d1e3b, gated 2,952 of 2,952 
 | Field utilization (plan 6.1 item 10) | D-26, D-37, D-63 | Landed: on demand, inside Org Optimizer only (#377) |
 | Tests run as permission-set users | D-33 | Landed (#219, self-containment #377) |
 | "Data Job" relabel | ADR-0047, D-45, D-51 | Landed (#377): object label Data Job, tab "Import" |
-| Deleting people keeps their household | D-88 | Landed (#377); the tidy-later option was decided by D-89 (2026-10-14), in progress: a nightly Core job moves empty households to the Recycle Bin once their former members can no longer be restored |
+| Deleting people keeps their household | D-88 | Landed (#377); the tidy-later option was decided by D-89 (2026-10-14), landed (#408): a nightly Core job moves empty households to the Recycle Bin once their former members can no longer be restored |
 | Namespace registration, first package version | D-01, ADR-0001, D-87 | After a v1.0 pilot |
 
 ## Post-1.0 (plan 6.1, parked)

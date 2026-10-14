@@ -8,12 +8,21 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Claude sessions
 
+- BMemory plan updated for #401 to #408: Section 11.3 work items 1, 3, 5 and 7 brought current; Section 11.2 item 16 dropped and item 24 accepted (Brandon); Section 7.3 notes the 25,000-row pilot bar (the 250k run later, in a sandbox); decision log D-89 marked landed and D-90 to D-94 added (25k pilot bar, Access Manager permission set, branded names stay, no switch end date, pilot is a milestone below v1.0 with versions set by Brandon); D-47 marked done in Section 6. Mirrored to `docs/product-plan.md`, `memory.md` and `roadmap.md`; `README.md` status and `architecture.md` gotchas refreshed.
 - BMemory plan D-89 recorded (commits 11193a9d, 60bb9222): empty households move to the Recycle Bin by a nightly Core job after their former members can no longer be restored (amends D-88; decided 2026-10-14, in progress); v0.11 row notes the scale test is done except the 25,000-row import run. Mirrored to `docs/product-plan.md`, `roadmap.md` and `memory.md`.
 - Tier 1 scale rerun on `oi-test` at 1238b859: 3,691 households, 8,672 contacts, 26,102 gifts, 52,786 soft credits and 27,413 allocations loaded; the Rollup Queue drained 331 entries in about 7 minutes with none Failed; default fund totals verified (26,102 gifts, 2,081,063.69). Known test-data limit: about 8% of households and 6% of contacts were refused by the standard duplicate rules (fuzzy name matching).
 - BMemory plan Section 11.5 Giving notes added (commit c7d0272f): deleting the default fund leaves new gifts refused; no supported way to re-split an existing gift's allocations. Mirrored to `docs/product-plan.md` and `memory.md`.
 
 ### Merged to main
 
+- #405 (e1e2d924): Load one object applies duplicate rule matching to new rows (D-47).
+- #408 (cbe543e7): empty household tidy-up: a nightly job moves a household emptied by deleting its people to the Recycle Bin once none can be restored; on by default, switchable (D-89, ADR-0120).
+- #406 (48dce07f): Salesforce-license-only permissions leave BarnCRM Admin for the optional `BarnCRM_Access_Manager` set (ADR-0121); `scripts/org/check-platform-license.sh`; the Access page checks up front and disables role and add-on changes without it.
+- #407 (48a643d2): import undo judges edits before restoring or deleting; a rollup's own save is not an edit; `RollupWriter` writes its stamp regardless of FLS (ADR-0119).
+- #402 (19d62891): the Access page assigns and removes Core's six add-on permission sets (allowlist, user permission check enforced in `AccessService`, per-user refusals shown and logged); the Import setup note is retired.
+- #403 (8651a5d3): merge survivors are always settled through `Merge_Settlement_Ready__e` and `MergeSettlementReadyTrigger` (ADR-0118); a person account survivor keeps its PersonMailing default.
+- #404 (12ed0f75): seven Core classes leave the coverage floor exceptions; two `AccountAddressHandler` tests added.
+- #401 (88b24de8): Core cleanups: journal keyset paging on `(CreatedDate, Id)`, unused `AffiliationSelector.selectByOrganizationIds` and unreachable Health Check catches removed, hygiene people check gets Open in Find in membership mode, stale README and settings statuses fixed.
 - #398 (b97c4726): Rollup Queue large parent route efficiency: a record goes to `RollupLargeParentBatch` only when its estimate reaches 40% of the query-row limit (run budget stays 60%); one batch start at a time under a row lock on the new protected custom setting `Rollup_Run_Lock__c`; the chain-depth hand-off no longer writes an Info log entry (it fired 31 times in 10 minutes on the scale rerun). Found by the tier 1 scale rerun (about 86 batch jobs for 2 large targets, fund recalculated twice concurrently).
 - #396 (1238b859): Rollup Queue: a save that queued entries and started no processor publishes `Rollup_Queue_Ready__e` after commit, closing an enqueue race that stranded 47 entries (ADR-0117).
 - #395 (dae769af): scale script: the default fund must resolve; cleanup keeps the default fund; generator names are unique.
