@@ -69,6 +69,25 @@ public without sharing class RollupQueue implements Queueable {
     /** Set once a processor is queued, or is this job, so one transaction asks for one only. */
     private static Boolean processorRequested = false;
 
+    /** Set when this transaction queued a processor, or is one: it reads what this one commits. */
+    private static Boolean processorComing = false;
+
+    /** Set once this transaction inserts entries, which no processor reads until it commits. */
+    private static Boolean insertedEntries = false;
+
+    /** Test seam: what a fresh transaction starts with, as the Ready event's subscriber has. */
+    @TestVisible
+    private static void newTransactionForTest() {
+        processorRequested = false;
+        processorComing = false;
+        insertedEntries = false;
+        readyEventsPublished = 0;
+    }
+
+    /** Test seam: stands in for the processors queued and not yet started; null reads them. */
+    @TestVisible
+    private static Integer waitingForTest;
+
     /** How many Rollup_Queue_Ready__e this transaction published: one at most. */
     @TestVisible
     private static Integer readyEventsPublished = 0;
@@ -296,13 +315,12 @@ public without sharing class RollupQueue implements Queueable {
             return;
         }
         Database.insert(entries, AccessLevel.SYSTEM_MODE);
+        insertedEntries = true;
         requestProcessor();
     }
 
     /**
-     * Queues a processor unless one already waits to start: a waiting one reads every entry
-     * committed by the time it starts. When the transaction can queue no more jobs, the entries
-     * wait for the next save that queues one, or for the nightly run.
+     * Queues a processor unless one already waits to start (`startProcessor`).
      *
      * Never from inside a Queueable (R-RQ3). A Queueable may queue one job, and the job running
      * may need that one job for its own next step: the sample data load and the household soft
@@ -312,7 +330,15 @@ public without sharing class RollupQueue implements Queueable {
      * commit, and its subscriber starts the processor (ADR-0100).
      */
     private static void requestProcessor() {
-        if (processorRequested || AutomationControl.isPaused()) {
+        if (AutomationControl.isPaused()) {
+            return;
+        }
+        if (processorRequested) {
+            // Asked earlier, before these entries existed, and nothing of this transaction's
+            // own is coming for them.
+            if (!processorComing) {
+                askAgainAfterCommit();
+            }
             return;
         }
         if (inQueueable()) {
@@ -351,6 +377,14 @@ public without sharing class RollupQueue implements Queueable {
      * Starts a processor now when entries are pending and none waits to start. For a background
      * job that saved records the engine queued, called when the job has no next step of its own,
      * so its totals catch up within minutes instead of waiting for the nightly run.
+     *
+     * A processor waiting to start reads every entry committed by the time it starts, but this
+     * transaction's own entries are not committed yet: the waiting one may start, find nothing
+     * and finish before they are, and then nothing ever comes for them (parallel Bulk API
+     * batches left 47 so). So a transaction that inserted entries and queues no processor
+     * publishes one Rollup_Queue_Ready__e, which is delivered after it commits; its subscriber
+     * asks again then, when a processor still waiting is sure to read them (R-RQ3). The same
+     * covers a transaction with no queueable job left to give.
      */
     public static void startProcessor() {
         if (processorRequested || AutomationControl.isPaused()) {
@@ -358,6 +392,7 @@ public without sharing class RollupQueue implements Queueable {
         }
         processorRequested = true;
         if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+            askAgainAfterCommit();
             return;
         }
         Integer pending = [
@@ -370,17 +405,32 @@ public without sharing class RollupQueue implements Queueable {
         if (pending == 0) {
             return;
         }
-        Integer waiting = [
-            SELECT COUNT()
-            FROM AsyncApexJob
-            WHERE
-                JobType = 'Queueable'
-                AND ApexClass.Name = :CLASS_NAME
-                AND Status IN ('Queued', 'Holding')
-            WITH SYSTEM_MODE
-        ];
+        Integer waiting = waitingForTest != null
+            ? waitingForTest
+            : [
+                  SELECT COUNT()
+                  FROM AsyncApexJob
+                  WHERE
+                      JobType = 'Queueable'
+                      AND ApexClass.Name = :CLASS_NAME
+                      AND Status IN ('Queued', 'Holding')
+                  WITH SYSTEM_MODE
+              ];
         if (waiting == 0) {
             System.enqueueJob(new RollupQueue());
+            processorComing = true;
+        } else {
+            askAgainAfterCommit();
+        }
+    }
+
+    /**
+     * The Ready event for entries this transaction inserted. Only for those: the subscriber
+     * inserts none, so it never announces again while a processor waits.
+     */
+    private static void askAgainAfterCommit() {
+        if (insertedEntries) {
+            announceReady();
         }
     }
 
@@ -389,6 +439,7 @@ public without sharing class RollupQueue implements Queueable {
     /** One run: a slice of the due entries, recalculated, then the next run if more are due. */
     public void execute(QueueableContext context) {
         processorRequested = true;
+        processorComing = true;
         if (AutomationControl.isPaused()) {
             // R-RQ5: the entries wait; the nightly run puts Both totals right after the pause.
             return;
