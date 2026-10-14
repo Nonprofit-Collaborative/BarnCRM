@@ -279,7 +279,7 @@ describe('c-affiliation-panel', () => {
 
     const fields = Array.from(
       asOrganization.shadowRoot.querySelectorAll('lightning-input-field')
-    ).map((node) => node.fieldName);
+    ).map((input) => input.fieldName);
     expect(fields[0]).toBe('Organization__c');
     expect(fields[1]).toBe('Person_Account__c');
   });

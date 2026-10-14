@@ -137,7 +137,9 @@ public with sharing class ImportObjectSchema {
     @NamespaceAccessible
     public static String operationFor(Schema.SObjectType type, Import_Template__c template) {
         String chosen = operationOf(template);
-        return updatesOnly(type) && !neverCreates(chosen) && chosen != OPERATION_DELETE
+        return updatesOnly(type) &&
+            !neverCreates(chosen) &&
+            chosen != OPERATION_DELETE
             ? OPERATION_UPDATE
             : chosen;
     }
