@@ -120,13 +120,13 @@ job_error_hint() {
 # job_report <label> <sf --json output file> [verb]: reads the job id, asks
 # `sf data bulk results` for the real counts and the failed rows, and logs them. Sets
 # JOB_OK (1 when a job ran), JOB_PROCESSED, JOB_FAILED, JOB_SUCCESS (numbers, 0 when unknown).
-# The CLI returns .result.jobId on success and exits nonzero with .data.jobId on partial
-# failure; it never returns jobInfo.
+# The CLI returns .result.jobId (import) or .result.jobInfo.id (bulk delete) on success and
+# exits nonzero with the same under .data on partial failure.
 JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0
 job_report() {
   local label="$1" outfile="$2" id msg res failed_csv slug errors
   JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0
-  id="$(jq -r '.result.jobId // .data.jobId // empty' "$outfile" 2>/dev/null)"
+  id="$(jq -r '.result.jobId // .result.jobInfo.id // .data.jobId // .data.jobInfo.id // empty' "$outfile" 2>/dev/null)"
   if [[ -z "$id" ]]; then
     msg="$(jq -r '[.name, .message] | map(select(. != null)) | join(": ")' "$outfile" 2>/dev/null)"
     [[ -z "$msg" ]] && msg="$(head -c 400 "$outfile")"
@@ -135,7 +135,7 @@ job_report() {
     return
   fi
   JOB_OK=1
-  log "  job: $id, state: $(jq -r '.data.state // .result.state // "see results"' "$outfile" 2>/dev/null)"
+  log "  job: $id, state: $(jq -r '.data.state // .result.state // .result.jobInfo.state // .data.jobInfo.state // "see results"' "$outfile" 2>/dev/null)"
   # The CLI writes <job id>-success-records.csv and -failed-records.csv into the current dir.
   res="$( cd "$DIR/work" && sf data bulk results --job-id "$id" --target-org "$ALIAS" --json 2>&1 )"
   if ! printf '%s' "$res" | jq -e '.result' >/dev/null 2>&1; then
