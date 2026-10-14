@@ -1720,10 +1720,11 @@ link stopped the chain and left Pending entries until the nightly run. A run tha
 something it cannot catch, such as a governor limit, is handled by its finalizer, which logs it
 to the Error Log. Only the records the run was recalculating are charged: they move to a new
 entry with one more attempt and the reason in Last Error (Failed after the fifth), and the rest
-of each entry it held stays as it was. An entry with attempts merges only with entries for the same
-entity and the same attempts, and a run takes a quarter as many records per attempt (50, 12, 3, then 1 of a 200 slice), so a
-record that stops every run holding it ends Failed alone while the records it shared runs with
-are recalculated. A single record that stopped its run on the query row limit goes to the large
+of each entry it held stays as it was. An entry charged by a stopped run merges only with others
+charged the same way, for the same entity and attempts, and a run takes a quarter as many records
+per attempt (50, 12, 3, then 1 of a 200 slice), so a record that stops every run holding it ends
+Failed alone while the records it shared runs with are recalculated. Entries whose save was
+refused (R-RQ4) are already one record each, so their retries merge and run at the full slice. A single record that stopped its run on the query row limit goes to the large
 parent route instead (R-RQ6). The finalizer then publishes the same event rather than queuing
 the next run itself, because the platform queues at most five jobs in a row from the finalizers
 of failed jobs. Before this a stopped run halved the next run's slice and queued it, and a record

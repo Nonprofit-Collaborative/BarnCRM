@@ -520,28 +520,32 @@ public without sharing class RollupQueue implements Queueable {
      * touches one household 5,000 times is one small recalculation. An entry larger than the
      * slice on its own gives up only its first identifiers.
      *
-     * The first due entry decides what a run takes: only entries with the same attempts. Entries
-     * with attempts (a run stopped while holding their records, or the platform refused to save
-     * one) merge only with each other, for one entity, and a quarter as many identifiers per
-     * attempt (50, 12, 3, then 1 of a 200 slice), so a record that stops every run holding it is
-     * narrowed down to itself and only it reaches Failed (R-RQ3).
+     * The first due entry decides what a run takes: only entries with the same attempts, narrowed
+     * or not. Entries charged because a run stopped while holding them merge only with each
+     * other, for one entity, and a quarter as many identifiers per attempt (50, 12, 3, then 1 of
+     * a 200 slice), so a record that stops every run holding it is narrowed down to itself and
+     * only it reaches Failed (R-RQ3). Entries whose save the platform refused are already one
+     * record each in their own right (saves succeed record by record), so they run at the full
+     * slice like fresh ones (R-RQ4).
      */
     @TestVisible
     private static Slice take(List<Rollup_Queue__c> due, Integer sliceSize) {
         Slice slice = new Slice();
-        Integer runAttempts;
+        String runKind;
         String retryTarget;
         for (Rollup_Queue__c entry : due) {
             Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
-            if (runAttempts == null) {
-                runAttempts = attempts;
+            Boolean narrowed = narrows(entry);
+            String kind = attempts + (narrowed ? ':narrowed' : ':full');
+            if (runKind == null) {
+                runKind = kind;
             }
             String target = String.isBlank(entry.Target_Object__c) ? '' : entry.Target_Object__c;
-            if (attempts != runAttempts || (retryTarget != null && target != retryTarget)) {
+            if (kind != runKind || (retryTarget != null && target != retryTarget)) {
                 continue;
             }
             Integer maxIds = sliceSize;
-            if (attempts > 0) {
+            if (narrowed) {
                 retryTarget = target;
                 maxIds = retrySlice(attempts, sliceSize);
             }
@@ -556,6 +560,22 @@ public without sharing class RollupQueue implements Queueable {
             takeEntry(slice, entry, maxIds);
         }
         return slice;
+    }
+
+    /**
+     * Whether a run takes this entry narrowed: it has attempts that are not a refused save. A
+     * refused save is known by the start of its reason, so anything else (a stopped run, a held
+     * large parent) narrows, the safe side.
+     */
+    @TestVisible
+    private static Boolean narrows(Rollup_Queue__c entry) {
+        if (entry.Attempts__c == null || entry.Attempts__c <= 0) {
+            return false;
+        }
+        String refused = System.Label.Core_Rollups_QueueSaveFailed.substringBefore('{0}');
+        return String.isBlank(refused) ||
+            entry.Last_Error__c == null ||
+            !entry.Last_Error__c.startsWith(refused);
     }
 
     /** The identifiers a retried entry gives one run: a quarter as many per attempt, at least 1. */
@@ -629,7 +649,13 @@ public without sharing class RollupQueue implements Queueable {
     private static List<Rollup_Queue__c> selectDue(Integer maxEntries) {
         Datetime now = Datetime.now();
         return [
-            SELECT Id, Target_Object__c, Record_Ids__c, Definition_Ids__c, Attempts__c
+            SELECT
+                Id,
+                Target_Object__c,
+                Record_Ids__c,
+                Definition_Ids__c,
+                Attempts__c,
+                Last_Error__c
             FROM Rollup_Queue__c
             WHERE
                 Status__c = :STATUS_PENDING

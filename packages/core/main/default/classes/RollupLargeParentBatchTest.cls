@@ -769,6 +769,46 @@ private class RollupLargeParentBatchTest {
         Assert.areEqual(50, slice.finished.size(), 'Each entry taken whole');
     }
 
+    /** A refused save is already one record each, so its retries run at the full slice. */
+    @IsTest
+    static void refusedSaveRetriesRunAtTheFullSlice() {
+        System.runAs(TestUsers.admin()) {
+            List<Id> ids = fakeAccountIds(300);
+            Map<Id, String> refused = new Map<Id, String>();
+            for (Id recordId : ids) {
+                refused.put(recordId, 'A validation rule refused it.');
+            }
+            RollupQueue.retryLater('Account', refused, 2);
+            insert new Rollup_Queue__c(
+                Target_Object__c = 'Account',
+                Record_Ids__c = '001000000009999',
+                Record_Count__c = 1,
+                Attempts__c = 3,
+                Last_Error__c = 'The rollup run stopped: Apex CPU time limit exceeded',
+                Status__c = RollupQueue.STATUS_PENDING
+            );
+            List<Rollup_Queue__c> waiting = [SELECT Id FROM Rollup_Queue__c];
+            for (Rollup_Queue__c entry : waiting) {
+                entry.Next_Attempt__c = Datetime.now().addMinutes(-1);
+            }
+            update waiting;
+
+            Test.startTest();
+            List<Rollup_Queue__c> due = RollupQueue.selectDue(500);
+            RollupQueue.Slice slice = RollupQueue.take(due, 200);
+            Test.stopTest();
+
+            Assert.isFalse(RollupQueue.narrows(due[0]), 'A refused save is not narrowed');
+            Assert.isTrue(RollupQueue.narrows(due[due.size() - 1]), 'A stopped run is');
+            Assert.areEqual(200, slice.idsByTarget.get('Account').size(), 'The full slice');
+            Assert.isFalse(
+                slice.idsByTarget.get('Account').contains(Id.valueOf('001000000009999')),
+                'Not merged with a narrowed entry'
+            );
+            Assert.areEqual(3, slice.attemptsByTarget.get('Account'), 'Charged from three');
+        }
+    }
+
     @IsTest
     static void entriesGroupByEntityWithTheirDefinitions() {
         System.runAs(TestUsers.admin()) {
