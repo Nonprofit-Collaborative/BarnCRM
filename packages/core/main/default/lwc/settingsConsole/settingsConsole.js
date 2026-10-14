@@ -93,6 +93,8 @@ function importCoreComponent(name) {
       return import('c/customMetadataManager');
     case 'editionSetting':
       return import('c/editionSetting');
+    case 'featureSettings':
+      return import('c/featureSettings');
     default:
       return null;
   }
