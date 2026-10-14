@@ -1086,7 +1086,7 @@
     <allowCreate>true</allowCreate>
     <allowDelete>false</allowDelete>
     <allowEdit>false</allowEdit>
-    <allowRead>false</allowRead>
+    <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Error_Log_Event__e</object>
     <viewAllRecords>false</viewAllRecords>

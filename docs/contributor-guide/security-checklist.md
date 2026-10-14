@@ -97,4 +97,4 @@ Closed since the v0.11 pass:
 
 | Item | What was done |
 | ---- | ------------- |
-| `Error_Log_Event__e` readable by Staff and Read Only | Read removed from both (2026-10-13). Publishing needs only Create; Read is for subscribing from outside Apex (CometD, `lightning/empApi`, Pub/Sub API), and nothing in BarnCRM subscribes that way. BarnCRM Admin keeps Read for troubleshooting. An org run confirms it: a Staff user without Read still produces an Error Log entry through the event |
+| `Error_Log_Event__e` readable by Staff and Read Only | Kept (2026-10-13). The org refuses Create on a platform event without Read ("Permission Create Error_Log_Event__e depends on permission(s): Read Error_Log_Event__e"), and publishing needs Create, so every packaged set that publishes holds both |
