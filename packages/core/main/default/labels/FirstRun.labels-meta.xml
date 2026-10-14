@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_FirstRun_Title</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: window heading</shortDescription>
+        <value>Set up BarnCRM</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_Intro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the line under the heading</shortDescription>
+        <value>Two questions before BarnCRM is ready. You are asked them once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_EditionQuestion</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the edition question</shortDescription>
+        <value>Which edition?</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_FeaturesQuestion</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the features question</shortDescription>
+        <value>What should BarnCRM turn on?</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_AllOption</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: turn every feature on</shortDescription>
+        <value>Turn on all the default core features</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_ChooseOption</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: pick the features one by one</shortDescription>
+        <value>Let me choose features</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_ChooseHelp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: help above the feature checkboxes</shortDescription>
+        <value>Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_ModulesNote</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: no module is installed here</shortDescription>
+        <value>No module is installed now. Install modules later from BarnCRM Settings, Modules.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_Finish</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: the finish button</shortDescription>
+        <value>Finish setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_AdminNeeded</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First-run setup: shown to someone who cannot finish it</shortDescription>
+        <value>An administrator needs to finish setting up BarnCRM.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_LoadError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>First-run setup: the state could not be read</shortDescription>
+        <value>BarnCRM could not check whether setup is finished. Reload the page, and if it fails again, check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FirstRun_SaveError</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>First-run setup: finishing failed</shortDescription>
+        <value>Setup could not be finished. Nothing was changed. Try again, and if it fails again, check the Error Log.</value>
+    </labels>
+</CustomLabels>

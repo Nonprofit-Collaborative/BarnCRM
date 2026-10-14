@@ -1,4 +1,5 @@
 <template>
+    <c-first-run-setup onsetupfinished={handleSetupFinished}></c-first-run-setup>
     <lightning-card title={labels.title} icon-name="standard:settings">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={loading}>

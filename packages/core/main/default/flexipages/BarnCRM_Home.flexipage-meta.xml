@@ -8,6 +8,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>firstRunSetup</componentName>
+        <identifier>firstRunSetup1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>whatsNew</componentName>
         <identifier>whatsNew1</identifier>
       </componentInstance>
