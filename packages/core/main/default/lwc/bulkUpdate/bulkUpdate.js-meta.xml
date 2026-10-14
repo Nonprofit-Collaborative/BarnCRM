@@ -3,7 +3,7 @@
   <apiVersion>67.0</apiVersion>
   <description>
     Bulk update (C-35): set, clear or copy up to five fields on the records a Find query returns,
-    previewed and confirmed, run in the background as the user. Undone from the Bulk Update tab.
+    previewed and confirmed, run in the background as the user. Undone from Data jobs on the Data Manager tab.
   </description>
   <isExposed>false</isExposed>
 </LightningComponentBundle>
