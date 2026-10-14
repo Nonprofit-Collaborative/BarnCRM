@@ -45,13 +45,17 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Every setting whose name, description, or section mentions greeting is listed, which
    includes the household formal and informal greeting settings.
 4. Click the result **Formal greeting pattern**. The console jumps to the Households
-   section with that setting in view. Read the description under it and, if you want the
-   longer explanation, click **Learn more** to open this admin guide at the household
-   naming page.
-5. Change the value. For example, put `{Salutation} {FirstName} {LastName}` in the formal
-   greeting pattern, then click **Save**. A green confirmation appears saying your settings
-   are saved. The new value is in effect immediately: the next contact you add gets the new
-   greeting, with no waiting and no cache to clear.
+   section and to the **Preview and recompute** panel. The three household naming
+   patterns (household name, formal greeting, informal greeting) are edited only in that
+   panel, not as separate rows, so the panel is where the search result takes you. The
+   panel's own text explains the patterns; the household naming page of this admin guide
+   gives the longer explanation.
+5. Change the value in the panel. For example, put `{Salutation} {FirstName} {LastName}` in
+   the formal greeting pattern, watch the preview update, then click the panel's **Save**.
+   A confirmation appears saying the patterns are saved. The new value is in effect
+   immediately: the next contact you add gets the new greeting, with no waiting and no
+   cache to clear. The settings console's own **Save** button is for the other settings in
+   the section, such as whether people who have died stay in the household name.
 6. Scroll to **Recent changes** at the bottom of the page. Your change is the first row,
    showing the setting by the name you see on this page, the old value, the new value, your
    name, and the time. Nothing is ever changed silently: one row is written per setting you

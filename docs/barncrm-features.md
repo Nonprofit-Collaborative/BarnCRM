@@ -208,7 +208,7 @@ An admin installs Core, then turns on the Nonprofit Edition, which opens Salesfo
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Hub app and home page | Major | One app with a home page that shows what to do next, a setup checklist, and tiles for errors, rollup freshness, seasonal swaps and recurring imports. | Shipped | C-03 |
-| Settings console | Major | One in-app page for every setting, grouped by section, with search, plain-language descriptions and "Learn more" links, so normal use never needs Salesforce Setup. | Shipped | C-03 |
+| Settings console | Major | One in-app page for every setting, grouped by section, with search, plain-language descriptions and "Learn more" links, so normal use never needs Salesforce Setup. The Households section edits the three naming patterns only in the naming panel, and a search for a pattern lands on the panel. | Shipped; change built, not merged (`fix/admin-11`) | C-03 |
 | A range on every number setting | Minor | Every number setting has a lowest and highest value: the console marks a value outside them and saves nothing, and the server refuses it naming the setting and the range. | Built, not merged (fix/admin-7) | ADMIN-27 |
 | Setup Assistant | Major | A guided, resumable eight-step checklist from install to first real record, with Back, Next and Skip. | Shipped | C-12 |
 | Access page | Major | Assigns packaged roles (permission set groups) to colleagues from the app and shows who holds each role. | Shipped | C-06 |

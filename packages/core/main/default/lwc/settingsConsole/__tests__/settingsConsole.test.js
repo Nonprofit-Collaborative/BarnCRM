@@ -27,6 +27,71 @@ jest.mock(
   () => ({ default: jest.fn().mockResolvedValue({}) }),
   { virtual: true }
 );
+// The naming panel is replaced by a stub so these tests see only the console's own work.
+jest.mock('c/householdNamingSettings', () =>
+  require('../../../../../test/jest-mocks/settingsConsole/householdNamingSettings')
+);
+
+const NAMING_KEYS = [
+  'Household_Name_Pattern__c',
+  'Formal_Greeting_Pattern__c',
+  'Informal_Greeting_Pattern__c'
+];
+
+/** A Households section as the package ships it: three pattern rows, a checkbox, the panel. */
+function householdsWithPanelModel() {
+  const text = (key, label) => ({
+    key,
+    label,
+    description: null,
+    dataType: 'Text',
+    section: 'Households',
+    component: null,
+    helpUrl: null,
+    value: 'x',
+    checked: false,
+    options: []
+  });
+  return {
+    canEdit: true,
+    sections: [
+      {
+        name: 'Households',
+        settings: [
+          text('Household_Name_Pattern__c', 'Household name pattern'),
+          text('Formal_Greeting_Pattern__c', 'Formal greeting pattern'),
+          text('Informal_Greeting_Pattern__c', 'Informal greeting pattern'),
+          {
+            key: 'Include_Deceased_In_Name__c',
+            label: 'Include deceased in name',
+            description: null,
+            dataType: 'Checkbox',
+            section: 'Households',
+            component: null,
+            helpUrl: null,
+            value: 'false',
+            checked: false,
+            options: []
+          },
+          {
+            key: 'Household_Naming_Preview',
+            label: 'Preview and recompute',
+            description: null,
+            dataType: 'Component',
+            section: 'Households',
+            settingsObject: 'BarnCRM_Settings__c',
+            component: 'householdNamingSettings',
+            navigationTarget: null,
+            helpUrl: null,
+            value: null,
+            checked: false,
+            options: []
+          }
+        ]
+      }
+    ]
+  };
+}
 
 // Reached through the module namespace rather than by name: a wire adapter may only be named
 // in a @wire decorator, and a test drives it through the stub's emit.
@@ -479,5 +544,90 @@ describe('c-settings-console', () => {
     await settle();
 
     expect(saveSettings).toHaveBeenCalledWith({ values: { Import_Chunk_Size__c: '5000' } });
+  });
+
+  describe('Households naming patterns (ADMIN-11)', () => {
+    beforeEach(() => {
+      getConsoleModel.mockResolvedValue(householdsWithPanelModel());
+    });
+
+    it('shows the naming panel and not the three plain pattern rows', async () => {
+      const element = build();
+      await settle();
+
+      const labels = Array.from(element.shadowRoot.querySelectorAll('div[role="group"]')).map(
+        (group) => group.getAttribute('aria-label')
+      );
+      expect(labels).toEqual(['Include deceased in name', 'Preview and recompute']);
+      NAMING_KEYS.forEach((key) => {
+        expect(element.shadowRoot.querySelector(`[data-key="${key}"]`)).toBeNull();
+      });
+      expect(
+        element.shadowRoot.querySelector('h3[data-key="Household_Naming_Preview"]')
+      ).not.toBeNull();
+    });
+
+    it('lands a search for a naming pattern on the panel', async () => {
+      const element = build();
+      await settle();
+      const focus = jest.fn();
+      const scrollIntoView = jest.fn();
+      const originalFocus = HTMLElement.prototype.focus;
+      const originalScroll = HTMLElement.prototype.scrollIntoView;
+      HTMLElement.prototype.focus = focus;
+      HTMLElement.prototype.scrollIntoView = scrollIntoView;
+      try {
+        element.shadowRoot.querySelector('c-settings-search').dispatchEvent(
+          new CustomEvent('settingselect', {
+            detail: { section: 'Households', key: 'Formal_Greeting_Pattern__c' }
+          })
+        );
+        await settle();
+      } finally {
+        HTMLElement.prototype.focus = originalFocus;
+        HTMLElement.prototype.scrollIntoView = originalScroll;
+      }
+
+      expect(scrollIntoView).toHaveBeenCalledTimes(1);
+      expect(focus).toHaveBeenCalledTimes(1);
+      expect(focus.mock.instances[0].dataset.key).toBe('Household_Naming_Preview');
+    });
+
+    it('still lands a search for another Households setting on that setting', async () => {
+      const element = build();
+      await settle();
+      const focus = jest.fn();
+      const originalFocus = HTMLElement.prototype.focus;
+      const originalScroll = HTMLElement.prototype.scrollIntoView;
+      HTMLElement.prototype.focus = focus;
+      HTMLElement.prototype.scrollIntoView = jest.fn();
+      try {
+        element.shadowRoot.querySelector('c-settings-search').dispatchEvent(
+          new CustomEvent('settingselect', {
+            detail: { section: 'Households', key: 'Include_Deceased_In_Name__c' }
+          })
+        );
+        await settle();
+      } finally {
+        HTMLElement.prototype.focus = originalFocus;
+        HTMLElement.prototype.scrollIntoView = originalScroll;
+      }
+
+      expect(focus.mock.instances[0].dataset.key).toBe('Include_Deceased_In_Name__c');
+    });
+
+    it('keeps the plain pattern rows when the section has no naming panel', async () => {
+      const withoutPanel = householdsWithPanelModel();
+      withoutPanel.sections[0].settings = withoutPanel.sections[0].settings.filter(
+        (setting) => setting.dataType !== 'Component'
+      );
+      getConsoleModel.mockResolvedValue(withoutPanel);
+      const element = build();
+      await settle();
+
+      NAMING_KEYS.forEach((key) => {
+        expect(element.shadowRoot.querySelector(`[data-key="${key}"]`)).not.toBeNull();
+      });
+    });
   });
 });

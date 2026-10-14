@@ -21,7 +21,10 @@ Naming is on as soon as Core is installed, with patterns that work out of the bo
 change them:
 
 1. Open the **BarnCRM** app and click the **BarnCRM Settings** tab.
-2. Click **Households** in the left navigation. The naming panel is in that section.
+2. Click **Households** in the left navigation. The naming panel is in that section, and
+   it is the only place the three patterns are edited: they are not also listed as
+   separate rows. Searching the settings for a pattern, for example `greeting`, takes you
+   to the panel.
 3. Change any of the three patterns. A preview of five sample households updates as you
    type, so you can see the result before you save. The samples ship with the product; they
    are not your own households.

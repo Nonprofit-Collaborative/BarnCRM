@@ -137,7 +137,11 @@
                             </template>
 
                             <template lwc:elseif={row.isComponent}>
-                                <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">
+                                <h3
+                                    class="slds-text-heading_small slds-var-m-bottom_x-small"
+                                    data-key={row.key}
+                                    tabindex="-1"
+                                >
                                     {row.label}
                                 </h3>
                                 <template lwc:if={row.ctor}>

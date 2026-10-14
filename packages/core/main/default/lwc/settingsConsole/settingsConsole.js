@@ -28,6 +28,27 @@ import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 
 const RECENT_LIMIT = 10;
+
+// The three household naming patterns are edited in the naming panel (a Component row), which
+// saves them. Their plain rows are hidden while that panel is in the section so a pattern has
+// one editor (ADMIN-11). The settings and their definitions stay; search still finds them and
+// lands on the panel.
+const NAMING_PANEL_COMPONENT = 'householdNamingSettings';
+const NAMING_PATTERN_KEYS = [
+  'Household_Name_Pattern__c',
+  'Formal_Greeting_Pattern__c',
+  'Informal_Greeting_Pattern__c'
+];
+
+/** The panel row of a section, when it has one. */
+function namingPanelRow(section) {
+  return section.settings.find((setting) => setting.component === NAMING_PANEL_COMPONENT);
+}
+
+/** True for a naming pattern row whose section also shows the naming panel. */
+function isHiddenNamingPattern(section, setting) {
+  return NAMING_PATTERN_KEYS.includes(setting.key) && Boolean(namingPanelRow(section));
+}
 const TAB_ICON = 'standard:settings';
 
 /** A Record Type List value, stored as developer names separated by commas, as a list. */
@@ -175,7 +196,9 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
     if (!section) {
       return [];
     }
-    return section.settings.map((setting) => this.toRow(setting));
+    return section.settings
+      .filter((setting) => !isHiddenNamingPattern(section, setting))
+      .map((setting) => this.toRow(setting));
   }
 
   get sectionIsEmpty() {
@@ -321,9 +344,23 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   handleSearchSelect(event) {
     if (event.detail && event.detail.section) {
+      const sameSection = this.selectedSection === event.detail.section;
       this.selectedSection = event.detail.section;
-      this.focusKey = event.detail.key;
+      this.focusKey = this.visibleKeyFor(event.detail.section, event.detail.key);
+      if (sameSection) {
+        // Nothing re-renders when the section is already open, so go to the row now.
+        this.focusChosenSetting();
+      }
     }
+  }
+
+  /** A hidden naming pattern is found on the naming panel, so a search for it lands there. */
+  visibleKeyFor(sectionName, key) {
+    const section = this.sections.find((candidate) => candidate.name === sectionName);
+    if (!section || !isHiddenNamingPattern(section, { key })) {
+      return key;
+    }
+    return namingPanelRow(section).key;
   }
 
   // The admin guide says a search result takes you to the setting, not just its section, so
