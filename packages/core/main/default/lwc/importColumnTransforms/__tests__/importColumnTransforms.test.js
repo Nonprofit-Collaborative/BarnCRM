@@ -99,7 +99,14 @@ describe('the changes to one column', () => {
       'replace',
       'ifBlank',
       'append',
-      'date'
+      'date',
+      'map',
+      'ifThen',
+      'part',
+      'first',
+      'last',
+      'shiftDate',
+      'today'
     ]);
     const columns = input(element, 'columns');
     expect(columns.options.map((option) => option.value)).toEqual(['Middle', 'Last']);
@@ -132,6 +139,67 @@ describe('the changes to one column', () => {
         transformsJson: JSON.stringify([{ op: 'date', dateOrder: 'MDY' }])
       })
     );
+  });
+
+  it('edits a value map table row by row', async () => {
+    const element = render();
+    listen(element);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add"]').click();
+    await flush();
+    change(input(element, 'op'), 'map');
+    await flush();
+    expect(steps(element)[0].querySelectorAll('[data-id="pair"]')).toHaveLength(1);
+    change(input(element, 'text'), 'CA');
+    change(input(element, 'value'), 'California');
+    steps(element)[0].querySelector('[data-id="add-pair"]').click();
+    await flush();
+    const pairs = steps(element)[0].querySelectorAll('[data-id="pair"]');
+    change(pairs[1].querySelector('[data-name="text"]'), 'NY');
+    change(pairs[1].querySelector('[data-name="value"]'), 'New York');
+    change(input(element, 'otherwise'), 'Other');
+    await flush();
+    expect(changes[changes.length - 1].transforms).toEqual([
+      {
+        op: 'map',
+        pairs: [
+          { text: 'CA', value: 'California' },
+          { text: 'NY', value: 'New York' }
+        ],
+        otherwise: 'Other',
+        matchCase: false
+      }
+    ]);
+    steps(element)[0].querySelectorAll('[data-id="remove-pair"]')[0].click();
+    await flush();
+    expect(changes[changes.length - 1].transforms[0].pairs).toEqual([
+      { text: 'NY', value: 'New York' }
+    ]);
+  });
+
+  it('sends the newer steps with whole numbers and their defaults', async () => {
+    const element = render([
+      { op: 'ifThen', test: 'blank' },
+      { op: 'part', separator: '@', position: 2 },
+      { op: 'first', count: 5 },
+      { op: 'shiftDate', amount: 1, unit: 'months' },
+      { op: 'today' }
+    ]);
+    listen(element);
+    await flush();
+    expect(input(element, 'text', 0)).toBeNull();
+    change(input(element, 'position', 1), '3');
+    change(input(element, 'amount', 3), '-30');
+    change(input(element, 'unit', 3), 'days');
+    change(input(element, 'whenBlank', 4), true);
+    await flush();
+    expect(changes[changes.length - 1].transforms).toEqual([
+      { op: 'ifThen', test: 'blank', text: '', value: '', otherwise: '', matchCase: false },
+      { op: 'part', separator: '@', position: 3, fromEnd: false },
+      { op: 'first', count: 5 },
+      { op: 'shiftDate', amount: -30, unit: 'days' },
+      { op: 'today', whenBlank: true }
+    ]);
   });
 
   it('removes a change, and allows no more than ten', async () => {

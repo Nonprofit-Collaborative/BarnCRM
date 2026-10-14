@@ -32,10 +32,42 @@ import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
 import rowNumberHeader from '@salesforce/label/c.Core_Import_RowNumberHeader';
 import opAddFields from '@salesforce/label/c.Core_BulkUpdate_StepAddFields';
 import fieldsLabel from '@salesforce/label/c.Core_BulkUpdate_StepFields';
+import opMap from '@salesforce/label/c.Core_Import_StepsOpMap';
+import opIfThen from '@salesforce/label/c.Core_Import_StepsOpIfThen';
+import opPart from '@salesforce/label/c.Core_Import_StepsOpPart';
+import opFirst from '@salesforce/label/c.Core_Import_StepsOpFirst';
+import opLast from '@salesforce/label/c.Core_Import_StepsOpLast';
+import opShiftDate from '@salesforce/label/c.Core_Import_StepsOpShiftDate';
+import opToday from '@salesforce/label/c.Core_Import_StepsOpToday';
+import mapFromLabel from '@salesforce/label/c.Core_Import_StepsMapFrom';
+import mapToLabel from '@salesforce/label/c.Core_Import_StepsMapTo';
+import mapAddRowLabel from '@salesforce/label/c.Core_Import_StepsMapAddRow';
+import mapRemoveRowLabel from '@salesforce/label/c.Core_Import_StepsMapRemoveRow';
+import mapOtherwiseLabel from '@salesforce/label/c.Core_Import_StepsMapOtherwise';
+import testLabel from '@salesforce/label/c.Core_Import_StepsTest';
+import testEquals from '@salesforce/label/c.Core_Import_StepsTestEquals';
+import testContains from '@salesforce/label/c.Core_Import_StepsTestContains';
+import testBlank from '@salesforce/label/c.Core_Import_StepsTestBlank';
+import testTextLabel from '@salesforce/label/c.Core_Import_StepsTestText';
+import thenValueLabel from '@salesforce/label/c.Core_Import_StepsThenValue';
+import otherwiseLabel from '@salesforce/label/c.Core_Import_StepsOtherwise';
+import splitAtLabel from '@salesforce/label/c.Core_Import_StepsSplitAt';
+import positionLabel from '@salesforce/label/c.Core_Import_StepsPosition';
+import fromEndLabel from '@salesforce/label/c.Core_Import_StepsFromEnd';
+import countLabel from '@salesforce/label/c.Core_Import_StepsCount';
+import amountLabel from '@salesforce/label/c.Core_Import_StepsAmount';
+import unitLabel from '@salesforce/label/c.Core_Import_StepsUnit';
+import unitDays from '@salesforce/label/c.Core_Import_StepsUnitDays';
+import unitMonths from '@salesforce/label/c.Core_Import_StepsUnitMonths';
+import whenBlankLabel from '@salesforce/label/c.Core_Import_StepsWhenBlank';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
+/** The most rows a value map may have, as DataTransform.MAX_PAIRS says. */
+const MAX_PAIRS = 100;
 const SAMPLE_ROWS = 5;
+/** Number parameters, kept as whole numbers in the document. */
+const NUMBER_PARAMETERS = ['position', 'count', 'amount'];
 
 /**
  * The changes to one column's values as they load (canonical model R-IT15): an ordered list
@@ -94,7 +126,23 @@ export default class ImportColumnTransforms extends LightningElement {
     previewHeading,
     beforeHeader,
     afterHeader,
-    rowNumberHeader
+    rowNumberHeader,
+    mapFromLabel,
+    mapToLabel,
+    mapAddRowLabel,
+    mapRemoveRowLabel,
+    mapOtherwiseLabel,
+    testLabel,
+    testTextLabel,
+    thenValueLabel,
+    otherwiseLabel,
+    splitAtLabel,
+    positionLabel,
+    fromEndLabel,
+    countLabel,
+    amountLabel,
+    unitLabel,
+    whenBlankLabel
   };
 
   /** The column's steps, as the mapping document holds them. */
@@ -138,7 +186,29 @@ export default class ImportColumnTransforms extends LightningElement {
       { label: opReplace, value: 'replace' },
       { label: opIfBlank, value: 'ifBlank' },
       { label: this.embedded ? opAddFields : opAppend, value: 'append' },
-      { label: opDate, value: 'date' }
+      { label: opDate, value: 'date' },
+      { label: opMap, value: 'map' },
+      { label: opIfThen, value: 'ifThen' },
+      { label: opPart, value: 'part' },
+      { label: opFirst, value: 'first' },
+      { label: opLast, value: 'last' },
+      { label: opShiftDate, value: 'shiftDate' },
+      { label: opToday, value: 'today' }
+    ];
+  }
+
+  get testOptions() {
+    return [
+      { label: testEquals, value: 'equals' },
+      { label: testContains, value: 'contains' },
+      { label: testBlank, value: 'blank' }
+    ];
+  }
+
+  get unitOptions() {
+    return [
+      { label: unitDays, value: 'days' },
+      { label: unitMonths, value: 'months' }
     ];
   }
 
@@ -167,7 +237,20 @@ export default class ImportColumnTransforms extends LightningElement {
       isIfBlank: step.op === 'ifBlank',
       isAppend: step.op === 'append',
       isDate: step.op === 'date',
-      columns: step.columns || []
+      isMap: step.op === 'map',
+      isIfThen: step.op === 'ifThen',
+      needsTestText: step.op === 'ifThen' && step.test !== 'blank',
+      isPart: step.op === 'part',
+      isCount: step.op === 'first' || step.op === 'last',
+      isShiftDate: step.op === 'shiftDate',
+      isToday: step.op === 'today',
+      columns: step.columns || [],
+      pairRows: (step.pairs || []).map((pair, index) => ({
+        ...pair,
+        index,
+        key: `${step.key}-pair-${index}`
+      })),
+      cannotAddPair: (step.pairs || []).length >= MAX_PAIRS
     }));
   }
 
@@ -212,9 +295,42 @@ export default class ImportColumnTransforms extends LightningElement {
         return step;
       }
       if (name === 'op') {
-        return this.keyed({ op: value, key });
+        // A new kind starts from its stored defaults, so the inputs show what will be saved.
+        return this.keyed({ ...this.stored({ op: value }), key });
+      }
+      if (NUMBER_PARAMETERS.includes(name)) {
+        const number = parseInt(value, 10);
+        return { ...step, [name]: Number.isNaN(number) ? null : number };
       }
       return { ...step, [name]: value };
+    });
+    this.changed();
+  }
+
+  /** One cell of a value map's table: the input names the step, the row and the side. */
+  handlePair(event) {
+    const { key, index, name } = event.target.dataset;
+    const value = event.detail && event.detail.value !== undefined ? event.detail.value : '';
+    this.updatePairs(key, (pairs) =>
+      pairs.map((pair, at) => (at === Number(index) ? { ...pair, [name]: value } : pair))
+    );
+  }
+
+  handleAddPair(event) {
+    this.updatePairs(event.target.dataset.key, (pairs) => pairs.concat({ text: '', value: '' }));
+  }
+
+  handleRemovePair(event) {
+    const { key, index } = event.target.dataset;
+    this.updatePairs(key, (pairs) => pairs.filter((pair, at) => at !== Number(index)));
+  }
+
+  updatePairs(key, change) {
+    this.steps = this.steps.map((step) => {
+      if (step.key !== key) {
+        return step;
+      }
+      return { ...step, pairs: change(step.pairs || []) };
     });
     this.changed();
   }
@@ -281,7 +397,50 @@ export default class ImportColumnTransforms extends LightningElement {
       }
     } else if (step.op === 'date') {
       result.dateOrder = step.dateOrder || 'MDY';
+    } else {
+      Object.assign(result, this.storedNewer(step));
     }
     return result;
+  }
+
+  /** The parameters of the steps ADR-NEXT (more transform steps) added. */
+  storedNewer(step) {
+    switch (step.op) {
+      case 'map':
+        return {
+          pairs: (step.pairs || [{ text: '', value: '' }]).map((pair) => ({
+            text: pair.text || '',
+            value: pair.value || ''
+          })),
+          otherwise: step.otherwise || '',
+          matchCase: Boolean(step.matchCase)
+        };
+      case 'ifThen':
+        return {
+          test: step.test || 'equals',
+          text: step.text || '',
+          value: step.value || '',
+          otherwise: step.otherwise || '',
+          matchCase: Boolean(step.matchCase)
+        };
+      case 'part':
+        return {
+          separator: step.separator || '',
+          position: step.position === undefined ? 1 : step.position,
+          fromEnd: Boolean(step.fromEnd)
+        };
+      case 'first':
+      case 'last':
+        return { count: step.count === undefined ? 1 : step.count };
+      case 'shiftDate':
+        return {
+          amount: step.amount === undefined ? 0 : step.amount,
+          unit: step.unit || 'days'
+        };
+      case 'today':
+        return { whenBlank: Boolean(step.whenBlank) };
+      default:
+        return {};
+    }
   }
 }

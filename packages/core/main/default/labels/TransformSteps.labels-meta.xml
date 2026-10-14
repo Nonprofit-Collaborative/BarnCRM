@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_StepsOpMap</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: map values</shortDescription>
+        <value>Map values</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpIfThen</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: if then</shortDescription>
+        <value>If, then</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpPart</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: keep one part</shortDescription>
+        <value>Keep part</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpFirst</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: keep the first characters</shortDescription>
+        <value>First characters</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpLast</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: keep the last characters</shortDescription>
+        <value>Last characters</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpShiftDate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: shift a date</shortDescription>
+        <value>Shift a date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOpToday</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column change: today&apos;s date</shortDescription>
+        <value>Today&apos;s date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsMapFrom</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Map values: the value to look for</shortDescription>
+        <value>When the value is</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsMapTo</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Map values: what it becomes</shortDescription>
+        <value>Change it to</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsMapAddRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Map values: add a row to the table</shortDescription>
+        <value>Add a row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsMapRemoveRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Map values: remove a row</shortDescription>
+        <value>Remove row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsMapOtherwise</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Map values: the value for anything not listed</shortDescription>
+        <value>Anything else (empty keeps the value)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsTest</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: what is tested</shortDescription>
+        <value>If the value</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsTestEquals</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: the value equals the text</shortDescription>
+        <value>equals</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsTestContains</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: the value contains the text</shortDescription>
+        <value>contains</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsTestBlank</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: the value is empty</shortDescription>
+        <value>is empty</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsTestText</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: the text compared</shortDescription>
+        <value>Text</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsThenValue</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: the value written when the test holds</shortDescription>
+        <value>Then write (empty clears)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsOtherwise</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>If then: the value written when the test fails</shortDescription>
+        <value>Otherwise write (empty keeps the value)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsSplitAt</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Keep part: the separator</shortDescription>
+        <value>Split at</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsPosition</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Keep part: which part</shortDescription>
+        <value>Part number</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsFromEnd</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Keep part: count parts from the end</shortDescription>
+        <value>Count from the end</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsCount</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>First or last characters: how many</shortDescription>
+        <value>Number of characters</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsAmount</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shift a date: how far</shortDescription>
+        <value>How many (a minus sign goes back)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsUnit</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shift a date: days or months</shortDescription>
+        <value>Days or months</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsUnitDays</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shift a date: days</shortDescription>
+        <value>Days</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsUnitMonths</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shift a date: months</shortDescription>
+        <value>Months</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_StepsWhenBlank</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Today&apos;s date: only fill empty values</shortDescription>
+        <value>Only when empty</value>
+    </labels>
+</CustomLabels>
