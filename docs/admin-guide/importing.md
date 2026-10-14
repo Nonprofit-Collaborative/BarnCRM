@@ -53,12 +53,17 @@ Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-fr
 
 ## 3. A five-minute walkthrough (as Maria)
 
-You need a CSV file or an Excel workbook (.xlsx). A small one is best for the first run: five
-or six rows.
+You need a CSV file (or another text file whose columns are separated by semicolons, tabs or
+pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five or six rows.
 
 1. Open the **Import** tab. Select **Generic contact list**, then **Next**.
 2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
    you every column it found, with the first few values from the file underneath each one.
+   For a text file, **Columns are separated by** shows the separator BarnCRM found (commas,
+   semicolons, tabs or pipes); change it if the columns look wrong, for example every heading
+   in one column. For a workbook with more than one sheet, **Sheet** chooses which one to load
+   (the first, until you choose another). Changing either reads the file again and suggests
+   the columns afresh.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
    "Email" for a column headed `Email Address`. Change anything that is wrong from the
    picker beside it. A column you do not want loaded is set to **Do not load**, and its
@@ -244,9 +249,15 @@ imported by a person, because an import nobody watched is an import nobody check
 
 ## 7. Common mistakes
 
-**An Excel file shows the wrong columns, or none.** Only the **first sheet** of a workbook is
-read, and its first row must be the column headings. Move the sheet you want to the front, or
-copy it into a workbook of its own. A formula is read as the value Excel last saved for it,
+**Every heading shows as one column.** The file separates its columns with something other
+than what BarnCRM chose (European exports often use semicolons). Choose the right separator in
+**Columns are separated by** above the column list. A file of only one column reads as comma
+separated.
+
+**An Excel file shows the wrong columns, or none.** The **first sheet** of a workbook is read
+until you choose another in **Sheet** above the column list, and the sheet's first row must be
+the column headings. A sheet with no rows under its headings shows no columns and you cannot go
+on until you choose another. A formula is read as the value Excel last saved for it,
 and a date as the date, whatever format the cell shows. An older .xls file, or a
 password-protected workbook, cannot be read: save it as .xlsx or CSV and upload that. A
 browser too old to open a workbook says so; save the sheet as CSV instead. So does a workbook

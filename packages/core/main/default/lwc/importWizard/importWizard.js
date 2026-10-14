@@ -1,9 +1,17 @@
 import { LightningElement, wire } from 'lwc';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
-import { parseCsv, toRecords } from './csv';
+import { parseCsv, toRecords, detectDelimiter } from './csv';
 import { toCsv } from 'c/findCsv';
-import { isXlsx, readXlsx, XLSX_ERRORS } from './xlsx';
+import { isXlsx, readXlsx, readSheetNames, XLSX_ERRORS } from './xlsx';
+import delimiterLabel from '@salesforce/label/c.Core_Import_DelimiterLabel';
+import delimiterHelp from '@salesforce/label/c.Core_Import_DelimiterHelp';
+import delimiterComma from '@salesforce/label/c.Core_Import_DelimiterComma';
+import delimiterSemicolon from '@salesforce/label/c.Core_Import_DelimiterSemicolon';
+import delimiterTab from '@salesforce/label/c.Core_Import_DelimiterTab';
+import delimiterPipe from '@salesforce/label/c.Core_Import_DelimiterPipe';
+import sheetLabel from '@salesforce/label/c.Core_Import_SheetLabel';
+import sheetHelp from '@salesforce/label/c.Core_Import_SheetHelp';
 
 import canImport from '@salesforce/apex/ImportController.canImport';
 import getTemplates from '@salesforce/apex/ImportController.getTemplates';
@@ -147,6 +155,13 @@ const STAGE_PAGE_SIZE = 500;
 const MAX_STORED_FILE_BYTES = 2500000;
 /** How many values of each column the picker shows, so the choice can be checked by eye. */
 const SAMPLE_VALUES = 3;
+/** The separators a text file's columns may use, as the separator picker offers them. */
+const DELIMITER_OPTIONS = [
+  { value: ',', label: delimiterComma },
+  { value: ';', label: delimiterSemicolon },
+  { value: '\t', label: delimiterTab },
+  { value: '|', label: delimiterPipe }
+];
 
 const IGNORE = 'Ignore';
 
@@ -223,6 +238,11 @@ export default class ImportWizard extends LightningElement {
   batch;
   rejectedRows = [];
   fileName;
+  /** How a text file's columns are separated, detected and then as chosen. */
+  delimiter;
+  /** A workbook's sheets, and the one being read. */
+  sheetNames = [];
+  sheetName;
   pollTimer;
   storeFileError;
   enclosingTabId;
@@ -348,7 +368,11 @@ export default class ImportWizard extends LightningElement {
     lookupFieldLabel,
     duplicateRulesLabel,
     duplicateRulesHelp,
-    duplicateRulesNone
+    duplicateRulesNone,
+    delimiterLabel,
+    delimiterHelp,
+    sheetLabel,
+    sheetHelp
   };
 
   async connectedCallback() {
@@ -542,16 +566,62 @@ export default class ImportWizard extends LightningElement {
     if (!file) {
       return;
     }
+    // A new file is read with its own separator or first sheet, not the last file's.
+    this.delimiter = undefined;
+    this.sheetNames = [];
+    this.sheetName = undefined;
+    await this.loadFile(file);
+  }
+
+  /** Reads the text file again with the separator the administrator chose. */
+  async handleDelimiterChange(event) {
+    this.delimiter = event.detail.value;
+    await this.loadFile(this.pendingFile);
+  }
+
+  /** Reads another sheet of the workbook. */
+  async handleSheetChange(event) {
+    this.sheetName = event.detail.value;
+    await this.loadFile(this.pendingFile);
+  }
+
+  get isDelimitedFile() {
+    return Boolean(this.fileName) && !isXlsx(this.fileName);
+  }
+
+  get hasSeveralSheets() {
+    return this.sheetNames.length > 1;
+  }
+
+  get delimiterOptions() {
+    return DELIMITER_OPTIONS;
+  }
+
+  get sheetOptions() {
+    return this.sheetNames.map((name) => ({ label: name, value: name }));
+  }
+
+  /** A separator or sheet that read nothing leaves no columns to go on with. */
+  get hasNoColumns() {
+    return this.parsing || this.columns.length === 0;
+  }
+
+  /** Reads the file into headers and rows, then suggests a mapping for its columns. */
+  async loadFile(file) {
+    if (!file) {
+      return;
+    }
     this.message = undefined;
     this.parsing = true;
     this.fileName = file.name;
     try {
       const rows = isXlsx(file.name)
         ? await this.readWorkbook(file)
-        : parseCsv(await this.readText(file));
+        : this.readDelimited(await this.readText(file));
       const { headers, records } = toRecords(rows);
       if (headers.length === 0 || records.length === 0) {
         this.message = noHeaderRow;
+        this.clearColumns();
         return;
       }
       this.headers = headers;
@@ -560,9 +630,20 @@ export default class ImportWizard extends LightningElement {
       this.step = 3;
     } catch (error) {
       this.message = this.errorText(error);
+      this.clearColumns();
     } finally {
       this.parsing = false;
     }
+  }
+
+  /**
+   * Forgets the last reading's columns, so a separator or sheet that reads nothing never leaves
+   * another reading's rows on the screen to be loaded under the new choice.
+   */
+  clearColumns() {
+    this.headers = [];
+    this.records = [];
+    this.columns = [];
   }
 
   readText(file) {
@@ -574,7 +655,18 @@ export default class ImportWizard extends LightningElement {
     });
   }
 
-  /** The first sheet of an Excel workbook, as rows; a file it cannot read says what to do. */
+  /** A text file's rows, split on the separator detected from it unless one was chosen. */
+  readDelimited(text) {
+    if (!this.delimiter) {
+      this.delimiter = detectDelimiter(text);
+    }
+    return parseCsv(text, this.delimiter);
+  }
+
+  /**
+   * The chosen sheet of an Excel workbook (the first until another is chosen), as rows; a file
+   * it cannot read says what to do.
+   */
   async readWorkbook(file) {
     const buffer = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -583,7 +675,9 @@ export default class ImportWizard extends LightningElement {
       reader.readAsArrayBuffer(file);
     });
     try {
-      return await readXlsx(buffer);
+      this.sheetNames = await readSheetNames(buffer);
+      this.sheetName = this.sheetName || this.sheetNames[0];
+      return await readXlsx(buffer, { sheet: this.sheetName });
     } catch (error) {
       const sentences = {
         [XLSX_ERRORS.unsupportedBrowser]: xlsxUnsupportedBrowser,
@@ -1321,6 +1415,9 @@ export default class ImportWizard extends LightningElement {
     this.columns = [];
     this.fileName = undefined;
     this.pendingFile = undefined;
+    this.delimiter = undefined;
+    this.sheetNames = [];
+    this.sheetName = undefined;
     this.message = undefined;
     this.expectedCount = '';
     this.expectedAmount = '';

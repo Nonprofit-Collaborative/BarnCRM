@@ -1,4 +1,4 @@
-import { parseCsv, toRecords, withoutFormulaGuard } from '../csv';
+import { parseCsv, toRecords, withoutFormulaGuard, detectDelimiter } from '../csv';
 import { toCsv } from 'c/findCsv';
 
 describe('the CSV reader', () => {
@@ -79,6 +79,43 @@ describe('the CSV reader', () => {
       const { records } = toRecords(parseCsv(exported));
       expect(records.map((record) => record.Value)).toEqual(values);
       expect(withoutFormulaGuard("''+1")).toBe("''+1");
+    });
+  });
+
+  describe('the separator', () => {
+    it('splits on the separator it is given, keeping one inside quotes', () => {
+      expect(parseCsv('a;b\n"x;y";2', ';')).toEqual([
+        ['a', 'b'],
+        ['x;y', '2']
+      ]);
+      expect(parseCsv('a\tb\n1\t2', '\t')[1]).toEqual(['1', '2']);
+      expect(parseCsv('a|b\n1|2', '|')[1]).toEqual(['1', '2']);
+    });
+
+    it('reads as commas when given a separator it does not offer', () => {
+      expect(parseCsv('a,b', ':')).toEqual([['a', 'b']]);
+    });
+
+    it('detects semicolons, tabs and pipes, and commas by default', () => {
+      expect(detectDelimiter('Name;Amount\nRamirez;12,50\nOkafor;3,00')).toBe(';');
+      expect(detectDelimiter('Name\tEmail\nAna\tana@example.org')).toBe('\t');
+      expect(detectDelimiter('Name|Email\nAna|ana@example.org')).toBe('|');
+      expect(detectDelimiter('Name,Email\nAna,ana@example.org')).toBe(',');
+      expect(detectDelimiter('Email\nana@example.org')).toBe(',');
+      expect(detectDelimiter('')).toBe(',');
+    });
+
+    it('ignores a separator inside quotes when detecting', () => {
+      expect(detectDelimiter('Name,Note\n"Ramirez; Ana","a; b; c"\nOkafor,x')).toBe(',');
+    });
+
+    it('prefers the separator that gives every row the header width', () => {
+      // Three columns by semicolon in the header only; two by comma on every row.
+      expect(detectDelimiter('a,b;c;d\n1,2\n3,4\n5,6')).toBe(',');
+    });
+
+    it('stops after the rows it was asked for', () => {
+      expect(parseCsv('a\n1\n2\n3', ',', 2)).toEqual([['a'], ['1']]);
     });
   });
 

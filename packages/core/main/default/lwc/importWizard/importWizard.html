@@ -92,7 +92,7 @@
                         type="file"
                         data-id="file"
                         label={labels.uploadLabel}
-                        accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        accept=".csv,text/csv,.tsv,.txt,text/tab-separated-values,text/plain,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         onchange={handleFileChange}
                     ></lightning-input>
                     <p class="slds-text-body_small slds-var-m-top_x-small">{labels.uploadHint}</p>
@@ -107,6 +107,30 @@
                     <h2 class="slds-text-heading_small slds-var-m-bottom_small">
                         {labels.stepColumns}
                     </h2>
+                    <template lwc:if={isDelimitedFile}>
+                        <lightning-combobox
+                            data-id="delimiter"
+                            class="slds-var-m-bottom_small"
+                            label={labels.delimiterLabel}
+                            field-level-help={labels.delimiterHelp}
+                            options={delimiterOptions}
+                            value={delimiter}
+                            disabled={parsing}
+                            onchange={handleDelimiterChange}
+                        ></lightning-combobox>
+                    </template>
+                    <template lwc:if={hasSeveralSheets}>
+                        <lightning-combobox
+                            data-id="sheet"
+                            class="slds-var-m-bottom_small"
+                            label={labels.sheetLabel}
+                            field-level-help={labels.sheetHelp}
+                            options={sheetOptions}
+                            value={sheetName}
+                            disabled={parsing}
+                            onchange={handleSheetChange}
+                        ></lightning-combobox>
+                    </template>
                     <div class="slds-scrollable_x">
                         <table
                             class="slds-table slds-table_bordered slds-table_cell-buffer"
@@ -430,6 +454,7 @@
                             variant="brand"
                             label={labels.nextButton}
                             data-id="next"
+                            disabled={hasNoColumns}
                             onclick={handleNext}
                         ></lightning-button>
                     </template>

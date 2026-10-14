@@ -1,6 +1,7 @@
 /**
- * Reads the first sheet of an Excel workbook (.xlsx) into rows of text, the same shape
- * `parseCsv` returns, so the rest of the wizard does not know which kind of file it was given.
+ * Reads one sheet of an Excel workbook (.xlsx), the first unless another is named, into rows
+ * of text, the same shape `parseCsv` returns, so the rest of the wizard does not know which
+ * kind of file it was given.
  *
  * An .xlsx file is a zip of XML documents. This reads the zip's central directory, inflates
  * the few parts it needs with the browser's own DecompressionStream, and reads the XML with
@@ -54,14 +55,57 @@ export function isXlsx(fileName) {
 }
 
 /**
- * The first sheet's rows, each an array of text.
+ * The names of the workbook's sheets, in the order Excel shows their tabs. Reads only the
+ * workbook part, so it is cheap to call before choosing which sheet to read.
+ *
+ * @param {ArrayBuffer} buffer the file's bytes
+ * @param {object} [options] as for readXlsx
+ * @returns {Promise<string[]>} the sheet names
+ */
+export async function readSheetNames(buffer, options = {}) {
+  const { workbook } = await openWorkbook(buffer, options);
+  return byLocalName(workbook, 'sheet').map((sheet) => sheet.getAttribute('name') || '');
+}
+
+/**
+ * One sheet's rows, each an array of text: the sheet named in `options.sheet`, or the first.
  *
  * @param {ArrayBuffer} buffer the file's bytes
  * @param {object} [options] `inflate(bytes)` returning a promise of the raw-inflated bytes,
- *   for a test to supply where the browser's DecompressionStream is not available
+ *   for a test to supply where the browser's DecompressionStream is not available; `sheet`,
+ *   the name of the sheet to read
  * @returns {Promise<string[][]>} the rows
  */
 export async function readXlsx(buffer, options = {}) {
+  const { workbook, read } = await openWorkbook(buffer, options);
+  const relationships = parseRelationships(await read('xl/_rels/workbook.xml.rels'));
+  const sheets = byLocalName(workbook, 'sheet');
+  const chosen = options.sheet
+    ? sheets.find((sheet) => sheet.getAttribute('name') === options.sheet)
+    : sheets[0];
+  if (!chosen) {
+    throw new XlsxError(XLSX_ERRORS.notAWorkbook);
+  }
+  const sheetTarget = relationships.byId.get(relationshipId(chosen));
+  const sheetXml = sheetTarget ? await read(sheetTarget) : null;
+  if (!sheetXml) {
+    throw new XlsxError(XLSX_ERRORS.notAWorkbook);
+  }
+  const sharedStrings = readSharedStrings(
+    await read(relationships.byType.get('sharedStrings') || 'xl/sharedStrings.xml')
+  );
+  const dateStyles = readDateStyles(
+    await read(relationships.byType.get('styles') || 'xl/styles.xml')
+  );
+  const workbookPr = byLocalName(workbook, 'workbookPr')[0];
+  const date1904 = Boolean(
+    workbookPr && ['1', 'true'].includes(workbookPr.getAttribute('date1904'))
+  );
+  return readSheet(parseXml(sheetXml), { sharedStrings, dateStyles, date1904 });
+}
+
+/** The parsed workbook part, and a reader for the zip's other parts. */
+async function openWorkbook(buffer, options) {
   const inflate = options.inflate || inflateInBrowser;
   const bytes = new Uint8Array(buffer);
   const entries = readCentralDirectory(bytes);
@@ -84,28 +128,7 @@ export async function readXlsx(buffer, options = {}) {
   if (!workbookXml) {
     throw new XlsxError(XLSX_ERRORS.notAWorkbook);
   }
-  const workbook = parseXml(workbookXml);
-  const relationships = parseRelationships(await read('xl/_rels/workbook.xml.rels'));
-  const firstSheet = byLocalName(workbook, 'sheet')[0];
-  if (!firstSheet) {
-    throw new XlsxError(XLSX_ERRORS.notAWorkbook);
-  }
-  const sheetTarget = relationships.byId.get(relationshipId(firstSheet));
-  const sheetXml = sheetTarget ? await read(sheetTarget) : null;
-  if (!sheetXml) {
-    throw new XlsxError(XLSX_ERRORS.notAWorkbook);
-  }
-  const sharedStrings = readSharedStrings(
-    await read(relationships.byType.get('sharedStrings') || 'xl/sharedStrings.xml')
-  );
-  const dateStyles = readDateStyles(
-    await read(relationships.byType.get('styles') || 'xl/styles.xml')
-  );
-  const workbookPr = byLocalName(workbook, 'workbookPr')[0];
-  const date1904 = Boolean(
-    workbookPr && ['1', 'true'].includes(workbookPr.getAttribute('date1904'))
-  );
-  return readSheet(parseXml(sheetXml), { sharedStrings, dateStyles, date1904 });
+  return { workbook: parseXml(workbookXml), read };
 }
 
 // -----------------------------------------------------------------------------------------

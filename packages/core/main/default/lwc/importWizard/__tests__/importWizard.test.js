@@ -20,6 +20,7 @@ import getKeyFields from '@salesforce/apex/ImportController.getKeyFields';
 import getChangedValues from '@salesforce/apex/ImportController.getChangedValues';
 import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
+import { readSheetNames, readXlsx } from '../xlsx';
 
 jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
   virtual: true
@@ -95,6 +96,16 @@ jest.mock('@salesforce/apex/ImportController.getChangedValues', () => ({ default
 });
 jest.mock('@salesforce/apex/ImportController.previewChanges', () => ({ default: jest.fn() }), {
   virtual: true
+});
+// The workbook reader runs for real (jsdom has no DecompressionStream, so a real workbook
+// cannot be opened here); a test that needs sheets gives their contents once.
+jest.mock('../xlsx', () => {
+  const actual = jest.requireActual('../xlsx');
+  return {
+    ...actual,
+    readSheetNames: jest.fn((...args) => actual.readSheetNames(...args)),
+    readXlsx: jest.fn((...args) => actual.readXlsx(...args))
+  };
 });
 
 const TEMPLATE = {
@@ -347,6 +358,100 @@ describe('the import wizard', () => {
       'c.Core_Import_XlsxUnreadable'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
+  });
+
+  it('reads a semicolon file by its own separator and offers to change it', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'Last Name;Email;Notes\nRamirez;ana@example.org;vip', 'eu.csv');
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+    const picker = element.shadowRoot.querySelector('[data-id="delimiter"]');
+    expect(picker.value).toBe(';');
+    expect(picker.options.map((option) => option.value)).toEqual([',', ';', '\t', '|']);
+    expect(element.shadowRoot.querySelector('[data-id="sheet"]')).toBeNull();
+  });
+
+  it('reads the file again when the separator is changed, and back', async () => {
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    const picker = element.shadowRoot.querySelector('[data-id="delimiter"]');
+    expect(picker.value).toBe(',');
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: ';' } }));
+    await flush();
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain('Last Name,Email,Notes');
+    expect(suggestMapping).toHaveBeenLastCalledWith({
+      templateId: 'a01',
+      headers: ['Last Name,Email,Notes']
+    });
+    element.shadowRoot
+      .querySelector('[data-id="delimiter"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: ',' } }));
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
+  });
+
+  it('offers the sheets of a workbook that has several, and reads the one chosen', async () => {
+    readSheetNames
+      .mockResolvedValueOnce(['Read me', 'Donors'])
+      .mockResolvedValueOnce(['Read me', 'Donors']);
+    readXlsx
+      .mockResolvedValueOnce([['About this export'], ['Exported 1 October']])
+      .mockResolvedValueOnce([
+        ['Last Name', 'Email'],
+        ['Ramirez', 'ana@example.org']
+      ]);
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'zip bytes', 'donors.xlsx');
+    const picker = element.shadowRoot.querySelector('[data-id="sheet"]');
+    expect(picker.value).toBe('Read me');
+    expect(picker.options).toEqual([
+      { label: 'Read me', value: 'Read me' },
+      { label: 'Donors', value: 'Donors' }
+    ]);
+    expect(element.shadowRoot.querySelector('[data-id="delimiter"]')).toBeNull();
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Donors' } }));
+    await flush();
+    expect(readXlsx).toHaveBeenLastCalledWith(expect.anything(), { sheet: 'Donors' });
+    const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
+    expect(rows).toHaveLength(2);
+    expect(rows[0].textContent).toContain('Last Name');
+  });
+
+  it('shows no columns and will not go on when the chosen sheet has no rows', async () => {
+    readSheetNames
+      .mockResolvedValueOnce(['Donors', 'Empty'])
+      .mockResolvedValueOnce(['Donors', 'Empty']);
+    readXlsx
+      .mockResolvedValueOnce([
+        ['Last Name', 'Email'],
+        ['Ramirez', 'ana@example.org']
+      ])
+      .mockResolvedValueOnce([['Last Name']]);
+    const element = render();
+    await flush();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element, 'zip bytes', 'donors.xlsx');
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(false);
+    element.shadowRoot
+      .querySelector('[data-id="sheet"]')
+      .dispatchEvent(new CustomEvent('change', { detail: { value: 'Empty' } }));
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      'c.Core_Import_NoHeaderRow'
+    );
+    expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
+    expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(true);
   });
 
   it('explains what the chosen matching rule risks', async () => {
