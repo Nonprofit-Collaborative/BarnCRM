@@ -341,8 +341,9 @@ deploy_stage() {
 # names never reaches the org, so nothing that depends on it is ever tested: Core's flows went
 # undeployed this way until 2026-10-13.
 CORE_DIR="packages/core/main/default"
-CORE_STAGED=(objects customMetadata labels staticresources customPermissions classes triggers
-  permissionsets permissionsetgroups layouts flexipages applications tabs quickActions lwc flows)
+CORE_STAGED=(objects customMetadata labels staticresources customPermissions notificationtypes
+  classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
+  tabs quickActions lwc prompts flows)
 unstaged=()
 for dir in "$CORE_DIR"/*/; do
   dir="$(basename "$dir")"
@@ -436,7 +437,8 @@ deploy_stage "Core (data model, custom metadata)" "packages/core/main/default/cu
 deploy_stage "Core (data model, labels)" "packages/core/main/default/labels" || exit $?
 deploy_stage "Core (data model, static resources and custom permissions)" \
   "packages/core/main/default/staticresources" \
-  "packages/core/main/default/customPermissions" || exit $?
+  "packages/core/main/default/customPermissions" \
+  "packages/core/main/default/notificationtypes" || exit $?
 deploy_stage "Core (Apex)" \
   "packages/core/main/default/classes" \
   "packages/core/main/default/triggers" || exit $?
@@ -451,7 +453,8 @@ deploy_stage "Core (UI and permissions)" \
   "packages/core/main/default/applications" \
   "packages/core/main/default/tabs" \
   "packages/core/main/default/quickActions" \
-  "packages/core/main/default/lwc" || exit $?
+  "packages/core/main/default/lwc" \
+  "packages/core/main/default/prompts" || exit $?
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
   deploy_stage "Giving" "packages/giving" || exit $?
