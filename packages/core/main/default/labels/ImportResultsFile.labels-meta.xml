@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_DownloadResultsButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: download every row with its outcome and record IDs</shortDescription>
+        <value>Download results</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsCapped</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: the results file holds fewer rows than the import</shortDescription>
+        <value>The results file holds the first {0} of {1} rows, the most one download can read.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsRow</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the row number column</shortDescription>
+        <value>Row</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsOutcome</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the outcome column</shortDescription>
+        <value>Outcome</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsReason</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the rejection reason column</shortDescription>
+        <value>Reason</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsRecordId</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the record ID column, one object</shortDescription>
+        <value>Record ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsPersonId</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the first person record ID column</shortDescription>
+        <value>Person ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsSecondPersonId</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the second person record ID column</shortDescription>
+        <value>Second person ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsHouseholdId</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the household record ID column</shortDescription>
+        <value>Household ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsOrganizationId</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the organization record ID column</shortDescription>
+        <value>Organization ID</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ResultsModuleRecordId</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results file: heading of the gift or module record ID column</shortDescription>
+        <value>Gift or other record ID</value>
+    </labels>
+</CustomLabels>

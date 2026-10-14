@@ -459,6 +459,98 @@ private class ImportControllerTest {
         }
     }
 
+    /**
+     * The results file: after a 200-row commit (one row rejected), reading every row with no
+     * status gives each row its outcome and the records it became, and the rejected row its
+     * reason and no record.
+     */
+    @IsTest
+    static void givesEveryRowItsOutcomeAndRecordIdsForTheResultsFile() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = permittedTemplate();
+            Import_Batch__c batch = ImportTestDataFactory.batch(template);
+            List<Map<String, String>> values = new List<Map<String, String>>();
+            for (Integer i = 0; i < 199; i++) {
+                values.add(
+                    ImportTestDataFactory.donorRow(
+                        'Person' + i,
+                        'Surname' + i,
+                        'results' + i + '@example.org',
+                        null
+                    )
+                );
+            }
+            // No last name: rejected, with a reason and no record.
+            values.add(ImportTestDataFactory.donorRow('Nobody', '', 'nobody@example.org', null));
+            ImportTestDataFactory.rows(batch, values);
+            batch.Status__c = ImportBatchService.STATUS_DRY_RUN_COMPLETE;
+            update batch;
+
+            Test.startTest();
+            Database.executeBatch(new ImportProcessorBatch(batch.Id, false), 200);
+            Test.stopTest();
+
+            ImportController.RowPage page = ImportController.getRowPage(
+                batch.Id,
+                null,
+                null,
+                0,
+                2000
+            );
+            Assert.areEqual(200, page.rows.size(), 'Every row, whatever its outcome.');
+            Assert.isFalse(page.hasMore, 'In one page. ' + pageText(page));
+            Map<String, Id> contactByEmail = new Map<String, Id>();
+            for (Contact person : [SELECT Id, Email FROM Contact]) {
+                contactByEmail.put(person.Email, person.Id);
+            }
+            for (Integer i = 0; i < 199; i++) {
+                ImportController.RowView row = page.rows[i];
+                Assert.areEqual(i + 2, row.rowNumber, 'In file order.');
+                Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.status, 'Created.');
+                Assert.areEqual(
+                    String.valueOf(contactByEmail.get('results' + i + '@example.org')),
+                    row.person1Id,
+                    'Named by the person it created.'
+                );
+                Assert.isNotNull(row.householdId, 'And the household it went into.');
+                Assert.isNull(row.person2Id, 'No second person on the row.');
+            }
+            ImportController.RowView rejected = page.rows[199];
+            Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.status, 'Rejected.');
+            Assert.isTrue(String.isNotBlank(rejected.errorMessage), 'With its reason.');
+            Assert.isNull(rejected.person1Id, 'And no record.');
+            Assert.isNull(rejected.householdId, 'Nor a household.');
+        }
+    }
+
+    /** A one-object load (or a module) holds its record as the Resulting Record; it is passed on. */
+    @IsTest
+    static void givesARowTheRecordALoadOfOneObjectResultedIn() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = ImportTestDataFactory.batch(permittedTemplate());
+            String recordId = String.valueOf(batch.Id);
+            insert new Import_Row__c(
+                Import_Batch__c = batch.Id,
+                Row_Number__c = 2,
+                Raw_Values_JSON__c = '{"Name":"Session 1"}',
+                Status__c = ImportRowProcessor.STATUS_UPDATED,
+                Gift_Id__c = recordId
+            );
+
+            ImportController.RowPage page = ImportController.getRowPage(
+                batch.Id,
+                null,
+                null,
+                0,
+                10
+            );
+
+            Assert.areEqual(1, page.rows.size(), 'The one row.');
+            Assert.areEqual(recordId, page.rows[0].resultingRecordId, 'With its record.');
+            Assert.isNull(page.rows[0].person1Id, 'And no person.');
+        }
+    }
+
     @IsTest
     static void holdsAPageBetweenOneRowAndTheCursorPageLimit() {
         System.runAs(TestUsers.admin()) {

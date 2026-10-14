@@ -188,7 +188,10 @@ public with sharing class ImportController {
         public Boolean personAccountRules;
     }
 
-    /** One staged row as the exceptions table shows it. */
+    /**
+     * One staged row as the exceptions table and the results file show it: its outcome, the
+     * records it resulted in, and its own values.
+     */
     public class RowView {
         @AuraEnabled
         public String id;
@@ -200,6 +203,18 @@ public with sharing class ImportController {
         public String errorMessage;
         @AuraEnabled
         public String values;
+        /** The first person, as a contact or a person account, whichever the row resolved to. */
+        @AuraEnabled
+        public String person1Id;
+        @AuraEnabled
+        public String person2Id;
+        @AuraEnabled
+        public String householdId;
+        @AuraEnabled
+        public String organizationId;
+        /** The record a module's import, or Load one object, created, updated or matched. */
+        @AuraEnabled
+        public String resultingRecordId;
     }
 
     /**
@@ -744,7 +759,18 @@ public with sharing class ImportController {
         view.status = row.Status__c;
         view.errorMessage = row.Error_Message__c;
         view.values = row.Raw_Values_JSON__c;
+        view.person1Id = idText(row.Contact_1__c, row.Person_1_Account__c);
+        view.person2Id = idText(row.Contact_2__c, row.Person_2_Account__c);
+        view.householdId = idText(row.Household__c, null);
+        view.organizationId = idText(row.Organization__c, null);
+        view.resultingRecordId = row.Gift_Id__c;
         return view;
+    }
+
+    /** The first ID that is set, as text, or null. */
+    private static String idText(Id first, Id second) {
+        Id chosen = first != null ? first : second;
+        return chosen == null ? null : String.valueOf(chosen);
     }
 
     /**
