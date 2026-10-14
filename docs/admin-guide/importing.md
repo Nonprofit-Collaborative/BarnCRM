@@ -238,9 +238,11 @@ What undo will not do, on purpose:
   to a person in that household. Each record kept is listed with the reason in the import's
   journal.
 - **It keeps a record somebody edited since.** A person or household somebody (or another
-  automation) changed after the import is kept. Totals that rollups recalculate are not an
-  edit: when undo deletes the imported gifts, the donors' totals are recalculated, and the
-  donors are still removed. A donor somebody edited before you selected Undo is kept even so.
+  automation) changed after the import is kept. Totals the import or the undo recalculates
+  are not an edit: when undo deletes the imported gifts, the donors' totals are recalculated,
+  and the donors are still removed. A donor somebody edited before you selected Undo is kept
+  even so. Totals recalculated later, such as by the nightly run, keep the record, since they
+  could hide an edit.
 - **It does not overwrite a correction.** A value somebody has changed since the import is
   left as they set it, and listed as not put back.
 - **It does not empty the recycle bin.** Deleted records go to the recycle bin, where you can

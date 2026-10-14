@@ -23,17 +23,24 @@ Process save as safe would hide edits made by flows and integrations that run as
 
 ## Decision
 
-1. **A rollup's save is not an edit, whoever made it.** Every rollup save writes
+1. **A rollup the import set off is not an edit, whoever ran it.** Every rollup save writes
    `Rollups_Last_Calculated__c` (canonical model, freshness stamp) in the same save as its
    totals, stamped just before the save. A record whose `LastModifiedDate` falls within five
    seconds after its stamp was last saved by a rollup. Any later save of another kind leaves the
    stamp behind it. The stamp is read by its name through describe, so Core names no module.
-2. **Edits are judged before anything is deleted.** A rollup's save, or the undo's own (a
-   household renamed), replaces `LastModifiedDate`, which would hide an edit made before it.
-   After the restore pass, one judging pass per delete pass, in the same order, notes which
-   tagged records were already edited, and the job carries that set to the delete passes. A
-   record saved during the undo by the undo itself or by a rollup is kept only when the judging
-   found it edited. A record saved during the undo by anybody else is kept, as before.
+   Such a save is the import's own when the stamp is no later than ten minutes after the commit
+   completed (the import's follow-on work). A later rollup save (a nightly run, a total that
+   depends on the date) may hide a real edit, so it keeps the record. `RollupWriter` writes the
+   stamp whenever the field exists and is not calculated, never by the running user's access:
+   the queue runs as the Automated Process user.
+2. **Edits are judged before anything is put back or deleted.** A rollup's save, or the undo's
+   own (a household renamed), replaces `LastModifiedDate`, which would hide an edit made before
+   it. The undo of an import starts with one judging pass per delete pass, in the same order,
+   before the restore pass; the job carries the records found edited to the delete passes. While
+   judging, the undo has changed nothing, so no save is excused as the undo's or as a rollup it
+   set off. In the delete passes, a record saved during the undo by the undo itself or by a
+   rollup is kept only when the judging found it edited; one saved during the undo by anybody
+   else is kept, as before. A bulk update's undo has no judging.
 
 ## Consequences
 
@@ -45,9 +52,11 @@ Process save as safe would hide edits made by flows and integrations that run as
 - An object without the stamp cannot tell a rollup's save from an edit, and such a save keeps
   the record. Core ships no rollup targets without it; an administrator's own rollup onto an
   object without the stamp keeps the safe answer.
-- An edit made within five seconds after a rollup's save is read as that save. An edit hidden
-  by a rollup that ran later, before the undo began, is not seen; the import's own rollups run
-  within minutes of the commit.
+- An edit made within five seconds after a rollup's save is read as that save.
+- A rollup save stamped more than ten minutes after the commit completed keeps the record, even
+  when nobody edited it: the import's own rollups still being worked through a long queue, a
+  nightly run, or a total that depends on the date. Keeping is the safe answer; the journal
+  says why.
 
 ## Alternatives considered
 

@@ -111,12 +111,17 @@ public without sharing class RollupWriter {
         return result;
     }
 
-    /** The freshness attribute on this entity, or null when it has none it can write. */
+    /**
+     * The freshness attribute on this entity, or null when it has none or it is calculated.
+     * Not the running user's access: the save is in system mode, and the Rollup Queue runs as
+     * the Automated Process user, whose access says nothing. Import undo reads the stamp to
+     * tell a rollup's save from an edit (R-IB9), so it must never be skipped silently.
+     */
     public static Schema.SObjectField freshnessField(Schema.SObjectType targetType) {
         Schema.SObjectField stamp = targetType.getDescribe(SObjectDescribeOptions.DEFERRED)
             .fields.getMap()
             .get(RollupService.FRESHNESS_FIELD);
-        return stamp != null && stamp.getDescribe().isUpdateable() ? stamp : null;
+        return stamp != null && !stamp.getDescribe().isCalculated() ? stamp : null;
     }
 
     /**

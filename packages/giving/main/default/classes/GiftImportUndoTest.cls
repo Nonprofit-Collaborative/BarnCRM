@@ -18,6 +18,7 @@ public class GiftImportUndoTest {
     @TestSetup
     static void importDonors() {
         createUsers();
+        TestUsers.admin();
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
             imported(null);
         }
@@ -160,6 +161,59 @@ public class GiftImportUndoTest {
                 taggedLeft(batchId),
                 'Every person and household the import made goes. ' + undoJournal(batchId)
             );
+        }
+    }
+
+    /**
+     * The Rollup Queue started by its Ready event, the path the platform runs as the Automated
+     * Process user, writes the freshness stamp with the totals, so the undo can tell its save
+     * from an edit (ADR-NEXT). A test's subscriber runs as the user who published, so the
+     * event is published by one who may not edit the stamp.
+     */
+    @IsTest
+    static void theQueueStartedByItsEventStampsTheTotals() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Id batchId = batch().Id;
+            Contact donor = [
+                SELECT Id
+                FROM Contact
+                WHERE Created_By_Import_Batch__c = :batchId
+                ORDER BY Id
+                LIMIT 1
+            ];
+            RollupTestSupport.recalculateJustAfterTheSave();
+            // A second gift saved with its rollups off, so only the queue changes the total.
+            AutomationControl.bypass('Giving_Rollups_Gift');
+            insert GivingTestDataFactory.buildGift(donor.Id, 50);
+            AutomationControl.clearBypass('Giving_Rollups_Gift');
+            Database.update(
+                new Contact(Id = donor.Id, Rollups_Last_Calculated__c = null),
+                AccessLevel.SYSTEM_MODE
+            );
+            insert new Rollup_Queue__c(
+                Target_Object__c = 'Contact',
+                Record_Ids__c = String.valueOf(donor.Id),
+                Record_Count__c = 1,
+                Attempts__c = 0,
+                Status__c = RollupQueue.STATUS_PENDING
+            );
+
+            // Started by a user with no Giving access, who may not edit the stamp: like the
+            // Automated Process user, its access must not decide whether the stamp is written.
+            System.runAs(TestUsers.admin()) {
+                Test.startTest();
+                EventBus.publish(new Rollup_Queue_Ready__e());
+                Test.getEventBus().deliver();
+                Test.stopTest();
+            }
+
+            Contact after = [
+                SELECT Total_Giving__c, Rollups_Last_Calculated__c, LastModifiedById
+                FROM Contact
+                WHERE Id = :donor.Id
+            ];
+            Assert.areEqual(150, after.Total_Giving__c, 'The queue recalculated the total.');
+            Assert.isNotNull(after.Rollups_Last_Calculated__c, 'And stamped it in the save.');
         }
     }
 

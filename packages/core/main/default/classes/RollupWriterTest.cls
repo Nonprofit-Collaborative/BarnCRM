@@ -9,6 +9,36 @@ private class RollupWriterTest {
         TestUsers.admin();
     }
 
+    /**
+     * The freshness stamp is written wherever the entity has one that is not calculated,
+     * whatever the running user may edit: the Rollup Queue runs as the Automated Process user,
+     * and import undo reads the stamp to tell a rollup's save from an edit (ADR-NEXT).
+     */
+    @IsTest
+    static void theStampIsFoundByTheFieldNotTheUsersAccess() {
+        User noAccess = TestUsers.standardUser('Stamp');
+        System.runAs(noAccess) {
+            Schema.SObjectField onContact = RollupWriter.freshnessField(Contact.SObjectType);
+            Schema.SObjectField declared = Contact.SObjectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
+                .fields.getMap()
+                .get(RollupService.FRESHNESS_FIELD);
+            Assert.areEqual(declared, onContact, 'Found when Contact has it, whoever runs.');
+            Assert.isNull(
+                RollupWriter.freshnessField(Rollup_Queue__c.SObjectType),
+                'None where the entity has none.'
+            );
+            Assert.areEqual(
+                0,
+                RollupWriter.writeTotals(null, null, null, Datetime.now()).written.size(),
+                'Nothing to write, nothing written.'
+            );
+            RollupWriter.insertDefinitions(new List<Rollup_Definition__c>());
+            RollupWriter.stampDefinitions(new Map<Id, Datetime>());
+        }
+    }
+
     @IsTest
     static void valuesAreComparedAsTheyWouldBeStored() {
         System.runAs(TestUsers.admin()) {

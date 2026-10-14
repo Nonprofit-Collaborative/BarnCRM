@@ -1,11 +1,11 @@
 /**
  * The work of undoing one import, in passes (canonical model R-IB8, R-IB9):
  *
+ * 0. **Judge.** One pass per delete pass below, in the same order, notes which tagged records
+ *    were edited before the undo began, so a rollup set off by a later restore or delete
+ *    cannot hide the edit (ADR-NEXT). Nothing is changed. A bulk update's undo has none.
  * 1. **Restore.** Each commit journal page, newest first, puts back the values the import
  *    wrote where the record still holds the value written.
- * 1b. **Judge.** One pass per delete pass below, in the same order, notes which tagged records
- *    were edited before the undo began, so a rollup set off by a later delete cannot hide the
- *    edit (ADR-NEXT). Nothing is changed.
  * 1a. **Created.** Each Created journal page of a one-object import (R-IT12) deletes the
  *    records it names, which carry no tag: only one the committer created during the commit,
  *    and with every check a tagged record gets.
@@ -114,28 +114,41 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /** The job's operation: an import, or a bulk update, whose undo is the restore pass only. */
     private String operation;
     /**
-     * The records the judging passes found edited before the undo began, with the reason,
-     * carried from pass to pass. Only these are kept when a record's last change was made
-     * during the undo by the undo itself or by a rollup (ADR-NEXT).
+     * The records the judging passes found edited before the undo began, carried from pass to
+     * pass. Only these are kept when a record's last change was made during the undo by the
+     * undo itself or by a rollup (ADR-NEXT).
      */
-    private Map<Id, String> editedBeforeUndo = new Map<Id, String>();
+    private Set<Id> editedBeforeUndo = new Set<Id>();
 
     /**
      * Starts the first pass of the undo of one batch. `countedAtStart` is the total the person
      * confirmed, kept so the run log can say how many of those were deleted and how many kept.
+     * An import's undo starts with the judging; a bulk update created nothing, so its undo is
+     * the restore pass alone (R-BU5).
      */
     @NamespaceAccessible
     public static Id run(Id batchId, Integer countedAtStart) {
+        String operation = [
+            SELECT Operation__c
+            FROM Import_Batch__c
+            WHERE Id = :batchId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ]
+        .Operation__c;
+        String first = BulkUpdateService.OPERATION_UPDATE.equals(operation)
+            ? PASS_RESTORE
+            : passes()[0];
         return Database.executeBatch(
             new ImportUndoBatch(
                 batchId,
                 countedAtStart,
-                PASS_RESTORE,
+                first,
                 0,
                 false,
                 toTheSecond(Datetime.now())
             ),
-            scopeFor(PASS_RESTORE, batchId)
+            scopeFor(first, batchId)
         );
     }
 
@@ -152,14 +165,14 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             );
         }
         deletes.addAll(new List<String>{ PASS_CONTACTS, PASS_PERSON_ACCOUNTS, PASS_ACCOUNTS });
-        // Every tagged record is judged before anything is deleted: a delete sets off rollups
-        // that save the records judged later, which would hide an earlier edit. A one-object
-        // import's Created pass tags nothing, so it has nothing to judge.
-        List<String> result = new List<String>{ PASS_RESTORE };
+        // Every tagged record is judged before anything is put back or deleted: either sets
+        // off rollups that save the records judged later, which would hide an earlier edit. A
+        // one-object import's Created pass tags nothing, so it has nothing to judge.
+        List<String> result = new List<String>();
         for (String deletePass : deletes) {
             result.add(PASS_JUDGE_PREFIX + deletePass);
         }
-        result.add(PASS_CREATED);
+        result.addAll(new List<String>{ PASS_RESTORE, PASS_CREATED });
         result.addAll(deletes);
         return result;
     }
@@ -680,7 +693,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 
     /**
      * Notes which of this chunk's tagged records were edited before the undo began, before any
-     * pass deletes anything (ADR-NEXT). The delete passes come later; by then a
+     * pass puts back or deletes anything (ADR-NEXT). The other passes come later; by then a
      * gift the undo deleted may have set off a rollup that saved its donor, which would hide
      * an edit made before it.
      */
@@ -696,7 +709,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         }
         Map<Id, String> edited = new Map<Id, String>();
         markEdited(edited, ids, records[0].getSObjectType());
-        editedBeforeUndo.putAll(edited);
+        editedBeforeUndo.addAll(edited.keySet());
     }
 
     // -------------------------------------------------------------------------------------
@@ -970,11 +983,12 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      * counts when it was made by somebody other than the committer after the commit started,
      * or by anybody once the commit's own follow-on work has settled.
      *
-     * Two kinds of save are not edits (ADR-NEXT): a rollup's, told by the freshness stamp it
-     * writes in the same save, whoever ran it (the committer, the undo, or the Automated
-     * Process user that starts the Rollup Queue); and the undo's own (a household renamed as
-     * its imported members go). Either may hide an earlier edit, so a record they saved during
-     * the undo is judged by what the judging passes found before the undo began.
+     * Two kinds of save are not edits (ADR-NEXT): a rollup the import set off, told by the
+     * freshness stamp it writes in the same save, dated before the import's follow-on work
+     * settled, whoever ran it (the committer or the Automated Process user that starts the
+     * Rollup Queue); and, once the judging is done, the undo's own saves and the rollups its
+     * deletes set off. Those may hide an earlier edit, so a record they saved during the undo
+     * is judged by what the judging passes found before anything was put back or deleted.
      */
     private void markEdited(Map<Id, String> keep, Set<Id> ids, Schema.SObjectType type) {
         Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
@@ -1001,16 +1015,23 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 modifiedBy == UserInfo.getUserId() &&
                 duringUndo &&
                 modified <= checkedAt;
-            Boolean byARollup =
-                stampField != null && isRollupSave(modified, (Datetime) row.get(stampField));
+            Datetime stamp = stampField == null ? null : (Datetime) row.get(stampField);
+            Boolean byARollup = isRollupSave(modified, stamp);
+            // A rollup the import itself set off, stamped before its follow-on work settled.
+            // A later one (a nightly run, a date driven total) may hide a real edit: kept.
+            Boolean importsOwnRollup =
+                byARollup &&
+                completedAt != null &&
+                stamp <= completedAt.addMinutes(SETTLE_MINUTES);
             Boolean edited;
-            String reason = Label.Core_Import_UndoKeptEdited;
-            if (duringUndo && (byTheUndo || byARollup)) {
-                edited = !judging() && editedBeforeUndo.containsKey(row.Id);
-                reason = edited ? editedBeforeUndo.get(row.Id) : reason;
+            if (!judging() && duringUndo && (byTheUndo || byARollup)) {
+                // Saved since the undo began, by the undo or by a rollup its work set off:
+                // what the judging found before anything was put back or deleted decides.
+                // While judging, the undo has changed nothing yet, so no save is excused so.
+                edited = editedBeforeUndo.contains(row.Id);
             } else {
                 edited =
-                    !byARollup &&
+                    !importsOwnRollup &&
                     ((startedAt != null &&
                     committedBy != null &&
                     modified >= startedAt &&
@@ -1020,7 +1041,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             }
             Boolean activity = hasActivities && row.get('LastActivityDate') != null;
             if (edited || activity) {
-                keep.put(row.Id, edited ? reason : Label.Core_Import_UndoKeptEdited);
+                keep.put(row.Id, Label.Core_Import_UndoKeptEdited);
             }
         }
     }

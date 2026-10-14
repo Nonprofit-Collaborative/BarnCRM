@@ -151,8 +151,8 @@ private class ImportUndoTest {
         Datetime undoStartedAt,
         Boolean accountsPassAlone
     ) {
+        // Every pass, the restore included: the job's first pass is a judging one.
         List<String> passes = ImportUndoBatch.passes();
-        passes.remove(passes.indexOf(ImportUndoBatch.PASS_RESTORE));
         ImportUndoBatch job;
         for (String pass : passes) {
             // Each pass carries what the judging passes found, as the job's own chain does.
@@ -407,30 +407,92 @@ private class ImportUndoTest {
      */
     @IsTest
     static void totalsRecalculatedAfterTheImportAreNotAnEdit() {
-        Schema.SObjectField stamp = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap()
-            .get(RollupService.FRESHNESS_FIELD);
-        if (stamp == null) {
+        if (stampField() == null) {
             return;
         }
         System.runAs(TestUsers.admin()) {
             Import_Batch__c batch = committedBatch();
             Contact imported = importedPerson(batch, 'Ramirez');
-            User rollupQueue = TestUsers.standardUserWith(
-                'Queue',
-                new List<String>{ TestUsers.CORE_ADMIN }
-            );
-            System.runAs(rollupQueue) {
-                // The shape of a rollup's save: its totals and the stamp, in one save.
-                Contact totals = new Contact(Id = imported.Id);
-                totals.put(stamp, Datetime.now());
-                Database.update(totals, AccessLevel.SYSTEM_MODE);
-            }
+            savedByARollup(imported.Id);
 
             // Undo pressed a second later, so the save is not read as the undo's.
             undo(batch, Datetime.now().addSeconds(1));
 
             Assert.isFalse(exists(imported.Id), 'A recalculated total keeps nobody.');
+        }
+    }
+
+    /**
+     * A rollup saved long after the import settled (a nightly run, a total that depends on
+     * the date) may hide a real edit made before it, so the person is kept: not knowing is not
+     * the same as knowing nobody edited them (ADR-NEXT).
+     */
+    @IsTest
+    static void aRollupSavedLongAfterTheImportKeepsThePerson() {
+        if (stampField() == null) {
+            return;
+        }
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = settledHoursAgo(committedBatch());
+            Contact imported = importedPerson(batch, 'Ramirez');
+            savedByARollup(imported.Id);
+
+            undo(batch, Datetime.now().addSeconds(1));
+
+            Assert.isTrue(exists(imported.Id), 'A late rollup save keeps the person.');
+        }
+    }
+
+    /**
+     * A rollup that lands while the judging runs is not one the undo set off: the undo has
+     * changed nothing yet. One the import did not set off either keeps the person.
+     */
+    @IsTest
+    static void aRollupSavedDuringTheJudgingKeepsThePerson() {
+        if (stampField() == null) {
+            return;
+        }
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = settledHoursAgo(committedBatch());
+            Contact imported = importedPerson(batch, 'Ramirez');
+            // Undo pressed a minute ago: the rollup's save below is made during the undo.
+            Datetime undoStartedAt = Datetime.now().addMinutes(-1);
+            savedByARollup(imported.Id);
+
+            undo(batch, undoStartedAt);
+
+            Assert.isTrue(exists(imported.Id), 'A rollup saved during the judging keeps them.');
+        }
+    }
+
+    /** The rollup freshness stamp on Contact, which a module adds, or null with Core alone. */
+    private static Schema.SObjectField stampField() {
+        return Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+            .fields.getMap()
+            .get(RollupService.FRESHNESS_FIELD);
+    }
+
+    /** A batch committed three hours ago, its follow-on work long settled. */
+    private static Import_Batch__c settledHoursAgo(Import_Batch__c batch) {
+        batch.Started_At__c = Datetime.now().addHours(-3);
+        batch.Completed_At__c = Datetime.now().addHours(-2);
+        update batch;
+        return batch;
+    }
+
+    /**
+     * The shape of a rollup's save, its totals and the stamp in one save, made by somebody
+     * other than the committer and the undo, as the Automated Process user makes it.
+     */
+    private static void savedByARollup(Id contactId) {
+        User rollupQueue = TestUsers.standardUserWith(
+            'Queue',
+            new List<String>{ TestUsers.CORE_ADMIN }
+        );
+        System.runAs(rollupQueue) {
+            Contact totals = new Contact(Id = contactId);
+            totals.put(stampField(), Datetime.now());
+            Database.update(totals, AccessLevel.SYSTEM_MODE);
         }
     }
 
@@ -478,7 +540,10 @@ private class ImportUndoTest {
             Assert.isTrue(again.allowed, 'And the undo can be run again.');
 
             ImportUndoBatch.jobErrorsForTest = null;
+            // The second run with limits of its own, as a new job has.
+            Test.startTest();
             runDeletePasses(batch, again.total, Datetime.now());
+            Test.stopTest();
 
             Assert.isFalse(exists(imported.Id), 'The second run finishes the work.');
             Assert.areEqual(
@@ -768,8 +833,10 @@ private class ImportUndoTest {
                 'The preview counts them.'
             );
 
+            // Latched only: the passes below run here, the restore among them.
+            System.abortJob(ImportUndoService.start(batch.Id, 0));
             Test.startTest();
-            ImportUndoService.start(batch.Id, 0);
+            new ImportUndoTestSupport.Run(batch.Id, 0, Datetime.now()).rest();
             Test.stopTest();
 
             Map<Id, Contact> after = new Map<Id, Contact>([SELECT MailingCity FROM Contact]);
@@ -886,13 +953,13 @@ private class ImportUndoTest {
             Assert.areEqual(3, view.total, 'The module records are in the total confirmed.');
             Assert.areEqual(
                 new List<String>{
-                    ImportUndoBatch.PASS_RESTORE,
                     ImportUndoBatch.PASS_JUDGE_PREFIX +
                     ImportUndoBatch.PASS_TAGGED_PREFIX +
                     'Contact',
                     ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_CONTACTS,
                     ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_PERSON_ACCOUNTS,
                     ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_ACCOUNTS,
+                    ImportUndoBatch.PASS_RESTORE,
                     ImportUndoBatch.PASS_CREATED,
                     ImportUndoBatch.PASS_TAGGED_PREFIX + 'Contact',
                     ImportUndoBatch.PASS_CONTACTS,
