@@ -397,9 +397,16 @@ private class BulkUpdateBatchTest {
 
             System.Assert.areEqual(0, job.Rows_Updated__c, job.Run_Log__c);
             System.Assert.areEqual(200, job.Rows_Rejected__c, 'Each record is refused');
+            // A long text area cannot be filtered in SOQL, so the saved ones are counted here.
+            Integer saved = 0;
+            for (Contact person : [SELECT Description FROM Contact]) {
+                if (person.Description != null) {
+                    saved++;
+                }
+            }
             System.Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Contact WHERE Description != NULL],
+                saved,
                 'Nothing was saved without an undo'
             );
             List<Map<String, Object>> entries = journal(job.Id, ImportJournalService.PHASE_COMMIT);

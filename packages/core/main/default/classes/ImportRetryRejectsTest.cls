@@ -49,16 +49,17 @@ private class ImportRetryRejectsTest {
     private static List<Map<String, Object>> fixedRows() {
         List<Map<String, Object>> rows = new List<Map<String, Object>>();
         for (Integer i = 0; i < FILE_ROWS; i += 10) {
-            rows.add(
-                new Map<String, Object>(
-                    ImportTestDataFactory.donorRow(
-                        'Person' + i,
-                        'Fixed' + i,
-                        'retry' + i + '@example.org',
-                        null
-                    )
-                )
+            Map<String, String> donor = ImportTestDataFactory.donorRow(
+                'Person' + i,
+                'Fixed' + i,
+                'retry' + i + '@example.org',
+                null
             );
+            Map<String, Object> row = new Map<String, Object>();
+            for (String heading : donor.keySet()) {
+                row.put(heading, donor.get(heading));
+            }
+            rows.add(row);
         }
         return rows;
     }
