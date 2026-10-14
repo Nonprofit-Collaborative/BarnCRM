@@ -66,9 +66,15 @@ public with sharing class RollupService {
     @TestVisible
     private static Integer instantLimit = 50;
 
+    /** The module's own settings object (canonical model Section 14B, ADR-NEXT decision 6). */
+    @NamespaceAccessible
+    public static final String SETTINGS_OBJECT = 'Rollup_Settings__c';
     /** The setting that says when real-time totals are recalculated (R-R4, ADR-0098). */
     @NamespaceAccessible
     public static final String PROCESSING_SETTING = 'Rollup_Processing__c';
+    /** The setting that says which mode a new definition starts in (R-R4). */
+    @NamespaceAccessible
+    public static final String MODE_DEFAULT_SETTING = 'Rollup_Mode_Default__c';
     /** Queued and recalculated just after the save: the default. */
     @NamespaceAccessible
     public static final String PROCESSING_BACKGROUND = 'Background';
@@ -88,7 +94,7 @@ public with sharing class RollupService {
      */
     @NamespaceAccessible
     public static Boolean recalculatesInTheSave() {
-        Object stored = SettingsService.getValue(PROCESSING_SETTING);
+        Object stored = SettingsService.getValue(SETTINGS_OBJECT, PROCESSING_SETTING);
         return stored != null && PROCESSING_IN_SAVE.equals(String.valueOf(stored));
     }
 
@@ -101,7 +107,7 @@ public with sharing class RollupService {
     /** The mode a new definition starts in, from the org's default. */
     @NamespaceAccessible
     public static String defaultMode() {
-        Object stored = SettingsService.getValue('Rollup_Mode_Default__c');
+        Object stored = SettingsService.getValue(SETTINGS_OBJECT, MODE_DEFAULT_SETTING);
         String mode = stored == null ? null : String.valueOf(stored);
         return REAL_TIME_MODES.contains(mode) || MODE_SCHEDULED.equals(mode) ? mode : MODE_BOTH;
     }

@@ -7,22 +7,26 @@
  * org to recalculating in the save instead. The two paths run the same engine over the same
  * marked records; `RollupBackgroundTest` and the Giving `GiftSaveRollupCostTest` pin the queued
  * path and its cost.
+ *
+ * The setting lives on the module's own `Rollup_Settings__c` (ADR-NEXT decision 6) and is
+ * saved through the settings service, as the console saves it.
  */
 @IsTest
 public class RollupTestSupport {
     /** Real-time totals are recalculated in the save, as before ADR-0098. */
     public static void recalculateInTheSave() {
-        SettingsService.saveSystemValue(
-            RollupService.PROCESSING_SETTING,
-            RollupService.PROCESSING_IN_SAVE
-        );
+        saveProcessing(RollupService.PROCESSING_IN_SAVE);
     }
 
     /** Real-time totals are queued and recalculated just after the save: the default. */
     public static void recalculateJustAfterTheSave() {
-        SettingsService.saveSystemValue(
-            RollupService.PROCESSING_SETTING,
-            RollupService.PROCESSING_BACKGROUND
+        saveProcessing(RollupService.PROCESSING_BACKGROUND);
+    }
+
+    private static void saveProcessing(String value) {
+        SettingsService.saveValues(
+            RollupService.SETTINGS_OBJECT,
+            new Map<String, Object>{ RollupService.PROCESSING_SETTING => value }
         );
     }
 }

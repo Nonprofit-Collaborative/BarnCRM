@@ -17,8 +17,9 @@ Giving depends on this module. Offered in both editions.
 ## What is here
 
 - **Objects:** `Rollup_Definition__c`, `Rollup_Queue__c`, the `Rollup_Run_Lock__c` custom
-  setting, the `Rollup_Queue_Ready__e` platform event, and the `Rollup_Definition_Default__mdt`
-  shipped defaults type (canonical model Sections 13, 14 and 14A).
+  setting, the `Rollup_Queue_Ready__e` platform event, the `Rollup_Definition_Default__mdt`
+  shipped defaults type, and `Rollup_Settings__c`, the module's own settings object, shown in
+  the Rollups section of BarnCRM Settings (canonical model Sections 13, 14, 14A and 14B).
 - **Engine:** `RollupService`, `RollupEngine` and the classes it plans and writes with, the
   queue and its processors, `RollupFullRecalcBatch` and `RollupScheduler`.
 - **Screens:** the Rollup Builder tab and app page (`rollupBuilder`, `rollupDefinitions`,
