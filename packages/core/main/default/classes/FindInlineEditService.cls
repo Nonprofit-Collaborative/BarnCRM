@@ -4,7 +4,7 @@
  * An edit is a small bulk update: every field is one a bulk update may write (BulkUpdateFields,
  * R-BU4), every value is typed as a bulk update's set value is, the records are read again and
  * saved as the person in user mode, and the save is one Update data job with a commit journal
- * page, so the Bulk Update tab lists it and its undo is the import undo (R-BU5). The job record
+ * page, so Data jobs (Data Manager) lists it and its undo is the import undo (R-BU5). The job record
  * and the journal are the package's own bookkeeping, written in system mode (ADR-0021).
  */
 public with sharing class FindInlineEditService {

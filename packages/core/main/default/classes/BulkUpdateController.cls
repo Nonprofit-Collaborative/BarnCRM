@@ -1,5 +1,5 @@
 /**
- * What the bulk update panel and the Bulk Update tab read and write (C-35, canonical model
+ * What the bulk update panel and its list in Data jobs read and write (C-35, canonical model
  * Section 29E, ADR-0077 bulk update).
  *
  * Every method requires the Bulk Update Records custom permission and, because every bulk update
@@ -73,7 +73,7 @@ public with sharing class BulkUpdateController {
     /**
      * The person's recent bulk updates, or everyone's when asked for by someone who manages
      * BarnCRM Settings. A person without the permissions gets an empty page that says so,
-     * rather than an error, because the Bulk Update tab shows the list to all.
+     * rather than an error, because Data jobs shows the list to all.
      */
     @AuraEnabled
     public static BulkUpdatePage getPage(Boolean everyone) {

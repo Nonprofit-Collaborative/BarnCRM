@@ -75,7 +75,7 @@ public with sharing class ImportUndoService {
         if (batch == null) {
             return view;
         }
-        // A bulk delete is undone by undeleting, from the Bulk Update tab; this undo would only
+        // A bulk delete is undone by undeleting, from Data jobs; this undo would only
         // mark it Undone and bring nothing back (R-BD5).
         if (BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c)) {
             view.reason = Label.Core_Import_UndoErrorBulkDelete;

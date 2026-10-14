@@ -1,5 +1,5 @@
 /**
- * What the bulk delete panel and its list on the Bulk Update tab read and write (C-37,
+ * What the bulk delete panel and its list in Data jobs read and write (C-37,
  * canonical model R-BD1 to R-BD6, ADR-0091).
  *
  * Every method requires the Bulk Delete Records custom permission and, where a bulk delete
@@ -54,7 +54,7 @@ public with sharing class BulkDeleteController {
         public List<DataJobs.Failure> failures;
     }
 
-    /** The list on the Bulk Update tab: whether the person may, and recent jobs. */
+    /** The list in Data jobs: whether the person may, and recent jobs. */
     public class BulkDeletePage {
         @AuraEnabled
         public Boolean allowed;
@@ -68,7 +68,7 @@ public with sharing class BulkDeleteController {
     /**
      * The person's recent bulk deletes, or everyone's when asked for by someone who manages
      * BarnCRM Settings. A person without the permission gets an empty page that says so, rather
-     * than an error, because the Bulk Update tab shows the list to all.
+     * than an error, because Data jobs shows the list to all.
      */
     @AuraEnabled
     public static BulkDeletePage getPage(Boolean everyone) {
