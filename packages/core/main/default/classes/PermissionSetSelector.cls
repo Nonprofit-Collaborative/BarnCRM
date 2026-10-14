@@ -28,4 +28,33 @@ public with sharing class PermissionSetSelector {
         ];
         return sets.isEmpty() ? null : sets[0];
     }
+
+    /**
+     * Returns the permission sets with the given API names that this package ships, in user
+     * mode. A permission set an admin created with the same API name is never returned: only
+     * a set in the package's own namespace (none when the package has no namespace) is.
+     *
+     * @param permissionSetNames the API names to look for, without a namespace prefix
+     * @param namespacePrefix the package namespace without underscores, or null for none
+     * @return the matching permission sets
+     */
+    public List<PermissionSet> selectPackagedByNames(
+        Set<String> permissionSetNames,
+        String namespacePrefix
+    ) {
+        if (permissionSetNames == null || permissionSetNames.isEmpty()) {
+            return new List<PermissionSet>();
+        }
+        String prefix = String.isBlank(namespacePrefix) ? null : namespacePrefix;
+        return [
+            SELECT Id, Name, Label
+            FROM PermissionSet
+            WHERE
+                Name IN :permissionSetNames
+                AND NamespacePrefix = :prefix
+                AND IsOwnedByProfile = FALSE
+                AND Type = 'Regular'
+            WITH USER_MODE
+        ];
+    }
 }

@@ -9,6 +9,174 @@
         <value>Give access</value>
     </labels>
     <labels>
+        <fullName>Core_Access_AddOnAddButton</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: button that gives the chosen person an extra permission</shortDescription>
+        <value>Give permission</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnAssignSuccess</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: extra permission given; {0} person, {1} permission</shortDescription>
+        <value>{0} now has the {1} permission.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnBulkDelete</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what BarnCRM Bulk Delete grants</shortDescription>
+        <value>Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnBulkUpdate</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what BarnCRM Bulk Update grants</shortDescription>
+        <value>Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnConfirmAddMessage</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: confirm giving; {0} person, {1} permission</shortDescription>
+        <value>Give {0} the {1} permission?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnConfirmRemoveMessage</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: confirm removing; {0} person, {1} permission</shortDescription>
+        <value>Remove the {1} permission from {0}? Their roles stay in place.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnDestructiveWarning</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: warning for an extra permission that removes data</shortDescription>
+        <value>This permission lets the person remove data. Give it only to someone you trust to do that.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnDuplicateReview</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what BarnCRM Duplicate Review grants</shortDescription>
+        <value>Review suggested duplicate people and households. Works only for people with a Sales Cloud or Service Cloud license.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnErasePeople</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what BarnCRM Erase People grants</shortDescription>
+        <value>Erase a person on their request (the right to be forgotten), which cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnFindAndExport</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what BarnCRM Find and Export grants</shortDescription>
+        <value>Build, run, save and export Find queries and use Data Hygiene, seeing only the records the person can already see.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnLabel</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: label of the extra permission picker</shortDescription>
+        <value>Extra permission</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnMetadataAdmin</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what BarnCRM Metadata Admin grants</shortDescription>
+        <value>Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnPickerPlaceholder</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: placeholder of the extra permission picker</shortDescription>
+        <value>Choose an extra permission</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnRemoveSuccess</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: extra permission removed; {0} person, {1} permission</shortDescription>
+        <value>{0} no longer has the {1} permission.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnsDescription</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: text under the Extra permissions heading</shortDescription>
+        <value>Some features are in no role. Give them to a person here, alongside their role. Only permissions given here are listed: one that comes with a role is not.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnsHeading</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: heading of the extra permissions section</shortDescription>
+        <value>Extra permissions</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_AddOnsReadOnlyNotice</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: may change roles but not give permissions</shortDescription>
+        <value>You can see who has each extra permission but not change it. Giving one needs the Assign Permission Sets permission in Salesforce, which comes with the BarnCRM Admin role.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_NoOneHasAddOn</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: an extra permission nobody has been given</shortDescription>
+        <value>No one has been given this permission here.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_ErrorAddOnNotFound</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: the chosen permission is not one the page may give</shortDescription>
+        <value>That permission is not one this page can give. Reload the page and choose from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_ErrorAddOnRefused</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: one person refused; {0} person, {1} permission, {2} reason</shortDescription>
+        <value>{0} could not be given {1}. Their Salesforce license may not allow what it grants. Salesforce said: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Access_ErrorCannotAssignPermissionSets</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: the person lacks Assign Permission Sets</shortDescription>
+        <value>You cannot give or remove extra permissions. That needs the Assign Permission Sets permission in Salesforce, which comes with the BarnCRM Admin role.</value>
+    </labels>
+    <labels>
         <fullName>Core_Access_AssignSuccess</fullName>
         <categories>Access</categories>
         <language>en_US</language>

@@ -115,4 +115,26 @@ private class PermissionSetAssignmentSelectorTest {
             Assert.areEqual(0, count, 'Counting nobody should return zero without querying.');
         }
     }
+
+    @IsTest
+    static void permissionSetQueriesWithNoInputReturnNothing() {
+        System.runAs(TestUsers.admin()) {
+            PermissionSetAssignmentSelector selector = new PermissionSetAssignmentSelector();
+
+            Test.startTest();
+            Integer bySets = selector.selectByPermissionSetIds(new Set<Id>()).size();
+            Integer byOne = selector.selectByPermissionSetIdAndUserIds(null, new Set<Id>()).size();
+            Integer grants = selector.countAssignPermissionSetsGrants(null);
+            Integer adminGrants = selector.countAssignPermissionSetsGrants(UserInfo.getUserId());
+            Test.stopTest();
+
+            Assert.areEqual(0, bySets, 'Asking about no permission sets should return nothing.');
+            Assert.areEqual(0, byOne, 'Asking about no permission set should return nothing.');
+            Assert.areEqual(0, grants, 'Asking about nobody should return zero.');
+            Assert.isTrue(
+                adminGrants > 0,
+                'A System Administrator can assign permission sets, so it should be counted.'
+            );
+        }
+    }
 }

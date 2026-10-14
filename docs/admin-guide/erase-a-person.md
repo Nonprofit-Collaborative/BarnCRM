@@ -37,7 +37,7 @@ and each record that changed with the fields that were emptied. It never holds a
 
 1. Erasing needs the **Erase People** permission, which is **in no role, not even BarnCRM
    Admin**. Assign the **BarnCRM Erase People** permission set to the one or two people who handle
-   privacy requests (Setup, Users, choose the person, Permission Set Assignments).
+   privacy requests (BarnCRM Settings, Access, Extra permissions).
 2. The person erasing also needs edit access to the person and to everything the erasure changes
    (their addresses, relationships, affiliations and household memberships). BarnCRM Admin has
    it.

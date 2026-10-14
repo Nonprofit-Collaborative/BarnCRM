@@ -100,6 +100,47 @@
                     onclick={handleAddClick}
                 ></lightning-button>
 
+                <template lwc:if={showAddOnControls}>
+                    <template lwc:if={hasAddOns}>
+                        <div class="slds-grid slds-wrap slds-gutters slds-var-m-top_medium">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-combobox
+                                    data-id="add-on-picker"
+                                    label={labels.addOnLabel}
+                                    placeholder={labels.addOnPickerPlaceholder}
+                                    value={selectedAddOn}
+                                    options={addOnOptions}
+                                    onchange={handleAddOnChange}
+                                ></lightning-combobox>
+                                <template lwc:if={chosenAddOnDescription}>
+                                    <p class="slds-var-m-top_x-small slds-text-body_small" data-id="add-on-description">
+                                        {chosenAddOnDescription}
+                                    </p>
+                                </template>
+                                <template lwc:if={chosenAddOnWarning}>
+                                    <p class="slds-var-m-top_x-small slds-text-color_error" role="alert" data-id="add-on-warning">
+                                        <lightning-icon
+                                            icon-name="utility:warning"
+                                            size="x-small"
+                                            variant="warning"
+                                            class="slds-var-m-right_xx-small"
+                                        ></lightning-icon>
+                                        {chosenAddOnWarning}
+                                    </p>
+                                </template>
+                            </div>
+                        </div>
+                        <lightning-button
+                            class="slds-var-m-top_small"
+                            variant="brand"
+                            data-id="add-on-add-button"
+                            label={labels.addOnAddButton}
+                            disabled={canSubmitAddOnDisabled}
+                            onclick={handleAddOnAddClick}
+                        ></lightning-button>
+                    </template>
+                </template>
+
                 <p class="slds-var-m-top_small slds-text-body_small">
                     {labels.createUserHelp}
                     <a href={setupUsersPage} target="_blank" rel="noopener noreferrer" data-id="setup-link">{labels.createUserLink}</a>
@@ -153,6 +194,66 @@
                     </div>
                 </template>
             </div>
+
+            <template lwc:if={hasAddOns}>
+                <section class="slds-var-m-top_medium" data-id="add-ons-section">
+                    <h2 class="slds-text-heading_small">{labels.addOnsHeading}</h2>
+                    <p class="slds-text-body_small slds-var-m-bottom_small">{labels.addOnsDescription}</p>
+                    <template lwc:if={showAddOnReadOnly}>
+                        <div class="slds-var-m-bottom_small" role="status" data-id="add-ons-read-only">
+                            <lightning-formatted-text value={labels.addOnsReadOnlyNotice}></lightning-formatted-text>
+                        </div>
+                    </template>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <template for:each={addOnCards} for:item="addOn">
+                            <div
+                                key={addOn.developerName}
+                                class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_small"
+                            >
+                                <article class="slds-box slds-box_small" data-id="add-on-card">
+                                    <h3 class="slds-text-heading_small" data-id="add-on-heading">{addOn.heading}</h3>
+                                    <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="add-on-card-description">
+                                        {addOn.description}
+                                    </p>
+                                    <template lwc:if={addOn.warning}>
+                                        <p class="slds-text-body_small slds-text-color_error slds-var-m-bottom_x-small" data-id="add-on-card-warning">
+                                            {addOn.warning}
+                                        </p>
+                                    </template>
+                                    <template lwc:if={addOn.hasUsers}>
+                                        <ul class="slds-has-dividers_bottom-space">
+                                            <template for:each={addOn.users} for:item="person">
+                                                <li
+                                                    key={person.userId}
+                                                    class="slds-item slds-grid slds-grid_align-spread"
+                                                    data-id="add-on-member"
+                                                >
+                                                    <span class="slds-truncate" title={person.email}>{person.name}</span>
+                                                    <template lwc:if={showAddOnControls}>
+                                                        <lightning-button
+                                                            variant="base"
+                                                            data-id="add-on-remove-button"
+                                                            data-user-id={person.userId}
+                                                            data-user-name={person.name}
+                                                            data-add-on={addOn.developerName}
+                                                            label={labels.removeButton}
+                                                            title={person.removeLabel}
+                                                            onclick={handleAddOnRemoveClick}
+                                                        ></lightning-button>
+                                                    </template>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </template>
+                                    <template lwc:else>
+                                        <p class="slds-text-body_small" data-id="empty-add-on">{labels.noOneHasAddOn}</p>
+                                    </template>
+                                </article>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </template>
 
             <p class="slds-var-m-top_small slds-text-body_small">
                 {labels.automaticAccessHelp}

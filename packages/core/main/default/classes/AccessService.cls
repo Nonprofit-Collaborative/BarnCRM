@@ -25,6 +25,40 @@ public with sharing class AccessService {
         'Read_Only'
     };
 
+    /**
+     * The add-on permission sets the Access page may give and take away, in the order the
+     * page shows them. These are the packaged Core permission sets that no role includes (or,
+     * for Find and Export, that only BarnCRM Admin includes), and nothing else: the page never
+     * assigns an arbitrary permission set. Each is resolved by API name in the package's own
+     * namespace at runtime, never by Id.
+     *
+     * Module permission sets (Giving Staff and the rest) are out of scope. Core has no
+     * extension point through which a module contributes roles or permission sets to this
+     * page today; when one is added, its sets join this list through it rather than by name.
+     */
+    public static final List<String> ADD_ON_PERMISSION_SETS = new List<String>{
+        'BarnCRM_Find_And_Export',
+        'BarnCRM_Bulk_Update',
+        'BarnCRM_Bulk_Delete',
+        'BarnCRM_Erase_People',
+        'BarnCRM_Duplicate_Review',
+        'BarnCRM_Metadata_Admin'
+    };
+
+    /** The add-ons that let a person remove data, which the page warns about. */
+    public static final Set<String> DESTRUCTIVE_ADD_ONS = new Set<String>{
+        'BarnCRM_Bulk_Delete',
+        'BarnCRM_Erase_People'
+    };
+
+    /**
+     * Stands in for the Assign Permission Sets check in tests. No packaged permission set
+     * carries Manage BarnCRM Settings without Assign Permission Sets, but an org's own can,
+     * so the refusal for that person is proven by setting this to false.
+     */
+    @TestVisible
+    private static Boolean assignPermissionSetsOverride;
+
     private static final String READY_STATUS = 'Updated';
     private static final Integer USER_SEARCH_LIMIT = 20;
 
@@ -100,6 +134,343 @@ public with sharing class AccessService {
             this.roleDeveloperName = roleDeveloperName;
             this.users = new List<UserSummary>();
         }
+    }
+
+    /** One add-on permission set, as the page shows it. */
+    public class AddOn {
+        @AuraEnabled
+        public String developerName;
+        @AuraEnabled
+        public String label;
+        @AuraEnabled
+        public String description;
+        @AuraEnabled
+        public Boolean isDestructive;
+        @AuraEnabled
+        public String warning;
+
+        /**
+         * Describes one add-on from the packaged permission set that carries it.
+         *
+         * @param permissionSetRecord the packaged permission set
+         */
+        public AddOn(PermissionSet permissionSetRecord) {
+            this.developerName = permissionSetRecord.Name;
+            this.label = permissionSetRecord.Label;
+            this.description = addOnDescription(permissionSetRecord.Name);
+            this.isDestructive = DESTRUCTIVE_ADD_ONS.contains(permissionSetRecord.Name);
+            // System.Label: a bare Label here would resolve to this class's own label field.
+            this.warning = this.isDestructive
+                ? System.Label.Core_Access_AddOnDestructiveWarning
+                : null;
+        }
+    }
+
+    /** The people who hold one add-on directly. */
+    public class AddOnAssignments {
+        @AuraEnabled
+        public String permissionSetName;
+        @AuraEnabled
+        public List<UserSummary> users;
+
+        /**
+         * Starts an empty list of the people who hold one add-on.
+         *
+         * @param permissionSetName the add-on's API name
+         */
+        public AddOnAssignments(String permissionSetName) {
+            this.permissionSetName = permissionSetName;
+            this.users = new List<UserSummary>();
+        }
+    }
+
+    /**
+     * Returns the add-on permission sets this org has, with a one sentence description of
+     * what each grants.
+     *
+     * @return the add-ons, in the page's order
+     */
+    public static List<AddOn> getAddOns() {
+        Map<String, PermissionSet> setsByName = loadAddOnSets();
+        List<AddOn> addOns = new List<AddOn>();
+        for (String name : ADD_ON_PERMISSION_SETS) {
+            PermissionSet permissionSetRecord = setsByName.get(name);
+            if (permissionSetRecord != null) {
+                addOns.add(new AddOn(permissionSetRecord));
+            }
+        }
+        return addOns;
+    }
+
+    /**
+     * Returns the people who hold each add-on directly, one entry per add-on this org has.
+     * Holding an add-on only through a role (BarnCRM Admin includes Find and Export) is not
+     * listed, because removing it here could not take it away.
+     *
+     * @return the assignments, in the same order as getAddOns
+     */
+    public static List<AddOnAssignments> getAddOnAssignments() {
+        Map<String, PermissionSet> setsByName = loadAddOnSets();
+        Map<Id, AddOnAssignments> resultsById = new Map<Id, AddOnAssignments>();
+        List<AddOnAssignments> results = new List<AddOnAssignments>();
+        for (String name : ADD_ON_PERMISSION_SETS) {
+            PermissionSet permissionSetRecord = setsByName.get(name);
+            if (permissionSetRecord != null) {
+                AddOnAssignments entry = new AddOnAssignments(name);
+                resultsById.put(permissionSetRecord.Id, entry);
+                results.add(entry);
+            }
+        }
+        if (resultsById.isEmpty()) {
+            return results;
+        }
+        try {
+            for (
+                PermissionSetAssignment assignment : assignmentSelector.selectByPermissionSetIds(
+                    resultsById.keySet()
+                )
+            ) {
+                resultsById.get(assignment.PermissionSetId)
+                    .users.add(
+                        new UserSummary(
+                            assignment.AssigneeId,
+                            assignment.Assignee.Name,
+                            assignment.Assignee.Email
+                        )
+                    );
+            }
+        } catch (Exception e) {
+            throw logAndWrap(
+                e,
+                'AccessService.getAddOnAssignments',
+                Label.Core_Access_ErrorUnexpected
+            );
+        }
+        return results;
+    }
+
+    /**
+     * Whether the running user could assign permission sets in Setup: they hold Assign
+     * Permission Sets or Manage Users through their profile, a permission set, or a role.
+     * Any failure to tell counts as no.
+     *
+     * @return true when they hold either permission
+     */
+    public static Boolean canAssignPermissionSets() {
+        if (assignPermissionSetsOverride != null) {
+            return assignPermissionSetsOverride;
+        }
+        try {
+            return assignmentSelector.countAssignPermissionSetsGrants(UserInfo.getUserId()) > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Gives a set of people one add-on permission set. People who already hold it directly
+     * are skipped. Each person is inserted on their own terms: when Salesforce refuses one
+     * person, usually because their license does not allow what the add-on grants, the
+     * others still get it, and that person is reported by name.
+     *
+     * @param userIds the people to give the add-on to
+     * @param permissionSetName the API name of one of the Core add-on permission sets
+     * @return one plain message per person who could not be given it; empty when all were
+     */
+    public static List<String> assignAddOn(Set<Id> userIds, String permissionSetName) {
+        requireAssignPermission();
+        PermissionSet permissionSetRecord = requireAddOn(permissionSetName);
+        Map<Id, User> targets = requireActiveUserMap(userIds);
+
+        Set<Id> alreadyAssigned = new Set<Id>();
+        List<PermissionSetAssignment> rows = new List<PermissionSetAssignment>();
+        try {
+            for (
+                PermissionSetAssignment assignment : assignmentSelector.selectByPermissionSetIdAndUserIds(
+                    permissionSetRecord.Id,
+                    targets.keySet()
+                )
+            ) {
+                alreadyAssigned.add(assignment.AssigneeId);
+            }
+            for (Id userId : targets.keySet()) {
+                if (!alreadyAssigned.contains(userId)) {
+                    rows.add(
+                        new PermissionSetAssignment(
+                            AssigneeId = userId,
+                            PermissionSetId = permissionSetRecord.Id
+                        )
+                    );
+                }
+            }
+            if (rows.isEmpty()) {
+                return new List<String>();
+            }
+            List<String> failures = describeFailures(
+                rows,
+                Database.insert(rows, false, AccessLevel.USER_MODE),
+                targets,
+                permissionSetRecord.Label
+            );
+            if (!failures.isEmpty()) {
+                ErrorLogger.logMessages(
+                    failures,
+                    'AccessService.assignAddOn',
+                    ErrorLogger.SEVERITY_ERROR
+                );
+            }
+            return failures;
+        } catch (Exception e) {
+            throw logAndWrap(e, 'AccessService.assignAddOn', Label.Core_Access_ErrorUnexpected);
+        }
+    }
+
+    /**
+     * Takes one add-on permission set away from a set of people, in a single DML operation.
+     * Removing an add-on a person does not hold directly changes nothing and is not an error.
+     *
+     * @param userIds the people to take the add-on from
+     * @param permissionSetName the API name of one of the Core add-on permission sets
+     */
+    public static void removeAddOn(Set<Id> userIds, String permissionSetName) {
+        requireAssignPermission();
+        PermissionSet permissionSetRecord = requireAddOn(permissionSetName);
+        Set<Id> targets = requireChosenPeople(userIds);
+        try {
+            List<PermissionSetAssignment> toDelete = assignmentSelector.selectByPermissionSetIdAndUserIds(
+                permissionSetRecord.Id,
+                targets
+            );
+            if (!toDelete.isEmpty()) {
+                Database.delete(toDelete, true, AccessLevel.USER_MODE);
+            }
+        } catch (Exception e) {
+            throw logAndWrap(e, 'AccessService.removeAddOn', Label.Core_Access_ErrorUnexpected);
+        }
+    }
+
+    /**
+     * Turns the per-row results of an insert into one plain message per person refused.
+     * Kept separate from the DML so that the refusal path, which in a real org is a license
+     * that does not allow what the add-on grants, can be proven without such a user.
+     *
+     * @param rows the assignment rows, in the order they were inserted
+     * @param results the insert results, one per row in the same order
+     * @param people the people, by Id, to name in the messages
+     * @param addOnLabel the add-on's label
+     * @return one message per refused row; empty when every row was saved
+     */
+    @TestVisible
+    private static List<String> describeFailures(
+        List<PermissionSetAssignment> rows,
+        List<Database.SaveResult> results,
+        Map<Id, User> people,
+        String addOnLabel
+    ) {
+        List<String> failures = new List<String>();
+        for (Integer i = 0; i < results.size(); i++) {
+            if (results[i].isSuccess()) {
+                continue;
+            }
+            List<String> reasons = new List<String>();
+            for (Database.Error error : results[i].getErrors()) {
+                reasons.add(error.getMessage());
+            }
+            User person = people == null ? null : people.get(rows[i].AssigneeId);
+            failures.add(
+                String.format(
+                    Label.Core_Access_ErrorAddOnRefused,
+                    new List<Object>{
+                        person == null ? String.valueOf(rows[i].AssigneeId) : person.Name,
+                        addOnLabel,
+                        String.join(reasons, ' ')
+                    }
+                )
+            );
+        }
+        return failures;
+    }
+
+    /**
+     * The one plain sentence the page shows for what an add-on grants.
+     *
+     * @param permissionSetName the add-on's API name
+     * @return the sentence, or null for a name that is not an add-on
+     */
+    private static String addOnDescription(String permissionSetName) {
+        switch on permissionSetName {
+            when 'BarnCRM_Find_And_Export' {
+                return Label.Core_Access_AddOnFindAndExport;
+            }
+            when 'BarnCRM_Bulk_Update' {
+                return Label.Core_Access_AddOnBulkUpdate;
+            }
+            when 'BarnCRM_Bulk_Delete' {
+                return Label.Core_Access_AddOnBulkDelete;
+            }
+            when 'BarnCRM_Erase_People' {
+                return Label.Core_Access_AddOnErasePeople;
+            }
+            when 'BarnCRM_Duplicate_Review' {
+                return Label.Core_Access_AddOnDuplicateReview;
+            }
+            when 'BarnCRM_Metadata_Admin' {
+                return Label.Core_Access_AddOnMetadataAdmin;
+            }
+            when else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Loads the packaged add-on permission sets, keyed by API name. Only sets in this
+     * package's own namespace count, so a same-named set an admin created is never used.
+     *
+     * @return the add-ons this org has
+     */
+    private static Map<String, PermissionSet> loadAddOnSets() {
+        Map<String, PermissionSet> setsByName = new Map<String, PermissionSet>();
+        try {
+            for (
+                PermissionSet permissionSetRecord : permissionSetSelector.selectPackagedByNames(
+                    new Set<String>(ADD_ON_PERMISSION_SETS),
+                    NamespaceUtil.prefix().removeEnd('__')
+                )
+            ) {
+                setsByName.put(permissionSetRecord.Name, permissionSetRecord);
+            }
+        } catch (Exception e) {
+            throw logAndWrap(e, 'AccessService.loadAddOnSets', Label.Core_Access_ErrorUnexpected);
+        }
+        return setsByName;
+    }
+
+    /** Refuses, with a readable message, a person who could not assign permission sets in Setup. */
+    private static void requireAssignPermission() {
+        if (!canAssignPermissionSets()) {
+            throw new AccessException(Label.Core_Access_ErrorCannotAssignPermissionSets);
+        }
+    }
+
+    /**
+     * Checks that the name is on the add-on allowlist and that the org has that packaged set.
+     *
+     * @param permissionSetName the API name to check
+     * @return the packaged permission set
+     */
+    private static PermissionSet requireAddOn(String permissionSetName) {
+        if (
+            String.isBlank(permissionSetName) ||
+            !new Set<String>(ADD_ON_PERMISSION_SETS).contains(permissionSetName)
+        ) {
+            throw new AccessException(Label.Core_Access_ErrorAddOnNotFound);
+        }
+        PermissionSet permissionSetRecord = loadAddOnSets().get(permissionSetName);
+        if (permissionSetRecord == null) {
+            throw new AccessException(Label.Core_Access_ErrorAddOnNotFound);
+        }
+        return permissionSetRecord;
     }
 
     /**
@@ -488,12 +859,20 @@ public with sharing class AccessService {
      * @return the same people, confirmed active
      */
     private static Set<Id> requireActiveUsers(Set<Id> userIds) {
+        return requireActiveUserMap(userIds).keySet();
+    }
+
+    /**
+     * Checks that every chosen person exists and can still sign in, keeping their names.
+     *
+     * @param userIds the people the caller chose
+     * @return the same people, confirmed active, by Id
+     */
+    private static Map<Id, User> requireActiveUserMap(Set<Id> userIds) {
         Set<Id> requested = requireChosenPeople(userIds);
-        Set<Id> found = new Set<Id>();
+        Map<Id, User> found;
         try {
-            for (User person : userSelector.selectActiveByIds(requested)) {
-                found.add(person.Id);
-            }
+            found = new Map<Id, User>(userSelector.selectActiveByIds(requested));
         } catch (Exception e) {
             throw logAndWrap(
                 e,
