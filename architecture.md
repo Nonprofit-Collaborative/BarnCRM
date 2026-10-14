@@ -94,4 +94,5 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - The `oi-test` running user lacks Bulk API Hard Delete: hard delete fails there, so scale cleanup falls back to soft delete.
 - `sf data delete bulk --json` returns the job id at `.result.jobInfo.id`.
 - The synced folder can create `name 2` duplicate git refs inside `.git` that break `git fetch`; check they are stale, then move them out of `.git`.
+- `FOR UPDATE` works on a hierarchy custom setting's org-level row; Core uses `Rollup_Run_Lock__c` as a run lock (#398, 2026-10-14).
 - A new ADR on a branch uses the placeholder file `NEXT-<title>.md` and never a chosen number; the integrator numbers it at merge (see the repo `CLAUDE.md`).

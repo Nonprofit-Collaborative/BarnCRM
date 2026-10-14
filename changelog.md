@@ -13,6 +13,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 
 ### Merged to main
 
+- #398 (b97c4726): Rollup Queue large parent route efficiency: a record goes to `RollupLargeParentBatch` only when its estimate reaches 40% of the query-row limit (run budget stays 60%); one batch start at a time under a row lock on the new protected custom setting `Rollup_Run_Lock__c`; the chain-depth hand-off no longer writes an Info log entry (it fired 31 times in 10 minutes on the scale rerun). Found by the tier 1 scale rerun (about 86 batch jobs for 2 large targets, fund recalculated twice concurrently).
 - #396 (1238b859): Rollup Queue: a save that queued entries and started no processor publishes `Rollup_Queue_Ready__e` after commit, closing an enqueue race that stranded 47 entries (ADR-0117).
 - #395 (dae769af): scale script: the default fund must resolve; cleanup keeps the default fund; generator names are unique.
 - #394 (cd348906): Rollup Queue retries narrow 50, 12, 3, 1 only for runs that stopped; refused saves retry at full size.
