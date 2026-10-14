@@ -71,6 +71,32 @@ sample data set, then rerun `scripts/org/seed-sample-data.sh oi-test` if the sam
 removed. Write the results into the v0.11 release notes under "Scale test", with the tier,
 volumes, timings and every finding.
 
+### How to run tier 1
+
+From the dedicated worktree, holding the `oi-test` lock (needs `sf`, `jq` and `python3`):
+
+```bash
+bash scripts/org/scale-test-tier1.sh oi-test            # generate, load, record
+# ... the runs table above ...
+bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children first
+```
+
+- `scripts/data/generate-scale-data.py` writes the CSVs into `scale-test-data/` (git-ignored,
+  seeded, names from `generate-sample-data.py`). The load script runs it for you. It also
+  writes `import-wizard-25k.csv` (25,000 gift rows with the donor on each row, in the
+  "Generic gift list" template's headings) for the Import row; those rows need the
+  "Scale test General" fund, so run the import before cleanup, or clean up with
+  `--keep-funds`. Undo the import batch in the wizard, not in cleanup.
+- The load script records the four limits above, record counts, and per load the rows, elapsed
+  seconds, failed rows and first error in `scale-test-data/results-run-<alias>-<time>.md`. It
+  refuses any alias but `oi-test` unless `SCALE_TEST_ALLOW=1`.
+- The tier 1 files hold 88,000 households, contacts and gifts, plus 6,000 soft credits and
+  3,000 second allocations. Every gift also gets an automatic default allocation (60,000 more
+  records), so about 157,000 records land in the org, over the roughly 100,000 a scratch org's
+  200 MB holds. Check `DataStorageMB` before loading. To shrink the run, set
+  `SCALE_TEST_GENERATOR_ARGS="--households 3000 --contacts 7500 --gifts 20000"`.
+- Hard delete needs the Bulk API Hard Delete permission on the running user.
+
 ## Mobile audit
 
 Run on `oi-test` with the Salesforce mobile app on one iPhone and one Android phone (or the
