@@ -16,8 +16,9 @@
 # first and do not run the org test gate at the same time. Run it from a dedicated worktree.
 # Needs: sf, jq, python3. Generates the CSVs itself (scripts/data/generate-scale-data.py).
 # Every gift gets an automatic allocation to the default fund. If the org has none, the
-# generated "Scale test General" fund is loaded as the default (cleanup removes it); if it
-# has one, that stays the default.
+# generated "Scale test General" fund is loaded as the default; if its default resolves (an
+# active fund the Giving settings point at), that stays the default. Cleanup never deletes
+# the default fund (the next run reuses it).
 #
 # Environment: SCALE_TEST_DIR (default scale-test-data/ in the repo, git-ignored),
 #              SCALE_TEST_WAIT_MINUTES (per load, default 120),
@@ -258,6 +259,8 @@ generate() {
   local extra=""
   # A second default fund would move the org's default and rewrite Giving settings.
   [[ "${ORG_HAS_DEFAULT:-0}" == "1" ]] && extra="--no-default-fund"
+  local code
+  for code in ${SKIP_FUND_CODES:-}; do extra="$extra --skip-fund-code $code"; done
   # shellcheck disable=SC2086
   python3 "$GENERATOR" --tier1 --out-dir "$DIR" $extra ${SCALE_TEST_GENERATOR_ARGS:-} 2>&1 | tee -a "$RESULTS"
   python3 "$GENERATOR" --import-file --out-dir "$DIR" | tee -a "$RESULTS"
@@ -276,20 +279,38 @@ resolve() {
 run() {
   log "BarnCRM tier 1 scale test load: org $ALIAS, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   log "Reminder: hold the org lock; no org test gate at the same time."
-  # Every gift gets an automatic allocation to the default fund. An org with none gets the
-  # generated "Scale test General" fund as its default; an org with one keeps it.
-  local default_funds setting_fund
-  default_funds="$(count_of "SELECT COUNT() FROM Fund__c WHERE Is_Default__c = true AND Active__c = true")"
+  # Every gift gets an automatic allocation to the default fund. An org whose default
+  # resolves keeps it; an org with none (or a setting pointing at a missing, deleted or
+  # inactive fund) gets the generated "Scale test General" fund as its default.
+  local setting_fund resolved
   setting_fund="$(sf data query --target-org "$ALIAS" --json \
     --query "SELECT Default_Fund__c FROM Giving_Settings__c" 2>/dev/null </dev/null \
     | jq -r '[.result.records[]?.Default_Fund__c | select(. != null and . != "")] | first // empty')"
   ORG_HAS_DEFAULT=0
-  if [[ "$default_funds" =~ ^[1-9][0-9]*$ || -n "$setting_fund" ]]; then
-    ORG_HAS_DEFAULT=1
-    log "Org already has a default fund; it stays the default."
+  if [[ -z "$setting_fund" ]]; then
+    log "Giving settings name no default fund on $ALIAS."
+  elif [[ ! "$setting_fund" =~ ^[A-Za-z0-9]{15,18}$ ]]; then
+    log "Giving settings hold an unreadable default fund value; treating the org as having no default."
   else
-    log "No default fund on $ALIAS: the generated 'Scale test General' fund is loaded as the default."
+    # A query skips deleted rows, so this is the non-deleted, active, default-flagged fund.
+    resolved="$(count_of "SELECT COUNT() FROM Fund__c WHERE Id = '$setting_fund' AND Active__c = true AND Is_Default__c = true")"
+    if [[ "$resolved" == "1" ]]; then
+      ORG_HAS_DEFAULT=1
+    else
+      log "Giving settings point at fund $setting_fund, which is missing, deleted, inactive or not"
+      log "flagged default (matching funds: $resolved). Treating the org as having no default."
+    fi
   fi
+  if [[ "$ORG_HAS_DEFAULT" == "1" ]]; then
+    log "Org already has a default fund ($setting_fund); it stays the default."
+  else
+    log "No usable default fund on $ALIAS: the generated 'Scale test General' fund is loaded as the default."
+  fi
+  # A SCALE-* fund still in the org (a kept default) must not be loaded a second time.
+  SKIP_FUND_CODES="$(sf data query --target-org "$ALIAS" --json \
+    --query "SELECT Accounting_Code__c FROM Fund__c WHERE Accounting_Code__c LIKE 'SCALE-%'" 2>/dev/null </dev/null \
+    | jq -r '[.result.records[]?.Accounting_Code__c] | join(" ")')"
+  [[ -n "$SKIP_FUND_CODES" ]] && log "Funds with these codes already exist and are not loaded again: $SKIP_FUND_CODES"
   generate
   record_limits "before"
   record_counts "before"
@@ -413,7 +434,14 @@ cleanup() {
   if [[ "$KEEP_FUNDS" == "1" ]]; then
     log "  funds: kept (--keep-funds), needed by the import wizard file"
   else
-    delete_where "funds" Fund__c "Accounting_Code__c LIKE 'SCALE-%'"
+    # Never the org's default fund: Giving settings point at it. Cleanup keeps it, and the
+    # next run reuses it (and skips loading a fund with the same code).
+    local kept
+    kept="$(sf data query --target-org "$ALIAS" --json \
+      --query "SELECT Accounting_Code__c FROM Fund__c WHERE Accounting_Code__c LIKE 'SCALE-%' AND Is_Default__c = true" \
+      2>/dev/null </dev/null | jq -r '[.result.records[]?.Accounting_Code__c] | join(", ")')"
+    [[ -n "$kept" ]] && log "  funds: kept the default fund ($kept); it is not deleted"
+    delete_where "funds (not the default)" Fund__c "Accounting_Code__c LIKE 'SCALE-%' AND Is_Default__c = false"
   fi
   record_counts "after cleanup"
   log ""
