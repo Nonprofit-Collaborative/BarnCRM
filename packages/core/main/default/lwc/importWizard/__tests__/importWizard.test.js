@@ -8,6 +8,7 @@ import createBatch from '@salesforce/apex/ImportController.createBatch';
 import stageRows from '@salesforce/apex/ImportController.stageRows';
 import startDryRun from '@salesforce/apex/ImportController.startDryRun';
 import startCommit from '@salesforce/apex/ImportController.startCommit';
+import startTrial from '@salesforce/apex/ImportController.startTrial';
 import getBatch from '@salesforce/apex/ImportController.getBatch';
 import getRowPage from '@salesforce/apex/ImportController.getRowPage';
 import saveRecurring from '@salesforce/apex/ImportController.saveRecurring';
@@ -60,6 +61,9 @@ jest.mock('@salesforce/apex/ImportController.startDryRun', () => ({ default: jes
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.startCommit', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/ImportController.startTrial', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/ImportController.getBatch', () => ({ default: jest.fn() }), {
@@ -1356,6 +1360,81 @@ describe('the import wizard', () => {
       expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
         'c.Core_Import_ResultsCapped'
       );
+    });
+  });
+
+  describe('trying the first rows', () => {
+    const PREVIEWED = { ...DRY_RUN_BATCH, rowCount: 300, defaultTrialRows: 25 };
+
+    async function toPreview() {
+      startDryRun.mockResolvedValue(PREVIEWED);
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      return element;
+    }
+
+    it('offers the org size, imports that many first rows, and shows the results', async () => {
+      startTrial.mockResolvedValue({ ...PREVIEWED, status: 'Committing', isFinished: false });
+      const element = await toPreview();
+      const rows = element.shadowRoot.querySelector('[data-id="trial-rows"]');
+      expect(rows.value).toBe('25');
+      click(element, 'trial-button');
+      await flush();
+      expect(startTrial).toHaveBeenCalledWith({ batchId: 'a02', rowCount: 25 });
+      expect(startCommit).not.toHaveBeenCalled();
+      expect(element.shadowRoot.querySelector('[data-id="start-over"]')).not.toBeNull();
+    });
+
+    it('takes a size typed for this file, and refuses one out of range', async () => {
+      startTrial.mockResolvedValue({ ...PREVIEWED, status: 'Committing', isFinished: false });
+      const element = await toPreview();
+      const rows = element.shadowRoot.querySelector('[data-id="trial-rows"]');
+      rows.value = '0';
+      rows.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="trial-button"]').disabled).toBe(true);
+      rows.value = '10';
+      rows.dispatchEvent(new CustomEvent('change'));
+      await flush();
+      click(element, 'trial-button');
+      await flush();
+      expect(startTrial).toHaveBeenCalledWith({ batchId: 'a02', rowCount: 10 });
+    });
+
+    it('is not offered while the preview cannot be imported', async () => {
+      startDryRun.mockResolvedValue({ ...PREVIEWED, controlTotalsAgree: false });
+      const element = await toMatchingStep();
+      click(element, 'dry-run');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="trial"]')).toBeNull();
+    });
+
+    it('after the trial, says what is left and imports it into the same import', async () => {
+      startTrial.mockResolvedValue({
+        ...PREVIEWED,
+        status: 'Trial complete',
+        isDryRun: false,
+        isFinished: true,
+        trialRows: 25
+      });
+      startCommit.mockResolvedValue({
+        ...PREVIEWED,
+        status: 'Committing',
+        isDryRun: false,
+        isFinished: false,
+        trialRows: 25
+      });
+      const element = await toPreview();
+      click(element, 'trial-button');
+      await flush();
+      expect(element.shadowRoot.querySelector('[data-id="trial-done"]').textContent).toContain(
+        'c.Core_Import_TrialDone'
+      );
+      click(element, 'remaining-button');
+      await flush();
+      expect(startCommit).toHaveBeenCalledWith({ batchId: 'a02' });
+      expect(element.shadowRoot.querySelector('[data-id="remaining"]')).toBeNull();
     });
   });
 });

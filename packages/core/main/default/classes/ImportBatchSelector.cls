@@ -13,7 +13,7 @@ public with sharing class ImportBatchSelector {
         'Rows_Updated__c, Rows_Matched__c, Rows_Rejected__c, Run_Log__c, Started_At__c, ' +
         'Completed_At__c, Chunk_Size__c, Undo_Deadline__c, Committed_By__c, Expected_Count__c, ' +
         'Expected_Amount__c, File_Amount__c, Processor_Settings_JSON__c, Pass_Number__c, Job_Id__c, ' +
-        'File_Values_JSON__c, Match_Only__c, Operation__c';
+        'File_Values_JSON__c, Match_Only__c, Operation__c, Trial_Rows__c';
 
     /** One batch, or null. */
     @NamespaceAccessible
@@ -73,14 +73,22 @@ public with sharing class ImportBatchSelector {
      */
     @NamespaceAccessible
     public static Map<String, Integer> countRowsByStatus(Id batchId) {
+        return countRowsByStatus(batchId, null);
+    }
+
+    /** As above, counting only the rows the given pass processed when one is given (R-IB16). */
+    @NamespaceAccessible
+    public static Map<String, Integer> countRowsByStatus(Id batchId, Decimal pass) {
         Map<String, Integer> result = new Map<String, Integer>();
         if (batchId == null) {
             return result;
         }
         List<AggregateResult> grouped = Database.queryWithBinds(
             'SELECT Status__c status, COUNT(Id) total FROM Import_Row__c ' +
-            'WHERE Import_Batch__c = :batchId GROUP BY Status__c',
-            new Map<String, Object>{ 'batchId' => batchId },
+                'WHERE Import_Batch__c = :batchId' +
+                (pass == null ? '' : ' AND Pass_Number__c = :pass') +
+                ' GROUP BY Status__c',
+            new Map<String, Object>{ 'batchId' => batchId, 'pass' => pass },
             AccessLevel.SYSTEM_MODE
         );
         for (AggregateResult row : grouped) {
@@ -90,6 +98,25 @@ public with sharing class ImportBatchSelector {
             }
         }
         return result;
+    }
+
+    /**
+     * The row number of the batch's nth row in file order (n from 1), or null when it has
+     * fewer; the last row of a trial of n rows (R-IB16). OFFSET reaches 2,000, the trial's
+     * ceiling. System mode, as the processor reads the rows (ADR-0021).
+     */
+    @NamespaceAccessible
+    public static Decimal selectRowNumberAt(Id batchId, Integer n) {
+        if (batchId == null || n == null || n < 1) {
+            return null;
+        }
+        List<Import_Row__c> rows = Database.queryWithBinds(
+            'SELECT Row_Number__c FROM Import_Row__c WHERE Import_Batch__c = :batchId' +
+            ' ORDER BY Row_Number__c ASC LIMIT 1 OFFSET :skip',
+            new Map<String, Object>{ 'batchId' => batchId, 'skip' => n - 1 },
+            AccessLevel.SYSTEM_MODE
+        );
+        return rows.isEmpty() ? null : rows[0].Row_Number__c;
     }
 
     /**

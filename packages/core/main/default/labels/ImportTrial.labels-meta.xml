@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Import_TrialHeading</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: heading of the trial import choice</shortDescription>
+        <value>Try the first rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TrialHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: what a trial import does and why</shortDescription>
+        <value>The preview writes nothing, so a validation rule, a required field or one of your org's flows is first met when rows are saved. Import only the first rows for real, check them, then import the rest into the same import; one undo removes both.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TrialRowsLabel</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: how many first rows a trial imports</shortDescription>
+        <value>Rows to try</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TrialButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import preview: button that imports only the first rows</shortDescription>
+        <value>Import the first rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_RemainingButton</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: button that imports the rows after a trial</shortDescription>
+        <value>Import the remaining rows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_TrialDone</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import results: a trial finished; {0} rows tried, {1} remain</shortDescription>
+        <value>The first {0} rows were imported. Check them above, then import the remaining {1} rows into the same import. If they are wrong, undo the import from Recent imports instead.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorRemainingOtherUser</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import: the rest of a trial refused to someone other than its runner</shortDescription>
+        <value>Only the person who imported the first rows can import the remaining rows, so one undo can tell this import's records from anyone else's. Ask them, or undo the import and import the file again.</value>
+    </labels>
+</CustomLabels>

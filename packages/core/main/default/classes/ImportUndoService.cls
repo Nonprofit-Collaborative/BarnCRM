@@ -255,6 +255,7 @@ public with sharing class ImportUndoService {
         }
         if (
             !(ImportBatchService.STATUS_COMPLETE.equals(status) ||
+            ImportBatchService.STATUS_TRIAL_COMPLETE.equals(status) ||
             ImportBatchService.STATUS_FAILED.equals(status) ||
             ImportBatchService.STATUS_UNDO_FAILED.equals(status)) ||
             batch.Undo_Deadline__c == null ||

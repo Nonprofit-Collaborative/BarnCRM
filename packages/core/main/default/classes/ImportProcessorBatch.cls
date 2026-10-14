@@ -34,13 +34,26 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     /** The pass this run is (R-IB13), stamped on a chunk's rows even when the chunk dies. */
     private Decimal pass;
 
+    /** A trial's size, or null: only the file's first rows are committed (R-IB16). */
+    private final Integer trialRows;
+    /** The rest of a trial: only rows after this row number, or null for every row. */
+    private final Decimal afterRow;
+
     public ImportProcessorBatch(Id batchId, Boolean dryRun) {
+        this(batchId, dryRun, null, null);
+    }
+
+    public ImportProcessorBatch(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow) {
         this.batchId = batchId;
         this.dryRun = dryRun == true;
+        this.trialRows = trialRows;
+        this.afterRow = afterRow;
     }
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id owner = batchId;
+        Decimal after = afterRow == null ? -1 : afterRow;
+        Integer most = trialRows == null ? 50000000 : trialRows;
         // System mode, stated because API 67.0 would otherwise read in user mode: the staged
         // rows are the package's own bookkeeping, written in system mode for the reason
         // ADR-0021 gives, and this read only feeds that processing. The records a row makes
@@ -63,9 +76,10 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                     Gift_Id__c,
                     Soft_Credit_Id__c
                 FROM Import_Row__c
-                WHERE Import_Batch__c = :owner
+                WHERE Import_Batch__c = :owner AND (Row_Number__c > :after OR Row_Number__c = NULL)
                 WITH SYSTEM_MODE
                 ORDER BY Row_Number__c ASC
+                LIMIT :most
             ]
         );
     }
@@ -148,7 +162,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
                 failed,
                 lines,
                 fileAmount,
-                processorSettings
+                processorSettings,
+                trialRows != null
             );
         } catch (Exception e) {
             ErrorLogger.log(e, 'ImportProcessorBatch.finish');
