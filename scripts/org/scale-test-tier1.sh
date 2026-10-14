@@ -23,7 +23,13 @@
 #              SCALE_TEST_WAIT_MINUTES (per load, default 120),
 #              SCALE_TEST_GENERATOR_ARGS (for example "--gifts 20000" to shrink the run),
 #              SCALE_TEST_SOFT_DELETE=1 (cleanup without --hard-delete, to the Recycle Bin,
-#              for a user without the Bulk API Hard Delete permission).
+#              for a user without the Bulk API Hard Delete permission),
+#              SCALE_TEST_HARD_DELETE=1 (force hard delete; fail instead of falling back),
+#              SCALE_TEST_ALLOW_EXISTING=1 (load even when scale records already exist).
+# Cleanup tries hard delete first; if the first delete fails with HardDeletePermissionError
+# it logs that and soft deletes (Recycle Bin) for that step and the rest.
+# The load refuses to start when scale households, contacts or gifts already exist: run
+# cleanup first.
 # Exit status: nonzero when cleanup deletes nothing or leaves scale records behind.
 
 set -uo pipefail
@@ -198,6 +204,13 @@ load() {
 # automation, cuts the default allocation to 70% and adds the 30% row, then checks every gift
 # with GiftService.validateAllocations and rolls the chunk back on any problem. The scripts
 # print a SCALE_SPLIT line with the counts, collected here.
+# split_field <line> <name>: the value after "name=" up to the next space ("" when absent).
+split_field() {
+  local rest="${1#*"$2"=}"
+  [[ "$rest" == "$1" ]] && return
+  printf '%s' "${rest%% *}"
+}
+
 split_gifts() {
   local script out start end line requested=0 skipped=0 rows=0 failed=0 first="" n=0 value
   log ""
@@ -213,16 +226,25 @@ split_gifts() {
       failed=$((failed + 1))
       continue
     fi
-    line="$(jq -r '.result.logs // ""' "$out" | grep -o 'SCALE_SPLIT .*' | head -n 1)"
+    # Only the USER_DEBUG line: the log also echoes the source line of the script.
+    line="$(jq -r '.result.logs // ""' "$out" | grep 'USER_DEBUG.*SCALE_SPLIT ' | head -n 1)"
+    line="${line#*SCALE_SPLIT }"
     if [[ -z "$line" ]]; then
       log "  $(basename "$script"): ran, but printed no SCALE_SPLIT line (log level?)"
       continue
     fi
-    value="${line#*requested=}"; requested=$((requested + ${value%% *}))
-    value="${line#*skipped=}"; skipped=$((skipped + ${value%% *}))
-    value="${line#*rows=}"; rows=$((rows + ${value%% *}))
-    value="${line#*failedRows=}"; failed=$((failed + ${value%% *}))
+    local v_req v_skip v_rows v_fail
+    v_req="$(split_field "$line" requested)"; v_skip="$(split_field "$line" skipped)"
+    v_rows="$(split_field "$line" rows)"; v_fail="$(split_field "$line" failedRows)"
+    if [[ ! "$v_req" =~ ^[0-9]+$ || ! "$v_skip" =~ ^[0-9]+$ || ! "$v_rows" =~ ^[0-9]+$ || ! "$v_fail" =~ ^[0-9]+$ ]]; then
+      log "  $(basename "$script"): FAILED: unreadable SCALE_SPLIT line: $(printf '%s' "$line" | head -c 200)"
+      failed=$((failed + 1))
+      continue
+    fi
+    requested=$((requested + v_req)); skipped=$((skipped + v_skip))
+    rows=$((rows + v_rows)); failed=$((failed + v_fail))
     value="${line#*firstError=}"
+    [[ "$value" == "$line" ]] && value=""
     [[ -z "$first" && -n "$value" ]] && first="$value"
   done
   end="$(date +%s)"
@@ -271,6 +293,14 @@ run() {
   generate
   record_limits "before"
   record_counts "before"
+  if [[ "$SCALE_REMAINING" -ne 0 && "${SCALE_TEST_ALLOW_EXISTING:-}" != "1" ]]; then
+    log ""
+    log "REFUSING TO LOAD: scale households, contacts or gifts already exist on $ALIAS"
+    log "(count $SCALE_REMAINING; -1 means a count could not be read). Loading on top of them"
+    log "produces duplicate failures. Run 'scale-test-tier1.sh cleanup $ALIAS' first, or set"
+    log "SCALE_TEST_ALLOW_EXISTING=1 to load anyway."
+    exit 1
+  fi
 
   load "funds" Fund__c "$DIR/funds.csv"
 
@@ -315,8 +345,7 @@ run() {
 
 # delete_where <label> <sobject> <where clause>: bulk export the Ids, then hard delete them.
 delete_where() {
-  local file="$DIR/work/delete-$2.csv" n start end flag="--hard-delete" outfile="$DIR/work/last-delete.json"
-  [[ "${SCALE_TEST_SOFT_DELETE:-}" == "1" ]] && flag=""
+  local file="$DIR/work/delete-$2.csv" n start end flag outfile="$DIR/work/last-delete.json" slug
   log ""
   log "Delete: $1 ($2)"
   export_to "SELECT Id FROM $2 WHERE $3" "$file"
@@ -325,14 +354,31 @@ delete_where() {
     log "  nothing to delete"
     return
   fi
-  log "  $n Ids to delete${flag:+ (hard delete)}"
-  start="$(date +%s)"
-  # shellcheck disable=SC2086
-  sf data delete bulk --sobject "$2" --file "$file" --target-org "$ALIAS" $flag \
-    --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-delete.err" </dev/null
-  end="$(date +%s)"
-  job_report "delete $1" "$outfile"
-  log "  elapsed: $((end - start)) s"
+  slug="$(printf '%s' "delete $1" | tr -c 'A-Za-z0-9' '-')"
+  while :; do
+    flag="--hard-delete"
+    [[ "$DELETE_SOFT" == "1" ]] && flag=""
+    if [[ -n "$flag" ]]; then log "  $n Ids to delete (hard delete)"; else log "  $n Ids to delete (soft delete, Recycle Bin)"; fi
+    start="$(date +%s)"
+    rm -f "$DIR/work/failed-$slug.csv"
+    # shellcheck disable=SC2086
+    sf data delete bulk --sobject "$2" --file "$file" --target-org "$ALIAS" $flag \
+      --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-delete.err" </dev/null
+    end="$(date +%s)"
+    job_report "delete $1" "$outfile"
+    log "  elapsed: $((end - start)) s"
+    # No hard delete permission: the first delete says so. Fall back to soft delete for this
+    # and the remaining steps unless the user forced hard delete.
+    if [[ -n "$flag" && "$FORCE_HARD" != "1" && "$JOB_SUCCESS" -le 0 ]] \
+      && cat "$outfile" "$DIR/work/last-delete.err" "$DIR/work/failed-$slug.csv" 2>/dev/null \
+        | grep -qi 'HardDeletePermissionError'; then
+      DELETE_SOFT=1
+      log "  HardDeletePermissionError: the user lacks Bulk API Hard Delete. Falling back to soft"
+      log "  delete (Recycle Bin) for this and the remaining steps."
+      continue
+    fi
+    break
+  done
   if [[ "$JOB_OK" != "1" || "$JOB_FAILED" != "0" || "$JOB_SUCCESS" -le 0 ]]; then
     CLEANUP_FAILED=1
     log "  NOTHING OR NOT EVERYTHING WAS DELETED for $1 ($JOB_SUCCESS of $n)."
@@ -342,10 +388,20 @@ delete_where() {
 }
 
 CLEANUP_FAILED=0
+# DELETE_SOFT=1 means delete to the Recycle Bin; FORCE_HARD=1 means hard delete or fail.
+DELETE_SOFT=0
+FORCE_HARD=0
 cleanup() {
   log "BarnCRM tier 1 scale test cleanup: org $ALIAS, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  log "Hard delete needs the Bulk API Hard Delete permission on the running user"
-  log "(SCALE_TEST_SOFT_DELETE=1 deletes to the Recycle Bin instead)."
+  if [[ "${SCALE_TEST_HARD_DELETE:-}" == "1" ]]; then
+    FORCE_HARD=1
+    log "Hard delete forced (SCALE_TEST_HARD_DELETE=1): no fallback to soft delete."
+  elif [[ "${SCALE_TEST_SOFT_DELETE:-}" == "1" ]]; then
+    DELETE_SOFT=1
+    log "Soft delete (SCALE_TEST_SOFT_DELETE=1): records go to the Recycle Bin."
+  else
+    log "Hard delete first; without the Bulk API Hard Delete permission it falls back to soft delete."
+  fi
   record_counts "before cleanup"
   # Children first. Allocations are not deleted on their own: Giving refuses to delete a
   # gift's allocation while the gift remains (the gift would be under-allocated), so they go
