@@ -7,7 +7,7 @@
  * thing letting the wrong people in.
  *
  * The defect these cover: the file was linked to the donor Contact and the donor Account as well
- * as to the receipt, and a Program Staff or Volunteer Coordinator user, who holds `BarnCRM_Staff`
+ * as to the receipt, and a Team Member or Coordinator user, who holds `BarnCRM_Staff`
  * and no Giving permission set at all, has Read on Account and Contact. A donor's year end
  * statement, listing their whole giving history, the organization's EIN and the signer's name, was
  * in the Files related list of a record those users open every day.

@@ -266,7 +266,7 @@ private class AccessControllerTest {
 
             Assert.isTrue(
                 assigned.success,
-                'Maria should be able to give David the Program Staff role.'
+                'Maria should be able to give David the Team Member role.'
             );
             Assert.isTrue(removed.success, 'Maria should be able to take the role away again.');
             Assert.areEqual(

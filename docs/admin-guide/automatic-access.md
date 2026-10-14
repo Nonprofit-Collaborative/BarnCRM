@@ -17,7 +17,7 @@ There are two kinds of policy on this page:
 
 | Policy | What it does | When it runs |
 |---|---|---|
-| New staff get a role | A new user with your staff profile gets a BarnCRM role (for example Program Staff) the moment the user is created | Automatically, when a user is created |
+| New staff get a role | A new user with your staff profile gets a BarnCRM role (for example Team Member) the moment the user is created | Automatically, when a user is created |
 | Module access follows the role (with Giving) | Anyone who holds a BarnCRM role also gets the matching Giving permission set: BarnCRM Admin gets Giving Admin, Fundraising Staff gets Giving Staff, Read Only gets Giving Read Only | Once, when you click **Apply Policy**, and again whenever a matching user record is edited |
 
 The second kind fills the gap described on the Access page: a role carries what Core
@@ -40,18 +40,18 @@ access step of the Setup Assistant, opens this page.
 
 ## A five-minute walkthrough
 
-Maria's organization hires program staff every few months. Every new hire gets the
-"Program User" profile. She wants each one to have the Program Staff role on their first day.
+Maria's organization takes on new staff every few months. Every new hire gets the
+"Team User" profile. She wants each one to have the Team Member role on their first day.
 
 1. In Setup, open **User Access Policies** and click **New**.
-2. Fill in the policy as in "Policy 1" below, choosing her own profile, **Program User**, in
+2. Fill in the policy as in "Policy 1" below, choosing her own profile, **Team User**, in
    the profile filter.
 3. Save. The policy is in **Design** status: it does nothing yet.
 4. Click **Automate Policy** (or set the status to Active), choose **when a user is created**,
    and give it an Order (Maria uses 10).
-5. The next time someone in Setup creates a user with the Program User profile, that user
-   holds the Program Staff role straight away. Maria checks on the Access page: the new name
-   is on the Program Staff card.
+5. The next time someone in Setup creates a user with the Team User profile, that user
+   holds the Team Member role straight away. Maria checks on the Access page: the new name
+   is on the Team Member card.
 
 If your org has Giving, Maria also creates Policy 2, then clicks **Apply Policy** once and
 applies it to every user it lists. Everyone who already holds BarnCRM Admin now also holds
@@ -67,15 +67,16 @@ are in brackets.
 
 | Field | Value |
 |---|---|
-| Label | BarnCRM: new staff get Program Staff |
-| Description | Gives every new active user with our staff profile the BarnCRM Program Staff role. |
+| Label | BarnCRM: new staff get Team Member |
+| Description | Gives every new active user with our staff profile the BarnCRM Team Member role. |
 | Filter 1 | Profile, equals, **your own staff profile** (it differs in every org) |
 | User field filter | Active (`IsActive`) equals `true` |
-| Action | Grant, Permission Set Group, **Program Staff** (`Program_Staff`) |
+| Action | Grant, Permission Set Group, **Team Member** (`Program_Staff`) |
 | Trigger | When a user is created |
 | Order | 10 |
 
-Change the role to suit: **Volunteer Coordinator** (`Volunteer_Coordinator`), **Read Only**
+The API names in brackets are the roles' original names and never change, so a policy keeps
+working across upgrades. Change the role to suit: **Coordinator** (`Volunteer_Coordinator`), **Read Only**
 (`Read_Only`), **BarnCRM Admin** (`BarnCRM_Admin_Group`) or, with Giving, **Fundraising
 Staff** (`Fundraising_Staff`). With Giving, add a second action to the same policy so the new
 user gets the module's permission set at the same time, for example Grant, Permission Set,

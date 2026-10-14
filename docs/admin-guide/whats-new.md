@@ -15,7 +15,7 @@ notes come with the upgrade itself.
 There is nothing to turn on. The card is part of the BarnCRM home page as soon as BarnCRM is
 installed, and it fills itself from the notes each release ships.
 
-- **Who sees it:** everyone with a BarnCRM role (Admin, Program Staff, Volunteer Coordinator or
+- **Who sees it:** everyone with a BarnCRM role (Admin, Team Member, Coordinator or
   Read Only) who opens the BarnCRM home page.
 - **What they see:** the notes for every release since they last dismissed the card, newest
   first. Someone who has never dismissed it sees only the notes for the current release, not

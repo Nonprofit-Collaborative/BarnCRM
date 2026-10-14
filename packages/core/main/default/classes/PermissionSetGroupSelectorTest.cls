@@ -57,7 +57,7 @@ private class PermissionSetGroupSelectorTest {
             PermissionSetGroup groupRecord = selector.selectByDeveloperName('Program_Staff');
             Test.stopTest();
 
-            Assert.isNotNull(groupRecord, 'The Program Staff group ships with BarnCRM Core.');
+            Assert.isNotNull(groupRecord, 'The Team Member group ships with BarnCRM Core.');
             Assert.areEqual(
                 'Program_Staff',
                 groupRecord.DeveloperName,

@@ -112,7 +112,7 @@ BarnCRM Admin. That is not an oversight, and there is no switch for it.
 for a single gift receipt to the **Gift** as well. It is not attached to the donor's household
 or contact record. So a person can open a receipt PDF if, and only if, they hold one of the
 three Giving permission sets: Giving Admin, Giving Staff or Giving Read Only. Somebody with
-only a Core role, for example Program Staff or Volunteer Coordinator, can open the donor and
+only a Core role, for example Team Member or Coordinator, can open the donor and
 cannot open the donor's receipts or year-end statement. That is deliberate: a year-end
 statement is a donor's whole giving history plus your tax identification number, and it should
 not be in the Files list of a record that everybody reads.
