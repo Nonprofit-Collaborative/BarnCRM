@@ -88,6 +88,7 @@ export default class HouseholdMembersPanel extends LightningElement {
   @track searchResults = [];
   searchTerm = '';
   searchTimer;
+  searchSequence = 0;
 
   // The Add new person form, flexible membership mode only.
   newSalutation = '';
@@ -293,16 +294,22 @@ export default class HouseholdMembersPanel extends LightningElement {
   }
 
   async runSearch(term) {
+    const sequence = ++this.searchSequence;
     if (term.trim().length < SEARCH_MIN_LENGTH) {
       this.searchResults = [];
       return;
     }
     try {
-      this.searchResults = (await searchPeople({ searchTerm: term })) || [];
-      this.errorMessage = undefined;
+      const found = (await searchPeople({ searchTerm: term })) || [];
+      if (sequence === this.searchSequence) {
+        this.searchResults = found;
+        this.errorMessage = undefined;
+      }
     } catch (error) {
-      this.searchResults = [];
-      this.errorMessage = this.readError(error);
+      if (sequence === this.searchSequence) {
+        this.searchResults = [];
+        this.errorMessage = this.readError(error);
+      }
     }
   }
 
@@ -361,6 +368,9 @@ export default class HouseholdMembersPanel extends LightningElement {
   }
 
   clearSearchTimer() {
+    // Also called on a keystroke and when the add form closes: a search still on its way for
+    // an earlier term is out of date from then on and must not fill the list.
+    this.searchSequence++;
     if (this.searchTimer) {
       clearTimeout(this.searchTimer);
       this.searchTimer = undefined;

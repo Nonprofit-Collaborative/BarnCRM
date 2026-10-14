@@ -234,6 +234,49 @@ describe('c-data-job-history', () => {
     expect(one(element, UPDATE_JOB.recordId)).toBeNull();
   });
 
+  it('keeps reading the list after an undo until the job leaves Undoing (FINDB-19)', async () => {
+    const pending = [];
+    const realSetTimeout = window.setTimeout;
+    jest.spyOn(window, 'setTimeout').mockImplementation((callback, delay, ...args) => {
+      if (delay === 3000 || delay === 10000) {
+        pending.push(callback);
+        return pending.length;
+      }
+      return realSetTimeout.call(window, callback, delay, ...args);
+    });
+    undoUpdate.mockResolvedValue({ ...UPDATE_JOB, status: 'Undoing', running: true });
+    const element = await render();
+    one(element, UPDATE_JOB.recordId).click();
+    await flush();
+    await change(one(element, 'undo-confirm'), '37');
+    one(element, 'bulk-undo-start').click();
+    await flush();
+    expect(pending).toHaveLength(1);
+    const readsBefore = getUpdatePage.mock.calls.length;
+
+    // Still running: read again and keep polling.
+    getUpdatePage.mockResolvedValue({
+      allowed: true,
+      jobs: [{ ...UPDATE_JOB, status: 'Undoing', running: true }]
+    });
+    pending.pop()();
+    await flush();
+    expect(getUpdatePage.mock.calls.length).toBe(readsBefore + 1);
+    expect(pending).toHaveLength(1);
+
+    // Done: the row shows its final status and polling stops.
+    getUpdatePage.mockResolvedValue({
+      allowed: true,
+      jobs: [{ ...UPDATE_JOB, status: 'Undone', running: false, canUndo: false }]
+    });
+    pending.pop()();
+    await flush();
+    expect(getUpdatePage.mock.calls.length).toBe(readsBefore + 2);
+    expect(pending).toHaveLength(0);
+    expect(element.shadowRoot.textContent).toContain('Undone');
+    jest.restoreAllMocks();
+  });
+
   it('undoes a bulk delete with the records it brings back', async () => {
     undoDelete.mockResolvedValue({ ...DELETE_JOB, status: 'Undoing', canUndo: false });
     const element = await render();

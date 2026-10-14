@@ -369,6 +369,38 @@
         <value>Saved {0}.</value>
     </labels>
     <labels>
+        <fullName>Core_Find_DeleteConfirmHeading</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading of the dialog that confirms deleting a saved query.</shortDescription>
+        <value>Delete this saved query?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_DeleteConfirmBody</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Body of the delete confirmation. {0}: the query name.</shortDescription>
+        <value>{0} will be deleted. This cannot be undone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_DeleteConfirmShared</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Extra line in the delete confirmation when the query is shared.</shortDescription>
+        <value>This query is shared with everyone who uses Find. Deleting it removes it for all of them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_DeleteConfirmCancel</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that keeps the saved query instead of deleting it.</shortDescription>
+        <value>Keep it</value>
+    </labels>
+    <labels>
         <fullName>Core_Find_DeletedNotice</fullName>
         <categories>Find</categories>
         <language>en_US</language>

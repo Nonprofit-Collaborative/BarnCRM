@@ -61,7 +61,9 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 4. Press **Preview**. BarnCRM says how many records match, for example 37, and shows the first
    five with the value before and after.
 5. Type `37` into **Type the number of records to confirm**, then press **Update 37 records**.
-6. The progress bar shows the chunks done. When it finishes, the panel says how many records
+6. The progress bar shows the chunks done. It checks every 3 seconds for the first minute and
+   every 10 seconds after that, and tries once more if a check fails before it shows an
+   error. When it finishes, the panel says how many records
    were updated, how many already held the new value and how many failed, with the reason for
    each failure. The job's run log, on the Data Job record, also says how many no longer matched
    the query.

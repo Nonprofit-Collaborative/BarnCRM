@@ -58,10 +58,16 @@ describe('c/findCsv', () => {
   });
 
   it('names the file after the object and the day', () => {
-    expect(fileName('Gift__c', new Date('2026-10-12T10:00:00Z'))).toBe('Gift__c-2026-10-12.csv');
-    expect(fileName('Gift__c', new Date('2026-10-12T10:00:00Z'), 'xlsx')).toBe(
+    expect(fileName('Gift__c', new Date(2026, 9, 12, 10, 0))).toBe('Gift__c-2026-10-12.csv');
+    expect(fileName('Gift__c', new Date(2026, 9, 12, 10, 0), 'xlsx')).toBe(
       'Gift__c-2026-10-12.xlsx'
     );
+  });
+
+  it('dates the file by the local day, even late in the evening (UI-14)', () => {
+    // 11:30 pm local: in a US time zone the UTC date is already the next day.
+    expect(fileName('Gift__c', new Date(2026, 9, 12, 23, 30))).toBe('Gift__c-2026-10-12.csv');
+    expect(fileName('Gift__c', new Date(2026, 0, 1, 0, 5))).toBe('Gift__c-2026-01-01.csv');
   });
 
   it('writes a date-time as the clock reads in the person time zone', () => {

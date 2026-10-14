@@ -2,6 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import listObjects from '@salesforce/apex/FindController.listObjects';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
@@ -54,6 +55,10 @@ import SAVE_AS from '@salesforce/label/c.Core_Find_SaveAs';
 import DELETE_LABEL from '@salesforce/label/c.Core_Find_Delete';
 import NEW_QUERY from '@salesforce/label/c.Core_Find_New';
 import SAVED_NOTICE from '@salesforce/label/c.Core_Find_SavedNotice';
+import DELETE_CONFIRM_HEADING from '@salesforce/label/c.Core_Find_DeleteConfirmHeading';
+import DELETE_CONFIRM_BODY from '@salesforce/label/c.Core_Find_DeleteConfirmBody';
+import DELETE_CONFIRM_SHARED from '@salesforce/label/c.Core_Find_DeleteConfirmShared';
+import DELETE_CONFIRM_CANCEL from '@salesforce/label/c.Core_Find_DeleteConfirmCancel';
 import DELETED_NOTICE from '@salesforce/label/c.Core_Find_DeletedNotice';
 import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
 import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
@@ -95,6 +100,8 @@ const TABLE_EDIT_TYPES = { email: 'email', phone: 'phone', url: 'url' };
 const SAVED_QUERY_STATE = '__savedQueryId';
 
 const DEFAULT_ROWS = 200;
+/** How long typing must pause before the SOQL preview asks the server (FINDA-4). */
+const PREVIEW_DEBOUNCE_MS = 300;
 const OFFERED_TYPES = new Set(['address', 'location', 'base64']);
 const TABLE_TYPES = {
   currency: 'currency',
@@ -189,6 +196,9 @@ export default class FindRecords extends LightningElement {
   objectByPath = new Map();
   infoVersion = 0;
   previewSequence = 0;
+  previewTimer;
+  /** The message the last failed preview showed, so a good preview clears only that one. */
+  previewError;
 
   // Advanced Find (C-36): related records, the summary, and editing in the grid.
   related = [];
@@ -241,6 +251,10 @@ export default class FindRecords extends LightningElement {
 
   connectedCallback() {
     this.loadPage();
+  }
+
+  disconnectedCallback() {
+    clearTimeout(this.previewTimer);
   }
 
   async loadPage() {
@@ -522,7 +536,20 @@ export default class FindRecords extends LightningElement {
     return true;
   }
 
+  /**
+   * Asks for the SOQL after a pause in typing, so "Springfield" costs one server compile and
+   * not eleven. The bulk panels close at once: the query they were opened with has changed.
+   */
+  schedulePreview() {
+    this.bulkQueryJson = undefined;
+    this.deleteQueryJson = undefined;
+    clearTimeout(this.previewTimer);
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.previewTimer = setTimeout(() => this.refreshPreview(), PREVIEW_DEBOUNCE_MS);
+  }
+
   async refreshPreview() {
+    clearTimeout(this.previewTimer);
     // A bulk panel acts on the query it was opened with; an edited query closes it.
     this.bulkQueryJson = undefined;
     this.deleteQueryJson = undefined;
@@ -540,12 +567,17 @@ export default class FindRecords extends LightningElement {
       const soql = await previewQuery({ queryJson: this.queryDocument() });
       if (sequence === this.previewSequence) {
         this.soql = soql;
-        this.errorMessage = undefined;
+        // Only the preview's own error goes; a run or save error stays while the person types.
+        if (this.previewError && this.errorMessage === this.previewError) {
+          this.errorMessage = undefined;
+        }
+        this.previewError = undefined;
       }
     } catch (error) {
       if (sequence === this.previewSequence) {
         this.soql = '';
-        this.errorMessage = messageFrom(error);
+        this.previewError = messageFrom(error);
+        this.errorMessage = this.previewError;
       }
     }
   }
@@ -566,7 +598,7 @@ export default class FindRecords extends LightningElement {
     this.children = event.detail.children;
     this.relatedValid = event.detail.valid;
     this.loadChildLabels();
-    this.refreshPreview();
+    this.schedulePreview();
   }
 
   handleSummaryChange(event) {
@@ -671,7 +703,7 @@ export default class FindRecords extends LightningElement {
   handleFilterChange(event) {
     this.filterJson = event.detail.value;
     this.filterValid = event.detail.valid;
-    this.refreshPreview();
+    this.schedulePreview();
   }
 
   handleSortChange(event) {
@@ -686,7 +718,7 @@ export default class FindRecords extends LightningElement {
 
   handleRowLimitChange(event) {
     this.rowLimit = event.target.value;
-    this.refreshPreview();
+    this.schedulePreview();
   }
 
   handleNameChange(event) {
@@ -845,6 +877,18 @@ export default class FindRecords extends LightningElement {
 
   async handleDelete() {
     const name = this.openQuery ? this.openQuery.name : '';
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: DELETE_CONFIRM_HEADING,
+      message: format(DELETE_CONFIRM_BODY, name),
+      details: this.openQuery && this.openQuery.shared ? [DELETE_CONFIRM_SHARED] : [],
+      confirmLabel: DELETE_LABEL,
+      cancelLabel: DELETE_CONFIRM_CANCEL,
+      confirmVariant: 'destructive'
+    });
+    if (!confirmed) {
+      return;
+    }
     await this.work(async () => {
       this.page = await deleteQuery({ recordId: this.openQueryId });
       this.resetQuery();

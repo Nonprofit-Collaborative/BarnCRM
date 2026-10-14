@@ -72,6 +72,23 @@ const FINISHED = {
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+/**
+ * Holds the poll timers c/jobPoller sets (3 or 10 seconds) so a test runs them by hand; every
+ * other timer, such as flush, runs for real. `next()` returns the callback of the latest poll.
+ */
+function capturePolls() {
+  const pending = [];
+  const realSetTimeout = window.setTimeout;
+  jest.spyOn(window, 'setTimeout').mockImplementation((callback, delay, ...args) => {
+    if (delay === 3000 || delay === 10000) {
+      pending.push(callback);
+      return pending.length;
+    }
+    return realSetTimeout.call(window, callback, delay, ...args);
+  });
+  return { next: () => pending.pop() };
+}
+
 async function render(queryJson) {
   const element = createElement('c-bulk-update', { is: BulkUpdate });
   element.queryJson = queryJson;
@@ -156,12 +173,7 @@ describe('c-bulk-update', () => {
     const start = element.shadowRoot.querySelector('[data-id="start"]');
     expect(start.disabled).toBe(true);
 
-    let poll;
-    jest.spyOn(window, 'setInterval').mockImplementation((callback) => {
-      poll = callback;
-      return 1;
-    });
-    jest.spyOn(window, 'clearInterval').mockImplementation(() => {});
+    const polls = capturePolls();
     await change(element.shadowRoot.querySelector('[data-id="confirm"]'), '200');
     expect(start.disabled).toBe(false);
     start.click();
@@ -170,13 +182,39 @@ describe('c-bulk-update', () => {
       expect.objectContaining({ queryJson: QUERY, confirmedCount: 200 })
     );
 
-    poll();
+    polls.next()();
     await flush();
     expect(getJob).toHaveBeenCalledWith({ jobId: FINISHED.recordId });
     expect(element.shadowRoot.querySelector('[data-id="job-summary"]').textContent).toBe(
       '200 matched: 200 updated, 0 unchanged, 0 failed.'
     );
     expect(element.shadowRoot.querySelector('[data-id="undo-from-tab"]')).not.toBeNull();
+  });
+
+  it('retries one failed progress read, and reports the error after a second (FINDB-19)', async () => {
+    previewUpdate.mockResolvedValue({ count: 200, runLimit: 48000, objectLabel: 'Contacts' });
+    startUpdate.mockResolvedValue({ ...FINISHED, status: 'Committing', running: true });
+    getJob.mockRejectedValue({ body: { message: 'Connection lost' } });
+    const element = await render(QUERY);
+    await change(byPart(element, 'field'), 'Title');
+    await change(byPart(element, 'value'), 'Coordinator');
+    element.shadowRoot.querySelector('[data-id="preview"]').click();
+    await flush();
+    const polls = capturePolls();
+    await change(element.shadowRoot.querySelector('[data-id="confirm"]'), '200');
+    element.shadowRoot.querySelector('[data-id="start"]').click();
+    await flush();
+
+    polls.next()();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]')).toBeNull();
+
+    polls.next()();
+    await flush();
+    expect(getJob).toHaveBeenCalledTimes(2);
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+      'Connection lost'
+    );
   });
 
   it('offers copy sources for the chosen field', async () => {

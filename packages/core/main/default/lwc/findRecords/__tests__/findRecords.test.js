@@ -10,6 +10,8 @@ import saveQuery from '@salesforce/apex/FindController.saveQuery';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import getBulkPage from '@salesforce/apex/BulkUpdateController.getPage';
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
+import deleteQuery from '@salesforce/apex/FindController.deleteQuery';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 
@@ -78,6 +80,11 @@ jest.mock('@salesforce/apex/FindController.saveQuery', () => ({ default: jest.fn
 jest.mock('@salesforce/apex/FindController.deleteQuery', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/label/c.Core_Find_DeleteConfirmBody',
+  () => ({ default: '{0} will be deleted.' }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/BulkUpdateController.getPage', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -363,6 +370,127 @@ describe('c-find-records', () => {
     ).toBe('Amount__c');
     expect(one(element, 'save').disabled).toBe(true);
     expect(one(element, 'save-as').disabled).toBe(false);
+  });
+
+  describe('deleting a saved query (FINDA-15)', () => {
+    const MINE = { ...PAGE.savedQueries[0], mine: true, name: 'My gifts' };
+
+    async function openOwn(shared) {
+      getPage.mockResolvedValue({ ...PAGE, savedQueries: [{ ...MINE, shared }] });
+      const element = await render();
+      await flush();
+      await choose(one(element, 'saved'), MINE.recordId);
+      await flush();
+      return element;
+    }
+
+    it('asks first, naming the query, and deletes only when confirmed', async () => {
+      deleteQuery.mockResolvedValue({ ...PAGE, savedQueries: [] });
+      BarnConfirmModal.open.mockResolvedValue(true);
+      const element = await openOwn(false);
+
+      one(element, 'delete').click();
+      await flush();
+
+      expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
+      const dialog = BarnConfirmModal.open.mock.calls[0][0];
+      expect(dialog.message).toContain('My gifts');
+      expect(dialog.details).toEqual([]);
+      expect(dialog.confirmVariant).toBe('destructive');
+      expect(deleteQuery).toHaveBeenCalledWith({ recordId: MINE.recordId });
+    });
+
+    it('says a shared query goes away for everyone', async () => {
+      deleteQuery.mockResolvedValue({ ...PAGE, savedQueries: [] });
+      BarnConfirmModal.open.mockResolvedValue(true);
+      const element = await openOwn(true);
+
+      one(element, 'delete').click();
+      await flush();
+
+      expect(BarnConfirmModal.open.mock.calls[0][0].details).toHaveLength(1);
+    });
+
+    it('keeps the query when the person cancels', async () => {
+      BarnConfirmModal.open.mockResolvedValue(false);
+      const element = await openOwn(true);
+
+      one(element, 'delete').click();
+      await flush();
+
+      expect(deleteQuery).not.toHaveBeenCalled();
+      expect(one(element, 'saved').value).toBe(MINE.recordId);
+    });
+  });
+
+  describe('the SOQL preview while typing (FINDA-4)', () => {
+    function holdPreviewTimers() {
+      const pending = [];
+      const realSetTimeout = window.setTimeout;
+      jest.spyOn(window, 'setTimeout').mockImplementation((callback, delay, ...args) => {
+        if (delay === 300) {
+          pending.push(callback);
+          return pending.length;
+        }
+        return realSetTimeout.call(window, callback, delay, ...args);
+      });
+      jest.spyOn(window, 'clearTimeout').mockImplementation((id) => {
+        if (id && id <= pending.length) {
+          pending[id - 1] = () => {};
+        }
+      });
+      return pending;
+    }
+
+    function change(element, value) {
+      element.shadowRoot.querySelector('c-filter-builder').dispatchEvent(
+        new CustomEvent('change', {
+          detail: {
+            value: JSON.stringify({
+              version: 1,
+              conditions: [{ id: 1, field: 'Amount__c', operator: 'greater than', value }]
+            }),
+            valid: true
+          }
+        })
+      );
+    }
+
+    it('asks the server once for a burst of keystrokes, after the pause', async () => {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      const pending = holdPreviewTimers();
+      previewQuery.mockClear();
+
+      change(element, '1');
+      change(element, '12');
+      change(element, '123');
+      expect(previewQuery).not.toHaveBeenCalled();
+
+      pending.forEach((run) => run());
+      await flush();
+
+      expect(previewQuery).toHaveBeenCalledTimes(1);
+      const sent = JSON.parse(previewQuery.mock.calls[0][0].queryJson);
+      expect(sent.filter.conditions[0].value).toBe('123');
+    });
+
+    it('leaves a run error on screen while the person types', async () => {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      runQuery.mockRejectedValue({ body: { message: 'The run failed.' } });
+      one(element, 'run').click();
+      await flush();
+      await flush();
+      expect(element.shadowRoot.textContent).toContain('The run failed.');
+      const pending = holdPreviewTimers();
+
+      change(element, '5');
+      pending.forEach((run) => run());
+      await flush();
+
+      expect(element.shadowRoot.textContent).toContain('The run failed.');
+    });
   });
 
   it('shows the refusal when Find cannot load', async () => {
