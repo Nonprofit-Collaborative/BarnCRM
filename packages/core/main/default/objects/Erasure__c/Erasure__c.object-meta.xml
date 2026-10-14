@@ -13,7 +13,7 @@
   <enableReports>true</enableReports>
   <enableSearch>false</enableSearch>
   <enableSharing>true</enableSharing>
-  <enableStreamingApi>false</enableStreamingApi>
+  <enableStreamingApi>true</enableStreamingApi>
   <label>Erasure</label>
   <nameField>
     <displayFormat>ER-{000000}</displayFormat>
