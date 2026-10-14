@@ -53,7 +53,7 @@ private class DataProtectedFieldsTest {
     static void bulkUpdateAndLoadShareOneProtectedList() {
         System.runAs(TestUsers.admin()) {
             DataProtectionExtensions.noneForTest = true;
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             Test.startTest();
             Boolean savedQueries = DataProtectedFields.isBookkeeping(Saved_Query__c.SObjectType);
             Boolean dismissals = DataProtectedFields.isBookkeeping(
@@ -215,13 +215,9 @@ private class DataProtectedFieldsTest {
     @IsTest
     static void everyRollupTargetIsProtectedWithoutCode() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>{
-                new Rollup_Definition__c(
-                    Target_Object__c = 'Contact',
-                    Target_Field__c = 'Description'
-                ),
-                new Rollup_Definition__c(Target_Object__c = 'Account', Target_Field__c = 'Site'),
-                new Rollup_Definition__c(Target_Object__c = 'Account', Target_Field__c = null)
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>{
+                'Contact' => new Set<String>{ 'Description' },
+                'Account' => new Set<String>{ 'Site', null }
             };
 
             Test.startTest();

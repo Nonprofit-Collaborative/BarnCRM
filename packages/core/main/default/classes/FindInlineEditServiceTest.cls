@@ -49,7 +49,7 @@ private class FindInlineEditServiceTest {
     @IsTest
     static void savesTwoHundredEditsAsOneUndoableJob() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             List<Contact> people = makePeople(200);
             FindInlineEditService.SaveSummary summary;
 
@@ -101,7 +101,7 @@ private class FindInlineEditServiceTest {
     @IsTest
     static void anEmptyValueClearsAndNothingChangedWritesNoJob() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             List<Contact> people = makePeople(2);
             FindInlineEditService.SaveSummary cleared;
             FindInlineEditService.SaveSummary nothing;
@@ -121,7 +121,7 @@ private class FindInlineEditServiceTest {
     @IsTest
     static void editsOutsideTheRulesAreRefused() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             List<Contact> people = makePeople(1);
             Account organization = [SELECT Id FROM Account LIMIT 1];
             List<Object> tooMany = new List<Object>();

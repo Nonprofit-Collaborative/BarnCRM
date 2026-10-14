@@ -53,7 +53,11 @@ describe('c-hub-rollups', () => {
 
   it('says when the rollups last completed', async () => {
     const element = build();
-    getHomeModel.emit({ rollupsLastCalculated: '2026-09-08T02:00:00.000Z', rollupsStale: false });
+    getHomeModel.emit({
+      rollupsInstalled: true,
+      rollupsLastCalculated: '2026-09-08T02:00:00.000Z',
+      rollupsStale: false
+    });
     await settle();
 
     expect(byId(element, 'rollups-last-calculated')).not.toBeNull();
@@ -62,7 +66,7 @@ describe('c-hub-rollups', () => {
 
   it('warns when the rollups are more than 36 hours old, and not by color alone', async () => {
     const element = build();
-    getHomeModel.emit({ rollupsLastCalculated: null, rollupsStale: true });
+    getHomeModel.emit({ rollupsInstalled: true, rollupsLastCalculated: null, rollupsStale: true });
     await settle();
 
     expect(byId(element, 'rollups-never')).not.toBeNull();
@@ -91,9 +95,18 @@ describe('c-hub-rollups', () => {
     expect(byId(element, 'load-error')).not.toBeNull();
   });
 
+  it('shows no tile when the Rollup Builder module is not installed', async () => {
+    const element = build();
+    getHomeModel.emit({ rollupsInstalled: false, rollupsStale: false });
+    await settle();
+
+    expect(byId(element, 'rollups-card')).toBeNull();
+    expect(byId(element, 'rollups-never')).toBeNull();
+  });
+
   it('opens the Rollups section of BarnCRM Settings by page reference', async () => {
     const element = build();
-    getHomeModel.emit({});
+    getHomeModel.emit({ rollupsInstalled: true });
     await settle();
 
     byId(element, 'open-rollups').click();

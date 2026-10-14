@@ -114,9 +114,12 @@ public with sharing class DataProtectedFields {
         'lastreferenceddate'
     };
 
-    /** Set only by tests: the Rollup Definitions to read in place of the org's. */
+    /**
+     * Set only by tests: the rollup target fields by object to read in place of the ones the
+     * Rollup Builder module reports (`RollupEngineExtension.targetFieldsByObject`).
+     */
     @TestVisible
-    private static List<Rollup_Definition__c> definitionsOverride;
+    private static Map<String, Set<String>> targetsOverride;
 
     /**
      * Set only by tests: bookkeeping objects (lower-case local names) to treat as the org's own
@@ -289,28 +292,35 @@ public with sharing class DataProtectedFields {
 
     /**
      * The target fields of every Rollup Definition, active or not, on the object of this name,
-     * in lower case, as written and without a namespace, so either form matches.
+     * in lower case, as written and without a namespace, so either form matches. The Rollup
+     * Builder module reports them; without it there are none (ADR-NEXT).
      */
     private static Set<String> rollupTargetsOf(String objectName) {
         if (rollupTargets == null) {
             rollupTargets = new Map<String, Set<String>>();
-            List<Rollup_Definition__c> definitions = definitionsOverride != null
-                ? definitionsOverride
-                : RollupSelector.selectAll();
-            for (Rollup_Definition__c definition : definitions) {
-                if (
-                    String.isBlank(definition.Target_Object__c) ||
-                    String.isBlank(definition.Target_Field__c)
-                ) {
+            Map<String, Set<String>> reported = targetsOverride;
+            if (reported == null) {
+                RollupEngineExtension engine = RollupEngineExtensions.find();
+                reported = engine == null
+                    ? new Map<String, Set<String>>()
+                    : engine.targetFieldsByObject();
+            }
+            for (String objectKey : reported.keySet()) {
+                if (String.isBlank(objectKey) || reported.get(objectKey) == null) {
                     continue;
                 }
-                String target = localName(definition.Target_Object__c.trim().toLowerCase());
+                String target = localName(objectKey.trim().toLowerCase());
                 if (!rollupTargets.containsKey(target)) {
                     rollupTargets.put(target, new Set<String>());
                 }
-                String field = definition.Target_Field__c.trim().toLowerCase();
-                rollupTargets.get(target).add(field);
-                rollupTargets.get(target).add(localName(field));
+                for (String fieldName : reported.get(objectKey)) {
+                    if (String.isBlank(fieldName)) {
+                        continue;
+                    }
+                    String field = fieldName.trim().toLowerCase();
+                    rollupTargets.get(target).add(field);
+                    rollupTargets.get(target).add(localName(field));
+                }
             }
         }
         String key = localName(objectName.toLowerCase());

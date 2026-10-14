@@ -32,7 +32,7 @@ private class BulkDeleteControllerTest {
     );
 
     private static void makeVolunteers(Integer howMany) {
-        DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+        DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
         Account organization = new Account(Name = 'Springfield Food Bank');
         insert organization;
         List<Contact> people = new List<Contact>();

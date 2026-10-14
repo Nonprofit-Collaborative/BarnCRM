@@ -469,7 +469,7 @@ private class ImportUndoTest {
     private static Schema.SObjectField stampField() {
         return Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
             .fields.getMap()
-            .get(RollupService.FRESHNESS_FIELD);
+            .get('Rollups_Last_Calculated__c');
     }
 
     /** A batch committed three hours ago, its follow-on work long settled. */

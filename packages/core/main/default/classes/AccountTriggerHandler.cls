@@ -207,14 +207,19 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
      * merged person stored as an account also has the totals on the contact the platform
      * keeps behind it, which the merge changes too, so the survivors' person contacts are
      * recalculated as well. A failure is logged and never fails the merge: the nightly run
-     * puts a total right, as for every rollup.
+     * puts a total right, as for every rollup. Without the Rollup Builder module there are no
+     * totals, and the merge has nothing to recalculate (ADR-NEXT).
      */
     private static void recalculateSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
         if (survivorByMerged.isEmpty()) {
             return;
         }
         try {
-            RollupService.runAfterMerge(String.valueOf(Account.SObjectType), gone);
+            RollupEngineExtension engine = RollupEngineExtensions.find();
+            if (engine == null) {
+                return;
+            }
+            engine.afterMerge(String.valueOf(Account.SObjectType), gone);
             Set<Id> survivingPeople = new Set<Id>();
             if (handlesPeople()) {
                 Set<Id> mergedPeople = personIdsOf(gone);
@@ -225,7 +230,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
                 }
             }
             if (!survivingPeople.isEmpty()) {
-                RollupService.runForSurvivors(
+                engine.forSurvivors(
                     String.valueOf(Contact.SObjectType),
                     new Set<Id>(PersonRecordSelector.getPersonContactIds(survivingPeople).values())
                 );

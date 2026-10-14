@@ -117,8 +117,12 @@ public with sharing class SampleDataModules {
         List<SampleDataModule> modules = installed();
         if (index >= modules.size()) {
             // The load has ended. Start the Rollup Queue for any totals of the people and gifts
-            // it saved that are still pending; it starts nothing when none are (R-RQ3).
-            RollupService.startQueuedRecalculation();
+            // it saved that are still pending; it starts nothing when none are (R-RQ3), and
+            // there is none without the Rollup Builder module (ADR-NEXT).
+            RollupEngineExtension engine = RollupEngineExtensions.find();
+            if (engine != null) {
+                engine.startQueuedRecalculation();
+            }
             SampleDataLoader.notifyLoadFinished();
             return;
         }

@@ -67,7 +67,7 @@ private class BulkUpdateServiceTest {
     @IsTest
     static void previewCountsTwoHundredAndShowsFiveSetBeforeAndAfter() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             makePeople(200, 30);
             BulkUpdateService.Preview preview;
             Test.startTest();
@@ -103,7 +103,7 @@ private class BulkUpdateServiceTest {
     @IsTest
     static void previewShowsClearAndCopyOverTwoHundred() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             makePeople(200, 0);
             BulkUpdateService.Preview preview;
             System.runAs(maria()) {
@@ -136,7 +136,7 @@ private class BulkUpdateServiceTest {
     @IsTest
     static void refusesMoreRecordsThanTheRunLimit() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
             settings.Bulk_Update_Run_Limit__c = 150;
             TestDataFactory.saveSettings(settings);
@@ -163,7 +163,7 @@ private class BulkUpdateServiceTest {
     @IsTest
     static void refusesAQueryThatMatchesNothing() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             makePeople(5, 0);
             System.runAs(maria()) {
                 try {
@@ -187,7 +187,7 @@ private class BulkUpdateServiceTest {
     @IsTest
     static void refusesChangesThatCannotBeMade() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             Map<String, List<Map<String, Object>>> cases = new Map<String, List<Map<String, Object>>>{
                 'none' => new List<Map<String, Object>>(),
                 'six' => new List<Map<String, Object>>{
@@ -230,7 +230,7 @@ private class BulkUpdateServiceTest {
     @IsTest
     static void aJobsDefinitionHoldsTheQueryTheChangesAndTheCount() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             System.runAs(maria()) {
                 BulkUpdateService.Plan checked = BulkUpdateService.plan(
                     query('Volunteer'),

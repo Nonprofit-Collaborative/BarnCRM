@@ -44,20 +44,11 @@ public with sharing class RollupDateWindow {
 
     /**
      * The month the fiscal year starts, 1 through 12, defaulting to January when the setting has
-     * never been touched or holds something the platform cannot mean.
+     * never been touched or holds something the platform cannot mean. Core owns the setting and
+     * reads it (`FiscalYearSelector`), so the engine and Core's checks share one reading.
      */
     public static Integer fiscalYearStartMonth() {
-        Object stored = SettingsService.getValue('Fiscal_Year_Start_Month__c');
-        if (stored == null) {
-            return 1;
-        }
-        Integer month;
-        try {
-            month = Integer.valueOf(String.valueOf(stored));
-        } catch (Exception ignored) {
-            return 1;
-        }
-        return month >= 1 && month <= 12 ? month : 1;
+        return FiscalYearSelector.settingsFiscalYearStartMonth();
     }
 
     /** The window for an offset, counted back from the fiscal year the org is in today. */

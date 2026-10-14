@@ -27,7 +27,7 @@ private class BulkUpdateFieldsTest {
     @IsTest
     static void offersEditableFieldsAndNeverOnesThePackageOrPlatformKeeps() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             Set<String> offered;
             System.runAs(maria()) {
                 offered = names(BulkUpdateFields.targets('Contact'));
@@ -51,8 +51,8 @@ private class BulkUpdateFieldsTest {
     @IsTest
     static void aRollupTargetIsKeptWithoutACodeChange() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>{
-                new Rollup_Definition__c(Target_Object__c = 'Contact', Target_Field__c = 'Title')
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>{
+                'Contact' => new Set<String>{ 'Title' }
             };
             System.runAs(maria()) {
                 System.Assert.isFalse(
@@ -126,7 +126,7 @@ private class BulkUpdateFieldsTest {
     @IsTest
     static void copySourcesAreFieldsWhoseValuesFit() {
         System.runAs(TestUsers.admin()) {
-            DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
+            DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
             Set<String> intoEmail = new Set<String>();
             Set<String> intoText = new Set<String>();
             System.runAs(maria()) {

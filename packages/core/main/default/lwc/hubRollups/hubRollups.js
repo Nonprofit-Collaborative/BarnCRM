@@ -11,19 +11,29 @@ import WARNING from '@salesforce/label/c.Core_HubHome_WarningAltText';
 const SETTINGS_TAB = 'BarnCRM_Settings';
 const ROLLUPS_SECTION = 'Rollups';
 
-/** "Rollups last completed" on the BarnCRM home page, and a warning once the nightly run is overdue. */
+/**
+ * "Rollups last completed" on the BarnCRM home page, and a warning once the nightly run is overdue.
+ * Shown only when the Rollup Builder module is installed (ADR-NEXT): an org that keeps its totals
+ * with another tool sees no tile.
+ */
 export default class HubRollups extends NavigationMixin(LightningElement) {
   labels = { heading: HEADING, never: NEVER, stale: STALE, link: LINK, warning: WARNING };
 
   lastCalculated;
   stale = false;
   errorMessage;
+  installed = false;
   // "Never calculated" shows once the model has arrived, not while it is still loading.
   loaded = false;
+
+  get shown() {
+    return this.installed || Boolean(this.errorMessage);
+  }
 
   @wire(getHomeModel)
   wiredModel({ data, error }) {
     if (data) {
+      this.installed = Boolean(data.rollupsInstalled);
       this.lastCalculated = data.rollupsLastCalculated;
       this.stale = Boolean(data.rollupsStale);
       this.errorMessage = undefined;

@@ -38,8 +38,7 @@ public with sharing class OrgOptimizerObjectChecks {
         Import_Journal__c.SObjectType,
         Import_Template__c.SObjectType,
         Error_Log__c.SObjectType,
-        Saved_Query__c.SObjectType,
-        Rollup_Definition__c.SObjectType
+        Saved_Query__c.SObjectType
     };
 
     /** Stands in for the edition's limit in tests. */

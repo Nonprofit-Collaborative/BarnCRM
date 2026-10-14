@@ -98,6 +98,22 @@ private class RollupDateWindowTest {
     }
 
     @IsTest
+    static void theEngineReadsTheFiscalYearCoreChecks() {
+        System.runAs(TestUsers.admin()) {
+            SettingsService.saveSystemValue('Fiscal_Year_Start_Month__c', 7);
+
+            System.Assert.areEqual(
+                FiscalYearSelector.settingsFiscalYearStartMonth(),
+                RollupDateWindow.fiscalYearStartMonth(),
+                'The number Health Check compares is the number the totals were computed from. ' +
+                    'Reading the setting a second way would let the check pass while the totals ' +
+                    'were measured on another boundary.'
+            );
+            System.Assert.areEqual(7, RollupDateWindow.fiscalYearStartMonth(), 'July');
+        }
+    }
+
+    @IsTest
     static void aRollupThatIsNotFiscalAwareGetsNoWindow() {
         System.runAs(TestUsers.admin()) {
             System.Assert.areEqual(
