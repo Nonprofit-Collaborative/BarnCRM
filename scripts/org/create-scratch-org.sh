@@ -153,7 +153,7 @@ fi
 #   (b) here, at org-creation time for the platform-only shape only: we create a user with the
 #       "Salesforce Platform" user license and the "Standard Platform User" profile, then assign
 #       every Core permission set to that user, except the optional sets that only a Salesforce
-#       license can hold (Duplicate Review, Access Manager; ADR-0050, ADR-NEXT). Salesforce
+#       license can hold (Duplicate Review, Access Manager; ADR-0050, ADR-0121). Salesforce
 #       refuses a set that grants an object or user permission that license cannot have, which
 #       is exactly the signal we want. scripts/org/check-platform-license.sh does this, tries
 #       every set, names every refusal, and can be rerun on an existing org.

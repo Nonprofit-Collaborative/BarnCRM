@@ -137,14 +137,6 @@
         <value>Extra permissions</value>
     </labels>
     <labels>
-        <fullName>Core_Access_AddOnsReadOnlyNotice</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: may change roles but not give permissions</shortDescription>
-        <value>You can see who has each extra permission but not change it. Giving one needs the Assign Permission Sets permission in Salesforce, which comes with the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_NoOneHasAddOn</fullName>
         <categories>Access</categories>
         <language>en_US</language>
@@ -177,12 +169,12 @@
         <value>{1} could not be removed from {0}. Salesforce said: {2}</value>
     </labels>
     <labels>
-        <fullName>Core_Access_ErrorCannotAssignPermissionSets</fullName>
+        <fullName>Core_Access_ErrorNeedsAccessManager</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Access page: the person lacks Assign Permission Sets</shortDescription>
-        <value>You cannot give or remove extra permissions. That needs the Assign Permission Sets permission in Salesforce, which comes with the BarnCRM Admin role.</value>
+        <shortDescription>Access page: may manage settings but lacks Assign Permission Sets</shortDescription>
+        <value>You can see who has each role and extra permission but not change them. That needs the Assign Permission Sets permission in Salesforce: a system administrator has it, and a BarnCRM Admin on a Salesforce license gets it from the BarnCRM Access Manager permission set, assigned in Setup. A Salesforce Platform license cannot have it, so ask a colleague with a Salesforce license.</value>
     </labels>
     <labels>
         <fullName>Core_Access_AssignSuccess</fullName>

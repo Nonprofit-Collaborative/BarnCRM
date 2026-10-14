@@ -171,7 +171,7 @@ Instead, `create-scratch-org.sh` verifies Platform-only compatibility two ways:
    counts as assignable, so it can be rerun on an existing org. A passing run is direct
    evidence that Core's permission sets are Platform-license-safe, not just that its source
    code looks clean. The optional sets that only a Salesforce license can hold
-   (`BarnCRM_Duplicate_Review`, `BarnCRM_Access_Manager`; ADR-0050, ADR-NEXT) are skipped:
+   (`BarnCRM_Duplicate_Review`, `BarnCRM_Access_Manager`; ADR-0050, ADR-0121) are skipped:
    their list is in `scripts/ci/check-permission-sets.py`, which also fails CI if any other
    set grants what they hold.
 

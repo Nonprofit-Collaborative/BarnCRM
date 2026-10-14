@@ -42,7 +42,7 @@ const WARNING = 'This permission lets the person remove data.';
 const OVERVIEW = {
   success: true,
   canManage: true,
-  canAssignAddOns: true,
+  canChangeAccess: true,
   currentUserId: MARIA_ID,
   roles: [
     {
@@ -249,25 +249,29 @@ describe('c-access-manager extra permissions', () => {
     });
   });
 
-  it('shows the cards with a notice and no buttons to a person who cannot assign permission sets', async () => {
+  it('shows roles and cards with the Access Manager notice and no changes to a person who cannot assign permission sets', async () => {
     const element = createComponent();
-    getAccessOverview.emit({ ...OVERVIEW, canAssignAddOns: false });
+    getAccessOverview.emit({ ...OVERVIEW, canChangeAccess: false });
     await flush();
 
     expect(element.shadowRoot.querySelectorAll('[data-id="add-on-card"]').length).toBe(2);
-    expect(element.shadowRoot.querySelector('[data-id="add-ons-read-only"]')).not.toBeNull();
+    const notice = element.shadowRoot.querySelector(
+      '[data-id="change-read-only"] lightning-formatted-text'
+    );
+    expect(notice.value).toBe('c.Core_Access_ErrorNeedsAccessManager');
     expect(element.shadowRoot.querySelector('[data-id="add-on-picker"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="add-on-remove-button"]')).toBeNull();
-    // Roles are unaffected: the person may still give a role.
-    expect(element.shadowRoot.querySelector('[data-id="add-button"]')).not.toBeNull();
+    // Roles follow the same check: Give access stays disabled and no role can be removed.
+    expect(element.shadowRoot.querySelector('[data-id="add-button"]').disabled).toBe(true);
+    expect(element.shadowRoot.querySelector('[data-id="remove-button"]')).toBeNull();
   });
 
   it('shows no extra permission controls in read-only mode and no section when the org has none', async () => {
     const element = createComponent();
-    getAccessOverview.emit({ ...OVERVIEW, canManage: false, canAssignAddOns: false });
+    getAccessOverview.emit({ ...OVERVIEW, canManage: false, canChangeAccess: false });
     await flush();
     expect(element.shadowRoot.querySelector('[data-id="add-on-picker"]')).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="add-ons-read-only"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="change-read-only"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="add-on-remove-button"]')).toBeNull();
 
     getAccessOverview.emit({ ...OVERVIEW, addOns: [], addOnAssignments: [] });

@@ -9,7 +9,7 @@
 #
 # The optional sets (BarnCRM_Duplicate_Review, BarnCRM_Access_Manager) are expected to be
 # refused and are skipped. Their list lives in scripts/ci/check-permission-sets.py, which
-# also keeps the license-limited grants out of every other set (ADR-0050, ADR-NEXT).
+# also keeps the license-limited grants out of every other set (ADR-0050, ADR-0121).
 #
 # Tries every set and reports every refusal, then exits 1 if there was one. Safe to run
 # again: it creates the Platform user only when missing, and a set the user already holds

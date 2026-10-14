@@ -708,12 +708,12 @@ private class AccessServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Access_ErrorCannotAssignPermissionSets,
+                Label.Core_Access_ErrorNeedsAccessManager,
                 assignMessage,
                 'The person should be told what Setup permission is missing.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorCannotAssignPermissionSets,
+                Label.Core_Access_ErrorNeedsAccessManager,
                 removeMessage,
                 'Nor remove them.'
             );

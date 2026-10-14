@@ -1,4 +1,4 @@
-# ADR-NEXT: Permissions only a Salesforce license can hold live in optional sets, never in a role
+# ADR-0121: Permissions only a Salesforce license can hold live in optional sets, never in a role
 
 **Status:** Accepted (builder decision; confirm on review)
 **Date:** 2026-10-14
@@ -52,16 +52,21 @@ user at all, which breaks the floor for the whole settings console, not just the
 
 - On a Platform license, the BarnCRM Admin role gives the whole settings console. Giving roles
   on the Access page, and the Module Manager handing its admin set to the person who turned a
-  module on, need Assign Permission Sets, which that license cannot have; the platform
-  refuses and the page shows its error message. Such an org gives roles through an
-  administrator with a Salesforce license.
+  module on, need Assign Permission Sets, which that license cannot have. The Access page
+  checks this up front (below); the Module Manager's grant is refused by the platform and
+  shows its error message. Such an org gives roles through an administrator with a
+  Salesforce license.
 - A BarnCRM Admin on a Salesforce license who is not a system administrator needs BarnCRM
   Access Manager, assigned in Setup, to give roles. The admin guide's Access page says so.
 - Without View All Users, a person finds colleagues in the Access search box through the
   org's User sharing (public read only by default). An org that made User private gives the
   people who manage access BarnCRM Access Manager, or View All Users through their profile.
-- An Access page that checks for Assign Permission Sets or Manage Users before offering the
-  buttons (pull request #402) fits this unchanged: the permission comes from the profile or
-  from BarnCRM Access Manager rather than from BarnCRM Admin.
+- The Access page uses one check for roles and add-ons, the one pull request #402 added for
+  add-ons (`AccessService.changeRefusal`: Manage BarnCRM Settings, plus Assign Permission
+  Sets or Manage Users from any source). A person who fails only the second sees who holds
+  what, with Give access disabled, no Remove or add-on controls, and a notice
+  (`Core_Access_ErrorNeedsAccessManager`) naming BarnCRM Access Manager and the
+  Salesforce-license limit; the server returns the same message if a change is attempted.
+  BarnCRM Access Manager stays off the add-on allowlist: it is assigned in Setup.
 - Test users who give roles as a non-administrator hold BarnCRM Access Manager as well as the
   BarnCRM Admin role.

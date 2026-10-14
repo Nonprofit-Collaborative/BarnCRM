@@ -40,7 +40,7 @@ private class AccessControllerTest {
     /**
      * Creates Maria: a person who holds the BarnCRM Admin role, and therefore the
      * Manage BarnCRM Settings custom permission that the Access page requires, and BarnCRM
-     * Access Manager, which carries the Salesforce permissions to give roles (ADR-NEXT).
+     * Access Manager, which carries the Salesforce permissions to give roles (ADR-0121).
      *
      * @return the inserted user, already in the BarnCRM Admin role
      */
@@ -76,22 +76,41 @@ private class AccessControllerTest {
             User maria = insertAdminRoleOnly();
             User david = insertUser('David', 'Okafor');
             TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            AccessController.AccessResult overview;
             AccessController.AccessResult assigned;
+            AccessController.AccessResult removed;
 
             Test.startTest();
             System.runAs(maria) {
+                overview = AccessController.getAccessOverview();
                 assigned = AccessController.assignRole(david.Id, PROGRAM_ROLE);
+                removed = AccessController.removeRole(maria.Id, AccessService.ADMIN_ROLE);
             }
             Test.stopTest();
 
+            Assert.isTrue(overview.canManage, 'Maria may manage BarnCRM settings.');
             Assert.isFalse(
-                assigned.success,
-                'BarnCRM Admin no longer carries Assign Permission Sets, so the platform refuses.'
+                overview.canChangeAccess,
+                'BarnCRM Admin does not carry Assign Permission Sets, so the page disables changes.'
             );
-            Assert.isTrue(
-                String.isNotBlank(assigned.message),
-                'The page is given a message to show, not an unhandled error.'
-            );
+            for (
+                AccessController.AccessResult refused : new List<AccessController.AccessResult>{
+                    assigned,
+                    removed
+                }
+            ) {
+                Assert.isFalse(refused.success, 'Refused up front.');
+                Assert.areEqual(
+                    AccessController.ERROR_NO_PERMISSION,
+                    refused.errorCode,
+                    'A permission refusal, not a failure.'
+                );
+                Assert.areEqual(
+                    Label.Core_Access_ErrorNeedsAccessManager,
+                    refused.message,
+                    'The reason names BarnCRM Access Manager and the license limit.'
+                );
+            }
             Assert.areEqual(
                 0,
                 [
@@ -376,7 +395,7 @@ private class AccessControllerTest {
             Test.stopTest();
 
             Assert.isTrue(
-                forMaria.canAssignAddOns,
+                forMaria.canChangeAccess,
                 'The BarnCRM Admin role carries Assign Permission Sets, so Maria may give add-ons.'
             );
             Assert.areEqual(
@@ -389,7 +408,7 @@ private class AccessControllerTest {
                 forMaria.addOnAssignments.size(),
                 'Each add-on should have its list of people.'
             );
-            Assert.isFalse(forDavid.canAssignAddOns, 'David may not give add-ons.');
+            Assert.isFalse(forDavid.canChangeAccess, 'David may not give add-ons.');
             Assert.isNotNull(forDavid.addOns, 'The page always gets a list, even an empty one.');
         }
     }
@@ -444,7 +463,7 @@ private class AccessControllerTest {
             Test.stopTest();
 
             Assert.isTrue(overview.canManage, 'Maria still manages BarnCRM Settings.');
-            Assert.isFalse(overview.canAssignAddOns, 'But she may not give add-ons.');
+            Assert.isFalse(overview.canChangeAccess, 'But she may not give add-ons.');
             Assert.isFalse(result.success, 'Her attempt should be refused.');
             Assert.areEqual(
                 AccessController.ERROR_NO_PERMISSION,
@@ -452,7 +471,7 @@ private class AccessControllerTest {
                 'The page needs a code it can branch on.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorCannotAssignPermissionSets,
+                Label.Core_Access_ErrorNeedsAccessManager,
                 result.message,
                 'The message should name the Setup permission that is missing.'
             );

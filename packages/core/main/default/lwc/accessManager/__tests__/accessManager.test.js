@@ -35,6 +35,7 @@ const DAVID_ID = '005000000000002AAA';
 const OVERVIEW = {
   success: true,
   canManage: true,
+  canChangeAccess: true,
   currentUserId: MARIA_ID,
   errorCode: null,
   message: null,

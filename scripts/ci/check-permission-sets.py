@@ -31,7 +31,7 @@ user. Such objects may appear only in the optional sets named for them, and thos
 in no permission set group, because a role has to be assignable to everybody. The same holds
 for user permissions the Salesforce Platform license cannot hold: Assign Permission Sets and
 View All Users made BarnCRM_Admin unassignable to a Platform user on barn-core, so they live
-only in BarnCRM_Access_Manager (ADR-NEXT).
+only in BarnCRM_Access_Manager (ADR-0121).
 
 scripts/org/create-scratch-org.sh reads the optional sets from this file
 (--list-optional-license-sets), so its Platform user check expects exactly these to be refused.
@@ -50,7 +50,7 @@ import xml.etree.ElementTree as ET
 NS = "http://soap.sforce.com/2006/04/metadata"
 
 # Objects and user permissions a Salesforce Platform license cannot be granted, and the
-# optional sets allowed to grant them (C-20, ADR-0050 on duplicate detection; ADR-NEXT on
+# optional sets allowed to grant them (C-20, ADR-0050 on duplicate detection; ADR-0121 on
 # the Access page's Salesforce permissions).
 LICENSE_LIMITED_OBJECTS = {"DuplicateRecordSet", "DuplicateRecordItem"}
 LICENSE_LIMITED_USER_PERMISSIONS = {"AssignPermissionSets", "ViewAllUsers"}
