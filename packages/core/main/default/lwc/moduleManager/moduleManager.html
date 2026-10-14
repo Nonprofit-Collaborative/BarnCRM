@@ -12,10 +12,15 @@
         <template for:each={rows} for:item="module">
             <li key={module.name} class="slds-item slds-var-p-vertical_x-small" data-module={module.name}>
                 <div>
-                    <span class="slds-text-heading_x-small">{module.name}</span>
+                    <span class="slds-text-heading_x-small" data-id="name">{module.displayName}</span>
                     <span class={module.badgeClass} data-id="status">{module.statusText}</span>
+                    <template lwc:if={module.appUrl}>
+                        <a class="slds-var-m-left_small" href={module.appUrl} data-id="open-app"
+                            >{labels.openApp}<span class="slds-assistive-text">: {module.displayName}</span></a
+                        >
+                    </template>
                     <a class="slds-var-m-left_small" href={module.docsUrl} target="_blank" rel="noopener noreferrer"
-                        >{labels.learnMore}<span class="slds-assistive-text">{module.name} {labels.newTab}</span></a
+                        >{labels.learnMore}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
                     >
                 </div>
                 <template lwc:if={canEdit}>
@@ -27,7 +32,7 @@
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 data-id="install"
-                                >{labels.install}<span class="slds-assistive-text">{module.name} {labels.newTab}</span></a
+                                >{labels.install}<span class="slds-assistive-text">{module.displayName} {labels.newTab}</span></a
                             >
                         </template>
                         <template lwc:if={module.noInstallLink}>

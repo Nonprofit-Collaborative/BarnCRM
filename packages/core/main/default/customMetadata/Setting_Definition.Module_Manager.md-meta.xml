@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Section__c</field>
-    <value xsi:type="xsd:string">General</value>
+    <value xsi:type="xsd:string">Modules</value>
   </values>
   <values>
     <field>Module__c</field>
@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">The BarnCRM modules your edition offers, which are installed, and which are on. Install a module through Salesforce's installer, turn an installed module's automation off and on, and see what uninstalling it would delete. BarnCRM never installs or removes a package for you.</value>
+    <value xsi:type="xsd:string">The BarnCRM modules your edition offers, each a separate package. An installed module shows Installed with a link to its app; install one through Salesforce's installer, turn an installed module's automation off and on, and see what uninstalling it would delete. BarnCRM never installs or removes a package for you.</value>
   </values>
   <values>
     <field>Help_Path__c</field>
@@ -36,7 +36,7 @@
   </values>
   <values>
     <field>Sort_Order__c</field>
-    <value xsi:type="xsd:double">5</value>
+    <value xsi:type="xsd:double">1</value>
   </values>
   <values>
     <field>Settings_Object__c</field>

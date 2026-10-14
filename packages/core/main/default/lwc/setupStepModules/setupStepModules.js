@@ -7,7 +7,8 @@ import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
 import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
 
 /**
- * The modules step: the BarnCRM packages this org is offered, which of them are here, where to
+ * The modules step: the BarnCRM packages this org is offered, by their "BarnCRM X" names
+ * (ADR-NEXT), which of them are here, where to
  * read what each one does, and Salesforce's installer for a published one that is not here
  * (C-30). Turning a module on and off with one click is the Module Manager, and the notice
  * says so rather than pretending otherwise.
@@ -25,6 +26,7 @@ export default class SetupStepModules extends LightningElement {
   get rows() {
     return (this.modules || []).map((module) => ({
       ...module,
+      displayName: module.label || module.name,
       status: module.present ? PRESENT : ABSENT,
       statusClass: module.present
         ? 'slds-badge slds-theme_success'

@@ -61,4 +61,13 @@ describe('c-setup-step-modules', () => {
 
     expect(element.shadowRoot.querySelectorAll('[data-id="install-link"]')).toHaveLength(0);
   });
+
+  it('names a module by its BarnCRM label when it has one', () => {
+    const element = createElement('c-setup-step-modules', { is: SetupStepModules });
+    element.modules = [MODULES[0], { ...MODULES[1], label: 'BarnCRM Giving' }];
+    document.body.appendChild(element);
+
+    const names = element.shadowRoot.querySelectorAll('[data-id="module-name"]');
+    expect(Array.from(names).map((name) => name.textContent)).toEqual(['Core', 'BarnCRM Giving']);
+  });
 });

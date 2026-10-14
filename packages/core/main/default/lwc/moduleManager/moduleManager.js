@@ -22,13 +22,15 @@ import TABS_NOTICE from '@salesforce/label/c.Core_ModuleManager_TabsNotice';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import READ_ONLY from '@salesforce/label/c.Core_ModuleManager_ReadOnlyNotice';
 import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
+import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = '/lightning/setup/ImportedPackage/home';
 
 /**
- * The Module Manager (C-24): every module this org is offered, whether it is installed and on,
- * and the one thing to do next with it. Installing and uninstalling are Salesforce's own
+ * The Module Manager (C-24), the BarnCRM Settings Modules section (ADR-NEXT): every module this
+ * org is offered by its "BarnCRM X" name, whether it is installed and on, a link to an installed
+ * module's own app, and the one thing to do next with it. Installing and uninstalling are Salesforce's own
  * screens, opened from here; nothing is installed or removed by BarnCRM
  * (0073-module-manager-turns-automation-off-and-never-installs.md).
  */
@@ -51,7 +53,8 @@ export default class ModuleManager extends LightningElement {
     installedPackages: INSTALLED_PACKAGES,
     tabsNotice: TABS_NOTICE,
     checkAgain: CHECK_AGAIN,
-    readOnly: READ_ONLY
+    readOnly: READ_ONLY,
+    openApp: OPEN_APP
   };
 
   connectedCallback() {
@@ -76,6 +79,7 @@ export default class ModuleManager extends LightningElement {
       const report = this.reports[module.name];
       return {
         ...module,
+        displayName: module.label || module.name,
         statusText: STATUS_TEXT[module.status] || module.status,
         badgeClass:
           module.status === 'On'

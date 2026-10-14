@@ -38,7 +38,15 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Module Manager: status of an installed module that is on</shortDescription>
-        <value>On</value>
+        <value>Installed</value>
+    </labels>
+    <labels>
+        <fullName>Core_ModuleManager_OpenApp</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Module Manager: link to an installed module's own app</shortDescription>
+        <value>Open the app</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_StatusOff</fullName>

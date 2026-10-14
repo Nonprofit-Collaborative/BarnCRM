@@ -35,6 +35,8 @@ function state(givingStatus = 'On', canEdit = true) {
       { name: 'Core', status: 'On', canSwitch: false, docsUrl: 'https://example.invalid/core' },
       {
         name: 'Giving',
+        label: 'BarnCRM Giving',
+        appUrl: givingStatus === 'NotInstalled' ? undefined : '/lightning/app/Fundraising',
         status: givingStatus,
         canSwitch: givingStatus !== 'NotInstalled',
         docsUrl: 'https://example.invalid/giving'
@@ -99,6 +101,25 @@ describe('c-module-manager', () => {
       'Core_ModuleManager_StatusNotInstalled'
     );
     expect(row(element, 'Core').querySelector('[data-id="turn-off"]')).toBeNull();
+  });
+
+  it('names a module by its BarnCRM label and links an installed one to its app', async () => {
+    const element = await build();
+
+    const giving = row(element, 'Giving');
+    expect(giving.querySelector('[data-id="name"]').textContent).toBe('BarnCRM Giving');
+    expect(giving.querySelector('[data-id="open-app"]').getAttribute('href')).toBe(
+      '/lightning/app/Fundraising'
+    );
+    expect(row(element, 'Core').querySelector('[data-id="name"]').textContent).toBe('Core');
+    expect(row(element, 'Volunteers').querySelector('[data-id="open-app"]')).toBeNull();
+  });
+
+  it('shows no app link for a module that is not installed', async () => {
+    getState.mockResolvedValue(state('NotInstalled'));
+    const element = await build();
+
+    expect(row(element, 'Giving').querySelector('[data-id="open-app"]')).toBeNull();
   });
 
   it('links a published module to its installer in a new tab, and says when none is', async () => {

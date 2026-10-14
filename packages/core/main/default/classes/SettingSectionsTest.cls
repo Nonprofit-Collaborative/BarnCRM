@@ -14,9 +14,14 @@ private class SettingSectionsTest {
             Test.stopTest();
 
             Assert.areEqual(
-                13,
+                14,
                 sections.size(),
-                'Thirteen section names are agreed across the suite'
+                'Fourteen section names are agreed across the suite'
+            );
+            Assert.areEqual(
+                SettingSections.MODULES,
+                sections[1],
+                'Modules comes right after General, where the features are'
             );
             Assert.areEqual(
                 SettingSections.GENERAL,
