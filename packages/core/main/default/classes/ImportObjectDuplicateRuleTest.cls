@@ -190,37 +190,29 @@ private class ImportObjectDuplicateRuleTest {
     static void anUpsertKeyMatchWinsAndARuleMatchNeverOverwritesAnotherKey() {
         System.runAs(TestUsers.admin()) {
             System.runAs(admin()) {
-                List<Duplicate_Dismissal__c> existing = dismissals(3);
-                // A record with no key yet takes the row's.
-                existing[1].Pair_Key__c = null;
-                update existing[1];
+                // Pair Key is required here, so every match already holds a key.
+                List<Duplicate_Dismissal__c> existing = dismissals(2);
                 ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
                     // Were the key row asked, the rules would send it to the other record.
                     'k0' => new List<Id>{ existing[1].Id },
-                    'n1' => new List<Id>{ existing[1].Id },
-                    'n3' => new List<Id>{ existing[2].Id }
+                    'n1' => new List<Id>{ existing[1].Id }
                 };
                 given(
                     ImportObjectSchema.OPERATION_UPSERT,
-                    new List<Map<String, String>>{
-                        row('K0', 'Key'),
-                        row('N1', 'Rule'),
-                        row('N3', 'Rule')
-                    }
+                    new List<Map<String, String>>{ row('K0', 'Key'), row('N1', 'Rule') }
                 );
 
                 Test.startTest();
                 ImportRowProcessor.Outcome committed = run(false);
                 Test.stopTest();
 
-                Assert.areEqual(2, committed.updated, 'Two update: ' + rowErrors());
+                Assert.areEqual(1, committed.updated, 'The key row updates: ' + rowErrors());
                 Assert.areEqual('Key', reread(existing[0].Id).Reason__c, 'The key found its own.');
                 Duplicate_Dismissal__c matched = reread(existing[1].Id);
-                Assert.areEqual('Rule', matched.Reason__c, 'The rules found the other.');
-                Assert.areEqual('N1', matched.Pair_Key__c, 'And it takes the row key.');
+                Assert.areEqual('Old', matched.Reason__c, 'The rule match is left alone.');
+                Assert.areEqual('K1', matched.Pair_Key__c, 'Its key is kept.');
                 List<Import_Row__c> loaded = rows();
                 Assert.isFalse(loaded[0].Duplicate_Rule_Match__c, 'A key match is not ticked.');
-                Assert.isTrue(loaded[1].Duplicate_Rule_Match__c, 'A rule match is.');
                 Assert.areEqual(
                     String.format(
                         Label.Core_Import_ErrorDuplicateRuleKeyDiffers,
@@ -228,12 +220,11 @@ private class ImportObjectDuplicateRuleTest {
                             Schema.SObjectType.Duplicate_Dismissal__c.fields.Pair_Key__c.getLabel()
                         }
                     ),
-                    loaded[2].Error_Message__c,
+                    loaded[1].Error_Message__c,
                     'A match holding another key is rejected.'
                 );
-                Assert.areEqual('K2', reread(existing[2].Id).Pair_Key__c, 'Its key is kept.');
                 Assert.areEqual(
-                    3,
+                    2,
                     [SELECT COUNT() FROM Duplicate_Dismissal__c],
                     'Nothing is created.'
                 );
