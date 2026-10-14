@@ -1,4 +1,4 @@
-# ADR-NEXT: BarnCRM comes in two editions, the Nonprofit Edition and the Standard Edition
+# ADR-0122: BarnCRM comes in two editions, the Nonprofit Edition and the Standard Edition
 
 **Status:** Accepted (owner decision, Brandon, 2026-10-14; plan decision D-96)
 **Date:** 2026-10-14
