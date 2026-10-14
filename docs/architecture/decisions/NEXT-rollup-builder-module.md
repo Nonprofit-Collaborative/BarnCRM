@@ -162,3 +162,20 @@ subscriber migration.
   canonical model Sections 12, 14, 14A and 32 before the settings object is added, the admin
   guide's rollups, module manager, Health Check, settings and editions pages, the feature
   catalog, and a `packages/rollups/README.md`.
+
+## Open decisions (owner)
+
+- **D1.** The Rollup Settings tab hosts Core's console filtered by module (decision 7), rather
+  than a module-owned settings component. Recommended.
+- **D2.** Staff and Read Only keep a read-only Builder through `Rollup_Builder_User`, assigned
+  to holders of `BarnCRM_Staff` or `BarnCRM_Read_Only` when the module is turned on, as Giving
+  does for `Giving_Staff`. Recommended over dropping their view.
+- **D3.** `BarnCRM_Module__mdt` gains `Requires__c` (module keys), so Giving's Install says to
+  install Rollup Builder first and the Nonprofit Edition setup offers both, rather than relying
+  on the installer's dependency error. Recommended; built on the edition-gates stack.
+- **D4.** The module switch replaces the edition-gates "Rollup Builder" Super Tool and "rollups"
+  Core feature group (decision 11). Recommended.
+- **D5.** Moved labels and rows keep their `Core_` names (decision 2). Recommended.
+- **D6.** Health Check keeps the one-click Restore shipped rollups fix through
+  `HealthCheckFixExtension` (decision 4). Recommended.
+- **D7.** Module key `Rollups`, folder `packages/rollups`, display name `BarnCRM Rollup Builder`.
