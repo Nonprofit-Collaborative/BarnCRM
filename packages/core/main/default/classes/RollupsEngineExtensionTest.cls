@@ -12,10 +12,9 @@ private class RollupsEngineExtensionTest {
     @IsTest
     static void coreFindsThisEngineByName() {
         System.runAs(TestUsers.admin()) {
+            // Through Core's public lookup, since a module cannot see Core's test seams.
             Assert.isTrue(
-                RollupEngineExtensions.resolve(
-                    RollupEngineExtensions.EXTENSION_CLASS
-                ) instanceof RollupsEngineExtension,
+                RollupEngineExtensions.find() instanceof RollupsEngineExtension,
                 'The class Core looks up is this one'
             );
         }

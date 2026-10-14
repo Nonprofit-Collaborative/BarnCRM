@@ -50,7 +50,8 @@ subscriber migration.
    in both editions. Core never references it; it reaches Core the way Giving does
    (`@NamespaceAccessible` classes, ADR-0017).
 2. **What moves**, unchanged except where named: every `Rollup*` class and test except
-   `RollupFilterParser` and its test; the triggers `RollupDefinitionTrigger`,
+   `RollupFilterParser` and its test and Core's engine seam (`RollupEngineExtension`,
+   `RollupEngineExtensions` and `RollupEngineExtensionsTest`); the triggers `RollupDefinitionTrigger`,
    `RollupQueueReadyTrigger` and `RollupRecalcErrorTrigger`; the LWCs `rollupBuilder`,
    `rollupDefinitions`, `rollupFilterBuilder`, `rollupNeedsAttention` and `rollupWizard` with
    their Jest mocks; the four objects and `Rollup_Definition_Default__mdt`; the `Rollup_Builder`

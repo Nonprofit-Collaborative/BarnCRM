@@ -266,6 +266,7 @@ public with sharing class HealthCheckService {
     }
 
     /** Everything the panel needs in one round trip. */
+    @NamespaceAccessible
     public class Report {
         @AuraEnabled
         public List<Finding> findings;

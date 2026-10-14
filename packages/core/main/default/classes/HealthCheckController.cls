@@ -5,7 +5,11 @@
  * it and tell an administrator what it says. Acting on a finding needs the
  * Manage_BarnCRM_Settings custom permission, checked here rather than trusted from the
  * component.
+ *
+ * `applyFix` is also called by a module's tests, which press a fix the module owns the way the
+ * panel does (ADR-NEXT `NEXT-rollup-builder-module.md`).
  */
+@NamespaceAccessible
 public with sharing class HealthCheckController {
     /**
      * The whole report: findings, org shape, current and recommended mode.
@@ -107,6 +111,7 @@ public with sharing class HealthCheckController {
      * @param expectedScope the fix scope the confirmed finding carried
      */
     @AuraEnabled
+    @NamespaceAccessible
     public static HealthCheckService.Report applyFix(String fixKey, List<String> expectedScope) {
         requireManageSettings();
         String fixLabel = fixLabel(fixKey);

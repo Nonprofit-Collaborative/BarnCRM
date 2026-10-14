@@ -268,38 +268,9 @@ private class RollupsHealthCheckExtensionTest {
         }
     }
 
-    @IsTest
-    static void aFixThatFailsAfterWritingLeavesNothingBehind() {
-        System.runAs(TestUsers.admin()) {
-            User maria = HealthCheckTestHelper.mariaWithManageSettings();
-            shipOneRollup('Both');
-
-            System.runAs(maria) {
-                HealthCheckService.Finding finding = find('shipped_rollups_missing');
-                HealthCheckController.failAfterFixForTest = true;
-
-                Test.startTest();
-                try {
-                    press(finding);
-                    Assert.fail('The failure reaches the panel.');
-                } catch (AuraHandledException expected) {
-                    Assert.areEqual(
-                        System.Label.Core_HealthCheck_FixFailed,
-                        expected.getMessage(),
-                        'As a sentence.'
-                    );
-                }
-                Test.stopTest();
-            }
-
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Rollup_Definition__c],
-                'The total the fix created is rolled back.'
-            );
-            Assert.areEqual(0, changesLogged().size(), 'And so is its change history entry.');
-        }
-    }
+    // A fix that fails after writing is rolled back by Core's savepoint, whoever owns the fix:
+    // HealthCheckFixesTest.aModulesFixThatFailsAfterWritingLeavesNothingBehind. The failure
+    // switch it uses is a Core test seam a module cannot reach.
 
     @IsTest
     static void aNightlyOnlyRollupWithNoNightlyRunIsAWarningWithTheNightlyJobsFix() {

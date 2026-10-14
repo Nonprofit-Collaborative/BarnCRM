@@ -15,6 +15,7 @@
  * integration notes.
  */
 @IsTest
+@NamespaceAccessible
 public class RelationshipTestDataFactory {
     private static final String CONTACT_HANDLER = 'ContactTriggerHandler';
     private static final String ACCOUNT_HANDLER = 'AccountTriggerHandler';
@@ -26,6 +27,7 @@ public class RelationshipTestDataFactory {
      * never change a household or an address, so the tests are about relationships and
      * affiliations only, and setup stays cheap.
      */
+    @NamespaceAccessible
     public static void quietOtherAutomations() {
         AutomationControl.bypass(CONTACT_HANDLER);
         AutomationControl.bypass(ACCOUNT_HANDLER);
