@@ -272,10 +272,7 @@ private class AccessServiceTest {
                 names.contains(AccessService.ADMIN_ROLE),
                 'The BarnCRM Admin role should be one of the packaged roles.'
             );
-            Assert.isTrue(
-                names.contains(PROGRAM_ROLE),
-                'The Team Member role should be packaged.'
-            );
+            Assert.isTrue(names.contains(PROGRAM_ROLE), 'The Team Member role should be packaged.');
         }
     }
 
