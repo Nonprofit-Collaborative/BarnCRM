@@ -125,6 +125,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0114](0114-delete-by-file.md) | Delete by file is a one-object import operation that hands its dry run to the bulk delete job | Proposed (builder decision) |
 | [0115](0115-find-export-to-files.md) | Find's export to Files is a Batch Apex job that writes CSV parts the person owns | Proposed (builder decision) |
 | [0116](0116-rollup-large-parents-recalculated-by-a-batch.md) | Rollup totals too large for a Queueable are recalculated by a batch over their source rows | Accepted (builder decision) |
+| [0117](0117-rollup-queue-asks-again-after-commit.md) | A save that queues Rollup Queue entries and no processor asks again after it commits | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

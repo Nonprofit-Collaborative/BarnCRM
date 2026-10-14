@@ -1705,8 +1705,8 @@ harmless, because recalculation recomputes (R-R11). A writer starts a processor 
 is queued. A waiting processor may start and finish before the writer commits, so a transaction
 that inserted entries and queued no processor (one was waiting, it asked earlier with nothing
 pending, or its job allowance was used) publishes one `Rollup_Queue_Ready__e`, whose subscriber
-asks again after commit; the subscriber, which inserts none, never publishes (ADR-NEXT,
-`NEXT-rollup-queue-asks-again-after-commit.md`). When automation is paused, or the event cannot
+asks again after commit; the subscriber, which inserts none, never publishes (ADR-0117,
+`0117-rollup-queue-asks-again-after-commit.md`). When automation is paused, or the event cannot
 be published, the nightly run, the
 end of a pause, Retry and Start now on the Needs attention list start one for the Pending
 entries. A save inside a Queueable job never starts
@@ -7112,7 +7112,7 @@ mirrors the primary member).
 | 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-0113, `0113-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
 | v0.6 | 2026-10-14 | Tier 1 scale test findings. No object or field added. R-H4: a name or greeting fits its field, a long list naming the first members and counting the rest. R-RQ3: the processor hands off to `Rollup_Queue_Ready__e` at the chain depth limit instead of queuing a run the platform refuses. |
 | v0.6 | 2026-10-14 | Large rollup parents (ADR-0116, `0116-rollup-large-parents-recalculated-by-a-batch.md`, tier 1 scale test). No object or field added. New R-RQ6: a record whose source rows are more than one transaction may read is recalculated by `RollupLargeParentBatch`, chunk by chunk over its source rows, with one write at the end; records are routed there by an estimate from stored counts, or as a lone record that stopped its run on the query row limit. R-RQ3: a run takes records up to a row budget; a run that stops charges only the records it was recalculating, which are retried alone and a quarter as many at a time so only the record that keeps stopping runs ends Failed; and the finalizer starts the next processor through `Rollup_Queue_Ready__e` instead of halving the slice and queuing it, which the platform stopped after five failed jobs in a row and left 826 entries Pending. |
-| v0.6 | 2026-10-14 | Rollup Queue enqueue race (ADR-NEXT, `NEXT-rollup-queue-asks-again-after-commit.md`, tier 1 scale rerun). No object or field added. R-RQ3: a transaction that inserted entries and queued no processor publishes `Rollup_Queue_Ready__e`, so the check runs again after it commits; before this a processor waiting at the save could finish before the save committed, and a parallel Bulk API load left 47 entries Pending with no processor. |
+| v0.6 | 2026-10-14 | Rollup Queue enqueue race (ADR-0117, `0117-rollup-queue-asks-again-after-commit.md`, tier 1 scale rerun). No object or field added. R-RQ3: a transaction that inserted entries and queued no processor publishes `Rollup_Queue_Ready__e`, so the check runs again after it commits; before this a processor waiting at the save could finish before the save committed, and a parallel Bulk API load left 47 entries Pending with no processor. |
 
 ---
 ## 32. Entity ownership by package

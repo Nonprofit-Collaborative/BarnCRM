@@ -565,4 +565,31 @@ private class RollupQueueTest {
             Assert.areEqual(1, RollupQueue.readyEventsPublished, 'So it asks after commit');
         }
     }
+
+    @IsTest
+    static void aSaveSeeingOnlyARunningProcessorQueuesItsOwn() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            // A processor already running is not waiting: it may have read the queue already.
+            RollupQueue.waitingForTest = 0;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+            Assert.areEqual(1, processorsQueued(), 'Queues its own');
+            Assert.areEqual(0, RollupQueue.readyEventsPublished, 'No event needed');
+            Test.stopTest();
+        }
+    }
+
+    @IsTest
+    static void aSaveWithNoQueueableJobLeftAsksAfterItCommits() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            RollupQueue.queueableForTest = false;
+            RollupQueue.noQueueableJobsLeftForTest = true;
+            RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+            Assert.areEqual(0, processorsQueued(), 'None it could queue');
+            Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The subscriber starts one');
+            Test.stopTest();
+        }
+    }
 }

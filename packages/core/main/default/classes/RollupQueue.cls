@@ -88,6 +88,10 @@ public without sharing class RollupQueue implements Queueable {
     @TestVisible
     private static Integer waitingForTest;
 
+    /** Test seam: true stands in for a transaction with no queueable job left to give. */
+    @TestVisible
+    private static Boolean noQueueableJobsLeftForTest;
+
     /** How many Rollup_Queue_Ready__e this transaction published: one at most. */
     @TestVisible
     private static Integer readyEventsPublished = 0;
@@ -383,15 +387,18 @@ public without sharing class RollupQueue implements Queueable {
      * and finish before they are, and then nothing ever comes for them (parallel Bulk API
      * batches left 47 so). So a transaction that inserted entries and queues no processor
      * publishes one Rollup_Queue_Ready__e, which is delivered after it commits; its subscriber
-     * asks again then, when a processor still waiting is sure to read them (R-RQ3). The same
-     * covers a transaction with no queueable job left to give.
+     * asks again then, when a processor still waiting is sure to read them (R-RQ3, ADR-0117). The
+     * same covers a transaction with no queueable job left to give.
      */
     public static void startProcessor() {
         if (processorRequested || AutomationControl.isPaused()) {
             return;
         }
         processorRequested = true;
-        if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+        if (
+            noQueueableJobsLeftForTest == true ||
+            Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()
+        ) {
             askAgainAfterCommit();
             return;
         }

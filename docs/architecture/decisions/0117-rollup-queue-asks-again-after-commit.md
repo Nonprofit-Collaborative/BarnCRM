@@ -1,4 +1,4 @@
-# ADR-NEXT: A save that queues no processor asks again after it commits
+# ADR-0117: A save that queues no processor asks again after it commits
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-14
