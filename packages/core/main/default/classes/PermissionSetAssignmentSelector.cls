@@ -92,6 +92,50 @@ public with sharing class PermissionSetAssignmentSelector {
     }
 
     /**
+     * Returns every active user's direct assignment to the given permission sets. A permission
+     * set someone holds only through a role (a permission set group) is not listed: that
+     * assignment row points at the group, not at the permission set.
+     *
+     * @param permissionSetIds the permission set Ids to report on
+     * @return the assignments, ordered by the assignee's name
+     */
+    public List<PermissionSetAssignment> selectByPermissionSetIds(Set<Id> permissionSetIds) {
+        if (permissionSetIds == null || permissionSetIds.isEmpty()) {
+            return new List<PermissionSetAssignment>();
+        }
+        return [
+            SELECT Id, AssigneeId, Assignee.Name, Assignee.Email, PermissionSetId
+            FROM PermissionSetAssignment
+            WHERE PermissionSetId IN :permissionSetIds AND Assignee.IsActive = TRUE
+            WITH USER_MODE
+            ORDER BY Assignee.Name
+        ];
+    }
+
+    /**
+     * Returns the direct assignments that link any of the given users to one permission set.
+     * Used to make giving an add-on idempotent and to find the rows a removal deletes.
+     *
+     * @param permissionSetId the permission set to look in
+     * @param userIds the users to look for
+     * @return the matching assignments
+     */
+    public List<PermissionSetAssignment> selectByPermissionSetIdAndUserIds(
+        Id permissionSetId,
+        Set<Id> userIds
+    ) {
+        if (permissionSetId == null || userIds == null || userIds.isEmpty()) {
+            return new List<PermissionSetAssignment>();
+        }
+        return [
+            SELECT Id, AssigneeId, Assignee.Name, PermissionSetId
+            FROM PermissionSetAssignment
+            WHERE PermissionSetId = :permissionSetId AND AssigneeId IN :userIds
+            WITH USER_MODE
+        ];
+    }
+
+    /**
      * Counts the active users assigned to one permission set group.
      * Used to stop the last BarnCRM Admin removing themselves.
      *

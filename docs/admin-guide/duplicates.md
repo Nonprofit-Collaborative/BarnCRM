@@ -20,9 +20,9 @@ Salesforce licensing rule:
 **Who can review duplicates.** Salesforce keeps possible duplicates in records called duplicate
 record sets, and gives access to them only to users with a **Sales Cloud or Service Cloud
 license**. No other license can have it, Salesforce Platform included. So BarnCRM puts that
-access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In Setup,
-open **Users**, choose each person who will review duplicates, and under **Permission Set
-Assignments** add **BarnCRM Duplicate Review**. Salesforce refuses the assignment for a user
+access in its own permission set, **BarnCRM Duplicate Review**, which is in no role. In BarnCRM
+Settings, open **Access** and, under **Extra permissions**, give **BarnCRM Duplicate Review** to
+each person who will review duplicates. Salesforce refuses the assignment for a user
 without one of those licenses. If nobody in your org has one, duplicate rules still warn people
 as they type, but nobody can review or merge suggestions: not on this panel, and not on the
 **Potential Duplicates** card on a contact's page, which reads the same records and shows a
