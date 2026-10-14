@@ -48,4 +48,27 @@ private class PermissionSetSelectorTest {
             Assert.isNull(blank, 'A blank name should come back as nothing without querying.');
         }
     }
+
+    @IsTest
+    static void selectPackagedByNamesFindsOnlyTheNamedPackagedSets() {
+        System.runAs(TestUsers.admin()) {
+            PermissionSetSelector selector = new PermissionSetSelector();
+            String namespacePrefix = NamespaceUtil.prefix().removeEnd('__');
+
+            Test.startTest();
+            List<PermissionSet> found = selector.selectPackagedByNames(
+                new Set<String>{ 'BarnCRM_Bulk_Update', 'No_Such_Permission_Set_Here' },
+                namespacePrefix
+            );
+            List<PermissionSet> none = selector.selectPackagedByNames(
+                new Set<String>(),
+                namespacePrefix
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, found.size(), 'Only the packaged set that exists should be found.');
+            Assert.areEqual('BarnCRM_Bulk_Update', found[0].Name, 'It should be the named set.');
+            Assert.areEqual(0, none.size(), 'Asking for no names should return nothing.');
+        }
+    }
 }

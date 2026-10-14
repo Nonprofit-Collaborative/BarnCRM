@@ -105,12 +105,11 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 | Section | What to change in Setup | Checked by BarnCRM |
 |---|---|---|
 | General | Make the Setup fiscal year start in the same month as **Fiscal year start month** (Setup, Company Settings, Fiscal Year) | Yes |
-| General | To save Custom Metadata entries in an installed package: assign **BarnCRM Metadata Admin** and turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings) | No |
-| Households | To review duplicates: assign **BarnCRM Duplicate Review** to people with a Sales Cloud or Service Cloud license, and keep the standard duplicate rules active (Setup, Duplicate Rules) | No: the Duplicates panel shows each rule as On or Off |
+| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex** (Setup, Apex Settings). The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra permissions | No |
+| Households | To review duplicates: keep the standard duplicate rules active (Setup, Duplicate Rules). The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra permissions, to people with a Sales Cloud or Service Cloud license | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it (Setup, Object Manager, the object, Fields & Relationships) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
-| Access | Assign a module's own permission set, such as Giving Staff, alongside the role (Setup, Users, Permission Set Assignments). Creating the user is the **Create a user in Setup** link on the page itself | No |
-| Import | To let someone who is not a BarnCRM Admin bulk update, or anyone bulk delete: assign **BarnCRM Bulk Update** or **BarnCRM Bulk Delete**, with **BarnCRM Find and Export** (Setup, Users, Permission Set Assignments) | No |
+| Access | Assign a module's own permission set, such as Giving Staff, alongside the role (Setup, Users, Permission Set Assignments). Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself, under Extra permissions; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a user in Setup** link on the page itself | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.

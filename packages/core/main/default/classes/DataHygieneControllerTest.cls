@@ -151,27 +151,27 @@ private class DataHygieneControllerTest {
     }
 
     @IsTest
-    static void aCheckFindCannotListIsNotOpened() {
+    static void peopleWithNoHouseholdOpenInFindInMembershipRecordMode() {
         System.runAs(TestUsers.admin()) {
             BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
                 HouseholdTestDataFactory.MODE_JUNCTION
             );
             HouseholdTestDataFactory.save(settings);
             User maria = maria();
+            DataHygieneController.OpenInFind opened;
 
             System.runAs(maria) {
-                try {
-                    DataHygieneController.openInFind(DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
-                    Assert.fail('Junction mode people cannot be listed in Find yet.');
-                } catch (AuraHandledException refused) {
-                    Assert.areEqual(
-                        System.Label.Core_DataHygiene_NotInFindYet,
-                        refused.getMessage(),
-                        'And the person is told so.'
-                    );
-                }
+                opened = DataHygieneController.openInFind(
+                    DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
+                );
             }
-            Assert.areEqual(0, [SELECT COUNT() FROM Saved_Query__c], 'Nothing is saved.');
+
+            Assert.isNotNull(opened.savedQueryId, 'The query is saved and ready to open.');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Saved_Query__c WHERE Id = :opened.savedQueryId],
+                'As one saved query.'
+            );
         }
     }
 

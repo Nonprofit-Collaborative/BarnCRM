@@ -31,7 +31,7 @@ refused is listed with the reason; the rest are still deleted.
 1. Bulk delete needs two permissions: **Bulk Delete Records**, and **Find and Export Records**,
    because every bulk delete starts from a Find query. **Bulk Delete Records is in no role, not
    even BarnCRM Admin**: assign the **BarnCRM Bulk Delete** permission set to the few people
-   who should have it (Setup, Users, choose the person, Permission Set Assignments), with
+   who should have it (BarnCRM Settings, Access, Extra permissions), with
    **BarnCRM Find and Export** if they do not have it already. Neither grants access to any
    record. Seeing the list of recent bulk deletes, and undoing one, needs only **Bulk Delete
    Records**, as does deleting by file from the Import tab.

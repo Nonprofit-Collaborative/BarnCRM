@@ -52,6 +52,23 @@ public with sharing class UserSelector {
     }
 
     /**
+     * Returns the running user's effective Assign Permission Sets and Manage Users
+     * permissions: everything their profile, permission sets and permission set groups give,
+     * after muting, as Salesforce itself evaluates it.
+     *
+     * @return the running user's permission access, or null when none is returned
+     */
+    public UserPermissionAccess selectRunningUserPermissionAccess() {
+        List<UserPermissionAccess> access = [
+            SELECT PermissionsAssignPermissionSets, PermissionsManageUsers
+            FROM UserPermissionAccess
+            WITH USER_MODE
+            LIMIT 1
+        ];
+        return access.isEmpty() ? null : access[0];
+    }
+
+    /**
      * Escapes the characters that carry meaning inside a SOQL LIKE pattern, so that a
      * person searching for "a_b" is not offered every three letter name.
      *

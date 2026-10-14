@@ -127,6 +127,7 @@ ALLOWED = {
     "PermissionSetAssignment": "assigning them, and asserting the assignment in tests.",
     "PermissionSetGroup": "the packaged groups, C-06.",
     "PermissionSetGroupComponent": "what a packaged group contains, asserted in tests.",
+    "UserPermissionAccess": "the running user's effective Assign Permission Sets, checked before the Access page gives an add-on. Every edition.",
     "ObjectPermissions": "read back by the access checks in C-06.",
     "FieldPermissions": "same.",
     "SetupEntityAccess": "class and custom permission grants inside a permission set.",
