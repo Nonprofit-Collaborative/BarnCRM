@@ -42,7 +42,7 @@ Read it in this order:
 
 ### 1.1 The one-paragraph vision
 
-BarnCRM is a free, open source, AppExchange-listed suite of managed packages that gives small and medium nonprofits an easy, complete, and trustworthy way to run fundraising, constituents, and programs on Salesforce, on whatever Salesforce licenses they already have (Agentforce Nonprofit, Sales/Service Cloud, or plain Platform licenses), with no professional implementation required. It takes the best of NPSP (the household model, the data importer, the opinionated defaults, the community), the best of Nonprofit Cloud (the cleaner gift model, program and outcome thinking), and fills the gaps neither product closes (receipting and year-end statements, funder pipeline, front-end settings, modular enablement, upgrade-safe administration). It is built so that a two-person development office can install it on a Tuesday and enter gifts on Wednesday.
+BarnCRM is a free, open source, AppExchange-listed suite of managed packages that gives nonprofits of any size (and any Salesforce org), and especially the small and mid-sized teams that lack the resources for many licenses and customization, an easy, complete, and trustworthy way to run fundraising, constituents, and programs on Salesforce, with powerful tools preloaded (D-95), on whatever Salesforce licenses they already have (Agentforce Nonprofit, Sales/Service Cloud, or plain Platform licenses), with no professional implementation required. It takes the best of NPSP (the household model, the data importer, the opinionated defaults, the community), the best of Nonprofit Cloud (the cleaner gift model, program and outcome thinking), and fills the gaps neither product closes (receipting and year-end statements, funder pipeline, front-end settings, modular enablement, upgrade-safe administration). It is built so that a two-person development office can install it on a Tuesday and enter gifts on Wednesday.
 
 ### 1.2 The problem
 
@@ -79,7 +79,9 @@ Salesforce stopped developing NPSP in March 2023 and, since December 2025, no lo
 
 ### 2.1 Primary customer
 
-Small and medium nonprofits: roughly $250K to $10M annual revenue, 2 to 50 staff, one to ten Salesforce users, typically on ten free Power of Us licenses plus a handful of paid ones. They have no full-time Salesforce admin. The person configuring the system is a development director, operations manager, or executive director who is comfortable with spreadsheets and modern web apps.
+**Open to any Salesforce org of any size (Brandon, 2026-10-14; D-95).** BarnCRM is extra valuable for small and mid-sized teams that lack the resources for many licenses and customization, because it comes with powerful tools preloaded. The pilot is likewise open to any org size, not limited to one to ten users.
+
+The design center is small and medium nonprofits: roughly $250K to $10M annual revenue, 2 to 50 staff, typically one to ten Salesforce users, on ten free Power of Us licenses plus a handful of paid ones. They have no full-time Salesforce admin. The person configuring the system is a development director, operations manager, or executive director who is comfortable with spreadsheets and modern web apps.
 
 Secondary: organizations up to $50M who are cost-sensitive, and larger organizations using one module (for example Volunteers) alongside other systems.
 
@@ -179,7 +181,7 @@ Person Account dependency, batch-only rollups with compute credits, permission s
 
 **Suites and packaging (owner decision, Brandon, 2026-09-23; D-81).** The product's tentative name is BarnCRM (Section 8.3). It ships as two suites built from the same packages:
 
-- **Impact Suite** (nonprofits): Core plus Giving, with Programs, Logic Models, Volunteers, Funders and Connect offered as further modules.
+- **Impact Suite** (nonprofits; the Nonprofit Edition, described as "like NPSP for Nonprofit Cloud", plus other useful tools; D-95): Core plus Giving, with Programs, Logic Models, Volunteers, Funders and Connect offered as further modules.
 - **Community Suite** (for-profit and other organizations that are not nonprofits): Core alone, with the modules that fit (for example Volunteers, and Events later) offered. Nonprofit-only modules are never offered.
 - **One install to start, guided installs after.** An administrator installs Core. The Setup Assistant's first step asks which suite; turning on the Nonprofit Edition opens Salesforce's installer for Giving, and the other modules are offered the same way (C-24, C-30). A package cannot install another silently, so each module is one administrator click in Salesforce's installer, and an org that never turns the Nonprofit Edition on never carries gifts, receipts or tax fields.
 - **Core is neutral.** Households, relationships, affiliations, addresses, import, rollups, settings, Health Check and the Setup Assistant carry no nonprofit wording. The nonprofit app and wording, the giving and receipt settings, and the nonprofit Setup Assistant steps live in Giving (C-29). Core is still never split into a base package it depends on: the Community Suite is simply Core.
@@ -1087,6 +1089,7 @@ Findings and decisions about the modules (Giving, Connect, Volunteers, Programs,
 | D-92 | Product-branded names stay (Brandon, 2026-10-14; closes Section 11.2 item 24): BarnCRM Admin, Staff, Read Only, Duplicate Review and BarnCRM Settings | Neutral Core names | The names are the product's; no reason to split labels between Core and Giving |
 | D-93 | No end date on per-automation switches (Brandon, 2026-10-14; closes Section 11.2 item 16): they stay off until an admin turns them back on; the org-wide pause still expires (ADR-0055) | An optional end date per switch | Extra setting and job for little gain |
 | D-94 | The pilot is a milestone below v1.0 (Brandon, 2026-10-14): no version number is attached to it; Brandon decides version numbers | Naming the pilot as a version | Version numbers are the owner's call; D-87 already settles release prerequisites after a pilot |
+| D-95 | BarnCRM is open to any Salesforce org regardless of size, and extra valuable for small to mid-sized teams that lack the resources for many licenses and customization; it comes with powerful tools preloaded. The pilot is likewise open to any org size (Brandon, 2026-10-14). The Nonprofit Edition is described as "like NPSP for Nonprofit Cloud", plus other useful tools | Limiting the audience or the pilot to small teams (one to ten users) | Size is not the line; the value is highest where licenses and customization are scarce, and a pilot on varied org sizes gives better evidence |
 
 ---
 

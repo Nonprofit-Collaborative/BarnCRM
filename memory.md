@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-14 (through D-94).
+Last refreshed from BMemory 2026-10-14 (through D-95).
 
 ## Decision log (plan Section 12)
 
@@ -102,6 +102,7 @@ Last refreshed from BMemory 2026-10-14 (through D-94).
 | D-92 | 2026-10-14 | Product-branded names stay (Brandon; closes Section 11.2 item 24): BarnCRM Admin, Staff, Read Only, Duplicate Review, BarnCRM Settings |
 | D-93 | 2026-10-14 | No end date on per-automation switches (Brandon; closes Section 11.2 item 16): they stay off until an admin turns them back on; the org-wide pause still expires (ADR-0055) |
 | D-94 | 2026-10-14 | The pilot is a milestone below v1.0; Brandon decides version numbers |
+| D-95 | 2026-10-14 | BarnCRM is open to any Salesforce org regardless of size, and extra valuable for small to mid-sized teams that lack the resources for many licenses and customization; it comes with powerful tools preloaded. The pilot is likewise open to any org size (not limited to one to ten users). The Nonprofit Edition is described as "like NPSP for Nonprofit Cloud", plus other useful tools (Brandon) |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
