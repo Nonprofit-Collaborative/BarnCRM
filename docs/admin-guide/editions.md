@@ -13,11 +13,16 @@ duplicate review, Org Optimizer, Health Check, settings and the rest of BarnCRM 
 
 The edition decides what BarnCRM shows and offers. It never installs, removes or changes
 anything: every module is a separate package that you install yourself through Salesforce's
-installer, and no records change when the edition changes.
+installer, and no records change when the edition changes. You install a module from
+BarnCRM Settings, General, Modules and features, which opens Salesforce's installer. Which
+editions offer each module ships with BarnCRM as data (BarnCRM Module records), so a later
+module offered to both editions simply appears in both.
 
-You choose the edition once, in the first step of the [Setup Assistant](setup-assistant.md).
-After that the step shows the edition you chose and no longer offers the choice, because
-changing it later is rare and changes what everyone sees.
+You choose the edition once, in the first-run setup window that the BarnCRM home page and
+BarnCRM Settings both show until an administrator finishes it (see
+[BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). After that the
+Setup Assistant's first step shows the edition you chose and no longer offers the choice,
+because changing it later is rare and changes what everyone sees.
 
 ## What each edition shows
 
@@ -28,6 +33,7 @@ These are the places that depend on the edition.
 | Setup Assistant, module step | Core, plus any module that is already installed | Core and all five nonprofit modules, each Present or Not installed with its Install link |
 | BarnCRM Settings, General, Modules ([Module Manager](module-manager.md)) | The same list as the module step | The same list as the module step |
 | BarnCRM home page, Modules card | The same list | The same list |
+| BarnCRM Settings, General, Modules and features; first-run setup's "Let me choose" list | Installed modules only, plus the Super Tools and Core features | Every nonprofit module (switch when installed, Install link when not), plus the Super Tools and Core features |
 | Health Check, "The Gift Transaction mirror is in the Connect module" (Nonprofit Cloud orgs only) | Not shown | Shown when Connect is not installed |
 | Setup Assistant, first step | Edition shown read-only | Edition shown read-only, with the Giving install link while Giving is not installed |
 

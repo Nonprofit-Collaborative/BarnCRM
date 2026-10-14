@@ -17,7 +17,10 @@ Without Giving, the steps after step three move up by one.
 
 Nothing it asks is permanent. Every answer is a setting you can change later on the
 BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
-changes. The edition is the one answer you give once: after step one the assistant shows it
+changes. The edition is the one answer you give once, and you give it before the assistant:
+until an administrator finishes the first-run setup window (see
+[BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)), the home page shows
+that window instead of the assistant. The assistant's step one then shows the edition
 read-only, and [Editions](editions.md) says how to change it later.
 
 ## How to turn it on
@@ -70,7 +73,9 @@ ready than to go and find:
 
 BarnCRM comes in two editions built from the same parts, and both include the full core suite of tools. Any organization can choose either
 one. You choose once: the edition decides which modules BarnCRM shows and offers everywhere
-(see [Editions](editions.md)).
+(see [Editions](editions.md)). In a new install the edition is already chosen in the
+first-run setup window, so this step shows it read-only; the choice below appears only in an
+org where no edition was ever saved and the window was not shown.
 
 - **Standard Edition**: the full core suite of tools, including households, people, organizations, relationships, addresses,
   importing and everything else in BarnCRM Core. Nothing more to install.

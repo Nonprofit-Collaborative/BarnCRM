@@ -376,8 +376,8 @@ public with sharing class HealthCheckOrgShapeChecks {
         if (shape == null || shape.hasIndustriesNonprofit != true) {
             return null;
         }
-        // Connect is a nonprofit module: only the Nonprofit Edition is told about it (ADR-NEXT).
-        if (!ModuleDetectionService.isNonprofitEdition() || isConnectInstalled()) {
+        // Only an edition whose module catalog offers Connect is told about it (ADR-NEXT).
+        if (!ModuleDetectionService.isOffered('Connect') || isConnectInstalled()) {
             return null;
         }
 

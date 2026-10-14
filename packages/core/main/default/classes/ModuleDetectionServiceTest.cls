@@ -202,9 +202,10 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
-            ModuleDetectionService.installVersionIds = new Map<String, String>{
-                'Giving' => FakeIds.ofPrefix('04t', 1),
-                'Volunteers' => 'not a version id'
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                catalogRow('Giving', 'Impact', FakeIds.ofPrefix('04t', 1), 10),
+                catalogRow('Volunteers', 'Impact', 'not a version id', 20),
+                catalogRow('Programs', 'Impact', null, 30)
             };
             chooseSuite(ModuleDetectionService.SUITE_IMPACT);
 
@@ -243,8 +244,8 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            ModuleDetectionService.installVersionIds = new Map<String, String>{
-                'Giving' => FakeIds.ofPrefix('04t', 1)
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                catalogRow('Giving', 'Impact', FakeIds.ofPrefix('04t', 1), 10)
             };
 
             Test.startTest();
@@ -258,6 +259,76 @@ private class ModuleDetectionServiceTest {
                 'Its description is linked'
             );
         }
+    }
+
+    @IsTest
+    static void aModuleBothEditionsOfferNeedsOnlyACatalogRow() {
+        System.runAs(TestUsers.admin()) {
+            SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+            ModuleDetectionService.givingPresentOverride = false;
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+                catalogRow('Giving', 'Impact', null, 10),
+                catalogRow('Events', 'Community; Impact', null, 5)
+            };
+            chooseSuite(ModuleDetectionService.SUITE_COMMUNITY);
+
+            Test.startTest();
+            List<String> names = new List<String>();
+            for (ModuleDetectionService.ModuleInfo module : ModuleDetectionService.getModules()) {
+                names.add(module.name);
+            }
+            Boolean eventsOffered = ModuleDetectionService.isOffered('Events');
+            Boolean givingOffered = ModuleDetectionService.isOffered('Giving');
+            Test.stopTest();
+
+            Assert.areEqual(
+                new List<String>{ 'Core', 'Events' },
+                names,
+                'The Standard Edition lists the module its row names, in Sort Order, and not Giving'
+            );
+            Assert.isTrue(eventsOffered, 'Offered to the Standard Edition');
+            Assert.isFalse(givingOffered, 'Giving is for the Nonprofit Edition only');
+        }
+    }
+
+    @IsTest
+    static void shipsANonprofitOnlyRowForEveryKnownModule() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Map<String, BarnCRM_Module__mdt> shipped = BarnCRM_Module__mdt.getAll();
+            Test.stopTest();
+
+            List<String> modules = new List<String>{
+                'Giving',
+                'Volunteers',
+                'Programs',
+                'Funders',
+                'Connect'
+            };
+            for (String name : modules) {
+                Assert.isTrue(shipped.containsKey(name), name + ' has a catalog row');
+                Assert.areEqual(
+                    'Impact',
+                    shipped.get(name).Editions__c,
+                    name + ' is nonprofit only'
+                );
+            }
+        }
+    }
+
+    private static BarnCRM_Module__mdt catalogRow(
+        String name,
+        String editions,
+        String versionId,
+        Integer sortOrder
+    ) {
+        return new BarnCRM_Module__mdt(
+            DeveloperName = name,
+            Editions__c = editions,
+            Package_Folder__c = name.toLowerCase(),
+            Install_Version_Id__c = versionId,
+            Sort_Order__c = sortOrder
+        );
     }
 
     private static void chooseSuite(String suite) {

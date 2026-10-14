@@ -29,6 +29,67 @@ There is nothing to turn on, but there is one permission to give out.
 Everyone can open the page and read it. That is deliberate: David should be able to see
 how greetings are configured before he asks Maria to change them.
 
+## First-run setup
+
+Until BarnCRM's first-run setup is finished, the BarnCRM home page and this page both show
+the same setup window in front of everything else, and nothing behind it can be used.
+
+- **Someone with the BarnCRM Admin role** (Manage BarnCRM Settings) sees two questions:
+  1. **Which edition**: Standard Edition or Nonprofit Edition (see [Editions](editions.md)).
+     This is the only place the edition is asked; the Setup Assistant's first step then shows
+     it read-only.
+  2. **What to turn on**: **Turn on all the default core features** (everything on, the
+     usual choice), or **Let me choose modules and features**, which lists the same modules,
+     Super Tools and Core features as the panel described below, all ticked. Untick what you
+     do not want.
+
+  Click **Finish setup**. What you left on is turned on fully: its switch, its tabs, its
+  settings, and its automations. What you unticked is turned off the same way. You land on
+  **General** in BarnCRM Settings, and the setup window never shows again on either page.
+- **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and nothing
+  else, on both pages, until an administrator finishes.
+
+An org that had already chosen an edition before this release never sees the window.
+
+## Modules and features (General)
+
+The **General** section starts with **Edition** (read-only, see [Editions](editions.md)) and
+then **Modules and features**: one row per thing you can turn on or off, each with a short
+description, its state, and a switch. Turning something off hides its tabs and its settings
+in this page for everyone and stops its automations; turning it on brings them back. Nothing
+is deleted either way. Only people with Manage BarnCRM Settings can use the switches.
+
+| Row | What it covers | Off hides or stops |
+|---|---|---|
+| Each installed module (Giving and the others) | The module | Its automations and its rows in this page. Its tabs follow the module's own permission sets until that module ships switchable tabs (Giving does not yet) |
+| A module that is not installed | Shown as **Not installed** with **Install** and **What this module does**, no switch. The Standard Edition lists no nonprofit module that is not installed | Nothing |
+| Data Manager (Super Tool) | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
+| Duplicate Review (Super Tool) | Duplicate suggestions and review | The Duplicates row in Households |
+| Org Optimizer and Health Check (Super Tool) | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
+| Rollup Builder (Super Tool) | The Rollup Builder tab and the rollup list | The Rollup Builder tab and the Rollups list row |
+| Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
+| Addresses | Address capture and the default address | Its three automations and the Addresses section |
+| Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
+| Affiliations | The primary affiliation | Its automation |
+| Rollups | Household and person totals kept current | Its two automations and the rollup timing rows |
+| Preferred email | Copying the preferred email into the standard email | Its two automations |
+
+Rules that enforce data (relationship, affiliation and rollup definition checks) are not
+part of any row and always run. The Automation section still lists every automation for
+fine-grained control; a feature row is on when any of its automations is on.
+
+**How tab hiding works.** Salesforce shows a tab to anyone holding a permission set that
+grants it, and an app cannot hide a tab any other way. So each switchable tab has its own
+small packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab,
+and BarnCRM gives it to, or takes it from, the people who should see the tab: whoever holds a
+role or extra permission that used to include the tab (BarnCRM Admin for all six, Find and
+Export for Find, Data Manager and Data Hygiene, Bulk Update or Bulk Delete for Bulk Update and
+Data Manager). BarnCRM keeps these in step when a switch changes, when a role or extra
+permission is given on the Access page, after every upgrade, and every night (for roles given
+in Setup or by user access policies). A large org may take a few minutes to catch up after a
+switch. Do not assign the BarnCRM Tab permission sets by hand: the nightly run removes them
+from anyone who should not have them.
+
 ## A five-minute walkthrough
 
 Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
@@ -176,3 +237,5 @@ changes.
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Giving brings its own. |
 | A row in Recent changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
+| Which Super Tools are off | BarnCRM Settings, Features Turned Off (a comma-separated list; empty means all on) |
+| Which modules are off | BarnCRM Settings, Modules Turned Off |
