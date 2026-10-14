@@ -44,6 +44,7 @@ import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
 import TYPE_TO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
 import CANCEL from '@salesforce/label/c.Core_BulkUpdate_Cancel';
 import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
+import EVERYONE from '@salesforce/label/c.Core_BulkUpdate_EveryonesJobs';
 
 const IMPORT = 'Import';
 const UPDATE = 'Update';
@@ -142,11 +143,15 @@ export default class DataJobHistory extends LightningElement {
     typeToConfirm: TYPE_TO_CONFIRM,
     cancel: CANCEL,
     loading: LOADING,
-    importConfirmButton: IMPORT_CONFIRM_BUTTON
+    importConfirmButton: IMPORT_CONFIRM_BUTTON,
+    everyone: EVERYONE
   };
 
   jobs = [];
   allowedKinds = [];
+  /** Whether the person may list everyone's bulk jobs, and whether they asked to. */
+  canSeeEveryone = false;
+  everyone = false;
   filter = 'all';
   loading = true;
   busy = false;
@@ -178,9 +183,15 @@ export default class DataJobHistory extends LightningElement {
         wanted.includes(IMPORT) && canManageSettings
           ? getRecentBatches({ howMany: IMPORTS_SHOWN })
           : null,
-        wanted.includes(UPDATE) && canBulkUpdate ? getUpdatePage() : null,
-        wanted.includes(DELETE) && canBulkDelete ? getDeletePage() : null
+        wanted.includes(UPDATE) && canBulkUpdate
+          ? getUpdatePage({ everyone: this.everyone })
+          : null,
+        wanted.includes(DELETE) && canBulkDelete ? getDeletePage({ everyone: this.everyone }) : null
       ]);
+      this.canSeeEveryone = Boolean(
+        (updates && updates.allowed && updates.canSeeEveryone) ||
+        (deletes && deletes.allowed && deletes.canSeeEveryone)
+      );
       const allowed = [];
       let jobs = [];
       if (imports) {
@@ -314,6 +325,12 @@ export default class DataJobHistory extends LightningElement {
 
   handleFilter(event) {
     this.filter = event.detail.value;
+  }
+
+  /** Lists every person's bulk updates and deletes, for someone who manages settings. */
+  handleEveryone(event) {
+    this.everyone = event.target.checked;
+    this.load();
   }
 
   async handleRefresh() {

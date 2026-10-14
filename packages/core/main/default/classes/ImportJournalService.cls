@@ -56,6 +56,17 @@ public with sharing class ImportJournalService {
     @TestVisible
     private static Integer maxCreatedPerPage = 100;
 
+    /** The most pages a walk through one phase reads: the journal's own read limit. */
+    @NamespaceAccessible
+    public static final Integer MAX_PAGES_READ = 200;
+
+    /**
+     * Pages read per query on such a walk, each window released before the next: at most
+     * about 2.6 MB of text at once, well inside the heap.
+     */
+    @TestVisible
+    private static Integer pagesPerRead = 10;
+
     /** A created record: which object, which record, which file row (R-IJ3). */
     @NamespaceAccessible
     public static Map<String, Object> created(String objectName, Id recordId, Integer row) {
@@ -241,15 +252,71 @@ public with sharing class ImportJournalService {
      */
     @NamespaceAccessible
     public static Integer actionCount(Id batchId, String phase, String action) {
+        return walk(batchId, phase, action, null, 0);
+    }
+
+    /**
+     * The first `howMany` entries of one action in one phase, in the order they were written,
+     * from at most MAX_PAGES_READ pages: for example the first refusals of a job, wherever in
+     * the job they fell.
+     */
+    @NamespaceAccessible
+    public static List<Map<String, Object>> firstWithAction(
+        Id batchId,
+        String phase,
+        String action,
+        Integer howMany
+    ) {
+        List<Map<String, Object>> kept = new List<Map<String, Object>>();
+        if (howMany != null && howMany > 0) {
+            walk(batchId, phase, action, kept, howMany);
+        }
+        return kept;
+    }
+
+    /**
+     * Counts the entries of one action, and keeps the first `keep` of them in `kept` when it is
+     * given, stopping once it has them. Reads a few pages at a time, so a long journal never
+     * holds the heap, and parses only a page whose text names the action.
+     */
+    private static Integer walk(
+        Id batchId,
+        String phase,
+        String action,
+        List<Map<String, Object>> kept,
+        Integer keep
+    ) {
         Integer total = 0;
-        if (batchId == null) {
+        if (batchId == null || action == null) {
             return total;
         }
-        for (Import_Journal__c page : pages(batchId, phase, 200)) {
-            for (Map<String, Object> entry : entries(page)) {
-                if (action != null && action.equals(entry.get('action'))) {
-                    total++;
+        String marker = JSON.serialize(action);
+        String after;
+        Integer read = 0;
+        while (read < MAX_PAGES_READ) {
+            Integer asked = Math.min(pagesPerRead, MAX_PAGES_READ - read);
+            List<Import_Journal__c> window = pagesAfter(batchId, phase, asked, after);
+            for (Import_Journal__c page : window) {
+                after = page.Name;
+                if (page.Entries_JSON__c == null || !page.Entries_JSON__c.contains(marker)) {
+                    continue;
                 }
+                for (Map<String, Object> entry : entries(page)) {
+                    if (!action.equals(entry.get('action'))) {
+                        continue;
+                    }
+                    total++;
+                    if (kept != null) {
+                        kept.add(entry);
+                        if (kept.size() >= keep) {
+                            return total;
+                        }
+                    }
+                }
+            }
+            read += window.size();
+            if (window.size() < asked) {
+                break;
             }
         }
         return total;
@@ -258,15 +325,27 @@ public with sharing class ImportJournalService {
     /** The pages of one phase of a batch, in the order they were written. */
     @NamespaceAccessible
     public static List<Import_Journal__c> pages(Id batchId, String phase, Integer howMany) {
+        return pagesAfter(batchId, phase, howMany, null);
+    }
+
+    /** As `pages`, starting after the page named `afterName`, or at the start when null. */
+    private static List<Import_Journal__c> pagesAfter(
+        Id batchId,
+        String phase,
+        Integer howMany,
+        String afterName
+    ) {
         Integer limitSize = howMany == null || howMany <= 0 ? 20 : Math.min(howMany, 200);
         return Database.queryWithBinds(
             'SELECT Id, Name, Phase__c, Entry_Count__c, Entries_JSON__c FROM Import_Journal__c ' +
                 'WHERE Import_Batch__c = :batchId AND Phase__c = :phase ' +
+                (afterName == null ? '' : 'AND Name > :afterName ') +
                 'ORDER BY Name ASC LIMIT :limitSize',
             new Map<String, Object>{
                 'batchId' => batchId,
                 'phase' => phase,
-                'limitSize' => limitSize
+                'limitSize' => limitSize,
+                'afterName' => afterName
             },
             AccessLevel.USER_MODE
         );

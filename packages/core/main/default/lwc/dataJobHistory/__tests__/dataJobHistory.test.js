@@ -304,4 +304,23 @@ describe('c-data-job-history', () => {
 
     expect(getUpdatePage).toHaveBeenCalledTimes(2);
   });
+
+  it('lists the person own bulk jobs, and everyone else too for someone allowed who asks', async () => {
+    let element = await render();
+    expect(getUpdatePage).toHaveBeenCalledWith({ everyone: false });
+    expect(getDeletePage).toHaveBeenCalledWith({ everyone: false });
+    expect(one(element, 'everyone')).toBeNull();
+    document.body.removeChild(element);
+
+    getUpdatePage.mockResolvedValue({ allowed: true, canSeeEveryone: true, jobs: [] });
+    element = await render();
+    const everyone = one(element, 'everyone');
+    everyone.checked = true;
+    everyone.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    await flush();
+
+    expect(getUpdatePage).toHaveBeenLastCalledWith({ everyone: true });
+    expect(getDeletePage).toHaveBeenLastCalledWith({ everyone: true });
+  });
 });

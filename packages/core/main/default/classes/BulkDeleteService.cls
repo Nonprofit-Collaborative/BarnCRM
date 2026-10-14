@@ -12,8 +12,6 @@ public with sharing class BulkDeleteService {
     public static final String OPERATION_DELETE = 'Delete';
     /** How many records the preview names. */
     public static final Integer SAMPLE_SIZE = 5;
-    /** Records a chunk deletes, so one journal page holds one chunk (R-IJ1). */
-    public static final Integer MAX_CHUNK = 200;
     /** The run limit's default (R-BD2). */
     public static final Integer DEFAULT_RUN_LIMIT = 10000;
     /** The run limit's highest value: what one request can count exactly (R-BD2). */
@@ -25,8 +23,6 @@ public with sharing class BulkDeleteService {
     /** Query rows left free for the reads around a count. */
     private static final Integer COUNT_MARGIN = 100;
     private static final Integer DEFINITION_VERSION = 1;
-    /** The most journal pages a fallback count reads (the journal's own read limit). */
-    private static final Integer MAX_JOURNAL_PAGES = 200;
 
     /** Raised for anything the person can fix; the message is for them. */
     public class BulkDeleteException extends Exception {
@@ -81,11 +77,7 @@ public with sharing class BulkDeleteService {
         @AuraEnabled
         public Integer count;
         @AuraEnabled
-        public Integer runLimit;
-        @AuraEnabled
         public String objectLabel;
-        @AuraEnabled
-        public String soql;
         @AuraEnabled
         public List<SampleRecord> sample = new List<SampleRecord>();
         /** The kinds of child record the platform deletes with each record (R-BD2). */
@@ -174,7 +166,6 @@ public with sharing class BulkDeleteService {
         if (result.count > ceiling) {
             throw new BulkDeleteException(overLimit(ceiling));
         }
-        result.runLimit = ceiling;
         Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
             SObjectDescribeOptions.DEFERRED
         );
@@ -187,7 +178,6 @@ public with sharing class BulkDeleteService {
             null
         );
         sample.binds.put('sampleSize', SAMPLE_SIZE);
-        result.soql = sample.display;
         for (
             SObject record : Database.queryWithBinds(
                 sample.soql + ' ORDER BY Id LIMIT :sampleSize',
@@ -273,7 +263,7 @@ public with sharing class BulkDeleteService {
             );
         }
         Import_Batch__c job = createJob(checked, count, confirmedCount);
-        Id jobId = Database.executeBatch(new BulkDeleteBatch(job.Id), MAX_CHUNK);
+        Id jobId = Database.executeBatch(new BulkDeleteBatch(job.Id), job.Chunk_Size__c.intValue());
         job.Job_Id__c = jobId;
         Database.update(
             new Import_Batch__c(Id = job.Id, Job_Id__c = jobId),
@@ -300,7 +290,7 @@ public with sharing class BulkDeleteService {
             Rows_Matched__c = 0,
             Rows_Rejected__c = 0,
             Rows_Deleted__c = 0,
-            Chunk_Size__c = MAX_CHUNK,
+            Chunk_Size__c = DataJobs.chunkSize(),
             Started_At__c = now,
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = undoDeadlineFrom(now),
@@ -409,21 +399,11 @@ public with sharing class BulkDeleteService {
 
     /** How many Deleted entries a job's commit journal holds. */
     private static Integer deletedEntries(Id jobId) {
-        Integer total = 0;
-        for (
-            Import_Journal__c page : ImportJournalService.pages(
-                jobId,
-                ImportJournalService.PHASE_COMMIT,
-                MAX_JOURNAL_PAGES
-            )
-        ) {
-            for (Map<String, Object> entry : ImportJournalService.entries(page)) {
-                if (ImportJournalService.ACTION_DELETED.equals(entry.get('action'))) {
-                    total++;
-                }
-            }
-        }
-        return total;
+        return ImportJournalService.actionCount(
+            jobId,
+            ImportJournalService.PHASE_COMMIT,
+            ImportJournalService.ACTION_DELETED
+        );
     }
 
     /** The undo deadline of a bulk delete started at `startedAt` (R-BD2). */

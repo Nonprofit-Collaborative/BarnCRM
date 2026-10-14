@@ -18,8 +18,6 @@ public with sharing class BulkUpdateService {
     public static final Integer MAX_CHANGES = 5;
     /** How many records the preview shows before and after. */
     public static final Integer SAMPLE_SIZE = 5;
-    /** Records a chunk saves, so one journal page holds one chunk (R-IJ1). */
-    public static final Integer MAX_CHUNK = 200;
     /** The run limit's default and highest value (R-BU2). */
     public static final Integer MAX_RUN_LIMIT = 48000;
     /** Query rows left free for the reads around a count. */
@@ -182,11 +180,7 @@ public with sharing class BulkUpdateService {
         @AuraEnabled
         public Integer count;
         @AuraEnabled
-        public Integer runLimit;
-        @AuraEnabled
         public String objectLabel;
-        @AuraEnabled
-        public String soql;
         @AuraEnabled
         public List<SampleRecord> sample = new List<SampleRecord>();
     }
@@ -387,7 +381,6 @@ public with sharing class BulkUpdateService {
         if (result.count > ceiling) {
             throw new BulkUpdateFields.BulkUpdateException(overLimit(ceiling));
         }
-        result.runLimit = ceiling;
         result.objectLabel = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
             .getLabelPlural();
         Set<String> fields = checked.readFields();
@@ -397,7 +390,6 @@ public with sharing class BulkUpdateService {
         }
         QueryCompiler.Compiled sample = QueryCompiler.compileSelection(queryJson, fields, null);
         sample.binds.put('sampleSize', SAMPLE_SIZE);
-        result.soql = sample.display;
         for (
             SObject record : Database.queryWithBinds(
                 sample.soql + ' ORDER BY Id LIMIT :sampleSize',
@@ -483,7 +475,7 @@ public with sharing class BulkUpdateService {
             );
         }
         Import_Batch__c job = createJob(checked, count, confirmedCount);
-        Id jobId = Database.executeBatch(new BulkUpdateBatch(job.Id), MAX_CHUNK);
+        Id jobId = Database.executeBatch(new BulkUpdateBatch(job.Id), job.Chunk_Size__c.intValue());
         job.Job_Id__c = jobId;
         Database.update(
             new Import_Batch__c(Id = job.Id, Job_Id__c = jobId),
@@ -509,7 +501,7 @@ public with sharing class BulkUpdateService {
             Rows_Updated__c = 0,
             Rows_Matched__c = 0,
             Rows_Rejected__c = 0,
-            Chunk_Size__c = MAX_CHUNK,
+            Chunk_Size__c = DataJobs.chunkSize(),
             Started_At__c = now,
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = now.addDays(ImportBatchService.undoWindowDays()),

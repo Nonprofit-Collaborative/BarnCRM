@@ -87,6 +87,16 @@
                         onchange={handleFilter}
                     ></lightning-combobox>
                 </template>
+                <template lwc:if={canSeeEveryone}>
+                    <lightning-input
+                        type="checkbox"
+                        data-id="everyone"
+                        class="slds-var-m-bottom_small"
+                        label={labels.everyone}
+                        checked={everyone}
+                        onchange={handleEveryone}
+                    ></lightning-input>
+                </template>
 
                 <template lwc:if={loading}>
                     <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>

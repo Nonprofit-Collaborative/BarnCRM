@@ -425,6 +425,14 @@
         <value>Records that failed, and why</value>
     </labels>
     <labels>
+        <fullName>Core_BulkUpdate_EveryonesJobs</fullName>
+        <categories>BulkUpdate</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Checkbox, for someone who manages settings, that lists every person's bulk jobs.</shortDescription>
+        <value>Show everyone's jobs</value>
+    </labels>
+    <labels>
         <fullName>Core_BulkUpdate_Refresh</fullName>
         <categories>BulkUpdate</categories>
         <language>en_US</language>

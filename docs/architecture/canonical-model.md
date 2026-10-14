@@ -953,6 +953,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one bulk update may change (R-BU2). From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
 | `Import_Row_Retention_Days__c` | integer | 90 | How many days after an import finished its staged rows are kept before the nightly Import row cleanup removes them (R-IR5, D-40). From 1 to 3650; 0 keeps them for ever; empty reads as 90, over 3650 as 3650. |
+| `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 
 ### v0.8 keys
 
@@ -6308,8 +6309,10 @@ person, in user mode, and shows the first five before and after. The start count
 refused when none match, when more match than the person confirmed, or when more match than
 `Bulk_Update_Run_Limit__c`. One request may read just under 50,000 rows, so the count reads at
 most the run limit plus one, and the limit is held to 48,000. When the count starts, the job
-stamps Committed By, Started At, Row Count (the count) and the Undo Deadline (R-IB7), and runs
-in Batch Apex, at most 200 records a chunk.
+stamps Committed By, Started At, Row Count (the count), Chunk Size (from `Bulk_Chunk_Size__c`)
+and the Undo Deadline (R-IB7), and runs in Batch Apex, at most 200 records a chunk. A person
+lists and undoes their own bulk jobs; a person with Manage BarnCRM Settings may also list and
+undo everyone's.
 
 **R-BU3 Only records that still match, as the person.** The job reads at most the confirmed
 number of records, in Id order, in user mode. Each chunk reads its records again with the

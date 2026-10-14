@@ -81,7 +81,7 @@ private class BulkUpdateServiceTest {
             System.Assert.areEqual(200, preview.count, 'Only matching records are counted');
             System.Assert.areEqual(
                 BulkUpdateService.MAX_RUN_LIMIT,
-                preview.runLimit,
+                BulkUpdateService.runLimit(),
                 'The default'
             );
             System.Assert.areEqual(

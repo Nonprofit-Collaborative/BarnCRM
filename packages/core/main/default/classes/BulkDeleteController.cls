@@ -5,25 +5,18 @@
  * Every method requires the Bulk Delete Records custom permission and, because every bulk
  * delete starts from a Find query, Find and Export Records (R-BD6). Neither grants record
  * access: the query is compiled and counted as the person, and every record is deleted in their
- * own mode. Jobs are read in user mode; the progress of a running job is read from its
- * AsyncApexJob in system mode, filtered by the job identifier the person's own job record holds.
+ * own mode. A person sees and undoes their own bulk deletes; one who manages BarnCRM Settings
+ * may also list and undo everyone's (`DataJobs`). Jobs are read in user mode; the progress of a
+ * running job is read from its AsyncApexJob in system mode, filtered by the job identifier the
+ * job record holds.
  */
 public with sharing class BulkDeleteController {
     public static final String PERMISSION = 'Bulk_Delete_Records';
     private static final Integer RECENT_JOBS = 10;
-    private static final Integer FAILURES_SHOWN = 20;
     private static final String JOB_FIELDS =
         'Id, Name, Status__c, Is_Dry_Run__c, Operation__c, Operation_JSON__c, Row_Count__c, ' +
         'Rows_Deleted__c, Rows_Rejected__c, Run_Log__c, Started_At__c, Completed_At__c, ' +
         'Undo_Deadline__c, Job_Id__c';
-
-    /** A record the platform refused, and why. */
-    public class Failure {
-        @AuraEnabled
-        public String recordId;
-        @AuraEnabled
-        public String reason;
-    }
 
     /** One bulk delete, as the page shows it. */
     public class JobView {
@@ -57,25 +50,27 @@ public with sharing class BulkDeleteController {
         @AuraEnabled
         public Integer recordsToUndo;
         @AuraEnabled
-        public List<Failure> failures;
+        public List<DataJobs.Failure> failures;
     }
 
-    /** The list on the Bulk Update tab: whether the person may, the limit, recent jobs. */
+    /** The list on the Bulk Update tab: whether the person may, and recent jobs. */
     public class BulkDeletePage {
         @AuraEnabled
         public Boolean allowed;
+        /** Whether the person may list everyone's bulk deletes, not only their own. */
         @AuraEnabled
-        public Integer runLimit;
+        public Boolean canSeeEveryone;
         @AuraEnabled
         public List<JobView> jobs;
     }
 
     /**
-     * The person's recent bulk deletes. A person without the permission gets an empty page
-     * that says so, rather than an error, because the Bulk Update tab shows the list to all.
+     * The person's recent bulk deletes, or everyone's when asked for by someone who manages
+     * BarnCRM Settings. A person without the permission gets an empty page that says so, rather
+     * than an error, because the Bulk Update tab shows the list to all.
      */
     @AuraEnabled
-    public static BulkDeletePage getPage() {
+    public static BulkDeletePage getPage(Boolean everyone) {
         try {
             BulkDeletePage page = new BulkDeletePage();
             page.allowed = hasPermission();
@@ -83,8 +78,16 @@ public with sharing class BulkDeleteController {
             if (!page.allowed) {
                 return page;
             }
-            page.runLimit = BulkDeleteService.runLimit();
-            for (Import_Batch__c job : jobs(null, RECENT_JOBS)) {
+            page.canSeeEveryone = DataJobs.canSeeEveryone();
+            for (
+                Import_Batch__c job : DataJobs.read(
+                    JOB_FIELDS,
+                    BulkDeleteService.OPERATION_DELETE,
+                    null,
+                    RECENT_JOBS,
+                    everyone
+                )
+            ) {
                 page.jobs.add(toView(job, false));
             }
             return page;
@@ -154,127 +157,56 @@ public with sharing class BulkDeleteController {
         }
     }
 
-    /** Bulk deletes the person can see, newest first, read as them. */
-    private static List<Import_Batch__c> jobs(Id jobId, Integer howMany) {
-        Map<String, Object> binds = new Map<String, Object>{
-            'operation' => BulkDeleteService.OPERATION_DELETE,
-            'howMany' => howMany,
-            'jobId' => jobId
-        };
-        return Database.queryWithBinds(
-            'SELECT ' +
-                JOB_FIELDS +
-                ' FROM Import_Batch__c WHERE Operation__c = :operation' +
-                (jobId == null ? '' : ' AND Id = :jobId') +
-                ' ORDER BY CreatedDate DESC LIMIT :howMany',
-            binds,
-            AccessLevel.USER_MODE
-        );
-    }
-
     private static Import_Batch__c requireJob(String jobId) {
-        Id parsed;
-        try {
-            parsed = String.isBlank(jobId) ? null : Id.valueOf(jobId);
-        } catch (Exception notAnId) {
-            parsed = null;
-        }
-        List<Import_Batch__c> found = parsed == null
-            ? new List<Import_Batch__c>()
-            : jobs(parsed, 1);
-        if (found.isEmpty()) {
+        Import_Batch__c found = DataJobs.find(
+            JOB_FIELDS,
+            BulkDeleteService.OPERATION_DELETE,
+            jobId
+        );
+        if (found == null) {
             throw new BulkDeleteService.BulkDeleteException(
                 System.Label.Core_BulkDelete_ErrorNotBulkDelete
             );
         }
-        return found[0];
+        return found;
     }
 
     private static JobView toView(Import_Batch__c job, Boolean detail) {
+        DataJobs.State state = DataJobs.stateOf(job, detail);
         JobView view = new JobView();
         view.recordId = job.Id;
         view.name = job.Name;
-        view.status = ImportUndoService.effectiveStatus(job);
-        view.matched = intOf(job.Row_Count__c);
-        view.deleted = intOf(job.Rows_Deleted__c);
-        view.failed = intOf(job.Rows_Rejected__c);
+        view.status = state.status;
+        view.matched = DataJobs.intOf(job.Row_Count__c);
+        view.deleted = DataJobs.intOf(job.Rows_Deleted__c);
+        view.failed = DataJobs.intOf(job.Rows_Rejected__c);
         view.runLog = job.Run_Log__c;
         view.startedAt = job.Started_At__c;
         view.undoDeadline = job.Undo_Deadline__c;
-        view.running = ImportBatchService.STATUS_COMMITTING.equals(view.status);
-        view.canUndo = String.isBlank(ImportUndoService.refusal(job)) && view.deleted > 0;
+        view.running = state.running;
+        view.chunksDone = state.chunksDone;
+        view.chunksTotal = state.chunksTotal;
+        Boolean undoable = String.isBlank(state.refusal);
+        view.canUndo = undoable && view.deleted > 0;
         view.recordsToUndo = view.deleted;
         // A job aborted, or stopped before its finish counted, deleted records it never
         // counted: the undo's own count (from the journal) is the number to confirm.
-        if (view.deleted == 0 && String.isBlank(ImportUndoService.refusal(job))) {
+        if (view.deleted == 0 && undoable) {
             BulkDeleteService.UndoPreview undoPreview = BulkDeleteService.undoPreview(job.Id);
             view.canUndo = undoPreview.allowed;
             view.recordsToUndo = undoPreview.records;
         }
-        if (detail && view.running && String.isNotBlank(job.Job_Id__c)) {
-            Id asyncJobId = job.Job_Id__c;
-            for (AsyncApexJob progress : [
-                SELECT JobItemsProcessed, TotalJobItems
-                FROM AsyncApexJob
-                WHERE Id = :asyncJobId
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ]) {
-                view.chunksDone = progress.JobItemsProcessed;
-                view.chunksTotal = progress.TotalJobItems;
-            }
-        }
-        view.failures = new List<Failure>();
-        if (detail && view.failed > 0) {
-            view.failures = failures(job.Id);
-        }
+        view.failures = detail && view.failed > 0
+            ? DataJobs.failures(job.Id)
+            : new List<DataJobs.Failure>();
         return view;
     }
 
-    /** The first refusals the job journaled, with the platform's reasons. */
-    private static List<Failure> failures(Id jobId) {
-        List<Failure> result = new List<Failure>();
-        for (
-            Import_Journal__c page : ImportJournalService.pages(
-                jobId,
-                ImportJournalService.PHASE_COMMIT,
-                FAILURES_SHOWN
-            )
-        ) {
-            for (Map<String, Object> entry : ImportJournalService.entries(page)) {
-                if (!ImportJournalService.ACTION_FAILED.equals(entry.get('action'))) {
-                    continue;
-                }
-                Failure failure = new Failure();
-                failure.recordId = (String) entry.get('id');
-                failure.reason = (String) entry.get('reason');
-                result.add(failure);
-                if (result.size() == FAILURES_SHOWN) {
-                    return result;
-                }
-            }
-        }
-        return result;
-    }
-
-    private static Integer intOf(Decimal value) {
-        return value == null ? 0 : value.intValue();
-    }
-
-    /** Anything the person can fix is shown as it is; anything else is logged and summarized. */
     private static AuraHandledException asUserError(Exception caught, String context) {
-        String message = caught.getMessage();
-        if (
-            !(caught instanceof BulkDeleteService.BulkDeleteException) &&
-            !(caught instanceof QueryCompiler.QueryCompilerException) &&
-            !(caught instanceof QueryFieldCatalog.QueryFieldCatalogException) &&
-            !(caught instanceof ImportException)
-        ) {
-            ErrorLogger.log(caught, context);
-            message = System.Label.Core_BulkUpdate_UnexpectedError;
-        }
-        AuraHandledException reported = new AuraHandledException(message);
-        reported.setMessage(message);
-        return reported;
+        return DataJobs.userError(
+            caught,
+            context,
+            caught instanceof BulkDeleteService.BulkDeleteException
+        );
     }
 }

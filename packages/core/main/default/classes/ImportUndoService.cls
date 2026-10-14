@@ -279,6 +279,15 @@ public with sharing class ImportUndoService {
      */
     @NamespaceAccessible
     public static String effectiveStatus(Import_Batch__c batch) {
+        return effectiveStatus(batch, null);
+    }
+
+    /**
+     * As `effectiveStatus`, with whether the batch's own job is running when the caller has
+     * already read it (`ImportBatchService.isRunning(batch, job)`); null to read it here.
+     */
+    @NamespaceAccessible
+    public static String effectiveStatus(Import_Batch__c batch, Boolean jobRunning) {
         if (batch == null) {
             return null;
         }
@@ -290,7 +299,7 @@ public with sharing class ImportUndoService {
         if (
             (ImportBatchService.STATUS_DRY_RUN.equals(batch.Status__c) ||
             ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c)) &&
-            !ImportBatchService.isRunning(batch)
+            !(jobRunning != null ? jobRunning : ImportBatchService.isRunning(batch))
         ) {
             return ImportBatchService.STATUS_FAILED;
         }
