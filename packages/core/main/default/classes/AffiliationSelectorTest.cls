@@ -1,6 +1,6 @@
 /**
- * The reads behind the affiliation cards: by person, held as a contact or as an account, and by
- * organization. Both come back in the order the cards show, current rows first.
+ * The read behind the affiliation cards: by person, held as a contact or as an account, in the
+ * order the cards show, current rows first.
  */
 @IsTest(testFor='ApexClass:AffiliationSelector')
 private class AffiliationSelectorTest {
@@ -22,11 +22,6 @@ private class AffiliationSelectorTest {
             Assert.isTrue(
                 AffiliationSelector.selectByPersonIds(new Set<Id>()).isEmpty(),
                 'no people'
-            );
-            Assert.isTrue(AffiliationSelector.selectByOrganizationIds(null).isEmpty(), 'null orgs');
-            Assert.isTrue(
-                AffiliationSelector.selectByOrganizationIds(new Set<Id>()).isEmpty(),
-                'no organizations'
             );
 
             Assert.areEqual(before, Limits.getQueries(), 'Nothing asked, nothing queried');
@@ -102,51 +97,6 @@ private class AffiliationSelectorTest {
             Assert.areEqual('Current', found[0].Status__c, 'Current first');
             Assert.areEqual(current.Id, found[0].Id);
             Assert.areEqual(former.Id, found[1].Id, 'Former after');
-        }
-    }
-
-    @IsTest
-    static void anOrganizationSeesItsOwnAffiliationsOnly() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> contacts = RelationshipTestDataFactory.contacts(2, 'Garcia');
-            List<Account> accounts = RelationshipTestDataFactory.peopleAsAccounts(1, 'Okafor');
-            List<Account> orgs = RelationshipTestDataFactory.organizations(2, 'Union Foundation');
-            Affiliation__c one = RelationshipTestDataFactory.affiliation(
-                contacts[0],
-                orgs[0],
-                'Board member'
-            );
-            Affiliation__c two = RelationshipTestDataFactory.affiliation(
-                accounts[0],
-                orgs[0],
-                'Volunteer'
-            );
-            Affiliation__c elsewhere = RelationshipTestDataFactory.affiliation(
-                contacts[1],
-                orgs[1],
-                'Officer'
-            );
-            insert new List<Affiliation__c>{ one, two, elsewhere };
-
-            Test.startTest();
-            List<Affiliation__c> found = AffiliationSelector.selectByOrganizationIds(
-                new Set<Id>{ orgs[0].Id }
-            );
-            List<Affiliation__c> both = AffiliationSelector.selectByOrganizationIds(
-                new Set<Id>{ orgs[0].Id, orgs[1].Id }
-            );
-            Test.stopTest();
-
-            Assert.areEqual(
-                new Set<Id>{ one.Id, two.Id },
-                idsOf(found),
-                'Only the affiliations pointing at that organization'
-            );
-            Assert.areEqual(3, both.size(), 'Two organizations read together');
-            for (Affiliation__c row : found) {
-                Assert.areEqual(orgs[0].Name, row.Organization__r.Name);
-            }
         }
     }
 }

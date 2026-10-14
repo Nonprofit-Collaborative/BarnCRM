@@ -95,30 +95,38 @@ private class DataHygieneServiceTest {
     }
 
     @IsTest
-    static void junctionModeCountsPeopleWithNoMembershipWithoutAFindQuery() {
+    static void junctionModeCountsPeopleWithNoMembershipAndFindListsTheSame() {
         System.runAs(TestUsers.admin()) {
             mode(HouseholdTestDataFactory.MODE_JUNCTION);
             insertWithoutAutomaticHouseholds(HouseholdTestDataFactory.manyContacts(3, 'Loose'));
             insert HouseholdTestDataFactory.newContact('Cy', 'Housed');
+            Account household = HouseholdTestDataFactory.newHousehold('The Past Family');
+            insert household;
+            Contact former = HouseholdTestDataFactory.newContact('Fay', 'Former');
+            insertWithoutAutomaticHouseholds(new List<Contact>{ former });
+            insert new Household_Member__c(
+                Household__c = household.Id,
+                Contact__c = former.Id,
+                Start_Date__c = Date.today().addYears(-3),
+                End_Date__c = Date.today().addYears(-1)
+            );
             User maria = maria();
 
             DataHygieneService.CheckResult result = runAs(
                 maria,
                 DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD
             );
+            Integer listed = findRows(maria, DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD);
 
             Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
-            Assert.areEqual(3, result.count, 'The three with no current membership.');
-            Assert.isFalse(result.canOpenInFind, 'Find cannot ask about a missing membership yet.');
+            Assert.areEqual(4, result.count, 'Three loose and one whose membership has ended.');
+            Assert.isTrue(result.canOpenInFind, 'Find can ask about a missing membership.');
             Assert.areEqual(
-                System.Label.Core_DataHygiene_NotInFindYet,
+                System.Label.Core_DataHygiene_PeopleAccountsNotListed,
                 result.note,
-                'And says so.'
+                'The check says where the count and the Find list can differ.'
             );
-            Assert.isNull(
-                DataHygieneService.queryDocument(DataHygieneService.PEOPLE_WITHOUT_HOUSEHOLD),
-                'There is no document to open.'
-            );
+            Assert.areEqual(4, listed, 'Find lists exactly what was counted.');
         }
     }
 
@@ -147,6 +155,11 @@ private class DataHygieneServiceTest {
 
             Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
             Assert.areEqual(203, result.count, 'Three contacts and 200 people kept as accounts.');
+            Assert.areEqual(
+                System.Label.Core_DataHygiene_PeopleAccountsNotListed,
+                result.note,
+                'The check says the person accounts are counted but not listed.'
+            );
         }
     }
 
