@@ -44,8 +44,6 @@ public with sharing class HealthCheckController {
         try {
             CoexistenceService.applyMode(OrgShapeDetector.recommendedCoexistenceMode());
             return HealthCheckService.buildReport();
-        } catch (AuraHandledException e) {
-            throw e;
         } catch (CoexistenceService.CoexistenceException e) {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
@@ -63,8 +61,6 @@ public with sharing class HealthCheckController {
         try {
             CoexistenceService.applyJunctionMembership();
             return HealthCheckService.buildReport();
-        } catch (AuraHandledException e) {
-            throw e;
         } catch (CoexistenceService.CoexistenceException e) {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
@@ -83,8 +79,6 @@ public with sharing class HealthCheckController {
         try {
             HouseholdService.enableAutomaticHouseholds();
             return HealthCheckService.buildReport();
-        } catch (AuraHandledException e) {
-            throw e;
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
             throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);

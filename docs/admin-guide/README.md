@@ -114,7 +114,7 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core | v0.1 |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving | v0.2 |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core | v0.8 |
-| Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core | Proposed, not scheduled |
+| Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core | Shipped |
 | C-13 Rollups | [rollups.md](rollups.md) | Core | v0.2 |
 | C-14 Importing | [importing.md](importing.md) | Core | v0.2 |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package | v0.6 |
@@ -154,10 +154,10 @@ about NPSP or Nonprofit Cloud is marked as applying only when that product is in
 | UX review item 2 | [A donor's giving on their record](donor-records.md) | Giving | v0.6 |
 | C-34 Find and export | [find.md](find.md) | Core | v0.7 |
 | C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core | v0.7 |
-| C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core | 1.x (built ahead) |
-| Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) | not scheduled (owner decision 2026-10-13) |
+| C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core | Shipped (#219) |
+| Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) | Shipped (#377) |
 | C-28 Data hygiene | [data-hygiene.md](data-hygiene.md) | Core | v0.7 |
-| Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Not scheduled (built ahead) |
+| Field utilization (plan Section 6.1 item 10) | [field-utilization.md](field-utilization.md) | Core | Shipped (#377) |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core | Core quality pass |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module | v0.6 |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core | Core quality pass |
