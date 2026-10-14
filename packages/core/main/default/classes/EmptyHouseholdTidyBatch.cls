@@ -10,16 +10,20 @@
  * still be restored. Both are read in every membership mode.
  *
  * It is kept for good, and stays on Health Check's and Data Hygiene's lists of households
- * without members, while any record of any object points at it through a child relationship of
- * Account (read by describe, so Core names no module object), an installed module credits
- * records to it (ADR-0070), or something outside BarnCRM depends on it (ADR-0036). A
- * relationship that cannot be read keeps every household in the chunk: not being able to answer
- * is not answering no.
+ * without members, while a record of any object points at it through a child relationship of
+ * Account (read by describe, so Core names no module object), a membership row names a person
+ * who still exists, an installed module credits records to it (ADR-0070), or something outside
+ * BarnCRM depends on it (ADR-0036). Three of Core's own lookups are the household's own records
+ * rather than dependents: its addresses (moved to the Recycle Bin with it, in the same
+ * transaction), the import rows that created it (an audit record whose lookup clears), and
+ * membership rows whose person is gone (they cascade). A relationship that cannot be read keeps
+ * every household in the chunk and is logged by name: not being able to answer is not
+ * answering no.
  *
  * The households are the package's own and the job runs as whoever scheduled it, so the reads
- * and the delete are in system mode and without sharing: a tidy-up that skipped what its
+ * and the deletes are in system mode and without sharing: a tidy-up that skipped what its
  * scheduler cannot see would decide "nothing points at it" on records it never saw (ADR-0021).
- * The delete is a soft delete, so a household removed by mistake comes back from the bin.
+ * Every delete is a soft delete, so a household removed by mistake comes back from the bin.
  */
 public without sharing class EmptyHouseholdTidyBatch implements Database.Batchable<SObject>, Database.Stateful {
     /** Households per chunk: keeps the one-row-per-relationship probe well inside the limits. */
@@ -30,16 +34,32 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
     /** Child relationship subqueries per probe query. */
     private static final Integer SUBQUERIES_PER_QUERY = 10;
 
-    /** Child objects that are the household's own bookkeeping, not records depending on it. */
+    /**
+     * Child objects that are the household's own bookkeeping, not records depending on it.
+     * `RecordActionHistory` (a History) also matters for another reason: it is stored as a big
+     * object, and a subquery on it with real rows ends the transaction with a platform fault no
+     * catch can handle (found on `oi-test`). Big objects (`__b`) are skipped for the same reason.
+     */
     private static final List<String> BOOKKEEPING_SUFFIXES = new List<String>{
         'Share',
         'History',
-        'Feed'
+        'Feed',
+        '__b'
     };
     private static final Set<String> BOOKKEEPING_OBJECTS = new Set<String>{
         'FeedItem',
         'FeedComment',
         'EntitySubscription'
+    };
+
+    /**
+     * Core's own lookups to Account that are part of the household rather than dependents on
+     * it, identified by field. Membership rows are read on their own (`withLivingMembers`).
+     */
+    private static final Set<Schema.SObjectField> OWN_RECORDS = new Set<Schema.SObjectField>{
+        Address__c.Account__c,
+        Import_Row__c.Household__c,
+        Household_Member__c.Household__c
     };
 
     /** Set by a test to probe these relationship names instead of every child relationship. */
@@ -68,8 +88,8 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
     @TestVisible
     private Integer keptForRecycleBin = 0;
 
-    /** Whether a relationship that could not be read has been logged in this run. */
-    private Boolean probeFailureLogged = false;
+    /** Relationships already logged as unreadable in this run, so each is logged once. */
+    private Set<String> unreadableLogged = new Set<String>();
 
     public Database.QueryLocator start(Database.BatchableContext context) {
         Id householdType = HouseholdService.householdRecordTypeId();
@@ -154,15 +174,17 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
     }
 
     /**
-     * Of these households, those anything still points at: a record in any child relationship
-     * of Account (live members and membership rows among them), a record an installed module
-     * credits to it, or a dependent outside BarnCRM.
+     * Of these households, those anything still points at: a record in a child relationship
+     * of Account other than the household's own records, a membership row of a person who
+     * still exists, a record an installed module credits to it, or a dependent outside
+     * BarnCRM.
      */
     private Set<Id> withDependents(Set<Id> householdIds) {
         Set<Id> dependent = new Set<Id>();
         if (householdIds.isEmpty()) {
             return dependent;
         }
+        dependent.addAll(withLivingMembers(householdIds));
         dependent.addAll(withChildRecords(householdIds));
         dependent.addAll(HouseholdSelector.getAccountsWithNativeDependents(householdIds));
         dependent.addAll(HouseholdDependentsExtensions.householdsWithDependents(householdIds));
@@ -170,7 +192,27 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
         return dependent;
     }
 
-    /** Of these households, those with a record in any child relationship of Account. */
+    /**
+     * Of these households, those with a membership row, current or ended, naming a person who
+     * still exists: deleting the household would cascade that person's history away. A row
+     * whose person was deleted names nobody (the platform clears the lookup), and goes with
+     * the household. An erased person is anonymized in place, not deleted (R-ER3), so their
+     * ended row keeps the household.
+     */
+    private static Set<Id> withLivingMembers(Set<Id> householdIds) {
+        Set<Id> found = new Set<Id>();
+        for (Household_Member__c membership : [
+            SELECT Household__c
+            FROM Household_Member__c
+            WHERE Household__c IN :householdIds AND (Contact__c != NULL OR Account__c != NULL)
+            WITH SYSTEM_MODE
+        ]) {
+            found.add(membership.Household__c);
+        }
+        return found;
+    }
+
+    /** Of these households, those with a record in any dependent child relationship. */
     private Set<Id> withChildRecords(Set<Id> householdIds) {
         Set<Id> found = new Set<Id>();
         List<String> pending = new List<String>();
@@ -189,8 +231,8 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 
     /**
      * One query for a group of relationships; when it cannot run, each relationship on its
-     * own, so one unreadable relationship does not hide the others. A relationship that cannot
-     * be read on its own keeps every household.
+     * own, so one unreadable relationship does not hide the others. Each relationship that
+     * cannot be read is logged by name, once a run, and keeps every household in the chunk.
      */
     private Set<Id> probe(List<String> relationships, Set<Id> householdIds) {
         try {
@@ -201,8 +243,8 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
                 try {
                     found.addAll(childRecordsIn(new List<String>{ relationship }, householdIds));
                 } catch (Exception unreadable) {
-                    if (!probeFailureLogged) {
-                        probeFailureLogged = true;
+                    found.addAll(householdIds);
+                    if (unreadableLogged.add(relationship)) {
                         ErrorLogger.logMessage(
                             String.format(
                                 System.Label.Core_Households_TidyProbeFailed,
@@ -212,7 +254,6 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
                             ErrorLogger.SEVERITY_WARNING
                         );
                     }
-                    return householdIds;
                 }
             }
             return found;
@@ -250,7 +291,8 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 
     /**
      * Every child relationship of Account whose records depend on the household: those with a
-     * name, on a queryable object, that are not the household's own bookkeeping.
+     * name, on a queryable object, that are neither the household's own bookkeeping nor one of
+     * Core's own records of the household (`OWN_RECORDS`).
      */
     @TestVisible
     private static List<String> dependentRelationships() {
@@ -267,7 +309,12 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
                 .getChildRelationships()
         ) {
             String name = relationship.getRelationshipName();
-            if (name == null || relationship.isDeprecatedAndHidden() || seen.contains(name)) {
+            if (
+                name == null ||
+                relationship.isDeprecatedAndHidden() ||
+                seen.contains(name) ||
+                OWN_RECORDS.contains(relationship.getField())
+            ) {
                 continue;
             }
             Schema.DescribeSObjectResult child = relationship.getChildSObject()
@@ -295,29 +342,59 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
         return false;
     }
 
-    /** Soft deletes these households; a refusal is one Error Log entry per chunk. */
+    /**
+     * Soft deletes these households, each with its addresses, so no address is left without an
+     * owner. The addresses go first, so a household that cannot be deleted gets them back. (The
+     * platform still clears the lookup of an address already in the Recycle Bin when its
+     * household follows, so restoring both means re-linking by hand.) A refusal is one Error
+     * Log entry per chunk.
+     */
     private void removeHouseholds(Set<Id> householdIds) {
         if (householdIds.isEmpty()) {
             return;
         }
+        List<Address__c> addresses = [
+            SELECT Id, Account__c
+            FROM Address__c
+            WHERE Account__c IN :householdIds
+            WITH SYSTEM_MODE
+        ];
+        List<String> failures = new List<String>();
+        Set<Id> addressesRefused = new Set<Id>();
+        if (!addresses.isEmpty()) {
+            List<Database.DeleteResult> addressResults = Database.delete(
+                addresses,
+                false,
+                AccessLevel.SYSTEM_MODE
+            );
+            for (Integer i = 0; i < addressResults.size(); i++) {
+                if (!addressResults[i].isSuccess()) {
+                    addressesRefused.add(addresses[i].Account__c);
+                    failures.add(addresses[i].Id + ': ' + firstError(addressResults[i]));
+                }
+            }
+        }
         List<Account> households = new List<Account>();
         for (Id householdId : householdIds) {
-            households.add(new Account(Id = householdId));
+            if (!addressesRefused.contains(householdId)) {
+                households.add(new Account(Id = householdId));
+            }
         }
-        List<String> failures = new List<String>();
+        Set<Id> kept = new Set<Id>(addressesRefused);
         List<Database.DeleteResult> results = Database.delete(
             households,
             false,
             AccessLevel.SYSTEM_MODE
         );
         for (Integer i = 0; i < results.size(); i++) {
-            Database.DeleteResult result = results[i];
-            if (result.isSuccess()) {
+            if (results[i].isSuccess()) {
                 removed++;
-            } else if (!result.getErrors().isEmpty()) {
-                failures.add(households[i].Id + ': ' + result.getErrors()[0].getMessage());
+            } else {
+                kept.add(households[i].Id);
+                failures.add(households[i].Id + ': ' + firstError(results[i]));
             }
         }
+        restoreAddressesOf(kept, addresses);
         if (!failures.isEmpty()) {
             ErrorLogger.logMessage(
                 String.format(
@@ -328,5 +405,22 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
                 ErrorLogger.SEVERITY_WARNING
             );
         }
+    }
+
+    /** Puts back the addresses of households that stay, so none is left without its addresses. */
+    private static void restoreAddressesOf(Set<Id> keptHouseholds, List<Address__c> addresses) {
+        List<Address__c> restoring = new List<Address__c>();
+        for (Address__c address : addresses) {
+            if (keptHouseholds.contains(address.Account__c)) {
+                restoring.add(address);
+            }
+        }
+        if (!restoring.isEmpty()) {
+            Database.undelete(restoring, false, AccessLevel.SYSTEM_MODE);
+        }
+    }
+
+    private static String firstError(Database.DeleteResult result) {
+        return result.getErrors().isEmpty() ? '' : result.getErrors()[0].getMessage();
     }
 }

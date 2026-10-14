@@ -38,13 +38,28 @@ households whose former members have left the Recycle Bin.**
   fields survive a soft delete, so an empty answer means no restorable record is lost by the
   delete. Both are read in every membership mode. While either set is non-empty the household is
   kept quietly and asked about again the next night; the Recycle Bin empties itself in 15 days.
-- **Nothing else points at it.** Live Contacts or membership rows (current or ended) keep the
-  household. Then the ADR-0036 probe, the ADR-0070 extension point, and a generic probe built from
-  `Account` child relationship describe: one subquery per relationship, grouped, `LIMIT 1` each,
-  in system mode. Shares, field history and feed records are bookkeeping of the household itself
-  and are skipped; every other relationship, Core's or a module's or a customer's, keeps the
-  household. A relationship that cannot be read keeps every household in the chunk and is
-  logged: not being able to answer is not answering no.
+- **Nothing else points at it.** Live Contacts keep the household, and so does a membership row,
+  current or ended, of a person who still exists: deleting the household would cascade that
+  person's history away. An erased person is anonymized in place (ADR-0110), so their ended row
+  keeps it too. A row whose person was deleted names nobody and goes with the household. Then the
+  ADR-0036 probe, the ADR-0070 extension point, and a generic probe built from `Account` child
+  relationship describe: one subquery per relationship, grouped, `LIMIT 1` each, in system mode.
+- **What does not count**, identified by `SObjectField`, never by name: the household's own
+  addresses (`Address__c.Account__c`), soft deleted first in the same transaction so none is left
+  without an owner, and restored if the household delete is refused (the platform still clears
+  their lookup when the household follows them into the bin, seen on `oi-test`, so restoring
+  both means re-linking the address by hand); the
+  import rows that created it (`Import_Row__c.Household__c`, an audit record, SetNull);
+  membership rows (read on their own, above); shares, field history, feed records and big
+  objects. Every other relationship, Core's or a module's or a customer's, keeps the household.
+- **Relationships that fail.** A read-only run of every Account child relationship on `oi-test`
+  and `oi-pa` found one that faults past any catch: `RecordActionHistories`
+  (`RecordActionHistory`, stored as a big object) on an org with action history rows. It is
+  history, so skipped as bookkeeping, and big objects are skipped for the same reason. The
+  others that failed outside system mode (`Erasures__r`, `Erasures__pr`, `RollupCalcItems__r`,
+  `LiveChatTranscripts`, `PersonLiveChatTranscripts`: object access) read in system mode, which
+  is how the batch reads. An unexpected failure is logged by name, once a run, and keeps only
+  that chunk's households: not being able to answer is not answering no.
 - **Kept households are reported where empty households already are.** They stay on Health
   Check's and Data Hygiene's lists of households without members. No Error Log entry: keeping
   them is a correct outcome.
@@ -78,8 +93,7 @@ households whose former members have left the Recycle Bin.**
   night or more. That errs toward keeping. Tests mark purged records through a test-only seam.
 - In a person account org, some relationships come back under another name than the one
   queried, so the probe reads whichever child lists came back rather than asking by name.
-- A household with anything at all pointing at it, including its own addresses or an old import
-  row, is kept; the generic probe is conservative by design and costs a household on a list, not
-  data. Import rows age out under R-IR5, after which the household is tidied.
+- A household with anything else pointing at it is kept; the generic probe is conservative by
+  design and costs a household on a list, not data.
 - The generic probe adds a few queries per chunk; the chunk is 100 households so the subquery
   rows stay well under the limits at any org size.

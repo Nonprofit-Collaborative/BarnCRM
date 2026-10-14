@@ -244,6 +244,62 @@ private class EmptyHouseholdTidyTest {
             runTidyUp();
 
             Assert.isFalse(isInRecycleBin(household.Id), 'Ana\'s ended membership is its history');
+            Assert.areEqual(
+                1,
+                DataHygieneService.run(DataHygieneService.HOUSEHOLDS_WITHOUT_MEMBERS).count,
+                'It stays on the list of empty households to review'
+            );
+        }
+    }
+
+    @IsTest
+    static void ownAddressesImportRowsAndRowsOfDeletedPeopleDoNotKeepAHousehold() {
+        System.runAs(TestUsers.admin()) {
+            contactMode();
+            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert maria;
+            Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+            Address__c home = new Address__c(
+                Account__c = household,
+                Type__c = 'Home',
+                Street__c = '1 Main St',
+                City__c = 'Springfield'
+            );
+            insert home;
+            Import_Batch__c batch = ImportTestDataFactory.batch(
+                ImportTestDataFactory.template(
+                    ImportTestDataFactory.donorMapping(),
+                    ImportTemplateService.RULE_EMAIL
+                )
+            );
+            insert new Import_Row__c(
+                Import_Batch__c = batch.Id,
+                Row_Number__c = 2,
+                Raw_Values_JSON__c = '{}',
+                Household__c = household
+            );
+            // A membership row whose person is gone names nobody and goes with the household.
+            Contact bob = HouseholdTestDataFactory.newContact('Mr.', 'Bob', 'Stone');
+            insert bob;
+            Household_Member__c orphan = new Household_Member__c(
+                Household__c = household,
+                Contact__c = bob.Id
+            );
+            insert orphan;
+            delete new List<Contact>{ maria, bob };
+            Assert.isNull(
+                [SELECT Contact__c FROM Household_Member__c WHERE Id = :orphan.Id].Contact__c,
+                'The row now names nobody'
+            );
+            purge(new List<Id>{ maria.Id, bob.Id });
+
+            runTidyUp();
+
+            Assert.isTrue(isInRecycleBin(household), 'Its own records do not keep it');
+            Assert.isTrue(
+                [SELECT IsDeleted FROM Address__c WHERE Id = :home.Id ALL ROWS].IsDeleted,
+                'Its address goes to the Recycle Bin with it, not left without an owner'
+            );
         }
     }
 
@@ -304,10 +360,15 @@ private class EmptyHouseholdTidyTest {
             runTidyUp();
 
             Assert.isFalse(isInRecycleBin(household), 'Not knowing is not answering no');
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'EmptyHouseholdTidyBatch'],
-                'The unreadable relationship is logged once'
+            List<Error_Log__c> entries = [
+                SELECT Message__c
+                FROM Error_Log__c
+                WHERE Context__c = 'EmptyHouseholdTidyBatch'
+            ];
+            Assert.areEqual(1, entries.size(), 'The unreadable relationship is logged once');
+            Assert.isTrue(
+                entries[0].Message__c.contains('No_Such_Relationship__r'),
+                'It is named: ' + entries[0].Message__c
             );
         }
     }
@@ -341,10 +402,23 @@ private class EmptyHouseholdTidyTest {
         Assert.isTrue(EmptyHouseholdTidyBatch.isBookkeeping('AccountShare'));
         Assert.isTrue(EmptyHouseholdTidyBatch.isBookkeeping('AccountHistory'));
         Assert.isTrue(EmptyHouseholdTidyBatch.isBookkeeping('FeedItem'));
+        // A subquery on this big-object-backed history faults past any catch (found on oi-test).
+        Assert.isTrue(EmptyHouseholdTidyBatch.isBookkeeping('RecordActionHistory'));
+        Assert.isTrue(EmptyHouseholdTidyBatch.isBookkeeping('Archive__b'));
         Assert.isFalse(EmptyHouseholdTidyBatch.isBookkeeping('Contact'));
         List<String> relationships = EmptyHouseholdTidyBatch.dependentRelationships();
         Assert.isTrue(relationships.contains('Contacts'), 'Live members keep a household');
         Assert.isFalse(relationships.contains('Shares'), 'Sharing rows do not');
+        Assert.isFalse(relationships.contains('RecordActionHistories'), 'Nor action history');
+        for (
+            String own : new List<String>{
+                'Addresses__r',
+                'Household_Members__r',
+                'Import_Rows_Household__r'
+            }
+        ) {
+            Assert.isFalse(relationships.contains(own), own + ' is the household\'s own');
+        }
     }
 
     @IsTest

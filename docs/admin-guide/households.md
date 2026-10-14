@@ -143,10 +143,12 @@ restore them. If you meant to remove both, delete the household by hand.
 Unless "Keep the households of deleted people" is on, a nightly tidy-up comes back for the
 household once nobody who belonged to it is left in the Recycle Bin (the Recycle Bin empties
 itself after 15 days, or sooner if someone empties it). It then moves the household to the
-Recycle Bin, where you can still restore it. It leaves the household alone when anything else
-is still linked to it: gifts, pledges, addresses, relationships, tasks, files, or any other
-record, whichever product made it. Those households stay on the "households with nobody in
-them" lists in Health Check and Data Hygiene for you to review. Households emptied before this
+Recycle Bin, where you can still restore it. The household's own addresses go to the Recycle
+Bin with it, and the import that created it keeps its record. It leaves the household alone
+when anything else is still linked to it: gifts, pledges, relationships, tasks, files, the
+past membership of someone who moved out (or was erased), or any other record, whichever
+product made it. Those households stay on the "households with nobody in them" lists in
+Health Check and Data Hygiene for you to review. Households emptied before this
 tidy-up was added, and households a merge or a move emptied, are never part of it. Schedule
 it with Health Check's **Nightly jobs are not scheduled** fix.
 

@@ -301,15 +301,23 @@ nightly empty household tidy-up (`EmptyHouseholdTidyScheduler`, ADR-NEXT) moves 
 household to the Recycle Bin, never a hard delete, once all of these hold, read in system mode
 and in every membership mode:
 
-- it has no Contact whose Account is the household and no Household Member row naming it as
-  the household, current or ended;
+- it has no Contact whose Account is the household and no Household Member row, current or
+  ended, naming it and a person who still exists (an erased person is anonymized in place, not
+  deleted, so their ended row keeps it); a row whose person was deleted names nobody and goes
+  with the household;
 - no Contact whose Account was the household and no Household Member row naming it is still
   in the Recycle Bin (`ALL ROWS`, `IsDeleted = true`): those are exactly the records deleting
   the household would purge, so its former members can no longer be restored either way;
 - nothing outside BarnCRM depends on it (ADR-0036), no installed module credits records to it
   (`HouseholdDependentsExtension`, ADR-0070), and no other record of any object points at it
   through any child relationship of Account (read by describe, so Core names no module object).
-  Shares, field history and feed records are the household's own bookkeeping and do not count.
+  Shares, field history, feed records and big objects are bookkeeping and do not count. Nor do
+  Core's own records of the household, identified by field: its addresses
+  (`Address__c.Account__c`), which go to the Recycle Bin with it in the same transaction (the
+  platform clears their lookup when the household follows, so restoring both re-links by hand),
+  and the import rows that created it (`Import_Row__c.Household__c`, an audit
+  record whose lookup clears). An unreadable relationship is logged by name and keeps that
+  chunk's households.
 
 A household that fails the last rule is kept and stays on the Health Check and Data Hygiene
 lists of households without members, which is where an administrator reviews it. A household
