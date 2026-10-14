@@ -1,6 +1,9 @@
 /**
- * The reads behind keeping both sides of a relationship in step (C-15, R-RL1, R-RL4a), and
- * nothing else.
+ * The reads behind keeping both sides of a relationship in step (C-15, R-RL1, R-RL4a) and the
+ * duplicate existence check (PEOPLE-23), and nothing else. The duplicate check reads
+ * `selectByFromPersonIds` for the same reason: a duplicate owned by someone else is invisible
+ * to the saver under private sharing and must still be refused. It uses only the existence of
+ * a clash; the detail of a row is shown only when a user mode read also returns it.
  *
  * ADR-0021 (system mode writes for package owned data), category 2, is the authority for this
  * class: a read whose only purpose is to compute package upkeep may run in system mode for the
