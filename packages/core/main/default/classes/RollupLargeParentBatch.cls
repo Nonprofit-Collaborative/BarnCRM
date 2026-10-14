@@ -13,12 +13,15 @@
  * the same target filters, currency handling and write as any other recalculation
  * (`RollupEngine.writeCalculated`).
  *
- * The queue sends it two kinds of target record: those whose stored COUNT totals say they read
- * more than `largeParentRows` (`oversized`), and those of an entry a run already failed on, for
- * whatever reason (any entry with an attempt). The batch owns the entries it was given: it
- * deletes them when their totals are written, charges them one attempt when a chunk stopped
- * (Failed after the fifth, R-RQ3), and until it ends they wait with a Next Attempt an hour away,
- * so a run that never ends leaves them to be tried again rather than lost.
+ * The queue sends it two kinds of target record only: those whose stored COUNT totals say they
+ * read at least `largeParentRows` (`estimate`), and a record that stopped a run of its own on the
+ * query row limit. Any other failure stays with the queue, which narrows it down to the one
+ * record that causes it (R-RQ3). The batch owns the entries it was given: they are charged one
+ * attempt when it takes them (so a run that keeps dying still ends Failed after the fifth), held
+ * with Next Attempt an hour ahead, renewed with every chunk, deleted when their totals are
+ * written, and released to be tried again, with the reason, when a chunk stopped. The write
+ * saves each record on its own (partial success), so one record the platform refuses never
+ * stops the others; it is queued again as any refused save is.
  *
  * One run at a time: while one is going, the entries routed here wait two minutes and are routed
  * again, so a fund touched by every gift is not read by a pile of runs at once.
@@ -57,6 +60,17 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
     /** Test seam: stands in for the stopped chunks the platform counts on a pass. */
     @TestVisible
     private static Integer stoppedChunksForTest;
+
+    /** Test seam: true stands in for a run already going. */
+    @TestVisible
+    private static Boolean runningForTest = false;
+
+    /**
+     * Source rows each query is taken to read per record when nothing stored says how many: a
+     * full slice of such records then uses about half a run's row budget.
+     */
+    @TestVisible
+    private static final Integer UNKNOWN_ROWS_PER_QUERY = 10;
 
     /** The runs this transaction started: a test sees only these as running. */
     private static Set<Id> startedHere = new Set<Id>();
@@ -102,50 +116,68 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
             : Limits.getLimitQueryRows() / 5;
     }
 
+    /** The source rows one queue run may expect to read across its whole slice. */
+    public static Integer sliceRowBudget() {
+        return sliceRowBudgetForTest != null
+            ? sliceRowBudgetForTest
+            : Limits.getLimitQueryRows() * 3 / 5;
+    }
+
+    /** Test seam: stands in for `sliceRowBudget`; null reads the platform's limit. */
+    @TestVisible
+    private static Integer sliceRowBudgetForTest;
+
     /**
-     * The records among these whose source rows are expected to exceed `largeParentRows`: the
-     * largest COUNT total each one stores, times the queries the definitions plan to, as the
-     * full run estimates a record's weight. A record with no COUNT total to go by is not sent
-     * here by this estimate; if it is too large its run fails and the entry comes here anyway.
+     * The source rows each record is expected to read: the largest COUNT total it stores, times
+     * the queries its definitions plan to, as the full run estimates a record's weight. A COUNT
+     * with a filter or fiscal window counts only part of the rows, so it is a floor, not the
+     * answer. A record with no COUNT total to go by (none defined, or never calculated) is
+     * unknown, not small: `UNKNOWN_ROWS_PER_QUERY` per query.
      *
      * @param targetType the entity of the records
      * @param definitions the definitions to calculate for them
      * @param ids the records
+     * @return the expected rows of every record given
      */
-    public static Set<Id> oversized(
+    public static Map<Id, Integer> estimate(
         Schema.SObjectType targetType,
         List<Rollup_Definition__c> definitions,
         Set<Id> ids
     ) {
-        Set<Id> large = new Set<Id>();
-        if (targetType == null || ids == null || ids.isEmpty() || definitions.isEmpty()) {
-            return large;
-        }
-        RollupPlanner.Plan plan = RollupPlanner.plan(targetType, definitions);
+        Map<Id, Integer> rowsById = new Map<Id, Integer>();
+        Integer queries = 1;
         Set<String> countFields = new Set<String>();
-        for (Integer i = 0; i < plan.definitions.size(); i++) {
-            if ('COUNT'.equalsIgnoreCase(plan.definitions[i].Aggregate__c)) {
-                countFields.add(String.valueOf(plan.targetFields[i]));
+        if (targetType != null && !definitions.isEmpty()) {
+            RollupPlanner.Plan plan = RollupPlanner.plan(targetType, definitions);
+            queries = Math.max(1, plan.queries.size());
+            for (Integer i = 0; i < plan.definitions.size(); i++) {
+                if ('COUNT'.equalsIgnoreCase(plan.definitions[i].Aggregate__c)) {
+                    countFields.add(String.valueOf(plan.targetFields[i]));
+                }
             }
         }
-        if (countFields.isEmpty() || plan.queries.isEmpty()) {
-            return large;
+        Integer unknown = queries * UNKNOWN_ROWS_PER_QUERY;
+        for (Id recordId : ids) {
+            rowsById.put(recordId, unknown);
         }
-        Integer queries = plan.queries.size();
-        Integer threshold = largeParentRows();
+        if (countFields.isEmpty()) {
+            return rowsById;
+        }
         for (SObject record : RollupAggregator.stored(targetType, countFields, ids).values()) {
-            Decimal largest = 0;
+            Decimal largest;
             for (String field : countFields) {
                 Object counted = record.get(field);
                 if (counted != null) {
-                    largest = Math.max(largest, RollupAggregator.toDecimal(counted));
+                    Decimal value = RollupAggregator.toDecimal(counted);
+                    largest = largest == null ? value : Math.max(largest, value);
                 }
             }
-            if (largest * queries >= threshold) {
-                large.add(record.Id);
+            if (largest != null) {
+                Decimal rows = Math.max(1, largest) * queries;
+                rowsById.put(record.Id, rows > 2000000000 ? 2000000000 : rows.intValue());
             }
         }
-        return large;
+        return rowsById;
     }
 
     /**
@@ -154,41 +186,98 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
      * routed again.
      *
      * @param entries Pending entries, with their target, records, definitions and attempts
+     * @param charge true to charge each entry one attempt as the run takes it; false when the
+     *        caller already charged it
      * @return true when a run started
      */
-    public static Boolean begin(List<Rollup_Queue__c> entries) {
+    public static Boolean begin(List<Rollup_Queue__c> entries, Boolean charge) {
+        startedForTest = false;
         if (entries == null || entries.isEmpty()) {
             return false;
         }
         Boolean started = false;
-        List<Target> targets = targetsFor(entries);
-        if (runningJobId() == null && !targets.isEmpty()) {
+        if (runningJobId() == null) {
+            List<Rollup_Queue__c> held = hold(entries, charge);
+            List<Target> targets = targetsFor(held);
             try {
-                Id jobId = Test.isRunningTest()
+                Id jobId = Test.isRunningTest() || targets.isEmpty()
                     ? null
                     : Database.executeBatch(new RollupLargeParentBatch(targets), CHUNK_SIZE);
                 if (jobId != null) {
                     startedHere.add(jobId);
                 }
-                started = true;
+                started = !targets.isEmpty();
             } catch (Exception refused) {
                 // The flex queue is full or the transaction has no async call left: try later.
                 ErrorLogger.log(refused, LOG_CONTEXT);
             }
+            if (started) {
+                startedForTest = true;
+                return true;
+            }
         }
-        startedForTest = started;
-        Datetime later = Datetime.now().addMinutes(started ? LEASE_MINUTES : BUSY_MINUTES);
         List<Rollup_Queue__c> waiting = new List<Rollup_Queue__c>();
         for (Rollup_Queue__c entry : entries) {
-            waiting.add(new Rollup_Queue__c(Id = entry.Id, Next_Attempt__c = later));
+            waiting.add(
+                new Rollup_Queue__c(
+                    Id = entry.Id,
+                    Next_Attempt__c = Datetime.now().addMinutes(BUSY_MINUTES)
+                )
+            );
         }
         Database.update(waiting, false, AccessLevel.SYSTEM_MODE);
-        return started;
+        return false;
+    }
+
+    /**
+     * The entries as a run holds them: charged one attempt when asked (Failed after the fifth),
+     * saying why they wait, and with Next Attempt an hour ahead.
+     */
+    private static List<Rollup_Queue__c> hold(List<Rollup_Queue__c> entries, Boolean charge) {
+        List<Rollup_Queue__c> held = new List<Rollup_Queue__c>();
+        List<Rollup_Queue__c> changes = new List<Rollup_Queue__c>();
+        for (Rollup_Queue__c entry : entries) {
+            Integer attempts =
+                (entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue()) + (charge ? 1 : 0);
+            Rollup_Queue__c change = new Rollup_Queue__c(
+                Id = entry.Id,
+                Attempts__c = attempts,
+                Next_Attempt__c = Datetime.now().addMinutes(LEASE_MINUTES),
+                Last_Error__c = System.Label.Core_Rollups_QueueHeldByBatch
+            );
+            if (attempts >= RollupQueue.MAX_ATTEMPTS) {
+                change.Status__c = RollupQueue.STATUS_FAILED;
+            }
+            changes.add(change);
+            Rollup_Queue__c copy = entry.clone(true, false, false, false);
+            copy.Attempts__c = attempts;
+            held.add(copy);
+        }
+        Database.update(changes, false, AccessLevel.SYSTEM_MODE);
+        return held;
+    }
+
+    /** Keeps the entries held while the run is still reading their rows. */
+    private static void renew(List<Rollup_Queue__c> entries) {
+        List<Rollup_Queue__c> changes = new List<Rollup_Queue__c>();
+        for (Rollup_Queue__c entry : entries) {
+            changes.add(
+                new Rollup_Queue__c(
+                    Id = entry.Id,
+                    Next_Attempt__c = Datetime.now().addMinutes(LEASE_MINUTES)
+                )
+            );
+        }
+        Database.update(changes, false, AccessLevel.SYSTEM_MODE);
     }
 
     /** The run going now, or null when none is. */
     @TestVisible
     private static Id runningJobId() {
+        if (runningForTest) {
+            // Any Id stands for the run going.
+            return UserInfo.getUserId();
+        }
         for (AsyncApexJob job : [
             SELECT Id
             FROM AsyncApexJob
@@ -276,6 +365,8 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
         if (currentTarget().stoppedReason != null) {
             return;
         }
+        // Held for as long as the run makes progress, however long that is.
+        renew(currentTarget().entries);
         RollupAggregator.calculateRows(
             currentPlan(),
             this.queryIndex,
@@ -318,11 +409,28 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 
     /**
      * Writes an entity's totals and deletes its entries, or, when a chunk stopped, writes nothing
-     * and charges its entries one attempt, so they are tried again and Failed after the fifth.
+     * and releases its entries to be tried again with the reason: the attempt was charged when
+     * the run took them, so they are Failed after the fifth.
      */
     private void settle(Target target, RollupPlanner.Plan plan) {
         if (target.stoppedReason != null) {
-            RollupQueue.charge(target.entries, target.stoppedReason);
+            String message = String.format(
+                    System.Label.Core_Rollups_QueueRunStopped,
+                    new List<String>{ target.stoppedReason }
+                )
+                .left(32768);
+            List<Rollup_Queue__c> released = new List<Rollup_Queue__c>();
+            for (Rollup_Queue__c entry : target.entries) {
+                Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
+                released.add(
+                    new Rollup_Queue__c(
+                        Id = entry.Id,
+                        Next_Attempt__c = RollupQueue.nextAttempt(Math.max(1, attempts)),
+                        Last_Error__c = message
+                    )
+                );
+            }
+            Database.update(released, false, AccessLevel.SYSTEM_MODE);
             return;
         }
         RollupEngine.Result result = RollupEngine.writeCalculated(

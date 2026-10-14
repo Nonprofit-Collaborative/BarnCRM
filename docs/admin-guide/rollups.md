@@ -352,8 +352,10 @@ Under the list, **Needs attention** shows what the engine has not finished:
   background run may read. BarnCRM recalculates such a record in a separate background job that
   reads its rows a few thousand at a time, so its totals take a few minutes rather than seconds.
   While that job runs, the record shows among the records waiting. Nothing to do. If a run ever
-  stops partway, the records it held are counted as one try, picked up by that job, and the rest
-  of the queue carries on; after five tries a record appears under **Could not be saved**.
+  stops partway (often an automation of yours failing on one record), the records it was
+  working on are counted as one try and retried in ever smaller groups, then one at a time,
+  while the rest of the queue carries on. Only the record that keeps stopping its run appears
+  under **Could not be saved**, after five tries.
 - **Could not be saved**: each record whose totals failed five times, with a link to it,
   what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
   rule or a record someone was editing), then click **Retry** for the ones you selected, or

@@ -329,6 +329,14 @@
         <value>The background recalculation stopped before it finished: {0} BarnCRM tries these records again, a few at a time.</value>
     </labels>
     <labels>
+        <fullName>Core_Rollups_QueueHeldByBatch</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: an entry held by the large record background job</shortDescription>
+        <value>These records have too many rows behind their totals for one background run, so a separate background job is recalculating them a few thousand rows at a time. If they are still waiting an hour after that job last made progress, it stopped before it finished, and BarnCRM tries again.</value>
+    </labels>
+    <labels>
         <fullName>Core_Rollups_QueueHandedOff</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

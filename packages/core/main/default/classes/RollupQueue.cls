@@ -9,11 +9,13 @@
  * Queueable, reads the due entries, merges and sorts their identifiers, recalculates a slice
  * through `RollupEngine`, deletes the entries it finished and runs again while entries remain
  * (R-RQ3). Records the platform refused to save come back as a new entry, tried later each time
- * and Failed after the fifth attempt (R-RQ4). Records whose source rows are more than a Queueable
- * may read go to `RollupLargeParentBatch` instead (R-RQ6, ADR-0116): those whose stored counts
- * say so before the run, and the entries of a run that stopped on a limit error it could not
- * catch, which its finalizer charges one attempt and hands to that batch before a fresh
- * processor carries on with the rest.
+ * and Failed after the fifth attempt (R-RQ4). A run takes records up to a row budget estimated
+ * from their stored counts and leaves the rest for the next run. A run that stops on an error it
+ * cannot catch has the records it held charged by its finalizer, which retries them alone and a
+ * quarter as many at a time, so only a record that stops every run reaches Failed. Records whose
+ * source rows are more than a Queueable may read go to `RollupLargeParentBatch` instead (R-RQ6,
+ * ADR-0116): those whose stored counts say so before the run, and a lone record that stopped its
+ * run on the query row limit.
  *
  * Recalculation recomputes (R-R11), so an entry processed twice, or two processors racing, give
  * the same totals; that is what lets this class stay this small.
@@ -224,8 +226,7 @@ public without sharing class RollupQueue implements Queueable {
     }
 
     /** Later each time: two minutes after the first failure, then four, eight and sixteen. */
-    @TestVisible
-    private static Datetime nextAttempt(Integer attempts) {
+    public static Datetime nextAttempt(Integer attempts) {
         Integer power = Math.max(1, Math.min(attempts, MAX_ATTEMPTS - 1));
         Integer minutes = Math.pow(2, power).intValue();
         return Datetime.now().addMinutes(minutes);
@@ -398,6 +399,9 @@ public without sharing class RollupQueue implements Queueable {
         Slice slice = take(selectDue(entriesPerRun), defaultSliceSize);
         drain.held.addAll(slice.entries);
         List<Rollup_Queue__c> large = new List<Rollup_Queue__c>();
+        List<Rollup_Queue__c> deferred = new List<Rollup_Queue__c>();
+        Integer budget = RollupLargeParentBatch.sliceRowBudget();
+        Boolean anyTaken = false;
         Integer failed = 0;
         for (String target : slice.idsByTarget.keySet()) {
             Set<Id> definitionIds = slice.definitionIdsFor(target);
@@ -410,21 +414,36 @@ public without sharing class RollupQueue implements Queueable {
                             String.valueOf(targetType),
                             RollupService.everyMode()
                         );
-            // R-RQ6: a record whose source rows would stop this run goes to the batch route.
-            Set<Id> ids = new Set<Id>(slice.idsByTarget.get(target));
-            Set<Id> oversized = RollupLargeParentBatch.oversized(targetType, definitions, ids);
-            if (!oversized.isEmpty()) {
-                ids.removeAll(oversized);
-                large.addAll(
-                    entriesFor(
-                        target,
-                        oversized,
-                        slice.attemptsByTarget.get(target),
-                        null,
-                        definitionIds
-                    )
-                );
+            // Until the split below, every record is charged if the run stops (R-RQ3).
+            drain.takenIds.addAll(slice.idsByTarget.get(target));
+            // R-RQ6: a record whose source rows would stop this run goes to the batch route, and
+            // records past the run's row budget wait for the next run.
+            Map<Id, Integer> rowsById = RollupLargeParentBatch.estimate(
+                targetType,
+                definitions,
+                slice.idsByTarget.get(target)
+            );
+            Set<Id> ids = new Set<Id>();
+            Set<Id> oversized = new Set<Id>();
+            Set<Id> later = new Set<Id>();
+            for (Id recordId : slice.idsByTarget.get(target)) {
+                Integer rows = rowsById.get(recordId);
+                if (rows >= RollupLargeParentBatch.largeParentRows()) {
+                    oversized.add(recordId);
+                } else if (rows > budget && anyTaken) {
+                    later.add(recordId);
+                } else {
+                    // The first record always runs, so a run never takes nothing.
+                    budget -= rows;
+                    anyTaken = true;
+                    ids.add(recordId);
+                }
             }
+            Integer attempts = slice.attemptsByTarget.get(target);
+            large.addAll(entriesFor(target, oversized, attempts, null, definitionIds));
+            deferred.addAll(entriesFor(target, later, attempts, null, definitionIds));
+            drain.takenIds.removeAll(oversized);
+            drain.takenIds.removeAll(later);
             RollupEngine.Result result = RollupEngine.recalculate(ids, definitions);
             if (!result.failed.isEmpty()) {
                 retryLater(
@@ -439,9 +458,12 @@ public without sharing class RollupQueue implements Queueable {
         // Partial success: an entry another run already finished is simply gone.
         Database.update(slice.remainders, false, AccessLevel.SYSTEM_MODE);
         Database.delete(slice.finished, false, AccessLevel.SYSTEM_MODE);
+        if (!deferred.isEmpty()) {
+            Database.insert(deferred, AccessLevel.SYSTEM_MODE);
+        }
         if (!large.isEmpty()) {
             Database.insert(large, AccessLevel.SYSTEM_MODE);
-            RollupLargeParentBatch.begin(large);
+            RollupLargeParentBatch.begin(large, true);
         }
         if (failed > 0) {
             ErrorLogger.logMessage(
@@ -496,53 +518,84 @@ public without sharing class RollupQueue implements Queueable {
     /**
      * Merges entries per target entity while the merged set stays within the slice, so a load that
      * touches one household 5,000 times is one small recalculation. An entry larger than the
-     * slice on its own, after a failure halved it, gives up only its first identifiers.
+     * slice on its own gives up only its first identifiers.
+     *
+     * An entry with attempts (a run stopped while holding its records, or the platform refused to
+     * save one) is never merged: a run takes it alone, and only a quarter as many of its
+     * identifiers per attempt (50, 12, 3, then 1 of a 200 slice), so a record that stops every run
+     * holding it is narrowed down to itself and only it reaches Failed (R-RQ3).
      */
     @TestVisible
     private static Slice take(List<Rollup_Queue__c> due, Integer sliceSize) {
         Slice slice = new Slice();
         for (Rollup_Queue__c entry : due) {
+            Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
+            if (attempts > 0) {
+                if (slice.entries.isEmpty()) {
+                    takeEntry(slice, entry, retrySlice(attempts, sliceSize));
+                    return slice;
+                }
+                continue;
+            }
             String target = String.isBlank(entry.Target_Object__c) ? '' : entry.Target_Object__c;
             Set<Id> taken = slice.idsByTarget.containsKey(target)
                 ? slice.idsByTarget.get(target)
                 : new Set<Id>();
-            List<Id> ids = idsOf(entry);
             Set<Id> merged = new Set<Id>(taken);
-            merged.addAll(ids);
+            merged.addAll(idsOf(entry));
             if (!taken.isEmpty() && merged.size() > sliceSize) {
                 continue;
             }
-            if (merged.size() > sliceSize) {
-                merged = new Set<Id>();
-                List<String> rest = new List<String>();
-                for (Id recordId : ids) {
-                    if (merged.size() < sliceSize) {
-                        merged.add(recordId);
-                    } else {
-                        rest.add(String.valueOf(recordId));
-                    }
-                }
-                slice.remainders.add(
-                    new Rollup_Queue__c(
-                        Id = entry.Id,
-                        Record_Ids__c = String.join(rest, SEPARATOR),
-                        Record_Count__c = rest.size()
-                    )
-                );
-            } else {
-                slice.finished.add(entry);
-            }
-            slice.entries.add(entry);
-            slice.idsByTarget.put(target, merged);
-            slice.addDefinitions(target, entry);
-            Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
-            Integer highest = slice.attemptsByTarget.get(target);
-            slice.attemptsByTarget.put(
-                target,
-                highest == null ? attempts : Math.max(highest, attempts)
-            );
+            takeEntry(slice, entry, sliceSize);
         }
         return slice;
+    }
+
+    /** The identifiers a retried entry gives one run: a quarter as many per attempt, at least 1. */
+    @TestVisible
+    private static Integer retrySlice(Integer attempts, Integer sliceSize) {
+        return Math.max(1, sliceSize >> (2 * Math.min(attempts, 8)));
+    }
+
+    /** Adds an entry's identifiers to the slice, splitting off what the limit leaves over. */
+    private static void takeEntry(Slice slice, Rollup_Queue__c entry, Integer sliceSize) {
+        String target = String.isBlank(entry.Target_Object__c) ? '' : entry.Target_Object__c;
+        Set<Id> taken = slice.idsByTarget.containsKey(target)
+            ? slice.idsByTarget.get(target)
+            : new Set<Id>();
+        List<Id> ids = idsOf(entry);
+        Set<Id> merged = new Set<Id>(taken);
+        merged.addAll(ids);
+        if (merged.size() > sliceSize) {
+            // Only an entry taken first for its entity gets here: the merge skips the others.
+            merged = new Set<Id>();
+            List<String> rest = new List<String>();
+            for (Id recordId : ids) {
+                if (merged.size() < sliceSize) {
+                    merged.add(recordId);
+                } else {
+                    rest.add(String.valueOf(recordId));
+                }
+            }
+            slice.remainders.add(
+                new Rollup_Queue__c(
+                    Id = entry.Id,
+                    Record_Ids__c = String.join(rest, SEPARATOR),
+                    Record_Count__c = rest.size()
+                )
+            );
+        } else {
+            slice.finished.add(entry);
+        }
+        slice.entries.add(entry);
+        slice.idsByTarget.put(target, merged);
+        slice.addDefinitions(target, entry);
+        Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
+        Integer highest = slice.attemptsByTarget.get(target);
+        slice.attemptsByTarget.put(
+            target,
+            highest == null ? attempts : Math.max(highest, attempts)
+        );
     }
 
     /** The identifiers an entry holds; anything that is not one is dropped. */
@@ -650,15 +703,23 @@ public without sharing class RollupQueue implements Queueable {
 
     /**
      * What happens when a run dies of something it could not catch, such as a governor limit
-     * (R-RQ3, R-RQ6): the entries it held are charged one attempt, with the reason, and those not
-     * yet Failed go to `RollupLargeParentBatch`, which reads their source rows in chunks however
-     * many there are. The rest of the queue carries on in a fresh processor started by the Ready
-     * event, never by a job this finalizer queues: the platform stops re-queuing from finalizers
-     * after five failed jobs in a row and refuses a link past the chain depth limit, and on the
-     * tier 1 scale test either one left 826 entries Pending with nothing to process them.
+     * (R-RQ3, R-RQ6). Only the records the run was recalculating are charged: they move to a new
+     * entry with one more attempt and the reason, Failed after the fifth, and the rest of each
+     * entry it held stays as it was. A retried entry runs alone and a quarter as large each
+     * attempt (`take`), so a record that stops every run narrows down to itself and only it
+     * reaches Failed. A run of one record that stopped on the query row limit hands that record to
+     * `RollupLargeParentBatch` instead, which reads its source rows in chunks however many there
+     * are.
+     *
+     * The queue carries on in a fresh processor started by the Ready event, never by a job this
+     * finalizer queues: the platform stops re-queuing from finalizers after five failed jobs in a
+     * row and refuses a link past the chain depth limit, and on the tier 1 scale test that left
+     * 826 entries Pending with nothing to process them.
      */
     public class Drain implements System.Finalizer {
         public List<Rollup_Queue__c> held = new List<Rollup_Queue__c>();
+        /** The records the run was recalculating when it stopped. */
+        public Set<Id> takenIds = new Set<Id>();
         public Boolean finished = false;
 
         public void execute(System.FinalizerContext context) {
@@ -673,26 +734,82 @@ public without sharing class RollupQueue implements Queueable {
             if (thrown != null) {
                 ErrorLogger.log(thrown, LOG_CONTEXT);
             }
-            stopped(this.held, thrown == null ? '' : thrown.getMessage());
+            stopped(this.held, this.takenIds, thrown == null ? '' : thrown.getMessage());
         }
     }
 
+    /** The message the platform gives when a transaction reads more rows than it may. */
+    private static final String ROW_LIMIT = 'Too many query rows';
+
     /**
-     * The entries of a run that stopped: charged one attempt, the ones still Pending handed to
-     * the large parent batch, and a fresh processor announced for everything else.
+     * The entries of a run that stopped: the records it was recalculating charged (or, a lone
+     * record over the row limit, handed to the large parent batch), the rest left as they were,
+     * and a fresh processor announced.
+     *
+     * @param held the entries the run held, as they were before it
+     * @param takenIds the records it was recalculating; empty charges every record held
+     * @param reason why it stopped
      */
     @TestVisible
-    private static void stopped(List<Rollup_Queue__c> held, String reason) {
-        List<Rollup_Queue__c> retried = new List<Rollup_Queue__c>();
-        Map<Id, Rollup_Queue__c> heldById = new Map<Id, Rollup_Queue__c>(held);
-        for (Rollup_Queue__c charged : charge(held, reason)) {
-            if (charged.Status__c == STATUS_PENDING) {
-                Rollup_Queue__c entry = heldById.get(charged.Id).clone(true, false, false, false);
-                entry.Attempts__c = charged.Attempts__c;
-                retried.add(entry);
+    private static void stopped(List<Rollup_Queue__c> held, Set<Id> takenIds, String reason) {
+        String message = String.format(
+                System.Label.Core_Rollups_QueueRunStopped,
+                new List<String>{ reason }
+            )
+            .left(LAST_ERROR_LENGTH);
+        Set<Id> charging = new Set<Id>(takenIds);
+        if (charging.isEmpty()) {
+            for (Rollup_Queue__c entry : held) {
+                charging.addAll(idsOf(entry));
             }
         }
-        RollupLargeParentBatch.begin(retried);
+        Boolean toBatch = charging.size() == 1 && reason.contains(ROW_LIMIT);
+        List<Rollup_Queue__c> rest = new List<Rollup_Queue__c>();
+        List<Rollup_Queue__c> emptied = new List<Rollup_Queue__c>();
+        List<Rollup_Queue__c> charged = new List<Rollup_Queue__c>();
+        for (Rollup_Queue__c entry : held) {
+            Set<Id> hit = new Set<Id>();
+            List<String> left = new List<String>();
+            for (Id recordId : idsOf(entry)) {
+                if (charging.contains(recordId)) {
+                    hit.add(recordId);
+                } else {
+                    left.add(String.valueOf(recordId));
+                }
+            }
+            if (hit.isEmpty()) {
+                continue;
+            }
+            if (left.isEmpty()) {
+                emptied.add(new Rollup_Queue__c(Id = entry.Id));
+            } else {
+                rest.add(
+                    new Rollup_Queue__c(
+                        Id = entry.Id,
+                        Record_Ids__c = String.join(left, SEPARATOR),
+                        Record_Count__c = left.size()
+                    )
+                );
+            }
+            Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
+            List<Id> named = definitionIdsOf(entry);
+            charged.addAll(
+                entriesFor(
+                    entry.Target_Object__c,
+                    hit,
+                    attempts + 1,
+                    message,
+                    named.isEmpty() ? null : new Set<Id>(named)
+                )
+            );
+        }
+        Database.update(rest, false, AccessLevel.SYSTEM_MODE);
+        Database.delete(emptied, false, AccessLevel.SYSTEM_MODE);
+        Database.insert(charged, false, AccessLevel.SYSTEM_MODE);
+        if (toBatch) {
+            // Already charged above: the batch only holds it.
+            RollupLargeParentBatch.begin(charged, false);
+        }
         announceReady();
     }
 

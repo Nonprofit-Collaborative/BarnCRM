@@ -68,6 +68,27 @@ public without sharing class RollupAggregator {
         public Object bestOrder;
         public String bestId;
         public List<Listed> listed = new List<Listed>();
+        /**
+         * Where each value sits in `listed`, for COUNT_DISTINCT and TEXT_LIST_DISTINCT, which
+         * keep one entry per value: the first in list order, the one the answer would show. A
+         * large parent's answer is then as large as its distinct values, not its rows (R-RQ6).
+         */
+        public Map<String, Integer> indexByValue = new Map<String, Integer>();
+
+        /** Lists a value; a distinct aggregate keeps only the earliest entry for each value. */
+        public void add(Listed entry, Boolean distinct) {
+            if (distinct) {
+                Integer at = this.indexByValue.get(entry.value);
+                if (at != null) {
+                    if (entry.compareTo(this.listed[at]) < 0) {
+                        this.listed[at] = entry;
+                    }
+                    return;
+                }
+                this.indexByValue.put(entry.value, this.listed.size());
+            }
+            this.listed.add(entry);
+        }
 
         /**
          * The value to write, a text list joined by this separator (canonical model R-R15):
@@ -566,9 +587,12 @@ public without sharing class RollupAggregator {
                 Object order = query.orderBy == null
                     ? value.toLowerCase()
                     : valueAt(row, query.orderBy);
+                Boolean distinct =
+                    measure.aggregate == 'COUNT_DISTINCT' ||
+                    measure.aggregate == 'TEXT_LIST_DISTINCT';
                 for (Id targetId : targets) {
                     tallyFor(answer, measure.definitionIndex, targetId)
-                        .listed.add(new Listed(order, rowId, value));
+                        .add(new Listed(order, rowId, value), distinct);
                 }
             }
         }

@@ -160,7 +160,7 @@ private class RollupQueueTest {
                 new Rollup_Queue__c(
                     Target_Object__c = 'Account',
                     Record_Ids__c = ids[1] + ',' + ids[2] + ',' + ids[3],
-                    Attempts__c = 2
+                    Attempts__c = 0
                 ),
                 new Rollup_Queue__c(
                     Target_Object__c = 'Account',
@@ -177,7 +177,7 @@ private class RollupQueueTest {
                 'Two entries, four records'
             );
             Assert.areEqual(2, slice.finished.size(), 'Both merged entries are finished');
-            Assert.areEqual(2, slice.attemptsByTarget.get('Account'), 'Carrying the most attempts');
+            Assert.areEqual(0, slice.attemptsByTarget.get('Account'), 'None tried yet');
             Assert.isTrue(slice.remainders.isEmpty(), 'Nothing split');
 
             RollupQueue.Slice halved = RollupQueue.take(due, 2);
