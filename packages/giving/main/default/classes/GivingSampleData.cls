@@ -65,12 +65,13 @@ public with sharing class GivingSampleData implements SampleDataModule {
     }
 
     /**
-     * Deletes every Giving sample record, inside Core's remove transaction. Allocations,
-     * soft credits, tributes and installments are details of a gift or a commitment, so
-     * they go with their master rather than being deleted here.
+     * Starts the Giving removal. Core calls this before it removes its own records, so the
+     * gifts go before the people and households they point at. Allocations, soft credits,
+     * tributes and installments are details of a gift or a commitment, so they go with their
+     * master rather than being deleted on their own.
      */
-    public Integer removeAll() {
-        return GivingSampleDataLoader.removeAll();
+    public void enqueueRemove() {
+        SampleDataRemoveBatch.startRemoval(new GivingSampleDataRemoveStages());
     }
 
     /** The Giving sample data JSON body, from the injected override or the static resource. */

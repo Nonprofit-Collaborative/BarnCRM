@@ -181,11 +181,18 @@ private class SampleDataLoaderTest {
             return;
         }
 
-        public Integer removeAll() {
+        public void enqueueRemove() {
             removeCalls++;
-            Integer removed = loaded;
             loaded = 0;
-            return removed;
+        }
+    }
+
+    /** Runs every stage of Core's removal in order, the way the removal batch does in an org. */
+    private static void runCoreRemoval() {
+        SampleDataRemoveStages stages = new SampleDataRemoveStages();
+        Integer count = stages.stageCount();
+        for (Integer stage = 0; stage < count; stage++) {
+            stages.runStage(stage);
         }
     }
 
@@ -379,10 +386,12 @@ private class SampleDataLoaderTest {
             SettingsService.clearCaches();
             loadEverything(buildJson(2, 2, false));
 
-            SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            SampleDataLoader.Counts before = SampleDataLoader.status();
+            System.assertEquals(2, before.householdCount, 'both sample households are loaded');
+            System.assertEquals(4, before.contactCount, 'every sample person is loaded');
 
-            System.assertEquals(2, removed.householdCount, 'both sample households are removed');
-            System.assertEquals(4, removed.contactCount, 'every sample person is removed');
+            runCoreRemoval();
+
             System.assertEquals(
                 0,
                 [SELECT COUNT() FROM Household_Member__c],
@@ -413,6 +422,34 @@ private class SampleDataLoaderTest {
                 );
             }
             System.assertEquals(true, threw, 'loading during a running load should throw');
+        }
+    }
+
+    @IsTest
+    static void testLoadAndRemoveRefuseWhileARemovalIsRunning() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            loadEverything(buildJson(1, 1, false));
+            SampleDataLoader.runningRemoveOverride = true;
+
+            Integer refused = 0;
+            try {
+                SampleDataLoader.remove();
+            } catch (SampleDataException e) {
+                refused++;
+                System.assertEquals(Label.Core_SampleData_RemoveInProgress, e.getMessage());
+            }
+            try {
+                SampleDataLoader.load();
+            } catch (SampleDataException e) {
+                refused++;
+                System.assertEquals(Label.Core_SampleData_RemoveInProgress, e.getMessage());
+            }
+            System.assertEquals(2, refused, 'neither starts while a removal runs');
+
+            SampleDataLoader.Counts status = SampleDataLoader.status();
+            System.assertEquals(true, status.removing, 'the card is told a removal is running');
+            System.assertEquals(false, status.loaded, 'a removal in progress is not loaded');
+            System.assertEquals(1, status.householdCount, 'the refused calls delete nothing');
         }
     }
 
@@ -462,10 +499,22 @@ private class SampleDataLoaderTest {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             loadEverything(buildJson(2, 2, false));
 
+            Test.startTest();
             SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            Test.stopTest();
             System.assertEquals(2, removed.householdCount);
             System.assertEquals(1, removed.organizationCount);
             System.assertEquals(4, removed.contactCount);
+            System.assertEquals(true, removed.removing, 'the card is told the removal started');
+            System.assertEquals(false, removed.loaded);
+            System.assertEquals(
+                true,
+                SampleDataStageBatch.started[0] instanceof SampleDataRemoveStages,
+                'with no module installed the batch runs Core\'s own removal stages'
+            );
+
+            // A test runs one stage of the batch; run the rest the way the batch does in an org.
+            runCoreRemoval();
 
             SampleDataLoader.Counts afterStatus = SampleDataLoader.status();
             System.assertEquals(
@@ -512,7 +561,7 @@ private class SampleDataLoaderTest {
             );
             insert ownAffiliation;
 
-            SampleDataLoader.remove();
+            runCoreRemoval();
 
             System.assertEquals(
                 1,
@@ -638,12 +687,19 @@ private class SampleDataLoaderTest {
             StubModule module = new StubModule(12);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
 
+            Test.startTest();
             SampleDataLoader.Counts removed = SampleDataLoader.remove();
+            Test.stopTest();
 
             System.assertEquals(
                 1,
                 module.removeCalls,
                 'the module is asked once to remove its own'
+            );
+            System.assertEquals(
+                0,
+                SampleDataStageBatch.started.size(),
+                'Core\'s own removal waits for the module to hand back'
             );
             System.assertEquals(
                 1,

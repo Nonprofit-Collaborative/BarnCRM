@@ -19,9 +19,12 @@
  * transaction outright; the later stages still run, but that stage never counts as done, so
  * finish() starts nothing after it either. Tests drive the
  * stages and the hand-off by calling runStage, start, execute and finish directly.
+ *
+ * Removal runs here too (SampleDataRemoveBatch, a subclass that only changes the job's class
+ * name and the stopped notice), so the status card can tell a load from a removal.
  */
 @NamespaceAccessible
-public with sharing class SampleDataStageBatch implements Database.Batchable<Integer>, Database.Stateful {
+public virtual with sharing class SampleDataStageBatch implements Database.Batchable<Integer>, Database.Stateful {
     /** One stage per transaction. */
     public static final Integer SCOPE_SIZE = 1;
 
@@ -47,8 +50,14 @@ public with sharing class SampleDataStageBatch implements Database.Batchable<Int
     /** Starts a batch that runs the given load's stages, and returns its job Id. */
     @NamespaceAccessible
     public static Id start(SampleDataStages stages) {
-        started.add(stages);
+        noteStarted(stages);
         return Database.executeBatch(new SampleDataStageBatch(stages), SCOPE_SIZE);
+    }
+
+    /** Records a started run for the tests; shared with SampleDataRemoveBatch. */
+    @NamespaceAccessible
+    public static void noteStarted(SampleDataStages stages) {
+        started.add(stages);
     }
 
     public Iterable<Integer> start(Database.BatchableContext context) {
@@ -111,6 +120,11 @@ public with sharing class SampleDataStageBatch implements Database.Batchable<Int
         // points leave logging to SampleDataController.
         ErrorLogger.log(failed, stages.name() + (stage == null ? '' : ', stage ' + stage));
         // The stage is already rolled back to its savepoint, so this notice stays (Q-04).
+        notifyStopped();
+    }
+
+    /** Tells the user the run stopped part way; the removal batch says it about its own run. */
+    protected virtual void notifyStopped() {
         SampleDataLoader.notifyLoadStopped();
     }
 }

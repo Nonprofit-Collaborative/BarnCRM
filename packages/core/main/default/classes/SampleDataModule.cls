@@ -15,9 +15,12 @@
  *   the module's SampleDataStages, not a chain of queueables, which stops after five jobs in
  *   Developer Edition, trial and scratch orgs. Its finish() calls
  *   SampleDataModules.startAfter with the module's name.
- * - `removeAll` runs synchronously inside Core's remove transaction, before Core deletes
- *   the households and people the module's records point at, and deletes only records the
- *   module's own loader created.
+ * - `enqueueRemove` starts the module's removal and returns, the same way. Start it with
+ *   SampleDataRemoveBatch.startRemoval over the module's SampleDataStages, one chunk of
+ *   records per stage. Its finish() calls SampleDataModules.removeAfter with the module's
+ *   name, which starts the module before it and then Core's own removal, because Core
+ *   deletes the households and people the module's records point at only after that. It
+ *   deletes only records the module's own loader created.
  * - `countLoaded` answers cheaply enough to be called from the status card on a poll.
  */
 @NamespaceAccessible
@@ -34,6 +37,6 @@ public interface SampleDataModule {
     /** Starts this module's load chain. Called once, after Core's own records exist. */
     void enqueueLoad();
 
-    /** Deletes every record this module's sample loader created, and returns how many. */
-    Integer removeAll();
+    /** Starts this module's removal. Called before Core's own records are removed. */
+    void enqueueRemove();
 }

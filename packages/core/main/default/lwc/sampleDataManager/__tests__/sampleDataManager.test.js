@@ -304,7 +304,8 @@ describe('c-sample-data-manager', () => {
     removeSampleData.mockResolvedValue({
       householdCount: 200,
       contactCount: 440,
-      organizationCount: 25
+      organizationCount: 25,
+      removing: true
     });
 
     const element = createManager();
@@ -317,6 +318,39 @@ describe('c-sample-data-manager', () => {
       expect.objectContaining({ label: 'c.Core_SampleData_RemoveConfirmTitle' })
     );
     expect(removeSampleData).toHaveBeenCalledTimes(1);
+    expect(Toast.show).toHaveBeenCalledWith(
+      { label: 'c.Core_SampleData_RemoveSuccess', message: '', variant: 'success' },
+      expect.anything()
+    );
+  });
+
+  it('shows Removing and keeps polling until the removal is done, then says so', async () => {
+    jest.useFakeTimers();
+    canManageSampleData.mockResolvedValue(true);
+    const removingStatus = { ...LOADED_STATUS, loaded: false, removing: true };
+    getStatus
+      .mockResolvedValueOnce(LOADED_STATUS)
+      .mockResolvedValueOnce(removingStatus)
+      .mockResolvedValue(NOT_LOADED_STATUS);
+    removeSampleData.mockResolvedValue(removingStatus);
+
+    const element = createManager();
+    await flushMicrotasks();
+
+    buttons(element)[REMOVE_BUTTON_INDEX].click();
+    await flushMicrotasks();
+
+    const badge = element.shadowRoot.querySelector('span[slot="actions"] span');
+    expect(badge.textContent).toBe('c.Core_SampleData_StatusRemoving');
+    expect(buttons(element)[LOAD_BUTTON_INDEX].disabled).toBe(true);
+    expect(buttons(element)[REMOVE_BUTTON_INDEX].disabled).toBe(true);
+    expect(Toast.show).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(3000);
+    await flushMicrotasks();
+
+    expect(badge.textContent).toBe('c.Core_SampleData_StatusNotLoaded');
+    expect(Toast.show).toHaveBeenCalledTimes(1);
     expect(Toast.show).toHaveBeenCalledWith(
       { label: 'c.Core_SampleData_RemoveSuccess', message: '', variant: 'success' },
       expect.anything()

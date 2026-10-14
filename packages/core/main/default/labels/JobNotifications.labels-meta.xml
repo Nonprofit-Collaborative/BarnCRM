@@ -161,6 +161,22 @@
         <value>{0} households, {1} people and {2} organizations are ready to explore.</value>
     </labels>
     <labels>
+        <fullName>Core_JobNotice_SampleDataRemove</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification: name of the sample data removal</shortDescription>
+        <value>Sample data removal</value>
+    </labels>
+    <labels>
+        <fullName>Core_JobNotice_SampleDataRemoveStoppedBody</fullName>
+        <categories>Job Notifications</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Job notification body: sample data removal stopped</shortDescription>
+        <value>The sample data removal stopped part way. The Error Log says why. Select Remove sample data again to finish it.</value>
+    </labels>
+    <labels>
         <fullName>Core_JobNotice_SampleDataStoppedBody</fullName>
         <categories>Job Notifications</categories>
         <language>en_US</language>

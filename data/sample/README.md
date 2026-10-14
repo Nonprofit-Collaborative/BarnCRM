@@ -191,9 +191,11 @@ stages (`GivingSampleDataStages`, run by the same batch class) insert the funds,
 and commitments and then the gifts in chunks of 100. Batch Apex rather than a queueable
 chain, because Developer Edition, trial and scratch orgs stop a chain after five jobs.
 
-`SampleDataLoader.remove()` deletes every record carrying the flag: each module's records
-first, because a gift points at a person and a household, then connections, affiliations,
-contacts and accounts. Allocations, soft credits and tributes are details of a gift, and
+`SampleDataLoader.remove()` starts deleting every record carrying the flag, in stages of
+about a hundred records run by `SampleDataRemoveBatch` (a `SampleDataStageBatch` subclass, so
+removal has no queueable chain limit either): each module's records first
+(`GivingSampleDataRemoveStages`), because a gift points at a person and a household, then
+Core's (`SampleDataRemoveStages`): connections, affiliations, contacts and accounts. Allocations, soft credits and tributes are details of a gift, and
 installments are details of a commitment, so they go with their master. Both actions are
 exposed to admins through **Nonprofit Settings > Sample Data** (`sampleDataManager` LWC);
 see `docs/admin-guide/sample-data.md`.

@@ -32,8 +32,8 @@ private class SampleDataStageBatchTest {
             loadStarted = true;
         }
 
-        public Integer removeAll() {
-            return 0;
+        public void enqueueRemove() {
+            return;
         }
     }
 

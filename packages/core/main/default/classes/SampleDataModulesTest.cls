@@ -40,11 +40,9 @@ private class SampleDataModulesTest {
             loadStarted = true;
         }
 
-        public Integer removeAll() {
+        public void enqueueRemove() {
             removeCalls++;
-            Integer removed = loaded;
             loaded = 0;
-            return removed;
         }
     }
 
@@ -145,17 +143,57 @@ private class SampleDataModulesTest {
     }
 
     @IsTest
-    static void testRemoveAllAsksEveryModuleAndSumsWhatWent() {
+    static void testStartRemovalStartsTheLastModuleFirst() {
         System.runAs(TestUsers.adminWithInstalledModules()) {
             StubModule first = new StubModule('First', 3);
             StubModule second = new StubModule('Second', 5);
             SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
 
-            Integer removed = SampleDataModules.removeAll();
+            SampleDataModules.startRemoval();
 
-            System.assertEquals(8, removed, 'the rows both modules removed are counted together');
-            System.assertEquals(1, first.removeCalls, 'each module is asked exactly once');
-            System.assertEquals(1, second.removeCalls, 'each module is asked exactly once');
+            System.assertEquals(1, second.removeCalls, 'the last module is removed first');
+            System.assertEquals(0, first.removeCalls, 'the earlier module waits for the hand-off');
+            System.assertEquals(
+                0,
+                SampleDataStageBatch.started.size(),
+                'Core\'s own records wait for every module'
+            );
+        }
+    }
+
+    @IsTest
+    static void testRemoveAfterStartsTheModuleBeforeThenCore() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            StubModule first = new StubModule('First', 3);
+            StubModule second = new StubModule('Second', 5);
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ first, second };
+
+            SampleDataModules.removeAfter('Second');
+            System.assertEquals(1, first.removeCalls, 'the module before the named one goes next');
+            System.assertEquals(0, SampleDataStageBatch.started.size(), 'Core is not started yet');
+
+            Test.startTest();
+            SampleDataModules.removeAfter('First');
+            Test.stopTest();
+
+            System.assertEquals(1, SampleDataStageBatch.started.size(), 'Core\'s removal starts');
+            System.assert(
+                SampleDataStageBatch.started[0] instanceof SampleDataRemoveStages,
+                'after the first module, the batch is Core\'s own removal stages'
+            );
+        }
+    }
+
+    @IsTest
+    static void testRemoveAfterAnUnknownModuleStartsNothing() {
+        System.runAs(TestUsers.adminWithInstalledModules()) {
+            StubModule only = new StubModule('Only', 3);
+            SampleDataModules.moduleOverride = new List<SampleDataModule>{ only };
+
+            SampleDataModules.removeAfter('NotInstalled');
+
+            System.assertEquals(0, only.removeCalls, 'an unknown name starts no module');
+            System.assertEquals(0, SampleDataStageBatch.started.size(), 'and not Core either');
         }
     }
 
