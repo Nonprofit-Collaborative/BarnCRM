@@ -5,7 +5,7 @@
     Names the survivors of a Salesforce merge that could not queue its own tidy-up: a merge inside
     a Queueable job, or in a transaction with no queueable job left. Published after commit, up to
     200 identifiers per list, and its subscriber queues the tidy-up in a fresh transaction (rule
-    PEOPLE-15, ADR-NEXT).
+    PEOPLE-15, ADR-0118).
   </description>
   <eventType>HighVolume</eventType>
   <label>Merge Settlement Ready</label>

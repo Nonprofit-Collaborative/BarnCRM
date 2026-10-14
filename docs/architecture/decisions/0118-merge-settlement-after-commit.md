@@ -1,4 +1,4 @@
-# ADR-NEXT: A merge that cannot queue its tidy-up asks for it after commit
+# ADR-0118: A merge that cannot queue its tidy-up asks for it after commit
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-14

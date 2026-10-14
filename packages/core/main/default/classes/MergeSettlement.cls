@@ -19,7 +19,7 @@
  *
  * A merge that cannot queue the job itself (inside a Queueable, or with no queueable job left)
  * publishes `Merge_Settlement_Ready__e` naming its survivors instead. The event is delivered
- * after the merge commits, and its subscriber queues this job in a fresh transaction (ADR-NEXT),
+ * after the merge commits, and its subscriber queues this job in a fresh transaction (ADR-0118),
  * as `Rollup_Queue_Ready__e` starts the Rollup Queue (ADR-0100, ADR-0117).
  */
 public with sharing class MergeSettlement implements Queueable {
@@ -82,7 +82,7 @@ public with sharing class MergeSettlement implements Queueable {
      * running Queueable may chain, which its own work may need (RollupQueue keeps it free in
      * the same way). Nor does one in a transaction that can queue no more. Either way it
      * publishes `Merge_Settlement_Ready__e` naming the survivors, delivered after commit, and
-     * the subscriber queues the job (ADR-NEXT). Only a publish the platform refuses leaves the
+     * the subscriber queues the job (ADR-0118). Only a publish the platform refuses leaves the
      * survivors unsettled; they are then named in the Error Log as a warning, so an
      * administrator can check them.
      */
