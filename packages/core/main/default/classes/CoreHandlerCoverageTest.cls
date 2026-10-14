@@ -103,6 +103,54 @@ private class CoreHandlerCoverageTest {
     }
 
     @IsTest
+    static void anUpdateGivenNothingInATriggerlessCallDoesNothing() {
+        System.runAs(TestUsers.admin()) {
+            TriggerHandler.testNew = null;
+            Test.startTest();
+            new AccountAddressHandler().afterUpdate();
+            Test.stopTest();
+            Assert.areEqual(0, [SELECT COUNT() FROM Address__c], 'Nothing to keep, nothing kept');
+        }
+    }
+
+    @IsTest
+    static void aHouseholdBillingAddressChangeIsNotCapturedAsANewAddressOnUpdate() {
+        System.runAs(TestUsers.admin()) {
+            Account household = new Account(
+                Name = 'The Okafor Family',
+                RecordTypeId = HouseholdService.householdRecordTypeId(),
+                BillingStreet = '2 Winter Road',
+                BillingCity = 'Springfield'
+            );
+            insert household;
+            Integer keptOnInsert = [
+                SELECT COUNT()
+                FROM Address__c
+                WHERE Account__c = :household.Id
+            ];
+            Account before = household.clone(true);
+            household.BillingStreet = '9 Summer Lane';
+            TriggerHandler.testNew = new List<SObject>{ household };
+            TriggerHandler.testOldMap = new Map<Id, SObject>{ before.Id => before };
+
+            Test.startTest();
+            try {
+                new AccountAddressHandler().afterUpdate();
+            } finally {
+                clearOverrides();
+            }
+            Test.stopTest();
+
+            Assert.isFalse(household.hasErrors(), 'A household save is not refused');
+            Assert.areEqual(
+                keptOnInsert,
+                [SELECT COUNT() FROM Address__c WHERE Account__c = :household.Id],
+                'Only a person account change is captured on update, so no address was added'
+            );
+        }
+    }
+
+    @IsTest
     static void twoHundredHouseholdsCreatedWithAnAddressEachKeepOne() {
         System.runAs(TestUsers.admin()) {
             List<Account> households = new List<Account>();
