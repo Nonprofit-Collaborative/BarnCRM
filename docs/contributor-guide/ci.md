@@ -743,9 +743,9 @@ stage this small has failed on its own. The working theory shifts from request s
 previous one reports done, against the one persistent org, with no gap between them. If the
 org's deploy engine needs a moment after a deploy completes before it can safely accept the
 next one, back to back calls would reproduce exactly this. Untested and not the only remaining
-explanation, but cheap and non-destructive to try: every `deploy_stage` call now pauses (15
-seconds by default, `STAGE_PAUSE_SECONDS` to change it) after a successful deploy, before the
-next stage starts. Apex and UI/permissions are unchanged, because neither has failed yet.
+explanation, but cheap and non-destructive to try: every `deploy_stage` call paused (15
+seconds, `STAGE_PAUSE_SECONDS`) after a successful deploy, before the next stage started. The
+pause is now off by default: see "Faster deploys" below. Apex and UI/permissions are unchanged, because neither has failed yet.
 
 **If a stage fails again, keep the pattern rather than guessing at a safe size.** Read
 `scripts/org/deploy-packages.sh`'s own header, which is updated at each split with what the
@@ -756,23 +756,23 @@ both this section and that header with the new count before pushing. Guessing a 
 pre-splitting everything to be safe is not the goal: each split should answer a question the
 previous failure actually raised.
 
-**Faster deploys: two switches, off until timed.** The stages cost about 36 requests, each
-followed by the pause: about 9 minutes of sleep per run before any submit or poll time. Both
-faults that drove the splitting were later traced to real defects (the Account to
+**Faster deploys: the fast settings are the defaults.** The stages cost about 36 requests,
+each followed by a 15 second pause: about 9 minutes of sleep per run before any submit or poll
+time. Both faults that drove the splitting were later traced to real defects (the Account to
 `Import_Batch__c` order, now computed, and the unparseable custom metadata resolved on
 2026-09-22), so neither the pause nor the per-object split has evidence behind it any more.
-Two environment variables let a run drop them:
+The full gate with both dropped took about 12 minutes end to end on oi-test on 2026-10-13,
+clean, so both are now the defaults:
 
-- `STAGE_PAUSE_SECONDS=0` skips the pause between stages.
-- `DATA_MODEL_STAGES=combined` deploys every Core object in one request. If that request fails
-  with component errors, the run stops as usual. If it fails with none (the opaque
+- `STAGE_PAUSE_SECONDS` defaults to 0: no pause between stages. Set it (for example to 15) to
+  bring the pause back.
+- `DATA_MODEL_STAGES` defaults to `combined`: every Core object in one request. If that request
+  fails with component errors, the run stops as usual. If it fails with none (the opaque
   `UNKNOWN_EXCEPTION`), the script falls back to one object per stage in the same run.
+  `DATA_MODEL_STAGES=per-object` always deploys one object per stage.
 
-To decide whether either becomes the default, time a deploy on the test org (holding its lock,
-as for any deploy) with each: `time STAGE_PAUSE_SECONDS=0 DATA_MODEL_STAGES=combined scripts/org/deploy-packages.sh <alias>`,
-then the same with the defaults, and note in this section and the script header whether the
-combined request succeeded or fell back, and the minutes saved. Change the defaults only after
-two clean runs.
+If the opaque fault comes back, run with `STAGE_PAUSE_SECONDS=15 DATA_MODEL_STAGES=per-object`
+and record in this section and the script header what the run showed.
 
 Two things constrain when it runs, both because there is one org rather than one per run.
 
