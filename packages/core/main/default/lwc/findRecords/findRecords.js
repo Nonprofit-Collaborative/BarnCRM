@@ -61,6 +61,7 @@ import LOADING from '@salesforce/label/c.Core_Find_Loading';
 import BULK_UPDATE from '@salesforce/label/c.Core_BulkUpdate_Title';
 import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
+import EXPORT_FILES from '@salesforce/label/c.Core_Find_ExportFiles';
 import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
 import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
 import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
@@ -147,6 +148,7 @@ export default class FindRecords extends LightningElement {
     run: RUN,
     export: EXPORT,
     exportExcel: EXPORT_EXCEL,
+    exportFiles: EXPORT_FILES,
     summarize: SUMMARIZE,
     bulkUpdate: BULK_UPDATE,
     bulkDelete: BULK_DELETE,
@@ -715,6 +717,22 @@ export default class FindRecords extends LightningElement {
 
   handleExportExcel() {
     return this.exportAs('xlsx');
+  }
+
+  /**
+   * Hands the query and each field column's label to the export to Files (R-SQ12), which runs
+   * on the server; related record columns are not part of it.
+   */
+  handleExportFiles() {
+    this.noticeMessage = undefined;
+    if (!this.checkReady()) {
+      return;
+    }
+    const labelsByPath = {};
+    for (const path of this.columns) {
+      labelsByPath[path] = this.columnLabel(path);
+    }
+    this.template.querySelector('c-find-export-files').start(this.queryDocument(), labelsByPath);
   }
 
   /** Reads every page (R-SQ3) and writes CSV, or an Excel workbook (R-SQ11). */

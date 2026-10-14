@@ -50,7 +50,7 @@ private class FindExportBatchTest {
             SetupOwnerId = UserInfo.getOrganizationId(),
             Job_Notifications__c = true
         );
-        SettingsService.clearCache();
+        SettingsService.clearCaches();
     }
 
     private static void run(FindExportBatch job) {

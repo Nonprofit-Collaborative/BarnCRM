@@ -1,0 +1,22 @@
+<template>
+    <template lwc:if={hasError}>
+        <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-vertical_small" role="alert">
+            <span data-id="error-message">{errorMessage}</span>
+        </div>
+    </template>
+    <template lwc:if={job}>
+        <div class={statusClass} role="status" aria-live="polite" data-id="export-files-status">
+            <p data-id="status-line">{statusLine}</p>
+            <template lwc:if={hasFiles}>
+                <p class="slds-var-m-top_x-small">{labels.files}</p>
+                <ul class="slds-list_dotted">
+                    <template for:each={files} for:item="file">
+                        <li key={file.documentId} data-id="file">
+                            <a href={file.url} target="_blank">{file.title}</a>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+    </template>
+</template>
