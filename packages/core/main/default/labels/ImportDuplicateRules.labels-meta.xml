@@ -32,4 +32,60 @@
         <shortDescription>Import row: duplicate rules matched both people to one record</shortDescription>
         <value>Your duplicate rules matched both people on this row to the same record. Put them on separate rows, or untick Also match with my duplicate rules, and import the row again.</value>
     </labels>
+    <labels>
+        <fullName>Core_Import_LogDuplicateRuleMatchesRecords</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: duplicate rules matched some one-object rows</shortDescription>
+        <value>Your duplicate rules matched some rows to a record you already have, so those rows update it instead of creating a new one. Their Matched By Duplicate Rule box is ticked: check them in the import&apos;s rows before you commit.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_LogNoDuplicateRuleRecords</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import run log: no duplicate rule could be asked about the object</shortDescription>
+        <value>Your duplicate rules were not asked: no rule for this object is switched on, or Salesforce could not run it. Rows were matched by their record ID or key alone.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorSeveralDuplicateRuleRecords</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row: duplicate rules matched several records</shortDescription>
+        <value>Your duplicate rules matched more than one record for this row, and the mapping says to reject such a row. Merge the duplicates, or choose Use the most recently changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_ErrorDuplicateRuleRecordRepeated</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import row: duplicate rules matched a record another row loads</shortDescription>
+        <value>Your duplicate rules matched this row to a record an earlier row of the file already loads. Combine the rows, or untick Also match with my duplicate rules, and import the row again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DuplicateRulesObjectHelp</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: what matching one object with duplicate rules does</shortDescription>
+        <value>A row that would create a record is first looked for with your org&apos;s duplicate rules for this object; a record they match is updated instead. They are looser than a record ID or key, so check the ticked rows in the dry run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DuplicateRulesObjectNoRule</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: no duplicate rule for the chosen object</shortDescription>
+        <value>Matching with your duplicate rules is not offered: no duplicate rule is switched on for this object. The Duplicates page of the admin guide says how to switch one on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Import_DuplicateRulesObjectNoCreate</fullName>
+        <categories>Import</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import wizard: duplicate rules need an operation that creates</shortDescription>
+        <value>Matching with your duplicate rules is offered only for Insert and Upsert by external ID, where a row could create a record. This choice finds every record by its ID or field.</value>
+    </labels>
 </CustomLabels>

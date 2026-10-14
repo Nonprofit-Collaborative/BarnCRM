@@ -1825,7 +1825,7 @@ Maria load the same payment processor export every month without rebuilding the 
 | Organization Matching Rule | picklist(Name exact, External ID) | no | How a row's organization is matched to an organization the org already has; empty means Name exact (R-IT2). |
 | Organization Match Field | text | no | Under the External ID organization rule, the API name of the account field organizations are matched on (R-IT8). |
 | Several Matches | picklist(Reject the row, Use the most recently changed) | no | What happens when the key a row is looked for by finds more than one record; empty means Reject the row (R-IT9). |
-| Use Duplicate Rules | boolean | yes (defaults false) | Whether people and organizations the rule found nobody for are also matched through the org's active duplicate rules (R-IT16). |
+| Use Duplicate Rules | boolean | yes (defaults false) | Whether people and organizations the rule found nobody for, or a one-object row that would create a record, are also matched through the org's active duplicate rules (R-IT16). |
 | Default Values | long text | no | Values applied to every row that does not carry its own, held in the same document format. |
 | Person Mode | picklist(Contacts, Person Accounts) | yes | Whether a person in this file becomes a Contact or a person Account; defaulted from the detected org shape. |
 | Is Package Default | boolean | yes (defaults false) | Marks a template materialized from a shipped default rather than built by the admin. |
@@ -2122,8 +2122,22 @@ key). A row matched this way has Matched By Duplicate Rule ticked (Section 17) a
 says that such rows exist. The active rules are read first (`DuplicateRule`, user mode): when
 the object has none the user can see, or the matcher raises, the entity is matched by its rule
 alone and the run log says so; nothing is rejected for it. A matcher failure is written to the
-Error Log only when a rule was known to be active. Duplicate rules are not asked for a
-one-object template.
+Error Log only when a rule was known to be active.
+
+For a one-object template (R-IT12) with Use Duplicate Rules ticked, the rules are asked only
+under Insert and Upsert by external ID, and only about a row that would create a record: a
+record ID or upsert key match always wins and is never asked about. The row's own values (not
+its lookups), as the target object's fields, go on an unsaved record of the target object (of the
+row's record type when it gives one) through the same matcher, 50 a call, read back in user
+mode with any record type. One record kept is updated with the row instead of a record being
+created, and the row has Matched By Duplicate Rule ticked; several follow Several Matches
+(R-IT9). A record that a row of an earlier chunk of the pass created is dropped from the
+matches, so the commit decides as the dry run, which could not see it; a record that another
+row of the chunk, or of an earlier chunk of the pass, already loads rejects the row, as a
+repeated key does (R-IT12). With no rule to ask, the rows create and the run log says so. The
+wizard offers the box for a one-object template only under those two operations and when the
+target object has an active duplicate rule the user can see (read for every listed template in
+one query), or when the rules cannot be read; otherwise it says why the box is missing.
 
 **R-IT18 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
 `"skipRows"`, at most 5 rules `{ "column", "test", "text" }` whose `test` is `equals`,
@@ -2714,7 +2728,7 @@ processor resolves those in dependency order.
 | Organization Key | text | computed | The same for the organization this row would create. |
 | Pass Number | integer | computed | The pass of its import that last processed this row (R-IB13). |
 | Several Matches | boolean | computed | True when the key this row's person or organization was looked for by found more than one record, whether the row was rejected for it or given the most recently changed one (R-IT9). |
-| Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule, matched this row's person or organization (R-IT16). |
+| Matched By Duplicate Rule | boolean | computed | True when the org's duplicate rules, not the template's rule or the row's key, matched this row's person, organization or one-object record (R-IT16). |
 | Processor Key | text | computed | In a dry run only, a digest the entity processor writes for what this row would load, so later chunks of the same dry run can see it (R-IR6). Core never reads its meaning. For a one-object template, Core writes it in both passes: a digest of the record ID or upsert value the row names, so a later row naming the same record is rejected (R-IT12), or with related records the parent row's key digest, one form when its parent was saved and another when it failed (R-IT17). |
 | Row Key | text | computed | When the template has One row per key columns, a digest of this row's key cells, written as the row is staged so a later page finds it (R-IT18). Empty for a skipped row or a row with no key. |
 

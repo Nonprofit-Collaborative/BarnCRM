@@ -139,6 +139,9 @@ import blankClearsLabel from '@salesforce/label/c.Core_Import_BlankClearsLabel';
 import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesLabel';
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
+import duplicateRulesObjectHelp from '@salesforce/label/c.Core_Import_DuplicateRulesObjectHelp';
+import duplicateRulesObjectNoRule from '@salesforce/label/c.Core_Import_DuplicateRulesObjectNoRule';
+import duplicateRulesObjectNoCreate from '@salesforce/label/c.Core_Import_DuplicateRulesObjectNoCreate';
 import ruleEmailExact from '@salesforce/label/c.Core_Import_RuleEmailExact';
 import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCode';
 import ruleExternalId from '@salesforce/label/c.Core_Import_RuleExternalId';
@@ -418,6 +421,9 @@ export default class ImportWizard extends LightningElement {
     duplicateRulesLabel,
     duplicateRulesHelp,
     duplicateRulesNone,
+    duplicateRulesObjectHelp,
+    duplicateRulesObjectNoRule,
+    duplicateRulesObjectNoCreate,
     delimiterLabel,
     delimiterHelp,
     sheetLabel,
@@ -954,7 +960,7 @@ export default class ImportWizard extends LightningElement {
         severalMatches: this.severalMatches
       }
     };
-    if (this.loadsPeople && this.useDuplicateRules) {
+    if (this.showDuplicateRules && this.useDuplicateRules) {
       // Sent only when ticked: the server reads an absent choice as unticked (R-IT16).
       options.matching.useDuplicateRules = true;
     }
@@ -1109,11 +1115,47 @@ export default class ImportWizard extends LightningElement {
     this.useDuplicateRules = event.target.checked;
   }
 
+  /** Whether the chosen one-object operation can create a record, so the rules can be asked. */
+  get loadCreates() {
+    return this.loadOperation === INSERT || this.loadOperation === UPSERT;
+  }
+
+  /**
+   * Whether the duplicate rules box is offered (R-IT16): always for people, and for one object
+   * under an operation that creates when its object has an active rule (or that is unknown).
+   */
+  get showDuplicateRules() {
+    if (!this.loadsOneObject) {
+      return true;
+    }
+    return this.loadCreates && this.selectedTemplate.objectDuplicateRules !== false;
+  }
+
+  /** Why a one-object mapping does not offer the box, or undefined when it does. */
+  get duplicateRulesHiddenReason() {
+    if (this.showDuplicateRules) {
+      return undefined;
+    }
+    return this.loadCreates
+      ? this.labels.duplicateRulesObjectNoRule
+      : this.labels.duplicateRulesObjectNoCreate;
+  }
+
+  get duplicateRulesHelpText() {
+    return this.loadsOneObject
+      ? this.labels.duplicateRulesObjectHelp
+      : this.labels.duplicateRulesHelp;
+  }
+
   /**
    * True when the box is ticked and no rule is switched on for people (or, where the file has
    * organizations, for them), so the box would change nothing. Unknown is not warned about.
    */
   get duplicateRulesMissing() {
+    if (this.loadsOneObject) {
+      // A one-object mapping shows the box only where its object has a rule (R-IT16).
+      return false;
+    }
     const template = this.selectedTemplate;
     const people =
       template && template.personMode === 'Person Accounts'

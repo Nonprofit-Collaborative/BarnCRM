@@ -1,6 +1,7 @@
 /**
  * Asks the org's own active duplicate rules about the people and organizations of an import
- * chunk that the template's rule found nobody for (canonical model R-IT16, ADR-0081
+ * chunk that the template's rule found nobody for, and about the rows of a one-object template
+ * that would create a record (canonical model R-IT16, ADR-0081
  * `0081-data-transform-document.md`).
  *
  * Nothing here decides what a row is. The platform's matcher compares an unsaved record built
@@ -194,6 +195,28 @@ public with sharing class ImportDuplicateRuleMatcher {
         }
     }
 
+    /**
+     * Which of these objects (API names as describe gives them) have an active duplicate rule
+     * the user can see, read in one query whatever the number of objects; null when the user
+     * cannot read the rules at all. Account counts for a rule that compares organizations, as
+     * `DuplicateSelector.objectsWithActiveRules` says. The import wizard offers matching through
+     * the rules on a one-object template only for an object in the answer, or when it is null.
+     */
+    @NamespaceAccessible
+    public static Set<String> objectsWithActiveRules(Set<String> objectNames) {
+        if (objectNames == null || objectNames.isEmpty()) {
+            return new Set<String>();
+        }
+        if (stubMatches != null || stubUnavailable == true) {
+            return stubUnavailable == true ? new Set<String>() : new Set<String>(objectNames);
+        }
+        try {
+            return DuplicateSelector.objectsWithActiveRules(objectNames);
+        } catch (Exception cannotReadRules) {
+            return null;
+        }
+    }
+
     /** Whether the probes are person accounts: of a person account record type. */
     private static Boolean arePersonAccounts(SObject probe) {
         if (probe.getSObjectType() != Account.SObjectType) {
@@ -269,14 +292,30 @@ public with sharing class ImportDuplicateRuleMatcher {
         }
         List<List<Id>> result = new List<List<Id>>();
         for (SObject probe : probes) {
-            Map<String, Object> given = probe.getPopulatedFieldsAsMap();
-            String name = (String) (given.containsKey('LastName')
-                ? given.get('LastName')
-                : given.get('Name'));
-            List<Id> ids = name == null ? null : stubMatches.get(name.toLowerCase());
+            List<Id> ids = stubbedFor(probe.getPopulatedFieldsAsMap());
             result.add(ids == null ? new List<Id>() : ids);
         }
         return result;
+    }
+
+    /**
+     * The stubbed matches for a probe: by its last name or name, or, for an object with
+     * neither (a custom object whose name is an auto number), by any text value it carries.
+     */
+    private static List<Id> stubbedFor(Map<String, Object> given) {
+        for (String field : new List<String>{ 'LastName', 'Name' }) {
+            if (given.get(field) instanceof String) {
+                return stubMatches.get(((String) given.get(field)).toLowerCase());
+            }
+        }
+        for (Object value : given.values()) {
+            if (
+                value instanceof String && stubMatches.containsKey(((String) value).toLowerCase())
+            ) {
+                return stubMatches.get(((String) value).toLowerCase());
+            }
+        }
+        return null;
     }
 
     /** The matched records the user can see, of an allowed record type, read in user mode. */

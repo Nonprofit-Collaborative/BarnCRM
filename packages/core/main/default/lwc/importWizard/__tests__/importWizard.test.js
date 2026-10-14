@@ -1559,6 +1559,76 @@ describe('the import wizard loading one object', () => {
     return element.shadowRoot.querySelector('[data-id="load-options"]');
   }
 
+  async function toObjectMatchingStep() {
+    const element = await toColumnsStep();
+    click(element, 'next');
+    await flush();
+    return element;
+  }
+
+  function chooseOperation(element, operation, matchField = '') {
+    loadOptions(element).dispatchEvent(
+      new CustomEvent('change', {
+        detail: { operation, matchField, lookupNotFound: 'Reject the row' }
+      })
+    );
+  }
+
+  it('offers the duplicate rules box when the object has an active rule, and sends it', async () => {
+    getTemplates.mockResolvedValue([{ ...OBJECT_TEMPLATE, objectDuplicateRules: true }]);
+    const element = await toObjectMatchingStep();
+    const box = element.shadowRoot.querySelector('[data-id="duplicate-rules"]');
+    expect(box).not.toBeNull();
+    expect(box.fieldLevelHelp).toBe('c.Core_Import_DuplicateRulesObjectHelp');
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-hidden"]')).toBeNull();
+    box.checked = true;
+    box.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    // A one-object mapping never warns about people rules.
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules-none"]')).toBeNull();
+    click(element, 'dry-run');
+    await flush();
+    expect(JSON.parse(createBatch.mock.calls[0][0].optionsJson).matching.useDuplicateRules).toBe(
+      true
+    );
+  });
+
+  it('offers the box under Upsert too, and when the rules cannot be read', async () => {
+    getTemplates.mockResolvedValue([{ ...OBJECT_TEMPLATE, objectDuplicateRules: null }]);
+    const element = await toObjectMatchingStep();
+    chooseOperation(element, 'Upsert by external ID', 'Session_Key__c');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules"]')).not.toBeNull();
+  });
+
+  it('hides the box with a reason when the object has no active duplicate rule', async () => {
+    getTemplates.mockResolvedValue([
+      { ...OBJECT_TEMPLATE, objectDuplicateRules: false, useDuplicateRules: true }
+    ]);
+    const element = await toObjectMatchingStep();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules"]')).toBeNull();
+    expect(
+      element.shadowRoot.querySelector('[data-id="duplicate-rules-hidden"]').textContent
+    ).toContain('c.Core_Import_DuplicateRulesObjectNoRule');
+    click(element, 'dry-run');
+    await flush();
+    // A choice the mapping held is not sent where the box is not offered.
+    expect(
+      JSON.parse(createBatch.mock.calls[0][0].optionsJson).matching.useDuplicateRules
+    ).toBeUndefined();
+  });
+
+  it('hides the box with a reason under an operation that never creates', async () => {
+    getTemplates.mockResolvedValue([{ ...OBJECT_TEMPLATE, objectDuplicateRules: true }]);
+    const element = await toObjectMatchingStep();
+    chooseOperation(element, 'Update by record Id');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="duplicate-rules"]')).toBeNull();
+    expect(
+      element.shadowRoot.querySelector('[data-id="duplicate-rules-hidden"]').textContent
+    ).toContain('c.Core_Import_DuplicateRulesObjectNoCreate');
+  });
+
   it('creates a one-object mapping from the objects the user may load and chooses it', async () => {
     getTemplates.mockResolvedValue([TEMPLATE]);
     getLoadableObjects.mockResolvedValue([

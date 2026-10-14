@@ -121,6 +121,40 @@ public with sharing class ImportRowSelector {
             .keySet();
     }
 
+    /**
+     * Which of these records an earlier chunk of the current pass gave a row as its resulting
+     * record (R-IT16): true for one such a row created, false for one it only updated or
+     * matched. A one-object template matching through the duplicate rules uses it so the commit
+     * takes a record the import created as the dry run does (not there), and a record an
+     * earlier row loads is never loaded again. Rejected rows name none.
+     */
+    @NamespaceAccessible
+    public static Map<String, Boolean> resultingRecordsWrittenEarlier(
+        Import_Batch__c batch,
+        Set<String> recordIds
+    ) {
+        Map<String, Boolean> found = new Map<String, Boolean>();
+        if (batch == null || batch.Id == null || recordIds == null || recordIds.isEmpty()) {
+            return found;
+        }
+        for (Import_Row__c row : [
+            SELECT Gift_Id__c, Status__c
+            FROM Import_Row__c
+            WHERE
+                Import_Batch__c = :batch.Id
+                AND Pass_Number__c = :passOf(batch)
+                AND Gift_Id__c IN :recordIds
+            WITH SYSTEM_MODE
+        ]) {
+            Boolean created = row.Status__c == ImportRowProcessor.STATUS_CREATED;
+            found.put(
+                row.Gift_Id__c,
+                created || (found.containsKey(row.Gift_Id__c) && found.get(row.Gift_Id__c))
+            );
+        }
+        return found;
+    }
+
     private static Map<String, Integer> digestsWrittenEarlier(
         Import_Batch__c batch,
         Set<String> digests,
