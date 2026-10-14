@@ -165,10 +165,28 @@ def person_name(rng, sample, surnames=None):
     return first, rng.choice(surnames or sample.SURNAME_POOL)
 
 
-def wide_surnames(sample):
-    """The sample surnames plus invented prefix + suffix ones, in a fixed order."""
-    invented = [p + s for p in SURNAME_PREFIXES for s in SURNAME_SUFFIXES]
-    return list(sample.SURNAME_POOL) + invented
+SURNAME_INFIXES = ["an", "en", "er", "in", "on", "ar", "or", "el", "ol", "id", "um", "est"]
+
+
+def wide_surnames(sample, needed=0):
+    """The sample surnames plus invented prefix + suffix ones, in a fixed order. When `needed`
+    exceeds that, prefix + infix + suffix ones are appended (all distinct, none repeated)."""
+    names = list(sample.SURNAME_POOL)
+    seen = set(names)
+    for p in SURNAME_PREFIXES:
+        for s in SURNAME_SUFFIXES:
+            if p + s not in seen:
+                seen.add(p + s)
+                names.append(p + s)
+    for i in SURNAME_INFIXES:
+        if len(names) >= needed:
+            break
+        for p in SURNAME_PREFIXES:
+            for s in SURNAME_SUFFIXES:
+                if p + i + s not in seen:
+                    seen.add(p + i + s)
+                    names.append(p + i + s)
+    return names
 
 
 def address(rng, sample, number):
@@ -274,30 +292,30 @@ def generate_tier1(args):
 
     sizes = household_sizes(rng, args.households, args.contacts)
 
-    surnames = wide_surnames(sample)
+    # Every contact gets a surname used once (a household's head shares the household's), so no
+    # two households or contacts share a name: the standard Account and Contact duplicate rules
+    # are fuzzy name matches and flagged 221 of 4,000 households and 452 contacts when names
+    # repeated. Drawn without replacement from a shuffled pool, so the order is fixed by SEED.
+    surnames = wide_surnames(sample, args.contacts + 1)
+    if len(surnames) < args.contacts:
+        raise SystemExit("not enough distinct surnames for %d contacts" % args.contacts)
+    rng.shuffle(surnames)
+    next_surname = iter(surnames)
     # One house number per household, never reused: the standard Account duplicate rule
     # (fuzzy name plus address) cannot match two households with different street addresses.
     house_numbers = rng.sample(range(100, 100 + max(99800, args.households * 3)), args.households)
-    used_names = set()
 
     household_rows, contact_rows = [], []
     contact_keys, contact_household = [], []
     for h, size in enumerate(sizes):
         hkey = "%sH-%05d" % (KEY_PREFIX, h + 1)
         street, city, state, postal = address(rng, sample, house_numbers[h])
-        surname = rng.choice(surnames)
+        surname = next(next_surname)
         household_rows.append([hkey, "%s Household" % surname, street, city, state, postal])
         for m in range(size):
             ckey = "%sC-%06d" % (KEY_PREFIX, len(contact_keys) + 1)
-            # No two contacts share a first and last name (the standard Contact rule is a fuzzy
-            # name match plus an email or phone match; this keeps the name half apart too).
-            while True:
-                first, last = person_name(rng, sample, surnames)
-                if m == 0:
-                    last = surname
-                if (first, last) not in used_names:
-                    used_names.add((first, last))
-                    break
+            first, _ = person_name(rng, sample, surnames)
+            last = surname if m == 0 else next(next_surname)
             email = contact_email(len(contact_keys) + 1, first, last)
             phone = contact_phone(len(contact_keys))
             role = ROLE_BY_POSITION[min(m, 4)]
@@ -360,6 +378,7 @@ def generate_tier1(args):
     funds_rows = [
         [n, c, "true", "true" if i == 0 and not args.no_default_fund else "false"]
         for i, (n, c) in enumerate(zip(FUND_NAMES, FUND_CODES))
+        if c not in (args.skip_fund_code or [])
     ]
     counts_out = {
         "funds": write_csv(
@@ -520,6 +539,8 @@ def main():
     p.add_argument("--const", action="append", default=[])
     p.add_argument("--only-col")
     p.add_argument("--only-from")
+    p.add_argument("--skip-fund-code", action="append", default=[], metavar="CODE",
+                   help="leave this fund out of funds.csv (it already exists in the org)")
     p.add_argument("--no-default-fund", action="store_true",
                    help="write the general fund without Is_Default__c (the org has a default)")
     args = p.parse_args()

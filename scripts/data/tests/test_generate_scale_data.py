@@ -18,11 +18,12 @@ def read(path):
         return list(csv.DictReader(handle))
 
 
-def run_tier1(out, households=400, contacts=1000, gifts=3000, no_default_fund=False):
+def run_tier1(out, households=400, contacts=1000, gifts=3000, no_default_fund=False,
+              skip_fund_code=None):
     gen.generate_tier1(
         Namespace(
             out_dir=str(out), households=households, contacts=contacts, gifts=gifts,
-            no_default_fund=no_default_fund,
+            no_default_fund=no_default_fund, skip_fund_code=skip_fund_code or [],
         )
     )
 
@@ -60,6 +61,35 @@ class Tier1Tests(unittest.TestCase):
             self.assertEqual(len(values), len(set(values)), column)
         names = [(r["FirstName"], r["LastName"]) for r in rows]
         self.assertEqual(len(names), len(set(names)))
+
+    def test_names_never_repeat(self):
+        # The standard duplicate rules are fuzzy name matches: no repeated household name, and
+        # no repeated contact surname except a head sharing the household's own.
+        households = read(self.out / "households.csv")
+        hnames = [r["Name"] for r in households]
+        self.assertEqual(len(hnames), len(set(hnames)))
+        surname_of = {r["Sample_Data_Key__c"]: r["Name"][: -len(" Household")] for r in households}
+        contacts = read(self.out / "contacts.csv")
+        lasts = [r["LastName"] for r in contacts]
+        self.assertEqual(len(lasts), len(set(lasts)))
+        for r in contacts:
+            if r["Household_Role__c"] == "Head":
+                self.assertEqual(r["LastName"], surname_of[r["Household_Key"]])
+
+    def test_names_unique_at_tier1_volume(self):
+        with tempfile.TemporaryDirectory() as big:
+            run_tier1(Path(big), households=4000, contacts=10000, gifts=100)
+            hnames = [r["Name"] for r in read(Path(big) / "households.csv")]
+            lasts = [r["LastName"] for r in read(Path(big) / "contacts.csv")]
+            self.assertEqual(len(hnames), len(set(hnames)))
+            self.assertEqual(len(lasts), len(set(lasts)))
+
+    def test_skip_fund_code(self):
+        with tempfile.TemporaryDirectory() as other:
+            run_tier1(Path(other), no_default_fund=True, skip_fund_code=["SCALE-GEN"])
+            codes = [f["Accounting_Code__c"] for f in read(Path(other) / "funds.csv")]
+            self.assertNotIn("SCALE-GEN", codes)
+            self.assertIn("SCALE-PROG", codes)
 
     def test_phone_unique_across_blocks(self):
         phones = {gen.contact_phone(i) for i in range(25000)}
