@@ -19,6 +19,16 @@ private class EmptyHouseholdTidyTest {
         return household;
     }
 
+    /**
+     * Empties these records from the Recycle Bin. A test still reads them with ALL ROWS
+     * afterwards, as an org does until the platform removes them physically, so the tidy-up is
+     * also told they are gone.
+     */
+    private static void purge(List<Id> recordIds) {
+        Database.emptyRecycleBin(recordIds);
+        EmptyHouseholdTidyBatch.purgedForTest.addAll(recordIds);
+    }
+
     private static void runTidyUp() {
         Test.startTest();
         Database.executeBatch(new EmptyHouseholdTidyBatch(), EmptyHouseholdTidyBatch.CHUNK_SIZE);
@@ -46,7 +56,7 @@ private class EmptyHouseholdTidyTest {
                 .Emptied_By_Deletion__c,
                 'The delete stamps the household it emptied'
             );
-            Database.emptyRecycleBin(new List<Id>{ maria.Id });
+            purge(new List<Id>{ maria.Id });
 
             runTidyUp();
 
@@ -81,7 +91,7 @@ private class EmptyHouseholdTidyTest {
             contactMode();
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Id household = deletedPersonsHousehold(maria);
-            Database.emptyRecycleBin(new List<Id>{ maria.Id });
+            purge(new List<Id>{ maria.Id });
             // Any record pointing at the household keeps it, whatever its object.
             Account foundation = AddressTestDataFactory.newOrganization('Garcia Foundation');
             foundation.ParentId = household;
@@ -104,7 +114,7 @@ private class EmptyHouseholdTidyTest {
             contactMode();
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Id household = deletedPersonsHousehold(maria);
-            Database.emptyRecycleBin(new List<Id>{ maria.Id });
+            purge(new List<Id>{ maria.Id });
             HouseholdDependentsExtensions.overrides.put(
                 HouseholdDependentsExtensions.EXTENSION_CLASSES[0],
                 new HouseholdDependentsExtensions.EveryHouseholdDependent()
@@ -125,7 +135,7 @@ private class EmptyHouseholdTidyTest {
             HouseholdTestDataFactory.save(settings);
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Id household = deletedPersonsHousehold(maria);
-            Database.emptyRecycleBin(new List<Id>{ maria.Id });
+            purge(new List<Id>{ maria.Id });
 
             runTidyUp();
 
@@ -192,7 +202,7 @@ private class EmptyHouseholdTidyTest {
             ]) {
                 purged.add(row.Id);
             }
-            Database.emptyRecycleBin(purged);
+            purge(purged);
 
             runTidyUp();
 
@@ -229,7 +239,7 @@ private class EmptyHouseholdTidyTest {
             ]) {
                 purged.add(row.Id);
             }
-            Database.emptyRecycleBin(purged);
+            purge(purged);
 
             runTidyUp();
 
@@ -249,7 +259,7 @@ private class EmptyHouseholdTidyTest {
             }
             Assert.areEqual(260, householdIds.size(), 'Each person has a household');
             delete people;
-            Database.emptyRecycleBin(people);
+            purge(new List<Id>(new Map<Id, Contact>(people).keySet()));
             List<Account> scope = [
                 SELECT Id
                 FROM Account
@@ -263,7 +273,14 @@ private class EmptyHouseholdTidyTest {
             tidy.finish(null);
             Test.stopTest();
 
-            Assert.areEqual(260, tidy.removed, 'Every household is removed');
+            Assert.areEqual(
+                260,
+                tidy.removed,
+                'Every household is removed. Kept for the bin ' +
+                    tidy.keptForRecycleBin +
+                    ', kept with dependents ' +
+                    tidy.keptWithDependents
+            );
             Assert.areEqual(
                 0,
                 [SELECT COUNT() FROM Account WHERE Id IN :householdIds],
@@ -278,7 +295,7 @@ private class EmptyHouseholdTidyTest {
             contactMode();
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             Id household = deletedPersonsHousehold(maria);
-            Database.emptyRecycleBin(new List<Id>{ maria.Id });
+            purge(new List<Id>{ maria.Id });
             EmptyHouseholdTidyBatch.relationshipsOverride = new List<String>{
                 'Contacts',
                 'No_Such_Relationship__r'

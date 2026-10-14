@@ -48,6 +48,14 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
 
     private static List<String> cachedRelationships;
 
+    /**
+     * Set by a test to the records it emptied from the Recycle Bin. In a test, and for a while
+     * after `emptyRecycleBin` in an org, `ALL ROWS` still returns a purged record until the
+     * platform removes it physically; the tidy-up simply waits for that, a test cannot.
+     */
+    @TestVisible
+    private static Set<Id> purgedForTest = new Set<Id>();
+
     /** Households moved to the Recycle Bin, across chunks. */
     @TestVisible
     private Integer removed = 0;
@@ -121,22 +129,26 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
     private static Set<Id> withFormerMembersInRecycleBin(Set<Id> householdIds) {
         Set<Id> found = new Set<Id>();
         for (Contact person : [
-            SELECT AccountId
+            SELECT Id, AccountId
             FROM Contact
             WHERE IsDeleted = TRUE AND AccountId IN :householdIds
             WITH SYSTEM_MODE
             ALL ROWS
         ]) {
-            found.add(person.AccountId);
+            if (!purgedForTest.contains(person.Id)) {
+                found.add(person.AccountId);
+            }
         }
         for (Household_Member__c membership : [
-            SELECT Household__c
+            SELECT Id, Household__c
             FROM Household_Member__c
             WHERE IsDeleted = TRUE AND Household__c IN :householdIds
             WITH SYSTEM_MODE
             ALL ROWS
         ]) {
-            found.add(membership.Household__c);
+            if (!purgedForTest.contains(membership.Id)) {
+                found.add(membership.Household__c);
+            }
         }
         return found;
     }
@@ -224,9 +236,10 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
                 AccessLevel.SYSTEM_MODE
             )
         ) {
-            for (String relationship : relationships) {
-                List<SObject> children = household.getSObjects(relationship);
-                if (children != null && !children.isEmpty()) {
+            // Read what came back rather than asking by name: a person account org answers some
+            // relationships under another name than the one queried (PersonAssets as Assets).
+            for (Object value : household.getPopulatedFieldsAsMap().values()) {
+                if (value instanceof List<SObject> && !((List<SObject>) value).isEmpty()) {
                     found.add(household.Id);
                     break;
                 }
