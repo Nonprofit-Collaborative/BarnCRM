@@ -112,6 +112,28 @@ private class CorePostInstallTest {
     }
 
     @IsTest
+    static void aNewInstallStartsWithEveryFeatureOffAndAnUpgradeKeepsThemOn() {
+        System.runAs(TestUsers.admin()) {
+            Id installer = newInstaller();
+            CorePostInstall handler = new CorePostInstall();
+
+            Test.startTest();
+            upgrade(handler, installer);
+            Boolean onAfterUpgrade = FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER);
+            install(handler, installer);
+            Test.stopTest();
+
+            Assert.isTrue(onAfterUpgrade, 'An upgraded org keeps every feature it used');
+            Assert.areEqual(
+                FeatureSwitchService.NONE_ON,
+                SettingsService.getSettings().Features_Turned_On__c,
+                'A new install stores None until first-run setup'
+            );
+            Assert.isTrue(FeatureSwitchService.featuresOn().isEmpty(), 'So no feature is on yet');
+        }
+    }
+
+    @IsTest
     static void installAlwaysGivesTheInstallerTheAdminPermissionSet() {
         System.runAs(TestUsers.admin()) {
             Id installer = newInstaller();

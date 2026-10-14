@@ -369,6 +369,14 @@
         <value>Empty household tidy-up</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_JobTabAccess</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that keeps feature tabs with the right people.</shortDescription>
+        <value>Tab access check</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_JobRollups</fullName>
         <categories>Core</categories>
         <language>en_US</language>

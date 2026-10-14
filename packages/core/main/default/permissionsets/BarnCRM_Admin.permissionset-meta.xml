@@ -1737,26 +1737,6 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Import</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Bulk_Update</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Data_Manager</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Find</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Data_Hygiene</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
     <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>

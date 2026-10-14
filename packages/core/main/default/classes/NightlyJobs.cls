@@ -38,7 +38,8 @@ public with sharing class NightlyJobs {
             new SeasonalAddressJob(),
             new ErrorDigestJob(),
             new ImportRowPurgeJob(),
-            new EmptyHouseholdTidyJob()
+            new EmptyHouseholdTidyJob(),
+            new TabAccessJob()
         };
         for (String className : PROVIDER_CLASSES) {
             jobs.addAll(providedBy(className));
@@ -212,6 +213,24 @@ public with sharing class NightlyJobs {
 
         public void schedule() {
             EmptyHouseholdTidyScheduler.start();
+        }
+    }
+
+    /**
+     * The nightly tab access check (ADR-NEXT): keeps the switchable tabs with the people who
+     * should see them when roles change outside BarnCRM's Access page.
+     */
+    public class TabAccessJob implements NightlyJob {
+        public String label() {
+            return System.Label.Core_HealthCheck_JobTabAccess;
+        }
+
+        public Boolean isScheduled() {
+            return TabAccessScheduler.isScheduled();
+        }
+
+        public void schedule() {
+            TabAccessScheduler.start();
         }
     }
 }

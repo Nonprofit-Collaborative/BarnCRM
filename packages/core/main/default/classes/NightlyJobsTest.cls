@@ -77,6 +77,7 @@ private class NightlyJobsTest {
                 jobs[4] instanceof NightlyJobs.EmptyHouseholdTidyJob,
                 'Then the empty households.'
             );
+            Assert.isTrue(jobs[5] instanceof NightlyJobs.TabAccessJob, 'Then the tabs.');
             Assert.areEqual(moduleJob, jobs[jobs.size() - 1], 'A registered job is counted last.');
             Assert.areEqual(
                 System.Label.Core_HealthCheck_JobSeasonalAddresses,
@@ -102,7 +103,7 @@ private class NightlyJobsTest {
             List<NightlyJob> jobs = NightlyJobs.all();
             Test.stopTest();
 
-            Assert.areEqual(6, jobs.size(), 'Core five, plus the module that answered.');
+            Assert.areEqual(7, jobs.size(), 'Core six, plus the module that answered.');
         }
     }
 

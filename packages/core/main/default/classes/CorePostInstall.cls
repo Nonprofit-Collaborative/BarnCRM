@@ -59,6 +59,7 @@ public with sharing class CorePostInstall implements InstallHandler {
     private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
     private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
+    private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
 
     /**
      * What every Error Log entry written by an install or upgrade starts with, including the
@@ -75,15 +76,35 @@ public with sharing class CorePostInstall implements InstallHandler {
         if (context == null) {
             return;
         }
+        markFeaturesOffOnANewInstall(context);
         applyRecommendedMode();
         ensureRollupDefaults();
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
+        // Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
+        // whoever had those tabs before (ADR-NEXT); queued, since it writes setup objects. It
+        // never throws.
+        TabAccessService.requestSync();
         Id installerId = context.installerId();
         if (installerId == null) {
             return;
         }
         grantInstallerAccess(installerId);
+    }
+
+    /**
+     * A new install starts with every Core feature off until first-run setup (ADR-NEXT). An
+     * upgrade leaves the list empty, which means every feature is on, so an existing org loses
+     * nothing it used.
+     */
+    private void markFeaturesOffOnANewInstall(InstallContext context) {
+        try {
+            if (context.previousVersion() == null) {
+                FeatureSwitchService.markNewInstall();
+            }
+        } catch (Exception e) {
+            ErrorLogger.log(e, FEATURE_CONTEXT);
+        }
     }
 
     /**
