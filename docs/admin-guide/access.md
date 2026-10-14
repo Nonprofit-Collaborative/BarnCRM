@@ -78,7 +78,9 @@ Three things control who can use the page:
    permission. A system administrator has it already. A BarnCRM Admin who is not a system
    administrator gets it from the optional **BarnCRM Access Manager** permission set: in
    Setup, open **Users**, choose the person, and under **Permission Set Assignments** add
-   **BarnCRM Access Manager**. It is in no role because only a full Salesforce license can
+   **BarnCRM Access Manager**. Assign Permission Sets is a Salesforce-wide permission: whoever
+   holds it can also assign any permission set in Setup, not only the BarnCRM roles, so give
+   it only to people you trust with that. It is in no role because only a full Salesforce license can
    hold it; a user with a **Salesforce Platform** license cannot be given it, so in that case
    a colleague with a Salesforce license gives the roles. Everything else in BarnCRM Settings
    works on a Platform license. The same permission lets the

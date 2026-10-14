@@ -202,7 +202,7 @@ def main():
             print(name)
         return 0
 
-    paths =sorted(glob.glob("packages/*/main/default/permissionsets/*.permissionset-meta.xml"))
+    paths = sorted(glob.glob("packages/*/main/default/permissionsets/*.permissionset-meta.xml"))
     group_paths = sorted(
         glob.glob("packages/*/main/default/permissionsetgroups/*.permissionsetgroup-meta.xml")
     )

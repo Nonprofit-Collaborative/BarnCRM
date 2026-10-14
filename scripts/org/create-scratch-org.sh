@@ -3,7 +3,8 @@
 #
 # Creates a scratch org of the given shape, deploys Core, assigns Core's permission sets, and
 # (for the platform-only shape) verifies that a Salesforce Platform license user can be given
-# every Core permission set but the optional Salesforce-license ones. See docs/contributor-guide/scratch-orgs.md for the full explanation.
+# every Core permission set but the optional Salesforce-license ones. See
+# docs/contributor-guide/scratch-orgs.md for the full explanation.
 #
 # Shapes (see config/scratch-defs/):
 #   platform-only     Developer edition, no Sales/Service objects available to the org's
