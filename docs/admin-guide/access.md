@@ -178,12 +178,13 @@ let you remove it from is named with the reason ("BarnCRM Bulk Update could not 
 Priya Nair. Salesforce said: ..."), and the others are still removed. Nothing is written to the
 Error Log when it works.
 
-## Tabs that follow a switch
+## Tabs that follow a feature
 
-Five tabs can be switched off for everyone in BarnCRM Settings, General, Modules and features:
-Data Manager, Import, Find, Bulk Update and Data Hygiene. So no role or extra permission grants
-them any more. Each comes from its own permission set, **BarnCRM Tab: (tab name)**, which
-BarnCRM gives automatically to the people who should see it while its feature is on:
+Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
+General, Features: Data Manager, Import, Find, Bulk Update and Data Hygiene. So no role or
+extra permission grants them any more. Each comes from its own permission set, **BarnCRM Tab:
+(tab name)**, which BarnCRM gives automatically to the people who should see it once its
+feature is on:
 
 | Tab | Given to holders of |
 |---|---|

@@ -21,7 +21,10 @@ changes. The edition is the one answer you give once, and you give it before the
 until an administrator finishes the first-run setup window (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)), the home page shows
 that window instead of the assistant. The assistant's step one then shows the edition
-read-only, and [Editions](editions.md) says how to change it later.
+read-only, and [Editions](editions.md) says how to change it later. The same window asks which
+Core features to turn on; a feature cannot be turned off once on, and one left off can be
+turned on later in BarnCRM Settings, General (see
+[BarnCRM Settings, Features](barncrm-settings.md#features-general)).
 
 ## How to turn it on
 

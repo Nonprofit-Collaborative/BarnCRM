@@ -54,7 +54,7 @@ private class ModuleDetectionServiceTest {
                 names.add(module.name);
             }
             Assert.areEqual(
-                new List<String>{ 'Core', 'RollupBuilder' },
+                new List<String>{ 'Core', 'Rollups' },
                 names,
                 'No nonprofit module is shown until the Nonprofit Edition is chosen'
             );
@@ -177,7 +177,7 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                new List<String>{ 'Core', 'RollupBuilder', 'Giving' },
+                new List<String>{ 'Core', 'Rollups', 'Giving' },
                 names,
                 'An installed module stays listed; the others stay hidden in the Standard Edition'
             );
@@ -337,11 +337,11 @@ private class ModuleDetectionServiceTest {
             }
             Assert.isTrue(
                 ModuleDetectionService.offeredIn(
-                    shipped.get('RollupBuilder'),
+                    shipped.get('Rollups'),
                     ModuleDetectionService.SUITE_COMMUNITY
                 ) &&
                 ModuleDetectionService.offeredIn(
-                    shipped.get('RollupBuilder'),
+                    shipped.get('Rollups'),
                     ModuleDetectionService.SUITE_IMPACT
                 ),
                 'BarnCRM Rollup Builder is offered to both editions'

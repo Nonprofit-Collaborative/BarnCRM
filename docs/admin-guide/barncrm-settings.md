@@ -38,37 +38,38 @@ the same setup window in front of everything else, and nothing behind it can be 
   1. **Which edition**: Standard Edition or Nonprofit Edition (see [Editions](editions.md)).
      This is the only place the edition is asked; the Setup Assistant's first step then shows
      it read-only.
-  2. **What to turn on**: **Turn on all the default core features** (everything on, the
-     usual choice), or **Let me choose modules and features**, which lists the same features
-     and installed modules as the panel described below, all ticked. Untick what you do not
-     want.
+  2. **What to turn on**: **Turn on all the default core features** (every feature on, the
+     usual choice), or **Let me choose features**, which lists the features described below,
+     all ticked. Untick what you do not want yet.
 
-  Click **Finish setup**. What you left on is turned on fully: its switch, its tabs, its
-  settings, and its automations. What you unticked is turned off the same way. You land on
-  **General** in BarnCRM Settings, and the setup window never shows again on either page.
+  Click **Finish setup**. What you left ticked is turned on fully: its tabs, its settings and
+  its automations. What you unticked stays off, and you can turn it on later in **General**.
+  You land on **General** in BarnCRM Settings, and the setup window never shows again on
+  either page. No module is installed by first-run setup: install modules later from the
+  **Modules** section.
 - **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and nothing
   else, on both pages, until an administrator finishes.
 
 An org that had already chosen an edition before this release never sees the window.
 
-## Modules and features (General)
+## Features (General)
+
+Features come with BarnCRM Core. On a new install every feature is off until you turn it on,
+in first-run setup or here. An org upgraded from a release before features existed has every
+feature on, so nothing it already used disappears.
 
 The **General** section starts with **Edition** (read-only, see [Editions](editions.md)) and
-then **Modules and features**. Only people with Manage BarnCRM Settings can use its switches
-and install links.
+then **Features**: one row per feature, each with a short description and its state. Above
+the rows a warning says that **a feature cannot be turned off once it is turned on**. A
+feature that is off has a **Turn on** button, which asks you to confirm before it does
+anything; a feature that is on just says **On**. Only people with Manage BarnCRM Settings see
+the Turn on buttons.
 
-- **Features** come with BarnCRM Core and can be turned on or off. Each has a short
-  description, its state, and a switch. Turning one off hides its tabs and its settings in
-  this page for everyone and stops its automations; turning it on brings them back. Nothing is
-  deleted either way.
-- **Modules** are separate packages, not installed with Core. Each is listed only in the
-  editions it belongs to. A module that is not installed shows **Not installed** with
-  **Install** and **What this module does**. An installed module shows its state, a switch,
-  and a link to its own app: each module has its own app with its own Settings tab, and its
-  settings live there, not in this page. (Some module sections still show in this page for
-  now; they move to the module's app in a later release.)
+While a feature is off its tabs are hidden for everyone, its rows in this page are hidden (a
+section left empty disappears), and its automations do not run. Turning it on shows its tabs
+to the people who should see them, shows its settings, and starts its automations.
 
-| Row | What it covers | Off hides or stops |
+| Feature | What it covers | Hidden or stopped while off |
 |---|---|---|
 | Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
 | Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
@@ -78,29 +79,41 @@ and install links.
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email | Copying the preferred email into the standard email | Its two automations |
-| Each installed module (BarnCRM Giving and the others) | The module | Its automations and its rows in this page. Its tabs follow the module's own permission sets until that module ships switchable tabs (BarnCRM Giving does not yet) |
+
+Rules that enforce data (relationship, affiliation and rollup definition checks) belong to no
+feature and always run. Once a feature is on, the Automation section still lets you pause any
+single automation for fine-grained control; that is not turning the feature off.
+
+**How tab hiding works.** Salesforce shows a tab to anyone holding a permission set that
+grants it, and an app cannot hide a tab any other way. So each feature tab has its own small
+packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab, and
+BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
+a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
+Export for Find, Data Manager and Data Hygiene, Bulk Update or Bulk Delete for Bulk Update and
+Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
+permission is given or removed on the Access page, after every upgrade, and every night (for
+roles given in Setup or by user access policies). A large org may take a few minutes to catch
+up. Do not assign the BarnCRM Tab permission sets by hand: the nightly run removes them from
+anyone who should not have them.
+
+## Modules
+
+Modules are separate packages, not installed with Core. The **Modules** section lists the
+modules your edition offers (see [Editions](editions.md)), plus any module already installed:
+
+- A module that is not installed shows **Not installed** with **Install**, which opens
+  Salesforce's installer, and **What this module does**.
+- An installed module shows **Installed** and a link to its own app. Each module has its own
+  app with its own Settings tab, and its settings live there, not in BarnCRM Settings. (Some
+  module sections still show in BarnCRM Settings for now; they move to the module's app in a
+  later release.)
 
 The modules are BarnCRM Rollup Builder (both editions), and BarnCRM Giving, BarnCRM
 Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect (Nonprofit Edition). The
 Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
-Builder is still part of Core while it is being split into its own package; until then its
-tab and settings show as they always have.
-
-Rules that enforce data (relationship, affiliation and rollup definition checks) are not
-part of any row and always run. The Automation section still lists every automation for
-fine-grained control; a feature row is on when any of its automations is on.
-
-**How tab hiding works.** Salesforce shows a tab to anyone holding a permission set that
-grants it, and an app cannot hide a tab any other way. So each switchable tab has its own
-small packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab,
-and BarnCRM gives it to, or takes it from, the people who should see the tab: whoever holds a
-role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export for Find, Data Manager and Data Hygiene, Bulk Update or Bulk Delete for Bulk Update and
-Data Manager). BarnCRM keeps these in step when a switch changes, when a role or extra
-permission is given on the Access page, after every upgrade, and every night (for roles given
-in Setup or by user access policies). A large org may take a few minutes to catch up after a
-switch. Do not assign the BarnCRM Tab permission sets by hand: the nightly run removes them
-from anyone who should not have them.
+Builder is still part of Core while it is being split into its own package; until then it
+shows as installed, and its tab and settings show as they always have. See the
+[Module Manager](module-manager.md) for what else you can do with an installed module.
 
 ## A five-minute walkthrough
 
@@ -109,9 +122,10 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM**. The home page
    opens with the **Setup checklist**.
 2. Click the **BarnCRM Settings** tab. The console opens with the section list on the
-   left and the first section showing on the right. The sections are General, Organization,
-   Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation, Error Log,
-   Access, Import, and Health. You only see the ones that have something in them: Giving and
+   left and the first section showing on the right. The sections are General, Modules,
+   Organization, Households, Relationships, Addresses, Giving, Receipts, Rollups, Automation,
+   Error Log, Access, Import, and Health. You only see the ones that have something in them,
+   and a feature that is off hides its sections: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in the Setup Assistant, and the
@@ -249,5 +263,5 @@ changes.
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Giving brings its own. |
 | A row in Recent changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
-| Which of Data Manager, Duplicate Review and Org Optimizer are off | BarnCRM Settings, Features Turned Off (a comma-separated list; empty means all on) |
+| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; empty, on an org upgraded from before features existed, means all on) |
 | Which modules are off | BarnCRM Settings, Modules Turned Off |
