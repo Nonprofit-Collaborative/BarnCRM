@@ -5979,8 +5979,10 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
 - **Event:** `Merge_Settlement_Ready__e`, a platform event, publish behavior Publish After
   Commit. `Household_Ids__c`, `Owner_Ids__c` and `Person_Ids__c` (Long Text Area, 32,768) each
   carry up to 200 comma-separated survivor identifiers; more survivors make more events.
-  `MergeSettlementReadyTrigger` subscribes and queues one settlement job per event, resuming
-  from a checkpoint when its transaction can queue no more. The three packaged permission sets
+  `MergeSettlementReadyTrigger` subscribes, as the Automated Process user, in batches of 50
+  (`PlatformEventSubscriberConfig` `MergeSettlementReadyTriggerConfig`, no running user), and
+  queues one settlement job per event, resuming from a checkpoint when its transaction can
+  queue no more and retrying a batch it could queue nothing for. The three packaged permission sets
   grant Read and Create on it, as on `Rollup_Queue_Ready__e`.
 - **Matching** is `Datacloud.FindDuplicatesByIds`, which evaluates the org's active duplicate
   rules. It is called for one object at a time, and for households only among accounts: a

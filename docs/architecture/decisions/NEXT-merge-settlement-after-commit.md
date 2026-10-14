@@ -28,11 +28,19 @@ After Commit, naming its survivors in three lists (households folded together, a
 people), up to 200 identifiers per list per event; more survivors make more events. The event
 is delivered only if the merge commits, and after it does, so the settlement reads what the
 merge saved. Its subscriber, `MergeSettlementReadyTrigger`, queues one `MergeSettlement` job
-per event, in a transaction that is not the merge's, and sets a resume checkpoint after each,
-so a delivery larger than its job allowance continues in a new call.
+per event, in a transaction that is not the merge's. A packaged `PlatformEventSubscriberConfig`
+(`MergeSettlementReadyTriggerConfig`, no running user named) sets its batch size to 50, so one
+delivery fits the 50 jobs a transaction may queue. As a guard, should the jobs still run out,
+it sets a resume checkpoint after each event it queued and stops; the platform sends the events
+after the checkpoint in a new call. That is the documented use of `setResumeCheckpoint` to cap
+a batch: a normal exit resumes from the checkpoint, not only an uncaught exception, and
+`MergeSettlementTest` proves on `oi-test` that later deliveries carry the rest. If not even the
+first event could be queued there is no checkpoint, so it throws `EventBus.RetryableException`
+(nothing was queued, so nothing is undone); on the last retry the platform allows, it names the
+survivors in the Error Log instead.
 
-The Warning stays for one case: the platform refusing the publish. It names the survivors and
-the platform's message.
+The Warning stays for two cases: the platform refusing the publish, with the platform's
+message, and that last retry. Both name the survivors.
 
 The event carries identifiers, unlike `Rollup_Queue_Ready__e`. ADR-0100 kept identifiers off
 that event because the Rollup Queue already stores them durably. Survivors have no such store,
@@ -45,8 +53,9 @@ What each piece prevents:
   records before the merge's changes are visible.
 - The 200 identifier chunk: a field too small for a bulk merge (200 identifiers of 18
   characters and a separator fit 32,768 characters with room to spare).
-- One job per event with a checkpoint: a large delivery queuing more jobs than the
-  subscriber's transaction may.
+- The batch size of 50: a delivery holding more events than the subscriber may queue jobs for
+  (the default batch is 2,000).
+- The checkpoint and the retry: events lost if the jobs run out anyway.
 
 ## Alternatives considered
 
@@ -58,8 +67,11 @@ What each piece prevents:
   breaks a caller that attaches its own.
 - **A scheduled job a minute later.** Uses one of the org's 100 scheduled job slots per merge
   transaction and still lags.
-- **Settle in the subscriber directly.** A delivery can hold up to 2,000 events, more than one
-  transaction can settle; one queued job per event keeps each settlement within its limits.
+- **Settle in the subscriber directly.** Even 50 events can name 10,000 survivors per list,
+  more than one transaction can settle; one queued job per event keeps each settlement within
+  its limits.
+- **Name a running user in the subscriber config.** A username is org-specific and cannot ship
+  in a package; the Automated Process user already settles correctly.
 
 ## Consequences
 
@@ -68,6 +80,11 @@ What each piece prevents:
 - The subscriber runs as the Automated Process user, and the job it queues runs as that user,
   not as whoever ran the merge. Its user mode reads and writes succeed for that user:
   `MergeSettlementTest` on `oi-test` checks that the job was created by the Automated Process
-  user, completed, and settled the survivor's addresses and relationships.
+  user, completed, and settled the survivor's addresses, relationships, household count, name
+  and primary affiliation. Records it changes show the Automated Process user as Last Modified
+  By.
+- `PlatformEventSubscriberConfig` is listed among the components available in
+  second-generation managed packages; the package developer owns its batch size, and a
+  subscriber may set only its user.
 - The three packaged permission sets grant Read and Create on the event, as on
   `Rollup_Queue_Ready__e` (the org refuses Create on a platform event without Read).

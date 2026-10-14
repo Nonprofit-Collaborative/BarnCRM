@@ -29,6 +29,9 @@ public with sharing class MergeSettlement implements Queueable {
 
     private static final String SEPARATOR = ',';
 
+    /** The platform delivers a batch again after `RetryableException` nine times at most. */
+    private static final Integer LAST_RETRY = 8;
+
     private final Set<Id> householdIds;
     private final Set<Id> ownerIds;
     private final Set<Id> personIds;
@@ -48,6 +51,18 @@ public with sharing class MergeSettlement implements Queueable {
     /** Test seam: a message here stands in for the platform refusing the publish. */
     @TestVisible
     private static String publishFailureForTest;
+
+    /** Test seam: stands in for the jobs the subscriber's transaction may still queue. */
+    @TestVisible
+    private static Integer jobsLeftForTest;
+
+    /** Test seam: stands in for the times the platform has delivered this batch again. */
+    @TestVisible
+    private static Integer retriesForTest;
+
+    /** Every survivor the subscriber queued a job for, across its calls, for a test. */
+    @TestVisible
+    private static Set<Id> queuedByEvents;
 
     @TestVisible
     private MergeSettlement(Set<Id> householdIds, Set<Id> ownerIds, Set<Id> personIds) {
@@ -92,17 +107,40 @@ public with sharing class MergeSettlement implements Queueable {
 
     /**
      * The subscriber of `Merge_Settlement_Ready__e`: queues one job per event, in the merge's
-     * place. When this transaction can queue no more, it stops and the platform delivers the
-     * rest again in a new call, from the last event it queued.
+     * place. Its delivery batch is 50 events (`PlatformEventSubscriberConfig`), within the jobs
+     * one transaction may queue, so normally every event is queued. Should the jobs run out
+     * anyway, it sets a resume checkpoint after each event it queued and stops: the platform
+     * sends the events after the checkpoint again in a new call. When not even the first
+     * could be queued there is no checkpoint, so it asks for the whole batch again with
+     * `EventBus.RetryableException` (nothing was queued, so nothing is undone); on the last
+     * retry the platform allows it names the survivors in the Error Log instead. No event is
+     * dropped silently.
      *
      * @param events the events delivered, oldest first
      */
     public static void settlePublished(List<Merge_Settlement_Ready__e> events) {
         Set<Id> queued = new Set<Id>();
+        Integer room = jobsLeftForTest != null
+            ? jobsLeftForTest
+            : Limits.getLimitQueueableJobs() - Limits.getQueueableJobs();
+        Integer queuedJobs = 0;
         for (Merge_Settlement_Ready__e event : events) {
-            if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+            if (queuedJobs >= room) {
+                if (queuedJobs == 0) {
+                    Integer retries = retriesForTest != null
+                        ? retriesForTest
+                        : EventBus.TriggerContext.currentContext().retries;
+                    if (retries < LAST_RETRY) {
+                        throw new EventBus.RetryableException(
+                            'No queueable job left to tidy up after a merge; delivering again.'
+                        );
+                    }
+                    // The platform retries no further: name the survivors for an administrator.
+                    logNotSettled(survivorsIn(events), 'No queueable job left');
+                }
                 break;
             }
+            queuedJobs++;
             Set<Id> householdIds = idsIn(event.Household_Ids__c);
             Set<Id> ownerIds = idsIn(event.Owner_Ids__c);
             Set<Id> personIds = idsIn(event.Person_Ids__c);
@@ -113,6 +151,10 @@ public with sharing class MergeSettlement implements Queueable {
             EventBus.TriggerContext.currentContext().setResumeCheckpoint(event.ReplayId);
         }
         lastQueued = queued;
+        if (queuedByEvents == null) {
+            queuedByEvents = new Set<Id>();
+        }
+        queuedByEvents.addAll(queued);
     }
 
     /**
@@ -184,6 +226,16 @@ public with sharing class MergeSettlement implements Queueable {
             part.add(String.valueOf(ids[i]));
         }
         return String.join(part, SEPARATOR);
+    }
+
+    private static Set<Id> survivorsIn(List<Merge_Settlement_Ready__e> events) {
+        Set<Id> survivors = new Set<Id>();
+        for (Merge_Settlement_Ready__e event : events) {
+            survivors.addAll(idsIn(event.Household_Ids__c));
+            survivors.addAll(idsIn(event.Owner_Ids__c));
+            survivors.addAll(idsIn(event.Person_Ids__c));
+        }
+        return survivors;
     }
 
     private static Set<Id> idsIn(String joined) {

@@ -486,6 +486,144 @@ private class MergeSettlementTest {
     }
 
     @IsTest
+    static void aHouseholdAndAPersonMergedInABackgroundJobAreSettledAfterItCommits() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account keptHousehold = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            Account otherHousehold = HouseholdTestDataFactory.newHousehold('The Lee Family');
+            insert new List<Account>{ keptHousehold, otherHousehold };
+            insert new List<Contact>{
+                AddressTestDataFactory.newContact('Maria', 'Garcia', keptHousehold.Id),
+                AddressTestDataFactory.newContact('Wei', 'Lee', otherHousehold.Id)
+            };
+            Contact kept = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Okafor');
+            Contact other = HouseholdTestDataFactory.newContact('Ms.', 'Anna', 'Okafor');
+            insert new List<Contact>{ kept, other };
+            List<Account> orgs = RelationshipTestDataFactory.organizations(2, 'Employer');
+            Affiliation__c first = RelationshipTestDataFactory.affiliation(kept, orgs[0], 'Staff');
+            first.Is_Primary__c = true;
+            insert first;
+            Affiliation__c second = RelationshipTestDataFactory.affiliation(
+                other,
+                orgs[1],
+                'Staff'
+            );
+            second.Is_Primary__c = true;
+            insert second;
+
+            Test.startTest();
+            MergeSettlement.queueableForTest = true;
+            Database.merge(new Account(Id = keptHousehold.Id), otherHousehold.Id);
+            Database.merge(new Contact(Id = kept.Id), other.Id);
+            MergeSettlement.queueableForTest = null;
+            Test.getEventBus().deliver();
+            Test.stopTest();
+
+            Account saved = [
+                SELECT Name, Member_Count__c
+                FROM Account
+                WHERE Id = :keptHousehold.Id
+            ];
+            Assert.areEqual(2, saved.Member_Count__c, 'Both people are counted');
+            Assert.isTrue(saved.Name.contains('Lee'), 'Renamed for the newcomer: ' + saved.Name);
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Affiliation__c
+                    WHERE Contact__c = :kept.Id AND Is_Primary__c = TRUE
+                ],
+                'One primary affiliation'
+            );
+            Assert.isTrue(
+                MergeSettlement.queuedByEvents.containsAll(
+                    new Set<Id>{ keptHousehold.Id, kept.Id }
+                ),
+                'Both were settled through the event'
+            );
+            for (AsyncApexJob job : [
+                SELECT CreatedBy.UserType, Status
+                FROM AsyncApexJob
+                WHERE ApexClass.Name = 'MergeSettlement'
+            ]) {
+                Assert.areEqual('AutomatedProcess', job.CreatedBy.UserType);
+                Assert.areEqual('Completed', job.Status);
+            }
+            Assert.areEqual(0, settlementWarnings().size(), 'Nothing for an administrator to do');
+        }
+    }
+
+    private static List<Contact> peopleNamedInEvents(Integer count) {
+        List<Contact> people = new List<Contact>();
+        for (Integer i = 0; i < count; i++) {
+            people.add(HouseholdTestDataFactory.newContact('Ms.', 'Person', 'Number' + i));
+        }
+        insert people;
+        List<Merge_Settlement_Ready__e> events = new List<Merge_Settlement_Ready__e>();
+        for (Contact person : people) {
+            events.add(
+                new Merge_Settlement_Ready__e(
+                    Owner_Ids__c = String.valueOf(person.Id),
+                    Person_Ids__c = String.valueOf(person.Id)
+                )
+            );
+        }
+        EventBus.publish(events);
+        return people;
+    }
+
+    @IsTest
+    static void moreEventsThanJobsLeftAreQueuedOverLaterDeliveries() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Contact> people = peopleNamedInEvents(5);
+            MergeSettlement.jobsLeftForTest = 2;
+
+            Test.getEventBus().deliver();
+            Assert.areEqual(2, MergeSettlement.queuedByEvents.size(), 'Two jobs fit the first');
+            Test.getEventBus().deliver();
+            Assert.areEqual(4, MergeSettlement.queuedByEvents.size(), 'The rest are sent again');
+            Test.getEventBus().deliver();
+            MergeSettlement.jobsLeftForTest = null;
+            Test.stopTest();
+
+            Assert.areEqual(
+                new Map<Id, Contact>(people).keySet(),
+                MergeSettlement.queuedByEvents,
+                'Every survivor was queued, none dropped'
+            );
+            Assert.areEqual(0, settlementWarnings().size(), 'Nothing for an administrator to do');
+        }
+    }
+
+    @IsTest
+    static void noJobLeftAtAllIsRetriedThenNamedInTheErrorLog() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<Contact> people = peopleNamedInEvents(1);
+            MergeSettlement.jobsLeftForTest = 0;
+            MergeSettlement.retriesForTest = 0;
+            Test.getEventBus().deliver();
+            Assert.areEqual(0, settlementWarnings().size(), 'A first failure asks again');
+            MergeSettlement.retriesForTest = 8;
+            Test.getEventBus().deliver();
+            Test.getEventBus().deliver();
+            Test.stopTest();
+
+            Assert.isTrue(
+                MergeSettlement.queuedByEvents == null || MergeSettlement.queuedByEvents.isEmpty(),
+                'Nothing could be queued'
+            );
+            List<Error_Log__c> warnings = settlementWarnings();
+            Assert.areEqual(1, warnings.size(), 'Named once, after the last retry');
+            Assert.isTrue(
+                warnings[0].Message__c.contains(String.valueOf(people[0].Id)),
+                'So an administrator can check them: ' + warnings[0].Message__c
+            );
+        }
+    }
+
+    @IsTest
     static void manySurvivorsArePublishedTwoHundredToAnEvent() {
         System.runAs(TestUsers.admin()) {
             String prefix = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
