@@ -44,8 +44,6 @@ public with sharing class HealthCheckController {
         try {
             CoexistenceService.applyMode(OrgShapeDetector.recommendedCoexistenceMode());
             return HealthCheckService.buildReport();
-        } catch (AuraHandledException e) {
-            throw e;
         } catch (CoexistenceService.CoexistenceException e) {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
@@ -63,8 +61,6 @@ public with sharing class HealthCheckController {
         try {
             CoexistenceService.applyJunctionMembership();
             return HealthCheckService.buildReport();
-        } catch (AuraHandledException e) {
-            throw e;
         } catch (CoexistenceService.CoexistenceException e) {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
@@ -81,15 +77,22 @@ public with sharing class HealthCheckController {
     public static HealthCheckService.Report enableAutomaticHouseholds() {
         requireManageSettings();
         try {
+            if (householdProblemForTest != null) {
+                throw householdProblemForTest;
+            }
             HouseholdService.enableAutomaticHouseholds();
             return HealthCheckService.buildReport();
-        } catch (AuraHandledException e) {
-            throw e;
+        } catch (HouseholdException e) {
+            throw HouseholdException.forScreen(e, System.Label.Core_HealthCheck_ErrorContext, null);
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_ErrorContext);
             throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
         }
     }
+
+    /** Set by a test to make the households fix raise a HouseholdException. */
+    @TestVisible
+    private static HouseholdException householdProblemForTest;
 
     /** What a fix is recorded under in the settings change history, before its button label. */
     private static final String CHANGE_PREFIX = 'Health Check: ';

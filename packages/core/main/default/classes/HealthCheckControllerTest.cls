@@ -180,6 +180,32 @@ private class HealthCheckControllerTest {
     }
 
     @IsTest
+    static void aHouseholdProblemOnTheHouseholdsFixIsShownInItsOwnWords() {
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+
+            System.runAs(maria) {
+                HealthCheckController.householdProblemForTest = new HouseholdException(
+                    System.Label.Core_Households_ErrorRecordTypeMissing
+                );
+
+                String shown;
+                try {
+                    HealthCheckController.enableAutomaticHouseholds();
+                } catch (AuraHandledException e) {
+                    shown = e.getMessage();
+                }
+
+                Assert.areEqual(
+                    System.Label.Core_Households_ErrorRecordTypeMissing,
+                    shown,
+                    'The household sentence reaches the screen, not the generic failure.'
+                );
+            }
+        }
+    }
+
+    @IsTest
     static void withThePermissionAutomaticHouseholdsAreTurnedOn() {
         System.runAs(TestUsers.admin()) {
             User maria = HealthCheckTestHelper.mariaWithManageSettings();
