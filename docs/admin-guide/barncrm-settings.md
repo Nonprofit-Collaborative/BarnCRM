@@ -111,6 +111,7 @@ cannot tell. Nothing on the note changes your org: you make the change in Setup 
 | Error Log | Allow the org to send email, or no digest is sent (Setup, Deliverability, Access level: All email) | Yes |
 | Access | Assign a module's own permission set, such as Giving Staff, alongside the role (Setup, Users, Permission Set Assignments). Creating the user is the **Create a user in Setup** link on the page itself | No |
 | Import | To let someone who is not a BarnCRM Admin bulk update, or anyone bulk delete: assign **BarnCRM Bulk Update** or **BarnCRM Bulk Delete**, with **BarnCRM Find and Export** (Setup, Users, Permission Set Assignments) | No |
+| Access | To let one or two people erase a person on request: assign **BarnCRM Erase People**, which is in no role, not even BarnCRM Admin (Setup, Users, Permission Set Assignments). See [Erase a person](erase-a-person.md) | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Done or Not done yet.
