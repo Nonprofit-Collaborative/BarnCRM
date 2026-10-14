@@ -91,22 +91,24 @@
 # POLL_SECONDS sets the report interval. `sf` is found on PATH, so a fake one can drive this
 # logic in a test.
 #
-# WHAT THE STAGES COST, AND THE SWITCHES TO MEASURE IT. About 36 stages, each followed by the
-# pause, is about 9 minutes of sleep per run plus the submit and poll overhead of every stage.
-# The two faults that justified the split have since been explained by real defects (the
-# Account to Import_Batch__c order, which the order below fixes, and the unparseable custom
-# metadata of 2026-09-22), so both are worth undoing once a run proves it safe:
-# STAGE_PAUSE_SECONDS=0 drops the pause, and DATA_MODEL_STAGES=combined deploys every Core
-# object in one request, falling back to one object per stage only when that request fails
-# with no component error (the platform's opaque UNKNOWN_EXCEPTION). Neither is the default
-# until a gate run with each has been timed: see docs/contributor-guide/ci.md, "Faster deploys".
+# WHAT THE STAGES COST, AND THE FAST DEFAULTS. About 36 stages, each followed by a 15 second
+# pause, cost about 9 minutes of sleep per run plus the submit and poll overhead of every
+# stage. The two faults that justified the split have since been explained by real defects
+# (the Account to Import_Batch__c order, which the order below fixes, and the unparseable
+# custom metadata of 2026-09-22). So the defaults are now the fast settings: no pause
+# (STAGE_PAUSE_SECONDS=0) and every Core object in one request (DATA_MODEL_STAGES=combined),
+# falling back to one object per stage only when that request fails with no component error
+# (the platform's opaque UNKNOWN_EXCEPTION). The full gate at these settings took about 12
+# minutes end to end on oi-test on 2026-10-13, clean. STAGE_PAUSE_SECONDS=15 and
+# DATA_MODEL_STAGES=per-object bring back the old behaviour: see docs/contributor-guide/ci.md,
+# "Faster deploys".
 #
 # Exit codes: 0 = every stage deployed, non-zero = the first stage that failed.
 
 set -uo pipefail
 
-STAGE_PAUSE_SECONDS="${STAGE_PAUSE_SECONDS:-15}"
-DATA_MODEL_STAGES="${DATA_MODEL_STAGES:-per-object}"
+STAGE_PAUSE_SECONDS="${STAGE_PAUSE_SECONDS:-0}"
+DATA_MODEL_STAGES="${DATA_MODEL_STAGES:-combined}"
 STALL_SECONDS="${STALL_SECONDS:-300}"
 POLL_SECONDS="${POLL_SECONDS:-15}"
 DEPLOY_WAIT_MINUTES="${DEPLOY_WAIT_MINUTES:-30}"
@@ -332,8 +334,10 @@ deploy_stage() {
     STALLS_RECOVERED=$(( STALLS_RECOVERED + ${#stalled[@]} ))
     echo "== Recovered: ${label} deployed on resubmission after stalled job ${stalled[*]} =="
   fi
-  echo "== Pausing ${STAGE_PAUSE_SECONDS}s before the next stage =="
-  sleep "$STAGE_PAUSE_SECONDS"
+  if [[ "$STAGE_PAUSE_SECONDS" != "0" ]]; then
+    echo "== Pausing ${STAGE_PAUSE_SECONDS}s before the next stage =="
+    sleep "$STAGE_PAUSE_SECONDS"
+  fi
   return 0
 }
 

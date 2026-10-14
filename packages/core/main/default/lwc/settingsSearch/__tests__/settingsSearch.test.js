@@ -82,6 +82,73 @@ describe('c-settings-search', () => {
     expect(element.shadowRoot.querySelector('p[role="status"]')).not.toBeNull();
   });
 
+  it('shows an error, not "no results", when the search fails (UI-16)', async () => {
+    search.mockRejectedValue(new Error('down'));
+    const element = build();
+
+    const input = element.shadowRoot.querySelector('lightning-input');
+    input.value = 'zzz';
+    input.dispatchEvent(new CustomEvent('change'));
+    jest.runAllTimers();
+    await settle();
+
+    expect(element.shadowRoot.querySelector('p[role="alert"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('p[role="status"]')).toBeNull();
+  });
+
+  it('ignores a slow answer to an earlier term (UI-16)', async () => {
+    let answerSlow;
+    search.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          answerSlow = resolve;
+        })
+    );
+    search.mockResolvedValueOnce([HITS[1]]);
+    const element = build();
+    const input = element.shadowRoot.querySelector('lightning-input');
+
+    input.value = 'gre';
+    input.dispatchEvent(new CustomEvent('change'));
+    jest.runAllTimers();
+    await settle();
+    input.value = 'greeting';
+    input.dispatchEvent(new CustomEvent('change'));
+    jest.runAllTimers();
+    await settle();
+    answerSlow(HITS);
+    await settle();
+
+    const rows = element.shadowRoot.querySelectorAll('li');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].textContent).toContain('Informal greeting');
+  });
+
+  it('does not bring results back after the box was cleared (UI-16)', async () => {
+    let answerSlow;
+    search.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          answerSlow = resolve;
+        })
+    );
+    const element = build();
+    const input = element.shadowRoot.querySelector('lightning-input');
+
+    input.value = 'greeting';
+    input.dispatchEvent(new CustomEvent('change'));
+    jest.runAllTimers();
+    await settle();
+    input.value = '';
+    input.dispatchEvent(new CustomEvent('change'));
+    jest.runAllTimers();
+    await settle();
+    answerSlow(HITS);
+    await settle();
+
+    expect(element.shadowRoot.querySelectorAll('li')).toHaveLength(0);
+  });
+
   it('does not search for an empty box', async () => {
     const element = build();
 

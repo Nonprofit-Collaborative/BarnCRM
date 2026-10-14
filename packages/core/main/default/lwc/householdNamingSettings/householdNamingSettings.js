@@ -64,6 +64,8 @@ export default class HouseholdNamingSettings extends LightningElement {
   isSaving = false;
 
   debounceTimer;
+  /** Counts previews, so a slow answer for earlier patterns cannot replace a newer one. */
+  previewSequence = 0;
 
   get canEdit() {
     return hasManageSettings === true;
@@ -128,18 +130,23 @@ export default class HouseholdNamingSettings extends LightningElement {
   }
 
   refreshPreview() {
+    const sequence = ++this.previewSequence;
     return preview({
       namePattern: this.namePattern,
       formalPattern: this.formalPattern,
       informalPattern: this.informalPattern
     })
       .then((rows) => {
-        this.samples = (rows || []).map((row, index) => ({ ...row, key: `sample-${index}` }));
-        this.errorMessage = undefined;
+        if (sequence === this.previewSequence) {
+          this.samples = (rows || []).map((row, index) => ({ ...row, key: `sample-${index}` }));
+          this.errorMessage = undefined;
+        }
       })
       .catch((error) => {
-        this.samples = [];
-        this.errorMessage = this.readError(error);
+        if (sequence === this.previewSequence) {
+          this.samples = [];
+          this.errorMessage = this.readError(error);
+        }
       });
   }
 

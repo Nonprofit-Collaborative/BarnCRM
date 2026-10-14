@@ -94,9 +94,19 @@ private class SampleDataControllerTest {
             SampleDataController.permissionOverride = true;
             loadEverything(buildJson(2, 2));
 
+            Test.startTest();
             SampleDataLoader.Counts removed = SampleDataController.removeSampleData();
+            Test.stopTest();
             System.assertEquals(2, removed.householdCount, 'both households should be removed');
             System.assertEquals(4, removed.contactCount, 'every sample contact should be removed');
+            System.assertEquals(true, removed.removing, 'the card is told the removal started');
+
+            // A test runs one stage of the batch; run the rest the way the batch does in an org.
+            SampleDataRemoveStages stages = new SampleDataRemoveStages();
+            Integer stageCount = stages.stageCount();
+            for (Integer stage = 0; stage < stageCount; stage++) {
+                stages.runStage(stage);
+            }
 
             SampleDataLoader.Counts status = SampleDataController.getStatus();
             System.assertEquals(0, status.householdCount, 'nothing flagged should remain');

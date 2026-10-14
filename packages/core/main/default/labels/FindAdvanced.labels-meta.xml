@@ -406,7 +406,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Notice after table edits are saved. {0} saved count, {1} unchanged count.</shortDescription>
-        <value>Saved {0} records. {1} already held the values. Undo from the Bulk Update tab.</value>
+        <value>Saved {0} records. {1} already held the values. Undo from Data jobs on the Data Manager tab.</value>
     </labels>
     <labels>
         <fullName>Core_Find_EditFailed</fullName>
