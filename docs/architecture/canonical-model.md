@@ -6567,6 +6567,16 @@ without them.
   Records again in user mode: a record gone or hidden since the dry run is counted as no longer
   matching. Deleting, journaling, Rows Deleted and the undo are as R-BD3 and R-BD5.
 
+**R-BD8 Download these records first.** Before the count is typed, the panel offers a download
+of every record the delete would delete: the query's matches, or a delete by file's Matched
+rows' records. The browser reads them page by page, 200 records a page in Id order after the
+last Id read, each page read in user mode with every field the person may read (describe's
+`isAccessible`; compound address and location fields and binary fields are left out, an
+address's parts are kept), Id first. It writes them as CSV with Find's export rules (R-SQ3).
+Nothing is written on the server and nothing is deleted; the download is optional and does not
+change the count to type. It needs what the delete's preview needs (R-BD6). Child records the
+platform deletes with a parent are not in it.
+
 ### Salesforce implementation
 
 - **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`,

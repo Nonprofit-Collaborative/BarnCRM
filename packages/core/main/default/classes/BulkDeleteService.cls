@@ -475,6 +475,131 @@ public with sharing class BulkDeleteService {
     }
 
     // -------------------------------------------------------------------------------------
+    // Download these records first (R-BD8)
+    // -------------------------------------------------------------------------------------
+
+    /** Records read per page of a download: every readable field, so fewer than Find's. */
+    public static final Integer BACKUP_PAGE_SIZE = 200;
+
+    /** One column of a download: a field the person may read. */
+    public class BackupColumn {
+        @AuraEnabled
+        public String fieldName;
+        @AuraEnabled
+        public String label;
+    }
+
+    /** One page of the records a delete would delete, with every field the person may read. */
+    public class BackupPage {
+        @AuraEnabled
+        public String objectName;
+        @AuraEnabled
+        public List<BackupColumn> columns = new List<BackupColumn>();
+        @AuraEnabled
+        public List<SObject> rows = new List<SObject>();
+        /** Where the next page starts; the browser sends it back. */
+        @AuraEnabled
+        public String lastId;
+        @AuraEnabled
+        public Boolean done = true;
+    }
+
+    /**
+     * One page of the records a bulk delete (a query document) or a delete by file (a batch's
+     * Matched rows) would delete, in Id order after `afterId`, read as the person with every
+     * field they may read. Nothing is written.
+     */
+    public static BackupPage backupPage(String queryJson, Id batchId, String afterId) {
+        Plan checked;
+        List<Id> ids = new List<Id>();
+        if (batchId != null) {
+            checked = planForFile(objectOfFile(dryRunOfFile(batchId)));
+            // The rows are the package's own bookkeeping (ADR-0021); the records are read below
+            // as the person.
+            for (
+                SObject row : Database.queryWithBinds(
+                    'SELECT Gift_Id__c FROM Import_Row__c WHERE Import_Batch__c = :batchId' +
+                        ' AND Status__c = :matched AND Gift_Id__c != NULL' +
+                        (String.isBlank(afterId) ? '' : ' AND Gift_Id__c > :after') +
+                        ' ORDER BY Gift_Id__c LIMIT :pageSize',
+                    new Map<String, Object>{
+                        'batchId' => batchId,
+                        'matched' => ImportRowProcessor.STATUS_MATCHED,
+                        'after' => afterId,
+                        'pageSize' => BACKUP_PAGE_SIZE
+                    },
+                    AccessLevel.SYSTEM_MODE
+                )
+            ) {
+                ids.add(Id.valueOf((String) row.get('Gift_Id__c')));
+            }
+        } else {
+            checked = plan(queryJson);
+            Id after = String.isBlank(afterId) ? null : Id.valueOf(afterId);
+            for (
+                SObject record : QueryCompiler.run(
+                    QueryCompiler.compileIdPage(queryJson, after, BACKUP_PAGE_SIZE)
+                )
+            ) {
+                ids.add(record.Id);
+            }
+        }
+        BackupPage page = new BackupPage();
+        page.objectName = checked.objectName;
+        List<String> fieldNames = new List<String>();
+        for (Schema.DescribeFieldResult field : backupFields(checked.objectType)) {
+            BackupColumn column = new BackupColumn();
+            column.fieldName = field.getName();
+            column.label = field.getLabel();
+            page.columns.add(column);
+            fieldNames.add(column.fieldName);
+        }
+        page.done = ids.size() < BACKUP_PAGE_SIZE;
+        page.lastId = ids.isEmpty() ? afterId : String.valueOf(ids[ids.size() - 1]);
+        if (!ids.isEmpty()) {
+            page.rows = Database.queryWithBinds(
+                'SELECT ' +
+                    String.join(fieldNames, ', ') +
+                    ' FROM ' +
+                    checked.objectName +
+                    ' WHERE Id IN :ids ORDER BY Id',
+                new Map<String, Object>{ 'ids' => ids },
+                AccessLevel.USER_MODE
+            );
+        }
+        return page;
+    }
+
+    /**
+     * The fields a download holds: every field the person may read, Id first, leaving out
+     * compound address and location fields (their parts are listed) and binary content.
+     */
+    @TestVisible
+    private static List<Schema.DescribeFieldResult> backupFields(Schema.SObjectType type) {
+        List<Schema.DescribeFieldResult> result = new List<Schema.DescribeFieldResult>();
+        List<Schema.DescribeFieldResult> others = new List<Schema.DescribeFieldResult>();
+        for (Schema.SObjectField token : type.getDescribe().fields.getMap().values()) {
+            Schema.DescribeFieldResult field = token.getDescribe();
+            Schema.DisplayType kind = field.getType();
+            if (
+                !field.isAccessible() ||
+                kind == Schema.DisplayType.ADDRESS ||
+                kind == Schema.DisplayType.LOCATION ||
+                kind == Schema.DisplayType.BASE64
+            ) {
+                continue;
+            }
+            if (field.getName() == 'Id') {
+                result.add(field);
+            } else {
+                others.add(field);
+            }
+        }
+        result.addAll(others);
+        return result;
+    }
+
+    // -------------------------------------------------------------------------------------
     // Undo
     // -------------------------------------------------------------------------------------
 

@@ -217,6 +217,34 @@ private class DeleteByFileTest {
     }
 
     @IsTest
+    static void theDownloadFirstHoldsTheTwoHundredRecordsTheFileWouldDelete() {
+        System.runAs(TestUsers.admin()) {
+            List<Contact> volunteers = makePeople(MANY, 10);
+            System.runAs(deleter()) {
+                Import_Batch__c batch = dryRun(deleteTemplate(), volunteers);
+                BulkDeleteService.BackupPage first = BulkDeleteController.backupPage(
+                    null,
+                    batch.Id,
+                    null
+                );
+                Assert.areEqual(MANY, first.rows.size(), 'One full page.');
+                Assert.isFalse(first.done);
+                BulkDeleteService.BackupPage second = BulkDeleteController.backupPage(
+                    null,
+                    batch.Id,
+                    first.lastId
+                );
+                Assert.areEqual(0, second.rows.size(), 'Only the Matched rows.');
+                Assert.isTrue(second.done);
+                for (SObject row : first.rows) {
+                    Assert.areEqual('Volunteer', row.get('Title'));
+                }
+            }
+            Assert.areEqual(MANY + 10, [SELECT COUNT() FROM Contact], 'Nothing is deleted.');
+        }
+    }
+
+    @IsTest
     static void aPersonWithoutBulkDeleteIsNeitherOfferedNorAllowedIt() {
         System.runAs(TestUsers.admin()) {
             List<Contact> volunteers = makePeople(2, 0);

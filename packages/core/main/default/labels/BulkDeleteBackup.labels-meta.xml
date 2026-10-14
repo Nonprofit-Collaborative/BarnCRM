@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_BulkDelete_Backup</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: download the records before deleting</shortDescription>
+        <value>Download these records first</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_BackupHelp</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete: what the download holds</shortDescription>
+        <value>Saves every record this delete would delete as a CSV file, with every field you can see, so you keep a copy outside Salesforce. Related records deleted with them are not included.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_BackingUp</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete download progress. {0} is the records read so far.</shortDescription>
+        <value>Reading records for the download: {0} so far.</value>
+    </labels>
+    <labels>
+        <fullName>Core_BulkDelete_BackupDone</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Bulk delete download finished. {0} is the number of records.</shortDescription>
+        <value>Downloaded {0} records. Nothing has been deleted yet.</value>
+    </labels>
+</CustomLabels>

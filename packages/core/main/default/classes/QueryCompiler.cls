@@ -167,6 +167,21 @@ public with sharing class QueryCompiler {
     }
 
     /**
+     * One page of the Ids the document's filter matches, in Id order, after the last Id already
+     * read: the document's own columns, order and row count are ignored (R-BD8).
+     */
+    public static Compiled compileIdPage(String queryJson, Id afterId, Integer pageSize) {
+        QueryDocument document = parse(queryJson);
+        document.fields = new List<String>{ 'Id' };
+        document.children.clear();
+        Compiled compiled = selectAndWhere(document, afterId, null);
+        compiled.binds.put('pageSize', pageSize);
+        compiled.soql += ' ORDER BY Id LIMIT :pageSize';
+        compiled.display += ' ORDER BY Id LIMIT ' + pageSize;
+        return compiled;
+    }
+
+    /**
      * The document's filter over other fields of its object, for bulk update (C-35, R-BU1): the
      * document's own columns, order and row count are ignored. With `onlyIds`, only those
      * records; the caller adds any order and row count.

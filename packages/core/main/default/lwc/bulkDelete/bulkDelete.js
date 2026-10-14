@@ -5,6 +5,12 @@ import getJob from '@salesforce/apex/BulkDeleteController.getJob';
 import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import FILE_INTRO from '@salesforce/label/c.Core_BulkDelete_FileIntro';
+import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
+import { toCsv, fileName } from 'c/findCsv';
+import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
+import BACKUP_HELP from '@salesforce/label/c.Core_BulkDelete_BackupHelp';
+import BACKING_UP from '@salesforce/label/c.Core_BulkDelete_BackingUp';
+import BACKUP_DONE from '@salesforce/label/c.Core_BulkDelete_BackupDone';
 
 import TITLE from '@salesforce/label/c.Core_BulkDelete_Title';
 import PANEL_INTRO from '@salesforce/label/c.Core_BulkDelete_PanelIntro';
@@ -39,6 +45,9 @@ function format(template, ...values) {
  *
  * The import wizard opens it over a delete by file's completed dry run instead (`batchId`,
  * R-BD7): the records are the dry run's Matched rows, and the page sends the batch and the count.
+ *
+ * Before the count is typed, "Download these records first" reads the records the delete would
+ * delete, every field the person may read, page by page, and saves them as CSV (R-BD8, R-SQ3).
  */
 export default class BulkDelete extends LightningElement {
   @api queryJson;
@@ -54,7 +63,9 @@ export default class BulkDelete extends LightningElement {
     failures: FAILURES,
     undoFromTab: UNDO_FROM_TAB,
     close: CLOSE,
-    loading: LOADING
+    loading: LOADING,
+    backup: BACKUP,
+    backupHelp: BACKUP_HELP
   };
 
   preview;
@@ -132,6 +143,40 @@ export default class BulkDelete extends LightningElement {
 
   handleConfirmText(event) {
     this.confirmText = event.detail.value;
+  }
+
+  /** Reads every record the delete would delete, page by page, and saves them as CSV (R-BD8). */
+  async handleBackup() {
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      let rows = [];
+      let page;
+      let afterId = null;
+      do {
+        // Each page starts after the last Id of the one before, so pages are read in turn.
+        // eslint-disable-next-line no-await-in-loop
+        page = await backupPage({
+          queryJson: this.batchId ? null : this.queryJson,
+          batchId: this.batchId || null,
+          afterId
+        });
+        rows = rows.concat(page.rows || []);
+        afterId = page.lastId;
+        this.noticeMessage = format(BACKING_UP, String(rows.length));
+      } while (!page.done);
+      const columns = (page.columns || []).map((column) => ({
+        label: column.label,
+        path: column.fieldName
+      }));
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(
+        new Blob([toCsv(columns, rows)], { type: 'text/csv;charset=utf-8' })
+      );
+      link.download = fileName(page.objectName);
+      link.click();
+      URL.revokeObjectURL(link.href);
+      this.noticeMessage = format(BACKUP_DONE, String(rows.length));
+    });
   }
 
   async handleStart() {
