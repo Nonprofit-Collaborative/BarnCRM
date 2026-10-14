@@ -361,6 +361,14 @@
         <value>Import row cleanup</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_JobEmptyHouseholds</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name of the nightly job that tidies households emptied by deleting people.</shortDescription>
+        <value>Empty household tidy-up</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_JobRollups</fullName>
         <categories>Core</categories>
         <language>en_US</language>

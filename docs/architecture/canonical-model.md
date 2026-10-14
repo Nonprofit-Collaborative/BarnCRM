@@ -290,9 +290,35 @@ that group, so deleting the account would destroy it rather than orphan it. A ho
 left in place for that reason is reported to the Error Log at Info severity, naming the
 household: it is a correct outcome, not a failure.
 
-Deleting people never deletes their household; moving them still tidies it as above. Deleting
+Deleting people never deletes their household at the time; moving them still tidies it as above. Deleting
 a household purges from the Recycle Bin the contacts and membership rows already deleted from
 it, so neither an undelete nor the bulk delete undo (R-BD5) could bring the people back.
+
+**R-H12a Households emptied by deleting people.** A delete that leaves a household with no
+members stamps the household's `Emptied_By_Deletion__c` with the day; a merge does not stamp
+(R-H13), and any later settle that finds the household with a member clears the stamp. The
+nightly empty household tidy-up (`EmptyHouseholdTidyScheduler`, ADR-NEXT) moves a stamped
+household to the Recycle Bin, never a hard delete, once all of these hold, read in system mode
+and in every membership mode:
+
+- it has no Contact whose Account is the household and no Household Member row naming it as
+  the household, current or ended;
+- no Contact whose Account was the household and no Household Member row naming it is still
+  in the Recycle Bin (`ALL ROWS`, `IsDeleted = true`): those are exactly the records deleting
+  the household would purge, so its former members can no longer be restored either way;
+- nothing outside BarnCRM depends on it (ADR-0036), no installed module credits records to it
+  (`HouseholdDependentsExtension`, ADR-0070), and no other record of any object points at it
+  through any child relationship of Account (read by describe, so Core names no module object).
+  Shares, field history and feed records are the household's own bookkeeping and do not count.
+
+A household that fails the last rule is kept and stays on the Health Check and Data Hygiene
+lists of households without members, which is where an administrator reviews it. A household
+whose former members are still in the Recycle Bin is kept quietly and looked at again each
+night. A relationship that cannot be read keeps every household in that run. The tidy-up is on
+unless `Keep_Households_Of_Deleted_People__c` is set, and it is independent of
+`Delete_Empty_Households__c`, which governs moves only. A household emptied before the stamp
+existed carries no stamp and is not tidied. Counts go to the debug log; a refused delete goes
+to the Error Log.
 
 **R-H13 Merge and split.** Two households can be merged (members move to the surviving
 household, rollups recalculate, names and greetings recompute unless Custom Name is set)
@@ -337,6 +363,7 @@ households with Custom Name set.
 | Anniversary | `Anniversary__c` | Date |
 | Sample Data | `Sample_Data__c` | Checkbox |
 | Sample Data Key | `Sample_Data_Key__c` | Text(20) (v0.4) |
+| Emptied By Deletion | `Emptied_By_Deletion__c` | Date (R-H12a) |
 
 - **Person attributes on Account.** The five person attributes listed under Contact
   (Section 7) are present on Account as well, with the same API names and the same
@@ -871,6 +898,7 @@ may add keys, and must add them here first.
 | `Household_Membership_Mode__c` | picklist(Contact, Junction) | Contact | Whether household membership uses the Contact's Account reference or the Household Member junction. |
 | `Auto_Create_Households__c` | boolean | true | Whether saving a new person who belongs to no household creates one automatically. Governs both membership modes, and both objects a person can be stored on (R-H1, R-H2). |
 | `Delete_Empty_Households__c` | boolean | true | Whether a household left with no members is deleted. |
+| `Keep_Households_Of_Deleted_People__c` | boolean | false | Whether households emptied by deleting people are kept rather than moved to the Recycle Bin by the nightly tidy-up (R-H12a). Inverted so the tidy-up is on for new installs and for orgs upgrading with saved settings, with nothing to apply in Apex. |
 | `Household_Name_Pattern__c` | text | The {LastName} Family | The pattern used to compute a household's name. |
 | `Formal_Greeting_Pattern__c` | text | {Salutation} {FirstName} {LastName} | The pattern used to compute the formal greeting. |
 | `Informal_Greeting_Pattern__c` | text | {FirstName} | The pattern used to compute the informal greeting. |
@@ -7121,6 +7149,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Tier 1 scale test findings. No object or field added. R-H4: a name or greeting fits its field, a long list naming the first members and counting the rest. R-RQ3: the processor hands off to `Rollup_Queue_Ready__e` at the chain depth limit instead of queuing a run the platform refuses. |
 | v0.6 | 2026-10-14 | Large rollup parents (ADR-0116, `0116-rollup-large-parents-recalculated-by-a-batch.md`, tier 1 scale test). No object or field added. New R-RQ6: a record whose source rows are more than one transaction may read is recalculated by `RollupLargeParentBatch`, chunk by chunk over its source rows, with one write at the end; records are routed there by an estimate from stored counts, or as a lone record that stopped its run on the query row limit. R-RQ3: a run takes records up to a row budget; a run that stops charges only the records it was recalculating, which are retried alone and a quarter as many at a time so only the record that keeps stopping runs ends Failed; and the finalizer starts the next processor through `Rollup_Queue_Ready__e` instead of halving the slice and queuing it, which the platform stopped after five failed jobs in a row and left 826 entries Pending. |
 | v0.6 | 2026-10-14 | Rollup Queue enqueue race (ADR-0117, `0117-rollup-queue-asks-again-after-commit.md`, tier 1 scale rerun). No object or field added. R-RQ3: a transaction that inserted entries and queued no processor publishes `Rollup_Queue_Ready__e`, so the check runs again after it commits; before this a processor waiting at the save could finish before the save committed, and a parallel Bulk API load left 47 entries Pending with no processor. |
+| post-1.0 | 2026-10-14 | Households emptied by deleting people (D-89, ADR-NEXT, amends D-88). Account gains `Emptied_By_Deletion__c` (Date); `BarnCRM_Settings__c` gains `Keep_Households_Of_Deleted_People__c` (shipped false, so the tidy-up is on). New rule R-H12a: a nightly tidy-up moves such a household to the Recycle Bin once none of its former members' contacts or membership rows remain there and nothing else points at it. |
 | v0.6 | 2026-10-14 | Large parent route efficiency (ADR-0116, tier 1 scale rerun). New protected hierarchy custom setting `Rollup_Run_Lock__c` (no fields, Section 14A implementation). R-RQ6: a record goes to the batch only when its estimate reaches two fifths of the query row limit (was a fifth; the run budget stays three fifths), and a run starts only under a lock on that setting's org-level record, so concurrent processors no longer start batches side by side. R-RQ3: the hand-off at the chain depth limit is no longer logged. |
 
 ---

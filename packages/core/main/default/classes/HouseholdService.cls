@@ -45,6 +45,13 @@ public with sharing class HouseholdService {
     private static Boolean upkeepRunning = false;
 
     /**
+     * Set while settling the households a person delete (not a merge) left, so that a
+     * household left empty is stamped `Emptied_By_Deletion__c` for the nightly tidy-up
+     * (R-H12a, ADR-NEXT).
+     */
+    private static Boolean settlingAfterPeopleDeleted = false;
+
+    /**
      * Households already reported in this transaction as kept for their native dependents.
      * A single move settles up twice, once from the trigger on the person's save and once
      * from the caller, and the administrator is told about a kept household once.
@@ -950,6 +957,22 @@ public with sharing class HouseholdService {
     }
 
     /**
+     * The settle-up after people (not a merge) were deleted: never tidies a household away
+     * (R-H12), and stamps each household left empty with the day, so the nightly tidy-up can
+     * move it to the Recycle Bin once its former members can no longer be restored (R-H12a,
+     * ADR-NEXT).
+     */
+    @NamespaceAccessible
+    public static void afterPeopleDeleted(Set<Id> householdIds) {
+        settlingAfterPeopleDeleted = true;
+        try {
+            afterMembershipChange(householdIds, false);
+        } finally {
+            settlingAfterPeopleDeleted = false;
+        }
+    }
+
+    /**
      * The same, saying whether a household left with nobody in it may be tidied away. It
      * may not on a path where people are still being added to a household that has only
      * just been created.
@@ -1013,6 +1036,11 @@ public with sharing class HouseholdService {
                 change.Member_Count__c = count;
                 bookkept = true;
             }
+            Date emptiedOn = emptiedByDeletion(household, count, recordTypeId);
+            if (household.Emptied_By_Deletion__c != emptiedOn) {
+                change.Emptied_By_Deletion__c = emptiedOn;
+                bookkept = true;
+            }
             Id primaryId = primaryByHousehold.get(household.Id);
             if (
                 primaryByHousehold.containsKey(household.Id) &&
@@ -1044,6 +1072,23 @@ public with sharing class HouseholdService {
             }
         }
         writeSettledHouseholds(retries);
+    }
+
+    /**
+     * The day a household was emptied by deleting people (R-H12a): stamped when a person
+     * delete leaves a household with no members, kept while it stays empty, and cleared as
+     * soon as anyone belongs to it again, so a later move that empties it is not mistaken for
+     * a delete.
+     */
+    private static Date emptiedByDeletion(Account household, Decimal count, Id recordTypeId) {
+        if (count > 0) {
+            return null;
+        }
+        Boolean isHousehold = recordTypeId != null && household.RecordTypeId == recordTypeId;
+        if (household.Emptied_By_Deletion__c == null && settlingAfterPeopleDeleted && isHousehold) {
+            return Date.today();
+        }
+        return household.Emptied_By_Deletion__c;
     }
 
     /**

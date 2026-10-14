@@ -136,7 +136,12 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
                 AutomationControl.clearBypass(MEMBER_HANDLER);
             }
         }
-        HouseholdService.afterMembershipChange(affected, false);
+        if (survivorByMerged.isEmpty()) {
+            // A household this delete empties is stamped for the nightly tidy-up (R-H12a).
+            HouseholdService.afterPeopleDeleted(affected);
+        } else {
+            HouseholdService.afterMembershipChange(affected, false);
+        }
         recalculateSurvivors(gone, survivorByMerged);
         settleSurvivors(gone, survivorByMerged);
     }

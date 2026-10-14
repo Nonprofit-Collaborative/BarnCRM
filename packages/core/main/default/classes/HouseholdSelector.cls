@@ -198,7 +198,8 @@ public with sharing class HouseholdSelector {
                 Member_Count__c,
                 Primary_Contact__c,
                 Household_Formal_Greeting__c,
-                Household_Informal_Greeting__c
+                Household_Informal_Greeting__c,
+                Emptied_By_Deletion__c
             FROM Account
             WHERE Id IN :householdIds
             WITH SYSTEM_MODE
