@@ -188,6 +188,136 @@ public with sharing class FindController {
         }
     }
 
+    /** One file an export to Files wrote (R-SQ12). */
+    public class ExportFile {
+        @AuraEnabled
+        public String documentId;
+        @AuraEnabled
+        public String title;
+        @AuraEnabled
+        public Integer size;
+    }
+
+    /** An export to Files: its job, how far it is, and the files written so far (R-SQ12). */
+    public class ServerExport {
+        @AuraEnabled
+        public String jobId;
+        @AuraEnabled
+        public String tag;
+        @AuraEnabled
+        public String status;
+        @AuraEnabled
+        public Boolean done = false;
+        @AuraEnabled
+        public Boolean failed = false;
+        @AuraEnabled
+        public Integer chunksDone;
+        @AuraEnabled
+        public Integer chunksTotal;
+        @AuraEnabled
+        public Integer rowLimit;
+        @AuraEnabled
+        public List<ExportFile> files = new List<ExportFile>();
+    }
+
+    private static final Pattern EXPORT_TAG = Pattern.compile('[0-9a-f]{6}');
+    private static final Set<String> FINISHED_JOB = new Set<String>{
+        'Completed',
+        'Failed',
+        'Aborted'
+    };
+
+    /**
+     * Starts an export to Files of the query (R-SQ12), at most the export row limit, with the
+     * column labels the page shows (`labelsJson`, a map of field path to label). The query is
+     * compiled first, so one that would not run is refused before the job starts.
+     */
+    @AuraEnabled
+    public static ServerExport startServerExport(String queryJson, String labelsJson) {
+        try {
+            requirePermission();
+            Integer rowLimit = exportLimit();
+            QueryCompiler.compileServerExport(queryJson, rowLimit);
+            Map<String, String> labels = new Map<String, String>();
+            if (String.isNotBlank(labelsJson)) {
+                Map<String, Object> given = (Map<String, Object>) JSON.deserializeUntyped(
+                    labelsJson
+                );
+                for (String path : given.keySet()) {
+                    labels.put(path, String.valueOf(given.get(path)).left(255));
+                }
+            }
+            String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
+            Id jobId = Database.executeBatch(
+                new FindExportBatch(queryJson, labels, tag, rowLimit),
+                FindExportBatch.SCOPE
+            );
+            return serverExport(jobId, tag);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Export a Find query to Files');
+        }
+    }
+
+    /** How far an export to Files the person started is, and the files it has written. */
+    @AuraEnabled
+    public static ServerExport serverExportStatus(String jobId, String tag) {
+        try {
+            requirePermission();
+            if (String.isBlank(tag) || !EXPORT_TAG.matcher(tag).matches()) {
+                throw new FindException(System.Label.Core_Find_ExportFilesNotFound);
+            }
+            return serverExport(Id.valueOf(jobId), tag);
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Read an export to Files');
+        }
+    }
+
+    /**
+     * The job, read in system mode but only when the person started it, and the person's own
+     * files whose title carries the export's tag.
+     */
+    private static ServerExport serverExport(Id jobId, String tag) {
+        ServerExport view = new ServerExport();
+        view.jobId = jobId;
+        view.tag = tag;
+        view.rowLimit = exportLimit();
+        Id me = UserInfo.getUserId();
+        List<AsyncApexJob> jobs = [
+            SELECT Status, JobItemsProcessed, TotalJobItems, NumberOfErrors
+            FROM AsyncApexJob
+            WHERE Id = :jobId AND CreatedById = :me
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ];
+        if (jobs.isEmpty()) {
+            throw new FindException(System.Label.Core_Find_ExportFilesNotFound);
+        }
+        view.status = jobs[0].Status;
+        view.chunksDone = jobs[0].JobItemsProcessed;
+        view.chunksTotal = jobs[0].TotalJobItems;
+        view.done = FINISHED_JOB.contains(view.status);
+        view.failed =
+            (view.done && view.status != 'Completed') ||
+            (jobs[0].NumberOfErrors != null &&
+            jobs[0].NumberOfErrors > 0);
+        String titles = '%-' + tag + '-part-%';
+        for (ContentVersion version : [
+            SELECT ContentDocumentId, Title, ContentSize
+            FROM ContentVersion
+            WHERE Title LIKE :titles AND IsLatest = TRUE AND OwnerId = :me
+            WITH USER_MODE
+            ORDER BY CreatedDate, Id
+            LIMIT 200
+        ]) {
+            ExportFile file = new ExportFile();
+            file.documentId = version.ContentDocumentId;
+            file.title = version.Title;
+            file.size = version.ContentSize;
+            view.files.add(file);
+        }
+        return view;
+    }
+
     /** One export page in Id order, after the last Id the browser has read (R-SQ3). */
     @AuraEnabled
     public static QueryResult exportPage(String queryJson, String afterId) {

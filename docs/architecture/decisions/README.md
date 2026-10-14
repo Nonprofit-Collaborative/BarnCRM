@@ -121,6 +121,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [ADR-NEXT](NEXT-more-transform-steps.md) | Six more transform steps (map values, if then, keep part, first or last characters, shift a date, today), still a closed list with no evaluation | Proposed (builder decision) |
 | [ADR-NEXT](NEXT-import-row-rules.md) | Import row rules: skip rows and one row per key decided at staging, and empty cells that clear a field only where a column says so | Proposed (builder decision) |
 | [NEXT](NEXT-delete-by-file.md) | Delete by file is a one-object import operation that hands its dry run to the bulk delete job | Proposed (builder decision) |
+| [NEXT](NEXT-find-export-to-files.md) | Find's export to Files is a Batch Apex job that writes CSV parts the person owns | Proposed (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
