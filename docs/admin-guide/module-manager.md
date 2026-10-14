@@ -48,7 +48,10 @@ cleans up her data, and check what removing a module would cost.
    gift, keeps running. Your records stay exactly as they are.
 4. Click **Turn on**. The row says **On**, Giving's automation runs again with every switch on
    the Automation page as you left it, and you are given the module's administrator access
-   (for Giving, the Giving Admin permission set) if you did not have it.
+   (for Giving, the Giving Admin permission set) if you did not have it. Giving it takes
+   Salesforce's Assign Permission Sets permission, which a system administrator has and a
+   BarnCRM Admin gets from **BarnCRM Access Manager** (see [Access](access.md)); without it
+   the module still turns on and an administrator assigns the set in Setup.
 5. On the **Giving** row, click **What an uninstall deletes**. A short report lists each kind
    of record the module owns and how many of each your org has, for example `Gift: 1,204`.
    A count with a `+`, for example `2,300+`, means at least that many: Salesforce lets one

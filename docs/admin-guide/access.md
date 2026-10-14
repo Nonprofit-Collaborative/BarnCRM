@@ -70,11 +70,20 @@ The person who installs BarnCRM is given the BarnCRM Admin role automatically, a
 install and again at every upgrade, so there is always at least one person who can use this
 page. If that person was you, you can start straight away.
 
-Two things control who can use the page:
+Three things control who can use the page:
 
 1. You need the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin
    role. Anyone without it sees the page in read-only mode with a notice explaining why.
-2. The person you are giving a role to must already be a Salesforce user with a license.
+2. To give or remove a role you also need Salesforce's **Assign Permission Sets**
+   permission. A system administrator has it already. A BarnCRM Admin who is not a system
+   administrator gets it from the optional **BarnCRM Access Manager** permission set: in
+   Setup, open **Users**, choose the person, and under **Permission Set Assignments** add
+   **BarnCRM Access Manager**. It is in no role because only a full Salesforce license can
+   hold it; a user with a **Salesforce Platform** license cannot be given it, so in that case
+   a colleague with a Salesforce license gives the roles. Everything else in BarnCRM Settings
+   works on a Platform license. The same permission lets the
+   [Module Manager](module-manager.md) give you a module's admin set when you turn it on.
+3. The person you are giving a role to must already be a Salesforce user with a license.
    Creating users is one of the few things Salesforce does not let an app do for you, so
    that step happens in Setup. See "What still needs Setup" below.
 

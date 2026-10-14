@@ -39,11 +39,28 @@ private class AccessControllerTest {
 
     /**
      * Creates Maria: a person who holds the BarnCRM Admin role, and therefore the
-     * Manage BarnCRM Settings custom permission that the Access page requires.
+     * Manage BarnCRM Settings custom permission that the Access page requires, and BarnCRM
+     * Access Manager, which carries the Salesforce permissions to give roles (ADR-NEXT).
      *
      * @return the inserted user, already in the BarnCRM Admin role
      */
     private static User insertAdminUser() {
+        User maria = insertAdminRoleOnly();
+        insert new PermissionSetAssignment(
+            AssigneeId = maria.Id,
+            PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'BarnCRM_Access_Manager']
+            .Id
+        );
+        return maria;
+    }
+
+    /**
+     * Creates Maria with the BarnCRM Admin role alone, as a Salesforce Platform user holds it:
+     * she may manage BarnCRM settings but has no Salesforce permission to give roles.
+     *
+     * @return the inserted user, in the BarnCRM Admin role only
+     */
+    private static User insertAdminRoleOnly() {
         PermissionSetGroup adminGroup = TestDataFactory.prepareRoleGroup(AccessService.ADMIN_ROLE);
         User maria = insertUser('Maria', 'Alvarez');
         insert new PermissionSetAssignment(
@@ -51,6 +68,42 @@ private class AccessControllerTest {
             PermissionSetGroupId = adminGroup.Id
         );
         return maria;
+    }
+
+    @IsTest
+    static void theAdminRoleAloneCannotGiveRolesAndSaysSo() {
+        System.runAs(TestUsers.admin()) {
+            User maria = insertAdminRoleOnly();
+            User david = insertUser('David', 'Okafor');
+            TestDataFactory.prepareRoleGroup(PROGRAM_ROLE);
+            AccessController.AccessResult assigned;
+
+            Test.startTest();
+            System.runAs(maria) {
+                assigned = AccessController.assignRole(david.Id, PROGRAM_ROLE);
+            }
+            Test.stopTest();
+
+            Assert.isFalse(
+                assigned.success,
+                'BarnCRM Admin no longer carries Assign Permission Sets, so the platform refuses.'
+            );
+            Assert.isTrue(
+                String.isNotBlank(assigned.message),
+                'The page is given a message to show, not an unhandled error.'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM PermissionSetAssignment
+                    WHERE
+                        AssigneeId = :david.Id
+                        AND PermissionSetGroup.DeveloperName = :PROGRAM_ROLE
+                ],
+                'David gets no role.'
+            );
+        }
     }
 
     @IsTest

@@ -159,16 +159,21 @@ Instead, `create-scratch-org.sh` verifies Platform-only compatibility two ways:
    under `packages/core`, `packages/giving`, `packages/volunteers`, `packages/programs`, or
    `packages/funders` references a Sales/Service or Industries object at all. Source code, not
    the org, is the thing being checked.
-2. **A runtime license check**, for the platform-only shape only: the script creates a user with
+2. **A runtime license check**, for the platform-only shape only, in
+   `scripts/org/check-platform-license.sh <alias>`: it creates a user with
    the "Salesforce Platform" user license and the "Standard Platform User" profile (using
    `config/users/platform-user.json`, username
-   `platformuser@<alias>.barncrm.test`), then assigns every permission set found under
-   `packages/core/main/default/permissionsets` to that user with
-   `sf org assign permset --on-behalf-of`. The "Standard Platform User" profile cannot see
-   Sales/Service objects at all, so if a Core permission set were to grant field- or
-   object-level access to something that license cannot see, the assignment fails loudly. A
-   passing assignment is direct evidence that Core's permission sets are Platform-license-safe,
-   not just that its source code looks clean.
+   `platformuser@<alias>.barncrm.test`) unless it exists, then assigns every permission set
+   found under `packages/core/main/default/permissionsets` to that user with
+   `sf org assign permset --on-behalf-of`. If a Core permission set grants an object or a user
+   permission that license cannot have, Salesforce refuses the assignment. The script tries
+   every set, names every refusal, and exits 1 if there was one; a set the user already holds
+   counts as assignable, so it can be rerun on an existing org. A passing run is direct
+   evidence that Core's permission sets are Platform-license-safe, not just that its source
+   code looks clean. The optional sets that only a Salesforce license can hold
+   (`BarnCRM_Duplicate_Review`, `BarnCRM_Access_Manager`; ADR-0050, ADR-NEXT) are skipped:
+   their list is in `scripts/ci/check-permission-sets.py`, which also fails CI if any other
+   set grants what they hold.
 
 ## NPSP: manual install fallback
 

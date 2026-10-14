@@ -28,7 +28,13 @@ One more grant resolves and still breaks ADR-0013: an object only some licenses 
 Salesforce grants DuplicateRecordSet and DuplicateRecordItem only to Sales Cloud and Service
 Cloud licenses, so a permission set granting them cannot be assigned to a Salesforce Platform
 user. Such objects may appear only in the optional sets named for them, and those sets may be
-in no permission set group, because a role has to be assignable to everybody.
+in no permission set group, because a role has to be assignable to everybody. The same holds
+for user permissions the Salesforce Platform license cannot hold: Assign Permission Sets and
+View All Users made BarnCRM_Admin unassignable to a Platform user on barn-core, so they live
+only in BarnCRM_Access_Manager (ADR-NEXT).
+
+scripts/org/create-scratch-org.sh reads the optional sets from this file
+(--list-optional-license-sets), so its Platform user check expects exactly these to be refused.
 
 Two limits the platform enforces only at deploy time are checked too: a permission set's label
 may be at most 80 characters and its description at most 255, counted as the platform counts
@@ -43,10 +49,12 @@ import xml.etree.ElementTree as ET
 
 NS = "http://soap.sforce.com/2006/04/metadata"
 
-# Objects a Salesforce Platform license cannot be granted, and the optional sets allowed to
-# grant them (C-20, ADR-0050 on duplicate detection).
+# Objects and user permissions a Salesforce Platform license cannot be granted, and the
+# optional sets allowed to grant them (C-20, ADR-0050 on duplicate detection; ADR-NEXT on
+# the Access page's Salesforce permissions).
 LICENSE_LIMITED_OBJECTS = {"DuplicateRecordSet", "DuplicateRecordItem"}
-OPTIONAL_LICENSE_SETS = {"BarnCRM_Duplicate_Review"}
+LICENSE_LIMITED_USER_PERMISSIONS = {"AssignPermissionSets", "ViewAllUsers"}
+OPTIONAL_LICENSE_SETS = {"BarnCRM_Duplicate_Review", "BarnCRM_Access_Manager"}
 
 # The platform's own limits on a permission set's label and description (Metadata API).
 LABEL_MAX = 80
@@ -130,6 +138,17 @@ def check(path):
                     f"ordinary create and edit access with it. Grant it on the master instead."
                 )
 
+    for entry in root.findall(q("userPermissions")):
+        value = entry.find(q("name")).text
+        enabled = entry.find(q("enabled"))
+        granted = enabled is None or enabled.text == "true"
+        if granted and value in LICENSE_LIMITED_USER_PERMISSIONS and name not in OPTIONAL_LICENSE_SETS:
+            problems.append(
+                f"{name}: grants user permission {value}, which a Salesforce Platform license "
+                f"cannot hold, so this set could not be assigned in a Platform-only org "
+                f"(ADR-0013). Grant it only in one of {sorted(OPTIONAL_LICENSE_SETS)}."
+            )
+
     for entry in root.findall(q("recordTypeVisibilities")):
         value = entry.find(q("recordType")).text
         obj, _, record_type = value.partition(".")
@@ -178,7 +197,12 @@ def check_group(path):
 
 
 def main():
-    paths = sorted(glob.glob("packages/*/main/default/permissionsets/*.permissionset-meta.xml"))
+    if sys.argv[1:] == ["--list-optional-license-sets"]:
+        for name in sorted(OPTIONAL_LICENSE_SETS):
+            print(name)
+        return 0
+
+    paths =sorted(glob.glob("packages/*/main/default/permissionsets/*.permissionset-meta.xml"))
     group_paths = sorted(
         glob.glob("packages/*/main/default/permissionsetgroups/*.permissionsetgroup-meta.xml")
     )
