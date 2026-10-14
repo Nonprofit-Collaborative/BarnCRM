@@ -190,8 +190,49 @@ public with sharing class RollupEngine {
         result.failed.putAll(write.failed);
     }
 
+    /**
+     * Writes the totals of one target entity's records from an answer already calculated, chunk
+     * by chunk, by `RollupLargeParentBatch` (ADR-0116): the same target filters, currency and
+     * write as any other recalculation, only the source rows were read elsewhere.
+     *
+     * @param plan the plan the answer was calculated with
+     * @param parentIds the target records
+     * @param answer the values by definition index and record
+     */
+    public static Result writeCalculated(
+        RollupPlanner.Plan plan,
+        Set<Id> parentIds,
+        RollupAggregator.Answer answer
+    ) {
+        Result result = new Result();
+        result.refused.addAll(plan.refused);
+        if (parentIds == null || parentIds.isEmpty() || plan.definitions.isEmpty()) {
+            return result;
+        }
+        Computation computation = compute(plan, parentIds, result, answer);
+        RollupWriter.TotalsWrite write = RollupWriter.writeTotals(
+            plan.targetType,
+            computation.stored,
+            computation.computed,
+            Datetime.now()
+        );
+        result.written.addAll(write.written);
+        result.failed.putAll(write.failed);
+        return result;
+    }
+
     /** Calculates one plan for records of its target entity; ran and refused go on `result`. */
     private static Computation compute(RollupPlanner.Plan plan, Set<Id> targetIds, Result result) {
+        return compute(plan, targetIds, result, null);
+    }
+
+    /** As above, from an answer already calculated when one is given. */
+    private static Computation compute(
+        RollupPlanner.Plan plan,
+        Set<Id> targetIds,
+        Result result,
+        RollupAggregator.Answer calculated
+    ) {
         Computation computation = new Computation();
         Boolean converts = RollupCurrency.isMultiCurrency();
         Set<String> columns = new Set<String>();
@@ -217,7 +258,9 @@ public with sharing class RollupEngine {
         for (Set<Id> admittedIds : admittedByDefinition) {
             anyAdmitted.addAll(admittedIds);
         }
-        RollupAggregator.Answer answer = RollupAggregator.calculate(plan, anyAdmitted);
+        RollupAggregator.Answer answer = calculated != null
+            ? calculated
+            : RollupAggregator.calculate(plan, anyAdmitted);
         Map<Id, Map<Schema.SObjectField, Object>> computed = computation.computed;
         for (Integer i = 0; i < plan.definitions.size(); i++) {
             Rollup_Definition__c definition = plan.definitions[i];
