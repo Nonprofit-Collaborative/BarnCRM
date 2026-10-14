@@ -47,8 +47,8 @@ showed them as failed.
    with the queue (decision 3).
 3. **A stopped run narrows down to the record that stops it.** The finalizer charges only the
    records the run was recalculating: they move to a new entry with one more attempt and the
-   reason, the rest of each entry stays as it was. A retried entry is never merged and a run
-   takes a quarter as many of its records per attempt (50, 12, 3, then 1 of a 200 slice), so a
+   reason, the rest of each entry stays as it was. A retried entry merges only with entries for the
+   same entity and the same attempts, and a run takes a quarter as many records per attempt (50, 12, 3, then 1 of a 200 slice), so a
    record that stops every run (a flow failing on it, heap, CPU) ends Failed alone and the
    others it shared a run with are recalculated. This replaces the halving of the next run's
    slice: the narrowing travels with the entries, so it survives a fresh chain.

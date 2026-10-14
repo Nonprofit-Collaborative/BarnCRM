@@ -652,36 +652,43 @@ private class RollupLargeParentBatchTest {
     }
 
     /**
-     * One record in two hundred stops every run that holds it, for a reason no batch fixes: the
-     * runs narrow down to it, and it alone ends Failed.
+     * One record in two hundred, each queued in its own entry, stops every run that holds it, for
+     * a reason no batch fixes: retried entries merge again, so the runs narrow down 200, 50, 12,
+     * 3, 1 to it in a few dozen runs rather than one run per record, and it alone ends Failed.
      */
     @IsTest
     static void onlyTheRecordThatStopsEveryRunEndsFailed() {
         System.runAs(TestUsers.admin()) {
             List<Id> ids = fakeAccountIds(200);
-            List<String> sorted = new List<String>();
+            Id bad = ids[137];
+            List<Rollup_Queue__c> queued = new List<Rollup_Queue__c>();
             for (Id recordId : ids) {
-                sorted.add(String.valueOf(recordId));
+                queued.add(
+                    new Rollup_Queue__c(
+                        Target_Object__c = 'Account',
+                        Record_Ids__c = String.valueOf(recordId),
+                        Record_Count__c = 1,
+                        Attempts__c = 0,
+                        Status__c = RollupQueue.STATUS_PENDING
+                    )
+                );
             }
-            sorted.sort();
-            Id bad = Id.valueOf(sorted[137]);
-            insert new Rollup_Queue__c(
-                Target_Object__c = 'Account',
-                Record_Ids__c = String.join(sorted, ','),
-                Record_Count__c = 200,
-                Attempts__c = 0,
-                Status__c = RollupQueue.STATUS_PENDING
-            );
+            insert queued;
 
             Test.startTest();
             Integer runs = 0;
-            while (runs < 60) {
-                List<Rollup_Queue__c> due = [
-                    SELECT Id, Target_Object__c, Record_Ids__c, Definition_Ids__c, Attempts__c
+            while (runs < 40) {
+                // Every retry made due now, then a run takes what the processor would.
+                List<Rollup_Queue__c> waiting = [
+                    SELECT Id
                     FROM Rollup_Queue__c
-                    WHERE Status__c = :RollupQueue.STATUS_PENDING
-                    ORDER BY CreatedDate, Id
+                    WHERE Status__c = :RollupQueue.STATUS_PENDING AND Next_Attempt__c != NULL
                 ];
+                for (Rollup_Queue__c entry : waiting) {
+                    entry.Next_Attempt__c = Datetime.now().addMinutes(-1);
+                }
+                update waiting;
+                List<Rollup_Queue__c> due = RollupQueue.selectDue(500);
                 if (due.isEmpty()) {
                     break;
                 }
@@ -701,12 +708,12 @@ private class RollupLargeParentBatchTest {
             Assert.areEqual(1, left.size(), 'Everything else was recalculated');
             Assert.areEqual(String.valueOf(bad), left[0].Record_Ids__c, 'The bad record alone');
             Assert.areEqual(RollupQueue.STATUS_FAILED, left[0].Status__c, 'Failed after five');
-            Assert.isTrue(runs < 60, 'In a bounded number of runs');
+            Assert.isTrue(runs < 40, 'Narrowed in a few dozen runs, not one per record');
         }
     }
 
     @IsTest
-    static void aRetriedEntryRunsAloneAndAQuarterAsLargeEachAttempt() {
+    static void aRetriedEntryRunsWithoutFreshOnesAndAQuarterAsLargeEachAttempt() {
         // runs-as: deploying user (pure function over in-memory entries, no data access)
         Assert.areEqual(50, RollupQueue.retrySlice(1, 200), 'First retry');
         Assert.areEqual(12, RollupQueue.retrySlice(2, 200), 'Second');
@@ -730,6 +737,36 @@ private class RollupLargeParentBatchTest {
         );
         Assert.areEqual(1, slice.idsByTarget.get('Account').size(), 'One record, alone');
         Assert.areEqual(1, slice.remainders.size(), 'The other waits in its entry');
+    }
+
+    @IsTest
+    static void retriedEntriesMergeOnlyWithTheSameAttemptsAndEntity() {
+        // runs-as: deploying user (pure function over in-memory entries, no data access)
+        List<Id> ids = fakeAccountIds(60);
+        List<Rollup_Queue__c> due = new List<Rollup_Queue__c>();
+        for (Integer i = 0; i < 60; i++) {
+            due.add(
+                new Rollup_Queue__c(
+                    Target_Object__c = 'Account',
+                    Record_Ids__c = String.valueOf(ids[i]),
+                    Attempts__c = i == 1 ? 2 : i == 2 ? 0 : 1
+                )
+            );
+        }
+        due.add(
+            new Rollup_Queue__c(
+                Target_Object__c = 'Contact',
+                Record_Ids__c = '003000000000001',
+                Attempts__c = 1
+            )
+        );
+        RollupQueue.Slice slice = RollupQueue.take(due, 200);
+        Assert.areEqual(50, slice.idsByTarget.get('Account').size(), 'Fifty, merged');
+        Assert.isFalse(slice.idsByTarget.get('Account').contains(ids[1]), 'Not another attempt');
+        Assert.isFalse(slice.idsByTarget.get('Account').contains(ids[2]), 'Not a fresh one');
+        Assert.isFalse(slice.idsByTarget.containsKey('Contact'), 'One entity per retry run');
+        Assert.areEqual(1, slice.attemptsByTarget.get('Account'), 'Charged from one');
+        Assert.areEqual(50, slice.finished.size(), 'Each entry taken whole');
     }
 
     @IsTest
