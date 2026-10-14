@@ -47,6 +47,10 @@
  * version reaches an org that already has others. Core adds its own here; each module that
  * ships templates calls the same method from its own script.
  *
+ * Alongside these (ADR-NEXT): a new install starts with every feature off, an upgrade with no
+ * edition saved gets the recommended one, and every run schedules the nightly tab access check
+ * unless it is already scheduled.
+ *
  * The whole thing runs twice safely: a person who already holds a permission set or a role
  * is left alone, and a rollup, a switch or an import template that already exists is left exactly as the
  * administrator left it, so an upgrade is a no-op for an org that is already set up. Nothing here throws: an
@@ -60,6 +64,12 @@ public with sharing class CorePostInstall implements InstallHandler {
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
     private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
     private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
+    private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
+    private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
+
+    /** Test seam: true lets a test see the nightly tab access check scheduled. */
+    @TestVisible
+    private static Boolean scheduleTabCheckInTests = false;
 
     /**
      * What every Error Log entry written by an install or upgrade starts with, including the
@@ -77,6 +87,7 @@ public with sharing class CorePostInstall implements InstallHandler {
             return;
         }
         markFeaturesOffOnANewInstall(context);
+        saveEditionOnAnUpgrade(context);
         applyRecommendedMode();
         ensureRollupDefaults();
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
@@ -85,6 +96,7 @@ public with sharing class CorePostInstall implements InstallHandler {
         // whoever had those tabs before (ADR-NEXT); queued, since it writes setup objects. It
         // never throws.
         TabAccessService.requestSync();
+        scheduleTabAccessCheck();
         Id installerId = context.installerId();
         if (installerId == null) {
             return;
@@ -104,6 +116,46 @@ public with sharing class CorePostInstall implements InstallHandler {
             }
         } catch (Exception e) {
             ErrorLogger.log(e, FEATURE_CONTEXT);
+        }
+    }
+
+    /**
+     * An upgraded org with no edition saved gets the one the Setup Assistant recommends, or the
+     * Standard Edition when nothing points to the Nonprofit one (what BarnCRM already shows with
+     * no edition). Its features are all on, so without this the first-run window would stand in
+     * front of an org that is already working (ADR-NEXT).
+     */
+    private void saveEditionOnAnUpgrade(InstallContext context) {
+        try {
+            if (
+                context.previousVersion() != null &&
+                String.isBlank(SettingsService.getSettings().Suite__c)
+            ) {
+                String suite = SetupAssistantService.recommendedSuite();
+                SettingsService.saveSystemValue(
+                    'Suite__c',
+                    suite == null ? ModuleDetectionService.SUITE_COMMUNITY : suite
+                );
+            }
+        } catch (Exception e) {
+            ErrorLogger.log(e, EDITION_CONTEXT);
+        }
+    }
+
+    /**
+     * Schedules the nightly tab access check, the safety net for roles given outside BarnCRM's
+     * Access page (ADR-NEXT). `start` finds a job already scheduled by name, so a reinstall or an
+     * upgrade never doubles it. Skipped in tests unless a test asks, so that a test of something
+     * else does not leave a scheduled job that runs at `Test.stopTest`.
+     */
+    private void scheduleTabAccessCheck() {
+        if (Test.isRunningTest() && !scheduleTabCheckInTests) {
+            return;
+        }
+        try {
+            TabAccessScheduler.start();
+        } catch (Exception e) {
+            ErrorLogger.log(e, TAB_CHECK_CONTEXT);
         }
     }
 

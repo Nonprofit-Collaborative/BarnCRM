@@ -129,8 +129,25 @@ separate work, and BarnCRM Giving will depend on it.
   pattern; until then they follow the module's permission sets. Giving is the first follow-up.
 - An upgraded org keeps every feature and every tab: `Features_Turned_On__c` is empty, which
   means all on, and the post-install run gives each tab set to everyone who had the tab before.
-- A new install runs no Core automation until first-run setup turns its feature on.
+- A new install runs no Core automation until first-run setup turns its feature on. With
+  household upkeep off that includes two guards that are not about creating households:
+  `refuseHandSetPrimaryContacts` (junction mode refuses a hand edit of Primary Contact) and the
+  junction-mode `beforeDelete` membership cleanup on Contact, so before setup a Primary Contact
+  can be set by hand and deleting a contact leaves its membership rows naming nobody.
+- Turning household upkeep on queues one batch (`HouseholdCatchUpBatch`) that gives a
+  household to every contact added while it was off, in the mode in force, through the same
+  `HouseholdService` methods the trigger uses. The other four feature groups are not caught
+  up: their records settle on their next save, or not at all.
+- An upgrade that finds no edition saved saves the recommended one (the Standard Edition when
+  nothing points to the Nonprofit one), so an upgraded org never sees the first-run window.
+  Every install and upgrade also schedules the nightly tab access check if it is not already.
 - A BarnCRM Tab set assigned by hand is removed by the next run.
 - An org that had saved an edition before this release never sees the first-run window.
+- First-run setup shows while `Suite__c` is empty or `Features_Turned_On__c` is `None`, so an
+  edition typed in Setup, Custom Settings before first-run setup still leads to the feature
+  choice, with that edition pre-selected. Finishing always moves the list off `None`: to the
+  keys turned on, or to `NoneChosen` when every feature was unticked, which counts as none on
+  and setup done. The window therefore cannot loop, and an upgraded org (an empty list) never
+  sees it once an edition is saved.
 - The admin guide covers it in `editions.md`, `barncrm-settings.md`, `access.md`,
   `module-manager.md` and `setup-assistant.md`.

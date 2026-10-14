@@ -6,7 +6,8 @@
  * Module Manager). Features are off on a new install until an administrator turns them on, and
  * turning one on is one-way. `Features_Turned_On__c` lists the keys that are on: empty means
  * every feature is on (an org upgraded from before features existed), `None` means none is (a
- * new install before first-run setup).
+ * new install before first-run setup), and `NoneChosen` means none is and first-run setup is
+ * finished (every feature was unticked).
  *
  * Two kinds of feature:
  * - a tool (Data Manager, Duplicate Review, Org Optimizer), whose tabs `TabAccessService` gives
@@ -34,6 +35,13 @@ public with sharing class FeatureSwitchService {
 
     /** What a new install stores until first-run setup: no feature is on. */
     public static final String NONE_ON = 'None';
+
+    /**
+     * What first-run setup stores when the administrator finished it with every feature
+     * unticked: still no feature on, but setup is done, so the window does not come back.
+     * Turning any feature on later replaces it with that feature's key.
+     */
+    public static final String NONE_CHOSEN = 'NoneChosen';
 
     private static final String ON_KEY = 'Features_Turned_On__c';
 
@@ -182,11 +190,35 @@ public with sharing class FeatureSwitchService {
             return keys;
         }
         for (String part : stored.split(',')) {
-            if (String.isNotBlank(part) && part.trim() != NONE_ON) {
-                keys.add(part.trim().toLowerCase());
+            String key = part.trim();
+            if (String.isNotBlank(key) && key != NONE_ON && key != NONE_CHOSEN) {
+                keys.add(key.toLowerCase());
             }
         }
         return keys;
+    }
+
+    /**
+     * Whether first-run setup is still to be finished as far as features go: the list holds
+     * `None`, which only a new install stores. Blank (an upgraded org) and `NoneChosen` (setup
+     * finished with nothing ticked) are both done.
+     */
+    public static Boolean awaitingFirstRun() {
+        String stored = SettingsService.getSettings().Features_Turned_On__c;
+        return stored != null && stored.trim() == NONE_ON;
+    }
+
+    /**
+     * First-run setup's save: turns the ticked features on and always leaves the list saying
+     * setup is done, as `NoneChosen` when nothing was ticked, so the window cannot loop.
+     */
+    public static void finishFirstRun(Set<String> keys) {
+        if (keys != null && !keys.isEmpty()) {
+            turnOn(keys);
+        }
+        if (awaitingFirstRun()) {
+            SettingsService.saveSystemValue(ON_KEY, NONE_CHOSEN);
+        }
     }
 
     /** Whether the feature is on. */
@@ -247,6 +279,11 @@ public with sharing class FeatureSwitchService {
         }
         if (tabsChange) {
             TabAccessService.requestSync();
+        }
+        // People added while household upkeep was off have no household: one batch gives them
+        // one, as the trigger would have (it never throws).
+        if (newKeys.contains(HOUSEHOLD_UPKEEP.toLowerCase())) {
+            HouseholdCatchUpBatch.enqueue();
         }
     }
 

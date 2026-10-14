@@ -123,6 +123,21 @@ public with sharing class HouseholdWriter {
     }
 
     /**
+     * Contact mode, the household catch-up: points each contact at the household just made
+     * for it. Only `AccountId` is sent, and its value is the package's own new household, so
+     * the same exception covers it as the trigger's before-insert assignment does. Returns one
+     * result per contact; each refusal is logged.
+     */
+    public static List<Database.SaveResult> linkContactsToHouseholds(List<Contact> links) {
+        if (links == null || links.isEmpty()) {
+            return new List<Database.SaveResult>();
+        }
+        List<Database.SaveResult> saves = Database.update(links, false, AccessLevel.SYSTEM_MODE);
+        logFailures(saves, Label.Core_Households_ErrorContextMembership);
+        return saves;
+    }
+
+    /**
      * The membership rows a people merge gives the survivor, and the survivor's rows it makes
      * primary. All or none, in system mode (upkeep, ADR-0021): a row that cannot be written
      * fails the merge, so nothing is lost and the merged-away person's households are

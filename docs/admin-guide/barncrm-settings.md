@@ -37,9 +37,13 @@ the same setup window in front of everything else, and nothing behind it can be 
 **On a new install, BarnCRM's automation does nothing until first-run setup is finished.**
 Every Core feature starts off, so its automation is held: no household is created for a new
 contact, no address is copied, no reciprocal relationship is made, no primary affiliation is
-set and no preferred email is filled in. Records added or imported before then are not
-processed later, when the feature is turned on, so finish first-run setup before you add or
-import people. An org upgraded from an earlier release keeps every feature on and is not held.
+set and no preferred email is filled in. Households are caught up automatically: when
+**Household Upkeep** is turned on (in first-run setup or in **General**), BarnCRM gives a
+household to every contact added while it was off, in the background, usually within a few
+minutes. The other four features are not caught up: records added or imported before
+Addresses, Relationships, Affiliations or Preferred Email is on are not processed when it is
+turned on, so finish first-run setup before you add or import people. An org upgraded from an
+earlier release keeps every feature on and is not held.
 
 - **Someone with the BarnCRM Admin role** (Manage BarnCRM Settings) sees two questions:
   1. **Which edition**: Standard Edition or Nonprofit Edition (see [Editions](editions.md)).
@@ -57,7 +61,11 @@ import people. An org upgraded from an earlier release keeps every feature on an
 - **Anyone else** sees "An administrator needs to finish setting up BarnCRM." and nothing
   else, on both pages, until an administrator finishes.
 
-An org that had already chosen an edition before this release never sees the window.
+An org that had already chosen an edition before this release never sees the window, and an
+upgraded org with no edition is given the recommended one by the upgrade. If someone set the
+edition in Salesforce Setup on a new install, the window still shows, with that edition
+already selected, because the features have not been chosen yet. Finishing with every feature
+unticked still finishes setup: the window does not come back.
 
 ## Features (General)
 
@@ -270,5 +278,5 @@ changes.
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Giving brings its own. |
 | A row in Recent changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
-| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; empty, on an org upgraded from before features existed, means all on) |
+| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; `NoneChosen` when first-run setup was finished with every feature unticked; empty, on an org upgraded from before features existed, means all on) |
 | Which modules are off | BarnCRM Settings, Modules Turned Off |

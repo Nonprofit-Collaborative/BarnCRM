@@ -134,6 +134,67 @@ private class CorePostInstallTest {
     }
 
     @IsTest
+    static void anUpgradeWithNoEditionSavesTheRecommendedOne() {
+        System.runAs(TestUsers.admin()) {
+            String recommended = SetupAssistantService.recommendedSuite();
+            String expected = recommended == null
+                ? ModuleDetectionService.SUITE_COMMUNITY
+                : recommended;
+
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+
+            Assert.areEqual(
+                expected,
+                ModuleDetectionService.chosenSuite(),
+                'An upgraded org is not stopped by the first-run window'
+            );
+            Assert.isFalse(FirstRunController.getState().needsSetup, 'So the window never shows');
+        }
+    }
+
+    @IsTest
+    static void anUpgradeKeepsASavedEditionAndANewInstallSavesNone() {
+        System.runAs(TestUsers.admin()) {
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
+
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+            String afterUpgrade = ModuleDetectionService.chosenSuite();
+            SettingsService.saveSystemValue('Suite__c', null);
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_IMPACT,
+                afterUpgrade,
+                'The edition chosen is kept'
+            );
+            Assert.isNull(
+                ModuleDetectionService.chosenSuite(),
+                'A new install leaves the edition to first-run setup'
+            );
+        }
+    }
+
+    @IsTest
+    static void everyRunSchedulesTheNightlyTabCheckOnce() {
+        System.runAs(TestUsers.admin()) {
+            CorePostInstall.scheduleTabCheckInTests = true;
+
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM CronTrigger
+                    WHERE CronJobDetail.Name = :TabAccessScheduler.JOB_NAME
+                ],
+                'An install and an upgrade leave one nightly tab access check'
+            );
+        }
+    }
+
+    @IsTest
     static void installAlwaysGivesTheInstallerTheAdminPermissionSet() {
         System.runAs(TestUsers.admin()) {
             Id installer = newInstaller();

@@ -49,6 +49,34 @@ private class SeasonalAddressBatchTest {
     }
 
     @IsTest
+    static void aRunDoesNothingWhileAddressesAreOff() {
+        System.runAs(TestUsers.admin()) {
+            Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
+            FeatureSwitchService.markNewInstall();
+
+            Test.startTest();
+            Database.executeBatch(
+                new SeasonalAddressBatch(Date.newInstance(2027, 1, 15)),
+                SeasonalAddressBatch.CHUNK_SIZE
+            );
+            Test.stopTest();
+
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Address__c
+                    WHERE
+                        Account__c = :garcia.Id
+                        AND Is_Default__c = TRUE
+                        AND City__c = :WINTER_CITY
+                ],
+                'With Addresses off the household stays at its home address'
+            );
+        }
+    }
+
+    @IsTest
     static void aRunWithNothingToDoStillRecordsThatItRan() {
         System.runAs(TestUsers.admin()) {
             householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);

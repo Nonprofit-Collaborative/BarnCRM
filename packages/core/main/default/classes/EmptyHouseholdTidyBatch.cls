@@ -135,8 +135,14 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
         );
     }
 
-    /** True when the org keeps the households of deleted people (R-H12a). */
+    /**
+     * True when the org keeps the households of deleted people (R-H12a), or when household
+     * upkeep is off (ADR-NEXT): a feature that is off does no work, nightly jobs included.
+     */
     private static Boolean keepsHouseholds() {
+        if (!FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP)) {
+            return true;
+        }
         BarnCRM_Settings__c settings = SettingsService.getSettings();
         return settings != null && settings.Keep_Households_Of_Deleted_People__c == true;
     }

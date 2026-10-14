@@ -1,7 +1,12 @@
 /**
- * First-run setup (ADR-NEXT): the window in front of BarnCRM Home and BarnCRM Settings until an
- * edition is saved. An administrator picks the edition and the features to turn on in one
- * step; anyone else is told an administrator needs to finish. It installs no module.
+ * First-run setup (ADR-NEXT): the window in front of BarnCRM Home and BarnCRM Settings until it
+ * is finished. It shows while no edition is saved, or while the features list still holds the
+ * new install's `None`: an edition typed in Setup, Custom Settings before first-run setup does
+ * not skip the feature choice, and the window pre-selects that edition. Finishing always
+ * leaves the list off `None` (`NoneChosen` when every feature was unticked), so the window
+ * cannot come back; an upgraded org (an empty list) never sees it once an edition is saved.
+ * An administrator picks the edition and the features to turn on in one step; anyone else is
+ * told an administrator needs to finish. It installs no module.
  */
 public with sharing class FirstRunController {
     private static final String ERROR_CONTEXT = 'FirstRunController';
@@ -42,9 +47,9 @@ public with sharing class FirstRunController {
         try {
             SetupAssistantService.ensureStarted();
             SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
-            if (featureKeys != null && !featureKeys.isEmpty()) {
-                FeatureSwitchService.turnOn(new Set<String>(featureKeys));
-            }
+            FeatureSwitchService.finishFirstRun(
+                featureKeys == null ? new Set<String>() : new Set<String>(featureKeys)
+            );
             return state();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
@@ -54,9 +59,11 @@ public with sharing class FirstRunController {
 
     private static FirstRunState state() {
         FirstRunState model = new FirstRunState();
-        model.needsSetup = ModuleDetectionService.chosenSuite() == null;
+        model.needsSetup =
+            ModuleDetectionService.chosenSuite() == null || FeatureSwitchService.awaitingFirstRun();
         model.canFinish = BarnCRMPermissions.canManageSettings();
         if (model.needsSetup && model.canFinish) {
+            // The saved edition when there is one (set in Setup), otherwise the suggestion.
             model.recommendedSuite = SetupAssistantService.recommendedSuite();
             model.features = FeatureController.rows();
         } else {

@@ -75,6 +75,66 @@ private class FirstRunControllerTest {
     }
 
     @IsTest
+    static void anEditionSavedInSetupStillAsksForFeaturesAndIsPreselected() {
+        System.runAs(TestUsers.admin()) {
+            FeatureSwitchService.markNewInstall();
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_IMPACT);
+
+            Test.startTest();
+            FirstRunController.FirstRunState state = FirstRunController.getState();
+            Test.stopTest();
+
+            Assert.isTrue(state.needsSetup, 'The features are still to be chosen');
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_IMPACT,
+                state.recommendedSuite,
+                'The saved edition is pre-selected'
+            );
+        }
+    }
+
+    @IsTest
+    static void finishingWithEveryFeatureUntickedDoesNotLoop() {
+        System.runAs(TestUsers.admin()) {
+            FeatureSwitchService.markNewInstall();
+
+            Test.startTest();
+            FirstRunController.FirstRunState state = FirstRunController.finish(
+                ModuleDetectionService.SUITE_COMMUNITY,
+                new List<String>()
+            );
+            Test.stopTest();
+
+            Assert.isFalse(state.needsSetup, 'The window does not come back');
+            Assert.areEqual(
+                FeatureSwitchService.NONE_CHOSEN,
+                SettingsService.getSettings().Features_Turned_On__c,
+                'Setup is marked done with nothing on'
+            );
+            Assert.isTrue(FeatureSwitchService.featuresOn().isEmpty(), 'No feature is on');
+            FeatureSwitchService.turnOn(FeatureSwitchService.RELATIONSHIPS);
+            Assert.areEqual(
+                FeatureSwitchService.RELATIONSHIPS,
+                SettingsService.getSettings().Features_Turned_On__c,
+                'A feature turned on later replaces the marker'
+            );
+        }
+    }
+
+    @IsTest
+    static void anUpgradedOrgWithAnEditionNeverSeesTheWindow() {
+        System.runAs(TestUsers.admin()) {
+            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_COMMUNITY);
+
+            Test.startTest();
+            FirstRunController.FirstRunState state = FirstRunController.getState();
+            Test.stopTest();
+
+            Assert.isFalse(state.needsSetup, 'Every feature is on and the edition is saved');
+        }
+    }
+
+    @IsTest
     static void anUnknownFeatureKeepsNothing() {
         System.runAs(TestUsers.admin()) {
             FeatureSwitchService.markNewInstall();

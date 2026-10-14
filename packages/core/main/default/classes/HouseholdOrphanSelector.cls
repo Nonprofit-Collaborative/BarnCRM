@@ -142,6 +142,75 @@ public with sharing class HouseholdOrphanSelector {
         ];
     }
 
+    /**
+     * Contact mode, for the household catch-up batch: every contact with no account, with the
+     * fields a household name is built from. Unlike the reads above this is household upkeep,
+     * not a screen, so it runs in system mode like the trigger it stands in for (ADR-0021);
+     * the class is `with sharing`, so it still sees only records the person who turned
+     * household upkeep on can see.
+     */
+    public static Database.QueryLocator contactsWithoutAccountLocator() {
+        Set<Id> erasedIds = erasedPeople();
+        return Database.getQueryLocator(
+            [
+                SELECT
+                    Id,
+                    AccountId,
+                    FirstName,
+                    LastName,
+                    Salutation,
+                    Preferred_Name__c,
+                    Household_Role__c,
+                    Deceased__c,
+                    Exclude_From_Household_Name__c,
+                    Exclude_From_Greetings__c,
+                    CreatedDate
+                FROM Contact
+                WHERE AccountId = NULL AND Id NOT IN :erasedIds
+                WITH SYSTEM_MODE
+            ]
+        );
+    }
+
+    /**
+     * Junction mode, for the household catch-up batch: every contact with no current
+     * membership row, leaving out those whose account is of an excluded type, as
+     * `contactsWithoutMembership` does. System mode for the reason above.
+     */
+    public static Database.QueryLocator contactsWithoutMembershipLocator(
+        Set<Id> excludedAccountTypes
+    ) {
+        Date today = Date.today();
+        Set<Id> erasedIds = erasedPeople();
+        return Database.getQueryLocator(
+            [
+                SELECT
+                    Id,
+                    AccountId,
+                    FirstName,
+                    LastName,
+                    Salutation,
+                    Preferred_Name__c,
+                    Household_Role__c,
+                    Deceased__c,
+                    Exclude_From_Household_Name__c,
+                    Exclude_From_Greetings__c,
+                    CreatedDate
+                FROM Contact
+                WHERE
+                    Id NOT IN (
+                        SELECT Contact__c
+                        FROM Household_Member__c
+                        WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+                    )
+                    AND Id NOT IN :erasedIds
+                    AND (AccountId = NULL
+                    OR Account.RecordTypeId NOT IN :excludedAccountTypes)
+                WITH SYSTEM_MODE
+            ]
+        );
+    }
+
     /** Junction mode, people stored as accounts: no current membership row names them. */
     public static Integer countPersonAccountsWithoutMembership(
         Set<Id> personRecordTypeIds,
