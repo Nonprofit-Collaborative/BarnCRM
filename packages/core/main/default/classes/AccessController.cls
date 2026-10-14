@@ -123,16 +123,12 @@ public with sharing class AccessController {
         Boolean isAssign
     ) {
         AccessResult result = new AccessResult();
-        if (!result.canManage) {
+        if (!result.canManage || !AccessService.canAssignPermissionSets()) {
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
-            result.message = Label.Core_Access_ErrorNoPermission;
-            return result;
-        }
-        if (!AccessService.canAssignPermissionSets()) {
-            result.success = false;
-            result.errorCode = ERROR_NO_PERMISSION;
-            result.message = Label.Core_Access_ErrorCannotAssignPermissionSets;
+            result.message = result.canManage
+                ? Label.Core_Access_ErrorCannotAssignPermissionSets
+                : Label.Core_Access_ErrorNoPermission;
             return result;
         }
         Id assigneeId = toUserId(userId);
@@ -143,18 +139,16 @@ public with sharing class AccessController {
             return result;
         }
         try {
+            List<String> refusals = new List<String>();
             if (isAssign) {
-                List<String> failures = AccessService.assignAddOn(
-                    new Set<Id>{ assigneeId },
-                    permissionSetName
-                );
-                if (!failures.isEmpty()) {
-                    result.success = false;
-                    result.errorCode = ERROR_FAILED;
-                    result.message = String.join(failures, ' ');
-                }
+                refusals = AccessService.assignAddOn(new Set<Id>{ assigneeId }, permissionSetName);
             } else {
                 AccessService.removeAddOn(new Set<Id>{ assigneeId }, permissionSetName);
+            }
+            if (!refusals.isEmpty()) {
+                // Salesforce refused the person, usually for their license: the message names
+                // them and gives Salesforce's reason, and is already in the Error Log.
+                throw new AccessService.AccessException(String.join(refusals, ' '));
             }
         } catch (AccessService.AccessException e) {
             result.success = false;

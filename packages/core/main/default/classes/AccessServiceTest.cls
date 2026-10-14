@@ -694,8 +694,26 @@ private class AccessServiceTest {
         // which a test org cannot be relied on to have. The per-row handling is proven on
         // results shaped exactly as Database.insert returns them.
         System.runAs(TestUsers.admin()) {
-            User david = insertUser('David', 'Okafor');
-            User priya = insertUser('Priya', 'Nair');
+            Map<Id, User> people = new Map<Id, User>(
+                [
+                    SELECT Id, Name
+                    FROM User
+                    WHERE
+                        Id IN :new List<Id>{
+                            insertUser('David', 'Okafor').Id,
+                            insertUser('Priya', 'Nair').Id
+                        }
+                ]
+            );
+            User david;
+            User priya;
+            for (User person : people.values()) {
+                if (person.Name == 'David Okafor') {
+                    david = person;
+                } else {
+                    priya = person;
+                }
+            }
             List<PermissionSetAssignment> rows = new List<PermissionSetAssignment>{
                 new PermissionSetAssignment(AssigneeId = david.Id),
                 new PermissionSetAssignment(AssigneeId = priya.Id)
@@ -709,15 +727,20 @@ private class AccessServiceTest {
             );
 
             Test.startTest();
-            List<String> failures = AccessService.describeFailures(
+            List<String> failures = AccessService.reportFailures(
                 rows,
                 results,
-                new Map<Id, User>{ david.Id => david, priya.Id => priya },
+                people,
                 'BarnCRM Duplicate Review'
             );
             Test.stopTest();
 
             Assert.areEqual(1, failures.size(), 'Only the refused person should be reported.');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Error_Log__c],
+                'The refusal should be written to the Error Log once.'
+            );
             Assert.isTrue(
                 failures[0].startsWith('Priya Nair could not be given BarnCRM Duplicate Review.'),
                 'The message should name the person and the permission: ' + failures[0]

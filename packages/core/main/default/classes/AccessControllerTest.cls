@@ -411,10 +411,12 @@ private class AccessControllerTest {
         System.runAs(TestUsers.admin()) {
             User maria = insertAdminUser();
             AccessController.AccessResult result;
+            AccessController.AccessResult blank;
 
             Test.startTest();
             System.runAs(maria) {
                 result = AccessController.assignAddOn('not an id', ERASE_PEOPLE);
+                blank = AccessController.removeAddOn('', ERASE_PEOPLE);
             }
             Test.stopTest();
 
@@ -422,6 +424,11 @@ private class AccessControllerTest {
                 AccessController.ERROR_INVALID_INPUT,
                 result.errorCode,
                 'A value that is not a person should be refused as invalid.'
+            );
+            Assert.areEqual(
+                AccessController.ERROR_INVALID_INPUT,
+                blank.errorCode,
+                'Choosing nobody should be refused as invalid.'
             );
         }
     }

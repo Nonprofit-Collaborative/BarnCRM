@@ -306,20 +306,12 @@ public with sharing class AccessService {
             if (rows.isEmpty()) {
                 return new List<String>();
             }
-            List<String> failures = describeFailures(
+            return reportFailures(
                 rows,
                 Database.insert(rows, false, AccessLevel.USER_MODE),
                 targets,
                 permissionSetRecord.Label
             );
-            if (!failures.isEmpty()) {
-                ErrorLogger.logMessages(
-                    failures,
-                    'AccessService.assignAddOn',
-                    ErrorLogger.SEVERITY_ERROR
-                );
-            }
-            return failures;
         } catch (Exception e) {
             throw logAndWrap(e, 'AccessService.assignAddOn', Label.Core_Access_ErrorUnexpected);
         }
@@ -347,6 +339,34 @@ public with sharing class AccessService {
         } catch (Exception e) {
             throw logAndWrap(e, 'AccessService.removeAddOn', Label.Core_Access_ErrorUnexpected);
         }
+    }
+
+    /**
+     * Describes the people an insert refused and writes each to the Error Log. Writes
+     * nothing when every row was saved.
+     *
+     * @param rows the assignment rows, in the order they were inserted
+     * @param results the insert results, one per row in the same order
+     * @param people the people, by Id, to name in the messages
+     * @param addOnLabel the add-on's label
+     * @return one message per refused row; empty when every row was saved
+     */
+    @TestVisible
+    private static List<String> reportFailures(
+        List<PermissionSetAssignment> rows,
+        List<Database.SaveResult> results,
+        Map<Id, User> people,
+        String addOnLabel
+    ) {
+        List<String> failures = describeFailures(rows, results, people, addOnLabel);
+        if (!failures.isEmpty()) {
+            ErrorLogger.logMessages(
+                failures,
+                'AccessService.assignAddOn',
+                ErrorLogger.SEVERITY_ERROR
+            );
+        }
+        return failures;
     }
 
     /**
