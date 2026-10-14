@@ -45,10 +45,14 @@ public with sharing class AccessService {
         'BarnCRM_Metadata_Admin'
     };
 
-    /** The add-ons that let a person remove data, which the page warns about. */
-    public static final Set<String> DESTRUCTIVE_ADD_ONS = new Set<String>{
-        'BarnCRM_Bulk_Delete',
-        'BarnCRM_Erase_People'
+    /** One plain sentence per add-on, and a warning flag on the two that remove data. */
+    private static final Map<String, AddOnText> ADD_ON_TEXT = new Map<String, AddOnText>{
+        'BarnCRM_Find_And_Export' => new AddOnText(Label.Core_Access_AddOnFindAndExport, false),
+        'BarnCRM_Bulk_Update' => new AddOnText(Label.Core_Access_AddOnBulkUpdate, false),
+        'BarnCRM_Bulk_Delete' => new AddOnText(Label.Core_Access_AddOnBulkDelete, true),
+        'BarnCRM_Erase_People' => new AddOnText(Label.Core_Access_AddOnErasePeople, true),
+        'BarnCRM_Duplicate_Review' => new AddOnText(Label.Core_Access_AddOnDuplicateReview, false),
+        'BarnCRM_Metadata_Admin' => new AddOnText(Label.Core_Access_AddOnMetadataAdmin, false)
     };
 
     /**
@@ -66,6 +70,17 @@ public with sharing class AccessService {
     private static PermissionSetAssignmentSelector assignmentSelector = new PermissionSetAssignmentSelector();
     private static UserSelector userSelector = new UserSelector();
     private static PermissionSetSelector permissionSetSelector = new PermissionSetSelector();
+
+    /** What the page says about one add-on: what it grants, and whether it removes data. */
+    private class AddOnText {
+        private final String description;
+        private final Boolean isDestructive;
+
+        private AddOnText(String description, Boolean isDestructive) {
+            this.description = description;
+            this.isDestructive = isDestructive;
+        }
+    }
 
     /** Thrown for every failure the Access page can meet, with a message fit to display. */
     public class AccessException extends Exception {
@@ -157,8 +172,9 @@ public with sharing class AccessService {
         public AddOn(PermissionSet permissionSetRecord) {
             this.developerName = permissionSetRecord.Name;
             this.label = permissionSetRecord.Label;
-            this.description = addOnDescription(permissionSetRecord.Name);
-            this.isDestructive = DESTRUCTIVE_ADD_ONS.contains(permissionSetRecord.Name);
+            AddOnText text = ADD_ON_TEXT.get(permissionSetRecord.Name);
+            this.description = text.description;
+            this.isDestructive = text.isDestructive;
             // System.Label: a bare Label here would resolve to this class's own label field.
             this.warning = this.isDestructive
                 ? System.Label.Core_Access_AddOnDestructiveWarning
@@ -250,9 +266,9 @@ public with sharing class AccessService {
     }
 
     /**
-     * Whether the running user could assign permission sets in Setup: they hold Assign
-     * Permission Sets or Manage Users through their profile, a permission set, or a role.
-     * Any failure to tell counts as no.
+     * Whether the running user could assign permission sets in Setup: their effective
+     * permissions (profile, permission sets and groups, after muting) include Assign
+     * Permission Sets or Manage Users. Any failure to tell counts as no.
      *
      * @return true when they hold either permission
      */
@@ -261,10 +277,25 @@ public with sharing class AccessService {
             return assignPermissionSetsOverride;
         }
         try {
-            return assignmentSelector.countAssignPermissionSetsGrants(UserInfo.getUserId()) > 0;
+            UserPermissionAccess access = userSelector.selectRunningUserPermissionAccess();
+            return access != null &&
+                (access.PermissionsAssignPermissionSets || access.PermissionsManageUsers);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Why the running user may not give or remove add-ons, or null when they may. They need
+     * Manage BarnCRM Settings, as for roles, and what Setup itself asks for.
+     *
+     * @return the message to show, or null when both checks pass
+     */
+    public static String addOnRefusal() {
+        if (!BarnCRMPermissions.canManageSettings()) {
+            return Label.Core_Access_ErrorNoPermission;
+        }
+        return canAssignPermissionSets() ? null : Label.Core_Access_ErrorCannotAssignPermissionSets;
     }
 
     /**
@@ -308,8 +339,9 @@ public with sharing class AccessService {
             }
             return reportFailures(
                 rows,
-                Database.insert(rows, false, AccessLevel.USER_MODE),
+                errorsOf(Database.insert(rows, false, AccessLevel.USER_MODE)),
                 targets,
+                Label.Core_Access_ErrorAddOnRefused,
                 permissionSetRecord.Label
             );
         } catch (Exception e) {
@@ -318,13 +350,16 @@ public with sharing class AccessService {
     }
 
     /**
-     * Takes one add-on permission set away from a set of people, in a single DML operation.
-     * Removing an add-on a person does not hold directly changes nothing and is not an error.
+     * Takes one add-on permission set away from a set of people. Removing an add-on a person
+     * does not hold directly changes nothing and is not an error. As with giving, each person
+     * is removed on their own terms: one Salesforce refuses is reported by name and the
+     * others are still removed.
      *
      * @param userIds the people to take the add-on from
      * @param permissionSetName the API name of one of the Core add-on permission sets
+     * @return one plain message per person it could not be removed from; empty when none
      */
-    public static void removeAddOn(Set<Id> userIds, String permissionSetName) {
+    public static List<String> removeAddOn(Set<Id> userIds, String permissionSetName) {
         requireAssignPermission();
         PermissionSet permissionSetRecord = requireAddOn(permissionSetName);
         Set<Id> targets = requireChosenPeople(userIds);
@@ -333,73 +368,89 @@ public with sharing class AccessService {
                 permissionSetRecord.Id,
                 targets
             );
-            if (!toDelete.isEmpty()) {
-                Database.delete(toDelete, true, AccessLevel.USER_MODE);
+            if (toDelete.isEmpty()) {
+                return new List<String>();
             }
+            Map<Id, User> people = new Map<Id, User>();
+            for (PermissionSetAssignment assignment : toDelete) {
+                people.put(assignment.AssigneeId, assignment.Assignee);
+            }
+            return reportFailures(
+                toDelete,
+                errorsOf(Database.delete(toDelete, false, AccessLevel.USER_MODE)),
+                people,
+                Label.Core_Access_ErrorAddOnRemoveRefused,
+                permissionSetRecord.Label
+            );
         } catch (Exception e) {
             throw logAndWrap(e, 'AccessService.removeAddOn', Label.Core_Access_ErrorUnexpected);
         }
     }
 
     /**
-     * Describes the people an insert refused and writes each to the Error Log. Writes
-     * nothing when every row was saved.
+     * The errors of each row of an insert, in row order; an empty list for a saved row.
      *
-     * @param rows the assignment rows, in the order they were inserted
-     * @param results the insert results, one per row in the same order
+     * @param results the insert results
+     * @return the errors per row
+     */
+    @TestVisible
+    private static List<List<Database.Error>> errorsOf(List<Database.SaveResult> results) {
+        List<List<Database.Error>> errors = new List<List<Database.Error>>();
+        for (Database.SaveResult result : results) {
+            errors.add(result.isSuccess() ? new List<Database.Error>() : result.getErrors());
+        }
+        return errors;
+    }
+
+    /**
+     * The errors of each row of a delete, in row order; an empty list for a deleted row.
+     *
+     * @param results the delete results
+     * @return the errors per row
+     */
+    @TestVisible
+    private static List<List<Database.Error>> errorsOf(List<Database.DeleteResult> results) {
+        List<List<Database.Error>> errors = new List<List<Database.Error>>();
+        for (Database.DeleteResult result : results) {
+            errors.add(result.isSuccess() ? new List<Database.Error>() : result.getErrors());
+        }
+        return errors;
+    }
+
+    /**
+     * Turns the rows Salesforce refused into one plain message per person and writes each
+     * to the Error Log. Writes nothing when every row went through. Kept separate from the
+     * DML so that the refusal path, which in a real org is usually a license that does not
+     * allow what the add-on grants, can be proven without such a user.
+     *
+     * @param rows the assignment rows, in the order they were sent
+     * @param errorsByRow the errors of each row, in the same order; empty for a row that went through
      * @param people the people, by Id, to name in the messages
+     * @param template the message label: {0} person, {1} add-on, {2} Salesforce's reason
      * @param addOnLabel the add-on's label
-     * @return one message per refused row; empty when every row was saved
+     * @return one message per refused row; empty when every row went through
      */
     @TestVisible
     private static List<String> reportFailures(
         List<PermissionSetAssignment> rows,
-        List<Database.SaveResult> results,
+        List<List<Database.Error>> errorsByRow,
         Map<Id, User> people,
-        String addOnLabel
-    ) {
-        List<String> failures = describeFailures(rows, results, people, addOnLabel);
-        if (!failures.isEmpty()) {
-            ErrorLogger.logMessages(
-                failures,
-                'AccessService.assignAddOn',
-                ErrorLogger.SEVERITY_ERROR
-            );
-        }
-        return failures;
-    }
-
-    /**
-     * Turns the per-row results of an insert into one plain message per person refused.
-     * Kept separate from the DML so that the refusal path, which in a real org is a license
-     * that does not allow what the add-on grants, can be proven without such a user.
-     *
-     * @param rows the assignment rows, in the order they were inserted
-     * @param results the insert results, one per row in the same order
-     * @param people the people, by Id, to name in the messages
-     * @param addOnLabel the add-on's label
-     * @return one message per refused row; empty when every row was saved
-     */
-    @TestVisible
-    private static List<String> describeFailures(
-        List<PermissionSetAssignment> rows,
-        List<Database.SaveResult> results,
-        Map<Id, User> people,
+        String template,
         String addOnLabel
     ) {
         List<String> failures = new List<String>();
-        for (Integer i = 0; i < results.size(); i++) {
-            if (results[i].isSuccess()) {
+        for (Integer i = 0; i < errorsByRow.size(); i++) {
+            if (errorsByRow[i].isEmpty()) {
                 continue;
             }
             List<String> reasons = new List<String>();
-            for (Database.Error error : results[i].getErrors()) {
+            for (Database.Error error : errorsByRow[i]) {
                 reasons.add(error.getMessage());
             }
-            User person = people == null ? null : people.get(rows[i].AssigneeId);
+            User person = people.get(rows[i].AssigneeId);
             failures.add(
                 String.format(
-                    Label.Core_Access_ErrorAddOnRefused,
+                    template,
                     new List<Object>{
                         person == null ? String.valueOf(rows[i].AssigneeId) : person.Name,
                         addOnLabel,
@@ -408,39 +459,10 @@ public with sharing class AccessService {
                 )
             );
         }
-        return failures;
-    }
-
-    /**
-     * The one plain sentence the page shows for what an add-on grants.
-     *
-     * @param permissionSetName the add-on's API name
-     * @return the sentence, or null for a name that is not an add-on
-     */
-    private static String addOnDescription(String permissionSetName) {
-        switch on permissionSetName {
-            when 'BarnCRM_Find_And_Export' {
-                return Label.Core_Access_AddOnFindAndExport;
-            }
-            when 'BarnCRM_Bulk_Update' {
-                return Label.Core_Access_AddOnBulkUpdate;
-            }
-            when 'BarnCRM_Bulk_Delete' {
-                return Label.Core_Access_AddOnBulkDelete;
-            }
-            when 'BarnCRM_Erase_People' {
-                return Label.Core_Access_AddOnErasePeople;
-            }
-            when 'BarnCRM_Duplicate_Review' {
-                return Label.Core_Access_AddOnDuplicateReview;
-            }
-            when 'BarnCRM_Metadata_Admin' {
-                return Label.Core_Access_AddOnMetadataAdmin;
-            }
-            when else {
-                return null;
-            }
+        if (!failures.isEmpty()) {
+            ErrorLogger.logMessages(failures, 'AccessService.addOns', ErrorLogger.SEVERITY_ERROR);
         }
+        return failures;
     }
 
     /**
@@ -466,10 +488,14 @@ public with sharing class AccessService {
         return setsByName;
     }
 
-    /** Refuses, with a readable message, a person who could not assign permission sets in Setup. */
+    /**
+     * Refuses, with a readable message, a person without Manage BarnCRM Settings or without
+     * what Setup itself asks for to assign a permission set.
+     */
     private static void requireAssignPermission() {
-        if (!canAssignPermissionSets()) {
-            throw new AccessException(Label.Core_Access_ErrorCannotAssignPermissionSets);
+        String refusal = addOnRefusal();
+        if (refusal != null) {
+            throw new AccessException(refusal);
         }
     }
 

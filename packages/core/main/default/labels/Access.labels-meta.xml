@@ -169,6 +169,14 @@
         <value>{0} could not be given {1}. Their Salesforce license may not allow what it grants. Salesforce said: {2}</value>
     </labels>
     <labels>
+        <fullName>Core_Access_ErrorAddOnRemoveRefused</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: removal refused; {0} person, {1} permission, {2} reason</shortDescription>
+        <value>{1} could not be removed from {0}. Salesforce said: {2}</value>
+    </labels>
+    <labels>
         <fullName>Core_Access_ErrorCannotAssignPermissionSets</fullName>
         <categories>Access</categories>
         <language>en_US</language>

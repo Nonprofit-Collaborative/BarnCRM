@@ -73,7 +73,7 @@ public with sharing class AccessController {
         }
         // Extra permissions are loaded on their own, so a failure here never hides the roles.
         // Giving one needs both Manage BarnCRM Settings and what Setup itself would need.
-        result.canAssignAddOns = result.canManage && AccessService.canAssignPermissionSets();
+        result.canAssignAddOns = AccessService.addOnRefusal() == null;
         try {
             result.addOns = AccessService.getAddOns();
             result.addOnAssignments = AccessService.getAddOnAssignments();
@@ -109,8 +109,9 @@ public with sharing class AccessController {
     }
 
     /**
-     * Shared path for giving and taking away an add-on: both permission checks, input
-     * validation, then the service call, which checks the Setup permission again.
+     * Shared path for giving and taking away an add-on: the permission refusal the service
+     * would give (so the page gets a code it can branch on), input validation, then the
+     * service call, which enforces both permission checks itself.
      *
      * @param userId the person, as an Id in text form
      * @param permissionSetName the API name of one of the Core add-on permission sets
@@ -123,12 +124,11 @@ public with sharing class AccessController {
         Boolean isAssign
     ) {
         AccessResult result = new AccessResult();
-        if (!result.canManage || !AccessService.canAssignPermissionSets()) {
+        String refusal = AccessService.addOnRefusal();
+        if (refusal != null) {
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
-            result.message = result.canManage
-                ? Label.Core_Access_ErrorCannotAssignPermissionSets
-                : Label.Core_Access_ErrorNoPermission;
+            result.message = refusal;
             return result;
         }
         Id assigneeId = toUserId(userId);
@@ -139,12 +139,10 @@ public with sharing class AccessController {
             return result;
         }
         try {
-            List<String> refusals = new List<String>();
-            if (isAssign) {
-                refusals = AccessService.assignAddOn(new Set<Id>{ assigneeId }, permissionSetName);
-            } else {
-                AccessService.removeAddOn(new Set<Id>{ assigneeId }, permissionSetName);
-            }
+            Set<Id> people = new Set<Id>{ assigneeId };
+            List<String> refusals = isAssign
+                ? AccessService.assignAddOn(people, permissionSetName)
+                : AccessService.removeAddOn(people, permissionSetName);
             if (!refusals.isEmpty()) {
                 // Salesforce refused the person, usually for their license: the message names
                 // them and gives Salesforce's reason, and is already in the Error Log.

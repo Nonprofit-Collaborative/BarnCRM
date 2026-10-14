@@ -126,4 +126,30 @@ private class UserSelectorTest {
             Assert.areEqual(0, none.size(), 'Asking about nobody should return nothing.');
         }
     }
+
+    @IsTest
+    static void runningUserPermissionAccessReflectsEffectivePermissions() {
+        System.runAs(TestUsers.admin()) {
+            User priya = insertUser('Priya', 'Nair');
+            UserSelector selector = new UserSelector();
+            UserPermissionAccess adminAccess;
+            UserPermissionAccess priyaAccess;
+
+            Test.startTest();
+            adminAccess = selector.selectRunningUserPermissionAccess();
+            System.runAs(priya) {
+                priyaAccess = selector.selectRunningUserPermissionAccess();
+            }
+            Test.stopTest();
+
+            Assert.isTrue(
+                adminAccess.PermissionsAssignPermissionSets,
+                'A System Administrator can assign permission sets.'
+            );
+            Assert.isFalse(
+                priyaAccess.PermissionsAssignPermissionSets || priyaAccess.PermissionsManageUsers,
+                'A standard user can neither assign permission sets nor manage users.'
+            );
+        }
+    }
 }

@@ -152,7 +152,10 @@ If Salesforce refuses one person, usually because their license does not allow w
 permission grants (Duplicate Review on a Salesforce Platform license, for example), the page says
 so by name: "Priya Nair could not be given BarnCRM Duplicate Review. Their Salesforce license
 may not allow what it grants. Salesforce said: ..." followed by Salesforce's own reason. The same
-message is written to the Error Log. Nothing is written there when it works.
+message is written to the Error Log. Removing works the same way: a person Salesforce will not
+let you remove it from is named with the reason ("BarnCRM Bulk Update could not be removed from
+Priya Nair. Salesforce said: ..."), and the others are still removed. Nothing is written to the
+Error Log when it works.
 
 ## What still needs Setup
 

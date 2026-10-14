@@ -675,9 +675,42 @@ private class AccessServiceTest {
 
             Assert.isFalse(priyaCanAssign, 'A standard user cannot assign permission sets.');
             Assert.areEqual(
+                Label.Core_Access_ErrorNoPermission,
+                assignMessage,
+                'Priya, without Manage BarnCRM Settings, should be refused by the service itself.'
+            );
+            Assert.areEqual(Label.Core_Access_ErrorNoPermission, removeMessage, 'Nor remove.');
+            Assert.areEqual(0, countAddOn(david.Id, BULK_UPDATE), 'Nothing should be assigned.');
+        }
+    }
+
+    @IsTest
+    static void manageSettingsWithoutAssignPermissionSetsIsRefused() {
+        // No packaged set carries Manage BarnCRM Settings without Assign Permission Sets, but
+        // an org's own can, so the Setup check is made to answer no.
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            String assignMessage;
+            String removeMessage;
+
+            Test.startTest();
+            AccessService.assignPermissionSetsOverride = false;
+            try {
+                AccessService.assignAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            } catch (AccessService.AccessException e) {
+                assignMessage = e.getMessage();
+            }
+            try {
+                AccessService.removeAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            } catch (AccessService.AccessException e) {
+                removeMessage = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
                 Label.Core_Access_ErrorCannotAssignPermissionSets,
                 assignMessage,
-                'Priya should be told she cannot give extra permissions, and why.'
+                'The person should be told what Setup permission is missing.'
             );
             Assert.areEqual(
                 Label.Core_Access_ErrorCannotAssignPermissionSets,
@@ -685,6 +718,42 @@ private class AccessServiceTest {
                 'Nor remove them.'
             );
             Assert.areEqual(0, countAddOn(david.Id, BULK_UPDATE), 'Nothing should be assigned.');
+        }
+    }
+
+    @IsTest
+    static void aRefusedRemovalIsNamedWithTheReason() {
+        System.runAs(TestUsers.admin()) {
+            User david = [
+                SELECT Id, Name
+                FROM User
+                WHERE Id = :insertUser('David', 'Okafor').Id
+            ];
+            List<PermissionSetAssignment> rows = new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(AssigneeId = david.Id)
+            };
+            List<Database.DeleteResult> results = (List<Database.DeleteResult>) JSON.deserialize(
+                '[{"success":false,"errors":[{"message":"Not allowed","statusCode":' +
+                '"INSUFFICIENT_ACCESS_OR_READONLY","fields":[]}]}]',
+                List<Database.DeleteResult>.class
+            );
+
+            Test.startTest();
+            List<String> failures = AccessService.reportFailures(
+                rows,
+                AccessService.errorsOf(results),
+                new Map<Id, User>{ david.Id => david },
+                Label.Core_Access_ErrorAddOnRemoveRefused,
+                'BarnCRM Bulk Update'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, failures.size(), 'The refused person should be reported.');
+            Assert.isTrue(
+                failures[0]
+                    .startsWith('BarnCRM Bulk Update could not be removed from David Okafor.'),
+                'The message should name the permission and the person: ' + failures[0]
+            );
         }
     }
 
@@ -729,8 +798,9 @@ private class AccessServiceTest {
             Test.startTest();
             List<String> failures = AccessService.reportFailures(
                 rows,
-                results,
+                AccessService.errorsOf(results),
                 people,
+                Label.Core_Access_ErrorAddOnRefused,
                 'BarnCRM Duplicate Review'
             );
             Test.stopTest();

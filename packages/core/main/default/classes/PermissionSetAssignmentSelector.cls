@@ -136,31 +136,6 @@ public with sharing class PermissionSetAssignmentSelector {
     }
 
     /**
-     * Counts the assignments that give one user the Assign Permission Sets or Manage Users
-     * permission: through their profile, a permission set, or a permission set group (whose
-     * assignment row points at the group's combined permission set). Read in user mode, so a
-     * person who cannot see the rows counts as not having the permission, which refuses
-     * rather than allows.
-     *
-     * @param userId the person to check
-     * @return how many of their assignments carry either permission; 0 when none do
-     */
-    public Integer countAssignPermissionSetsGrants(Id userId) {
-        if (userId == null) {
-            return 0;
-        }
-        return [
-            SELECT COUNT()
-            FROM PermissionSetAssignment
-            WHERE
-                AssigneeId = :userId
-                AND (PermissionSet.PermissionsAssignPermissionSets = TRUE
-                OR PermissionSet.PermissionsManageUsers = TRUE)
-            WITH USER_MODE
-        ];
-    }
-
-    /**
      * Counts the active users assigned to one permission set group.
      * Used to stop the last BarnCRM Admin removing themselves.
      *
