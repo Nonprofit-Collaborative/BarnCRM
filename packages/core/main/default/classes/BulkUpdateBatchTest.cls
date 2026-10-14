@@ -404,11 +404,7 @@ private class BulkUpdateBatchTest {
                     saved++;
                 }
             }
-            System.Assert.areEqual(
-                0,
-                saved,
-                'Nothing was saved without an undo'
-            );
+            System.Assert.areEqual(0, saved, 'Nothing was saved without an undo');
             List<Map<String, Object>> entries = journal(job.Id, ImportJournalService.PHASE_COMMIT);
             System.Assert.areEqual(200, entries.size(), 'One refusal per record');
             System.Assert.areEqual(

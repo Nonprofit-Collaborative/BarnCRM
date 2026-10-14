@@ -595,11 +595,13 @@ public with sharing class PersonErasure {
         // TaskRelation exists only where Shared Activities is on, so it is read by name: a
         // static reference would not compile in an org without it.
         if (NamespaceUtil.objectType('TaskRelation') != null) {
-            for (SObject relation : Database.queryWithBinds(
-                'SELECT TaskId FROM TaskRelation WHERE RelationId IN :people LIMIT :cap',
-                new Map<String, Object>{ 'people' => people, 'cap' => ACTIVITY_CAP },
-                AccessLevel.SYSTEM_MODE
-            )) {
+            for (
+                SObject relation : Database.queryWithBinds(
+                    'SELECT TaskId FROM TaskRelation WHERE RelationId IN :people LIMIT :cap',
+                    new Map<String, Object>{ 'people' => people, 'cap' => ACTIVITY_CAP },
+                    AccessLevel.SYSTEM_MODE
+                )
+            ) {
                 tasks.add((Id) relation.get('TaskId'));
             }
         }
