@@ -28,6 +28,9 @@ public with sharing class ModuleDetectionService {
     /** Salesforce's installer for one package version, relative to the org's own domain. */
     private static final String INSTALL_PATH = '/packaging/installPackage.apexp?p0=';
 
+    /** A Lightning app by its developer name, relative to the org's own domain. */
+    private static final String APP_PATH = '/lightning/app/';
+
     /**
      * Stands in for the shipped module catalog (`BarnCRM_Module__mdt`) in tests. The catalog
      * says which editions offer each module and where its installer is; Core never installs
@@ -44,8 +47,14 @@ public with sharing class ModuleDetectionService {
     public class ModuleInfo {
         @AuraEnabled
         public String name;
+        /** The name shown to administrators, such as BarnCRM Giving (the catalog's label). */
+        @AuraEnabled
+        public String label;
         @AuraEnabled
         public Boolean present;
+        /** The module's own app, where its Settings tab lives, or null when it has none yet. */
+        @AuraEnabled
+        public String appUrl;
         @AuraEnabled
         public String docsUrl;
         /** Salesforce's installer for this module, or null when it is here or not published. */
@@ -105,12 +114,13 @@ public with sharing class ModuleDetectionService {
     /** The Giving module alone, for the suite step: whether it is here, and where to read and install it. */
     public static ModuleInfo givingModule() {
         BarnCRM_Module__mdt row = catalogRow(MODULE_GIVING);
-        return module(
-            MODULE_GIVING,
-            isGivingPresent(),
-            row == null ? 'giving' : row.Package_Folder__c,
-            row == null ? null : row.Install_Version_Id__c
-        );
+        if (row == null) {
+            row = new BarnCRM_Module__mdt(
+                DeveloperName = MODULE_GIVING,
+                Package_Folder__c = 'giving'
+            );
+        }
+        return module(row, isGivingPresent());
     }
 
     /** Salesforce's installer for a published version, or null when none is published. */
@@ -129,19 +139,34 @@ public with sharing class ModuleDetectionService {
     public static List<ModuleInfo> getModules() {
         Set<String> announced = announcedModules();
         String edition = chosenSuite() == null ? SUITE_COMMUNITY : chosenSuite();
-        List<ModuleInfo> offered = new List<ModuleInfo>{ module(MODULE_CORE, true, 'core', null) };
+        List<ModuleInfo> offered = new List<ModuleInfo>{
+            module(
+                new BarnCRM_Module__mdt(DeveloperName = MODULE_CORE, Package_Folder__c = 'core'),
+                true
+            )
+        };
         for (BarnCRM_Module__mdt row : catalog()) {
-            String name = row.DeveloperName;
-            Boolean present = name == MODULE_GIVING
-                ? givingPresent(announced) || announced.contains(name.toLowerCase())
-                : announced.contains(name.toLowerCase());
+            Boolean present = isPresent(row, announced);
             if (present || offeredIn(row, edition)) {
-                offered.add(
-                    module(name, present, row.Package_Folder__c, row.Install_Version_Id__c)
-                );
+                offered.add(module(row, present));
             }
         }
         return offered;
+    }
+
+    /**
+     * True when the module announced itself with Setting Definition rows, when the catalog
+     * names an object of its own that this package has, or, for Giving, when its probe says so.
+     */
+    private static Boolean isPresent(BarnCRM_Module__mdt row, Set<String> announced) {
+        String name = row.DeveloperName;
+        if (announced.contains(name.toLowerCase())) {
+            return true;
+        }
+        if (name == MODULE_GIVING && givingPresent(announced)) {
+            return true;
+        }
+        return String.isNotBlank(row.Probe_Object__c) && objectExists(row.Probe_Object__c.trim());
     }
 
     /** True when the catalog says the chosen edition (Standard before one is chosen) offers it. */
@@ -212,17 +237,16 @@ public with sharing class ModuleDetectionService {
         return names;
     }
 
-    private static ModuleInfo module(
-        String name,
-        Boolean present,
-        String folder,
-        String versionId
-    ) {
+    private static ModuleInfo module(BarnCRM_Module__mdt row, Boolean present) {
         ModuleInfo info = new ModuleInfo();
-        info.name = name;
+        info.name = row.DeveloperName;
+        info.label = String.isBlank(row.MasterLabel) ? row.DeveloperName : row.MasterLabel;
         info.present = present;
-        info.docsUrl = DOCS_BASE + folder + '/README.md';
-        info.installUrl = present ? null : installUrl(versionId);
+        info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
+        info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);
+        info.appUrl = present && String.isNotBlank(row.App_Name__c)
+            ? APP_PATH + NamespaceUtil.prefix() + row.App_Name__c.trim()
+            : null;
         return info;
     }
 

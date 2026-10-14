@@ -24,9 +24,14 @@ Settings** permission to install, turn on, turn off, or check what an uninstall 
 
 Which modules are listed depends on the edition chosen in the first step of the
 [Setup Assistant](setup-assistant.md). The Standard Edition (or no edition chosen yet) lists
-Core only. The Nonprofit Edition lists all six: Core, Giving, Volunteers, Programs, Funders
-and Connect. A module that is installed is always listed, whatever the edition. See
+Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all seven: Core, BarnCRM Rollup
+Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM
+Connect. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
+
+Each installed module has its own app with its own Settings tab, where its settings live;
+its row links there. (Some module settings still show in BarnCRM Settings for now; they move
+to the module's app in a later release.)
 
 ## A five-minute walkthrough
 

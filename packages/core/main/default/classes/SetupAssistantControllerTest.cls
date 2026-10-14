@@ -43,9 +43,9 @@ private class SetupAssistantControllerTest {
                 'The organization step carries the fields it is going to edit'
             );
             Assert.areEqual(
-                1,
+                2,
                 state.modules.size(),
-                'Before an edition is chosen, only Core is listed, no nonprofit module'
+                'Before an edition is chosen, Core and Rollup Builder are listed, no nonprofit module'
             );
             Assert.isNotNull(state.roles, 'The access step needs the roles it can give out');
             Assert.isFalse(state.isComplete, 'A fresh org has not finished setup');
@@ -177,7 +177,7 @@ private class SetupAssistantControllerTest {
                 state.suite.giving.docsUrl.endsWith('/giving/README.md'),
                 'The step can say where to read about Giving'
             );
-            Assert.areEqual(6, state.modules.size(), 'The modules step now offers all six');
+            Assert.areEqual(7, state.modules.size(), 'The modules step now offers all seven');
             Assert.areEqual(
                 8,
                 state.stepsTotal,

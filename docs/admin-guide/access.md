@@ -180,11 +180,10 @@ Error Log when it works.
 
 ## Tabs that follow a switch
 
-Six tabs can be switched off for everyone in BarnCRM Settings, General, Modules and features:
-Data Manager, Import, Find, Bulk Update, Data Hygiene and Rollup Builder. So no role or extra
-permission grants them any more. Each comes from its own permission set, **BarnCRM Tab:
-(tab name)**, which BarnCRM gives automatically to the people who should see it while its
-Super Tool is on:
+Five tabs can be switched off for everyone in BarnCRM Settings, General, Modules and features:
+Data Manager, Import, Find, Bulk Update and Data Hygiene. So no role or extra permission grants
+them any more. Each comes from its own permission set, **BarnCRM Tab: (tab name)**, which
+BarnCRM gives automatically to the people who should see it while its feature is on:
 
 | Tab | Given to holders of |
 |---|---|
@@ -193,7 +192,6 @@ Super Tool is on:
 | Find | BarnCRM Admin, Find and Export |
 | Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
 | Data Hygiene | BarnCRM Admin, Find and Export |
-| Rollup Builder | BarnCRM Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or
 by a user access policy is caught up overnight, and every upgrade catches everyone up, so an

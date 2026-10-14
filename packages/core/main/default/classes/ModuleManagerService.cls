@@ -83,6 +83,9 @@ public with sharing class ModuleManagerService {
     public class ModuleStatus {
         @AuraEnabled
         public String name;
+        /** The name shown, such as BarnCRM Giving. */
+        @AuraEnabled
+        public String label;
         @AuraEnabled
         public String status;
         @AuraEnabled
@@ -91,6 +94,9 @@ public with sharing class ModuleManagerService {
         public String docsUrl;
         @AuraEnabled
         public String installUrl;
+        /** The module's own app, where its Settings tab lives, or null. */
+        @AuraEnabled
+        public String appUrl;
     }
 
     /** One line of the uninstall report: a kind of record and how many there are. */
@@ -111,8 +117,10 @@ public with sharing class ModuleManagerService {
         for (ModuleDetectionService.ModuleInfo info : ModuleDetectionService.getModules()) {
             ModuleStatus row = new ModuleStatus();
             row.name = info.name;
+            row.label = info.label;
             row.docsUrl = info.docsUrl;
             row.installUrl = info.installUrl;
+            row.appUrl = info.appUrl;
             row.canSwitch = info.present == true && info.name != CORE;
             row.status = info.present != true
                 ? STATUS_NOT_INSTALLED

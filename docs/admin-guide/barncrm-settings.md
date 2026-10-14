@@ -39,9 +39,9 @@ the same setup window in front of everything else, and nothing behind it can be 
      This is the only place the edition is asked; the Setup Assistant's first step then shows
      it read-only.
   2. **What to turn on**: **Turn on all the default core features** (everything on, the
-     usual choice), or **Let me choose modules and features**, which lists the same modules,
-     Super Tools and Core features as the panel described below, all ticked. Untick what you
-     do not want.
+     usual choice), or **Let me choose modules and features**, which lists the same features
+     and installed modules as the panel described below, all ticked. Untick what you do not
+     want.
 
   Click **Finish setup**. What you left on is turned on fully: its switch, its tabs, its
   settings, and its automations. What you unticked is turned off the same way. You land on
@@ -54,25 +54,37 @@ An org that had already chosen an edition before this release never sees the win
 ## Modules and features (General)
 
 The **General** section starts with **Edition** (read-only, see [Editions](editions.md)) and
-then **Modules and features**: one row per thing you can turn on or off, each with a short
-description, its state, and a switch. Turning something off hides its tabs and its settings
-in this page for everyone and stops its automations; turning it on brings them back. Nothing
-is deleted either way. Only people with Manage BarnCRM Settings can use the switches.
+then **Modules and features**. Only people with Manage BarnCRM Settings can use its switches
+and install links.
+
+- **Features** come with BarnCRM Core and can be turned on or off. Each has a short
+  description, its state, and a switch. Turning one off hides its tabs and its settings in
+  this page for everyone and stops its automations; turning it on brings them back. Nothing is
+  deleted either way.
+- **Modules** are separate packages, not installed with Core. Each is listed only in the
+  editions it belongs to. A module that is not installed shows **Not installed** with
+  **Install** and **What this module does**. An installed module shows its state, a switch,
+  and a link to its own app: each module has its own app with its own Settings tab, and its
+  settings live there, not in this page. (Some module sections still show in this page for
+  now; they move to the module's app in a later release.)
 
 | Row | What it covers | Off hides or stops |
 |---|---|---|
-| Each installed module (Giving and the others) | The module | Its automations and its rows in this page. Its tabs follow the module's own permission sets until that module ships switchable tabs (Giving does not yet) |
-| A module that is not installed | Shown as **Not installed** with **Install** and **What this module does**, no switch. The Standard Edition lists no nonprofit module that is not installed | Nothing |
-| Data Manager (Super Tool) | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
-| Duplicate Review (Super Tool) | Duplicate suggestions and review | The Duplicates row in Households |
-| Org Optimizer and Health Check (Super Tool) | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
-| Rollup Builder (Super Tool) | The Rollup Builder tab and the rollup list | The Rollup Builder tab and the Rollups list row |
+| Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
+| Duplicate Review | Duplicate suggestions and review | The Duplicates row in Households |
+| Org Optimizer and Health Check | The Data Hygiene tab and Health Check | The Data Hygiene tab, the Health section and the three "unused" thresholds in General |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the default address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships section |
 | Affiliations | The primary affiliation | Its automation |
-| Rollups | Household and person totals kept current | Its two automations and the rollup timing rows |
 | Preferred email | Copying the preferred email into the standard email | Its two automations |
+| Each installed module (BarnCRM Giving and the others) | The module | Its automations and its rows in this page. Its tabs follow the module's own permission sets until that module ships switchable tabs (BarnCRM Giving does not yet) |
+
+The modules are BarnCRM Rollup Builder (both editions), and BarnCRM Giving, BarnCRM
+Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect (Nonprofit Edition). The
+Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
+Builder is still part of Core while it is being split into its own package; until then its
+tab and settings show as they always have.
 
 Rules that enforce data (relationship, affiliation and rollup definition checks) are not
 part of any row and always run. The Automation section still lists every automation for
@@ -82,7 +94,7 @@ fine-grained control; a feature row is on when any of its automations is on.
 grants it, and an app cannot hide a tab any other way. So each switchable tab has its own
 small packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab,
 and BarnCRM gives it to, or takes it from, the people who should see the tab: whoever holds a
-role or extra permission that used to include the tab (BarnCRM Admin for all six, Find and
+role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
 Export for Find, Data Manager and Data Hygiene, Bulk Update or Bulk Delete for Bulk Update and
 Data Manager). BarnCRM keeps these in step when a switch changes, when a role or extra
 permission is given on the Access page, after every upgrade, and every night (for roles given
@@ -237,5 +249,5 @@ changes.
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Giving brings its own. |
 | A row in Recent changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
-| Which Super Tools are off | BarnCRM Settings, Features Turned Off (a comma-separated list; empty means all on) |
+| Which of Data Manager, Duplicate Review and Org Optimizer are off | BarnCRM Settings, Features Turned Off (a comma-separated list; empty means all on) |
 | Which modules are off | BarnCRM Settings, Modules Turned Off |

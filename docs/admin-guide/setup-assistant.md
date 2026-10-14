@@ -255,10 +255,11 @@ installed**, with a **Learn more** link to that package's description (its READM
 GitHub). A module that is not installed and has a published version also has an
 **Install** link, which opens Salesforce's installer for it in a new tab.
 
-- With the Standard Edition chosen in step one (or no edition chosen), the list shows Core,
-  plus any module that is already installed. It offers no nonprofit modules.
-- With the Nonprofit Edition chosen, it shows all six: Core, Giving, Volunteers, Programs,
-  Funders, and Connect.
+- With the Standard Edition chosen in step one (or no edition chosen), the list shows Core
+  and BarnCRM Rollup Builder, plus any module that is already installed. It offers no
+  nonprofit modules.
+- With the Nonprofit Edition chosen, it shows all seven: Core, BarnCRM Rollup Builder, BarnCRM
+  Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders, and BarnCRM Connect.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means

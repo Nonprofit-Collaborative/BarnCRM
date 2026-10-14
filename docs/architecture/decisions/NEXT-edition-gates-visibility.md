@@ -17,10 +17,17 @@ module to any Nonprofit Cloud org. The step also kept offering the choice on eve
 a casual click could change what every admin and user sees.
 
 The owner decided that nonprofit modules are not visible unless the Nonprofit Edition is
-chosen, that the edition is chosen once, that modules, Super Tools and Core features can be
-switched on and off from the General page with their tabs and settings hidden while off, and
-that a first-run setup window asks the edition and what to turn on before anything else. The
-repo rule that every admin setting lives in the in-app Settings console still holds.
+chosen, that the edition is chosen once, that features and modules can be switched on and off
+from the General page with their tabs and settings hidden while off, and that a first-run
+setup window asks the edition and what to turn on before anything else. The repo rule that
+every admin setting lives in the in-app Settings console still holds.
+
+Terms (owner, 2026-10-14): a **feature** is installed with Core and can be switched on or off
+(including the tools the website calls Super Tools; that name is not used in the product). A
+**module** is a separate package, not installed with Core, installed from Settings, General,
+and named "BarnCRM" plus its name: BarnCRM Rollup Builder (both editions), BarnCRM Giving,
+BarnCRM Volunteers, BarnCRM Programs, BarnCRM Funders and BarnCRM Connect. Rollup Builder
+becomes a module; its package split is separate work, and BarnCRM Giving will depend on it.
 
 ## Decision
 
@@ -32,20 +39,30 @@ repo rule that every admin setting lives in the in-app Settings console still ho
   (`connect_module_absent`) appears only in the Nonprofit Edition.
 - **Installed modules keep working.** The edition never installs, removes or turns off
   anything; an installed module stays listed in either edition.
+- **The module catalog is data.** `BarnCRM_Module__mdt` ships one record per module: the
+  editions that offer it, its label, its README folder, its installer version, an optional
+  probe object (so BarnCRM Rollup Builder counts as installed while its objects still ship in
+  Core) and its app name. A module both editions offer needs only a record.
+- **Modules have their own apps.** Each module has its own Lightning app with its own Settings
+  tab. The Core General page lists modules with their install state, an Install link when not
+  installed, and a link to the module's app when it is; it does not host module settings. The
+  module sections that still render in the Core console stay for now and move to each
+  module's app as follow-up work.
 - **Chosen once.** Once `Suite__c` has a value, the Setup Assistant's first step shows the
   edition read-only, also after Start again. The console's General section shows Edition
   read-only (`editionSetting`) with a collapsed "Change edition" disclosure for holders of
   Manage BarnCRM Settings, behind a confirmation; `SetupAssistantController.changeEdition`
   validates and audits it. Setup, Custom Settings (`Community` or `Impact`) also works; a value
   that is neither counts as no edition.
-- **Switches (General, Modules and features).** One panel lists every switchable item:
-  installed modules (filtered by edition), four Super Tools (Data Manager with Import, Find
-  and Bulk Update; Duplicate Review; Org Optimizer and Health Check; Rollup Builder) and six
-  Core feature groups (household upkeep, addresses, relationships, affiliations, rollups,
-  preferred email). Existing switches are reused: modules use `Modules_Turned_Off__c`
-  (ADR-0073), Core feature groups set their Automation Registry switches (on while any is on;
-  rule-enforcing validations belong to no group), and only the Super Tools, which had no
-  switch, get one new field, `Features_Turned_Off__c`. One Apex service
+- **Switches (General, Modules and features).** One panel lists every switchable item: three
+  tool features (Data Manager with Import, Find and Bulk Update; Duplicate Review; Org
+  Optimizer and Health Check), five Core feature groups (household upkeep, addresses,
+  relationships, affiliations, preferred email) and the modules offered in the edition.
+  Existing switches are reused: modules use `Modules_Turned_Off__c` (ADR-0073), Core feature
+  groups set their Automation Registry switches (on while any is on; rule-enforcing
+  validations belong to no group), and only the tool features, which had no switch, get one
+  new field, `Features_Turned_Off__c`. The rollup automations are not a Core group: they go
+  with BarnCRM Rollup Builder. One Apex service
   (`FeatureSwitchService`) turns an item on or off, used by the panel and by first-run setup.
   The item list and the default selection are owner-overridable.
 - **Off hides navigation.** While an item is off, its rows in BarnCRM Settings are hidden (a
@@ -59,11 +76,11 @@ repo rule that every admin setting lives in the in-app Settings console still ho
   directly assigned extra permissions (Find and Export, Bulk Update, Bulk Delete) grant, and
   changing a packaged group triggers an asynchronous recalculation. (3) would leave
   unpackaged permission sets behind and depends on `PermissionSetTabSetting` DML from Apex,
-  which the API lists but no BarnCRM code has proven. The six switchable tabs (Data Manager,
-  Import, Find, Bulk Update, Data Hygiene, Rollup Builder) are removed from every other
-  packaged set; `BarnCRM_Tab_<Tab>` grants each, and `TabAccessService` gives it to whoever
+  which the API lists but no BarnCRM code has proven. The five switchable tabs (Data Manager,
+  Import, Find, Bulk Update, Data Hygiene) are removed from every other packaged set (the
+  Rollup Builder tab is left as it was until it moves to its module); `BarnCRM_Tab_<Tab>` grants each, and `TabAccessService` gives it to whoever
   holds a set that used to grant the tab, and takes it from everyone else or from everyone
-  while the tool is off. It runs in system mode (the sets grant only a tab), in a queued job
+  while the feature is off. It runs in system mode (the sets grant only a tab), in a queued job
   so a large org stays inside DML limits, and is triggered by a switch, by the Access page
   after a role or extra permission is given or removed, by every install and upgrade, and by a
   nightly job (roles given in Setup or by user access policies).
@@ -81,12 +98,14 @@ repo rule that every admin setting lives in the in-app Settings console still ho
 - **Remove Edition from the console.** Rejected: breaks the in-app console rule.
 - **Hide installed modules in the Standard Edition.** Rejected: an installed, running module
   would become unmanageable.
-- **Hide a turned-off tool's page content instead of its tab.** Rejected by the owner: tabs
+- **Hide a turned-off feature's page content instead of its tab.** Rejected by the owner: tabs
   must disappear.
 
 ## Consequences
 
 - Volunteers is no longer offered in the Standard Edition; ADR-0062 decision 4 is superseded.
+- BarnCRM Rollup Builder is listed in both editions and shows as installed while it ships in
+  Core; its switch and tab follow the module once the package split lands.
 - A module's own tabs are hidden only once that module ships tab-only sets on the same
   pattern; until then they follow the module's permission sets. Giving is the first follow-up.
 - An upgraded org keeps every tab: nothing is listed as off, and the post-install run gives

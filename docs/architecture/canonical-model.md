@@ -1010,7 +1010,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 |---|---|---|---|
 | `Suite__c` | picklist(Community, Impact) | empty | Which edition the administrator chose in the Setup Assistant's first step: the Standard Edition (Core alone, the full core suite of tools) or the Nonprofit Edition (Core with Giving). Any org may choose either; empty until chosen. Shown as Standard Edition and Nonprofit Edition. When `Impact`, the modules step, the Module Manager and the home Modules card offer the nonprofit modules; otherwise Core shows none that is not installed. It installs and removes nothing (ADR-0072, `0072-suite-choice-is-the-first-setup-step.md`). Chosen once in the Setup Assistant; changed later only through the console's Change edition control or Setup, Custom Settings (ADR-NEXT, `NEXT-edition-gates-visibility.md`). |
 | `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
-| `Features_Turned_Off__c` | text (255) | empty | The comma separated keys of the Super Tools turned off in Modules and features (`DataManager`, `DuplicateReview`, `OrgOptimizer`, `RollupBuilder`). Empty means all on, which is also what an upgraded org has. While a key is listed, its tabs' BarnCRM Tab permission sets are taken from everyone and its rows are hidden in BarnCRM Settings. Written by the Modules and features panel and first-run setup, not edited as a setting (ADR-NEXT, `NEXT-edition-gates-visibility.md`). |
+| `Features_Turned_Off__c` | text (255) | empty | The comma separated keys of the tool features turned off in Modules and features (`DataManager`, `DuplicateReview`, `OrgOptimizer`). Empty means all on, which is also what an upgraded org has. While a key is listed, its tabs' BarnCRM Tab permission sets are taken from everyone and its rows are hidden in BarnCRM Settings. Written by the Modules and features panel and first-run setup, not edited as a setting (ADR-NEXT, `NEXT-edition-gates-visibility.md`). |
 
 ### Field utilization keys
 
@@ -1280,17 +1280,20 @@ depends on Core may ship its own records; Core never names them.
 modules Core can offer before they are installed, one record per module, read as shipped and
 never materialized. Core ships the records, because a module that is not installed cannot
 announce itself. Whether a module is installed is still detected (`ModuleDetectionService`);
-this type says only which editions offer it and where its description and installer are. A
-future module, or a Super Tool that becomes a module, needs only a new record.
+this type says only which editions offer it, how to tell it is here, and where its
+description, installer and app are. A future module, or a Core feature that becomes a module
+(such as BarnCRM Rollup Builder), needs only a new record.
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
 | DeveloperName | `DeveloperName` | text | The module's name as Core reports it, for example `Giving`; it is also the name `Modules_Turned_Off__c` and Setting Definition `Module__c` use. |
-| Label | `MasterLabel` | text | The module's name shown to administrators. |
+| Label | `MasterLabel` | text | The module's name shown to administrators, always starting `BarnCRM `, for example `BarnCRM Giving`. |
 | Editions | `Editions__c` | text (40) | The stored edition values that offer the module, separated by semicolons: `Impact` for a nonprofit module, `Community;Impact` for one both editions offer. An installed module is listed whatever this says. |
 | Package Folder | `Package_Folder__c` | text (40) | The module's folder under `packages/`, whose README is its "What this module does" link. |
 | Install Version Id | `Install_Version_Id__c` | text (18) | The published package version Id (`04t`) Salesforce's installer opens, or empty until the module is first published. |
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
+| Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. For a module whose code still ships in Core or that announces no settings rows; empty means detection by announcement alone. |
+| App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. Modules and features links an installed module to it; empty means no link yet. |
 
 ### Rules
 
@@ -7242,8 +7245,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Import undo and rollup saves (ADR-0119, `0119-import-undo-judges-edits-before-deleting.md`, 25,000 row gift import scale test). No object or field added. R-IB9: a rollup save the import set off, told by the `Rollups_Last_Calculated__c` stamp written in it (whatever the running user's access) and dated within sixty minutes of the commit completing, is not an edit, whoever ran it; a later one keeps the record; the undo judges every tagged record for edits before it puts back or deletes anything, so a rollup either sets off, or the undo's own save, cannot hide an earlier edit. Before this, undoing an import that created people and gifts kept 7,229 of 8,333 people, saved by the Automated Process user as their totals were recalculated. |
 | v0.6 | 2026-10-14 | Rollup queue row budget (ADR-0116, 25,000 row gift import scale test). No object or field added. R-RQ6: a record's estimate reads the stored totals of every active COUNT definition on its entity, not only those the run calculates, so a large parent whose entries name only a SUM or MAX still goes to the batch. R-RQ3: rows a run's recalculation of one entity read count against its row budget in place of their estimate. Before this two Rollup Queue runs stopped on "Too many query rows: 50001" while a fund's allocations rose to 25,000. |
 | v0.6 | 2026-10-14 | Rollup queue row ceiling (ADR-0116, 25,000 row scale rerun). No object or field added. R-RQ6: a queue run measures what each query of an entity's recalculation read, and before a further query would pass four fifths of the query row limit it stops, writes nothing and sends that entity's records to the large parent batch. Before this a fund whose stored count was stale (3,200 of 26,102 allocations) was estimated small, its second query stopped four runs on "Too many query rows: 50001", and it was narrowing towards Failed. |
-| v0.6 | 2026-10-14 | Editions, feature switches and first-run setup (ADR-NEXT, `NEXT-edition-gates-visibility.md`). New field `Features_Turned_Off__c` on BarnCRM Settings (the Super Tools turned off). New shipped type `BarnCRM_Module__mdt` (`Editions__c`, `Package_Folder__c`, `Install_Version_Id__c`, `Sort_Order__c`): which editions offer each module, replacing the module list and installer Ids held in Apex. |
-
+| v0.6 | 2026-10-14 | Editions, feature switches and first-run setup (ADR-NEXT, `NEXT-edition-gates-visibility.md`). New field `Features_Turned_Off__c` on BarnCRM Settings (the tool features turned off). New shipped type `BarnCRM_Module__mdt` (`Editions__c`, `Package_Folder__c`, `Install_Version_Id__c`, `Sort_Order__c`, `Probe_Object__c`, `App_Name__c`): which editions offer each module, replacing the module list and installer Ids held in Apex. |
 ---
 ## 32. Entity ownership by package
 One row per entity in the model, so a contributor or an agent can tell at a glance which

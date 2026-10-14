@@ -10,7 +10,7 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
-    static void listsTheSixPackagesAndSaysWhichAreHere() {
+    static void listsTheSevenPackagesAndSaysWhichAreHere() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
@@ -20,9 +20,15 @@ private class ModuleDetectionServiceTest {
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(6, modules.size(), 'The Nonprofit Edition is offered all six packages');
+            Assert.areEqual(7, modules.size(), 'The Nonprofit Edition is offered all seven');
             Assert.areEqual('Core', modules[0].name, 'Core comes first and is always here');
             Assert.isTrue(modules[0].present, 'Core is the package this code is in');
+            for (Integer i = 1; i < modules.size(); i++) {
+                Assert.isTrue(
+                    modules[i].label.startsWith('BarnCRM '),
+                    'Every module is shown as BarnCRM and its name: ' + modules[i].label
+                );
+            }
             for (ModuleDetectionService.ModuleInfo module : modules) {
                 Assert.isTrue(
                     module.docsUrl.endsWith('/README.md'),
@@ -34,7 +40,7 @@ private class ModuleDetectionServiceTest {
     }
 
     @IsTest
-    static void offersOnlyCoreBeforeAnEditionIsChosen() {
+    static void offersOnlyEveryEditionModulesBeforeAnEditionIsChosen() {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = false;
@@ -48,9 +54,13 @@ private class ModuleDetectionServiceTest {
                 names.add(module.name);
             }
             Assert.areEqual(
-                new List<String>{ 'Core' },
+                new List<String>{ 'Core', 'RollupBuilder' },
                 names,
                 'No nonprofit module is shown until the Nonprofit Edition is chosen'
+            );
+            Assert.isTrue(
+                modules[1].present,
+                'Rollup Builder counts as installed while its objects ship in Core'
             );
         }
     }
@@ -73,9 +83,9 @@ private class ModuleDetectionServiceTest {
             List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
             Test.stopTest();
 
-            Assert.areEqual(2, modules.size(), 'Core and the module that is installed');
-            Assert.areEqual('Programs', modules[1].name, 'An installed module is never hidden');
-            Assert.isTrue(modules[1].present, 'And it is shown as here');
+            Assert.areEqual(3, modules.size(), 'Core, Rollup Builder and the installed module');
+            Assert.areEqual('Programs', modules[2].name, 'An installed module is never hidden');
+            Assert.isTrue(modules[2].present, 'And it is shown as here');
         }
     }
 
@@ -121,11 +131,13 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                6,
+                7,
                 modules.size(),
-                'Any org that chose the Nonprofit Edition is offered all six, before Giving is here'
+                'Any org that chose the Nonprofit Edition is offered all seven, before Giving is here'
             );
-            Assert.isFalse(modules[1].present, 'And Giving is still shown as not installed');
+            Assert.areEqual('Giving', modules[2].name, 'Giving follows Rollup Builder');
+            Assert.isFalse(modules[2].present, 'And Giving is still shown as not installed');
+            Assert.isNull(modules[2].appUrl, 'A module that is not here has no app to open');
         }
     }
 
@@ -146,7 +158,7 @@ private class ModuleDetectionServiceTest {
                 chosen,
                 'The saved choice is read'
             );
-            Assert.areEqual(1, modules.size(), 'Core, and no nonprofit module');
+            Assert.areEqual(2, modules.size(), 'Core and Rollup Builder, and no nonprofit module');
         }
     }
 
@@ -165,7 +177,7 @@ private class ModuleDetectionServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                new List<String>{ 'Core', 'Giving' },
+                new List<String>{ 'Core', 'RollupBuilder', 'Giving' },
                 names,
                 'An installed module stays listed; the others stay hidden in the Standard Edition'
             );
@@ -244,9 +256,14 @@ private class ModuleDetectionServiceTest {
         System.runAs(TestUsers.admin()) {
             SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
             ModuleDetectionService.givingPresentOverride = true;
-            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
-                catalogRow('Giving', 'Impact', FakeIds.ofPrefix('04t', 1), 10)
-            };
+            BarnCRM_Module__mdt row = catalogRow(
+                'Giving',
+                'Impact',
+                FakeIds.ofPrefix('04t', 1),
+                10
+            );
+            row.App_Name__c = 'Fundraising';
+            ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
 
             Test.startTest();
             ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
@@ -254,6 +271,11 @@ private class ModuleDetectionServiceTest {
 
             Assert.isTrue(giving.present, 'Giving is here');
             Assert.isNull(giving.installUrl, 'So the step offers no installer');
+            Assert.areEqual(
+                '/lightning/app/' + NamespaceUtil.prefix() + 'Fundraising',
+                giving.appUrl,
+                'An installed module links to its own app, where its Settings tab lives'
+            );
             Assert.isTrue(
                 giving.docsUrl.endsWith('/giving/README.md'),
                 'Its description is linked'
@@ -313,6 +335,17 @@ private class ModuleDetectionServiceTest {
                     name + ' is nonprofit only'
                 );
             }
+            Assert.isTrue(
+                ModuleDetectionService.offeredIn(
+                    shipped.get('RollupBuilder'),
+                    ModuleDetectionService.SUITE_COMMUNITY
+                ) &&
+                ModuleDetectionService.offeredIn(
+                    shipped.get('RollupBuilder'),
+                    ModuleDetectionService.SUITE_IMPACT
+                ),
+                'BarnCRM Rollup Builder is offered to both editions'
+            );
         }
     }
 
