@@ -236,12 +236,16 @@ private class HealthCheckServiceTest {
     @IsTest
     static void peopleLinkedStraightToAHouseholdTheFlexibleWayCannotSeeAreAnError() {
         System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+            // Linked straight to the household on the simple way, then the setting moved by a
+            // route the settings write does not guard. Saving her that way under the flexible
+            // way would join her to the household with a membership record.
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
             insert household;
             Contact maria = HouseholdTestDataFactory.newContact('Maria', 'Garcia');
             maria.AccountId = household.Id;
             insert maria;
+            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 
             HealthCheckService.Finding finding = find(
                 HealthCheckService.run(),

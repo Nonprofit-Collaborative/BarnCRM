@@ -157,9 +157,14 @@ private class SampleDataStageBatchTest {
 
             SampleDataLoader.Counts status = SampleDataLoader.status();
             System.assertEquals(
-                2,
+                1,
                 status.relationshipCount,
-                'the connection and its mirror, using the household map kept between stages'
+                'one connection, using the household map kept between stages'
+            );
+            System.assertEquals(
+                2,
+                [SELECT COUNT() FROM Relationship__c WHERE Sample_Data__c = TRUE],
+                'the connection and its mirror'
             );
             System.assertEquals(false, batch.stopped, 'no stage failed');
             System.assertEquals(true, module.loadStarted, 'finish starts the first module');

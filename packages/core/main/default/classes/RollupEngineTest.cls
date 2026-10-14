@@ -286,7 +286,7 @@ private class RollupEngineTest {
             List<Account> parents = new List<Account>();
             for (Integer i = 0; i < 200; i++) {
                 Account parent = organization('Parent ' + i, null);
-                parent.Site = Math.mod(i, 2) == 0 ? 'North' : 'South';
+                parent.Preferred_Name__c = Math.mod(i, 2) == 0 ? 'North' : 'South';
                 parents.add(parent);
             }
             insert parents;
@@ -303,9 +303,9 @@ private class RollupEngineTest {
             }
             insert children;
             Rollup_Definition__c sum = fromChildren('SUM', 'NumberOfEmployees', 'Member_Count__c');
-            sum.Target_Filter_JSON__c = filter('Site', 'equals', 'north');
+            sum.Target_Filter_JSON__c = filter('Preferred_Name__c', 'equals', 'north');
             Rollup_Definition__c count = fromChildren('COUNT', null, 'NumberOfEmployees');
-            count.Target_Filter_JSON__c = filter('Site', 'not equals', 'NORTH');
+            count.Target_Filter_JSON__c = filter('Preferred_Name__c', 'not equals', 'NORTH');
 
             Test.startTest();
             RollupEngine.Result result = RollupEngine.recalculate(
@@ -316,11 +316,11 @@ private class RollupEngineTest {
 
             Assert.areEqual(200, result.written.size(), 'Every parent written once');
             for (Account parent : [
-                SELECT Site, Member_Count__c, NumberOfEmployees
+                SELECT Preferred_Name__c, Member_Count__c, NumberOfEmployees
                 FROM Account
                 WHERE Id IN :parents
             ]) {
-                if (parent.Site == 'North') {
+                if (parent.Preferred_Name__c == 'North') {
                     Assert.areEqual(3, parent.Member_Count__c, 'Equals ignores case');
                     Assert.isNull(parent.NumberOfEmployees, 'Not equals leaves North alone');
                 } else {
@@ -336,7 +336,7 @@ private class RollupEngineTest {
     static void aTextFilterIsQueriedOnlyWhenARecordHoldsABlank() {
         System.runAs(TestUsers.admin()) {
             Account named = organization('Named', null);
-            named.Site = 'North';
+            named.Preferred_Name__c = 'North';
             Account blank = organization('Blank', null);
             insert new List<Account>{ named, blank };
             insert new List<Account>{
@@ -359,9 +359,9 @@ private class RollupEngineTest {
                 'Member_Count__c'
             );
             Rollup_Definition__c equalsNorth = plain.clone();
-            equalsNorth.Target_Filter_JSON__c = filter('Site', 'equals', 'North');
+            equalsNorth.Target_Filter_JSON__c = filter('Preferred_Name__c', 'equals', 'North');
             Rollup_Definition__c notNorth = plain.clone();
-            notNorth.Target_Filter_JSON__c = filter('Site', 'not equals', 'North');
+            notNorth.Target_Filter_JSON__c = filter('Preferred_Name__c', 'not equals', 'North');
 
             Test.startTest();
             RollupEngine.preview(plain, named.Id);
@@ -381,8 +381,8 @@ private class RollupEngineTest {
             Assert.areEqual(unfiltered, filtered, 'Tested on the record already read');
             Assert.isTrue(inApex.admitted, 'North passes equals North');
             Assert.areEqual(2, inApex.calculated, 'Its total');
-            Assert.areEqual(unfiltered + 1, queried, 'A blank site is left to the query');
-            Assert.isTrue(fallback.admitted, 'A blank site is not North, as SOQL answers it');
+            Assert.areEqual(unfiltered + 1, queried, 'A blank name is left to the query');
+            Assert.isTrue(fallback.admitted, 'A blank name is not North, as SOQL answers it');
             Assert.areEqual(5, fallback.calculated, 'Its total');
         }
     }

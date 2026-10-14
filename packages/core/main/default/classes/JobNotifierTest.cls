@@ -192,7 +192,7 @@ private class JobNotifierTest {
             Assert.areEqual(UserInfo.getUserId(), JobNotifier.starter(), 'From a page');
 
             Test.startTest();
-            System.schedule('Q-04 starter test', '0 0 3 * * ?', new RecordStarter());
+            System.schedule('Q-04 starter test', '0 0 3 * * ?', new JobNotifierProbe());
             Test.stopTest();
 
             Assert.areEqual(
@@ -200,14 +200,6 @@ private class JobNotifierTest {
                 [SELECT COUNT() FROM Account WHERE Name = 'Starter: none'],
                 'A scheduled run tells nobody'
             );
-        }
-    }
-
-    /** Records what `starter()` answers inside a scheduled run, as an account name. */
-    private class RecordStarter implements Schedulable {
-        public void execute(SchedulableContext context) {
-            Id starter = JobNotifier.starter();
-            insert new Account(Name = starter == null ? 'Starter: none' : 'Starter: ' + starter);
         }
     }
 }

@@ -11,12 +11,26 @@ private class HouseholdSoftCreditRecomputeTest {
         TestUsers.adminWith('Giving_Admin');
     }
 
-    private static Set<Id> fakeHouseholds(Integer howMany) {
-        Set<Id> ids = new Set<Id>();
-        for (Integer i = 1; i <= howMany; i++) {
-            ids.add(FakeIds.of(Account.SObjectType, i));
+    /**
+     * Households with one gift each: a household with no gifts is never queued, so only these
+     * reach the job.
+     */
+    private static List<Id> householdsWithGifts(Integer howMany) {
+        GivingTestDataFactory.ensureDefaultFund();
+        Id householdType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+            .get(RecognitionTestData.HOUSEHOLD_RECORD_TYPE)
+            .getRecordTypeId();
+        List<Account> households = new List<Account>();
+        for (Integer i = 0; i < howMany; i++) {
+            households.add(new Account(Name = 'Household ' + i, RecordTypeId = householdType));
         }
-        return ids;
+        insert households;
+        List<Gift__c> gifts = new List<Gift__c>();
+        for (Account household : households) {
+            gifts.add(RecognitionTestData.newGift(null, household.Id, 100));
+        }
+        insert gifts;
+        return new List<Id>(new Map<Id, Account>(households).keySet());
     }
 
     private static Integer jobsRun() {
@@ -42,8 +56,10 @@ private class HouseholdSoftCreditRecomputeTest {
     @IsTest
     static void aFewHouseholdsAreRecomputedByOneJob() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Set<Id> households = new Set<Id>(householdsWithGifts(3));
+
             Test.startTest();
-            HouseholdSoftCreditRecompute.enqueue(fakeHouseholds(3));
+            HouseholdSoftCreditRecompute.enqueue(households);
             Test.stopTest();
 
             Assert.areEqual(1, jobsRun(), 'One job is queued and it runs');
@@ -64,10 +80,14 @@ private class HouseholdSoftCreditRecomputeTest {
     @IsTest
     static void aBulkLoadOfPeopleIsCappedAtFiftyHouseholdsAndTheRestIsLogged() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            HouseholdSoftCreditRecompute.enqueue(
-                fakeHouseholds(HouseholdSoftCreditRecompute.HOUSEHOLDS_PER_TRANSACTION_CAP + 150)
+            Set<Id> households = new Set<Id>(
+                householdsWithGifts(
+                    HouseholdSoftCreditRecompute.HOUSEHOLDS_PER_TRANSACTION_CAP + 10
+                )
             );
+
+            Test.startTest();
+            HouseholdSoftCreditRecompute.enqueue(households);
             Test.stopTest();
 
             Assert.areEqual(1, jobsRun(), 'The capped list still gets its job');
@@ -77,16 +97,14 @@ private class HouseholdSoftCreditRecomputeTest {
     @IsTest
     static void whenNoJobSlotIsLeftTheRecomputeIsDeferredNotThrown() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            List<Id> households = householdsWithGifts(Limits.getLimitQueueableJobs() + 1);
+
             Test.startTest();
             for (Integer i = 0; i < Limits.getLimitQueueableJobs(); i++) {
-                HouseholdSoftCreditRecompute.enqueue(
-                    new Set<Id>{ FakeIds.of(Account.SObjectType, i + 1) }
-                );
+                HouseholdSoftCreditRecompute.enqueue(new Set<Id>{ households[i] });
             }
             Integer queuedBefore = Limits.getQueueableJobs();
-            HouseholdSoftCreditRecompute.enqueue(
-                new Set<Id>{ FakeIds.of(Account.SObjectType, 999) }
-            );
+            HouseholdSoftCreditRecompute.enqueue(new Set<Id>{ households[households.size() - 1] });
             Integer queuedAfter = Limits.getQueueableJobs();
             Test.stopTest();
 
@@ -106,11 +124,12 @@ private class HouseholdSoftCreditRecomputeTest {
     @IsTest
     static void aJobThatCannotReadTheGiftsLogsAndStillCompletes() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            Set<Id> households = new Set<Id>(householdsWithGifts(2));
             User outsider = TestDataFactory.createUser('NoAccess', new List<String>());
 
             System.runAs(outsider) {
                 Test.startTest();
-                HouseholdSoftCreditRecompute.enqueue(fakeHouseholds(2));
+                HouseholdSoftCreditRecompute.enqueue(households);
                 Test.stopTest();
             }
 
