@@ -359,12 +359,16 @@ private class HouseholdOfPersonControllerTest {
                 LIMIT 1
             ];
             Assert.areEqual('Wei', created.FirstName, 'The new contact carries the name entered');
+            Id personId = personIdOf(created.Id);
             Assert.areEqual(
                 1,
                 [
                     SELECT COUNT()
                     FROM Household_Member__c
-                    WHERE Household__c = :household.Id AND Contact__c = :created.Id
+                    WHERE
+                        Household__c = :household.Id
+                        AND (Contact__c = :personId
+                        OR Account__c = :personId)
                 ],
                 'The new contact is now a member of the household'
             );
@@ -423,10 +427,11 @@ private class HouseholdOfPersonControllerTest {
             Test.stopTest();
 
             Contact created = [SELECT Id FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+            Id personId = personIdOf(created.Id);
             List<Household_Member__c> memberships = [
                 SELECT Household__c
                 FROM Household_Member__c
-                WHERE Contact__c = :created.Id AND End_Date__c = NULL
+                WHERE (Contact__c = :personId OR Account__c = :personId) AND End_Date__c = NULL
             ];
             Assert.areEqual(1, memberships.size(), 'Wei belongs to one household, not two');
             Assert.areEqual(
@@ -627,6 +632,17 @@ private class HouseholdOfPersonControllerTest {
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /**
+     * The id a membership names this new person by. Where the org stores people as accounts
+     * the panel creates a person account (PEOPLE-4), whose membership names the account, not
+     * the contact behind it.
+     */
+    private static Id personIdOf(Id contactId) {
+        Id account = PersonRecordSelector.getAccountsBehindPersonContacts(new Set<Id>{ contactId })
+            .get(contactId);
+        return account != null ? account : contactId;
+    }
 
     /**
      * A user on the most restricted standard profile, so that creating a contact without

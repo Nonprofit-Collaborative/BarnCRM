@@ -286,21 +286,28 @@ private class CoreHandlerCoverageTest {
         }
     }
 
+    /**
+     * The upkeep runs in system mode (PEOPLE-26), so no user's access makes it fail: the test
+     * makes it fail, and the person is told in every context.
+     */
     @IsTest
-    static void aPersonWhoCannotReadAffiliationsIsToldTheUpkeepFailedInEveryContext() {
+    static void anAffiliationUpkeepThatFailsIsReportedInEveryContext() {
         System.runAs(TestUsers.admin()) {
-            User outsider = nobody();
             Affiliation__c inserted = fakeAffiliation();
             Affiliation__c updated = fakeAffiliation();
+            // Only a change that can move who is primary reaches the upkeep (PEOPLE-39).
+            Affiliation__c updatedBefore = updated.clone(true);
+            updatedBefore.Is_Primary__c = true;
             Affiliation__c deleted = fakeAffiliation();
             Affiliation__c restored = fakeAffiliation();
 
-            System.runAs(outsider) {
+            AffiliationMaintenanceHandler.upkeepFailureForTest = new DmlException('boom');
+            try {
                 AffiliationMaintenanceHandler upkeep = new AffiliationMaintenanceHandler();
                 TriggerHandler.testNew = new List<SObject>{ inserted };
                 upkeep.afterInsert();
                 TriggerHandler.testNew = new List<SObject>{ updated };
-                TriggerHandler.testOld = new List<SObject>{ updated.clone(true) };
+                TriggerHandler.testOld = new List<SObject>{ updatedBefore };
                 upkeep.afterUpdate();
                 TriggerHandler.testNew = null;
                 TriggerHandler.testOld = new List<SObject>{ deleted };
@@ -308,6 +315,8 @@ private class CoreHandlerCoverageTest {
                 TriggerHandler.testOld = null;
                 TriggerHandler.testNew = new List<SObject>{ restored };
                 upkeep.afterUndelete();
+            } finally {
+                AffiliationMaintenanceHandler.upkeepFailureForTest = null;
                 clearOverrides();
             }
 
@@ -476,16 +485,20 @@ private class CoreHandlerCoverageTest {
         }
     }
 
+    /**
+     * The upkeep runs in system mode (PEOPLE-26), so no user's access makes it fail: the test
+     * makes it fail, and the person is told in every context.
+     */
     @IsTest
-    static void aPersonWhoCannotReadRelationshipsIsToldTheUpkeepFailedInEveryContext() {
+    static void aRelationshipUpkeepThatFailsIsReportedInEveryContext() {
         System.runAs(TestUsers.admin()) {
-            User outsider = nobody();
             Relationship__c inserted = fakeRelationship(false);
             Relationship__c updated = fakeRelationship(true);
             Relationship__c deleted = fakeRelationship(true);
             Relationship__c restored = fakeRelationship(false);
 
-            System.runAs(outsider) {
+            RelationshipMaintenanceHandler.upkeepFailureForTest = new DmlException('boom');
+            try {
                 RelationshipMaintenanceHandler upkeep = new RelationshipMaintenanceHandler();
                 TriggerHandler.testNew = new List<SObject>{ inserted };
                 upkeep.afterInsert();
@@ -498,6 +511,8 @@ private class CoreHandlerCoverageTest {
                 TriggerHandler.testOld = null;
                 TriggerHandler.testNew = new List<SObject>{ restored };
                 upkeep.afterUndelete();
+            } finally {
+                RelationshipMaintenanceHandler.upkeepFailureForTest = null;
                 clearOverrides();
             }
 

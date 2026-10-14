@@ -8,8 +8,10 @@
  * the package makes afterwards (the person's Primary Affiliation, and the flag taken off the
  * person's other affiliation) are the package's own and must not depend on that user's access.
  *
- * Private sharing cannot be set from a test, so these prove the object and field access half
- * of the change. The sharing half is confirmed by an org run under a private sharing model.
+ * The user is on a profile that edits nothing and may view every account and contact
+ * (TestUsers.peopleReaderWith), so under private sharing they see the people and still may
+ * not edit them. Private sharing cannot be set from a test: in an org that shares people
+ * read and write these prove the object and field access half of the change only.
  */
 @IsTest(
     testFor='ApexClass:AffiliationUpkeepWriter, ApexClass:AffiliationMaintenanceHandler, ApexClass:AffiliationService'
@@ -178,7 +180,7 @@ private class AffiliationUpkeepTest {
      * universally required field takes no field access row; Read Only already reads it.
      */
     private static User narrowUser() {
-        User narrow = TestDataFactory.createUser(
+        User narrow = TestUsers.peopleReaderWith(
             'Narrow',
             new List<String>{ READ_ONLY_PERMISSION_SET }
         );

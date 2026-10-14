@@ -129,8 +129,9 @@ private class ContactTriggerHandlerTest {
                 [SELECT Member_Count__c FROM Account WHERE Id = :fromHousehold].Member_Count__c,
                 'The household Maria left counts nobody'
             );
+            // Wei is that household's primary contact, so his surname comes first (R-H5).
             Assert.areEqual(
-                'Garcia and Lee Household',
+                'Lee and Garcia Household',
                 [SELECT Name FROM Account WHERE Id = :toHousehold].Name,
                 'The household Maria joined lists both surnames'
             );

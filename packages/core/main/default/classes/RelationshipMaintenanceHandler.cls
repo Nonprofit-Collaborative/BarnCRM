@@ -20,6 +20,19 @@
  * accessors on TriggerHandler, which is the contract every packaged handler is written to.
  */
 public with sharing class RelationshipMaintenanceHandler extends TriggerHandler {
+    /**
+     * Set by a test to make the upkeep fail, so the report a person sees can be exercised:
+     * the upkeep runs in system mode (PEOPLE-26), so no user's access makes it fail.
+     */
+    @TestVisible
+    private static Exception upkeepFailureForTest;
+
+    private static void failWhenAskedForTest() {
+        if (upkeepFailureForTest != null) {
+            throw upkeepFailureForTest;
+        }
+    }
+
     public override void afterInsert() {
         ensure((List<Relationship__c>) newRecords(), 'RelationshipMaintenanceHandler.afterInsert');
     }
@@ -30,6 +43,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.syncReciprocals(records, oldRecordsById());
         } catch (Exception thrown) {
             reportFailure(
@@ -47,6 +61,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.deleteReciprocals(deleted);
         } catch (Exception thrown) {
             reportFailure(
@@ -64,6 +79,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.restoreReciprocals(restored);
         } catch (Exception thrown) {
             reportFailure(
@@ -80,6 +96,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             return;
         }
         try {
+            failWhenAskedForTest();
             RelationshipService.ensureReciprocals(records);
         } catch (Exception thrown) {
             reportFailure(thrown, records, context, Label.Core_Relationship_SyncFailed);

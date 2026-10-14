@@ -9,8 +9,10 @@
  * pairing the package keeps. Their own saves run in user mode, as a save from the record page
  * does; the other side is the package's to write.
  *
- * Private sharing cannot be set from a test, so these prove the object and field access half
- * of the change. The sharing half is confirmed by an org run under a private sharing model.
+ * The user is on a profile that edits nothing and may view every account and contact
+ * (TestUsers.peopleReaderWith), so under private sharing they see the people and still may
+ * not edit them. Private sharing cannot be set from a test: in an org that shares people
+ * read and write these prove the object and field access half of the change only.
  */
 @IsTest(testFor='ApexClass:RelationshipUpkeepWriter, ApexClass:RelationshipService')
 private class RelationshipUpkeepTest {
@@ -140,7 +142,7 @@ private class RelationshipUpkeepTest {
      * row; Read Only already reads them.
      */
     private static User narrowUser() {
-        User narrow = TestDataFactory.createUser(
+        User narrow = TestUsers.peopleReaderWith(
             'Narrow',
             new List<String>{ READ_ONLY_PERMISSION_SET }
         );
