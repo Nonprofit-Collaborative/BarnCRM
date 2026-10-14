@@ -40,7 +40,7 @@ function format(template, ...values) {
  *
  * Find opens it over the query it just ran (`queryJson`). The page sends only the query document
  * and the confirmed count; BulkDeleteController checks both as the person (canonical model R-BD1
- * to R-BD6). Undo is on the Bulk Update tab (dataJobHistory).
+ * to R-BD6). Undo is in Data jobs on the Data Manager tab (dataJobHistory).
  *
  * The import wizard opens it over a delete by file's completed dry run instead (`batchId`,
  * R-BD7): the records are the dry run's Matched rows, and the page sends the batch and the count.

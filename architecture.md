@@ -2,7 +2,7 @@
 
 Purpose: environments, access, layout and gotchas for BarnCRM. Reference facts only, not a task log (work done goes in `changelog.md`). Check here before re-querying a live system.
 
-Last verified 2026-10-12.
+Last verified 2026-10-13.
 
 ## Pointers
 
@@ -28,7 +28,7 @@ Last verified 2026-10-12.
 | `devhub` | Dev Hub | Creates scratch orgs |
 | `oi-test` | Default scratch test org, Person Accounts shape | Named by the `SF_TEST_ORG_AUTH_URL` secret |
 | `oi-pa` | Person Account scratch org (D-15) | Expires 2026-10-24; recreation pre-approved. Cleaned 2026-10-12 (owner approved): old `Nonprofit_Admin` assignment, the 4 `Nonprofit_*` permission sets and their group deleted |
-| `barn-core` | Third scratch test org, Sales Cloud shape, for Core-only runs | Approved 2026-10-12 (alias was `bc-core`). Expires 2026-10-15; no recreation approval on record |
+| `barn-core` | Third scratch test org, Sales Cloud shape, for Core-only runs | Approved 2026-10-12 (alias was `bc-core`). Expires 2026-10-15; recreation pre-approved (owner, 2026-10-13) |
 | `barn-npc` | Nonprofit Cloud trial, production-type, Person Accounts on, API 68.0; for rollup S16 coverage and Nonprofit Cloud coexistence tests | Never the default. Enabled 2026-10-12 (owner approved): Fundraising_Admin and Program_Management_Administrator permission set groups on the admin; Contacts to Multiple Accounts on; Industries settings Fundraising, Gift Entry Grid, Group Membership, Program and Benefit Management on (irreversible). BarnCRM deploy approved once landing batches, Builder S10 to S14 and test self-containment merge |
 | `mwdbdevsb` | Sandbox of a real, built-out org, for Community Suite (Core without Giving) tests; alias was `mwdsb` until 2026-10-12; Midwest Dreamin' sandbox `brandondev`, connected 2026-10-12, instance API 68.0 | Never the default; check-only first; ask the owner before every deploy; no data changes, destructive deploys or scheduled jobs without approval; Core only. Real deploy on hold (owner, 2026-10-12). Lacks the Data Protection and Privacy objects, so vendored apex-rollup tests do not compile there |
 
@@ -41,7 +41,7 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 
 ## Package layout
 
-- `packages/core` (neutral Core; includes `packages/core/vendor/apex-rollup`, MIT, vendored as source, reached only by `RollupEngineComparison` since rollup S8 and deleted by S9), `packages/giving` (depends on Core), `packages/connect` (depends on Core and Giving; the only package that may touch Opportunity, Campaign, Case, Lead). `packages/volunteers`, `programs`, `funders` are placeholders.
+- `packages/core` (neutral Core; the vendored apex-rollup tree, `RollupAdapter` and `RollupEngineComparison` were deleted by rollup S9, #377), `packages/giving` (depends on Core), `packages/connect` (depends on Core and Giving; the only package that may touch Opportunity, Campaign, Case, Lead). `packages/volunteers`, `programs`, `funders` are placeholders.
 - Core never references Giving or Connect; no dependency on Person Accounts, Industries, OmniStudio, Data Cloud or Experience Cloud (ADR-0013).
 - Deploys to an org run in stages through `scripts/org/deploy-packages.sh`.
 - Namespace deferred (ADR-0001): `sfdx-project.json` namespace stays empty, no hard-coded prefix, no package versions; prefixed names come from `NamespaceUtil`.
@@ -54,10 +54,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 
 ## Runtime facts
 
-- Rollups: since S8 BarnCRM's engine is the only path. Full runs are `RollupFullRecalcBatch` (one at a time, `runningJobId`); chunk size comes from stored COUNT totals, with fixed constants (row budget 30,000, follow-up chunks a quarter, at most 10,000 held back), not admin settings. Stopped chunks retry through `RollupRecalcErrorTrigger` on `BatchApexErrorEvent` (the second trigger outside the dispatcher; `BatchApexErrorEvent` is on the object allowlist) and the Rollup Queue. `RollupEngineComparison` exists only until S9. Registry row `Rollup_Definition_Validation` (rule R-R15) refuses a rollup whose target field cannot hold its result; text rollups write dates in UTC.
-- Data jobs: `Import_Batch__c.Operation__c` (Import, Update) plus `Operation_JSON__c` make the import batch the general data job; bulk updates reuse `Import_Journal__c` and undo. Bulk update run limit `Bulk_Update_Run_Limit__c`, at most 48,000 (query rows).
+- Rollups: since S8 BarnCRM's engine is the only path. Full runs are `RollupFullRecalcBatch` (one at a time, `runningJobId`); chunk size comes from stored COUNT totals, with fixed constants (row budget 30,000, follow-up chunks a quarter, at most 10,000 held back), not admin settings. Stopped chunks retry through `RollupRecalcErrorTrigger` on `BatchApexErrorEvent` (the second trigger outside the dispatcher; `BatchApexErrorEvent` is on the object allowlist) and the Rollup Queue. Registry row `Rollup_Definition_Validation` (rule R-R15) refuses a rollup whose target field cannot hold its result; text rollups write dates in UTC.
+- Data jobs: `Import_Batch__c.Operation__c` (Import, Update, Delete) plus `Operation_JSON__c` make the import batch the general data job (object label Data Job); bulk updates and deletes reuse `Import_Journal__c` and undo, listed under Data jobs on the Data Manager tab. Bulk update run limit `Bulk_Update_Run_Limit__c`, at most 48,000 (query rows).
 - CMDT Manager: `Relationship_Type__mdt.Is_Shipped__c`; subscriber rows are named `Org_*`; `Setting_Change__c.Deployment_Id__c` audits each save; `Manage_BarnCRM_Metadata` is granted only by `BarnCRM_Metadata_Admin`. Needs the org setting "Deploy Metadata from Non-Certified Package Versions via Apex" for an unlocked package (unverified in an org).
-- Field utilization: `Field_Utilization_Snapshot__c`, weekly job "BarnCRM Field Utilization" (Sundays 04:00), 13 months kept.
+- Field utilization: `Field_Utilization_Snapshot__c`, counted on demand inside Org Optimizer; no scheduled job or automatic cleanup (D-37, D-63).
 - Also: `npm run lint`, `npm run prettier:verify` (Markdown is excluded from Prettier), `npx sfdx-lwc-jest`, Salesforce Code Analyzer with zero high or critical findings.
 
 ## Gotchas
@@ -81,4 +81,10 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - A queued batch without `Test.stopTest` still runs when the test method ends.
 - After `Database.emptyRecycleBin` a record can still be returned by `ALL ROWS`, and its undelete fails `UNDELETE_FAILED` "Entity is not in the recycle bin"; treat it as purged.
 - A Nonprofit Cloud trial org (production edition, `barn-npc`) rejects unpackaged deploys of custom settings and custom metadata types with visibility Protected; only developer, sandbox and scratch orgs accept them.
+- An inner `Schedulable` class of a test class never runs at `Test.stopTest`; use a top-level test class.
+- At API 67, user-mode DML in tests fails on standard fields no permission set grants (for example `Account.Site`); use a field a BarnCRM permission set grants.
+- Deleting a parent purges children deleted before it from the Recycle Bin (lookup cascade and `Contact.AccountId`), so they cannot be undeleted; hence deleting people never deletes their household (D-88, R-H12; confirmed on `oi-test`).
+- The org refuses Create on a platform event in a permission set without Read.
+- A long text area field cannot be filtered in SOQL.
+- The BarnCRM app's `navType` (Standard to Console) is not updateable by deploy: on an org that has the app, delete it first (destructive deploy), then deploy (done on `oi-test` 2026-10-13; D-57 for the other orgs).
 - A new ADR on a branch uses the placeholder file `NEXT-<title>.md` and never a chosen number; the integrator numbers it at merge (see the repo `CLAUDE.md`).

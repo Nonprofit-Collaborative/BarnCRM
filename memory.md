@@ -2,7 +2,7 @@
 
 Purpose: project context, decisions and rationale not derivable from code or git. Mirrors Sections 11 (open questions, parking lot) and 12 (decision log) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Architecture decisions are recorded as ADRs in `docs/architecture/decisions/`; this file points to them rather than copying them.
 
-Last refreshed from BMemory 2026-10-13 (through D-86).
+Last refreshed from BMemory 2026-10-13 (through D-88).
 
 ## Decision log (plan Section 12)
 
@@ -94,14 +94,16 @@ Last refreshed from BMemory 2026-10-13 (through D-86).
 | D-84 | 2026-10-13 | Working agreement: present only Core findings and decisions until the owner starts the modules; module notes go in plan Section 11.5, grouped by module. Goal now: Core v1.0 complete |
 | D-85 | 2026-10-13 | Working agreement: implement recommendations and tell the owner what is being changed, unless really important or contrary to his instructions. Module reviews or audits already in flight can finish; their findings are not processed with him now unless they relate to Core |
 | D-86 | 2026-10-13 | Erase a person: the preview lists activities and files for manual deletion (not erased automatically); Health Check skips erased people; PR #282 accepted at its size |
+| D-87 | 2026-10-13 | Release prerequisites after a v1.0 pilot: namespace registration, the Dev Hub and the steward entity (Section 11.2 items 1, 3, 4) settled after piloting v1.0; no package version until then; upgrade-path tests wait for the first version |
+| D-88 | 2026-10-13 | Deleting people never deletes their household, in every membership mode (R-H12, #377); moving people still tidies it. Reason: deleting a parent purges children deleted before it from the Recycle Bin, so deleted people could not be restored. Open option: tidy later, after the Recycle Bin window |
 
 D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the owner's standing instruction "proceed as recommended"; the owner may amend them. D-37 to D-47 are Brandon's own decisions (D-40 to D-46 "yes, as recommended").
 
 ## Open questions still open (plan Section 11.2)
 
-- 1: Namespace registration (deferred; blocks package versions only).
-- 3: Dev Hub type (Partner Business Org or Developer Edition with a planned migration).
-- 4: Steward entity.
+- 1: Namespace registration (deferred; blocks package versions only). Settled after a v1.0 pilot (D-87).
+- 3: Dev Hub type (Partner Business Org or Developer Edition with a planned migration). Settled after a v1.0 pilot (D-87).
+- 4: Steward entity. Settled after a v1.0 pilot (D-87).
 - 7: Telemetry (C-26): resolved 2026-10-12, deferred indefinitely (D-24).
 - 12: Permission set groups that contain only the staff set: resolved 2026-10-13, Fundraising Staff includes Giving Staff (D-44).
 - 14: Shipped import templates: resolved 2026-10-13, added at install and on upgrade (D-55).
@@ -109,12 +111,17 @@ D-25 to D-33 (2026-10-12) and D-34 to D-36 (2026-10-13) were accepted under the 
 - 19 to 22: Opportunity mirror defaults (NPSP mode direction, deleted gift, double thanks, record-type filter).
 - 23: A separate nonprofit app in Giving.
 - 24: Neutral labels for nonprofits (names become "BarnCRM ..." in the rename).
-- 27: Plan corrections awaiting approval.
+- 27: Plan corrections: resolved 2026-10-13, applied (D-80).
 - Provisional (confirm when the owner tests): 8 primary person through the person contact, 9 guards only, 10 membership-mode switch guard only.
 
 ## Parking lot (plan Section 11.3)
 
 Donor portal and online giving; email marketing beyond export; grantmaking as a funder; peer-to-peer; wealth screening; text-to-give; multi-org roll-up reporting; an in-app AI assistant; confidential interaction notes (D-19); Nonprofit Cloud household migration (X-09, until an org asks). Engineering follow-ups (plan 11.3, recorded 2026-09-27): 1 settings writers, 3 dynamic Apex, 4 CLI heap and 6 BarnCRM rename merged with #181; 5 small review items landing (#203 in #217); 2 (log unrecognized checkbox values in imports) has no branch yet. Work items from the 2026-10-12 landing (plan 11.3): rollup S9 after a clean comparison run; C-35 adopting the C-37 transforms, then bulk delete (done, #219); "Data Jobs" relabel (Title Case, D-45); `FieldUtilizationJob` in `NightlyJobs` (dropped, D-37); test self-containment follow-ups; version for `v1.x-draft-advanced-find.md`; ADR-0088 still Proposed; org checks for `barn-npc` (`main` deployed there 2026-10-13 and passes; confirm the rest by hand); `mwdbdevsb` real validation on hold.
+
+## Module notes (plan Section 11.5; not presented until each module starts, D-84)
+
+- Giving: receipt PDFs kept after Erase a person, deleted by hand (D-52); 66 label descriptions need the placeholder sweep; `HouseholdSoftCreditRecompute` chains one Queueable per household (stops after 5 in Developer Edition, trial and scratch orgs; candidate fix: a batch or a ready event); `GiftLookupSelector.selectHouseholdsWithGifts` semi-join runs without sharing (IDs only), to confirm against the Giving design.
+- Connect: 38 label descriptions need the placeholder sweep.
 
 ## Working agreements (owner instructions)
 
