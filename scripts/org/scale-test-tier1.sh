@@ -3,8 +3,8 @@
 # scale-test-tier1.sh cleanup <alias> [--keep-funds]
 #                                        hard delete the scale data, children first
 #
-# The v0.11 tier 1 scale test (docs/contributor-guide/scale-and-mobile-test-plan.md): 8,000
-# households, 20,000 contacts and 60,000 gifts, then their soft credits and allocations,
+# The v0.11 tier 1 scale test (docs/contributor-guide/scale-and-mobile-test-plan.md): 4,000
+# households, 10,000 contacts and 30,000 gifts, then their soft credits and allocations,
 # loaded with Bulk API 2.0 with Automation Control left on. Per load it records rows,
 # elapsed seconds, failed rows and the first error in a results file; before and after it
 # records the org limits the plan names and the record counts.
@@ -44,7 +44,7 @@ KEEP_FUNDS=0
 [[ -z "$ALIAS" ]] && usage
 
 if [[ "$ALIAS" != "oi-test" && "${SCALE_TEST_ALLOW:-}" != "1" ]]; then
-  echo "Refusing to run against '$ALIAS': the scale test loads about 150,000 records and is only" >&2
+  echo "Refusing to run against '$ALIAS': the scale test loads about 78,500 records and is only" >&2
   echo "for oi-test. Set SCALE_TEST_ALLOW=1 to override." >&2
   exit 1
 fi
@@ -141,6 +141,17 @@ resolve() { python3 "$GENERATOR" --resolve "$@" || exit 1; }
 run() {
   log "BarnCRM tier 1 scale test load: org $ALIAS, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   log "Reminder: hold the org lock; no org test gate at the same time."
+  # Every gift gets an automatic allocation to the default fund; without one each gift fails.
+  local default_funds setting_fund
+  default_funds="$(count_of "SELECT COUNT() FROM Fund__c WHERE Is_Default__c = true AND Active__c = true")"
+  setting_fund="$(sf data query --target-org "$ALIAS" --json \
+    --query "SELECT Default_Fund__c FROM Giving_Settings__c" 2>/dev/null \
+    | jq -r '[.result.records[]?.Default_Fund__c | select(. != null and . != "")] | first // empty')"
+  if [[ "$default_funds" != "1" && -z "$setting_fund" ]]; then
+    log "No default fund on $ALIAS (no active fund flagged default, none chosen in Giving settings)."
+    log "Every gift would fail. Load the sample data or choose a default fund, then run again."
+    exit 1
+  fi
   generate
   record_limits "before"
   record_counts "before"

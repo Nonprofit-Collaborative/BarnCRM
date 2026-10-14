@@ -11,8 +11,8 @@ appears in any file. Generated files are never committed (scale-test-data/ is ig
 Modes:
     python3 scripts/data/generate-scale-data.py [--tier1] [--out-dir DIR]
         Writes funds.csv, households.csv, contacts.csv, gifts.csv, soft_credits.csv and
-        allocations.csv. Tier 1 is the default and the only tier: 8,000 households,
-        20,000 contacts, 60,000 gifts, 10% of gifts with a soft credit, 5% with a second
+        allocations.csv. Tier 1 is the default and the only tier: 4,000 households,
+        10,000 contacts, 30,000 gifts, 10% of gifts with a soft credit, 5% with a second
         allocation. Override with --households, --contacts and --gifts to shrink a run.
     python3 scripts/data/generate-scale-data.py --import-file [--import-rows 25000]
         Writes import-wizard-25k.csv: one gift per row with the donor's name and email, in the
@@ -352,9 +352,9 @@ def main():
     p.add_argument("--import-file", action="store_true", help="write the import wizard file")
     p.add_argument("--import-rows", type=int, default=25000)
     p.add_argument("--out-dir", default=str(REPO_ROOT / "scale-test-data"))
-    p.add_argument("--households", type=int, default=8000)
-    p.add_argument("--contacts", type=int, default=20000)
-    p.add_argument("--gifts", type=int, default=60000)
+    p.add_argument("--households", type=int, default=4000)
+    p.add_argument("--contacts", type=int, default=10000)
+    p.add_argument("--gifts", type=int, default=30000)
     p.add_argument("--resolve", metavar="IN")
     p.add_argument("--out")
     p.add_argument("--map")

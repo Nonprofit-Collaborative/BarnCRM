@@ -25,7 +25,7 @@ does not fit in any scratch org. Run it in two tiers:
 
 | Tier | Where | Volume | Proves |
 | ---- | ----- | ------ | ------ |
-| 1 | `oi-test` | 20,000 contacts, 8,000 households, 60,000 gifts (keep total under about 90,000 records) | Every batch and queueable completes without a governor limit error at a realistic ratio of gifts to donors; per-chunk timings to extrapolate from |
+| 1 | `oi-test` | 10,000 contacts, 4,000 households, 30,000 gifts (about 78,500 records loaded, with each gift's automatic default allocation; keep the total under about 90,000) | Every batch and queueable completes without a governor limit error at a realistic ratio of gifts to donors; per-chunk timings to extrapolate from |
 | 2 | A Partial or Full Copy sandbox, or a Developer Pro sandbox with extra storage, owner approval needed | The full Section 7.3 target | The absolute numbers in the plan |
 
 Tier 1 is the v0.11 exit evidence unless the owner provides a tier 2 org. Report the
@@ -90,11 +90,13 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
 - The load script records the four limits above, record counts, and per load the rows, elapsed
   seconds, failed rows and first error in `scale-test-data/results-run-<alias>-<time>.md`. It
   refuses any alias but `oi-test` unless `SCALE_TEST_ALLOW=1`.
-- The tier 1 files hold 88,000 households, contacts and gifts, plus 6,000 soft credits and
-  3,000 second allocations. Every gift also gets an automatic default allocation (60,000 more
-  records), so about 157,000 records land in the org, over the roughly 100,000 a scratch org's
-  200 MB holds. Check `DataStorageMB` before loading. To shrink the run, set
+- The tier 1 files hold 4,000 households, 10,000 contacts and 30,000 gifts, plus 3,000 soft
+  credits and 1,500 second allocations. The gift trigger adds a default allocation to every
+  gift, so this loads about 78,500 records; the plan's original 60,000 gifts would have loaded
+  about 157,000, over the roughly 100,000 a scratch org's 200 MB holds. Check `DataStorageMB`
+  before loading. To change the size, set for example
   `SCALE_TEST_GENERATOR_ARGS="--households 3000 --contacts 7500 --gifts 20000"`.
+- The load script stops before loading if the org has no default fund.
 - Hard delete needs the Bulk API Hard Delete permission on the running user.
 
 ## Mobile audit
