@@ -18,7 +18,7 @@ import uniqueHelp from '@salesforce/label/c.Core_Import_RowRulesUniqueHelp';
 const MAX_RULES = 5;
 
 /**
- * Which rows of the file load (canonical model R-IT17): Skip rows where rules and One row per
+ * Which rows of the file load (canonical model R-IT18): Skip rows where rules and One row per
  * key columns, edited here and saved with the mapping by the wizard. The server decides each
  * row as the file is staged. See docs/admin-guide/importing.md, section 11.
  */

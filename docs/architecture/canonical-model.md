@@ -2057,7 +2057,7 @@ alone and the run log says so; nothing is rejected for it. A matcher failure is 
 Error Log only when a rule was known to be active. Duplicate rules are not asked for a
 one-object template.
 
-**R-IT17 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
+**R-IT18 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
 `"skipRows"`, at most 5 rules `{ "column", "test", "text" }` whose `test` is `equals`,
 `contains` or `blank` (`text` required unless `blank`, at most 255), and `"uniqueBy"`, at most
 5 column names (ADR-NEXT, `NEXT-import-row-rules.md`). Both read a row's cells as uploaded,
@@ -2069,7 +2069,7 @@ Skipped row, so the dry run and the commit see the same rows, and the run log co
 mapping whose rules are incomplete or too many is refused on save; a stored one that fails the
 check skips nothing.
 
-**R-IT18 An empty cell that clears.** A `Record` column (R-IT12) may carry `"blankClears":
+**R-IT19 An empty cell that clears.** A `Record` column (R-IT12) may carry `"blankClears":
 true`. Under Update or Upsert, when that column's cell is empty after values for every row
 (R-IB14) have filled blanks, the record's field is cleared if it holds a value: an ordinary
 change, compared, journaled with the value before (R-IJ3) and put back by undo. A record the

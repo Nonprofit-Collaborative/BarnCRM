@@ -230,7 +230,7 @@ public with sharing class ImportBatchService {
                 )
             );
         }
-        // Skip rows and One row per key (R-IT17) decide as the rows arrive, so every pass and
+        // Skip rows and One row per key (R-IT18) decide as the rows arrive, so every pass and
         // the dry run's counts see the same rows.
         Import_Template__c template = ImportTemplateSelector.selectById(batch.Import_Template__c);
         List<String> keys = ImportRowFilter.apply(

@@ -627,7 +627,7 @@ public with sharing class ImportController {
                         column.target = ImportMapping.TARGET_IGNORE;
                     }
                 }
-                // The rows to load are the mapping's, whatever the file's headings (R-IT17).
+                // The rows to load are the mapping's, whatever the file's headings (R-IT18).
                 suggested.skipRows = saved.skipRows;
                 suggested.uniqueBy = saved.uniqueBy;
             }

@@ -127,7 +127,7 @@ public with sharing class ImportRowProcessor {
         public Integer rejected = 0;
         @NamespaceAccessible
         public Integer skipped = 0;
-        /** Values an empty cell cleared, or would clear in a dry run (R-IT18). */
+        /** Values an empty cell cleared, or would clear in a dry run (R-IT19). */
         @NamespaceAccessible
         public Integer cleared = 0;
         /** Anything the run log should say once, not once per row. */

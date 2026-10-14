@@ -80,7 +80,7 @@ public with sharing class ImportMapping {
         public List<DataTransform.Step> transforms;
         /**
          * For a `Record` column of an update or upsert, an empty cell clears the field rather
-         * than leaving it as it is (R-IT18). False when absent.
+         * than leaving it as it is (R-IT19). False when absent.
          */
         @AuraEnabled
         public Boolean blankClears;
@@ -146,7 +146,7 @@ public with sharing class ImportMapping {
     }
 
     /**
-     * A rule that skips a row of the file (R-IT17): the row's cell in `column` equals `text`,
+     * A rule that skips a row of the file (R-IT18): the row's cell in `column` equals `text`,
      * contains it, or is blank (a test of `DataTransform.TESTS`), compared as uploaded,
      * trimmed and ignoring capitals.
      */
@@ -171,10 +171,10 @@ public with sharing class ImportMapping {
     public List<Column> columns;
     @AuraEnabled
     public List<Assignment> defaults;
-    /** Rows any of these rules matches are skipped when the file is staged (R-IT17). */
+    /** Rows any of these rules matches are skipped when the file is staged (R-IT18). */
     @AuraEnabled
     public List<SkipRule> skipRows;
-    /** Only the first row of each combination of these columns' values loads (R-IT17). */
+    /** Only the first row of each combination of these columns' values loads (R-IT18). */
     @AuraEnabled
     public List<String> uniqueBy;
 
@@ -524,7 +524,7 @@ public with sharing class ImportMapping {
     }
 
     /**
-     * The `Record` attributes whose column says an empty cell clears the field (R-IT18),
+     * The `Record` attributes whose column says an empty cell clears the field (R-IT19),
      * folded to lower case. A column set to Do not load is left out.
      */
     @NamespaceAccessible

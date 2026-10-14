@@ -325,7 +325,7 @@ export default class ImportWizard extends LightningElement {
   useDuplicateRules = false;
   /** The column whose changes are being edited, if any (R-IT15). */
   editingSource;
-  /** Skip rows where and One row per, as the mapping holds them (R-IT17). */
+  /** Skip rows where and One row per, as the mapping holds them (R-IT18). */
   skipRows = [];
   uniqueBy = [];
   /** Each changed value of a finished dry run's first rows (R-IT15). */
@@ -1042,13 +1042,13 @@ export default class ImportWizard extends LightningElement {
     return rules;
   }
 
-  /** Skip rows where and One row per, from the rows to load panel (R-IT17). */
+  /** Skip rows where and One row per, from the rows to load panel (R-IT18). */
   handleRowRulesChange(event) {
     this.skipRows = event.detail.skipRows;
     this.uniqueBy = event.detail.uniqueBy;
   }
 
-  /** Whether an empty cell of a column clears its field (R-IT18). */
+  /** Whether an empty cell of a column clears its field (R-IT19). */
   handleBlankClearsChange(event) {
     const source = event.target.dataset.source;
     const blankClears = event.target.checked;

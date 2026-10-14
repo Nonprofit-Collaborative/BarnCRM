@@ -773,7 +773,7 @@ public with sharing class ImportObjectLoader {
                 Schema.DescribeFieldResult field = byName.get(name);
                 Boolean clears = item.values.get(name) == null;
                 if (clears && item.creates) {
-                    // A new record has nothing to clear (R-IT18).
+                    // A new record has nothing to clear (R-IT19).
                     continue;
                 }
                 if (

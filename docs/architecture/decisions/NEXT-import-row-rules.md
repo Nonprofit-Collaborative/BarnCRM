@@ -3,7 +3,7 @@
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13
 **Source:** data tools parity report ranks 8 and 9 (owner decision 2026-10-13: build ranks 1 to
-17). Amends canonical model R-IT1 and adds R-IT17 and R-IT18. Related: `0080-import-load-one-object.md`
+17). Amends canonical model R-IT1 and adds R-IT18 and R-IT19. Related: `0080-import-load-one-object.md`
 (ADR-0080), `0081-data-transform-document.md` (ADR-0081).
 
 ## Context

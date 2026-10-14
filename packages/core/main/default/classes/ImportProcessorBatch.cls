@@ -25,7 +25,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
     private Set<String> notes = new Set<String>();
     private Boolean notesCut = false;
     private Integer chunksRun = 0;
-    /** Values empty cells cleared, or would clear, over the chunks (R-IT18). */
+    /** Values empty cells cleared, or would clear, over the chunks (R-IT19). */
     private Integer cleared = 0;
     /** The gift amounts the entity processor read, added up over the chunks (R-IB10). */
     private Decimal fileAmount;

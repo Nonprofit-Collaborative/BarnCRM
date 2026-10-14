@@ -1,5 +1,5 @@
 /**
- * Skips rows of a file as it is staged (canonical model R-IT17; ADR-NEXT
+ * Skips rows of a file as it is staged (canonical model R-IT18; ADR-NEXT
  * `NEXT-import-row-rules.md`): a row a Skip rows rule matches, and a row whose One row per key
  * an earlier row of the same file already has. A skipped row is staged with Status Skipped and
  * the reason, so it is listed with the file's rows and no pass reads it again.
