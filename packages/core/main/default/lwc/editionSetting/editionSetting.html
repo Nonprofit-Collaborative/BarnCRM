@@ -1,0 +1,36 @@
+<template>
+    <template lwc:if={loaded}>
+        <template lwc:if={editionName}>
+            <p class="slds-text-body_regular slds-text-title_bold" data-id="edition-name">{editionName}</p>
+        </template>
+        <template lwc:else>
+            <p class="slds-text-body_regular" data-id="edition-not-chosen">{labels.notChosen}</p>
+        </template>
+
+        <template lwc:if={canEdit}>
+            <details class="slds-var-m-top_x-small" data-id="change-edition">
+                <summary class="slds-text-body_small slds-text-link">{labels.changeToggle}</summary>
+                <div class="slds-var-p-around_small">
+                    <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.changeIntro}</p>
+                    <template for:each={switches} for:item="option">
+                        <lightning-button
+                            key={option.value}
+                            class="slds-var-m-right_x-small"
+                            label={option.label}
+                            data-value={option.value}
+                            disabled={isSaving}
+                            onclick={handleSwitch}
+                        ></lightning-button>
+                    </template>
+                </div>
+            </details>
+        </template>
+    </template>
+
+    <template lwc:if={savedMessage}>
+        <p class="slds-text-color_success slds-var-m-top_x-small" role="status" data-id="saved">{savedMessage}</p>
+    </template>
+    <template lwc:if={errorMessage}>
+        <p class="slds-text-color_error slds-var-m-top_x-small" role="alert" data-id="error">{errorMessage}</p>
+    </template>
+</template>

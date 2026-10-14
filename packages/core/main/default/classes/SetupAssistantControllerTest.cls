@@ -654,6 +654,81 @@ private class SetupAssistantControllerTest {
         }
     }
 
+    @IsTest
+    static void changesTheEditionFromTheConsoleAndAuditsIt() {
+        System.runAs(TestUsers.admin()) {
+            SetupAssistantController.applySuite(ModuleDetectionService.SUITE_IMPACT);
+
+            Test.startTest();
+            SetupAssistantController.EditionModel before = SetupAssistantController.getEdition();
+            SetupAssistantController.EditionModel after = SetupAssistantController.changeEdition(
+                ModuleDetectionService.SUITE_COMMUNITY
+            );
+            Test.stopTest();
+
+            Assert.areEqual(ModuleDetectionService.SUITE_IMPACT, before.currentSuite, 'Read');
+            Assert.isTrue(before.canEdit, 'The admin may change it');
+            Assert.areEqual(
+                ModuleDetectionService.SUITE_COMMUNITY,
+                after.currentSuite,
+                'The console is told what was saved'
+            );
+            Boolean audited = false;
+            for (Setting_Change__c change : SettingChangeSelector.getRecent(10)) {
+                if (
+                    change.Setting_Name__c != null &&
+                    change.Setting_Name__c.endsWithIgnoreCase('Suite__c') &&
+                    change.New_Value__c == ModuleDetectionService.SUITE_COMMUNITY
+                ) {
+                    audited = true;
+                }
+            }
+            Assert.isTrue(audited, 'The change is listed under Recent changes');
+        }
+    }
+
+    @IsTest
+    static void refusesAnUnknownEditionAndDavidsChange() {
+        System.runAs(TestUsers.admin()) {
+            User david = buildDavid();
+            System.runAs(new User(Id = UserInfo.getUserId())) {
+                insert david;
+            }
+            String unknownMessage;
+            String davidMessage;
+            Boolean davidMayEdit;
+
+            Test.startTest();
+            try {
+                SetupAssistantController.changeEdition('Standard');
+            } catch (AuraHandledException e) {
+                unknownMessage = e.getMessage();
+            }
+            System.runAs(david) {
+                davidMayEdit = SetupAssistantController.getEdition().canEdit;
+                try {
+                    SetupAssistantController.changeEdition(ModuleDetectionService.SUITE_IMPACT);
+                } catch (AuraHandledException e) {
+                    davidMessage = e.getMessage();
+                }
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                System.Label.Core_SuiteChoice_UnknownSuiteError,
+                unknownMessage,
+                'Only the two stored values are accepted'
+            );
+            Assert.isFalse(davidMayEdit, 'David is not offered the change');
+            Assert.areEqual(
+                System.Label.Core_Settings_PermissionRequiredError,
+                davidMessage,
+                'And it is refused if he tries'
+            );
+            Assert.isNull(ModuleDetectionService.chosenSuite(), 'Nothing was saved');
+        }
+    }
+
     private static List<Setting_Definition__mdt> identityRows() {
         List<Setting_Definition__mdt> rows = new List<Setting_Definition__mdt>();
         for (

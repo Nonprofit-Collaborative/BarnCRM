@@ -104,12 +104,65 @@ public with sharing class SetupAssistantController {
     }
 
     /**
-     * Step one: save the suite. The step finishes because the setting now has a value. This
-     * saves a preference and nothing else: it installs, removes and hides nothing.
+     * Step one: save the edition. The step finishes because the setting now has a value. It
+     * installs and removes nothing; it decides which modules Core shows (ADR-NEXT).
      */
     @AuraEnabled
     public static SetupState applySuite(String suite) {
         requireEdit();
+        String chosen = knownSuite(suite);
+        try {
+            SetupAssistantService.ensureStarted();
+            SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
+            return buildState();
+        } catch (Exception e) {
+            throw logged(e, System.Label.Core_SetupAssistant_SaveErrorMessage);
+        }
+    }
+
+    /** What the console's Edition row shows: the edition in force and whether it may be changed. */
+    public class EditionModel {
+        @AuraEnabled
+        public String currentSuite;
+        @AuraEnabled
+        public Boolean canEdit;
+    }
+
+    /** The console's read-only Edition row (ADR-NEXT). */
+    @AuraEnabled
+    public static EditionModel getEdition() {
+        try {
+            return editionModel();
+        } catch (Exception e) {
+            throw logged(e, System.Label.Core_SetupAssistant_LoadErrorMessage);
+        }
+    }
+
+    /**
+     * The console's Change edition control, after its confirmation. Saved as an audited
+     * settings change, like any console save; the Setup Assistant's progress is not touched.
+     */
+    @AuraEnabled
+    public static EditionModel changeEdition(String suite) {
+        requireEdit();
+        String chosen = knownSuite(suite);
+        try {
+            SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
+            return editionModel();
+        } catch (Exception e) {
+            throw logged(e, System.Label.Core_SetupAssistant_SaveErrorMessage);
+        }
+    }
+
+    private static EditionModel editionModel() {
+        EditionModel model = new EditionModel();
+        model.currentSuite = ModuleDetectionService.chosenSuite();
+        model.canEdit = BarnCRMPermissions.canManageSettings();
+        return model;
+    }
+
+    /** The stored value for one of the two editions, or a message Maria can act on. */
+    private static String knownSuite(String suite) {
         String chosen = suite == null ? '' : suite.trim();
         Set<String> suites = new Set<String>{
             ModuleDetectionService.SUITE_COMMUNITY,
@@ -118,13 +171,7 @@ public with sharing class SetupAssistantController {
         if (!suites.contains(chosen)) {
             throw asAuraException(System.Label.Core_SuiteChoice_UnknownSuiteError);
         }
-        try {
-            SetupAssistantService.ensureStarted();
-            SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
-            return buildState();
-        } catch (Exception e) {
-            throw logged(e, System.Label.Core_SetupAssistant_SaveErrorMessage);
-        }
+        return chosen;
     }
 
     /** The coexistence step: put the confirmed mode in force and record the step as done. */

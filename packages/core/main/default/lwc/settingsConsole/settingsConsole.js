@@ -91,6 +91,8 @@ function importCoreComponent(name) {
       return import('c/moduleManager');
     case 'customMetadataManager':
       return import('c/customMetadataManager');
+    case 'editionSetting':
+      return import('c/editionSetting');
     default:
       return null;
   }

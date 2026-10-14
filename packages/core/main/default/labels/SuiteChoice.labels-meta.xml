@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: what the edition choice step asks</shortDescription>
-        <value>Both editions include BarnCRM's full core suite of tools. Choose the Standard Edition for the core suite on its own, or the Nonprofit Edition, which adds the nonprofit tools, starting with the Giving module. Any organization can choose either, and you can change it later.</value>
+        <value>Both editions include BarnCRM's full core suite of tools. Choose the Standard Edition for the core suite on its own, or the Nonprofit Edition, which adds the nonprofit tools, starting with the Giving module. Any organization can choose either. You choose once: the edition decides which modules BarnCRM shows everywhere.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
@@ -119,5 +119,125 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: the install link beside a module</shortDescription>
         <value>Install</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_StandardName</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Standard Edition's name, shown where the edition is read-only</shortDescription>
+        <value>Standard Edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_NonprofitName</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Nonprofit Edition's name, shown where the edition is read-only</shortDescription>
+        <value>Nonprofit Edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_ChosenOnce</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Setup assistant: under the saved edition, which is not offered again</shortDescription>
+        <value>The edition is chosen once.</value>
+    </labels>
+    <labels>
+        <fullName>Core_SuiteChoice_ChangeHelpLink</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Link to the admin guide page on changing the edition</shortDescription>
+        <value>How to change it later</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_NotChosen</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings Edition row: no edition has been chosen yet</shortDescription>
+        <value>Not chosen yet. Choose it in the first step of the Setup Assistant.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_ChangeToggle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings Edition row: the collapsed control that opens the change</shortDescription>
+        <value>Change edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_ChangeIntro</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings Edition row: what changing the edition does</shortDescription>
+        <value>The edition decides which modules BarnCRM shows and offers to everyone. Changing it installs, removes and turns off nothing, and changes no records.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_SwitchToStandard</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings Edition row: button that starts the switch to Standard</shortDescription>
+        <value>Switch to the Standard Edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_SwitchToNonprofit</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings Edition row: button that starts the switch to Nonprofit</shortDescription>
+        <value>Switch to the Nonprofit Edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_ConfirmTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edition change confirmation: heading</shortDescription>
+        <value>Change the edition?</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_ConfirmToNonprofit</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edition change confirmation: what switching to Nonprofit does</shortDescription>
+        <value>BarnCRM will show and offer the nonprofit modules (Giving, Volunteers, Programs, Funders and Connect) in the Setup Assistant, the Module Manager and the home page, to every admin and user. Nothing is installed: you install each module yourself.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_ConfirmToStandard</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edition change confirmation: what switching to Standard does</shortDescription>
+        <value>BarnCRM will stop showing and offering nonprofit modules that are not installed, to every admin and user. Modules already installed stay listed and keep working. Nothing is removed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_ConfirmButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edition change confirmation: the button that saves the change</shortDescription>
+        <value>Change edition</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_CancelButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edition change confirmation: the button that leaves it as it is</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Core_Edition_Saved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings Edition row: shown after the edition was changed</shortDescription>
+        <value>Edition changed. Reload open BarnCRM pages to see the new module lists.</value>
     </labels>
 </CustomLabels>
