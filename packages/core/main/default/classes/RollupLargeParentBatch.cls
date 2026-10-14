@@ -135,8 +135,9 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
     private static Integer sliceRowBudgetForTest;
 
     /**
-     * The source rows each record is expected to read: the largest COUNT total it stores, times
-     * the queries its definitions plan to, as the full run estimates a record's weight. A COUNT
+     * The source rows each record is expected to read: the largest COUNT total it stores (of every
+     * active COUNT on its entity, not only those being calculated), times the queries the given
+     * definitions plan to, as the full run estimates a record's weight. A COUNT
      * with a filter or fiscal window counts only part of the rows, so it is a floor, not the
      * answer. A record with no COUNT total to go by (none defined, or never calculated) is
      * unknown, not small: `UNKNOWN_ROWS_PER_QUERY` per query.
@@ -157,11 +158,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
         if (targetType != null && !definitions.isEmpty()) {
             RollupPlanner.Plan plan = RollupPlanner.plan(targetType, definitions);
             queries = Math.max(1, plan.queries.size());
-            for (Integer i = 0; i < plan.definitions.size(); i++) {
-                if ('COUNT'.equalsIgnoreCase(plan.definitions[i].Aggregate__c)) {
-                    countFields.add(String.valueOf(plan.targetFields[i]));
-                }
-            }
+            countFields = storedCountFields(targetType);
         }
         Integer unknown = queries * UNKNOWN_ROWS_PER_QUERY;
         for (Id recordId : ids) {
@@ -185,6 +182,36 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
             }
         }
         return rowsById;
+    }
+
+    /**
+     * Where the entity's active COUNT definitions store their totals, whichever definitions a
+     * run calculates. A save that changed only what a SUM or MAX reads queues only those
+     * (ADR-0099), and the record's rows are no fewer for it: going by the counts of the queued
+     * definitions alone took a fund with 25,000 allocations as unknown (ten rows a query)
+     * whenever its entries named no COUNT, and its queries stopped the run on the query row
+     * limit.
+     */
+    private static Set<String> storedCountFields(Schema.SObjectType targetType) {
+        Map<String, Schema.SObjectField> fieldMap = targetType.getDescribe(
+                SObjectDescribeOptions.DEFERRED
+            )
+            .fields.getMap();
+        Set<String> countFields = new Set<String>();
+        for (
+            Rollup_Definition__c definition : RollupSelector.selectActiveForTarget(
+                String.valueOf(targetType),
+                RollupService.everyMode()
+            )
+        ) {
+            Schema.SObjectField field = String.isBlank(definition.Target_Field__c)
+                ? null
+                : fieldMap.get(definition.Target_Field__c);
+            if (field != null && 'COUNT'.equalsIgnoreCase(definition.Aggregate__c)) {
+                countFields.add(String.valueOf(field));
+            }
+        }
+        return countFields;
     }
 
     /**

@@ -318,6 +318,69 @@ private class RollupLargeParentBatchTest {
         }
     }
 
+    /**
+     * The shape of the 25,000 row scale test: a large parent whose entries name only
+     * definitions with no COUNT. Going by the named definitions' counts alone took it as
+     * unknown (ten rows a query), so its queries read every source row and stopped the run on
+     * the query row limit. The entity's stored counts decide, whichever definitions an entry
+     * names: the large parent goes to the batch, the run reads only the small one, and the
+     * batch then writes the large parent's totals.
+     */
+    @IsTest
+    static void aLargeParentWhoseEntriesNameNoCountStillGoesToTheBatch() {
+        System.runAs(TestUsers.admin()) {
+            insertDefinitions();
+            Rollup_Definition__c revenue = [
+                SELECT Id
+                FROM Rollup_Definition__c
+                WHERE Definition_Key__c = 'Test_Large_Revenue'
+            ];
+            Account large = parentWith(3, 40);
+            Account small = parentWith(1, 0);
+            RollupLargeParentBatch.largeParentRowsForTest = 30;
+
+            Map<Id, Integer> rows = RollupLargeParentBatch.estimate(
+                Account.SObjectType,
+                RollupSelector.selectActiveByIds(new Set<Id>{ revenue.Id }),
+                new Set<Id>{ large.Id }
+            );
+            Assert.areEqual(40, rows.get(large.Id), 'Its stored count, though no COUNT is named');
+
+            Test.startTest();
+            RollupQueue.add(
+                new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ large.Id, small.Id } },
+                new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ revenue.Id } }
+            );
+            Test.stopTest();
+
+            Assert.areEqual(10, totalsOf(small.Id).AnnualRevenue, 'Small: summed in the run');
+            Assert.isNull(totalsOf(large.Id).AnnualRevenue, 'Large: not read by the run');
+            Assert.isTrue(RollupLargeParentBatch.startedForTest, 'A batch run was started');
+            List<Rollup_Queue__c> held = [SELECT Id FROM Rollup_Queue__c];
+            Assert.areEqual(1, held.size(), 'One entry, for the large parent');
+            Rollup_Queue__c entry = reread(held[0].Id);
+            Assert.areEqual(String.valueOf(large.Id), entry.Record_Ids__c, 'Holding it alone');
+            Assert.areEqual(String.valueOf(revenue.Id), entry.Definition_Ids__c, 'Still named');
+
+            RollupLargeParentBatch.forEntries(new List<Rollup_Queue__c>{ entry }).runInline(2);
+
+            Account written = totalsOf(large.Id);
+            Assert.areEqual(30, written.AnnualRevenue, 'Summed by the batch, in chunks');
+            Assert.areEqual(40, written.NumberOfEmployees, 'The count was not named: untouched');
+            Assert.isTrue(entries().isEmpty(), 'The entry is finished');
+        }
+    }
+
+    /** What a run's recalculations read counts against its budget, not what was estimated. */
+    @IsTest
+    static void rowsARunReadLeaveLessOfItsBudgetThanTheEstimatesSaid() {
+        RollupLargeParentBatch.sliceRowBudgetForTest = 100;
+
+        Assert.areEqual(60, RollupQueue.rowsLeft(60, 30), 'Read as estimated: the estimates');
+        Assert.areEqual(20, RollupQueue.rowsLeft(60, 80), 'Read more: what was read');
+        Assert.areEqual(-5, RollupQueue.rowsLeft(60, 105), 'Over: no later record fits');
+    }
+
     // ------------------------------------------------------------------------------ merging
 
     @IsTest
