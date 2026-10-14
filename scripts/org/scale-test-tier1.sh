@@ -193,10 +193,11 @@ load() {
 }
 
 # split_gifts: the 5% two fund split. Giving refuses any save that leaves a gift's
-# allocations not totalling the gift, and it checks after every DML statement, so the default
-# allocation cannot be cut to 70% in one statement and the 30% row added in another. Each
-# generated script upserts both rows in one statement (about 200 gifts per script). The
-# scripts print a SCALE_SPLIT line with the counts, collected here.
+# allocations not totalling the gift, and it checks after every DML statement (a mixed
+# upsert too). Each generated script (about 200 gifts) pauses the Gift_Allocation_Totals
+# automation, cuts the default allocation to 70% and adds the 30% row, then checks every gift
+# with GiftService.validateAllocations and rolls the chunk back on any problem. The scripts
+# print a SCALE_SPLIT line with the counts, collected here.
 split_gifts() {
   local script out start end line requested=0 skipped=0 rows=0 failed=0 first="" n=0 value
   log ""

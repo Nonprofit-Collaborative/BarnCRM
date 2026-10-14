@@ -202,12 +202,14 @@ def split_rows_to_chunks(split_rows, size=SPLIT_CHUNK):
 def render_split_apex(chunk):
     """Anonymous Apex that splits each gift in `chunk` ([gift external id, fund code, ...]).
 
-    Per gift, one DML statement (an upsert) updates the default allocation to the primary
-    share and inserts the second fund's allocation for the rest. Giving refuses any save that
-    leaves a gift's allocations not totalling the gift, and checks after each DML, so the
-    update and the insert cannot be two statements; in one upsert both are saved before the
-    check. Gifts that did not load, or that have no single default allocation, are skipped
-    and counted. Prints one SCALE_SPLIT line with the counts and the first error.
+    Per gift, the default allocation is cut to the primary share and a second allocation takes
+    the rest. Giving refuses any save that leaves a gift's allocations not totalling the gift,
+    checking after each DML statement, and a mixed upsert is still two operations (proven on
+    oi-test), so the script pauses the Gift_Allocation_Totals automation for the update and
+    the insert. That automation also fills Percent__c, so the script sets it. Afterwards
+    GiftService.validateAllocations checks every gift in the chunk, and any problem rolls the
+    whole chunk back. Gifts that did not load, or that have no single default allocation, are
+    skipped and counted. Prints one SCALE_SPLIT line with the counts and the first error.
     """
     pairs = ", ".join("'%s' => '%s'" % (gift, fund) for gift, fund, *_ in chunk)
     return """Map<String, String> fundByGift = new Map<String, String>{ %(pairs)s };
@@ -220,30 +222,47 @@ for (Fund__c f : [SELECT Id, Accounting_Code__c FROM Fund__c
 List<Gift__c> gifts = [SELECT Id, External_Id__c, Amount__c,
                               (SELECT Id FROM Gift_Allocations__r)
                        FROM Gift__c WHERE External_Id__c IN :fundByGift.keySet()];
-List<Gift_Allocation__c> rows = new List<Gift_Allocation__c>();
+List<Gift_Allocation__c> primaries = new List<Gift_Allocation__c>();
+List<Gift_Allocation__c> seconds = new List<Gift_Allocation__c>();
+Set<Id> splitGiftIds = new Set<Id>();
 Integer skipped = fundByGift.size() - gifts.size();
 for (Gift__c g : gifts) {
     Id fundId = fundIds.get(fundByGift.get(g.External_Id__c));
-    if (fundId == null || g.Gift_Allocations__r.size() != 1) {
+    if (fundId == null || g.Gift_Allocations__r.size() != 1 || g.Amount__c == null || g.Amount__c == 0) {
         skipped++;
         continue;
     }
     Decimal primary = (g.Amount__c * %(percent)d / 100).setScale(2, System.RoundingMode.HALF_UP);
-    rows.add(new Gift_Allocation__c(Id = g.Gift_Allocations__r[0].Id, Amount__c = primary));
-    rows.add(new Gift_Allocation__c(Gift__c = g.Id, Fund__c = fundId, Amount__c = g.Amount__c - primary));
+    Decimal primaryPercent = (primary / g.Amount__c * 100).setScale(2, System.RoundingMode.HALF_UP);
+    primaries.add(new Gift_Allocation__c(Id = g.Gift_Allocations__r[0].Id, Amount__c = primary,
+        Percent__c = primaryPercent));
+    seconds.add(new Gift_Allocation__c(Gift__c = g.Id, Fund__c = fundId, Amount__c = g.Amount__c - primary,
+        Percent__c = 100 - primaryPercent));
+    splitGiftIds.add(g.Id);
 }
+Integer rowCount = primaries.size() + seconds.size();
 Integer failed = 0;
 String firstError = '';
-for (Database.UpsertResult r : Database.upsert(rows, false)) {
-    if (!r.isSuccess()) {
-        failed++;
-        if (firstError == '') {
-            firstError = r.getErrors()[0].getMessage();
-        }
+Savepoint sp = Database.setSavepoint();
+try {
+    AutomationControl.bypass('Gift_Allocation_Totals');
+    update primaries;
+    insert seconds;
+    AutomationControl.clearBypass('Gift_Allocation_Totals');
+    Map<Id, String> problems = GiftService.validateAllocations(splitGiftIds);
+    if (!problems.isEmpty()) {
+        Database.rollback(sp);
+        failed = rowCount;
+        firstError = problems.size() + ' gifts do not balance, chunk rolled back: ' + problems.values()[0];
     }
+} catch (Exception e) {
+    AutomationControl.clearBypass('Gift_Allocation_Totals');
+    Database.rollback(sp);
+    failed = rowCount;
+    firstError = e.getMessage();
 }
 System.debug('SCALE_SPLIT requested=' + fundByGift.size() + ' skipped=' + skipped
-    + ' rows=' + rows.size() + ' failedRows=' + failed + ' firstError=' + firstError);
+    + ' rows=' + rowCount + ' failedRows=' + failed + ' firstError=' + firstError);
 """ % {"pairs": pairs, "percent": SPLIT_PRIMARY_PERCENT}
 
 

@@ -93,7 +93,9 @@ class Tier1Tests(unittest.TestCase):
 
     def test_apex_keeps_the_gift_whole(self):
         apex = gen.render_split_apex([["SCALE-G-0000001", "SCALE-PROG"]])
-        self.assertIn("Database.upsert(rows, false)", apex)
+        self.assertIn("AutomationControl.bypass('Gift_Allocation_Totals')", apex)
+        self.assertIn("GiftService.validateAllocations(splitGiftIds)", apex)
+        self.assertIn("Database.rollback(sp)", apex)
         self.assertIn("g.Amount__c - primary", apex)  # the second row is the remainder
         self.assertIn("* 70 / 100", apex)
         self.assertNotIn("%", apex.replace("%s", ""))  # no unformatted placeholder left
