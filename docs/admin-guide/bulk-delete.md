@@ -77,9 +77,10 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
   the detail records of a master-detail relationship (for example, every line of a record that
   owns its lines), and a few standard ones (deleting an account deletes its contacts). The
   preview lists these kinds of record. The undo brings them back with their parent.
-- **Emptied households can go too.** With **Delete empty households** on, deleting the last
-  people in a household also deletes the household. The undo brings that household back first,
-  so the people return into it.
+- **Emptied households.** In the simple way of belonging, a household whose last people you
+  delete is kept, even with **Delete empty households** on, so the undo can bring them back
+  into it. In the flexible way, that setting can delete the emptied household; the undo brings
+  it back first, so the people return into it.
 - **Objects BarnCRM keeps itself** cannot be bulk deleted: imports and their journal, import
   templates, the error log, settings and setting changes, automation settings, rollup
   definitions, duplicate dismissals, saved queries, household membership rows (use the

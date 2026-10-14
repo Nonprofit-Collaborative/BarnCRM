@@ -102,7 +102,9 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 
     /**
      * A delete recounts and renames the households the people left, and tidies away one left
-     * empty where the org asks for that.
+     * empty where the org asks for that, except a household a deleted person's own account is
+     * (R-H12). That household is kept: deleting it would purge the person from the Recycle
+     * Bin, and neither an undelete nor a bulk delete undo could bring them back.
      *
      * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled so
      * that nothing is lost (C-20). The merged-away person's memberships go to the survivor
@@ -131,10 +133,12 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
                 AutomationControl.clearBypass(MEMBER_HANDLER);
             }
         }
+        Set<Id> kept = new Set<Id>(keptByMerge);
+        kept.addAll(householdIds(gone));
         Set<Id> mayTidy = new Set<Id>(affected);
-        mayTidy.removeAll(keptByMerge);
+        mayTidy.removeAll(kept);
         refresh(mayTidy, true);
-        refresh(keptByMerge, false);
+        refresh(kept, false);
         if (!survivorByMerged.isEmpty()) {
             // The survivors' addresses, relationships and affiliations, once the merge is
             // saved (PEOPLE-15). Their households were settled above: none is in the merge.

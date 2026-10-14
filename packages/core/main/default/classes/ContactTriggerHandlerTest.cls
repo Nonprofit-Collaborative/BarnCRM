@@ -62,21 +62,32 @@ private class ContactTriggerHandlerTest {
     }
 
     @IsTest
-    static void deletingTheLastMemberTidiesTheHouseholdAway() {
+    static void deletingTheLastMemberKeepsTheHouseholdSoTheyCanBeRestored() {
         System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            Assert.isTrue(settings.Delete_Empty_Households__c, 'The tidy-up is on');
             Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
             insert maria;
             Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
-
-            Test.startTest();
             delete maria;
-            Test.stopTest();
-
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Account WHERE Id = :household],
-                'The empty household went too'
+                [SELECT Member_Count__c FROM Account WHERE Id = :household].Member_Count__c,
+                'The household is kept, recounted to nobody, because Maria was deleted, not moved'
+            );
+
+            Test.startTest();
+            undelete maria;
+            Test.stopTest();
+
+            Account restored = [SELECT Member_Count__c FROM Account WHERE Id = :household];
+            Assert.areEqual(1, restored.Member_Count__c, 'Maria is a member again');
+            Assert.areEqual(
+                household,
+                [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId,
+                'Maria came back into her household'
             );
         }
     }
