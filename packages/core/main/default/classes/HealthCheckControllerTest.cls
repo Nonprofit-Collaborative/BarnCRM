@@ -202,6 +202,114 @@ private class HealthCheckControllerTest {
         }
     }
 
+    @IsTest
+    static void switchingMembershipIsRefusedWhileAPersonIsLinkedStraightToAHousehold() {
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert household;
+            insert AddressTestDataFactory.newContact('Maria', 'Garcia', household.Id);
+
+            System.runAs(maria) {
+                Boolean refused = false;
+                try {
+                    HealthCheckController.applyJunctionMembership();
+                } catch (AuraHandledException e) {
+                    refused = true;
+                }
+
+                Assert.isTrue(refused, 'The switch would strand that person, so it is refused.');
+                SettingsService.clearCaches();
+                Assert.areEqual(
+                    CoexistenceService.MEMBERSHIP_CONTACT,
+                    CoexistenceService.getMembershipMode(),
+                    'Nothing changed.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void takingTheRecommendationIsRefusedWhileItWouldStrandAPerson() {
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+            // The org has not chosen how people belong to households, so the recommendation
+            // would choose the junction for it.
+            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+            insert household;
+            insert AddressTestDataFactory.newContact('Maria', 'Garcia', household.Id);
+
+            System.runAs(maria) {
+                OrgShapeDetector.overrideShape = personAccountsShape();
+                String before = CoexistenceService.getCurrentMode();
+                Boolean refused = false;
+                try {
+                    HealthCheckController.applyRecommendedMode();
+                } catch (AuraHandledException e) {
+                    refused = true;
+                }
+
+                Assert.isTrue(refused, 'The recommendation moves membership, which is refused.');
+                SettingsService.clearCaches();
+                Assert.areEqual(
+                    before,
+                    CoexistenceService.getCurrentMode(),
+                    'The mode is as it was.'
+                );
+                Assert.areEqual(
+                    CoexistenceService.MEMBERSHIP_CONTACT,
+                    CoexistenceService.getMembershipMode(),
+                    'So is how people belong to households.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void aFixThatCannotSaveIsRefusedAndLoggedForEachButton() {
+        System.runAs(TestUsers.admin()) {
+            User maria = HealthCheckTestHelper.mariaWithManageSettings();
+            BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
+                HouseholdTestDataFactory.MODE_CONTACT
+            );
+            settings.Auto_Create_Households__c = false;
+            HouseholdTestDataFactory.save(settings);
+
+            System.runAs(maria) {
+                OrgShapeDetector.overrideShape = npspShape();
+                Test.startTest();
+                Test.setReadOnlyApplicationMode(true);
+                Integer refused = 0;
+                try {
+                    HealthCheckController.applyRecommendedMode();
+                } catch (AuraHandledException e) {
+                    refused++;
+                }
+                try {
+                    HealthCheckController.applyJunctionMembership();
+                } catch (AuraHandledException e) {
+                    refused++;
+                }
+                try {
+                    HealthCheckController.enableAutomaticHouseholds();
+                } catch (AuraHandledException e) {
+                    refused++;
+                }
+                Test.setReadOnlyApplicationMode(false);
+                Test.stopTest();
+
+                Assert.areEqual(3, refused, 'Each button reports a failure rather than crashing.');
+                SettingsService.clearCaches();
+                Assert.areNotEqual(
+                    true,
+                    SettingsService.getSettings().Auto_Create_Households__c,
+                    'The failed fix changed nothing.'
+                );
+            }
+        }
+    }
+
     private static OrgShapeDetector.OrgShape npspShape() {
         OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
         shape.hasNpsp = true;

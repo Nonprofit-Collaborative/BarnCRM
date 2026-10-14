@@ -272,6 +272,137 @@ private class MergeSettlementTest {
     }
 
     @IsTest
+    static void aPartThatFailsDoesNotStopTheOthersOrTheNextAttempt() {
+        System.runAs(TestUsers.admin()) {
+            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+            Contact kept = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert kept;
+            AutomationControl.bypass(ADDRESS_PROPAGATION);
+            insert new List<Address__c>{
+                defaultAddress(kept.Id, '1 Main Street', 'Oakland'),
+                defaultAddress(kept.Id, '2 Oak Avenue', 'Berkeley')
+            };
+            AutomationControl.clearBypass(ADDRESS_PROPAGATION);
+            insertRelationships(
+                new List<Relationship__c>{ RelationshipTestDataFactory.between(kept, kept, 'Friend') }
+            );
+            Set<Id> ids = new Set<Id>{ kept.Id };
+
+            Test.startTest();
+            Test.setReadOnlyApplicationMode(true);
+            new MergeSettlement(new Set<Id>(), ids, ids).execute(null);
+            Test.setReadOnlyApplicationMode(false);
+            Test.stopTest();
+
+            Assert.areEqual(
+                2,
+                [SELECT COUNT() FROM Address__c WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE],
+                'Where nothing can be saved, nothing is changed and nothing is thrown'
+            );
+            Assert.areEqual(
+                1,
+                RelationshipTestDataFactory.allRelationships().size(),
+                'The self relationship is still there'
+            );
+
+            new MergeSettlement(new Set<Id>(), ids, ids).execute(null);
+
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Address__c WHERE Contact__c = :kept.Id AND Is_Default__c = TRUE],
+                'The next attempt settles the address'
+            );
+            Assert.areEqual(
+                0,
+                RelationshipTestDataFactory.allRelationships().size(),
+                'And the self relationship'
+            );
+        }
+    }
+
+    private class Idle implements Queueable {
+        public void execute(QueueableContext context) {
+            return;
+        }
+    }
+
+    /** Runs afterMerge from inside a Queueable, where the one chained job is not ours to take. */
+    private class MergesInsideAQueueable implements Queueable {
+        private final Id survivorId;
+
+        MergesInsideAQueueable(Id survivorId) {
+            this.survivorId = survivorId;
+        }
+
+        public void execute(QueueableContext context) {
+            MergeSettlement.afterMerge(new Set<Id>(), new Set<Id>{ survivorId }, new Set<Id>());
+        }
+    }
+
+    private static List<Error_Log__c> settlementWarnings() {
+        return [
+            SELECT Message__c, Severity__c
+            FROM Error_Log__c
+            WHERE Context__c = :Label.Core_Households_ErrorContextMergeSettle
+        ];
+    }
+
+    @IsTest
+    static void nothingToSettleQueuesNothing() {
+        System.runAs(TestUsers.admin()) {
+            MergeSettlement.afterMerge(new Set<Id>(), new Set<Id>(), new Set<Id>());
+
+            Assert.isNull(MergeSettlement.lastQueued, 'No survivors, no job');
+            Assert.areEqual(0, Limits.getQueueableJobs());
+        }
+    }
+
+    @IsTest
+    static void aMergeWithNoQueueableJobsLeftNamesTheSurvivorsInTheErrorLog() {
+        System.runAs(TestUsers.admin()) {
+            Contact survivor = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert survivor;
+            Test.startTest();
+            for (Integer i = 0; i < Limits.getLimitQueueableJobs(); i++) {
+                System.enqueueJob(new Idle());
+            }
+
+            MergeSettlement.afterMerge(
+                new Set<Id>(),
+                new Set<Id>{ survivor.Id },
+                new Set<Id>{ survivor.Id }
+            );
+            Test.stopTest();
+
+            Assert.isNull(MergeSettlement.lastQueued, 'No job was queued');
+            List<Error_Log__c> warnings = settlementWarnings();
+            Assert.areEqual(1, warnings.size(), 'The survivors are named once');
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, warnings[0].Severity__c);
+            Assert.isTrue(
+                warnings[0].Message__c.contains(String.valueOf(survivor.Id)),
+                'So an administrator can check them: ' + warnings[0].Message__c
+            );
+        }
+    }
+
+    @IsTest
+    static void aMergeInsideAQueueableIsNamedNotQueued() {
+        System.runAs(TestUsers.admin()) {
+            Contact survivor = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+            insert survivor;
+
+            Test.startTest();
+            System.enqueueJob(new MergesInsideAQueueable(survivor.Id));
+            Test.stopTest();
+
+            Assert.isNull(MergeSettlement.lastQueued, 'The running Queueable keeps its chain');
+            List<Error_Log__c> warnings = settlementWarnings();
+            Assert.areEqual(1, warnings.size());
+            Assert.isTrue(warnings[0].Message__c.contains(String.valueOf(survivor.Id)));
+        }
+    }
+
+    @IsTest
     static void aMergeQueuesOneJobNamingItsSurvivors() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);

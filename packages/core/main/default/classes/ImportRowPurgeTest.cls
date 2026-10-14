@@ -168,6 +168,42 @@ private class ImportRowPurgeTest {
     }
 
     @IsTest
+    static void rowsThatCannotBeDeletedAreLoggedOncePerChunkAndTheJobFinishes() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = ImportTestDataFactory.template(
+                ImportTestDataFactory.donorMapping(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            Import_Batch__c old = finishedBatch(template, 100);
+            List<Import_Row__c> rows = [
+                SELECT Id
+                FROM Import_Row__c
+                WHERE Import_Batch__c = :old.Id
+            ];
+            // Gone before the chunk runs, so every delete in it is refused.
+            delete rows;
+
+            Test.startTest();
+            ImportRowPurgeBatch purge = new ImportRowPurgeBatch();
+            purge.execute(null, rows);
+            purge.finish(null);
+            Test.stopTest();
+
+            List<Error_Log__c> entries = [
+                SELECT Message__c, Severity__c
+                FROM Error_Log__c
+                WHERE Context__c = 'ImportRowPurgeBatch'
+            ];
+            Assert.areEqual(1, entries.size(), 'One entry for the chunk, not one per row');
+            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, entries[0].Severity__c);
+            Assert.isTrue(
+                entries[0].Message__c.contains(String.valueOf(rows.size())),
+                'It says how many rows were not removed: ' + entries[0].Message__c
+            );
+        }
+    }
+
+    @IsTest
     static void theCleanupIsScheduledOnceAndListedAsANightlyJob() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();

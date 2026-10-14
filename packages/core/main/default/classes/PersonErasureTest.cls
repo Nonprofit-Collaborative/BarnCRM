@@ -622,6 +622,88 @@ private class PersonErasureTest {
         Assert.isTrue(text.startsWith('Cleared | Contact | 1 | Email, Phone | '), text);
     }
 
+    @IsTest
+    static void installedModulesAreFoundByNameAfterTheInjectedOnes() {
+        PersonErasureExtensions.noneForTest = false;
+        PersonErasureExtensions.overrides.add(new KeepsDepartment());
+        Boolean givingThere = Type.forName('GivingPersonErasureExtension') != null;
+
+        List<PersonErasureExtension> found = PersonErasureExtensions.installed();
+
+        Assert.areEqual(givingThere ? 2 : 1, found.size(), 'The Giving module is asked for by name');
+        Assert.isTrue(found[0] instanceof KeepsDepartment, 'Injected ones come first');
+    }
+
+    @IsTest
+    static void aModuleThatDoesNotImplementTheInterfaceRefusesTheErasure() {
+        PersonErasureExtensions.noneForTest = false;
+        PersonErasureExtensions.EXTENSION_CLASSES.add('PersonErasureTest.NotAnExtension');
+
+        Test.startTest();
+        try {
+            PersonErasureExtensions.installed();
+            Assert.fail('An installed module that cannot be used refuses the erasure');
+        } catch (PersonErasure.ErasureException refused) {
+            Assert.isTrue(
+                refused.getMessage().contains('PersonErasureTest.NotAnExtension'),
+                'Names the module: ' + refused.getMessage()
+            );
+        }
+        Test.stopTest();
+        List<Error_Log__c> entries = [
+            SELECT Message__c
+            FROM Error_Log__c
+            WHERE Context__c = 'PersonErasureExtensions.resolve'
+        ];
+        Assert.areEqual(1, entries.size(), 'The reason is logged');
+        Assert.isTrue(
+            entries[0].Message__c.contains('does not implement PersonErasureExtension'),
+            'It says why: ' + entries[0].Message__c
+        );
+    }
+
+    @IsTest
+    static void aModuleThatCannotBeBuiltRefusesTheErasure() {
+        PersonErasureExtensions.noneForTest = false;
+        PersonErasureExtensions.EXTENSION_CLASSES.add('PersonErasureTest.CannotBuild');
+
+        Test.startTest();
+        try {
+            PersonErasureExtensions.installed();
+            Assert.fail('An installed module that cannot be built refuses the erasure');
+        } catch (PersonErasure.ErasureException refused) {
+            Assert.isTrue(
+                refused.getMessage().contains('PersonErasureTest.CannotBuild'),
+                'Names the module: ' + refused.getMessage()
+            );
+        }
+        Test.stopTest();
+        Assert.areEqual(
+            1,
+            [
+                SELECT COUNT()
+                FROM Error_Log__c
+                WHERE Context__c = 'PersonErasureExtensions.resolve'
+            ],
+            'The reason is logged'
+        );
+    }
+
+    public class NotAnExtension {
+    }
+
+    public class CannotBuild implements PersonErasureExtension {
+        public CannotBuild() {
+            throw new PersonErasure.ErasureException('No way to build this');
+        }
+        public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
+            return new Set<Schema.SObjectField>();
+        }
+        public List<PersonErasure.Change> erase(Id personId) {
+            return new List<PersonErasure.Change>();
+        }
+    }
+
     private class KeepsDepartment implements PersonErasureExtension {
         public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
             return new Set<Schema.SObjectField>{ Contact.Department };
