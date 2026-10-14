@@ -575,7 +575,16 @@ the same dry run, results, journal and undo as any import.
    of that object you may create or edit.
 4. For a column that fills a lookup (a field that points at another record), a second picker
    says how the file names that record: **Salesforce record ID** (the default), the record's
-   name, or one of its ID fields marked External ID or Unique.
+   name, or any of its text, email or phone fields you may read (for example a program code or
+   an organization's phone number). Matching is exact, ignoring case and the spaces around the
+   value, so a phone number matches only when the file writes it the way the record holds it:
+   "(555) 123-4567" does not find "555-123-4567".
+
+   **Large objects.** Salesforce finds a record quickly by its ID, its name, an email, and a
+   field marked External ID or Unique. Matching by any other field reads the whole object, so
+   on an object holding more than 100,000 records you can see, the dry run is refused and names
+   the field. Choose one of those fields instead, or ask your Salesforce administrator to mark
+   the field External ID.
 5. On the next step choose what each row does:
 
 | Choice | What it does | What it risks |

@@ -1909,13 +1909,20 @@ by record Id only (R-IT14).
 
 **R-IT13 Lookup columns.** A column mapped to a lookup field of the target object names its
 parent by the column's `lookupField` (R-IT1): the record ID when it is empty or `Id`, or else
-the parent's name field or one of the parent's External ID or Unique fields that holds text or
-an email and that the user may read. A lookup that can point at more than one object is read by
-record ID only. Parents are found in user mode, one query per column and chunk, and a parent the
-user cannot see is not found. When none is found, Lookup Not Found decides: Reject the row (the
-default), naming the column and the value, or Leave it empty, loading the rest of the row and
-saying once in the run log that lookups were left empty. A value that finds several parents
-follows Several Matches (R-IT9) and ticks the row's Several Matches.
+the parent's name field or any of the parent's text, email or phone fields that the user may
+read and filter on, compared ignoring case and surrounding spaces. A lookup that can point at
+more than one object is read by record ID only. Parents are found in user mode, one query per
+column and chunk, and a parent the user cannot see is not found. When none is found, Lookup Not
+Found decides: Reject the row (the default), naming the column and the value, or Leave it empty,
+loading the rest of the row and saying once in the run log that lookups were left empty. A value
+that finds several parents follows Several Matches (R-IT9) and ticks the row's Several Matches.
+
+The large object guard: a field the platform indexes (the record ID, the name field, a field
+marked External ID or Unique, and a standard Email field) may always be matched on. Any other
+field a lookup or the template's record key names is matched only when its object holds at most
+100,000 records the user can see, counted in user mode with a capped count, once per object per
+transaction; above that the template is refused (dry run and every chunk alike), naming the
+field and the object, because an unindexed search of a large object is slow and can time out.
 
 **R-IT14 What a load may write.** An object may be loaded only when all of these hold, decided
 from describe at run time, so a new object is judged without a code change:
@@ -6887,6 +6894,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Core quality pass, import (D-40). No object added. `BarnCRM_Settings__c` gains `Import_Row_Retention_Days__c` (v0.7 keys table, Import section). R-IR5: staged rows are deleted nightly once their batch finished more than that many days ago, and a batch without its rows cannot run again. |
 | v0.6 | 2026-10-13 | Core quality pass, import (number reading). No object or field added. R-IT11: numbers are read as spreadsheets export them in the user's locale (currency symbols and codes, grouping marks, accounting brackets); a value whose decimal mark cannot be told is refused. |
 | v0.6 | 2026-10-13 | Trial import (data tools parity rank 4). `Import_Batch__c` gains `Trial_Rows__c` and the Status value Trial complete; BarnCRM Settings gains `Import_Trial_Rows__c` (default 25). New rule R-IB16: commit the first N rows, then the remaining rows into the same batch, one undo for both. |
+| v0.6 | 2026-10-13 | Load one object lookups by any field (data tools parity). No object or field added. R-IT13: a lookup may name its parent by any text, email or phone field the user may read and filter on, and the large object guard refuses an unindexed field on an object over 100,000 records. |
 
 ---
 ## 32. Entity ownership by package
