@@ -9,22 +9,6 @@
         <value>Remove {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Phrase</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup filter in words: {0} field, {1} operator words, {2} values</shortDescription>
-        <value>{0} {1} {2}</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_PhraseNoValue</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup filter in words, no value: {0} field, {1} operator words</shortDescription>
-        <value>{0} {1}</value>
-    </labels>
-    <labels>
         <fullName>Core_Households_LateName</fullName>
         <categories>Households</categories>
         <language>en_US</language>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>When instant totals are calculated</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Rollup_Processing__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">BarnCRM_Settings__c</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
+    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">Background:Just after the save (recommended);In_Save:During the save</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">When totals in Instantly and Both mode are recalculated. Just after the save keeps every save fast and totals catch up within a minute. During the save updates them before the page refreshes, but makes each save slower and can make a save with a lot of automation fail.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">15</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+</CustomMetadata>

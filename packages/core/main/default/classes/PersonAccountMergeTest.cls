@@ -2,8 +2,8 @@
  * C-20: merging two people stored as accounts, in junction mode, keeps what the merged-away
  * person had. Their memberships go to the survivor, every household keeps exactly one current
  * primary member and its Primary Contact mirrors it (R-M3, ADR-0044), a household the merge
- * leaves empty is kept, and the survivors' real-time totals are recalculated for the
- * survivors only.
+ * leaves empty is kept, and the rollup engine, when the Rollup Builder module is there, is
+ * asked to recalculate the survivors only (ADR-NEXT; a stub stands in for the module).
  *
  * The first tests set the person overrides, so they hold on every org shape; the last one
  * needs real person accounts and returns early on an org without them.
@@ -13,6 +13,32 @@ private class PersonAccountMergeTest {
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
+    }
+
+    /** Records which survivors Core asked the engine to recalculate. */
+    private class RecordingEngine implements RollupEngineExtension {
+        public Map<String, Set<Id>> survivorsByObject = new Map<String, Set<Id>>();
+        public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+            return;
+        }
+        public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+            survivorsByObject.put(targetObject, survivorIds);
+        }
+        public void startQueuedRecalculation() {
+            return;
+        }
+        public void processPending() {
+            return;
+        }
+        public Datetime lastCalculated() {
+            return null;
+        }
+        public Boolean isStale() {
+            return false;
+        }
+        public Map<String, Set<String>> targetFieldsByObject() {
+            return new Map<String, Set<String>>();
+        }
     }
 
     @IsTest
@@ -82,19 +108,8 @@ private class PersonAccountMergeTest {
             Account bea = new Account(Name = 'Bea Lindqvist');
             insert new List<Account>{ ana, bea };
             Map<Id, Id> contactBehind = contactsBehind(ana, bea);
-            // A real-time total on the person contact, the record a gift names a person by.
-            insert new Rollup_Definition__c(
-                Name = 'Person total',
-                Definition_Key__c = 'Core_Person_Merge_Live',
-                Source_Object__c = 'Household_Member__c',
-                Target_Object__c = 'Contact',
-                Relationship_Path__c = 'Contact__c',
-                Aggregate__c = 'COUNT',
-                Target_Field__c = 'Member_Count__c',
-                Mode__c = RollupService.MODE_BOTH,
-                Fiscal_Year_Aware__c = false,
-                Active__c = true
-            );
+            RecordingEngine engine = new RecordingEngine();
+            RollupEngineExtensions.extensionOverride = engine;
 
             Test.startTest();
             Database.merge(ana, bea.Id);
@@ -102,8 +117,8 @@ private class PersonAccountMergeTest {
 
             Assert.areEqual(
                 new Set<Id>{ contactBehind.get(ana.Id) },
-                RollupService.lastParentIds,
-                'Only the survivor person contact is recalculated, not every record the total covers'
+                engine.survivorsByObject.get('Contact'),
+                'Only the survivor person contact is recalculated, the record a gift names a person by'
             );
             Assert.areEqual(
                 0,

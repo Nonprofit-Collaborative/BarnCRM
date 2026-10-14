@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Rollups_PageTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the Rollups page in the BarnCRM Settings console.</shortDescription>
+        <value>Rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_PageIntro</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Intro line on the Rollups page.</shortDescription>
+        <value>Every total BarnCRM keeps up to date for you, and when each one was last calculated.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ColumnRollup</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column heading for the rollup name and description.</shortDescription>
+        <value>Rollup</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ColumnCounts</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column heading for the source of a rollup.</shortDescription>
+        <value>What it counts</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_CountsSeparatedBy</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Added to what a text list counts: {0} is the delimiter, such as semicolon.</shortDescription>
+        <value>separated by {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ColumnMode</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column heading for when a rollup is recalculated.</shortDescription>
+        <value>Mode</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ColumnActive</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column heading for the active toggle.</shortDescription>
+        <value>Active</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ColumnLastCalculated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Column heading for the time a rollup last completed.</shortDescription>
+        <value>Last calculated</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_RecalculateAll</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that recalculates every rollup for one kind of record.</shortDescription>
+        <value>Recalculate all</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_RecalculateStarted</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Message shown when a recalculation is started.</shortDescription>
+        <value>Recalculation started. This page updates as it finishes.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ScheduleNightly</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that creates the nightly recalculation schedule.</shortDescription>
+        <value>Schedule nightly recalculation</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ScheduleActive</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Status shown when the nightly schedule exists.</shortDescription>
+        <value>Nightly recalculation is scheduled for 2:00 AM.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ScheduleMissing</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Status shown when the nightly schedule does not exist.</shortDescription>
+        <value>Nightly recalculation is not scheduled yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ReadOnly</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Message shown to a user without the settings permission.</shortDescription>
+        <value>You can see these totals but not change them. Ask an administrator for the Manage BarnCRM Settings permission.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorNoPermission</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error returned when a user without the permission tries to change a rollup.</shortDescription>
+        <value>You do not have permission to change rollups.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorUnknownDefinition</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error returned when a rollup id does not resolve.</shortDescription>
+        <value>That rollup no longer exists. Refresh the page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorInvalidMode</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error returned when a mode value is not one of the three.</shortDescription>
+        <value>That is not a rollup mode. Choose Instantly, Every night, or Both (recommended).</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorUnknownObject</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Info logged when a rollup names an object the org does not have.</shortDescription>
+        <value>The records this rollup counts are not in this org, so it was skipped.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsCheckbox</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Any or None is set to fill a field that is not a checkbox.</shortDescription>
+        <value>Any and None show their answer in a checkbox field. Choose a checkbox field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsText</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a text list is set to fill a field that is not text.</shortDescription>
+        <value>A text list shows its answer in a text field. Choose a text or long text field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNeedsNumber</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when Count distinct is set to fill a field that is not a number.</shortDescription>
+        <value>Count distinct shows its answer in a number field. Choose a number field for this rollup, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorCheckboxTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a checkbox field is given a calculation other than Any or None.</shortDescription>
+        <value>A checkbox field can show only Any or None. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTextTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a text field is given a calculation that does not produce text.</shortDescription>
+        <value>A text field can show only First, Last or a text list. Choose one of those calculations, or choose another field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetType</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the field chosen to show a rollup cannot hold its calculation.</shortDescription>
+        <value>That field cannot show this calculation. Choose a number, currency, percent or date field, or choose another calculation.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorTargetNotWritable</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when the field chosen to show a rollup is missing or cannot be written.</shortDescription>
+        <value>BarnCRM cannot write to the field this rollup fills. Choose a field that exists and is not a formula or read only.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorSourceFieldNeeded</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error when a calculation that reads a field on each record has no Source Field.</shortDescription>
+        <value>This calculation reads a field on each record. Fill in Source Field with the field to read.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_Recalculate</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recalculate one rollup</shortDescription>
+        <value>Recalculate</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_StopSchedule</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stop the nightly schedule</shortDescription>
+        <value>Stop the nightly recalculation</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_RestoreDefaults</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Restore the shipped rollups</shortDescription>
+        <value>Restore shipped rollups</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_EmptyList</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No rollups yet</shortDescription>
+        <value>No rollups are set up yet. Restore the shipped rollups to start with the ones BarnCRM provides.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ColumnTarget</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Target column heading</shortDescription>
+        <value>Where it shows</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_NeverCalculated</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Never calculated</shortDescription>
+        <value>Not calculated yet</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_UnexpectedError</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Unexpected rollup error</shortDescription>
+        <value>Something went wrong on the Rollups page. The Error Log has the details.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueSaveFailed</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: a record's totals could not be saved; {0} is the reason</shortDescription>
+        <value>The totals could not be saved: {0} BarnCRM tries again automatically, and the nightly run puts them right if it still cannot.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueRunStopped</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: a background recalculation stopped; {0} is the reason</shortDescription>
+        <value>The background recalculation stopped before it finished: {0} BarnCRM tries these records again, a few at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueHeldByBatch</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollup Queue: an entry held by the large record background job</shortDescription>
+        <value>These records have too many rows behind their totals for one background run, so a separate background job is recalculating them a few thousand rows at a time. If they are still waiting an hour after that job last made progress, it stopped before it finished, and BarnCRM tries again.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_QueueRunSummary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: queued totals not saved; {0} is the record count</shortDescription>
+        <value>{0} records' totals could not be saved in the background and wait in the Rollup Queue. They are tried again automatically; after five tries they wait for Retry.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunPaused</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: full recalculation skipped while automation is paused.</shortDescription>
+        <value>The rollup recalculation did not run because all automation is paused. It runs again tonight, or click Recalculate all once automation is back on.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunSummary</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: full run incomplete; {0} records not saved, {1} batches stopped</shortDescription>
+        <value>The rollup recalculation finished, but {0} records' totals could not be saved and {1} batches of records stopped before they finished. The saves are tried again automatically; rollups whose records stopped are not marked calculated and are put right by the next run.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunAlreadyRunning</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rollups page: a full recalculation is already running.</shortDescription>
+        <value>A full recalculation is already running. Its totals will be on the records when it finishes, so try again after that.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunAlreadyRunningLog</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: full run not started, one running; {0} is the job Id</shortDescription>
+        <value>A rollup recalculation did not start because another one was still running (job {0}). The running one brings the totals up to date.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FullRunChunkQueued</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log: a stopped chunk's records were queued; {0} is the count</shortDescription>
+        <value>Part of a rollup recalculation stopped before it finished. The totals of its {0} records are recalculated in the background within minutes.</value>
+    </labels>
+</CustomLabels>

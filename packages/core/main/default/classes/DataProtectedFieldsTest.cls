@@ -31,7 +31,8 @@ private class DataProtectedFieldsTest {
                 refusal(Error_Log__c.SObjectType),
                 refusal(Setting_Change__c.SObjectType),
                 refusal(Automation_Setting__c.SObjectType),
-                refusal(Rollup_Definition__c.SObjectType)
+                refusal(Duplicate_Dismissal__c.SObjectType),
+                refusal(Saved_Query__c.SObjectType)
             };
             Test.stopTest();
 
@@ -153,9 +154,6 @@ private class DataProtectedFieldsTest {
             Test.startTest();
             Set<String> accountFields = DataProtectedFields.fieldNames(Account.SObjectType);
             Set<String> contactFields = DataProtectedFields.fieldNames(Contact.SObjectType);
-            Set<String> rollupFields = DataProtectedFields.fieldNames(
-                Rollup_Definition__c.SObjectType
-            );
             Test.stopTest();
 
             for (
@@ -179,10 +177,6 @@ private class DataProtectedFieldsTest {
             Assert.isTrue(
                 contactFields.contains('primary_affiliation__c'),
                 'A primary affiliation is kept by the affiliation upkeep.'
-            );
-            Assert.isTrue(
-                rollupFields.contains('last_calculated__c'),
-                'A Last Calculated stamp is the package own.'
             );
             Assert.isFalse(accountFields.contains('name'), 'An account name is not kept as such.');
             Assert.isFalse(contactFields.contains('email'), 'Nor an email.');

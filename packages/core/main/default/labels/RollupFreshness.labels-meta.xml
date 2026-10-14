@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Rollups_FreshnessTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Title of the rollup freshness tile on the Hub home page.</shortDescription>
+        <value>Rollups last completed</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FreshnessNever</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Freshness tile text when nothing has been calculated.</shortDescription>
+        <value>Rollups have not been calculated yet.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FreshnessStale</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Freshness tile warning text.</shortDescription>
+        <value>Rollups have not been calculated in more than 36 hours. Open the Rollups page to start them.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_FreshnessLink</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Link from the freshness tile to the Rollups page.</shortDescription>
+        <value>Open the Rollups page</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorInvalidOperator</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error returned when a filter document names an unsupported operator.</shortDescription>
+        <value>That filter uses a comparison BarnCRM does not understand. Rebuild the filter on the Rollups page.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Rollups_ErrorInvalidFilter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error returned when a filter document cannot be parsed.</shortDescription>
+        <value>That filter could not be read. Rebuild the filter on the Rollups page.</value>
+    </labels>
+</CustomLabels>

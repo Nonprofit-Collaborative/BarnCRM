@@ -9,7 +9,8 @@
 # about which of 982 things caused it. Deploying Core before Giving means the next such
 # failure names a stage.
 #
-# It also matches how the packages actually depend on each other: Giving depends on Core.
+# It also matches how the packages actually depend on each other: the Rollup Builder module
+# depends on Core, and Giving depends on both.
 #
 # WHY CORE IS SEVERAL STAGES. docs/contributor-guide/ci.md records this same failure
 # hitting the undivided Core stage four times across four separate runs before 2026-09-09:
@@ -462,20 +463,25 @@ deploy_stage "Core (UI and permissions)" \
   "packages/core/main/default/prompts" || exit $?
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
+  # The Rollup Builder module depends on Core only, and Giving depends on it (ADR-NEXT
+  # NEXT-rollup-builder-module.md), so it goes between them. --core-only leaves it out, which is
+  # how a Core-only org (no rollup engine at all) is built.
+  deploy_stage "Rollup Builder" "packages/rollups" || exit $?
   deploy_stage "Giving" "packages/giving" || exit $?
   # Connect depends on Core and Giving (plan Section 4.1), so it goes last.
   deploy_stage "Connect" "packages/connect" || exit $?
-fi
 
-# A deployment is not an install, so neither post-install script runs here and the shipped
-# rollup definitions would not exist in a development org (ADR-0029). This is the same call
-# CorePostInstall and GivingPostInstall make, run once the last stage is in, so a development
-# org holds the rollups a real install would have. It creates only what is missing.
-echo ""
-echo "== Creating the shipped rollup definitions =="
-if ! printf '%s\n' 'RollupService.ensureDefaults();' | sf apex run --target-org "$ALIAS"; then
-  echo "The rollup definitions were not created. Nothing else is affected: the Restore shipped"
-  echo "rollups button on the Rollups page runs exactly the same step."
+  # A deployment is not an install, so no post-install script runs here and the shipped rollup
+  # definitions would not exist in a development org (ADR-0029). This is the same call
+  # RollupsPostInstall and GivingPostInstall make, run once the last stage is in, so a
+  # development org holds the rollups a real install would have. It creates only what is
+  # missing. A Core-only org has no engine, so there is nothing to call.
+  echo ""
+  echo "== Creating the shipped rollup definitions =="
+  if ! printf '%s\n' 'RollupService.ensureDefaults();' | sf apex run --target-org "$ALIAS"; then
+    echo "The rollup definitions were not created. Nothing else is affected: the Restore shipped"
+    echo "rollups button in the Rollup Builder runs exactly the same step."
+  fi
 fi
 
 echo ""

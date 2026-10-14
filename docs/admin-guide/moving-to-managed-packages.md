@@ -48,7 +48,7 @@ had none).
 2. **Log the computer into the org.** Run `sf org login web --alias pilot` and sign in as the
    administrator. For the rehearsal, add `--instance-url https://test.salesforce.com`.
 3. **Build the mapping.** From the repository folder, run
-   `python3 scripts/migration/build_mapping.py --packages core,giving,connect --output mapping.json`,
+   `python3 scripts/migration/build_mapping.py --packages core,rollups,giving,connect --output mapping.json`,
    listing the BarnCRM packages you have installed. It prints how many kinds of record it will
    copy and which it leaves out, and why.
 4. **Write down your settings.** Open **BarnCRM Settings** and go through every section. Step 7

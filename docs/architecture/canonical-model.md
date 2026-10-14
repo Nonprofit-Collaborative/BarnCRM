@@ -1339,7 +1339,9 @@ configuration surface of the rollup engine (plan Section 4.10, feature C-13). An
 administrator creates and edits these with a filter builder, and never types SOQL (plan
 Section 2.3), in the Rollup Builder, a tab of its own where every rollup, shipped or
 admin-made, is created and edited (`decisions/0082-barncrm-owns-its-rollup-engine.md`). The
-Rollups page of the settings console lists them with the same switches and links to it.
+Rollups section of the settings console opens it. The engine, this entity, the Rollup Queue
+(Section 14A) and the shipped defaults type belong to the BarnCRM Rollup Builder module, not
+Core (`decisions/NEXT-rollup-builder-module.md`).
 
 ### Attributes
 
@@ -7248,6 +7250,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Rollup queue row budget (ADR-0116, 25,000 row gift import scale test). No object or field added. R-RQ6: a record's estimate reads the stored totals of every active COUNT definition on its entity, not only those the run calculates, so a large parent whose entries name only a SUM or MAX still goes to the batch. R-RQ3: rows a run's recalculation of one entity read count against its row budget in place of their estimate. Before this two Rollup Queue runs stopped on "Too many query rows: 50001" while a fund's allocations rose to 25,000. |
 | v0.6 | 2026-10-14 | Rollup queue row ceiling (ADR-0116, 25,000 row scale rerun). No object or field added. R-RQ6: a queue run measures what each query of an entity's recalculation read, and before a further query would pass four fifths of the query row limit it stops, writes nothing and sends that entity's records to the large parent batch. Before this a fund whose stored count was stale (3,200 of 26,102 allocations) was estimated small, its second query stopped four runs on "Too many query rows: 50001", and it was narrowing towards Failed. |
 | v0.6 | 2026-10-14 | Editions, features, modules and first-run setup (ADR-0124, `0124-edition-gates-visibility.md`). New field `Features_Turned_On__c` on BarnCRM Settings (the Core features turned on; one-way). New shipped type `BarnCRM_Module__mdt` (`Editions__c`, `Package_Folder__c`, `Install_Version_Id__c`, `Sort_Order__c`, `Probe_Object__c`, `App_Name__c`): which editions offer each module, replacing the module list and installer Ids held in Apex. |
+| v0.6 | 2026-10-14 | The rollup engine leaves Core for the BarnCRM Rollup Builder module (ADR-NEXT, `NEXT-rollup-builder-module.md`). No object or field added or renamed. Rollup Definition, Rollup Queue, Rollup Run Lock, `Rollup_Queue_Ready__e` and Rollup Definition Default (shipped default) move to `packages/rollups` with their API names unchanged (Section 32). Core reaches the engine only through `RollupEngineExtension`. `Rollup_Mode_Default__c` and `Rollup_Processing__c` stay on `BarnCRM_Settings__c` until the module's own settings object is added. |
 
 ---
 ## 32. Entity ownership by package
@@ -7266,10 +7269,11 @@ included; standard objects the packages extend are named by the entity that gove
 | BarnCRM Settings | Core | v0.1, extended v0.2, v0.3, v0.5 and v0.6 | 12 |
 | Naming Pattern (shipped default) | Core | v0.1 | 13 |
 | Automation Registry (shipped default) | Core | v0.1 | 13 |
-| Rollup Definition | Core | v0.2 | 14 |
-| Rollup Queue | Core | v0.6 (rollup engine) | 14A |
-| Rollup Run Lock | Core | v0.6 (rollup engine) | 14A |
-| Rollup Definition Default (shipped default) | Core | v0.2 | 13 |
+| Rollup Definition | BarnCRM Rollup Builder (Core until ADR-NEXT) | v0.2, moved 2026-10-14 | 14 |
+| Rollup Queue | BarnCRM Rollup Builder (Core until ADR-NEXT) | v0.6 (rollup engine), moved 2026-10-14 | 14A |
+| Rollup Run Lock | BarnCRM Rollup Builder (Core until ADR-NEXT) | v0.6 (rollup engine), moved 2026-10-14 | 14A |
+| Rollup Queue Ready (platform event) | BarnCRM Rollup Builder (Core until ADR-NEXT) | v0.6 (rollup engine), moved 2026-10-14 | 14A |
+| Rollup Definition Default (shipped default) | BarnCRM Rollup Builder (Core until ADR-NEXT) | v0.2, moved 2026-10-14 | 13 |
 | Import Template | Core | v0.2 | 15 |
 | Import Template Default (shipped default) | Core | v0.2 | 13 |
 | Import Batch | Core | v0.2 | 16 |

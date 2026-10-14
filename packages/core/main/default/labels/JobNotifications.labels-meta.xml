@@ -185,14 +185,6 @@
         <value>The sample data load stopped part way. The Error Log says why. Remove what loaded, then load it again.</value>
     </labels>
     <labels>
-        <fullName>Core_JobNotice_RollupsBody</fullName>
-        <categories>Job Notifications</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup run notice; {0} records updated, {1} not saved, {2} batches stopped</shortDescription>
-        <value>{0} records' totals updated. {1} could not be saved and {2} batches stopped; those are tried again automatically.</value>
-    </labels>
-    <labels>
         <fullName>Core_JobNotice_HouseholdNamingBody</fullName>
         <categories>Job Notifications</categories>
         <language>en_US</language>

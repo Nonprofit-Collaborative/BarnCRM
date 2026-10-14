@@ -57,7 +57,6 @@
   <tabs>Find</tabs>
   <tabs>Data_Hygiene</tabs>
   <tabs>BarnCRM_Settings</tabs>
-  <tabs>Rollup_Builder</tabs>
   <tabs>Error_Log__c</tabs>
   <tabs>Address__c</tabs>
   <tabs>Relationship__c</tabs>
@@ -88,9 +87,6 @@
     </mappings>
     <mappings>
       <tab>BarnCRM_Settings</tab>
-    </mappings>
-    <mappings>
-      <tab>Rollup_Builder</tab>
     </mappings>
     <mappings>
       <tab>Error_Log__c</tab>

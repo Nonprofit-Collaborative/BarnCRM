@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # check-standard-objects.sh
 #
-# Fails (exit 1) if any file under packages/core, packages/giving, packages/volunteers,
-# packages/programs, or packages/funders (excluding README.md files) references, as whole
+# Fails (exit 1) if any file under packages/core, packages/rollups, packages/giving,
+# packages/volunteers, packages/programs, or packages/funders (excluding README.md files)
+# references, as whole
 # words, case-sensitive: Opportunity, Campaign, Lead, Case, OpportunityContactRole,
 # CampaignMember, PersonAccount, IsPersonAccount, or any Industries GiftTransaction / __dlm
 # name. Those objects and fields may only be referenced from packages/connect, and even there
@@ -69,7 +70,8 @@
 
 set -euo pipefail
 
-DIRS=(packages/core packages/giving packages/volunteers packages/programs packages/funders)
+DIRS=(packages/core packages/rollups packages/giving packages/volunteers packages/programs
+  packages/funders)
 
 PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case|PersonAccount|IsPersonAccount|GiftTransaction)\b|__dlm\b'
 

@@ -37,7 +37,19 @@ public class TestUsers {
      * The admin permission set of each module Core calls into by name, as SampleDataModules
      * names their sample data classes. Named as strings: Core cannot depend on a module.
      */
-    private static final List<String> MODULE_ADMINS = new List<String>{ 'Giving_Admin' };
+    private static final List<String> MODULE_ADMINS = new List<String>{
+        'Rollup_Builder_Admin',
+        'Giving_Admin'
+    };
+
+    /**
+     * The admin sets of the modules a module depends on, which its admins hold too: Giving
+     * depends on the Rollup Builder module and reads its definitions (ADR-NEXT), so a Giving
+     * admin in a test holds Rollup Builder Admin, as an installing administrator does.
+     */
+    private static final Map<String, List<String>> REQUIRED_ADMINS = new Map<String, List<String>>{
+        'Giving_Admin' => new List<String>{ 'Rollup_Builder_Admin' }
+    };
 
     private static final String DOMAIN = '@barncrm.example.invalid';
     private static final String PREFIX = 'barn-test.';
@@ -58,14 +70,19 @@ public class TestUsers {
 
     /**
      * A user holding BarnCRM Admin and one module permission set, for a module package's tests,
-     * for example `TestUsers.adminWith('Giving_Admin')`.
+     * for example `TestUsers.adminWith('Giving_Admin')`, with the admin sets of the modules that
+     * module depends on (`REQUIRED_ADMINS`).
      *
      * @param modulePermissionSet the bare API name of the module's permission set
      * @return the test user, created on first use in this transaction
      */
     @NamespaceAccessible
     public static User adminWith(String modulePermissionSet) {
-        return withPermissionSets(new List<String>{ CORE_ADMIN, modulePermissionSet });
+        List<String> names = new List<String>{ CORE_ADMIN, modulePermissionSet };
+        if (REQUIRED_ADMINS.containsKey(modulePermissionSet)) {
+            names.addAll(REQUIRED_ADMINS.get(modulePermissionSet));
+        }
+        return withPermissionSets(names);
     }
 
     /**

@@ -8,7 +8,7 @@
  * executed: no org in this environment.
  */
 @IsTest(
-    testFor='ApexClass:JobNotifier, ApexClass:ImportBatchService, ApexClass:ImportUndoService, ApexClass:BulkUpdateBatch, ApexClass:BulkDeleteUndoBatch, ApexClass:SeasonalAddressBatch, ApexClass:HouseholdNamingBatch, ApexClass:RollupFullRecalcBatch, ApexClass:SampleDataStageBatch'
+    testFor='ApexClass:JobNotifier, ApexClass:ImportBatchService, ApexClass:ImportUndoService, ApexClass:BulkUpdateBatch, ApexClass:BulkDeleteUndoBatch, ApexClass:SeasonalAddressBatch, ApexClass:HouseholdNamingBatch, ApexClass:SampleDataStageBatch'
 )
 private class JobNotificationPathsTest {
     @TestSetup
@@ -204,41 +204,6 @@ private class JobNotificationPathsTest {
             assertOneAboutSection(
                 JobNotifier.SECTION_GENERAL,
                 title(System.Label.Core_JobNotice_Stopped, System.Label.Core_JobNotice_SampleData)
-            );
-        }
-    }
-
-    @IsTest
-    static void rollupRecalculationOpensRollups() {
-        System.runAs(TestUsers.admin()) {
-            notifications(true);
-            Id organizationType = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-                .get('Organization')
-                .getRecordTypeId();
-            Account organization = new Account(Name = 'Food Bank', RecordTypeId = organizationType);
-            insert organization;
-            insert new Contact(LastName = 'Volunteer', AccountId = organization.Id);
-            Rollup_Definition__c definition = new Rollup_Definition__c(
-                Name = 'People per organization',
-                Definition_Key__c = 'Test_Q04_People_Per_Organization',
-                Source_Object__c = 'Contact',
-                Relationship_Path__c = 'AccountId',
-                Aggregate__c = 'COUNT',
-                Target_Object__c = 'Account',
-                Target_Field__c = 'NumberOfEmployees',
-                Mode__c = RollupService.MODE_BOTH,
-                Fiscal_Year_Aware__c = false,
-                Active__c = true
-            );
-            insert definition;
-            JobNotifier.sent.clear();
-
-            RollupFullRecalcBatch.firstPass(new List<Rollup_Definition__c>{ definition })
-                .runInline();
-
-            assertOneAboutSection(
-                JobNotifier.SECTION_ROLLUPS,
-                title(System.Label.Core_JobNotice_Finished, System.Label.Core_JobNotice_Rollups)
             );
         }
     }

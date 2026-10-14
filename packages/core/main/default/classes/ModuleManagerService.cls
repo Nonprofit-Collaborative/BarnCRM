@@ -66,13 +66,15 @@ public with sharing class ModuleManagerService {
             'Stewardship_Plan_Template__c',
             'Tribute__c'
         },
+        'Rollups' => new List<String>{ 'Rollup_Definition__c', 'Rollup_Queue__c' },
         'Connect' => new List<String>()
     };
 
     /** The permission set Turn on gives the person who turned the module on. */
     @TestVisible
     private static Map<String, String> adminPermissionSets = new Map<String, String>{
-        'Giving' => 'Giving_Admin'
+        'Giving' => 'Giving_Admin',
+        'Rollups' => 'Rollup_Builder_Admin'
     };
 
     /** Raised for a module the org does not have, or one that cannot be switched. */

@@ -1,7 +1,7 @@
 /**
  * What BarnCRM Core does for itself at install and at every upgrade.
  *
- * Five things. The first is to make sure the person who installed the package can open
+ * Four things. The first is to make sure the person who installed the package can open
  * BarnCRM Settings. Without it nobody in the org holds the Manage BarnCRM Settings
  * custom permission, so the console opens read only for everyone, including the System
  * Administrator who installed it, because a custom permission is not implied by Modify All
@@ -29,20 +29,17 @@
  * Only an org that has never chosen a mode is touched: an upgrade of an org whose
  * administrator has chosen is a no-op here, whatever they chose.
  *
- * The third is to create the Rollup Definitions the packages ship, so that a fresh org has
- * its totals without anybody being told to press a button (R-R6, ADR-0029). Core sees only
- * the shipped defaults whose source and target entities are in the org, so on a Core-only
- * install this creates Core's own rows and none of a module's; each module that ships
- * rollups calls the same method from its own post-install script, because Core installs
- * first and cannot see a module that is not there yet.
+ * The shipped Rollup Definitions are not Core's: the BarnCRM Rollup Builder module creates
+ * them from its own post-install script, `RollupsPostInstall` (ADR-0029, ADR-NEXT
+ * `NEXT-rollup-builder-module.md`).
  *
- * The fourth is to create the switch rows of the Automation page, one per automation the
+ * The third is to create the switch rows of the Automation page, one per automation the
  * shipped registry names, so the page lists every automation from the first install rather
- * than staying empty until somebody finds the Health Check fix (C-21). Like the rollups, Core
- * sees only its own registry rows at this point, and each module that ships automations calls
- * the same method from its own script.
+ * than staying empty until somebody finds the Health Check fix (C-21). Core sees only its own
+ * registry rows at this point, and each module that ships automations calls the same method
+ * from its own script.
  *
- * The fifth is to add the import templates the packages ship (D-41), so the wizard and the
+ * The fourth is to add the import templates the packages ship (D-41), so the wizard and the
  * migration guides find them from the first install, and a template shipped in a later
  * version reaches an org that already has others. Core adds its own here; each module that
  * ships templates calls the same method from its own script.
@@ -52,14 +49,13 @@
  * unless it is already scheduled.
  *
  * The whole thing runs twice safely: a person who already holds a permission set or a role
- * is left alone, and a rollup, a switch or an import template that already exists is left exactly as the
+ * is left alone, and a switch or an import template that already exists is left exactly as the
  * administrator left it, so an upgrade is a no-op for an org that is already set up. Nothing here throws: an
  * install must never fail because of a bootstrap step, so every failure is written to the
  * Error Log instead.
  */
 public with sharing class CorePostInstall implements InstallHandler {
     private static final String ACCESS_CONTEXT = 'CorePostInstall.grantInstallerAccess';
-    private static final String ROLLUP_CONTEXT = 'CorePostInstall.ensureRollupDefaults';
     private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
     private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
     private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
@@ -89,7 +85,6 @@ public with sharing class CorePostInstall implements InstallHandler {
         markFeaturesOffOnANewInstall(context);
         saveEditionOnAnUpgrade(context);
         applyRecommendedMode();
-        ensureRollupDefaults();
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
         // Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
@@ -200,20 +195,6 @@ public with sharing class CorePostInstall implements InstallHandler {
             WITH USER_MODE
             LIMIT :readUpTo
         ];
-    }
-
-    /**
-     * Creates the shipped Rollup Definitions this org does not have yet, and leaves every
-     * definition that is already here exactly as the administrator left it (R-R6).
-     *
-     * This runs on every install and every upgrade of Core. It is deliberately not tied to the
-     * installing person: the definitions belong to the org, not to whoever pressed Install.
-     */
-    private void ensureRollupDefaults() {
-        // The catch is inside RollupService, so that every module's post-install script gets the
-        // same guarantee from one place: an org with blank totals is two clicks from being right,
-        // and an install the platform rolled back is not.
-        RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
     }
 
     /**
