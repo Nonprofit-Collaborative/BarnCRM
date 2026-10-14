@@ -39,6 +39,13 @@ public without sharing class RollupQueue implements Queueable {
     /** The longest delay the platform accepts for a queued job, in minutes. */
     private static final Integer LONGEST_DELAY_MINUTES = 10;
 
+    /** The shortest chain of queued jobs any org allows: Developer Edition, trial, scratch. */
+    private static final Integer LOWEST_CHAIN_DEPTH = 5;
+
+    /** Test seam: stands in for this job's depth in its chain; null reads the platform. */
+    @TestVisible
+    private static Integer stackDepthForTest;
+
     /** Target records one run recalculates per target entity, before a failure halves it. */
     @TestVisible
     private static Integer defaultSliceSize = 200;
@@ -590,6 +597,18 @@ public without sharing class RollupQueue implements Queueable {
     }
 
     private static void enqueue(RollupQueue job, Integer delayMinutes) {
+        if (atChainDepthLimit()) {
+            // The platform would refuse the next link, the refusal kills this run, and the
+            // entries would stay Pending with nothing to process them. The Ready event starts a
+            // fresh chain after this run commits instead (ADR-0100's doorbell).
+            announceReady();
+            ErrorLogger.logMessage(
+                System.Label.Core_Rollups_QueueHandedOff,
+                LOG_CONTEXT,
+                ErrorLogger.SEVERITY_INFO
+            );
+            return;
+        }
         if (Test.isRunningTest() && chainInTests != true) {
             return;
         }
@@ -597,6 +616,25 @@ public without sharing class RollupQueue implements Queueable {
             return;
         }
         System.enqueueJob(job, delayMinutes);
+    }
+
+    /**
+     * Whether this job is as deep in its chain as the platform lets a chain go, so the job it
+     * queued would be refused. A chain given no depth of its own is held to the lowest depth the
+     * platform sets on any org (five, in Developer Edition, trial and scratch orgs), so the same
+     * code stays safe everywhere at the cost of one Ready event per five runs.
+     */
+    private static Boolean atChainDepthLimit() {
+        Integer depth = stackDepthForTest != null
+            ? stackDepthForTest
+            : AsyncInfo.getCurrentQueueableStackDepth();
+        if (depth == null) {
+            return false;
+        }
+        Integer limitDepth = AsyncInfo.hasMaxStackDepth()
+            ? AsyncInfo.getMaximumQueueableStackDepth()
+            : LOWEST_CHAIN_DEPTH;
+        return depth >= limitDepth;
     }
 
     /**

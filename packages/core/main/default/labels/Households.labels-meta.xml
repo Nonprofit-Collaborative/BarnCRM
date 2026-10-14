@@ -145,6 +145,22 @@
         <value>,</value>
     </labels>
     <labels>
+        <fullName>Core_Households_ListAndOneOther</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shortened name or greeting: {0} is the names kept</shortDescription>
+        <value>{0} and 1 other</value>
+    </labels>
+    <labels>
+        <fullName>Core_Households_ListAndOthers</fullName>
+        <categories>Households</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shortened name or greeting: {0} is the names kept, {1} is the number left out</shortDescription>
+        <value>{0} and {1} others</value>
+    </labels>
+    <labels>
         <fullName>Core_Households_NamePlaceholder</fullName>
         <categories>Households</categories>
         <language>en_US</language>

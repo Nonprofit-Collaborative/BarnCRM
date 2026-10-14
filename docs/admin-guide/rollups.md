@@ -344,6 +344,9 @@ Under the list, **Needs attention** shows what the engine has not finished:
   totals from recent saves and bulk changes, queued and calculated within a minute or a few.
   Nothing to do unless the oldest is more than an hour old, which Health Check also reports.
   Then click **Start now** to recalculate them now; the nightly run also picks them up.
+  A long queue is worked through in a series of background runs. Salesforce limits how long
+  such a series may be (five runs in Developer Edition, trial and scratch orgs), so at that
+  point BarnCRM starts a fresh series and notes it in the Error Log as Info. Nothing to do.
 - **Could not be saved**: each record whose totals failed five times, with a link to it,
   what went wrong in plain words, when, and how many tries. Fix the cause (often a validation
   rule or a record someone was editing), then click **Retry** for the ones you selected, or

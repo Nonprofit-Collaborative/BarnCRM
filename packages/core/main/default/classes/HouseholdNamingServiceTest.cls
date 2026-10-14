@@ -475,4 +475,200 @@ private class HouseholdNamingServiceTest {
             );
         }
     }
+
+    // ------------------------------------------------------------------ large households
+
+    /** Thirty people, Mr. First01 Surname01 to Mr. First30 Surname30, in that order. */
+    private static List<HouseholdService.Person> thirtySurnames() {
+        List<HouseholdService.Person> members = new List<HouseholdService.Person>();
+        for (Integer i = 1; i <= 30; i++) {
+            String n = String.valueOf(i).leftPad(2, '0');
+            members.add(HouseholdTestDataFactory.person('Mr.', 'First' + n, 'Surname' + n, null));
+        }
+        return members;
+    }
+
+    private static String othersEnding() {
+        return Label.Core_Households_ListAndOthers.substringAfter('{1}');
+    }
+
+    @IsTest
+    static void aLongSurnameListNamesTheFirstAndCountsTheRest() {
+        System.runAs(TestUsers.admin()) {
+            String name = HouseholdNamingService.computeName(thirtySurnames(), NAME_PATTERN, false);
+
+            List<String> kept = new List<String>();
+            for (Integer i = 1; i <= 21; i++) {
+                kept.add('Surname' + String.valueOf(i).leftPad(2, '0'));
+            }
+            String expected =
+                Label.Core_Households_ListAndOthers.replace('{1}', '9')
+                    .replace('{0}', String.join(kept, Label.Core_Households_ListSeparator + ' ')) +
+                ' ' +
+                Label.Core_Households_NameSuffix;
+            Assert.areEqual(
+                expected,
+                name,
+                'As many surnames as fit are named and the rest counted, within the field'
+            );
+            Assert.isTrue(name.length() <= 255, 'The name fits Account Name: ' + name.length());
+        }
+    }
+
+    @IsTest
+    static void aLongPerPersonNameAndBothGreetingsFitTheirFields() {
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>();
+            for (HouseholdService.Person person : thirtySurnames()) {
+                person.lastName = 'Fitzgerald';
+                members.add(person);
+            }
+            String name = HouseholdNamingService.computeName(
+                members,
+                '{FirstName} {LastName}',
+                false
+            );
+            String formal = HouseholdNamingService.computeFormalGreeting(
+                members,
+                FORMAL_PATTERN,
+                false
+            );
+            String informal = HouseholdNamingService.computeInformalGreeting(
+                members,
+                '{FirstName} {LastName}'
+            );
+
+            for (String value : new List<String>{ name, formal, informal }) {
+                Assert.isTrue(value.length() <= 255, 'Fits its field: ' + value);
+                Assert.isTrue(value.endsWith(othersEnding()), 'Counts who is left out: ' + value);
+            }
+            Assert.isTrue(name.startsWith('First01 Fitzgerald, First02 Fitzgerald'), name);
+            Assert.isTrue(
+                formal.startsWith('Mr. First01 Fitzgerald, Mr. First02 Fitzgerald'),
+                formal
+            );
+        }
+    }
+
+    @IsTest
+    static void oneLeftOutReadsAsOneOther() {
+        System.runAs(TestUsers.admin()) {
+            List<HouseholdService.Person> members = new List<HouseholdService.Person>{
+                HouseholdTestDataFactory.person(null, 'Ann', 'A'.repeat(80), null),
+                HouseholdTestDataFactory.person(null, 'Bob', 'B'.repeat(80), null),
+                HouseholdTestDataFactory.person(null, 'Cal', 'C'.repeat(80), null)
+            };
+            String name = HouseholdNamingService.computeName(members, NAME_PATTERN, false);
+
+            String kept =
+                'A'.repeat(80) +
+                Label.Core_Households_ListSeparator +
+                ' ' +
+                'B'.repeat(80);
+            Assert.areEqual(
+                Label.Core_Households_ListAndOneOther.replace('{0}', kept) +
+                    ' ' +
+                    Label.Core_Households_NameSuffix,
+                name,
+                'A single person left out is counted in the singular'
+            );
+        }
+    }
+
+    @IsTest
+    static void aLongPatternIsCutAtAWordNeverInsideOne() {
+        System.runAs(TestUsers.admin()) {
+            String pattern = 'The {LastName} Family' + ' wordy'.repeat(60);
+            String name = HouseholdNamingService.computeName(
+                new List<HouseholdService.Person>{
+                    HouseholdTestDataFactory.person('Ms.', 'Maria', 'Garcia', 'Head')
+                },
+                pattern,
+                false
+            );
+
+            Assert.isTrue(name.length() <= 255, 'Fits Account Name: ' + name.length());
+            Assert.isTrue(name.endsWith(' wordy'), 'Ends on a whole word: ' + name);
+        }
+    }
+
+    /** Thirty contacts with differing surnames, saved into one contact-mode household. */
+    private static Id householdOfThirty() {
+        HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+        Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
+        insert household;
+        List<Contact> people = new List<Contact>();
+        for (HouseholdService.Person person : thirtySurnames()) {
+            people.add(
+                new Contact(
+                    Salutation = person.salutation,
+                    FirstName = person.firstName,
+                    LastName = person.lastName,
+                    AccountId = household.Id
+                )
+            );
+        }
+        insert people;
+        return household.Id;
+    }
+
+    @IsTest
+    static void aHouseholdOfThirtyIsSavedByMembershipUpkeep() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            Id householdId = householdOfThirty();
+            Test.stopTest();
+
+            Account saved = [
+                SELECT
+                    Name,
+                    Member_Count__c,
+                    Household_Formal_Greeting__c,
+                    Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :householdId
+            ];
+            Assert.areEqual(30, saved.Member_Count__c, 'The count is saved with the wording');
+            Assert.isTrue(saved.Name.startsWith('Surname01, Surname02'), saved.Name);
+            Assert.isTrue(
+                saved.Household_Formal_Greeting__c.endsWith(othersEnding()),
+                saved.Household_Formal_Greeting__c
+            );
+            Assert.isTrue(
+                saved.Household_Informal_Greeting__c.startsWith('First01, First02'),
+                saved.Household_Informal_Greeting__c
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c], 'Nothing was refused');
+        }
+    }
+
+    @IsTest
+    static void aHouseholdOfThirtyIsSavedByApplyNaming() {
+        System.runAs(TestUsers.admin()) {
+            Id householdId = householdOfThirty();
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Informal_Greeting_Pattern__c = '{FirstName} {LastName}';
+            HouseholdTestDataFactory.save(settings);
+
+            Test.startTest();
+            Integer changed = HouseholdNamingService.applyNaming(new Set<Id>{ householdId });
+            Test.stopTest();
+
+            Account saved = [
+                SELECT Household_Informal_Greeting__c
+                FROM Account
+                WHERE Id = :householdId
+            ];
+            Assert.areEqual(1, changed, 'The new pattern is saved');
+            Assert.isTrue(
+                saved.Household_Informal_Greeting__c.startsWith('First01 Surname01, '),
+                saved.Household_Informal_Greeting__c
+            );
+            Assert.isTrue(
+                saved.Household_Informal_Greeting__c.endsWith(othersEnding()),
+                saved.Household_Informal_Greeting__c
+            );
+            Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c], 'Nothing was refused');
+        }
+    }
 }
