@@ -16,6 +16,7 @@ import removeConfirmBody from '@salesforce/label/c.Core_SampleData_RemoveConfirm
 import productionWarning from '@salesforce/label/c.Core_SampleData_ProductionWarning';
 import statusLoaded from '@salesforce/label/c.Core_SampleData_StatusLoaded';
 import statusNotLoaded from '@salesforce/label/c.Core_SampleData_StatusNotLoaded';
+import statusRemoving from '@salesforce/label/c.Core_SampleData_StatusRemoving';
 import statusLoading from '@salesforce/label/c.Core_SampleData_StatusLoading';
 import loadingAltText from '@salesforce/label/c.Core_SampleData_LoadingAltText';
 import householdsLabel from '@salesforce/label/c.Core_SampleData_HouseholdsLabel';
@@ -54,6 +55,7 @@ export default class SampleDataManager extends LightningElement {
     statusLoaded,
     statusNotLoaded,
     statusLoading,
+    statusRemoving,
     loadingAltText,
     householdsLabel,
     contactsLabel,
@@ -80,6 +82,8 @@ export default class SampleDataManager extends LightningElement {
   moduleCounts = [];
   loaded = false;
   loading = false;
+  // The remove runs in the stage batch too (ADMIN-3), so the card polls it like a load.
+  removing = false;
   // Undefined until the first status call answers, so the notice never flashes before the
   // org has been asked. Only an explicit true shows it.
   junctionMembership;
@@ -121,6 +125,7 @@ export default class SampleDataManager extends LightningElement {
 
   applyStatus(result) {
     const wasLoading = this.loading;
+    const wasRemoving = this.removing;
     this.householdCount = result.householdCount;
     this.contactCount = result.contactCount;
     this.organizationCount = result.organizationCount;
@@ -129,14 +134,18 @@ export default class SampleDataManager extends LightningElement {
     this.moduleCounts = result.moduleCounts || [];
     this.loaded = result.loaded;
     this.loading = result.loading;
+    this.removing = result.removing === true;
     this.junctionMembership = result.junctionMembership;
 
-    if (this.loading) {
+    if (this.loading || this.removing) {
       this.startPolling();
     } else {
       this.clearPollTimer();
       if (wasLoading && this.loaded) {
         this.showToast(this.labels.loadSuccess, '', 'success');
+      }
+      if (wasRemoving) {
+        this.showToast(this.labels.removeSuccess, '', 'success');
       }
     }
   }
@@ -191,24 +200,27 @@ export default class SampleDataManager extends LightningElement {
     if (this.loading) {
       return this.labels.statusLoading;
     }
+    if (this.removing) {
+      return this.labels.statusRemoving;
+    }
     return this.loaded ? this.labels.statusLoaded : this.labels.statusNotLoaded;
   }
 
   get statusBadgeClass() {
-    if (this.loading) {
+    if (this.loading || this.removing) {
       return 'slds-theme_warning';
     }
     return this.loaded ? 'slds-theme_success' : '';
   }
 
   get loadDisabled() {
-    return !this.canManage || this.loaded || this.loading || this.isBusy;
+    return !this.canManage || this.loaded || this.loading || this.removing || this.isBusy;
   }
 
   get removeDisabled() {
     // Remove stays disabled while a load runs: deleting the households mid-chain would
     // leave the next contact chunk inserting against records that no longer exist.
-    return !this.canManage || this.loading || !this.loaded || this.isBusy;
+    return !this.canManage || this.loading || this.removing || !this.loaded || this.isBusy;
   }
 
   handleLoadClick() {
@@ -242,8 +254,8 @@ export default class SampleDataManager extends LightningElement {
       if (action === 'load') {
         await loadSampleData();
       } else {
-        await removeSampleData();
-        this.showToast(this.labels.removeSuccess, '', 'success');
+        // The remove only starts here; the success toast waits for the batch to finish.
+        this.applyStatus(await removeSampleData());
       }
     } catch (error) {
       const message = action === 'load' ? this.labels.loadError : this.labels.removeError;

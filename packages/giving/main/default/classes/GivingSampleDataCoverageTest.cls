@@ -102,7 +102,12 @@ private class GivingSampleDataCoverageTest {
                 'It counts gifts'
             );
             Assert.areEqual(0, module.countLoaded(), 'Nothing is loaded yet');
-            Assert.areEqual(0, module.removeAll(), 'And removing nothing removes nothing');
+            Assert.areEqual(
+                0,
+                new GivingSampleDataRemoveStages().stageCount(),
+                'And removing nothing takes no stages'
+            );
+            Assert.areEqual(0, GivingSampleDataLoader.removeNext(), 'Nor deletes anything');
         }
     }
 
@@ -175,10 +180,11 @@ private class GivingSampleDataCoverageTest {
                 'The gift stage after the reference data stage loads all five gifts'
             );
             Assert.areEqual(5, new GivingSampleData().countLoaded(), 'And the card counts them');
-            Assert.isTrue(
-                new GivingSampleData().removeAll() >= 5,
-                'Removal takes at least the five gifts'
-            );
+            GivingSampleDataRemoveStages removal = new GivingSampleDataRemoveStages();
+            Integer removalStages = removal.stageCount();
+            for (Integer stage = 0; stage < removalStages; stage++) {
+                removal.runStage(stage);
+            }
             Assert.areEqual(0, new GivingSampleData().countLoaded(), 'Nothing is left');
         }
     }
