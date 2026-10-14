@@ -305,7 +305,9 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
         List<String> names = new List<String>();
         Set<String> seen = new Set<String>();
         for (
-            Schema.ChildRelationship relationship : Account.SObjectType.getDescribe()
+            Schema.ChildRelationship relationship : Account.SObjectType.getDescribe(
+                    SObjectDescribeOptions.DEFERRED
+                )
                 .getChildRelationships()
         ) {
             String name = relationship.getRelationshipName();
