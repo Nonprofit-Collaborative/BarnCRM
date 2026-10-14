@@ -74,10 +74,13 @@ paused for the load. She wants to know what the load left behind.
 | **Deceased people who can still be emailed** | People marked **Deceased** who have an **Email** and do not have **Email Opt Out** ticked. | A message to someone who has died hurts the family and your organization. | Tick **Email Opt Out** (Bulk update can do it from the Find query). |
 | **People not changed in N years** | People whose **Last Modified Date** is older than the years in **Years before a person is not changed** (5 unless set). | Old records nobody looks at may be out of date, or may be candidates for archiving. | Review them in Find. Nothing is archived or deleted for you. |
 
-**Open in Find** is not offered for **People with no household** in an org that uses
-membership records. Find cannot yet ask "has no current membership", which is a question about
-related records (planned with C-36). The count is still shown, and Health Check links the first
-five of them.
+In an org that uses membership records, **Open in Find** for **People with no household** lists
+the contacts that have no current membership (Find's **Has no related records**, see
+[Find](find.md), section 7.1), leaving out a contact whose account is a household or a person
+account. The date "today" is written into the query when you press **Open in Find**, so press
+it again for an up-to-date list. People kept as person accounts are in the count but not in the
+Find list, because Find lists one kind of record at a time, and the check says so; Health Check
+links the first five of them.
 
 Each count stops at 2,000 and then says **More than 2,000**, the same as the most rows Find
 shows at once. Find's export reads every matching record.
@@ -141,8 +144,8 @@ section 6).
 
 Checking whether a household's name still matches the naming rule needs every name worked out
 again, which is not a question a query can ask; it is not offered. Checks on related records
-("households with no gifts", "people with no current membership" in Find) wait for child
-conditions in Find (C-36). Changing many records at once is **Bulk update** (C-35), which starts
+("households with no gifts") are built in Find with **Has no related records** (section 7.1 of
+[Find](find.md)); only the one above is a ready-made check. Changing many records at once is **Bulk update** (C-35), which starts
 from a Find query.
 
 ## Field reference

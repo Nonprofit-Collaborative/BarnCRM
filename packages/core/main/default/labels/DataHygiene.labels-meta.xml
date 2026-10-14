@@ -73,12 +73,12 @@
         <value>Data hygiene needs the Find and Export Records permission. Ask your administrator to assign you the BarnCRM Find and Export permission set.</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_NotInFindYet</fullName>
+        <fullName>Core_DataHygiene_PeopleAccountsNotListed</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Note on a check that Find cannot list yet.</shortDescription>
-        <value>Find cannot list these yet, because it cannot ask about a missing membership. Health Check links the first five.</value>
+        <shortDescription>Note on the people check when some are person accounts.</shortDescription>
+        <value>The count includes people kept as person accounts. Find lists contacts only, so those are not in the list. Health Check links the first five.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_NoAccess</fullName>

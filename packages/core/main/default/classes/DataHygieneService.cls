@@ -7,9 +7,10 @@
  * is matched by developer name. Nothing is stored in the package, so a check cannot be edited
  * or left stale. The count is SELECT COUNT() over the same document, its filter rendered with
  * every value bound by RollupFilterParser and run in user mode, so the number is what Find
- * lists for the same person (ADR-0047). One check Find cannot express, people with no
- * household in junction mode (a child condition), is counted with HouseholdOrphanSelector, as
- * Health Check counts it (ADR-0048), and has no document.
+ * lists for the same person (ADR-0047). One check is counted another way: people with no
+ * household in junction mode are counted with HouseholdOrphanSelector, as Health Check counts
+ * them (ADR-0048), people kept as person accounts included. Its document, which Find opens,
+ * lists the contacts only, using Find's "has no related records" condition (C-36).
  *
  * Detection only: nothing here writes.
  */
@@ -89,13 +90,15 @@ public with sharing class DataHygieneService {
         result.description = description(key);
         try {
             String document = queryDocument(key);
-            if (document == null) {
+            if (key == PEOPLE_WITHOUT_HOUSEHOLD && HouseholdService.isJunctionMode()) {
                 result.count = countJunctionPeopleWithoutHousehold();
-                result.note = System.Label.Core_DataHygiene_NotInFindYet;
+                if (!OrgShapeDetector.personRecordTypeIds().isEmpty()) {
+                    result.note = System.Label.Core_DataHygiene_PeopleAccountsNotListed;
+                }
             } else {
                 result.count = count(document);
-                result.canOpenInFind = true;
             }
+            result.canOpenInFind = true;
             // A household that is also a Nonprofit Cloud household keeps its members there, so
             // it reads as empty here, and deleting it would delete its native group (ADR-0036).
             if (
@@ -124,13 +127,14 @@ public with sharing class DataHygieneService {
     }
 
     /**
-     * The check's query document as JSON, built for this org now, or null for the one check
-     * Find cannot list (people with no household in junction mode).
+     * The check's query document as JSON, built for this org now.
      */
     public static String queryDocument(String key) {
         Map<String, Object> document;
         if (key == PEOPLE_WITHOUT_HOUSEHOLD) {
-            document = HouseholdService.isJunctionMode() ? null : contactsWithoutAccount();
+            document = HouseholdService.isJunctionMode()
+                ? contactsWithoutMembership()
+                : contactsWithoutAccount();
         } else if (key == HOUSEHOLDS_WITHOUT_MEMBERS) {
             document = householdsWithoutMembers();
         } else if (key == MEMBERSHIPS_WITHOUT_PERSON) {
@@ -204,6 +208,62 @@ public with sharing class DataHygieneService {
             new List<Object>{ condition(1, name(Contact.AccountId), 'is null', null) },
             null
         );
+    }
+
+    /**
+     * Junction mode: a contact with no current membership row (no end date, or one still to
+     * come), leaving out one whose account is a household or a person account, as
+     * HouseholdOrphanSelector counts them. Today's date is written into the document.
+     */
+    private static Map<String, Object> contactsWithoutMembership() {
+        String accountType = parent(Contact.AccountId, 'RecordTypeId');
+        List<Object> conditions = new List<Object>{
+            condition(1, name(Contact.AccountId), 'is null', null)
+        };
+        List<String> notExcluded = new List<String>();
+        Set<Id> excluded = new Set<Id>(OrgShapeDetector.personRecordTypeIds());
+        Id householdType = HouseholdService.householdRecordTypeId();
+        if (householdType != null) {
+            excluded.add(householdType);
+        }
+        for (Id recordType : excluded) {
+            conditions.add(condition(conditions.size() + 1, accountType, 'not equals', recordType));
+            notExcluded.add(String.valueOf(conditions.size()));
+        }
+        Map<String, Object> result = document(
+            Contact.SObjectType,
+            new List<String>{ 'Name', name(Contact.CreatedDate) },
+            conditions,
+            notExcluded.isEmpty() ? null : '1 OR (' + String.join(notExcluded, ' AND ') + ')'
+        );
+        Map<String, Object> current = new Map<String, Object>{
+            'version' => 1,
+            'conditions' => new List<Object>{
+                condition(1, name(Household_Member__c.End_Date__c), 'is null', null),
+                condition(
+                    2,
+                    name(Household_Member__c.End_Date__c),
+                    'greater than',
+                    String.valueOf(Date.today())
+                )
+            },
+            'logic' => '1 OR 2'
+        };
+        result.put(
+            'related',
+            new List<Object>{
+                new Map<String, Object>{
+                    'object' => Household_Member__c.SObjectType.getDescribe(
+                            SObjectDescribeOptions.DEFERRED
+                        )
+                        .getName(),
+                    'field' => name(Household_Member__c.Contact__c),
+                    'has' => false,
+                    'filter' => current
+                }
+            }
+        );
+        return result;
     }
 
     /** A household whose Member Count is zero or empty (R-H11). */
