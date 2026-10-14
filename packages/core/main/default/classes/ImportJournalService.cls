@@ -291,13 +291,13 @@ public with sharing class ImportJournalService {
             return total;
         }
         String marker = JSON.serialize(action);
-        String after;
+        Import_Journal__c after;
         Integer read = 0;
         while (read < MAX_PAGES_READ) {
             Integer asked = Math.min(pagesPerRead, MAX_PAGES_READ - read);
             List<Import_Journal__c> window = pagesAfter(batchId, phase, asked, after);
             for (Import_Journal__c page : window) {
-                after = page.Name;
+                after = page;
                 if (page.Entries_JSON__c == null || !page.Entries_JSON__c.contains(marker)) {
                     continue;
                 }
@@ -328,24 +328,33 @@ public with sharing class ImportJournalService {
         return pagesAfter(batchId, phase, howMany, null);
     }
 
-    /** As `pages`, starting after the page named `afterName`, or at the start when null. */
+    /**
+     * As `pages`, starting after the page `after`, or at the start when null. Keyset paging on
+     * (CreatedDate, Id): the Name AutoNumber counts org-wide and stops sorting as text past
+     * IJ-999999.
+     */
     private static List<Import_Journal__c> pagesAfter(
         Id batchId,
         String phase,
         Integer howMany,
-        String afterName
+        Import_Journal__c after
     ) {
         Integer limitSize = howMany == null || howMany <= 0 ? 20 : Math.min(howMany, 200);
+        Datetime afterDate = after == null ? null : after.CreatedDate;
+        Id afterId = after == null ? null : after.Id;
         return Database.queryWithBinds(
-            'SELECT Id, Name, Phase__c, Entry_Count__c, Entries_JSON__c FROM Import_Journal__c ' +
+            'SELECT Id, Name, CreatedDate, Phase__c, Entry_Count__c, Entries_JSON__c FROM Import_Journal__c ' +
                 'WHERE Import_Batch__c = :batchId AND Phase__c = :phase ' +
-                (afterName == null ? '' : 'AND Name > :afterName ') +
-                'ORDER BY Name ASC LIMIT :limitSize',
+                (after == null
+                    ? ''
+                    : 'AND (CreatedDate > :afterDate OR (CreatedDate = :afterDate AND Id > :afterId)) ') +
+                'ORDER BY CreatedDate ASC, Id ASC LIMIT :limitSize',
             new Map<String, Object>{
                 'batchId' => batchId,
                 'phase' => phase,
                 'limitSize' => limitSize,
-                'afterName' => afterName
+                'afterDate' => afterDate,
+                'afterId' => afterId
             },
             AccessLevel.USER_MODE
         );

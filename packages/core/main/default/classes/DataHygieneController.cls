@@ -46,11 +46,6 @@ public with sharing class DataHygieneController {
         try {
             requirePermission();
             String document = DataHygieneService.queryDocument(checkKey);
-            if (document == null) {
-                throw new DataHygieneService.DataHygieneException(
-                    System.Label.Core_DataHygiene_NotInFindYet
-                );
-            }
             String name = DataHygieneService.savedQueryName(checkKey);
             Id existing = ownSavedQueryNamed(name);
             FindController.saveQuery(existing, name, document, false);

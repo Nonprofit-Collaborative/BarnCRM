@@ -5983,6 +5983,25 @@ page deletes the suggestion without a dismissal, because the pair no longer exis
   For a person stored as an account that is the rollups on Account and on the survivor's
   person contact. An account merge of households (R-H13) recalculates the surviving
   household's real-time rollups the same way.
+- **Merge settlement** (PEOPLE-15) runs just after any Salesforce merge, in a queued job
+  (`MergeSettlement`): a person in both merged households keeps one membership, a household
+  that took in members is recounted and renamed, a survivor keeps one default address (the one
+  matching its standard address fields: billing for a household or organization, mailing for a
+  contact or a person account, read by name so Core runs without person accounts; otherwise
+  the newest), and a person loses relationships with themselves and second copies and has
+  their primary affiliation chosen again. A merge that cannot queue the job (inside a
+  Queueable, or with no queueable job left) publishes `Merge_Settlement_Ready__e` instead, and
+  its subscriber queues the job after the merge commits (ADR-0118). Only a publish the
+  platform refuses leaves the survivors to an administrator, named in the Error Log as a
+  warning.
+- **Event:** `Merge_Settlement_Ready__e`, a platform event, publish behavior Publish After
+  Commit. `Household_Ids__c`, `Owner_Ids__c` and `Person_Ids__c` (Long Text Area, 32,768) each
+  carry up to 200 comma-separated survivor identifiers; more survivors make more events.
+  `MergeSettlementReadyTrigger` subscribes, as the Automated Process user, in batches of 50
+  (`PlatformEventSubscriberConfig` `MergeSettlementReadyTriggerConfig`, no running user), and
+  queues one settlement job per event, resuming from a checkpoint when its transaction can
+  queue no more and retrying a batch it could queue nothing for. The three packaged permission sets
+  grant Read and Create on it, as on `Rollup_Queue_Ready__e`.
 - **Matching** is `Datacloud.FindDuplicatesByIds`, which evaluates the org's active duplicate
   rules. It is called for one object at a time, and for households only among accounts: a
   call that includes a person stored as an account is refused by the platform when no person
@@ -7140,6 +7159,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Large rollup parents (ADR-0116, `0116-rollup-large-parents-recalculated-by-a-batch.md`, tier 1 scale test). No object or field added. New R-RQ6: a record whose source rows are more than one transaction may read is recalculated by `RollupLargeParentBatch`, chunk by chunk over its source rows, with one write at the end; records are routed there by an estimate from stored counts, or as a lone record that stopped its run on the query row limit. R-RQ3: a run takes records up to a row budget; a run that stops charges only the records it was recalculating, which are retried alone and a quarter as many at a time so only the record that keeps stopping runs ends Failed; and the finalizer starts the next processor through `Rollup_Queue_Ready__e` instead of halving the slice and queuing it, which the platform stopped after five failed jobs in a row and left 826 entries Pending. |
 | v0.6 | 2026-10-14 | Rollup Queue enqueue race (ADR-0117, `0117-rollup-queue-asks-again-after-commit.md`, tier 1 scale rerun). No object or field added. R-RQ3: a transaction that inserted entries and queued no processor publishes `Rollup_Queue_Ready__e`, so the check runs again after it commits; before this a processor waiting at the save could finish before the save committed, and a parallel Bulk API load left 47 entries Pending with no processor. |
 | v0.6 | 2026-10-14 | Large parent route efficiency (ADR-0116, tier 1 scale rerun). New protected hierarchy custom setting `Rollup_Run_Lock__c` (no fields, Section 14A implementation). R-RQ6: a record goes to the batch only when its estimate reaches two fifths of the query row limit (was a fifth; the run budget stays three fifths), and a run starts only under a lock on that setting's org-level record, so concurrent processors no longer start batches side by side. R-RQ3: the hand-off at the chain depth limit is no longer logged. |
+| v0.6 | 2026-10-14 | Merge settlement always runs (ADR-0118). New platform event `Merge_Settlement_Ready__e` (Publish After Commit; `Household_Ids__c`, `Owner_Ids__c`, `Person_Ids__c`, 200 identifiers each per event), subscribed by `MergeSettlementReadyTrigger`; the three packaged permission sets grant Read and Create on it. A merge inside a Queueable, or with no queueable job left, publishes it instead of only logging a warning, so its survivors are settled. A person account survivor keeps the default address matching its mailing fields, not the newest. |
 
 ---
 ## 32. Entity ownership by package
