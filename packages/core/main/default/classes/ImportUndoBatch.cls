@@ -1,6 +1,9 @@
 /**
  * The work of undoing one import, in passes (canonical model R-IB8, R-IB9):
  *
+ * 0. **Judge.** One pass per delete pass below, in the same order, notes which tagged records
+ *    were edited before the undo began, so a rollup set off by a later restore or delete
+ *    cannot hide the edit (ADR-0119). Nothing is changed. A bulk update's undo has none.
  * 1. **Restore.** Each commit journal page, newest first, puts back the values the import
  *    wrote where the record still holds the value written.
  * 1a. **Created.** Each Created journal page of a one-object import (R-IT12) deletes the
@@ -39,6 +42,21 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /** A module object's pass is this prefix and the object's API name. */
     @TestVisible
     private static final String PASS_TAGGED_PREFIX = 'Tagged:';
+    /**
+     * A judging pass is this prefix and the delete pass it judges for. It deletes nothing: it
+     * notes which records were already edited before the undo began (ADR-0119).
+     */
+    @TestVisible
+    private static final String PASS_JUDGE_PREFIX = 'Judge:';
+
+    /** How many records one judging chunk takes: it costs one query, whatever its size. */
+    private static final Integer JUDGE_CHUNK = 2000;
+
+    /**
+     * How long after a rollup's freshness stamp the save carrying it may be stamped by the
+     * platform. The stamp is taken just before the save, in the same transaction.
+     */
+    private static final Integer ROLLUP_WRITE_SECONDS = 5;
 
     /** Children never counted as something a record gained: the import's own bookkeeping. */
     private static final Set<String> NOT_GAINED = new Set<String>{
@@ -70,6 +88,13 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private static final Integer SETTLE_MINUTES = 10;
 
     /**
+     * How long after a commit completes a rollup it set off may still be saved by the Rollup
+     * Queue: the queue drains in minutes (about seven for 25,000 rows) but waits behind the
+     * rest of the org's work. A rollup stamped later may hide a real edit (ADR-0119).
+     */
+    private static final Integer ROLLUP_SETTLE_MINUTES = 60;
+
+    /**
      * Set only by tests: the error count a job reports when the platform stopped a chunk,
      * which a test cannot bring about for real.
      */
@@ -95,23 +120,42 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private Id committedBy;
     /** The job's operation: an import, or a bulk update, whose undo is the restore pass only. */
     private String operation;
+    /**
+     * The records the judging passes found edited before the undo began, carried from pass to
+     * pass. Only these are kept when a record's last change was made during the undo by the
+     * undo itself or by a rollup (ADR-0119).
+     */
+    private Set<Id> editedBeforeUndo = new Set<Id>();
 
     /**
      * Starts the first pass of the undo of one batch. `countedAtStart` is the total the person
      * confirmed, kept so the run log can say how many of those were deleted and how many kept.
+     * An import's undo starts with the judging; a bulk update created nothing, so its undo is
+     * the restore pass alone (R-BU5).
      */
     @NamespaceAccessible
     public static Id run(Id batchId, Integer countedAtStart) {
+        String operation = [
+            SELECT Operation__c
+            FROM Import_Batch__c
+            WHERE Id = :batchId
+            WITH SYSTEM_MODE
+            LIMIT 1
+        ]
+        .Operation__c;
+        String first = BulkUpdateService.OPERATION_UPDATE.equals(operation)
+            ? PASS_RESTORE
+            : passes()[0];
         return Database.executeBatch(
             new ImportUndoBatch(
                 batchId,
                 countedAtStart,
-                PASS_RESTORE,
+                first,
                 0,
                 false,
                 toTheSecond(Datetime.now())
             ),
-            scopeFor(PASS_RESTORE, batchId)
+            scopeFor(first, batchId)
         );
     }
 
@@ -121,18 +165,37 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
      */
     @TestVisible
     private static List<String> passes() {
-        List<String> result = new List<String>{ PASS_RESTORE, PASS_CREATED };
+        List<String> deletes = new List<String>();
         for (Schema.SObjectType type : ImportEntityProcessors.taggedTypes()) {
-            result.add(
+            deletes.add(
                 PASS_TAGGED_PREFIX + type.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
             );
         }
-        result.addAll(new List<String>{ PASS_CONTACTS, PASS_PERSON_ACCOUNTS, PASS_ACCOUNTS });
+        deletes.addAll(new List<String>{ PASS_CONTACTS, PASS_PERSON_ACCOUNTS, PASS_ACCOUNTS });
+        // Every tagged record is judged before anything is put back or deleted: either sets
+        // off rollups that save the records judged later, which would hide an earlier edit. A
+        // one-object import's Created pass tags nothing, so it has nothing to judge.
+        List<String> result = new List<String>();
+        for (String deletePass : deletes) {
+            result.add(PASS_JUDGE_PREFIX + deletePass);
+        }
+        result.addAll(new List<String>{ PASS_RESTORE, PASS_CREATED });
+        result.addAll(deletes);
         return result;
+    }
+
+    /** The delete pass this pass reads the records of: itself, or the one it judges for. */
+    private String target() {
+        return pass == null ? null : pass.removeStart(PASS_JUDGE_PREFIX);
+    }
+
+    private Boolean judging() {
+        return pass != null && pass.startsWith(PASS_JUDGE_PREFIX);
     }
 
     /** The module object a tagged pass deletes, or null when the module no longer names it. */
     private static Schema.SObjectType taggedTypeOf(String pass) {
+        pass = pass == null ? null : pass.removeStart(PASS_JUDGE_PREFIX);
         if (pass == null || !pass.startsWith(PASS_TAGGED_PREFIX)) {
             return null;
         }
@@ -222,10 +285,10 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 ]
             );
         }
-        if (pass.startsWith(PASS_TAGGED_PREFIX)) {
+        if (target().startsWith(PASS_TAGGED_PREFIX)) {
             return taggedLocator(owner);
         }
-        if (PASS_CONTACTS.equals(pass)) {
+        if (PASS_CONTACTS.equals(target())) {
             return Database.getQueryLocator(
                 [
                     SELECT Id, Name, Created_By_Import_Batch__c
@@ -236,7 +299,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             );
         }
         Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
-        if (PASS_PERSON_ACCOUNTS.equals(pass)) {
+        if (PASS_PERSON_ACCOUNTS.equals(target())) {
             return Database.getQueryLocator(
                 [
                     SELECT Id, Name, Created_By_Import_Batch__c
@@ -293,6 +356,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 for (SObject page : records) {
                     deleteCreated((Import_Journal__c) page, journal);
                 }
+            } else if (judging()) {
+                judge(records);
             } else {
                 deleteTagged(records, journal);
             }
@@ -317,15 +382,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 next = passes.size();
             }
             if (next > 0 && next < passes.size()) {
-                ImportUndoBatch following = new ImportUndoBatch(
-                    batchId,
-                    countedAtStart,
-                    passes[next],
-                    restored,
-                    failed,
-                    undoStartedAt
-                );
-                following.createdGone = createdGone;
+                ImportUndoBatch following = followedBy(passes[next]);
                 Database.executeBatch(following, scopeFor(passes[next], batchId));
                 return;
             }
@@ -334,6 +391,22 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
             failed = true;
         }
         ImportUndoService.finish(batchId, countedAtStart, restored, failed, createdGone);
+    }
+
+    /** The given pass of this undo, carrying what the passes so far found and counted. */
+    @TestVisible
+    private ImportUndoBatch followedBy(String nextPass) {
+        ImportUndoBatch following = new ImportUndoBatch(
+            batchId,
+            countedAtStart,
+            nextPass,
+            restored,
+            failed,
+            undoStartedAt
+        );
+        following.createdGone = createdGone;
+        following.editedBeforeUndo = editedBeforeUndo;
+        return following;
     }
 
     // -------------------------------------------------------------------------------------
@@ -622,6 +695,31 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     }
 
     // -------------------------------------------------------------------------------------
+    // Judge
+    // -------------------------------------------------------------------------------------
+
+    /**
+     * Notes which of this chunk's tagged records were edited before the undo began, before any
+     * pass puts back or deletes anything (ADR-0119). The other passes come later; by then a
+     * gift the undo deleted may have set off a rollup that saved its donor, which would hide
+     * an edit made before it.
+     */
+    private void judge(List<SObject> records) {
+        Set<Id> ids = new Set<Id>();
+        for (SObject record : records) {
+            if (record.get('Created_By_Import_Batch__c') == batchId) {
+                ids.add(record.Id);
+            }
+        }
+        if (ids.isEmpty()) {
+            return;
+        }
+        Map<Id, String> edited = new Map<Id, String>();
+        markEdited(edited, ids, records[0].getSObjectType());
+        editedBeforeUndo.addAll(edited.keySet());
+    }
+
+    // -------------------------------------------------------------------------------------
     // Delete
     // -------------------------------------------------------------------------------------
 
@@ -890,16 +988,24 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     /**
      * Keeps a record somebody edited since the import, or logged an activity on. An edit
      * counts when it was made by somebody other than the committer after the commit started,
-     * or by anybody once the commit's own follow-on work has settled; an edit the undo itself
-     * made (a household renamed as its imported members go) does not count.
+     * or by anybody once the commit's own follow-on work has settled.
+     *
+     * Two kinds of save are not edits (ADR-0119): a rollup the import set off, told by the
+     * freshness stamp it writes in the same save, dated before the import's follow-on work
+     * settled, whoever ran it (the committer or the Automated Process user that starts the
+     * Rollup Queue); and, once the judging is done, the undo's own saves and the rollups its
+     * deletes set off. Those may hide an earlier edit, so a record they saved during the undo
+     * is judged by what the judging passes found before anything was put back or deleted.
      */
     private void markEdited(Map<Id, String> keep, Set<Id> ids, Schema.SObjectType type) {
         Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
             .fields.getMap();
         Boolean hasActivities = fields.containsKey('lastactivitydate');
+        String stampField = rollupStampField(fields);
         String query =
             'SELECT Id, LastModifiedDate, LastModifiedById' +
             (hasActivities ? ', LastActivityDate' : '') +
+            (stampField == null ? '' : ', ' + stampField) +
             ' FROM ' +
             type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
             ' WHERE Id IN :ids';
@@ -911,22 +1017,67 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         for (SObject row : rows) {
             Datetime modified = (Datetime) row.get('LastModifiedDate');
             Id modifiedBy = (Id) row.get('LastModifiedById');
+            Boolean duringUndo = modified >= undoStartedAt;
             Boolean byTheUndo =
                 modifiedBy == UserInfo.getUserId() &&
-                modified >= undoStartedAt &&
+                duringUndo &&
                 modified <= checkedAt;
-            Boolean edited =
-                (startedAt != null &&
-                committedBy != null &&
-                modified >= startedAt &&
-                modifiedBy != committedBy) ||
-                (completedAt != null &&
-                modified > completedAt.addMinutes(SETTLE_MINUTES));
+            Datetime stamp = stampField == null ? null : (Datetime) row.get(stampField);
+            Boolean byARollup = isRollupSave(modified, stamp);
+            // A rollup the import itself set off, stamped before its follow-on work settled.
+            // A later one (a nightly run, a date driven total) may hide a real edit: kept.
+            Boolean importsOwnRollup =
+                byARollup &&
+                completedAt != null &&
+                stamp <= completedAt.addMinutes(ROLLUP_SETTLE_MINUTES);
+            Boolean edited;
+            if (!judging() && duringUndo && (byTheUndo || byARollup)) {
+                // Saved since the undo began, by the undo or by a rollup its work set off:
+                // what the judging found before anything was put back or deleted decides.
+                // While judging, the undo has changed nothing yet, so no save is excused so.
+                edited = editedBeforeUndo.contains(row.Id);
+            } else {
+                edited =
+                    !importsOwnRollup &&
+                    ((startedAt != null &&
+                    committedBy != null &&
+                    modified >= startedAt &&
+                    modifiedBy != committedBy) ||
+                    (completedAt != null &&
+                    modified > completedAt.addMinutes(SETTLE_MINUTES)));
+            }
             Boolean activity = hasActivities && row.get('LastActivityDate') != null;
-            if ((edited && !byTheUndo) || activity) {
+            if (edited || activity) {
                 keep.put(row.Id, Label.Core_Import_UndoKeptEdited);
             }
         }
+    }
+
+    /**
+     * The rollup freshness stamp on this object (canonical model, Rollups Last Calculated), or
+     * null where it has none. Read in system mode, so the undo's own access does not matter.
+     */
+    private static String rollupStampField(Map<String, Schema.SObjectField> fields) {
+        Schema.SObjectField stamp = fields.get(RollupService.FRESHNESS_FIELD);
+        if (stamp == null) {
+            return null;
+        }
+        Schema.DescribeFieldResult described = stamp.getDescribe();
+        return described.getType() == Schema.DisplayType.DATETIME ? described.getName() : null;
+    }
+
+    /**
+     * Whether a record's last save was a rollup's: the platform stamped it within a few
+     * seconds after the freshness stamp the rollup wrote in that save. A later save of any
+     * other kind leaves the stamp behind it.
+     */
+    @TestVisible
+    private static Boolean isRollupSave(Datetime modified, Datetime stamp) {
+        if (modified == null || stamp == null) {
+            return false;
+        }
+        Datetime stampedAt = toTheSecond(stamp);
+        return modified >= stampedAt && modified <= stampedAt.addSeconds(ROLLUP_WRITE_SECONDS);
     }
 
     /**
@@ -1199,6 +1350,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
     private static Integer scopeFor(String pass, Id batchId) {
         if (PASS_RESTORE.equals(pass) || PASS_CREATED.equals(pass)) {
             return 1;
+        }
+        if (pass.startsWith(PASS_JUDGE_PREFIX)) {
+            return JUDGE_CHUNK;
         }
         Decimal chunkSize = [
             SELECT Chunk_Size__c

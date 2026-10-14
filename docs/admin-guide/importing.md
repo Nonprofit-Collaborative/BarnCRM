@@ -237,6 +237,15 @@ What undo will not do, on purpose:
   gift was not entered after the import, for example an older gift whose donor was changed
   to a person in that household. Each record kept is listed with the reason in the import's
   journal.
+- **It keeps a record somebody edited since.** A person or household somebody (or another
+  automation) changed after the import is kept. Totals the import or the undo recalculates
+  are not an edit: when undo deletes the imported gifts, the donors' totals are recalculated,
+  and the donors are still removed. A donor somebody edited before you selected Undo is kept
+  even so. The import's own totals count as the import's when they are recalculated within an
+  hour of it finishing, which is usually minutes. Totals recalculated later, such as by the
+  nightly run, keep the record, since they could hide an edit; the journal says so. An edit
+  made in that first hour and then followed by a recalculation of the same person's totals is
+  not seen.
 - **It does not overwrite a correction.** A value somebody has changed since the import is
   left as they set it, and listed as not put back.
 - **It does not empty the recycle bin.** Deleted records go to the recycle bin, where you can

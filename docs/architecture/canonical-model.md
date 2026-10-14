@@ -2412,7 +2412,13 @@ after the deadline is refused, in a sentence naming the date it passed.
   - the record itself was edited since: by somebody other than the committer after the
     commit started, or by anybody more than ten minutes after it completed (the ten minutes
     are the import's own follow-on work, such as rollups and household naming, which runs as
-    the committer); or an activity has been logged on it;
+    the committer); or an activity has been logged on it. A rollup save the import set off is
+    not an edit, whoever ran it (the committer or the Automated Process user that starts the
+    Rollup Queue): it is told by `Rollups_Last_Calculated__c`, which the rollup writes in the
+    same save whatever the running user's access, the record's last save falling within five
+    seconds after that stamp, and the stamp no later than sixty minutes after the commit
+    completed, a fixed window the Rollup Queue drains well within (ADR-0119). A later rollup save may hide a real edit and keeps the record; so does
+    a save on an object without the stamp, which cannot be told apart;
   - for a household or an organization, a person this import did not create is still on it,
     or Nonprofit Cloud records depend on it (ADR-0036), or an installed module still credits
     records to it, asked through `HouseholdDependentsExtensions` as the empty household
@@ -2422,7 +2428,12 @@ after the deadline is refused, in a sentence naming the date it passed.
     checked.
 
   Work the undo itself does (a household renamed as its imported members are deleted) is
-  not counted. A check that cannot run, or would leave the delete too few queries, keeps the
+  not counted. Because such a save, or a rollup a delete sets off (a donor's totals once
+  their imported gifts are gone), would hide an edit made before it, the undo first judges
+  every tagged record, in one judging pass per delete pass before anything is put back or
+  deleted, and carries the records found edited to the delete passes; a record saved during
+  the undo by the undo or by a rollup is kept only when it was found edited then (ADR-0119).
+  A check that cannot run, or would leave the delete too few queries, keeps the
   record and journals that it was not checked. A record the person undoing cannot delete is
   kept and journaled with the reason. Deleting a donor clears the donor on every gift
   recorded against them since, which would change giving totals; the import's records are
@@ -7142,6 +7153,7 @@ mirrors the primary member).
 | v0.6 | 2026-10-14 | Rollup Queue enqueue race (ADR-0117, `0117-rollup-queue-asks-again-after-commit.md`, tier 1 scale rerun). No object or field added. R-RQ3: a transaction that inserted entries and queued no processor publishes `Rollup_Queue_Ready__e`, so the check runs again after it commits; before this a processor waiting at the save could finish before the save committed, and a parallel Bulk API load left 47 entries Pending with no processor. |
 | v0.6 | 2026-10-14 | Large parent route efficiency (ADR-0116, tier 1 scale rerun). New protected hierarchy custom setting `Rollup_Run_Lock__c` (no fields, Section 14A implementation). R-RQ6: a record goes to the batch only when its estimate reaches two fifths of the query row limit (was a fifth; the run budget stays three fifths), and a run starts only under a lock on that setting's org-level record, so concurrent processors no longer start batches side by side. R-RQ3: the hand-off at the chain depth limit is no longer logged. |
 | v0.6 | 2026-10-14 | Merge settlement always runs (ADR-0118). New platform event `Merge_Settlement_Ready__e` (Publish After Commit; `Household_Ids__c`, `Owner_Ids__c`, `Person_Ids__c`, 200 identifiers each per event), subscribed by `MergeSettlementReadyTrigger`; the three packaged permission sets grant Read and Create on it. A merge inside a Queueable, or with no queueable job left, publishes it instead of only logging a warning, so its survivors are settled. A person account survivor keeps the default address matching its mailing fields, not the newest. |
+| v0.6 | 2026-10-14 | Import undo and rollup saves (ADR-0119, `0119-import-undo-judges-edits-before-deleting.md`, 25,000 row gift import scale test). No object or field added. R-IB9: a rollup save the import set off, told by the `Rollups_Last_Calculated__c` stamp written in it (whatever the running user's access) and dated within sixty minutes of the commit completing, is not an edit, whoever ran it; a later one keeps the record; the undo judges every tagged record for edits before it puts back or deletes anything, so a rollup either sets off, or the undo's own save, cannot hide an earlier edit. Before this, undoing an import that created people and gifts kept 7,229 of 8,333 people, saved by the Automated Process user as their totals were recalculated. |
 
 ---
 ## 32. Entity ownership by package
