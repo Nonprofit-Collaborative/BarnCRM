@@ -30,7 +30,7 @@ public with sharing class AccessController {
         @AuraEnabled
         public Id currentUserId;
         @AuraEnabled
-        public Boolean canAssignAddOns;
+        public Boolean canChangeAccess;
         @AuraEnabled
         public List<AccessService.AddOn> addOns;
         @AuraEnabled
@@ -71,9 +71,10 @@ public with sharing class AccessController {
                 ? e.getMessage()
                 : Label.Core_Access_ErrorRolesNotVisible;
         }
+        // Giving a role or an add-on needs both Manage BarnCRM Settings and what Setup itself
+        // would need, so the page can disable both up front (ADR-0121).
+        result.canChangeAccess = AccessService.changeRefusal() == null;
         // Extra permissions are loaded on their own, so a failure here never hides the roles.
-        // Giving one needs both Manage BarnCRM Settings and what Setup itself would need.
-        result.canAssignAddOns = AccessService.addOnRefusal() == null;
         try {
             result.addOns = AccessService.getAddOns();
             result.addOnAssignments = AccessService.getAddOnAssignments();
@@ -124,7 +125,7 @@ public with sharing class AccessController {
         Boolean isAssign
     ) {
         AccessResult result = new AccessResult();
-        String refusal = AccessService.addOnRefusal();
+        String refusal = AccessService.changeRefusal();
         if (refusal != null) {
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
@@ -211,8 +212,10 @@ public with sharing class AccessController {
     }
 
     /**
-     * Shared path for giving and taking away a role: permission check, input validation,
-     * then the service call.
+     * Shared path for giving and taking away a role: the same permission check as for
+     * add-ons (Manage BarnCRM Settings, and Assign Permission Sets or Manage Users), so a
+     * person without the Salesforce permission gets a plain reason rather than the
+     * platform's refusal, then input validation, then the service call.
      *
      * @param userId the person, as an Id in text form
      * @param roleDeveloperName the DeveloperName of one of the five packaged roles
@@ -225,10 +228,11 @@ public with sharing class AccessController {
         Boolean isAssign
     ) {
         AccessResult result = new AccessResult();
-        if (!result.canManage) {
+        String refusal = AccessService.changeRefusal();
+        if (refusal != null) {
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
-            result.message = Label.Core_Access_ErrorNoPermission;
+            result.message = refusal;
             return result;
         }
         Id assigneeId = toUserId(userId);

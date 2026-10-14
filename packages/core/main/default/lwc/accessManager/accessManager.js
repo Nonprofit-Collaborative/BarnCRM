@@ -20,7 +20,7 @@ import ADD_ON_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_AddOnPick
 import ADD_ON_REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_AddOnRemoveSuccess';
 import ADD_ONS_DESCRIPTION from '@salesforce/label/c.Core_Access_AddOnsDescription';
 import ADD_ONS_HEADING from '@salesforce/label/c.Core_Access_AddOnsHeading';
-import ADD_ONS_READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_AddOnsReadOnlyNotice';
+import CHANGE_READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_ErrorNeedsAccessManager';
 import NO_ONE_HAS_ADD_ON from '@salesforce/label/c.Core_Access_NoOneHasAddOn';
 import ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AssignSuccess';
 import AUTOMATIC_ACCESS_HELP from '@salesforce/label/c.Core_Access_AutomaticAccessHelp';
@@ -94,7 +94,7 @@ export default class AccessManager extends LightningElement {
     addOnPickerPlaceholder: ADD_ON_PICKER_PLACEHOLDER,
     addOnsDescription: ADD_ONS_DESCRIPTION,
     addOnsHeading: ADD_ONS_HEADING,
-    addOnsReadOnlyNotice: ADD_ONS_READ_ONLY_NOTICE,
+    changeReadOnlyNotice: CHANGE_READ_ONLY_NOTICE,
     noOneHasAddOn: NO_ONE_HAS_ADD_ON,
     automaticAccessHelp: AUTOMATIC_ACCESS_HELP,
     automaticAccessLink: AUTOMATIC_ACCESS_LINK,
@@ -128,7 +128,7 @@ export default class AccessManager extends LightningElement {
   @track addOnAssignments = [];
 
   canManage = false;
-  canAssignAddOns = false;
+  canChangeAccess = false;
   selectedAddOn = '';
   currentUserId;
   loadError;
@@ -153,7 +153,7 @@ export default class AccessManager extends LightningElement {
       this.currentUserId = data.currentUserId;
       this.roles = data.roles || [];
       this.assignments = data.assignments || [];
-      this.canAssignAddOns = Boolean(data.canAssignAddOns);
+      this.canChangeAccess = Boolean(data.canChangeAccess);
       this.addOns = data.addOns || [];
       this.addOnAssignments = data.addOnAssignments || [];
       this.loadError = data.success ? undefined : data.message;
@@ -201,17 +201,18 @@ export default class AccessManager extends LightningElement {
     return this.addOns.length > 0;
   }
 
-  /** @returns {boolean} true when the person may give and remove extra permissions */
-  get showAddOnControls() {
-    return this.canManage && this.canAssignAddOns;
+  /** @returns {boolean} true when the person may give and remove roles and extra permissions */
+  get showChangeControls() {
+    return this.canManage && this.canChangeAccess;
   }
 
   /**
-   * @returns {boolean} true when the person may change roles but not extra permissions, so
-   * the section needs its own notice (without Manage BarnCRM Settings the page notice says it)
+   * @returns {boolean} true when the person may manage settings but lacks Assign Permission
+   * Sets, so the page explains BarnCRM Access Manager (without Manage BarnCRM Settings the
+   * read-only notice says it instead)
    */
-  get showAddOnReadOnly() {
-    return this.canManage && !this.canAssignAddOns && this.hasAddOns;
+  get showChangeReadOnly() {
+    return this.canManage && !this.canChangeAccess;
   }
 
   /** @returns {Array<object>} one card per extra permission, with the people given it */
@@ -310,7 +311,7 @@ export default class AccessManager extends LightningElement {
 
   /** @returns {boolean} true while the Give access button should stay disabled */
   get canSubmitDisabled() {
-    return !this.canSubmit;
+    return !this.canSubmit || !this.canChangeAccess;
   }
 
   /**
