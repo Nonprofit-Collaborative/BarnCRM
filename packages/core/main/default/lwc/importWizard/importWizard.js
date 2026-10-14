@@ -140,8 +140,6 @@ import duplicateRulesLabel from '@salesforce/label/c.Core_Import_DuplicateRulesL
 import duplicateRulesHelp from '@salesforce/label/c.Core_Import_DuplicateRulesHelp';
 import duplicateRulesNone from '@salesforce/label/c.Core_Import_DuplicateRulesNone';
 import duplicateRulesObjectHelp from '@salesforce/label/c.Core_Import_DuplicateRulesObjectHelp';
-import duplicateRulesObjectNoRule from '@salesforce/label/c.Core_Import_DuplicateRulesObjectNoRule';
-import duplicateRulesObjectNoCreate from '@salesforce/label/c.Core_Import_DuplicateRulesObjectNoCreate';
 import ruleEmailExact from '@salesforce/label/c.Core_Import_RuleEmailExact';
 import ruleNamePostalCode from '@salesforce/label/c.Core_Import_RuleNamePostalCode';
 import ruleExternalId from '@salesforce/label/c.Core_Import_RuleExternalId';
@@ -422,8 +420,6 @@ export default class ImportWizard extends LightningElement {
     duplicateRulesHelp,
     duplicateRulesNone,
     duplicateRulesObjectHelp,
-    duplicateRulesObjectNoRule,
-    duplicateRulesObjectNoCreate,
     delimiterLabel,
     delimiterHelp,
     sheetLabel,
@@ -1115,30 +1111,13 @@ export default class ImportWizard extends LightningElement {
     this.useDuplicateRules = event.target.checked;
   }
 
-  /** Whether the chosen one-object operation can create a record, so the rules can be asked. */
-  get loadCreates() {
-    return this.loadOperation === INSERT || this.loadOperation === UPSERT;
-  }
-
   /**
    * Whether the duplicate rules box is offered (R-IT16): always for people, and for one object
-   * under an operation that creates when its object has an active rule (or that is unknown).
+   * under Insert or Upsert, the operations where a row can create a record. With no rule
+   * switched on, the run log says so.
    */
   get showDuplicateRules() {
-    if (!this.loadsOneObject) {
-      return true;
-    }
-    return this.loadCreates && this.selectedTemplate.objectDuplicateRules !== false;
-  }
-
-  /** Why a one-object mapping does not offer the box, or undefined when it does. */
-  get duplicateRulesHiddenReason() {
-    if (this.showDuplicateRules) {
-      return undefined;
-    }
-    return this.loadCreates
-      ? this.labels.duplicateRulesObjectNoRule
-      : this.labels.duplicateRulesObjectNoCreate;
+    return !this.loadsOneObject || this.loadOperation === INSERT || this.loadOperation === UPSERT;
   }
 
   get duplicateRulesHelpText() {
@@ -1153,7 +1132,7 @@ export default class ImportWizard extends LightningElement {
    */
   get duplicateRulesMissing() {
     if (this.loadsOneObject) {
-      // A one-object mapping shows the box only where its object has a rule (R-IT16).
+      // People and organization rules say nothing about a one-object load (R-IT16).
       return false;
     }
     const template = this.selectedTemplate;

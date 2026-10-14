@@ -624,28 +624,39 @@ with my duplicate rules** (on the matching step) to stop a file from creating a 
 a record you already have. Each row that would create a record is first looked for with the
 duplicate rules your org has switched on for that object (see [Duplicates](duplicates.md)),
 custom objects included; a record they match is updated with the row's values instead, and a
-row they match to nothing creates its record as usual. The box is shown only when the object has
-at least one active duplicate rule you can see; otherwise the step says why it is missing. It
-is not offered under **Update by record ID**, **Update by a field you choose** or **Delete by
-record ID**, which never create a record.
+row they match to nothing creates its record as usual. The box is not offered under **Update
+by record ID**, **Update by a field you choose** or **Delete by record ID**, which never create
+a record (so it never appears for contacts and accounts, which load by Update only).
 
 - **Which wins.** The record ID and the field rows are found by always come first: under
   **Upsert by external ID**, a row whose external ID finds a record updates that record and the
   duplicate rules are never asked about it. Only a row that would otherwise create a record is
-  asked. A row the rules match under an upsert writes its external ID onto the matched record.
+  asked.
+- **External IDs are never overwritten.** Under an upsert, a row the rules match to a record
+  whose external ID field is empty fills it in with the row's value. A row they match to a
+  record that already holds a different external ID is rejected, naming the field: check which
+  record is right, then fix the file or the record.
 - **More than one match.** When the rules match several records, **When more than one record
   matches** decides, as in section 8: the row is rejected, or the most recently changed record
   is updated.
-- **One record, one row.** A row the rules match to a record that an earlier row of the file
-  already updates (by key or by a rule) is rejected, so no record is changed twice by one file.
-- **Dry run and commit agree.** The rules are asked only about records that were there before
-  the import: a record an earlier row of the same commit created is never taken as a match,
-  since the dry run could not have seen it.
+- **One record, one row.** A record that an earlier row of the file already creates or updates
+  is set aside before the choice. A row whose only matches are records earlier rows update is
+  rejected, so no record is changed twice by one file.
+- **Dry run and commit agree, with one limit.** The rules are asked only about records that
+  were there before the import, and records earlier rows load are set aside, so the commit
+  chooses as the dry run did. The limit: duplicate rules compare field values, so a value an
+  earlier row of the commit changes on some record can make the rules match that record (or
+  stop matching it) for a later row, where the dry run, which changed nothing, saw the old
+  values. Compare the commit's results with the dry run's when one file both updates and adds
+  similar records.
 - **Read before you commit.** Duplicate rules are looser than a record ID or key, so a row can
   update a record that is only similar. Every row matched this way has **Matched By Duplicate
-  Rule** ticked and the run log says so: check those rows in the dry run. If no rule can be
-  asked (none is switched on, or Salesforce could not run it), the run log says so and every
-  row is matched by its ID or key alone. The choice is saved with the mapping.
+  Rule** ticked and the run log says so: check those rows in the dry run.
+- **No rule, or a rule that fails.** If no duplicate rule is switched on for the object, the
+  run log says so and every row is matched by its ID or key alone. If a rule is switched on but
+  Salesforce could not run it, each row that would create a record is rejected with that reason
+  rather than risk a duplicate: import those rows again later, or untick the box. The choice is
+  saved with the mapping.
 
 **Which objects are listed.** Your org's own custom objects, and the standard objects
 Salesforce treats as business records (ones you can find in global search), where you

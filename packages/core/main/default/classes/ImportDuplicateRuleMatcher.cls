@@ -45,6 +45,13 @@ public with sharing class ImportDuplicateRuleMatcher {
     @TestVisible
     private static Boolean stubUnavailable = false;
 
+    /** In a test, a rule is active but the matcher raises, as the platform can. */
+    @TestVisible
+    private static Boolean stubFailure = false;
+
+    /** Whether the last `matchesFor` answered null because asking failed, not for want of a rule. */
+    private static Boolean lastAskFailed = false;
+
     /** How many times the platform's matcher was called in this transaction. */
     @TestVisible
     private static Integer calls = 0;
@@ -107,6 +114,7 @@ public with sharing class ImportDuplicateRuleMatcher {
     @NamespaceAccessible
     public static List<List<SObject>> matchesFor(List<SObject> probes, Set<Id> allowedRecordTypes) {
         List<List<SObject>> result = new List<List<SObject>>();
+        lastAskFailed = false;
         if (probes == null || probes.isEmpty()) {
             return result;
         }
@@ -115,11 +123,12 @@ public with sharing class ImportDuplicateRuleMatcher {
         if (active == false) {
             return null;
         }
-        List<List<Id>> matchedIds = stubMatches != null ||
-            stubUnavailable == true
+        List<List<Id>> matchedIds = isStubbed()
             ? stubbed(probes)
             : asked(probes, type, active == true);
         if (matchedIds == null) {
+            // A rule is active, or the rules could not be read: either way it was not asked.
+            lastAskFailed = true;
             return null;
         }
         Set<Id> all = new Set<Id>();
@@ -137,6 +146,20 @@ public with sharing class ImportDuplicateRuleMatcher {
             result.add(kept);
         }
         return result;
+    }
+
+    /**
+     * Whether the last `matchesFor` answered null because the matcher failed, with a rule
+     * active or the rules unreadable, rather than because the object has no active rule. A
+     * caller that must not create a duplicate rejects instead of creating then.
+     */
+    @NamespaceAccessible
+    public static Boolean lastAskFailed() {
+        return lastAskFailed;
+    }
+
+    private static Boolean isStubbed() {
+        return stubMatches != null || stubUnavailable == true || stubFailure == true;
     }
 
     /**
@@ -181,7 +204,7 @@ public with sharing class ImportDuplicateRuleMatcher {
      */
     @NamespaceAccessible
     public static Boolean hasActiveRule(Schema.SObjectType type, Boolean personAccounts) {
-        if (stubMatches != null || stubUnavailable == true) {
+        if (isStubbed()) {
             return stubUnavailable != true;
         }
         String objectName = type.getDescribe().getName();
@@ -190,28 +213,6 @@ public with sharing class ImportDuplicateRuleMatcher {
                 objectName,
                 type == Account.SObjectType && personAccounts == true
             );
-        } catch (Exception cannotReadRules) {
-            return null;
-        }
-    }
-
-    /**
-     * Which of these objects (API names as describe gives them) have an active duplicate rule
-     * the user can see, read in one query whatever the number of objects; null when the user
-     * cannot read the rules at all. Account counts for a rule that compares organizations, as
-     * `DuplicateSelector.objectsWithActiveRules` says. The import wizard offers matching through
-     * the rules on a one-object template only for an object in the answer, or when it is null.
-     */
-    @NamespaceAccessible
-    public static Set<String> objectsWithActiveRules(Set<String> objectNames) {
-        if (objectNames == null || objectNames.isEmpty()) {
-            return new Set<String>();
-        }
-        if (stubMatches != null || stubUnavailable == true) {
-            return stubUnavailable == true ? new Set<String>() : new Set<String>(objectNames);
-        }
-        try {
-            return DuplicateSelector.objectsWithActiveRules(objectNames);
         } catch (Exception cannotReadRules) {
             return null;
         }
@@ -287,7 +288,7 @@ public with sharing class ImportDuplicateRuleMatcher {
     }
 
     private static List<List<Id>> stubbed(List<SObject> probes) {
-        if (stubUnavailable == true) {
+        if (stubUnavailable == true || stubFailure == true) {
             return null;
         }
         List<List<Id>> result = new List<List<Id>>();

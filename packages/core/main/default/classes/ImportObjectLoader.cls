@@ -155,6 +155,9 @@ public with sharing class ImportObjectLoader {
             matchByDuplicateRules(batch, type, parents, plans, mostRecent, outcome);
         }
         readRecords(type, parents, plans);
+        if (operation == ImportObjectSchema.OPERATION_UPSERT) {
+            rejectKeyConflicts(type, ImportObjectSchema.keyFieldOf(template), parents);
+        }
         for (Item item : parents) {
             if (item.error == null && item.creates && batch.Match_Only__c == true) {
                 // A file that only matches creates nothing (R-IB15).
@@ -633,9 +636,11 @@ public with sharing class ImportObjectLoader {
      * record (R-IT16), through `ImportDuplicateRuleMatcher` as a people import asks: the row's
      * values on an unsaved record, at most 50 a call, matches read back in the user's mode. A
      * row they match updates that record instead; several follow Several Matches (R-IT9). A
-     * record an earlier chunk of this pass created is not taken, because the dry run could not
-     * have seen it, and a record an earlier row already loads rejects the row, as a repeated key
-     * does. With no rule to ask, the rows create and the run log says so.
+     * record an earlier chunk of this pass created or loaded is set aside before choosing,
+     * because the dry run could not have seen it as the commit does, and a row whose matches
+     * were all loaded by earlier rows is rejected, as a repeated key is. With no rule to ask,
+     * the rows create and the run log says so; when a rule could not be run, the asked rows are
+     * rejected rather than risk a duplicate.
      */
     private static void matchByDuplicateRules(
         Import_Batch__c batch,
@@ -669,6 +674,12 @@ public with sharing class ImportObjectLoader {
             return;
         }
         List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(probes, null);
+        if (found == null && ImportDuplicateRuleMatcher.lastAskFailed()) {
+            for (Item item : asked) {
+                item.error = Label.Core_Import_ErrorDuplicateRulesUnavailable;
+            }
+            return;
+        }
         if (found == null) {
             outcome.notes.add(Label.Core_Import_LogNoDuplicateRuleRecords);
             return;
@@ -685,7 +696,7 @@ public with sharing class ImportObjectLoader {
             if (matched == null) {
                 continue;
             }
-            if (taken.contains(matched) || earlier.containsKey(String.valueOf(matched))) {
+            if (taken.contains(matched)) {
                 asked[i].error = Label.Core_Import_ErrorDuplicateRuleRecordRepeated;
                 continue;
             }
@@ -698,7 +709,9 @@ public with sharing class ImportObjectLoader {
 
     /**
      * The record the rules matched for one row, or null: none, only records an earlier chunk
-     * of this pass created, or several under a Several Matches that rejects the row.
+     * of this pass created, or several under a Several Matches that rejects the row. Records an
+     * earlier chunk created or loaded are set aside first: a commit's earlier update changes
+     * when a record was last changed, so keeping them could choose otherwise than the dry run.
      */
     private static Id chosenByRule(
         Item item,
@@ -707,12 +720,19 @@ public with sharing class ImportObjectLoader {
         Boolean mostRecent
     ) {
         List<SObject> kept = new List<SObject>();
+        Boolean loadedEarlier = false;
         for (SObject matched : found) {
-            if (earlier.get(String.valueOf(matched.Id)) != true) {
+            Boolean created = earlier.get(String.valueOf(matched.Id));
+            if (created == null) {
                 kept.add(matched);
+            } else if (!created) {
+                loadedEarlier = true;
             }
         }
         if (kept.isEmpty()) {
+            if (loadedEarlier) {
+                item.error = Label.Core_Import_ErrorDuplicateRuleRecordRepeated;
+            }
             return null;
         }
         if (kept.size() > 1) {
@@ -735,6 +755,40 @@ public with sharing class ImportObjectLoader {
             }
         }
         return result;
+    }
+
+    /**
+     * Rejects an upsert row the duplicate rules matched to a record that already holds another
+     * value in the key field: loading it would overwrite that record's external ID. A blank key
+     * is filled in; no other record can hold the row's key, or the key itself would have found
+     * it.
+     */
+    private static void rejectKeyConflicts(
+        Schema.SObjectType type,
+        String keyField,
+        List<Item> items
+    ) {
+        Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, keyField);
+        if (token == null) {
+            return;
+        }
+        Schema.DescribeFieldResult field = token.getDescribe();
+        for (Item item : items) {
+            if (item.error != null || !item.ruleMatch || item.stored == null) {
+                continue;
+            }
+            Object held = item.stored.getPopulatedFieldsAsMap().get(field.getName());
+            if (
+                held != null &&
+                String.isNotBlank(String.valueOf(held)) &&
+                ImportMatcher.nameKey(String.valueOf(held)) != item.key
+            ) {
+                item.error = String.format(
+                    Label.Core_Import_ErrorDuplicateRuleKeyDiffers,
+                    new List<String>{ field.getLabel() }
+                );
+            }
+        }
     }
 
     /** The record type the row gives, so a rule for one record type compares like with like. */

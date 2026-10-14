@@ -58,12 +58,6 @@ public with sharing class ImportController {
         /** Whether the org's duplicate rules are asked too (R-IT16). */
         @AuraEnabled
         public Boolean useDuplicateRules;
-        /**
-         * For a one-object template, whether its object has an active duplicate rule the user
-         * can see; null when unknown (the rules cannot be read), and then the box is offered.
-         */
-        @AuraEnabled
-        public Boolean objectDuplicateRules;
         /** For a template that loads one object (R-IT12, R-IT13). */
         @AuraEnabled
         public String targetObject;
@@ -344,7 +338,6 @@ public with sharing class ImportController {
                 describeLoad(template, view);
                 result.add(view);
             }
-            markObjectRules(result);
             return result;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.getTemplates');
@@ -421,7 +414,6 @@ public with sharing class ImportController {
             view.organizationRule = ImportTemplateService.ORGANIZATION_RULE_NAME;
             view.severalMatches = ImportTemplateService.SEVERAL_REJECT;
             describeLoad(template, view);
-            markObjectRules(new List<TemplateView>{ view });
             return view;
         } catch (Exception e) {
             throw auraError(e, 'ImportController.createObjectTemplate');
@@ -574,31 +566,6 @@ public with sharing class ImportController {
         view.related = ImportObjectSchema.loadsRelated(template)
             ? template.Related_Object__c + '.' + template.Related_Parent_Field__c
             : null;
-    }
-
-    /**
-     * Says for each one-object template whether its object has an active duplicate rule
-     * (R-IT16), reading the rules once for every object listed, so the wizard offers matching
-     * through them only where it can change something. Objects are as describe names them.
-     */
-    private static void markObjectRules(List<TemplateView> views) {
-        Set<String> objects = new Set<String>();
-        for (TemplateView view : views) {
-            if (view.targetObject != null) {
-                objects.add(view.targetObject);
-            }
-        }
-        if (objects.isEmpty()) {
-            return;
-        }
-        Set<String> withRules = ImportDuplicateRuleMatcher.objectsWithActiveRules(objects);
-        for (TemplateView view : views) {
-            if (view.targetObject != null) {
-                view.objectDuplicateRules = withRules == null
-                    ? null
-                    : withRules.contains(view.targetObject);
-            }
-        }
     }
 
     /** The parent field a saved column names its parent by, for the column with this source. */

@@ -2131,13 +2131,17 @@ its lookups), as the target object's fields, go on an unsaved record of the targ
 row's record type when it gives one) through the same matcher, 50 a call, read back in user
 mode with any record type. One record kept is updated with the row instead of a record being
 created, and the row has Matched By Duplicate Rule ticked; several follow Several Matches
-(R-IT9). A record that a row of an earlier chunk of the pass created is dropped from the
-matches, so the commit decides as the dry run, which could not see it; a record that another
-row of the chunk, or of an earlier chunk of the pass, already loads rejects the row, as a
-repeated key does (R-IT12). With no rule to ask, the rows create and the run log says so. The
-wizard offers the box for a one-object template only under those two operations and when the
-target object has an active duplicate rule the user can see (read for every listed template in
-one query), or when the rules cannot be read; otherwise it says why the box is missing.
+(R-IT9). Records that rows of an earlier chunk of the pass created or loaded are set aside
+before the choice, so the commit decides as the dry run (an earlier update changes a record's
+LastModifiedDate, and a created record was never there for the dry run); a row whose matches
+were all loaded by earlier rows, or whose one match another row of the chunk loads, is rejected,
+as a repeated key is (R-IT12). Field changes an earlier chunk of the commit makes can still
+change what the rules match for a later row; that limit is documented. Under Upsert, a row
+matched to a record whose key field holds a different non-blank value is rejected rather than
+overwrite that key; a blank key is filled in. With no active rule, the rows create and the run
+log says so; when a rule is active (or the rules cannot be read) and the matcher fails, the
+asked rows are rejected rather than risk a duplicate. The wizard offers the box for a one-object
+template only under those two operations.
 
 **R-IT18 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
 `"skipRows"`, at most 5 rules `{ "column", "test", "text" }` whose `test` is `equals`,

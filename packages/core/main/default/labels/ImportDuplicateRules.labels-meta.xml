@@ -73,19 +73,19 @@
         <value>A row that would create a record is first looked for with your org&apos;s duplicate rules for this object; a record they match is updated instead. They are looser than a record ID or key, so check the ticked rows in the dry run.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DuplicateRulesObjectNoRule</fullName>
+        <fullName>Core_Import_ErrorDuplicateRulesUnavailable</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: no duplicate rule for the chosen object</shortDescription>
-        <value>Matching with your duplicate rules is not offered: no duplicate rule is switched on for this object. The Duplicates page of the admin guide says how to switch one on.</value>
+        <shortDescription>Import row: duplicate rules could not be checked</shortDescription>
+        <value>Your duplicate rules could not be checked for this row (Salesforce could not run them), so it was not loaded rather than risk creating a duplicate. Import it again later, or untick Also match with my duplicate rules.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_DuplicateRulesObjectNoCreate</fullName>
+        <fullName>Core_Import_ErrorDuplicateRuleKeyDiffers</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import wizard: duplicate rules need an operation that creates</shortDescription>
-        <value>Matching with your duplicate rules is offered only for Insert and Upsert by external ID, where a row could create a record. This choice finds every record by its ID or field.</value>
+        <shortDescription>Import row: duplicate rule match already has another key; {0} is the key field</shortDescription>
+        <value>Your duplicate rules matched this row to a record whose {0} already holds a different value, which loading the row would overwrite. Check which record is right, fix the file or the record, and import the row again.</value>
     </labels>
 </CustomLabels>

@@ -2,11 +2,10 @@
  * A one-object template matching through the org's duplicate rules (canonical model R-IT16,
  * R-IT12): only rows that would create are asked, a record ID or key match wins, a match updates
  * the record instead of creating one, several follow Several Matches, a record another row loads
- * or an earlier chunk created is not taken, the dry run decides as the commit, and the wizard is
- * told which objects have an active rule. Which records an org's rules call duplicates is the
- * org's business and a test cannot create a rule, so the matcher's answer is stubbed
- * (`ImportDuplicateRuleMatcher.stubMatches`) and the rules are given through
- * `DuplicateSelector.rulesOverride`.
+ * or an earlier chunk created or loaded is set aside, the dry run decides as the commit, a match
+ * never overwrites another key, and a rule that cannot run rejects rather than creates. Which
+ * records an org's rules call duplicates is the org's business and a test cannot create a rule,
+ * so the matcher's answer is stubbed (`ImportDuplicateRuleMatcher.stubMatches`).
  *
  * Duplicate dismissals stand for an org's own object with an external ID, as in
  * `ImportObjectLoaderTest`. Every test runs as a minimal-profile user holding only BarnCRM
@@ -124,19 +123,6 @@ private class ImportObjectDuplicateRuleTest {
         return [SELECT Pair_Key__c, Reason__c FROM Duplicate_Dismissal__c WHERE Id = :recordId];
     }
 
-    private static DuplicateRule rule(String objectName, Boolean active) {
-        return (DuplicateRule) JSON.deserialize(
-            JSON.serialize(
-                new Map<String, Object>{
-                    'attributes' => new Map<String, Object>{ 'type' => 'DuplicateRule' },
-                    'SobjectType' => objectName,
-                    'IsActive' => active
-                }
-            ),
-            DuplicateRule.class
-        );
-    }
-
     // -------------------------------------------------------------------------------------
     // Insert: 200 rows, dry run and commit
     // -------------------------------------------------------------------------------------
@@ -201,25 +187,33 @@ private class ImportObjectDuplicateRuleTest {
     // -------------------------------------------------------------------------------------
 
     @IsTest
-    static void anUpsertKeyMatchWinsAndOnlyARowThatWouldCreateIsAsked() {
+    static void anUpsertKeyMatchWinsAndARuleMatchNeverOverwritesAnotherKey() {
         System.runAs(TestUsers.admin()) {
             System.runAs(admin()) {
-                List<Duplicate_Dismissal__c> existing = dismissals(2);
+                List<Duplicate_Dismissal__c> existing = dismissals(3);
+                // A record with no key yet takes the row's.
+                existing[1].Pair_Key__c = null;
+                update existing[1];
                 ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
                     // Were the key row asked, the rules would send it to the other record.
                     'k0' => new List<Id>{ existing[1].Id },
-                    'n1' => new List<Id>{ existing[1].Id }
+                    'n1' => new List<Id>{ existing[1].Id },
+                    'n3' => new List<Id>{ existing[2].Id }
                 };
                 given(
                     ImportObjectSchema.OPERATION_UPSERT,
-                    new List<Map<String, String>>{ row('K0', 'Key'), row('N1', 'Rule') }
+                    new List<Map<String, String>>{
+                        row('K0', 'Key'),
+                        row('N1', 'Rule'),
+                        row('N3', 'Rule')
+                    }
                 );
 
                 Test.startTest();
                 ImportRowProcessor.Outcome committed = run(false);
                 Test.stopTest();
 
-                Assert.areEqual(2, committed.updated, 'Both update: ' + rowErrors());
+                Assert.areEqual(2, committed.updated, 'Two update: ' + rowErrors());
                 Assert.areEqual('Key', reread(existing[0].Id).Reason__c, 'The key found its own.');
                 Duplicate_Dismissal__c matched = reread(existing[1].Id);
                 Assert.areEqual('Rule', matched.Reason__c, 'The rules found the other.');
@@ -227,6 +221,64 @@ private class ImportObjectDuplicateRuleTest {
                 List<Import_Row__c> loaded = rows();
                 Assert.isFalse(loaded[0].Duplicate_Rule_Match__c, 'A key match is not ticked.');
                 Assert.isTrue(loaded[1].Duplicate_Rule_Match__c, 'A rule match is.');
+                Assert.areEqual(
+                    String.format(
+                        Label.Core_Import_ErrorDuplicateRuleKeyDiffers,
+                        new List<String>{
+                            Schema.SObjectType.Duplicate_Dismissal__c.fields.Pair_Key__c.getLabel()
+                        }
+                    ),
+                    loaded[2].Error_Message__c,
+                    'A match holding another key is rejected.'
+                );
+                Assert.areEqual('K2', reread(existing[2].Id).Pair_Key__c, 'Its key is kept.');
+                Assert.areEqual(
+                    3,
+                    [SELECT COUNT() FROM Duplicate_Dismissal__c],
+                    'Nothing is created.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void severalMatchesSetAsideARecordAnEarlierChunkLoaded() {
+        System.runAs(TestUsers.admin()) {
+            System.runAs(admin()) {
+                List<Duplicate_Dismissal__c> existing = dismissals(2);
+                ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
+                    'n0' => new List<Id>{ existing[0].Id },
+                    'n9' => new List<Id>{ existing[0].Id, existing[1].Id }
+                };
+                given(
+                    ImportObjectSchema.OPERATION_INSERT,
+                    new List<Map<String, String>>{ row('N0', 'First'), row('N9', 'Second') }
+                );
+                template.Several_Matches__c = ImportTemplateService.SEVERAL_MOST_RECENT;
+                update template;
+                template = ImportTemplateSelector.selectById(template.Id);
+
+                Test.startTest();
+                List<Id> chosen = new List<Id>();
+                for (Boolean dryRun : new List<Boolean>{ true, false }) {
+                    ImportBatchService.beginPass(batch.Id);
+                    List<Import_Row__c> staged = ImportTestDataFactory.reload(batch.Id);
+                    chunk(new List<Import_Row__c>{ staged[0] }, dryRun);
+                    chunk(new List<Import_Row__c>{ staged[1] }, dryRun);
+                    chosen.add(rows()[1].Gift_Id__c);
+                }
+                Test.stopTest();
+
+                Assert.areEqual(
+                    existing[1].Id,
+                    chosen[0],
+                    'The dry run sets aside the record the first chunk loads: ' + rowErrors()
+                );
+                Assert.areEqual(
+                    chosen[0],
+                    chosen[1],
+                    'The commit chooses the same, though the first chunk changed that record.'
+                );
             }
         }
     }
@@ -390,118 +442,35 @@ private class ImportObjectDuplicateRuleTest {
         }
     }
 
-    // -------------------------------------------------------------------------------------
-    // What the wizard is told (R-IT16)
-    // -------------------------------------------------------------------------------------
-
     @IsTest
-    static void theWizardIsToldWhichObjectsHaveAnActiveRule() {
+    static void whenARuleCannotBeRunTheRowsThatWouldCreateAreRejected() {
         System.runAs(TestUsers.admin()) {
             System.runAs(admin()) {
-                given(ImportObjectSchema.OPERATION_INSERT, new List<Map<String, String>>());
-                Import_Template__c affiliations = ImportTestDataFactory.template(
-                    new ImportMapping().serialize(),
-                    null
+                dismissals(1);
+                ImportDuplicateRuleMatcher.stubFailure = true;
+                given(
+                    ImportObjectSchema.OPERATION_UPSERT,
+                    new List<Map<String, String>>{ row('K0', 'Key'), row('N1', 'New') }
                 );
-                affiliations.Target_Object__c = 'Affiliation__c';
-                update affiliations;
-                DuplicateSelector.rulesOverride = new List<DuplicateRule>{
-                    rule(OBJECT_NAME, true),
-                    rule('Affiliation__c', false)
-                };
 
                 Test.startTest();
-                List<ImportController.TemplateView> views = ImportController.getTemplates();
-                DuplicateSelector.rulesOverride = new List<DuplicateRule>();
-                Integer before = Limits.getQueries();
-                Set<String> none = ImportDuplicateRuleMatcher.objectsWithActiveRules(
-                    new Set<String>()
-                );
-                Integer queries = Limits.getQueries() - before;
+                ImportRowProcessor.Outcome committed = run(false);
                 Test.stopTest();
 
-                Map<Id, ImportController.TemplateView> byId = new Map<Id, ImportController.TemplateView>();
-                for (ImportController.TemplateView view : views) {
-                    byId.put(view.id, view);
-                }
-                Assert.isTrue(
-                    byId.get(template.Id).objectDuplicateRules,
-                    'An object with an active rule is offered the box.'
+                Assert.isTrue(ImportDuplicateRuleMatcher.lastAskFailed(), 'The ask failed.');
+                Assert.areEqual(1, committed.updated, 'The key row still loads.');
+                Assert.areEqual(1, committed.rejected, 'The row that would create does not.');
+                Assert.areEqual(
+                    Label.Core_Import_ErrorDuplicateRulesUnavailable,
+                    rows()[1].Error_Message__c,
+                    'Said in words.'
                 );
-                Assert.isFalse(
-                    byId.get(affiliations.Id).objectDuplicateRules,
-                    'One whose only rule is inactive is not.'
+                Assert.areEqual(
+                    1,
+                    [SELECT COUNT() FROM Duplicate_Dismissal__c],
+                    'No possible duplicate is created.'
                 );
-                for (ImportController.TemplateView view : views) {
-                    if (view.targetObject == null) {
-                        Assert.isNull(view.objectDuplicateRules, 'A people mapping is not told.');
-                    }
-                }
-                Assert.isTrue(none.isEmpty(), 'No object, no answer.');
-                Assert.areEqual(0, queries, 'And no query.');
             }
-        }
-    }
-
-    /** Without the import permission, nothing that offers the box answers. */
-    @IsTest
-    static void theTemplateAndFieldListsNeedThePermission() {
-        System.runAs(TestUsers.admin()) {
-            ImportController.permissionOverride = false;
-            Integer refused = 0;
-            for (Integer call = 0; call < 11; call++) {
-                try {
-                    if (call == 7) {
-                        ImportController.getRelatedOptions(null);
-                    } else if (call == 8) {
-                        ImportController.getRelatedFields(null, null);
-                    } else if (call == 9) {
-                        ImportController.getEntityTargets();
-                    } else if (call == 10) {
-                        ImportController.saveRecurring(null, false, null);
-                    } else if (call == 0) {
-                        ImportController.getTemplates();
-                    } else if (call == 1) {
-                        ImportController.getMatchFields();
-                    } else if (call == 2) {
-                        ImportController.getLoadableObjects();
-                    } else if (call == 3) {
-                        ImportController.createObjectTemplate('Sessions', OBJECT_NAME);
-                    } else if (call == 4) {
-                        ImportController.getObjectFields(null);
-                    } else if (call == 5) {
-                        ImportController.getKeyFields(null);
-                    } else {
-                        ImportController.getRowMatchFields(null);
-                    }
-                } catch (AuraHandledException expected) {
-                    Assert.areEqual(
-                        Label.Core_Import_ErrorNoPermission,
-                        expected.getMessage(),
-                        'Saying so.'
-                    );
-                    refused++;
-                }
-            }
-            Assert.areEqual(11, refused, 'Every call is refused.');
-        }
-    }
-
-    @IsTest
-    static void theMatcherStubAnswersForEveryObjectOrNone() {
-        System.runAs(TestUsers.admin()) {
-            Set<String> objects = new Set<String>{ OBJECT_NAME };
-            ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
-            Assert.areEqual(
-                objects,
-                ImportDuplicateRuleMatcher.objectsWithActiveRules(objects),
-                'A stubbed rule answers for the object.'
-            );
-            ImportDuplicateRuleMatcher.stubUnavailable = true;
-            Assert.isTrue(
-                ImportDuplicateRuleMatcher.objectsWithActiveRules(objects).isEmpty(),
-                'An unavailable one for none.'
-            );
         }
     }
 }
