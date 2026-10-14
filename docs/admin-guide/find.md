@@ -35,7 +35,7 @@ builder and checks it exactly as if it had been built by hand.
 
 1. Find needs the **Find and Export Records** permission. The **BarnCRM Admin** role has it.
    To let a staff member find and export without making them an admin, assign them the
-   **BarnCRM Find and Export** permission set (Setup, Users, Permission Sets), alone or
+   **BarnCRM Find and Export** permission set (BarnCRM Settings, Access, Extra permissions), alone or
    alongside their usual role. The permission opens the tool and nothing else: it never
    grants access to a record or field the person could not already see.
 2. Open the **Find** tab in the BarnCRM app.

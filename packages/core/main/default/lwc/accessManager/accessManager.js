@@ -7,8 +7,21 @@ import getAccessOverview from '@salesforce/apex/AccessController.getAccessOvervi
 import searchUsersApex from '@salesforce/apex/AccessController.searchUsers';
 import assignRoleApex from '@salesforce/apex/AccessController.assignRole';
 import removeRoleApex from '@salesforce/apex/AccessController.removeRole';
+import assignAddOnApex from '@salesforce/apex/AccessController.assignAddOn';
+import removeAddOnApex from '@salesforce/apex/AccessController.removeAddOn';
 
 import ADD_BUTTON from '@salesforce/label/c.Core_Access_AddButton';
+import ADD_ON_ADD_BUTTON from '@salesforce/label/c.Core_Access_AddOnAddButton';
+import ADD_ON_ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AddOnAssignSuccess';
+import ADD_ON_CONFIRM_ADD from '@salesforce/label/c.Core_Access_AddOnConfirmAddMessage';
+import ADD_ON_CONFIRM_REMOVE from '@salesforce/label/c.Core_Access_AddOnConfirmRemoveMessage';
+import ADD_ON_LABEL from '@salesforce/label/c.Core_Access_AddOnLabel';
+import ADD_ON_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_AddOnPickerPlaceholder';
+import ADD_ON_REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_AddOnRemoveSuccess';
+import ADD_ONS_DESCRIPTION from '@salesforce/label/c.Core_Access_AddOnsDescription';
+import ADD_ONS_HEADING from '@salesforce/label/c.Core_Access_AddOnsHeading';
+import ADD_ONS_READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_AddOnsReadOnlyNotice';
+import NO_ONE_HAS_ADD_ON from '@salesforce/label/c.Core_Access_NoOneHasAddOn';
 import ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AssignSuccess';
 import AUTOMATIC_ACCESS_HELP from '@salesforce/label/c.Core_Access_AutomaticAccessHelp';
 import AUTOMATIC_ACCESS_LINK from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
@@ -76,6 +89,13 @@ function format(template, values) {
 export default class AccessManager extends LightningElement {
   labels = {
     addButton: ADD_BUTTON,
+    addOnAddButton: ADD_ON_ADD_BUTTON,
+    addOnLabel: ADD_ON_LABEL,
+    addOnPickerPlaceholder: ADD_ON_PICKER_PLACEHOLDER,
+    addOnsDescription: ADD_ONS_DESCRIPTION,
+    addOnsHeading: ADD_ONS_HEADING,
+    addOnsReadOnlyNotice: ADD_ONS_READ_ONLY_NOTICE,
+    noOneHasAddOn: NO_ONE_HAS_ADD_ON,
     automaticAccessHelp: AUTOMATIC_ACCESS_HELP,
     automaticAccessLink: AUTOMATIC_ACCESS_LINK,
     cancelButton: CANCEL_BUTTON,
@@ -104,8 +124,12 @@ export default class AccessManager extends LightningElement {
   @track roles = [];
   @track assignments = [];
   @track searchResults = [];
+  @track addOns = [];
+  @track addOnAssignments = [];
 
   canManage = false;
+  canAssignAddOns = false;
+  selectedAddOn = '';
   currentUserId;
   loadError;
   isLoading = true;
@@ -129,6 +153,9 @@ export default class AccessManager extends LightningElement {
       this.currentUserId = data.currentUserId;
       this.roles = data.roles || [];
       this.assignments = data.assignments || [];
+      this.canAssignAddOns = Boolean(data.canAssignAddOns);
+      this.addOns = data.addOns || [];
+      this.addOnAssignments = data.addOnAssignments || [];
       this.loadError = data.success ? undefined : data.message;
     } else if (error) {
       this.isLoading = false;
@@ -167,6 +194,72 @@ export default class AccessManager extends LightningElement {
         heading: `${role.label} (${users.length})`
       };
     });
+  }
+
+  /** @returns {boolean} true when there is at least one extra permission to show */
+  get hasAddOns() {
+    return this.addOns.length > 0;
+  }
+
+  /** @returns {boolean} true when the person may give and remove extra permissions */
+  get showAddOnControls() {
+    return this.canManage && this.canAssignAddOns;
+  }
+
+  /**
+   * @returns {boolean} true when the person may change roles but not extra permissions, so
+   * the section needs its own notice (without Manage BarnCRM Settings the page notice says it)
+   */
+  get showAddOnReadOnly() {
+    return this.canManage && !this.canAssignAddOns && this.hasAddOns;
+  }
+
+  /** @returns {Array<object>} one card per extra permission, with the people given it */
+  get addOnCards() {
+    const usersByName = {};
+    this.addOnAssignments.forEach((entry) => {
+      usersByName[entry.permissionSetName] = entry.users || [];
+    });
+    return this.addOns.map((addOn) => {
+      const users = (usersByName[addOn.developerName] || []).map((person) => ({
+        ...person,
+        removeLabel: format(REMOVE_PERSON, [person.name])
+      }));
+      return {
+        developerName: addOn.developerName,
+        label: addOn.label,
+        description: oneLine(addOn.description),
+        warning: addOn.isDestructive ? addOn.warning : '',
+        users,
+        hasUsers: users.length > 0,
+        heading: `${addOn.label} (${users.length})`
+      };
+    });
+  }
+
+  /** @returns {Array<object>} the extra permissions as options for their picker */
+  get addOnOptions() {
+    return this.addOns.map((addOn) => ({ label: addOn.label, value: addOn.developerName }));
+  }
+
+  /** @returns {object|undefined} the extra permission chosen in the picker */
+  get chosenAddOn() {
+    return this.addOns.find((addOn) => addOn.developerName === this.selectedAddOn);
+  }
+
+  /** @returns {string} what the chosen extra permission grants, shown under the picker */
+  get chosenAddOnDescription() {
+    return this.chosenAddOn ? oneLine(this.chosenAddOn.description) : '';
+  }
+
+  /** @returns {string} the warning for a chosen extra permission that removes data */
+  get chosenAddOnWarning() {
+    return this.chosenAddOn && this.chosenAddOn.isDestructive ? this.chosenAddOn.warning : '';
+  }
+
+  /** @returns {boolean} true while the Give permission button should stay disabled */
+  get canSubmitAddOnDisabled() {
+    return !(this.selectedUser && this.selectedAddOn) || this.working;
   }
 
   /** @returns {Array<object>} the five roles as options for the role picker */
@@ -369,20 +462,102 @@ export default class AccessManager extends LightningElement {
   }
 
   /**
+   * Remembers the chosen extra permission.
+   *
+   * @param {Event} event the change event from the extra permission picker
+   */
+  handleAddOnChange(event) {
+    this.selectedAddOn = event.detail.value;
+  }
+
+  /** Asks the person to confirm giving the chosen extra permission to the chosen person. */
+  handleAddOnAddClick() {
+    if (!this.selectedUser || !this.selectedAddOn) {
+      this.showError(ERROR_INVALID_INPUT);
+      return Promise.resolve();
+    }
+    return this.confirmAndRun(
+      this.addOnAction(true, this.selectedUser.userId, this.selectedUser.name, this.selectedAddOn)
+    );
+  }
+
+  /**
+   * Asks the person to confirm taking an extra permission away.
+   *
+   * @param {Event} event the click on a Remove button on an extra permission card
+   */
+  handleAddOnRemoveClick(event) {
+    const { userId, userName, addOn } = event.currentTarget.dataset;
+    return this.confirmAndRun(this.addOnAction(false, userId, userName, addOn));
+  }
+
+  /**
+   * Describes a change to an extra permission in the same shape as a change to a role.
+   *
+   * @param {boolean} isAssign true to give it, false to take it away
+   * @param {string} userId the person's Id
+   * @param {string} userName the person's name
+   * @param {string} developerName the extra permission's API name
+   * @returns {object} the change
+   */
+  addOnAction(isAssign, userId, userName, developerName) {
+    const addOn = this.addOns.find((candidate) => candidate.developerName === developerName);
+    return {
+      isAssign,
+      isAddOn: true,
+      userId,
+      userName,
+      roleDeveloperName: developerName,
+      roleLabel: addOn ? addOn.label : developerName,
+      warning: isAssign && addOn && addOn.isDestructive ? addOn.warning : ''
+    };
+  }
+
+  /**
+   * The wording for one change, by whether it gives or takes away and whether it is a role
+   * or an extra permission.
+   *
+   * @param {object} action the change
+   * @returns {object} confirm, success and button wording
+   */
+  wordingFor(action) {
+    if (action.isAddOn) {
+      return {
+        confirm: action.isAssign ? ADD_ON_CONFIRM_ADD : ADD_ON_CONFIRM_REMOVE,
+        success: action.isAssign ? ADD_ON_ASSIGN_SUCCESS : ADD_ON_REMOVE_SUCCESS,
+        button: action.isAssign ? this.labels.addOnAddButton : this.labels.removeButton
+      };
+    }
+    return {
+      confirm: action.isAssign ? CONFIRM_ADD_MESSAGE : CONFIRM_REMOVE_MESSAGE,
+      success: action.isAssign ? ASSIGN_SUCCESS : REMOVE_SUCCESS,
+      button: action.isAssign ? this.labels.addButton : this.labels.removeButton
+    };
+  }
+
+  /**
    * Asks the person to confirm a change in a modal, and carries it out when they do.
    * Cancel, Escape and the close button change nothing.
    *
-   * @param {object} action the change: isAssign, userId, userName, roleDeveloperName, roleLabel
+   * @param {object} action the change: isAssign, isAddOn, userId, userName, roleDeveloperName,
+   * roleLabel, and for an extra permission that removes data, warning
    * @returns {Promise} settles once the change is done or declined
    */
   async confirmAndRun(action) {
-    const template = action.isAssign ? CONFIRM_ADD_MESSAGE : CONFIRM_REMOVE_MESSAGE;
+    const wording = this.wordingFor(action);
+    const details = [];
+    if (this.isSelfRemoval(action)) {
+      details.push(this.labels.selfRemovalWarning);
+    }
+    if (action.warning) {
+      details.push(action.warning);
+    }
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: action.isAssign ? this.labels.confirmAddTitle : this.labels.confirmRemoveTitle,
-      message: format(template, [action.userName, action.roleLabel]),
-      details: this.isSelfRemoval(action) ? [this.labels.selfRemovalWarning] : [],
-      confirmLabel: action.isAssign ? this.labels.addButton : this.labels.removeButton,
+      message: format(wording.confirm, [action.userName, action.roleLabel]),
+      details,
+      confirmLabel: wording.button,
       cancelLabel: this.labels.cancelButton
     });
     if (confirmed) {
@@ -398,12 +573,20 @@ export default class AccessManager extends LightningElement {
    */
   run(action) {
     this.working = true;
-    const call = action.isAssign ? assignRoleApex : removeRoleApex;
-    return call({ userId: action.userId, roleDeveloperName: action.roleDeveloperName })
+    let request;
+    if (action.isAddOn) {
+      const call = action.isAssign ? assignAddOnApex : removeAddOnApex;
+      request = call({ userId: action.userId, permissionSetName: action.roleDeveloperName });
+    } else {
+      const call = action.isAssign ? assignRoleApex : removeRoleApex;
+      request = call({ userId: action.userId, roleDeveloperName: action.roleDeveloperName });
+    }
+    return request
       .then((result) => {
         if (result && result.success) {
-          const template = action.isAssign ? ASSIGN_SUCCESS : REMOVE_SUCCESS;
-          this.showSuccess(format(template, [action.userName, action.roleLabel]));
+          this.showSuccess(
+            format(this.wordingFor(action).success, [action.userName, action.roleLabel])
+          );
           this.resetChooser();
           return refreshApex(this.overviewResult);
         }
@@ -422,6 +605,7 @@ export default class AccessManager extends LightningElement {
   resetChooser() {
     this.selectedUser = undefined;
     this.selectedRole = '';
+    this.selectedAddOn = '';
     this.searchTerm = '';
     this.searchResults = [];
     this.highlightedIndex = -1;

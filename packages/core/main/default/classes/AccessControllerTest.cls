@@ -302,4 +302,192 @@ private class AccessControllerTest {
             );
         }
     }
+
+    private static final String ERASE_PEOPLE = 'BarnCRM_Erase_People';
+
+    @IsTest
+    static void getAccessOverviewListsTheAddOnsAndWhoMayGiveThem() {
+        System.runAs(TestUsers.admin()) {
+            User maria = insertAdminUser();
+            User david = insertUser('David', 'Okafor');
+            AccessController.AccessResult forMaria;
+            AccessController.AccessResult forDavid;
+
+            Test.startTest();
+            System.runAs(maria) {
+                forMaria = AccessController.getAccessOverview();
+            }
+            System.runAs(david) {
+                forDavid = AccessController.getAccessOverview();
+            }
+            Test.stopTest();
+
+            Assert.isTrue(
+                forMaria.canAssignAddOns,
+                'The BarnCRM Admin role carries Assign Permission Sets, so Maria may give add-ons.'
+            );
+            Assert.areEqual(
+                AccessService.ADD_ON_PERMISSION_SETS.size(),
+                forMaria.addOns.size(),
+                'Maria should see every Core add-on.'
+            );
+            Assert.areEqual(
+                forMaria.addOns.size(),
+                forMaria.addOnAssignments.size(),
+                'Each add-on should have its list of people.'
+            );
+            Assert.isFalse(forDavid.canAssignAddOns, 'David may not give add-ons.');
+            Assert.isNotNull(forDavid.addOns, 'The page always gets a list, even an empty one.');
+        }
+    }
+
+    @IsTest
+    static void assignAddOnIsRefusedWithoutThePermission() {
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            AccessController.AccessResult result;
+
+            Test.startTest();
+            System.runAs(david) {
+                result = AccessController.assignAddOn(david.Id, ERASE_PEOPLE);
+            }
+            Test.stopTest();
+
+            Assert.isFalse(result.success, 'David may not give himself Erase People.');
+            Assert.areEqual(
+                AccessController.ERROR_NO_PERMISSION,
+                result.errorCode,
+                'The page needs a code it can branch on.'
+            );
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM PermissionSetAssignment
+                    WHERE AssigneeId = :david.Id AND PermissionSet.Name = :ERASE_PEOPLE
+                ],
+                'A refused attempt should leave no assignment behind.'
+            );
+        }
+    }
+
+    @IsTest
+    static void assignAddOnIsRefusedWithoutAssignPermissionSets() {
+        System.runAs(TestUsers.admin()) {
+            // Manage BarnCRM Settings alone is not enough: giving a permission set also needs
+            // what Setup itself would need. No packaged set carries the one without the other,
+            // but an org's own permission set can, so the check is made to answer no.
+            User maria = insertAdminUser();
+            User david = insertUser('David', 'Okafor');
+            AccessController.AccessResult result;
+            AccessController.AccessResult overview;
+
+            Test.startTest();
+            System.runAs(maria) {
+                AccessService.assignPermissionSetsOverride = false;
+                result = AccessController.assignAddOn(david.Id, ERASE_PEOPLE);
+                overview = AccessController.getAccessOverview();
+            }
+            Test.stopTest();
+
+            Assert.isTrue(overview.canManage, 'Maria still manages BarnCRM Settings.');
+            Assert.isFalse(overview.canAssignAddOns, 'But she may not give add-ons.');
+            Assert.isFalse(result.success, 'Her attempt should be refused.');
+            Assert.areEqual(
+                AccessController.ERROR_NO_PERMISSION,
+                result.errorCode,
+                'The page needs a code it can branch on.'
+            );
+            Assert.areEqual(
+                Label.Core_Access_ErrorCannotAssignPermissionSets,
+                result.message,
+                'The message should name the Setup permission that is missing.'
+            );
+        }
+    }
+
+    @IsTest
+    static void assignAddOnRejectsSomethingThatIsNotAUserId() {
+        System.runAs(TestUsers.admin()) {
+            User maria = insertAdminUser();
+            AccessController.AccessResult result;
+            AccessController.AccessResult blank;
+
+            Test.startTest();
+            System.runAs(maria) {
+                result = AccessController.assignAddOn('not an id', ERASE_PEOPLE);
+                blank = AccessController.removeAddOn('', ERASE_PEOPLE);
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                AccessController.ERROR_INVALID_INPUT,
+                result.errorCode,
+                'A value that is not a person should be refused as invalid.'
+            );
+            Assert.areEqual(
+                AccessController.ERROR_INVALID_INPUT,
+                blank.errorCode,
+                'Choosing nobody should be refused as invalid.'
+            );
+        }
+    }
+
+    @IsTest
+    static void assignAddOnRefusesAPermissionSetOffTheAllowlist() {
+        System.runAs(TestUsers.admin()) {
+            User maria = insertAdminUser();
+            User david = insertUser('David', 'Okafor');
+            AccessController.AccessResult result;
+
+            Test.startTest();
+            System.runAs(maria) {
+                result = AccessController.assignAddOn(david.Id, 'BarnCRM_Admin');
+            }
+            Test.stopTest();
+
+            Assert.isFalse(result.success, 'Only the Core add-ons may be given here.');
+            Assert.areEqual(
+                Label.Core_Access_ErrorAddOnNotFound,
+                result.message,
+                'The refusal should say the permission is not one the page can give.'
+            );
+        }
+    }
+
+    @IsTest
+    static void assignAddOnAndRemoveAddOnWorkForMaria() {
+        System.runAs(TestUsers.admin()) {
+            User maria = insertAdminUser();
+            User david = insertUser('David', 'Okafor');
+            AccessController.AccessResult assigned;
+            AccessController.AccessResult removed;
+            Integer held;
+
+            Test.startTest();
+            System.runAs(maria) {
+                assigned = AccessController.assignAddOn(david.Id, ERASE_PEOPLE);
+                held = [
+                    SELECT COUNT()
+                    FROM PermissionSetAssignment
+                    WHERE AssigneeId = :david.Id AND PermissionSet.Name = :ERASE_PEOPLE
+                ];
+                removed = AccessController.removeAddOn(david.Id, ERASE_PEOPLE);
+            }
+            Test.stopTest();
+
+            Assert.isTrue(assigned.success, 'Maria should be able to give David Erase People.');
+            Assert.areEqual(1, held, 'David should hold Erase People once given it.');
+            Assert.isTrue(removed.success, 'Maria should be able to take it away again.');
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM PermissionSetAssignment
+                    WHERE AssigneeId = :david.Id AND PermissionSet.Name = :ERASE_PEOPLE
+                ],
+                'David should not hold Erase People after Maria removes it.'
+            );
+        }
+    }
 }
