@@ -240,4 +240,44 @@ private class ImportJournalServiceTest {
             Assert.areEqual(250, updated, 'Every saved record counted');
         }
     }
+
+    /** Pages sharing one CreatedDate are still read in full, once each, in the order written. */
+    @IsTest
+    static void pagingHoldsAcrossPagesWithTheSameCreatedDate() {
+        System.runAs(TestUsers.admin()) {
+            Import_Batch__c batch = newBatch();
+            ImportJournalService.maxEntriesPerPage = 10;
+            ImportJournalService.pagesPerRead = 3;
+            List<Map<String, Object>> entries = new List<Map<String, Object>>();
+            for (Integer row = 0; row < 100; row++) {
+                entries.add(anUpdate(row));
+            }
+            Assert.isTrue(
+                ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
+            );
+            Datetime sameMoment = Datetime.now().addDays(-1);
+            for (Import_Journal__c page : [SELECT Id FROM Import_Journal__c]) {
+                Test.setCreatedDate(page.Id, sameMoment);
+            }
+
+            Test.startTest();
+            Integer updated = ImportJournalService.actionCount(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT,
+                ImportJournalService.ACTION_UPDATED
+            );
+            List<Map<String, Object>> first = ImportJournalService.firstWithAction(
+                batch.Id,
+                ImportJournalService.PHASE_COMMIT,
+                ImportJournalService.ACTION_UPDATED,
+                100
+            );
+            Test.stopTest();
+
+            Assert.areEqual(100, updated, 'Every entry counted across 10 pages of one moment');
+            Assert.areEqual(100, first.size(), 'None skipped or repeated');
+            Assert.areEqual(0, first[0].get('row'), 'In the order written');
+            Assert.areEqual(99, first[99].get('row'), 'To the last');
+        }
+    }
 }

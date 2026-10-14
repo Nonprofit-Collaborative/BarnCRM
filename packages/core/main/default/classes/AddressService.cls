@@ -236,9 +236,10 @@ public with sharing class AddressService {
      * merge, which arrives with the other record's default as well as its own (PEOPLE-15).
      *
      * The default kept is the one that matches the owner's standard address fields (billing
-     * for an account, mailing for a contact), because those hold the address the merge chose;
-     * otherwise, and for a person account, the most recently created, as when a default is
-     * deleted. The others stay as ordinary addresses. Nothing is copied into the standard
+     * for a household or organization, mailing for a contact or a person account), because
+     * those hold the address the merge chose; otherwise the most recently created, as when a
+     * default is deleted. A person account's mailing fields are named as strings, so this runs
+     * in an org without person accounts. The others stay as ordinary addresses. Nothing is copied into the standard
      * fields: the kept default is the one they already hold, or the merge left them as chosen.
      */
     public static void keepOneDefault(Set<Id> ownerIds) {
@@ -271,10 +272,29 @@ public with sharing class AddressService {
             return;
         }
         Map<Id, String> standardKeyByOwner = new Map<Id, String>();
-        for (Account owner : AddressSelector.selectAccountBillingAddresses(crowdedAccounts)) {
+        Set<Id> personAccounts = personAccountIdsAmong(crowdedAccounts);
+        List<String> personFields = personAccounts.isEmpty()
+            ? null
+            : new List<String>{
+                  PERSON_MAILING_STREET,
+                  PERSON_MAILING_CITY,
+                  PERSON_MAILING_POSTAL_CODE
+              };
+        for (
+            Account owner : AddressSelector.selectAccountBillingAddresses(
+                crowdedAccounts,
+                personFields
+            )
+        ) {
             standardKeyByOwner.put(
                 owner.Id,
-                addressKey(owner.BillingStreet, owner.BillingCity, owner.BillingPostalCode)
+                personAccounts.contains(owner.Id)
+                    ? addressKey(
+                          (String) owner.get(PERSON_MAILING_STREET),
+                          (String) owner.get(PERSON_MAILING_CITY),
+                          (String) owner.get(PERSON_MAILING_POSTAL_CODE)
+                      )
+                    : addressKey(owner.BillingStreet, owner.BillingCity, owner.BillingPostalCode)
             );
         }
         for (Contact owner : AddressSelector.selectContactMailingAddresses(crowdedContacts)) {
