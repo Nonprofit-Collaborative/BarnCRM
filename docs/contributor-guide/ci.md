@@ -225,6 +225,12 @@ Salesforce org is needed for this job. Steps:
    version named in `docs/release-notes` has no `Release_Note` custom metadata record, so the
    What's New card would still show an older release. Run with `--release` it fails instead;
    the release checklist in `docs/release-notes/README.md` runs it that way.
+   `scripts/ci/check-deploy-readiness.py` (unit tests in `scripts/ci/tests`) fails the build
+   on deploy errors the org gate would otherwise only find after starting: a Core folder not
+   named in `CORE_STAGED` in `scripts/org/deploy-packages.sh`, a custom object whose
+   `enableSharing`, `enableBulkApi` and `enableStreamingApi` are not all equal, or a custom
+   object without `nameField`, `label` or `pluralLabel`, or a permission set that grants
+   Create on a platform event (`__e`) without Read. The rules are listed in its header.
 19. A grep check that fails the build if any tracked file contains an em dash character.
 20. Installs the Salesforce CLI and the `code-analyzer` plugin, then runs
    `sf code-analyzer run --workspace packages --rule-selector Recommended --severity-threshold 2`.

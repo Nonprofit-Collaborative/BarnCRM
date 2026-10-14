@@ -114,6 +114,11 @@ jobs:
       - name: Check every switchable Core automation has a Flow template or a reason
         run: python3 scripts/ci/check-flow-templates.py
 
+      - name: Check deploy readiness (staged Core folders, object API flags)
+        run: |
+          python3 scripts/ci/check-deploy-readiness.py
+          python3 -m unittest discover -s scripts/ci/tests
+
       - name: Warn when the newest release notes have no What's New entries
         run: python3 scripts/ci/check-whats-new.py
 
