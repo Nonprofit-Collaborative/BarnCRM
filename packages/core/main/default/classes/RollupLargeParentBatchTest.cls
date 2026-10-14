@@ -411,11 +411,13 @@ private class RollupLargeParentBatchTest {
     /** What a run's recalculations read counts against its budget, not what was estimated. */
     @IsTest
     static void rowsARunReadLeaveLessOfItsBudgetThanTheEstimatesSaid() {
-        RollupLargeParentBatch.sliceRowBudgetForTest = 100;
+        System.runAs(TestUsers.admin()) {
+            RollupLargeParentBatch.sliceRowBudgetForTest = 100;
 
-        Assert.areEqual(60, RollupQueue.rowsLeft(60, 30), 'Read as estimated: the estimates');
-        Assert.areEqual(20, RollupQueue.rowsLeft(60, 80), 'Read more: what was read');
-        Assert.areEqual(-5, RollupQueue.rowsLeft(60, 105), 'Over: no later record fits');
+            Assert.areEqual(60, RollupQueue.rowsLeft(60, 30), 'Read as estimated: the estimates');
+            Assert.areEqual(20, RollupQueue.rowsLeft(60, 80), 'Read more: what was read');
+            Assert.areEqual(-5, RollupQueue.rowsLeft(60, 105), 'Over: no later record fits');
+        }
     }
 
     // ------------------------------------------------------------------------------ merging
