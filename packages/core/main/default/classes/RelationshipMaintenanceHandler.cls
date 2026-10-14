@@ -66,7 +66,12 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
         try {
             RelationshipService.restoreReciprocals(restored);
         } catch (Exception thrown) {
-            report(thrown, restored, 'RelationshipMaintenanceHandler.afterUndelete');
+            reportFailure(
+                thrown,
+                restored,
+                'RelationshipMaintenanceHandler.afterUndelete',
+                Label.Core_Relationship_SyncFailed
+            );
         }
     }
 

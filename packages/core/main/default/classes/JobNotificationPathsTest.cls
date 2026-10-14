@@ -96,7 +96,7 @@ private class JobNotificationPathsTest {
             notifications(true);
             Import_Batch__c committed = job(null);
 
-            ImportBatchService.finish(committed.Id, false, false, new List<String>());
+            ImportBatchService.finish(committed.Id, false, false, new List<String>(), null, null);
 
             JobNotifier.Notice notice = assertOneAboutRecord(
                 committed.Id,
@@ -106,7 +106,7 @@ private class JobNotificationPathsTest {
 
             JobNotifier.sent.clear();
             Import_Batch__c previewed = job(null);
-            ImportBatchService.finish(previewed.Id, true, true, new List<String>());
+            ImportBatchService.finish(previewed.Id, true, true, new List<String>(), null, null);
             assertOneAboutRecord(
                 previewed.Id,
                 title(
@@ -123,7 +123,7 @@ private class JobNotificationPathsTest {
             notifications(true);
             Import_Batch__c imported = job(null);
 
-            ImportUndoService.finish(imported.Id, 0, 0, false);
+            ImportUndoService.finish(imported.Id, 0, 0, false, 0);
 
             assertOneAboutRecord(
                 imported.Id,
@@ -132,7 +132,7 @@ private class JobNotificationPathsTest {
 
             JobNotifier.sent.clear();
             Import_Batch__c updated = job(BulkUpdateService.OPERATION_UPDATE);
-            ImportUndoService.finish(updated.Id, 0, 3, true);
+            ImportUndoService.finish(updated.Id, 0, 3, true, 0);
             assertOneAboutRecord(
                 updated.Id,
                 title(
@@ -314,7 +314,7 @@ private class JobNotificationPathsTest {
             Import_Batch__c updated = job(BulkUpdateService.OPERATION_UPDATE);
 
             new BulkUpdateBatch(updated.Id).finish(null);
-            ImportUndoService.finish(updated.Id, 0, 0, false);
+            ImportUndoService.finish(updated.Id, 0, 0, false, 0);
             new HouseholdNamingBatch().finish(null);
             new SeasonalAddressBatch().finish(null);
             runOneStage(true);

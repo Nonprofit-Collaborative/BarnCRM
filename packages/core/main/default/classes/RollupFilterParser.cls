@@ -208,14 +208,18 @@ public with sharing class RollupFilterParser {
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
         }
         try {
-            return compile(parsed, binder);
+            return compile(parsed, binder, entity);
         } catch (TypeException wrongShape) {
             // A part of the right name but the wrong shape, such as "conditions": ["Name"].
             throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
         }
     }
 
-    private static String compile(Map<String, Object> parsed, FilterValueBinder binder) {
+    private static String compile(
+        Map<String, Object> parsed,
+        FilterValueBinder binder,
+        Schema.SObjectType entity
+    ) {
         Integer version = parsed.get('version') == null
             ? SUPPORTED_VERSION
             : Integer.valueOf(parsed.get('version'));
