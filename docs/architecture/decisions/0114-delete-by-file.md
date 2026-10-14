@@ -1,4 +1,4 @@
-# ADR-NEXT: Delete by file is a one-object import operation that hands its dry run to the bulk delete job
+# ADR-0114: Delete by file is a one-object import operation that hands its dry run to the bulk delete job
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

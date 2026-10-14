@@ -1,6 +1,6 @@
 /**
- * The template side of related records (canonical model R-IT17; ADR-NEXT
- * `NEXT-load-related-records.md`): which related records an object offers, saving the choice
+ * The template side of related records (canonical model R-IT17; ADR-0111
+ * `0111-load-related-records.md`): which related records an object offers, saving the choice
  * with describe's names, and the refusals, at save and at run time, of Insert and of a field
  * that does not point at the object. The `Related` entity of the mapping document is read
  * apart from `Record`.

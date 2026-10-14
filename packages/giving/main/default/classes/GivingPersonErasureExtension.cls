@@ -1,6 +1,6 @@
 /**
- * What erasing a person does to Giving's records (canonical model R-ER8; ADR-NEXT
- * `NEXT-erase-a-person-anonymizes-in-place.md`, "Giving's defaults"). Core finds this class by
+ * What erasing a person does to Giving's records (canonical model R-ER8; ADR-0110
+ * `0110-erase-a-person-anonymizes-in-place.md`, "Giving's defaults"). Core finds this class by
  * name in `PersonErasureExtensions.EXTENSION_CLASSES` and calls it inside the erasure's own
  * transaction, so a refusal here takes the whole erasure back.
  *

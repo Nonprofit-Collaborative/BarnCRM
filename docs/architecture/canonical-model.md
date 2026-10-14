@@ -389,7 +389,7 @@ contact mirrors the primary member).
   current primary member of its household is refused before the save (label
   `Core_Households_ErrorSecondPrimary`), pointing to Make primary. A save of more than one
   record, or one arriving through the APIs, the Bulk API or background Apex, is a load and
-  is not refused (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`): with
+  is not refused (ADR-0108, `0108-a-second-primary-is-refused-on-a-single-save.md`): with
   more than one current primary, the first of them in R-H5 order is mirrored and no
   membership row is changed.
 - `HouseholdService` is the only writer in junction mode. It settles the mirror on every
@@ -1968,7 +1968,7 @@ named once in the run log and skipped; so is a field the user may not create or 
 describe for each row according to whether it creates or updates.
 
 **R-IT17 Related records in the same file.** A one-object template with a Related Object and a
-Related Parent Field (ADR-NEXT, `NEXT-load-related-records.md`) also creates records of the
+Related Parent Field (ADR-0111, `0111-load-related-records.md`) also creates records of the
 Related Object from the same rows. Its columns are mapped to `Related.<field API name>`, with
 the same lookups (R-IT13), value reading, access and never-written rules as `Record` columns
 (R-IT12, R-IT14); a column mapped to the Related Parent Field is skipped, because the load fills
@@ -2026,7 +2026,7 @@ column's value before it is matched or written (ADR-0081, `0081-data-transform-d
 | `shiftDate` | `amount` (a whole number, at most 36,600 days or 1,200 months either way), `unit`: `days` or `months` | Reads the first three numbers year first (so `2025-12-31` and a stored date with a time both read), adds the amount and writes `YYYY-MM-DD`; adding months keeps the day where the month has it, otherwise the month's last day. A value that is not a date, or a result outside the years 1700 to 4000, is left unchanged. |
 | `today` | `whenBlank` (default false) | Today's date as `YYYY-MM-DD` in the running user's time zone; under `whenBlank`, only when the value so far is blank. |
 
-The steps from `map` on were added by ADR-NEXT (`NEXT-more-transform-steps.md`); a document
+The steps from `map` on were added by ADR-0112 (`0112-more-transform-steps.md`); a document
 whose steps may use them carries `"version": 2` (the mapping document of R-IT1 and the bulk
 update definition of R-BU1). A reader that does not know an `op` skips that step, as below.
 
@@ -2063,7 +2063,7 @@ one-object template.
 **R-IT18 Rows to load: skip rows and one row per key.** The R-IT1 document may carry
 `"skipRows"`, at most 5 rules `{ "column", "test", "text" }` whose `test` is `equals`,
 `contains` or `blank` (`text` required unless `blank`, at most 255), and `"uniqueBy"`, at most
-5 column names (ADR-NEXT, `NEXT-import-row-rules.md`). Both read a row's cells as uploaded,
+5 column names (ADR-0113, `0113-import-row-rules.md`). Both read a row's cells as uploaded,
 before any column change (R-IT15), trimmed and ignoring capitals. When a page of the file is
 staged, a row any rule matches, and a row whose `uniqueBy` cells (not all empty) equal an
 earlier row's, is staged with Status Skipped and the reason in Error Message; every other row
@@ -6304,7 +6304,7 @@ browser. The browser's stop is a convenience, not a control: the pages are serve
 with Find, in their own access. Only an export to Files (R-SQ12) enforces the limit on the
 server.
 
-**R-SQ12 Export to Files** (C-36; ADR-NEXT, `NEXT-find-export-to-files.md`). A Batch Apex job
+**R-SQ12 Export to Files** (C-36; ADR-0115, `0115-find-export-to-files.md`). A Batch Apex job
 run as the person reads the document's filter in Id order in user mode, at most Export Row
 Limit rows (the query's LIMIT, so the server never reads more), with the document's own
 columns and none of its `related` entries. It writes the rows as R-SQ3's CSV (same cell rules,
@@ -6559,7 +6559,7 @@ only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access. What 
 needs only `Bulk_Delete_Records`: the list of jobs, a job's progress, the undo, and a delete by
 file (R-BD7), which needs import access instead of Find.
 
-**R-BD7 Delete by file** (ADR-NEXT, `NEXT-delete-by-file.md`). A one-object template (R-IT12)
+**R-BD7 Delete by file** (ADR-0114, `0114-delete-by-file.md`). A one-object template (R-IT12)
 whose Load Operation is Delete by record Id names, in each row's `Record.Id`, a record to
 delete; every other column is ignored. The operation is offered only to a person holding
 `Bulk_Delete_Records`, for an object R-BD4 allows (people included), and the template is refused
@@ -6762,7 +6762,7 @@ Task for this feature beyond the action that creates it.
 
 The record that a person was erased at their request (the right to be forgotten): who erased
 them, when, under which request, and what changed. It never holds an erased value
-(ADR-NEXT, `NEXT-erase-a-person-anonymizes-in-place.md`).
+(ADR-0110, `0110-erase-a-person-anonymizes-in-place.md`).
 
 ### Attributes
 
@@ -7030,9 +7030,9 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | A range on every number setting (owner decision 2026-10-13, ADMIN-27). `Setting_Definition__mdt` gains `Min_Value__c` and `Max_Value__c` (Section 13); every shipped Number row sets both, and the console and `SettingsService` refuse a value outside them. No object added. |
 | v0.11 | 2026-10-13 | Household Member integrity (PEOPLE-25). No object or field added. R-M4 is now enforced by the validation rule `Membership_Names_One_Person` on a save that creates a row or changes who it names. New R-M6: one current membership per person per household, refused before the save by the Household Member trigger (label `Core_Households_ErrorAlreadyCurrentMember`). R-M3's tolerance of two primaries from a data load is unchanged. |
 | v0.11 | 2026-10-13 | Address defaults (PEOPLE-22, PEOPLE-49). No object or field added. R-AD2 now says what happens to several defaults in one save, refuses clearing an owner's only default, prefers a non-seasonal address when the default is deleted, and makes the first address added from the card the default. `Seasonal_Day_In_Range` accepts only days the month has (February 29 allowed). |
-| v0.11 | 2026-10-13 | Households and people quality pass (ADR-NEXT, `NEXT-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
-| v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-NEXT, `NEXT-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
-| post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
+| v0.11 | 2026-10-13 | Households and people quality pass (ADR-0107, `0107-a-persons-household-and-primary-contact-in-both-modes.md`). No object or field added. R-H1: the person a household is created for is its Primary Contact. R-H2: a Contact inserted in junction mode with its Account set to a household joins it with one membership record. R-H10: in contact mode a Primary Contact who is not a member is refused before save. R-M3 gains a person's household: the primary membership, else the earliest current one. |
+| v0.11 | 2026-10-13 | A second primary is refused on a single save (ADR-0108, `0108-a-second-primary-is-refused-on-a-single-save.md`). No object or field added. R-M3: a one-record save by a person that would give a household a second current primary member is refused before the save (label `Core_Households_ErrorSecondPrimary`); a load of many records, or through the APIs or background Apex, is tolerated and settled as before. |
+| post-1.0 | 2026-10-13 | Erase a person (owner decision 2026-10-13, ADR-0110 `0110-erase-a-person-anonymizes-in-place.md`). New Section 29H, `Erasure__c` with `Contact__c`, `Person_Account__c`, `Erased_Record_Id__c`, `Request_Reference__c` and `Details__c`, rules R-ER1 to R-ER10 (R-ER9 and R-ER10 owner decisions 2026-10-13). New custom permission `Erase_People` and permission set `BarnCRM_Erase_People`, in no role. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-4, IMPORT-8). No object or field added. R-IT11: people and organization values are read as Load one object reads them, a value the field cannot take rejects the row, and a change is decided on typed values with capitals counting. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-1). `Import_Batch__c` gains `Template_Snapshot_JSON__c`. R-IB1: a dry run records the template it started with, and that dry run and the commit run under it, so a template edited after the preview does not change the commit. |
 | v0.6 | 2026-10-13 | Core quality pass, import (IMPORT-3). No object or field added. R-IB1: a row's organization is created only after its people are matched and validated, so a rejected row creates nothing and the dry run counts what the commit does; a rejected row points at what it saved. |
@@ -7044,10 +7044,10 @@ mirrors the primary member).
 | v0.6 | 2026-10-13 | Trial import (data tools parity rank 4). `Import_Batch__c` gains `Trial_Rows__c` and the Status value Trial complete; BarnCRM Settings gains `Import_Trial_Rows__c` (default 25). New rule R-IB16: commit the first N rows, then the remaining rows into the same batch, one undo for both. |
 | v0.6 | 2026-10-13 | Load one object lookups by any field (data tools parity). No object or field added. R-IT13: a lookup may name its parent by any text, email or phone field the user may read and filter on, and the large object guard refuses an unindexed field on an object over 100,000 records. |
 | v0.6 | 2026-10-13 | Load one object updates by a field you choose (data tools parity). `Import_Template__c.Load_Operation__c` gains Update by a matching field, and Load Match Field serves it. R-IT12 gains that operation, which finds each row's record by any text, email or phone field, rejects a row it finds nothing for, and follows Several Matches; Account and Contact may use it (R-IT14). |
-| v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-NEXT, `NEXT-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
+| v0.6 | 2026-10-13 | Load one object related records (data tools parity; ADR-0111, `0111-load-related-records.md`). `Import_Template__c` gains `Related_Object__c` and `Related_Parent_Field__c`; `Import_Row__c` gains `Related_Status__c`, and its Second Resulting Record holds the related record. New rule R-IT17: parents and related records from one file, parent key dedupe, parents saved first, related rows of a failed parent rejected, one undo for both. |
 | v0.6 | 2026-10-13 | Retrying the rejected rows (data tools parity). `Import_Batch__c` gains `Retry_After_Row__c` and the Status value Retrying; `Import_Row__c.Status__c` gains Retried. New rule R-IB17: a committed import's fixed rejected rows are staged, previewed and committed into the same batch, and one undo covers both runs. |
-| 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-NEXT, `NEXT-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
-| 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-NEXT, `NEXT-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
+| 1.x (built ahead) | 2026-10-13 | More transform steps (ADR-0112, `0112-more-transform-steps.md`). No object or field added. R-IT15 gains `map`, `ifThen`, `part`, `first`, `last`, `shiftDate` and `today`; the R-IT1 mapping document and the R-BU1 bulk update definition are written as version 2. R-BU7 applies them unchanged. |
+| 1.x (built ahead) | 2026-10-13 | Import row rules (ADR-0113, `0113-import-row-rules.md`). R-IT1 gains `skipRows`, `uniqueBy` and a column's `blankClears`; new R-IT18 (skip rows and one row per key, decided at staging, Status Skipped) and R-IT19 (an empty cell clears a one-object field only where its column says so, journaled). `Import_Row__c` gains `Row_Key__c` (Text 16, External ID, bookkeeping in no permission set). |
 
 ---
 ## 32. Entity ownership by package

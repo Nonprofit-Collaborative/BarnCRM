@@ -63,8 +63,8 @@ public with sharing class DataTransform {
     public static final String OP_TODAY = 'today';
 
     /**
-     * The version of a document whose steps may use the operations from `map` on (ADR-NEXT,
-     * `NEXT-more-transform-steps.md`). A reader that does not know an operation skips it.
+     * The version of a document whose steps may use the operations from `map` on (ADR-0112,
+     * `0112-more-transform-steps.md`). A reader that does not know an operation skips it.
      */
     @NamespaceAccessible
     public static final Integer DOCUMENT_VERSION = 2;
@@ -298,7 +298,7 @@ public with sharing class DataTransform {
         return problemWithNewer(step);
     }
 
-    /** The checks of the operations ADR-NEXT added (`NEXT-more-transform-steps.md`). */
+    /** The checks of the operations ADR-0112 added (`0112-more-transform-steps.md`). */
     private static String problemWithNewer(Step step) {
         switch on step.op {
             when 'map' {

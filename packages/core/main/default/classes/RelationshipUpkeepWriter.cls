@@ -2,7 +2,7 @@
  * The writes that keep the other side of a relationship in step (C-15, R-RL1).
  *
  * ADR-0021 (system mode writes for package owned data), category 2, is the authority for this
- * class, as extended by `NEXT-relationship-mirror-upkeep-in-system-mode.md`. The other side of a
+ * class, as extended by `0109-relationship-mirror-upkeep-in-system-mode.md`. The other side of a
  * relationship is a record the package builds and maintains from the side a person saved:
  * every value on it is copied or computed by `RelationshipService`, and none is typed there by
  * a person. Under private sharing it usually belongs to another user, and under a narrower

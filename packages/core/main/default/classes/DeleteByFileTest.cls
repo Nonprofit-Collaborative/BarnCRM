@@ -1,5 +1,5 @@
 /**
- * Delete by file (canonical model R-BD7, ADR-NEXT `NEXT-delete-by-file.md`): a one-object
+ * Delete by file (canonical model R-BD7, ADR-0114 `0114-delete-by-file.md`): a one-object
  * import whose rows name records by ID is dry run as an import, refuses the import commit, and
  * starts as a bulk delete of exactly the Matched rows once the count is typed; the job deletes
  * as the person, journals each record and is undone by undelete.

@@ -1031,7 +1031,7 @@ export default class ImportWizard extends LightningElement {
 
   get mappingDocument() {
     return JSON.stringify({
-      // Version 2: column changes may use the steps ADR-NEXT (more transform steps) added.
+      // Version 2: column changes may use the steps ADR-0112 (more transform steps) added.
       version: 2,
       columns: this.columns.map((column) => {
         const mapped = { source: column.source, target: column.target };

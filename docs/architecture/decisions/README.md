@@ -115,13 +115,15 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0104](0104-agent-ready-core-actions.md) | Core ships four agent-ready Flow actions, and no agent metadata | Accepted (builder decision, Q-14 approved by the owner) |
 | [0105](0105-health-check-reschedules-jobs-of-deactivated-owners.md) | Health Check reschedules jobs whose owner was deactivated (amends ADR-0048, extends ADR-0075) | Accepted (builder decision) |
 | [0106](0106-health-check-on-home-shows-the-last-result.md) | Health Check on Home shows the last result, with Run now | Accepted (owner approved) |
-| [NEXT](NEXT-relationship-mirror-upkeep-in-system-mode.md) | Relationship and affiliation upkeep run in system mode (extends ADR-0021) | Accepted (owner decision D-85) |
-| [NEXT](NEXT-erase-a-person-anonymizes-in-place.md) | Erase a person anonymizes the record in place, as the user, with a module seam | Proposed (builder decision) |
-| [NEXT](NEXT-load-related-records.md) | Load one object loads related records from the same file, keyed by the record key | Proposed (builder decision) |
-| [ADR-NEXT](NEXT-more-transform-steps.md) | Six more transform steps (map values, if then, keep part, first or last characters, shift a date, today), still a closed list with no evaluation | Proposed (builder decision) |
-| [ADR-NEXT](NEXT-import-row-rules.md) | Import row rules: skip rows and one row per key decided at staging, and empty cells that clear a field only where a column says so | Proposed (builder decision) |
-| [NEXT](NEXT-delete-by-file.md) | Delete by file is a one-object import operation that hands its dry run to the bulk delete job | Proposed (builder decision) |
-| [NEXT](NEXT-find-export-to-files.md) | Find's export to Files is a Batch Apex job that writes CSV parts the person owns | Proposed (builder decision) |
+| [0107](0107-a-persons-household-and-primary-contact-in-both-modes.md) | A person's household, and the Primary Contact, in both membership modes | Accepted (owner default, D-85) |
+| [0108](0108-a-second-primary-is-refused-on-a-single-save.md) | A second primary member is refused on a single save, and tolerated in a load (builds on ADR-0044) | Accepted (owner default, D-85) |
+| [0109](0109-relationship-mirror-upkeep-in-system-mode.md) | Relationship and affiliation upkeep run in system mode (extends ADR-0021) | Accepted (owner decision D-85) |
+| [0110](0110-erase-a-person-anonymizes-in-place.md) | Erase a person anonymizes the record in place, as the user, with a module seam | Proposed (builder decision) |
+| [0111](0111-load-related-records.md) | Load one object loads related records from the same file, keyed by the record key | Proposed (builder decision) |
+| [0112](0112-more-transform-steps.md) | Six more transform steps (map values, if then, keep part, first or last characters, shift a date, today), still a closed list with no evaluation | Proposed (builder decision) |
+| [0113](0113-import-row-rules.md) | Import row rules: skip rows and one row per key decided at staging, and empty cells that clear a field only where a column says so | Proposed (builder decision) |
+| [0114](0114-delete-by-file.md) | Delete by file is a one-object import operation that hands its dry run to the bulk delete job | Proposed (builder decision) |
+| [0115](0115-find-export-to-files.md) | Find's export to Files is a Batch Apex job that writes CSV parts the person owns | Proposed (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

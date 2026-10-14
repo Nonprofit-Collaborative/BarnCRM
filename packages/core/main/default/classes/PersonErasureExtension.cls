@@ -1,6 +1,6 @@
 /**
  * The seam a dependent package uses to decide what erasing a person does to its own records
- * (canonical model R-ER8; ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`), in the shape
+ * (canonical model R-ER8; ADR-0110 `0110-erase-a-person-anonymizes-in-place.md`), in the shape
  * of `HouseholdDependentsExtension` (ADR-0017, ADR-0070). Core is neutral and may not know what
  * a module's records are: it looks implementations up by name (`PersonErasureExtensions`) and
  * asks each one inside the erasure's own transaction.

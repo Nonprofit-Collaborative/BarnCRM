@@ -56,7 +56,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * R-M3, ADR-NEXT. A save of one row that makes it a current primary member of a household
+     * R-M3, ADR-0108. A save of one row that makes it a current primary member of a household
      * that already has another current primary member is refused, with a message pointing to
      * Make primary, which moves the flag in one save. Only one-row saves made by a person are
      * checked: a load of many rows, or one arriving through the APIs or background Apex, is let

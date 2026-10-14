@@ -1,5 +1,5 @@
 /**
- * Related records in one file (canonical model R-IT17; ADR-NEXT `NEXT-load-related-records.md`):
+ * Related records in one file (canonical model R-IT17; ADR-0111 `0111-load-related-records.md`):
  * parents first and each related record linked to its row's parent, at 200 parents over two
  * chunks; a failed parent rejecting its related rows in its chunk and later ones; a related
  * record that fails leaving its parent; a row with only a key and related columns; the dry run

@@ -1,4 +1,4 @@
-# ADR-NEXT: Six more transform steps, still a closed list with no evaluation
+# ADR-0112: Six more transform steps, still a closed list with no evaluation
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

@@ -1,5 +1,5 @@
 /**
- * Import row rules (canonical model R-IT18, R-IT19; ADR-NEXT `NEXT-import-row-rules.md`): Skip
+ * Import row rules (canonical model R-IT18, R-IT19; ADR-0113 `0113-import-row-rules.md`): Skip
  * rows and One row per decide as the file is staged, a skipped row is never processed and is
  * counted apart from rejected rows, and an empty cell clears a field only where its column says
  * so, counted in the dry run, journaled by the commit and put back by undo.

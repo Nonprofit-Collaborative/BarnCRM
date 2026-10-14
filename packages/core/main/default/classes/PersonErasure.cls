@@ -1,6 +1,6 @@
 /**
  * Erases one person at their request (the right to be forgotten; canonical model Section 29H,
- * rules R-ER1 to R-ER8; ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`).
+ * rules R-ER1 to R-ER8; ADR-0110 `0110-erase-a-person-anonymizes-in-place.md`).
  *
  * The person's record is anonymized in place, never deleted, so gifts and totals keep pointing
  * at it. What to empty is worked out from describe: every field that can be empty, except what

@@ -15,7 +15,7 @@
  * before. Each record a commit creates is journaled on a Created page, since an arbitrary object
  * has no batch tag, and undo deletes it from there.
  *
- * With a Related Object (R-IT17; ADR-NEXT `NEXT-load-related-records.md`) each row may also
+ * With a Related Object (R-IT17; ADR-0111 `0111-load-related-records.md`) each row may also
  * create a related record pointing at its parent. The first row of a key is the parent row;
  * later rows of the key only add related records. Parents are saved before related records,
  * and a related row of a failed parent is rejected.

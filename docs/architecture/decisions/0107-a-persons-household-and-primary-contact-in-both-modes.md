@@ -1,4 +1,4 @@
-# ADR-NEXT: A person's household, and the Primary Contact, in both membership modes
+# ADR-0107: A person's household, and the Primary Contact, in both membership modes
 
 **Status:** Accepted (owner default, D-85)
 **Date:** 2026-10-13

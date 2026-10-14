@@ -1,7 +1,7 @@
 /**
  * The other side of a relationship is kept in step for a user who may save their side but may
  * not edit the other side's package fields, nor the other person (PEOPLE-26, ADR-0021 category
- * 2 as extended by NEXT-relationship-mirror-upkeep-in-system-mode.md).
+ * 2 as extended by 0109-relationship-mirror-upkeep-in-system-mode.md).
  *
  * The user here holds BarnCRM Read Only, which reads people and relationships and edits
  * neither, plus a permission set built in the test that lets them create, edit and delete

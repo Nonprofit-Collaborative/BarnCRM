@@ -32,7 +32,7 @@
  *
  * The reads and writes of the other side run in system mode through
  * `RelationshipUpkeepSelector` and `RelationshipUpkeepWriter` (ADR-0021 category 2, extended by
- * `NEXT-relationship-mirror-upkeep-in-system-mode.md`): the side the person saved has already
+ * `0109-relationship-mirror-upkeep-in-system-mode.md`): the side the person saved has already
  * been authorized in user mode, and the other side often belongs to somebody else.
  */
 public with sharing class RelationshipService {

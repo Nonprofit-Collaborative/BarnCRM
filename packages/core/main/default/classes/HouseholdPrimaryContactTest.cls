@@ -217,7 +217,7 @@ private class HouseholdPrimaryContactTest {
     }
 
     /**
-     * The bulk path (ADR-NEXT): a save of many rows, as a data load makes, is let through
+     * The bulk path (ADR-0108): a save of many rows, as a data load makes, is let through
      * with two primaries, and settled the existing way.
      */
     @IsTest
@@ -246,7 +246,7 @@ private class HouseholdPrimaryContactTest {
     }
 
     /**
-     * R-M3, ADR-NEXT: one person's save that adds a second current primary to a household is
+     * R-M3, ADR-0108: one person's save that adds a second current primary to a household is
      * refused, with a message pointing to Make primary.
      */
     @IsTest
@@ -277,7 +277,7 @@ private class HouseholdPrimaryContactTest {
     }
 
     /**
-     * R-M3, ADR-NEXT: ticking Is Primary on a second member by hand is refused the same way,
+     * R-M3, ADR-0108: ticking Is Primary on a second member by hand is refused the same way,
      * and ticking it where nobody else holds it is allowed.
      */
     @IsTest
@@ -306,7 +306,7 @@ private class HouseholdPrimaryContactTest {
     }
 
     /**
-     * R-M3, ADR-NEXT: an ended primary does not count, so a new primary is allowed.
+     * R-M3, ADR-0108: an ended primary does not count, so a new primary is allowed.
      */
     @IsTest
     static void anEndedPrimaryDoesNotBlockANewOne() {
@@ -330,7 +330,7 @@ private class HouseholdPrimaryContactTest {
     }
 
     /**
-     * ADR-NEXT: one row arriving through a load (the APIs, the Bulk API, background Apex) is
+     * ADR-0108: one row arriving through a load (the APIs, the Bulk API, background Apex) is
      * let through as before, so an import never newly fails.
      */
     @IsTest

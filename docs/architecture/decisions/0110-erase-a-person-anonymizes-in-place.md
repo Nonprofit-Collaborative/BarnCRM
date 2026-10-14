@@ -1,4 +1,4 @@
-# ADR-NEXT: Erase a person anonymizes the record in place, as the user, with a module seam
+# ADR-0110: Erase a person anonymizes the record in place, as the user, with a module seam
 
 **Status:** Proposed (builder decision; owner approved the feature, Brandon, 2026-10-13)
 **Date:** 2026-10-13

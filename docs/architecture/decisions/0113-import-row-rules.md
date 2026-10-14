@@ -1,4 +1,4 @@
-# ADR-NEXT: Import row rules: skip rows, one row per key, and empty cells that clear
+# ADR-0113: Import row rules: skip rows, one row per key, and empty cells that clear
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

@@ -1,4 +1,4 @@
-# ADR-NEXT: Load one object loads related records from the same file, keyed by the record key
+# ADR-0111: Load one object loads related records from the same file, keyed by the record key
 
 **Status:** Proposed (builder decision)
 **Date:** 2026-10-13

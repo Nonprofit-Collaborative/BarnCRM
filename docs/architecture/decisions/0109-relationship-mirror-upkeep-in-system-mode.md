@@ -1,4 +1,4 @@
-# ADR-NEXT: Relationship and affiliation upkeep run in system mode
+# ADR-0109: Relationship and affiliation upkeep run in system mode
 
 **Status:** Accepted (product owner, decision D-85)
 **Date:** 2026-10-13

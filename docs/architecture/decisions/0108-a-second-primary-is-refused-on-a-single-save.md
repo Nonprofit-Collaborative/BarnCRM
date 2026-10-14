@@ -1,4 +1,4 @@
-# ADR-NEXT: A second primary member is refused on a single save, and tolerated in a load
+# ADR-0108: A second primary member is refused on a single save, and tolerated in a load
 
 **Status:** Accepted (owner default, D-85)
 **Date:** 2026-10-13

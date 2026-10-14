@@ -1,6 +1,6 @@
 /**
  * Finds the person erasure extensions dependent packages installed (canonical model R-ER8;
- * ADR-NEXT `NEXT-erase-a-person-anonymizes-in-place.md`), by namespace and class name as
+ * ADR-0110 `0110-erase-a-person-anonymizes-in-place.md`), by namespace and class name as
  * `HouseholdDependentsExtensions` does (ADR-0017).
  *
  * One rule differs from the other seams on purpose: an extension that is installed but cannot be

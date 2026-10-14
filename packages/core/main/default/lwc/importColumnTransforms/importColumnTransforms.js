@@ -403,7 +403,7 @@ export default class ImportColumnTransforms extends LightningElement {
     return result;
   }
 
-  /** The parameters of the steps ADR-NEXT (more transform steps) added. */
+  /** The parameters of the steps ADR-0112 (more transform steps) added. */
   storedNewer(step) {
     switch (step.op) {
       case 'map':
