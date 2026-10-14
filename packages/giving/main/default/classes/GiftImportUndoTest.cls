@@ -6,17 +6,27 @@
  * person undoing. Here the gift pass runs as a second user, so the totals it sets off are saved
  * by somebody who is not the undo, as they are in an org. Those saves are not edits, and the
  * people go; a person somebody edited after the import stays.
+ *
+ * The import is made in @TestSetup, the passes before the people's run after Test.startTest,
+ * and the people's as a job, so each part has its own governor limits as each chunk of the job
+ * does: the undo's checks keep what they cannot afford to ask about. Public so `GiftImportUndoPersonAccountsTest` shares it.
  */
 @IsTest(testFor='ApexClass:GiftImportProcessor')
-private class GiftImportUndoTest {
+public class GiftImportUndoTest {
     private static final Integer DONORS = 3;
 
     @TestSetup
-    static void createTestUsers() {
+    static void importDonors() {
+        createUsers();
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            imported(null);
+        }
+    }
+
+    /** The users these tests run as, made once. */
+    public static void createUsers() {
         TestUsers.adminWith('Giving_Admin');
-        TestUsers.withPermissionSets(
-            new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Admin', 'Giving_Staff' }
-        );
+        rollupQueue();
         TestUsers.admin();
     }
 
@@ -27,13 +37,11 @@ private class GiftImportUndoTest {
         );
     }
 
-    private static Import_Batch__c batch;
-
     /**
      * Imports one gift from each of three new donors, with the shipped rollups recalculated in
-     * the save, and marks the batch committed by the running user five minutes ago.
+     * the save, and marks the batch committed by the running user, started five minutes ago.
      */
-    private static void imported(String personMode) {
+    public static void imported(String personMode) {
         TestDataFactory.defaultSettings();
         GivingTestDataFactory.insertDefaultFund();
         GivingRollupTestData.installShippedRollups();
@@ -51,7 +59,7 @@ private class GiftImportUndoTest {
             template.Person_Mode__c = personMode;
             update template;
         }
-        batch = ImportTestDataFactory.batch(template);
+        Import_Batch__c batch = ImportTestDataFactory.batch(template);
         List<Map<String, String>> rows = new List<Map<String, String>>();
         for (Integer index = 0; index < DONORS; index++) {
             rows.add(
@@ -67,8 +75,6 @@ private class GiftImportUndoTest {
             );
         }
         ImportTestDataFactory.rows(batch, rows);
-        batch.Started_At__c = Datetime.now().addMinutes(-5);
-        update batch;
         ImportRowProcessor.process(
             batch,
             template,
@@ -78,80 +84,96 @@ private class GiftImportUndoTest {
         );
         batch.Is_Dry_Run__c = false;
         batch.Status__c = ImportBatchService.STATUS_COMPLETE;
+        batch.Started_At__c = Datetime.now().addMinutes(-5);
         batch.Completed_At__c = Datetime.now().addMinutes(1);
         batch.Committed_By__c = UserInfo.getUserId();
         batch.Undo_Deadline__c = Datetime.now().addDays(30);
         update batch;
-        Assert.areEqual(
-            DONORS,
-            [SELECT COUNT() FROM Gift__c WHERE Created_By_Import_Batch__c = :batch.Id],
-            'One gift a donor was imported.'
-        );
+    }
+
+    /** The batch the setup imported. */
+    public static Import_Batch__c batch() {
+        return [SELECT Id FROM Import_Batch__c WHERE Committed_By__c != NULL LIMIT 1];
     }
 
     /** The people and accounts the batch created that are still there. */
-    private static Integer taggedLeft() {
-        return [SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batch.Id] +
-            [SELECT COUNT() FROM Account WHERE Created_By_Import_Batch__c = :batch.Id];
+    public static Integer taggedLeft(Id batchId) {
+        return [SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batchId] +
+            [SELECT COUNT() FROM Account WHERE Created_By_Import_Batch__c = :batchId];
     }
 
-    /** The imported people: contacts, or person accounts in that mode. */
-    private static List<SObject> people(Boolean personAccounts) {
-        Id owner = batch.Id;
-        Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
-        if (personAccounts) {
-            return [
-                SELECT Id
-                FROM Account
-                WHERE Created_By_Import_Batch__c = :owner AND RecordTypeId IN :personTypes
-                ORDER BY Id
-            ];
+    private static String undoJournal(Id batchId) {
+        String text = '';
+        for (Import_Journal__c page : [
+            SELECT Entries_JSON__c
+            FROM Import_Journal__c
+            WHERE Import_Batch__c = :batchId AND Phase__c = :ImportJournalService.PHASE_UNDO
+        ]) {
+            text += page.Entries_JSON__c;
         }
-        return [SELECT Id FROM Contact WHERE Created_By_Import_Batch__c = :owner ORDER BY Id];
+        return text;
     }
 
     /**
      * Undoes the batch as the running user, its gifts deleted by the second user, so the
-     * totals they set off are saved by somebody who is not the undo.
+     * totals they set off are saved by somebody who is not the undo. The passes before the
+     * people's run after Test.startTest, and the people's as a job, each with limits of their
+     * own.
      */
-    private static void undo() {
+    public static void undo(Id batchId) {
+        Assert.areEqual(
+            DONORS,
+            [SELECT COUNT() FROM Gift__c WHERE Created_By_Import_Batch__c = :batchId],
+            'One gift a donor was imported.'
+        );
         GivingRollupTestData.nextSave();
-        Integer total = ImportUndoService.preview(batch.Id).total;
+        Integer total = ImportUndoService.preview(batchId).total;
         // Latched only: the passes below are the only ones that run.
-        System.abortJob(ImportUndoService.start(batch.Id, total));
+        System.abortJob(ImportUndoService.start(batchId, total));
         ImportUndoTestSupport.Run run = new ImportUndoTestSupport.Run(
-            batch.Id,
+            batchId,
             total,
             Datetime.newInstance((Datetime.now().getTime() / 1000) * 1000)
         );
+        Test.startTest();
         System.runAs(rollupQueue()) {
             run.beforePeople();
         }
         Assert.areEqual(
             0,
-            [SELECT COUNT() FROM Gift__c WHERE Created_By_Import_Batch__c = :batch.Id],
-            'The gifts are gone first.'
+            [SELECT COUNT() FROM Gift__c WHERE Created_By_Import_Batch__c = :batchId],
+            'The gifts are gone first. ' + undoJournal(batchId)
         );
-        run.rest();
+        run.queueRest();
+        Test.stopTest();
     }
 
     @IsTest
     static void undoingRemovesThePeopleWhoseTotalsTheUndoRecalculated() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            imported(null);
-            Assert.areEqual(DONORS, people(false).size(), 'Three people were imported.');
+            Id batchId = batch().Id;
 
-            undo();
+            undo(batchId);
 
-            Assert.areEqual(0, taggedLeft(), 'Every person and household the import made goes.');
+            Assert.areEqual(
+                0,
+                taggedLeft(batchId),
+                'Every person and household the import made goes. ' + undoJournal(batchId)
+            );
         }
     }
 
     @IsTest
     static void aPersonEditedAfterTheImportIsKept() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            imported(null);
-            Contact edited = (Contact) people(false)[0];
+            Id batchId = batch().Id;
+            Contact edited = [
+                SELECT Id
+                FROM Contact
+                WHERE Created_By_Import_Batch__c = :batchId
+                ORDER BY Id
+                LIMIT 1
+            ];
             System.runAs(TestUsers.admin()) {
                 // Somebody else's edit to a field no rollup writes. A test runs within a
                 // second, so the totals are dated an hour earlier, as they would be.
@@ -165,12 +187,12 @@ private class GiftImportUndoTest {
                 );
             }
 
-            undo();
+            undo(batchId);
 
             Assert.areEqual(
                 1,
-                [SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batch.Id],
-                'Only the edited person stays.'
+                [SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batchId],
+                'Only the edited person stays. ' + undoJournal(batchId)
             );
             Assert.areEqual(
                 1,
@@ -179,32 +201,9 @@ private class GiftImportUndoTest {
             );
             Assert.areEqual(
                 1,
-                [SELECT COUNT() FROM Account WHERE Created_By_Import_Batch__c = :batch.Id],
+                [SELECT COUNT() FROM Account WHERE Created_By_Import_Batch__c = :batchId],
                 'With the household they are still on.'
             );
-        }
-    }
-
-    /**
-     * The same undo where people are stored as person accounts. A Platform only org has none
-     * (ADR-0013), so there the test returns at once: the contact shape is covered above.
-     */
-    @IsTest
-    static void undoingRemovesPersonAccountsWhoseTotalsTheUndoRecalculated() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            if (
-                OrgShapeDetector.detect().hasPersonAccounts != true ||
-                OrgShapeDetector.creatablePersonRecordTypeId() == null
-            ) {
-                return;
-            }
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            imported(ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS);
-            Assert.areEqual(DONORS, people(true).size(), 'Three person accounts were imported.');
-
-            undo();
-
-            Assert.areEqual(0, taggedLeft(), 'Every person and household the import made goes.');
         }
     }
 }

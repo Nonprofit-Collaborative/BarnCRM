@@ -47,6 +47,15 @@ public class ImportUndoTestSupport {
             job.finish(null);
         }
 
+        /**
+         * Queues the rest to run as a job of its own, with limits of its own, as the platform
+         * runs each pass. Called between Test.startTest and Test.stopTest.
+         */
+        @NamespaceAccessible
+        public void queueRest() {
+            System.enqueueJob(new Rest(this));
+        }
+
         private void runNext() {
             if (next > 0) {
                 job = job.followedBy(passes[next]);
@@ -64,6 +73,19 @@ public class ImportUndoTestSupport {
             if (!chunk.isEmpty()) {
                 job.execute(null, chunk);
             }
+        }
+    }
+
+    /** The rest of one undo's passes, as a job. */
+    private class Rest implements Queueable {
+        private final Run run;
+
+        Rest(Run run) {
+            this.run = run;
+        }
+
+        public void execute(QueueableContext context) {
+            run.rest();
         }
     }
 }
