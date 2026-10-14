@@ -25,7 +25,7 @@ does not fit in any scratch org. Run it in two tiers:
 
 | Tier | Where | Volume | Proves |
 | ---- | ----- | ------ | ------ |
-| 1 | `oi-test` | 20,000 contacts, 8,000 households, 60,000 gifts (keep total under about 90,000 records) | Every batch and queueable completes without a governor limit error at a realistic ratio of gifts to donors; per-chunk timings to extrapolate from |
+| 1 | `oi-test` | 10,000 contacts, 4,000 households, 30,000 gifts (about 78,500 records loaded, with each gift's automatic default allocation; keep the total under about 90,000) | Every batch and queueable completes without a governor limit error at a realistic ratio of gifts to donors; per-chunk timings to extrapolate from |
 | 2 | A Partial or Full Copy sandbox, or a Developer Pro sandbox with extra storage, owner approval needed | The full Section 7.3 target | The absolute numbers in the plan |
 
 Tier 1 is the v0.11 exit evidence unless the owner provides a tier 2 org. Report the
@@ -70,6 +70,34 @@ Delete the loaded data (Bulk API hard delete, children first) so `oi-test` retur
 sample data set, then rerun `scripts/org/seed-sample-data.sh oi-test` if the sample data was
 removed. Write the results into the v0.11 release notes under "Scale test", with the tier,
 volumes, timings and every finding.
+
+### How to run tier 1
+
+From the dedicated worktree, holding the `oi-test` lock (needs `sf`, `jq` and `python3`):
+
+```bash
+bash scripts/org/scale-test-tier1.sh oi-test            # generate, load, record
+# ... the runs table above ...
+bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children first
+```
+
+- `scripts/data/generate-scale-data.py` writes the CSVs into `scale-test-data/` (git-ignored,
+  seeded, names from `generate-sample-data.py`). The load script runs it for you. It also
+  writes `import-wizard-25k.csv` (25,000 gift rows with the donor on each row, in the
+  "Generic gift list" template's headings) for the Import row; those rows need the
+  "Scale test General" fund, so run the import before cleanup, or clean up with
+  `--keep-funds`. Undo the import batch in the wizard, not in cleanup.
+- The load script records the four limits above, record counts, and per load the rows, elapsed
+  seconds, failed rows and first error in `scale-test-data/results-run-<alias>-<time>.md`. It
+  refuses any alias but `oi-test` unless `SCALE_TEST_ALLOW=1`.
+- The tier 1 files hold 4,000 households, 10,000 contacts and 30,000 gifts, plus 3,000 soft
+  credits and 1,500 second allocations. The gift trigger adds a default allocation to every
+  gift, so this loads about 78,500 records; the plan's original 60,000 gifts would have loaded
+  about 157,000, over the roughly 100,000 a scratch org's 200 MB holds. Check `DataStorageMB`
+  before loading. To change the size, set for example
+  `SCALE_TEST_GENERATOR_ARGS="--households 3000 --contacts 7500 --gifts 20000"`.
+- The load script stops before loading if the org has no default fund.
+- Hard delete needs the Bulk API Hard Delete permission on the running user.
 
 ## Mobile audit
 
