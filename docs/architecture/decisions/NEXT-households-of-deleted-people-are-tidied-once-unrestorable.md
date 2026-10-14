@@ -73,6 +73,11 @@ households whose former members have left the Recycle Bin.**
 ## Consequences
 
 - Households emptied before this ships have no stamp and are not tidied.
+- `ALL ROWS` keeps returning a record emptied from the Recycle Bin until the platform removes it
+  physically (seen on `oi-test` in a test context), so the tidy-up can trail a manual empty by a
+  night or more. That errs toward keeping. Tests mark purged records through a test-only seam.
+- In a person account org, some relationships come back under another name than the one
+  queried, so the probe reads whichever child lists came back rather than asking by name.
 - A household with anything at all pointing at it, including its own addresses or an old import
   row, is kept; the generic probe is conservative by design and costs a household on a list, not
   data. Import rows age out under R-IR5, after which the household is tidied.
