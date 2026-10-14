@@ -1,7 +1,7 @@
 # ADR-NEXT: The rollup engine and Rollup Builder move out of Core into the BarnCRM Rollup Builder module
 
-**Status:** Proposed (owner decision, Brandon, 2026-10-14, to move the engine; the design below
-awaits confirmation of the open decisions listed at the end)
+**Status:** Accepted (owner decision, Brandon, 2026-10-14: the move, this design, and decisions
+D1 to D7 below as recommended)
 **Date:** 2026-10-14
 **Source:** owner decision 2026-10-14; amends ADR-0003 (Core no longer contains the rollup
 engine), ADR-0029 (Core no longer materializes shipped rollups) and ADR-0082 decision 7 (the
@@ -163,19 +163,19 @@ subscriber migration.
   guide's rollups, module manager, Health Check, settings and editions pages, the feature
   catalog, and a `packages/rollups/README.md`.
 
-## Open decisions (owner)
+## Owner decisions (decided 2026-10-14, each as recommended)
 
-- **D1.** The Rollup Settings tab hosts Core's console filtered by module (decision 7), rather
-  than a module-owned settings component. Recommended.
+- **D1.** The Rollup Settings tab hosts Core's console filtered by module (decision 7), not a
+  module-owned settings component.
 - **D2.** Staff and Read Only keep a read-only Builder through `Rollup_Builder_User`, assigned
   to holders of `BarnCRM_Staff` or `BarnCRM_Read_Only` when the module is turned on, as Giving
-  does for `Giving_Staff`. Recommended over dropping their view.
+  does for `Giving_Staff`.
 - **D3.** `BarnCRM_Module__mdt` gains `Requires__c` (module keys), so Giving's Install says to
-  install Rollup Builder first and the Nonprofit Edition setup offers both, rather than relying
-  on the installer's dependency error. Recommended; built on the edition-gates stack.
+  install Rollup Builder first and the Nonprofit Edition setup offers both. Built on the
+  edition-gates stack.
 - **D4.** The module switch replaces the edition-gates "Rollup Builder" Super Tool and "rollups"
-  Core feature group (decision 11). Recommended.
-- **D5.** Moved labels and rows keep their `Core_` names (decision 2). Recommended.
+  Core feature group (decision 11).
+- **D5.** Moved labels and rows keep their `Core_` names (decision 2).
 - **D6.** Health Check keeps the one-click Restore shipped rollups fix through
-  `HealthCheckFixExtension` (decision 4). Recommended.
+  `HealthCheckFixExtension` (decision 4).
 - **D7.** Module key `Rollups`, folder `packages/rollups`, display name `BarnCRM Rollup Builder`.
