@@ -192,7 +192,7 @@ public with sharing class RollupEngine {
 
     /**
      * Writes the totals of one target entity's records from an answer already calculated, chunk
-     * by chunk, by `RollupLargeParentBatch` (ADR-NEXT): the same target filters, currency and
+     * by chunk, by `RollupLargeParentBatch` (ADR-0116): the same target filters, currency and
      * write as any other recalculation, only the source rows were read elsewhere.
      *
      * @param plan the plan the answer was calculated with

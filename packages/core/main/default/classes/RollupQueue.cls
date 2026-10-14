@@ -10,7 +10,7 @@
  * through `RollupEngine`, deletes the entries it finished and runs again while entries remain
  * (R-RQ3). Records the platform refused to save come back as a new entry, tried later each time
  * and Failed after the fifth attempt (R-RQ4). Records whose source rows are more than a Queueable
- * may read go to `RollupLargeParentBatch` instead (R-RQ6, ADR-NEXT): those whose stored counts
+ * may read go to `RollupLargeParentBatch` instead (R-RQ6, ADR-0116): those whose stored counts
  * say so before the run, and the entries of a run that stopped on a limit error it could not
  * catch, which its finalizer charges one attempt and hands to that batch before a fresh
  * processor carries on with the rest.

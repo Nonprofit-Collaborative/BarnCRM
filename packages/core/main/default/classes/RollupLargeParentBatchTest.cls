@@ -1,5 +1,5 @@
 /**
- * The large parent route of the Rollup Queue (canonical model R-RQ6, ADR-NEXT). Core holds no
+ * The large parent route of the Rollup Queue (canonical model R-RQ6, ADR-0116). Core holds no
  * giving objects, so the totals here roll organizations up to their parent account
  * (`ParentId`), as `RollupQueueTest` does. A test seam stands in for the row threshold, so a
  * parent with a handful of children is "too large" without inserting 50,000 rows.

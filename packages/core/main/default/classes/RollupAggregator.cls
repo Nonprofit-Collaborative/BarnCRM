@@ -224,7 +224,7 @@ public without sharing class RollupAggregator {
 
     /**
      * One source query of a plan for these target records, over these source rows only, folded
-     * into `answer` (ADR-NEXT, `RollupLargeParentBatch`). Partial answers merge exactly, as the
+     * into `answer` (ADR-0116, `RollupLargeParentBatch`). Partial answers merge exactly, as the
      * alternatives of a path already do (R-R1), so a record whose source rows are more than one
      * transaction may read is calculated chunk by chunk. A query that fails leaves its
      * definitions out of the write, as in `calculate`.

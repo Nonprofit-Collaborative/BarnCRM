@@ -1,4 +1,4 @@
-# ADR-NEXT: Rollup totals too large for a Queueable are recalculated by a batch over their source rows
+# ADR-0116: Rollup totals too large for a Queueable are recalculated by a batch over their source rows
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-10-14

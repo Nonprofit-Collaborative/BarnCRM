@@ -1,5 +1,5 @@
 /**
- * The large parent route of the Rollup Queue (ADR-NEXT, canonical model R-RQ6): totals for target
+ * The large parent route of the Rollup Queue (ADR-0116, canonical model R-RQ6): totals for target
  * records whose source rows are more than one background job may read.
  *
  * An aggregate query counts every row it aggregates towards the platform's 50,000 query rows a
