@@ -34,7 +34,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 
     /**
      * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted, renamed and tidied once, after the delete,
+     * itself, so that a household is recounted and renamed once, after the delete,
      * rather than in the middle of it. Rollups on membership rows are a different handler and
      * still run.
      */
@@ -101,14 +101,15 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     }
 
     /**
-     * A delete recounts and renames the households the people left, and tidies away one left
-     * empty where the org asks for that.
+     * A delete recounts and renames the households the people left, and never tidies one away,
+     * even left empty (R-H12): deleting the household would purge the people, or their
+     * membership rows, from the Recycle Bin, and neither an undelete nor a bulk delete undo
+     * could bring them back.
      *
      * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled so
      * that nothing is lost (C-20). The merged-away person's memberships go to the survivor
-     * (junction mode), and a household the merged-away person was in is never tidied away by
-     * the merge: gifts, notes and history credited to it would lose their household. A
-     * household a merge leaves empty is kept for a person to merge into the survivor's.
+     * (junction mode). A household a merge leaves empty is kept for a person to merge into
+     * the survivor's.
      */
     public override void afterDelete() {
         List<Contact> gone = (List<Contact>) Trigger.old;
@@ -119,9 +120,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         affected.addAll(householdIds(gone));
 
         Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        Set<Id> keptByMerge = new Set<Id>();
         if (!survivorByMerged.isEmpty()) {
-            keptByMerge = householdsOfMerged(gone, removed, survivorByMerged.keySet());
             AutomationControl.bypass(MEMBER_HANDLER);
             try {
                 affected.addAll(
@@ -131,10 +130,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
                 AutomationControl.clearBypass(MEMBER_HANDLER);
             }
         }
-        Set<Id> mayTidy = new Set<Id>(affected);
-        mayTidy.removeAll(keptByMerge);
-        refresh(mayTidy, true);
-        refresh(keptByMerge, false);
+        refresh(affected, false);
         if (!survivorByMerged.isEmpty()) {
             // The survivors' addresses, relationships and affiliations, once the merge is
             // saved (PEOPLE-15). Their households were settled above: none is in the merge.
@@ -162,27 +158,6 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         for (Contact record : records) {
             if (record.MasterRecordId != null) {
                 result.put(record.Id, record.MasterRecordId);
-            }
-        }
-        return result;
-    }
-
-    /** Every household the merged-away people were in, by reference or by membership. */
-    private static Set<Id> householdsOfMerged(
-        List<Contact> records,
-        List<Household_Member__c> removed,
-        Set<Id> mergedIds
-    ) {
-        Set<Id> result = new Set<Id>();
-        for (Contact record : records) {
-            if (mergedIds.contains(record.Id)) {
-                add(result, record.AccountId);
-            }
-        }
-        for (Household_Member__c row : removed) {
-            Id personId = HouseholdService.personOf(row);
-            if (mergedIds.contains(personId)) {
-                add(result, row.Household__c);
             }
         }
         return result;

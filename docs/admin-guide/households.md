@@ -135,6 +135,10 @@ were made in.
 Either "Delete a household once it is empty" is off, or BarnCRM deliberately
 left that one alone.
 
+Deleting people never deletes their household; moving them out still tidies it away.
+Deleting the household too would empty those people out of the Recycle Bin, and you could not
+restore them. If you meant to remove both, delete the household by hand.
+
 If the setting is off, that is a reasonable choice if you want to keep an empty household
 and its giving history. Delete the household by hand, and turn the setting on if you want
 it done for you next time.

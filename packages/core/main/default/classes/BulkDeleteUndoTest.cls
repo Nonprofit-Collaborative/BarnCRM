@@ -143,11 +143,12 @@ private class BulkDeleteUndoTest {
     }
 
     /**
-     * With Delete Empty Households on, deleting each household's only member also deletes the
-     * household. The undo brings the households back first, so the people return into them.
+     * With Delete Empty Households on, deleting each household's only member still keeps the
+     * household (R-H12): deleting it would purge the person from the Recycle Bin. The undo
+     * brings the people back into their households.
      */
     @IsTest
-    static void householdsTidiedAwayByTheDeleteComeBackWithTheirPeople() {
+    static void householdsEmptiedByTheDeleteAreKeptAndGetTheirPeopleBack() {
         System.runAs(TestUsers.admin()) {
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
             DataProtectedFields.definitionsOverride = new List<Rollup_Definition__c>();
@@ -185,9 +186,9 @@ private class BulkDeleteUndoTest {
                 job.finish(null);
             }
             System.Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Account WHERE Id IN :households],
-                'The emptied households were tidied away'
+                200,
+                [SELECT COUNT() FROM Account WHERE Id IN :households AND Member_Count__c = 0],
+                'The emptied households are kept, with nobody in them'
             );
 
             Test.startTest();
@@ -201,7 +202,11 @@ private class BulkDeleteUndoTest {
                 [SELECT COUNT() FROM Contact WHERE AccountId IN :households],
                 reread(jobId).Run_Log__c
             );
-            System.Assert.areEqual(200, [SELECT COUNT() FROM Account WHERE Id IN :households]);
+            System.Assert.areEqual(
+                200,
+                [SELECT COUNT() FROM Account WHERE Id IN :households AND Member_Count__c = 1],
+                'Each household has its person back'
+            );
         }
     }
 

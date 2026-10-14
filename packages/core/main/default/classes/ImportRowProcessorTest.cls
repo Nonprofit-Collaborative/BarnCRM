@@ -101,8 +101,13 @@ private class ImportRowProcessorTest {
             );
             Assert.areEqual(
                 0,
-                [SELECT COUNT() FROM Import_Journal__c],
-                'Nothing is journaled for records the import created: the tag is their record.'
+                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
+                'Nothing is journaled for records the import tagged: the tag is their record.'
+            );
+            Assert.areEqual(
+                1,
+                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_CREATED),
+                'Only the affiliation with Rose City, which carries no tag, is journaled (R-AF5).'
             );
         }
     }

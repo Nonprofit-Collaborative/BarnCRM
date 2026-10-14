@@ -63,14 +63,14 @@ private class FilterValueBinderTest {
             FilterValueBinder bound = bind(
                 'Error_Log__c',
                 '{"id": 1, "field": "Context__c", "operator": "equals", "value": "C:\\\\temp"},' +
-                '{"id": 2, "field": "Message__c", "operator": "contains", "value": "a\\\\b"}',
+                '{"id": 2, "field": "Object_Name__c", "operator": "contains", "value": "a\\\\b"}',
                 null
             );
 
             System.Assert.areEqual('C:\\temp', bound.binds.get('fb0'), 'Bound as typed');
             System.Assert.areEqual('%a\\\\b%', bound.binds.get('fb1'), 'A LIKE escape');
             System.Assert.areEqual(
-                'Context__c = \'C:\\\\temp\' AND Message__c LIKE \'%a\\\\\\\\b%\'',
+                'Context__c = \'C:\\\\temp\' AND Object_Name__c LIKE \'%a\\\\\\\\b%\'',
                 bound.display(),
                 'Both read back as the values bound'
             );

@@ -2320,13 +2320,15 @@ public with sharing class ImportRowProcessor {
             ? Affiliation__c.Person_Account__c
             : Affiliation__c.Contact__c;
         Set<String> linked = existingAffiliations(personIds, organizationIds, personField);
+        if (dryRun) {
+            // A pair an earlier chunk's row would link is there by the time the commit reaches
+            // this chunk, so the dry run counts it as the commit does (R-IB12).
+            linked.addAll(pairsLinkedEarlier(linking, batch));
+        }
         List<Affiliation__c> toCreate = new List<Affiliation__c>();
         List<Working> owners = new List<Working>();
         for (Working item : linking) {
-            String pair = item.person1Id == null ||
-                item.organizationId == null
-                ? null
-                : String.valueOf(item.person1Id) + '>' + String.valueOf(item.organizationId);
+            String pair = pairOf(item, dryRun);
             if (pair != null && linked.contains(pair)) {
                 continue;
             }
@@ -2377,6 +2379,49 @@ public with sharing class ImportRowProcessor {
     }
 
     /** The person and organization pairs already joined by a current affiliation. */
+    /**
+     * The pair a row links, told apart as the commit tells them: by the records' Ids, or in a
+     * dry run, for a person or an organization the run would create, by the digest a later row
+     * finds them by (R-IB12). Null when either side has neither.
+     */
+    private static String pairOf(Working item, Boolean dryRun) {
+        String person = item.person1Id != null
+            ? String.valueOf(item.person1Id)
+            : (dryRun ? personDigest(item) : null);
+        String organization = item.organizationId != null
+            ? String.valueOf(item.organizationId)
+            : (dryRun && item.organizationKey != null
+                  ? ImportValues.digest(ORGANIZATION_DIGEST, item.organizationKey)
+                  : null);
+        return person == null || organization == null ? null : person + '>' + organization;
+    }
+
+    /** The digest a new first person is found by: with the first name when the row gives one. */
+    private static String personDigest(Working item) {
+        if (item.personKey1 == null) {
+            return null;
+        }
+        String named = namedKey(item, true);
+        return ImportValues.digest(
+            PERSON_DIGEST,
+            named != null ? named : ImportMatcher.baseKey(item.personKey1)
+        );
+    }
+
+    /** In a dry run, the pairs rows of earlier chunks of this pass would have linked. */
+    private static Set<String> pairsLinkedEarlier(List<Working> linking, Import_Batch__c batch) {
+        Set<String> people = new Set<String>();
+        Set<String> organizations = new Set<String>();
+        for (Working item : linking) {
+            String pair = pairOf(item, true);
+            if (pair != null) {
+                people.add(pair.substringBefore('>'));
+                organizations.add(pair.substringAfter('>'));
+            }
+        }
+        return ImportRowSelector.affiliationPairsWrittenEarlier(batch, people, organizations);
+    }
+
     private static Set<String> existingAffiliations(
         Set<Id> personIds,
         Set<Id> organizationIds,

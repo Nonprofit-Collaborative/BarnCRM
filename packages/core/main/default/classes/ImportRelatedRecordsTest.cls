@@ -327,12 +327,15 @@ private class ImportRelatedRecordsTest {
                         row('Org 1', null, ana.Id, 'Volunteer')
                     }
                 );
-                batch.Is_Dry_Run__c = false;
-                batch.Status__c = ImportBatchService.STATUS_COMMITTING;
-                batch.Started_At__c = Datetime.now().addMinutes(-1);
-                batch.Committed_By__c = UserInfo.getUserId();
-                batch.Undo_Deadline__c = Datetime.now().addDays(30);
-                update batch;
+                // A fresh record: the read one holds Operation__c, which BarnCRM Admin may not edit.
+                update new Import_Batch__c(
+                    Id = batch.Id,
+                    Is_Dry_Run__c = false,
+                    Status__c = ImportBatchService.STATUS_COMMITTING,
+                    Started_At__c = Datetime.now().addMinutes(-1),
+                    Committed_By__c = UserInfo.getUserId(),
+                    Undo_Deadline__c = Datetime.now().addDays(30)
+                );
                 batch = ImportBatchSelector.selectById(batch.Id);
                 chunk(2, 4, false);
                 update new Import_Batch__c(

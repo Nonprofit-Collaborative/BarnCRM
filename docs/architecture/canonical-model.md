@@ -283,6 +283,10 @@ that group, so deleting the account would destroy it rather than orphan it. A ho
 left in place for that reason is reported to the Error Log at Info severity, naming the
 household: it is a correct outcome, not a failure.
 
+Deleting people never deletes their household; moving them still tidies it as above. Deleting
+a household purges from the Recycle Bin the contacts and membership rows already deleted from
+it, so neither an undelete nor the bulk delete undo (R-BD5) could bring the people back.
+
 **R-H13 Merge and split.** Two households can be merged (members move to the surviving
 household, rollups recalculate, names and greetings recompute unless Custom Name is set)
 and a contact can be split out to a new or existing household. Both are front-end
@@ -2340,7 +2344,9 @@ after the deadline is refused, in a sentence naming the date it passed.
     credit, a membership, an address, an activity, anything in any package, found by
     describing the record's child relationships, never by naming an object), and was created
     after the batch completed, or was created while the commit ran by somebody other than the
-    person who committed it;
+    person who committed it; a record carrying this batch's own tag does not count, since the
+    undo deletes it too (an aborted commit's household naming its new person as Primary
+    Contact);
   - the record itself was edited since: by somebody other than the committer after the
     commit started, or by anybody more than ten minutes after it completed (the ten minutes
     are the import's own follow-on work, such as rollups and household naming, which runs as
@@ -5609,7 +5615,9 @@ after the people are saved: a current affiliation of that person with that organ
 matched and nothing is written; otherwise one is created with the row's `Affiliation`
 attributes, through the ordinary rules (R-AF1 to R-AF4, so it is primary only when R-AF2 makes
 it so). Two rows of a chunk naming the same pair make one. The dry run counts the row as
-creating something and writes nothing. A created affiliation carries no batch tag: it is
+creating something and writes nothing, unless an earlier row of the file, in its chunk or an
+earlier one, would link the same pair, which the commit then finds (R-IB12): a person or an
+organization the run would create is told apart by the key a later row finds it by. A created affiliation carries no batch tag: it is
 journaled as Created (R-IJ3) and an undo deletes it before the people and organizations. The
 second person is not linked, as NPSP's import links only its first contact with its first
 account.
