@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    For whoever schedules people and tracks their time. Day to day work with people, households,
-    and organizations, and shifts and hours once the Volunteers module is turned on. Does not
-    include BarnCRM Settings.
+    For whoever schedules people and tracks their time. Day to day work with people, households
+    and organizations. Does not include BarnCRM Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Coordinator</label>

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    For anyone on the team who does the day to day work. People, households, and organizations,
-    and program and service records once the Programs module is turned on. Does not include
-    BarnCRM Settings.
+    For anyone on the team who does the day to day work with people, households and
+    organizations. Does not include BarnCRM Settings.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
   <label>Team Member</label>
