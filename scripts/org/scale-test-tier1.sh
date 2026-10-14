@@ -4,20 +4,27 @@
 #                                        hard delete the scale data, children first
 #
 # The v0.11 tier 1 scale test (docs/contributor-guide/scale-and-mobile-test-plan.md): 4,000
-# households, 10,000 contacts and 30,000 gifts, then their soft credits and allocations,
-# loaded with Bulk API 2.0 with Automation Control left on. Per load it records rows,
-# elapsed seconds, failed rows and the first error in a results file; before and after it
+# households, 10,000 contacts and 30,000 gifts, then their soft credits, then a 70/30 split
+# of 5% of the gifts across two funds (anonymous Apex, because Giving refuses a gift whose
+# allocations do not total it, so a second allocation cannot be Bulk loaded). Loads use
+# Bulk API 2.0 with Automation Control left on. Per load it records the job id, rows
+# processed and failed (from `sf data bulk results`), elapsed seconds and the top error
+# messages with counts; failed rows are saved under the work dir. Before and after it
 # records the org limits the plan names and the record counts.
 #
 # Refuses any alias other than oi-test unless SCALE_TEST_ALLOW=1. Take the shared org lock
 # first and do not run the org test gate at the same time. Run it from a dedicated worktree.
 # Needs: sf, jq, python3. Generates the CSVs itself (scripts/data/generate-scale-data.py).
-# Needs a default fund on the org (sample data or the Setup Assistant supplies one): every
-# gift gets an automatic allocation to it.
+# Every gift gets an automatic allocation to the default fund. If the org has none, the
+# generated "Scale test General" fund is loaded as the default (cleanup removes it); if it
+# has one, that stays the default.
 #
 # Environment: SCALE_TEST_DIR (default scale-test-data/ in the repo, git-ignored),
 #              SCALE_TEST_WAIT_MINUTES (per load, default 120),
-#              SCALE_TEST_GENERATOR_ARGS (for example "--gifts 20000" to shrink the run).
+#              SCALE_TEST_GENERATOR_ARGS (for example "--gifts 20000" to shrink the run),
+#              SCALE_TEST_SOFT_DELETE=1 (cleanup without --hard-delete, to the Recycle Bin,
+#              for a user without the Bulk API Hard Delete permission).
+# Exit status: nonzero when cleanup deletes nothing or leaves scale records behind.
 
 set -uo pipefail
 
@@ -70,87 +77,195 @@ record_limits() {
 }
 
 count_of() {
-  sf data query --target-org "$ALIAS" --query "$1" --json 2>/dev/null | jq -r '.result.totalSize // "?"'
+  sf data query --target-org "$ALIAS" --query "$1" --json 2>/dev/null </dev/null | jq -r '.result.totalSize // "?"'
 }
 
+# record_counts <when>: logs the scale record counts; SCALE_REMAINING is left holding their
+# sum, or -1 when a count could not be read (cleanup treats that as not clean).
+SCALE_REMAINING=0
 record_counts() {
   log ""
   log "Record counts ($1):"
-  log "  Account (scale households): $(count_of "SELECT COUNT() FROM Account WHERE Sample_Data_Key__c LIKE 'SCALE-H-%'")"
-  log "  Contact (scale contacts):   $(count_of "SELECT COUNT() FROM Contact WHERE Sample_Data_Key__c LIKE 'SCALE-C-%'")"
-  log "  Gift__c (scale gifts):      $(count_of "SELECT COUNT() FROM Gift__c WHERE External_Id__c LIKE 'SCALE-G-%'")"
-  log "  Soft_Credit__c:             $(count_of "SELECT COUNT() FROM Soft_Credit__c WHERE Gift__r.External_Id__c LIKE 'SCALE-G-%'")"
-  log "  Gift_Allocation__c:         $(count_of "SELECT COUNT() FROM Gift_Allocation__c WHERE Gift__r.External_Id__c LIKE 'SCALE-G-%'")"
+  local label query n sum=0
+  while IFS='|' read -r label query; do
+    n="$(count_of "$query")"
+    log "  $label $n"
+    if [[ "$n" =~ ^[0-9]+$ ]]; then sum=$((sum + n)); else sum=-1000000000; fi
+  done <<'EOF'
+Account (scale households):|SELECT COUNT() FROM Account WHERE Sample_Data_Key__c LIKE 'SCALE-H-%'
+Contact (scale contacts):  |SELECT COUNT() FROM Contact WHERE Sample_Data_Key__c LIKE 'SCALE-C-%'
+Gift__c (scale gifts):     |SELECT COUNT() FROM Gift__c WHERE External_Id__c LIKE 'SCALE-G-%'
+Soft_Credit__c:            |SELECT COUNT() FROM Soft_Credit__c WHERE Gift__r.External_Id__c LIKE 'SCALE-G-%'
+Gift_Allocation__c:        |SELECT COUNT() FROM Gift_Allocation__c WHERE Gift__r.External_Id__c LIKE 'SCALE-G-%'
+EOF
+  if [[ "$sum" -lt 0 ]]; then SCALE_REMAINING=-1; else SCALE_REMAINING="$sum"; fi
+}
+
+# job_error_hint <text>: a hint when the error text points at the hard delete permission.
+job_error_hint() {
+  if printf '%s' "$1" | grep -qiE 'hard.?delete|INSUFFICIENT_ACCESS|not authorized|insufficient access|permission'; then
+    log "  HINT: this looks like a permission problem. Hard delete needs the Bulk API Hard Delete"
+    log "  permission on the running user (a profile or permission set system permission that is"
+    log "  off by default, even for System Administrators). Grant it, or rerun cleanup with"
+    log "  SCALE_TEST_SOFT_DELETE=1 to delete to the Recycle Bin instead."
+  fi
+}
+
+# job_report <label> <sf --json output file> [verb]: reads the job id, asks
+# `sf data bulk results` for the real counts and the failed rows, and logs them. Sets
+# JOB_OK (1 when a job ran), JOB_PROCESSED, JOB_FAILED, JOB_SUCCESS (numbers, 0 when unknown).
+# The CLI returns .result.jobId on success and exits nonzero with .data.jobId on partial
+# failure; it never returns jobInfo.
+JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0
+job_report() {
+  local label="$1" outfile="$2" id msg res failed_csv slug errors
+  JOB_OK=0 JOB_PROCESSED=0 JOB_FAILED=0 JOB_SUCCESS=0
+  id="$(jq -r '.result.jobId // .data.jobId // empty' "$outfile" 2>/dev/null)"
+  if [[ -z "$id" ]]; then
+    msg="$(jq -r '[.name, .message] | map(select(. != null)) | join(": ")' "$outfile" 2>/dev/null)"
+    [[ -z "$msg" ]] && msg="$(head -c 400 "$outfile")"
+    log "  FAILED to run (no job id): $(printf '%s' "$msg" | head -c 600)"
+    job_error_hint "$msg"
+    return
+  fi
+  JOB_OK=1
+  log "  job: $id, state: $(jq -r '.data.state // .result.state // "see results"' "$outfile" 2>/dev/null)"
+  # The CLI writes <job id>-success-records.csv and -failed-records.csv into the current dir.
+  res="$( cd "$DIR/work" && sf data bulk results --job-id "$id" --target-org "$ALIAS" --json 2>&1 )"
+  if ! printf '%s' "$res" | jq -e '.result' >/dev/null 2>&1; then
+    log "  could not read the job results: $(printf '%s' "$res" | jq -r '.message // empty' 2>/dev/null | head -c 400)"
+    JOB_FAILED=-1
+    return
+  fi
+  JOB_PROCESSED="$(printf '%s' "$res" | jq -r '.result.processedRecords // 0')"
+  JOB_SUCCESS="$(printf '%s' "$res" | jq -r '.result.successfulRecords // 0')"
+  JOB_FAILED="$(printf '%s' "$res" | jq -r '.result.failedRecords // 0')"
+  log "  rows processed: $JOB_PROCESSED, succeeded: $JOB_SUCCESS, failed: $JOB_FAILED"
+  if [[ "$JOB_FAILED" != "0" ]]; then
+    slug="$(printf '%s' "$label" | tr -c 'A-Za-z0-9' '-')"
+    failed_csv="$(ls "$DIR"/work/*"$id"*failed*.csv 2>/dev/null | head -n 1)"
+    if [[ -n "$failed_csv" ]]; then
+      cp "$failed_csv" "$DIR/work/failed-$slug.csv"
+      log "  failed rows saved: $DIR/work/failed-$slug.csv"
+      errors="$(python3 - "$failed_csv" <<'PY'
+import collections, csv, sys
+counts = collections.Counter()
+with open(sys.argv[1], newline="", encoding="utf-8") as handle:
+    for row in csv.DictReader(handle):
+        counts[row.get("sf__Error", "").strip()[:200] or "(no message)"] += 1
+for message, n in counts.most_common(5):
+    print("    %6d x %s" % (n, message))
+PY
+)"
+      log "  top errors:"
+      log "$errors"
+      job_error_hint "$errors"
+    else
+      log "  no failed-rows file found for job $id in $DIR/work"
+    fi
+  fi
 }
 
 # export_to <soql> <file>: a bulk export to CSV; leaves an empty file when nothing matches.
 export_to() {
+  local msg
   rm -f "$2"
-  sf data export bulk --target-org "$ALIAS" --query "$1" --output-file "$2" \
-    --result-format csv --wait "$WAIT" >/dev/null 2>&1 || true
+  if ! msg="$(sf data export bulk --target-org "$ALIAS" --query "$1" --output-file "$2" \
+    --result-format csv --wait "$WAIT" --json 2>&1 </dev/null)"; then
+    log "  EXPORT FAILED ($1): $(printf '%s' "$msg" | jq -r '.message // empty' 2>/dev/null | head -c 300)"
+  fi
   [[ -f "$2" ]] || : >"$2"
 }
 
 # load <label> <sobject> <csv>: one Bulk API 2.0 ingest job, recorded in the results file.
 load() {
-  local label="$1" sobject="$2" file="$3" start end out job processed failed state id first
+  local label="$1" sobject="$2" file="$3" start end outfile
+  outfile="$DIR/work/last-load.json"
   log ""
   log "Load: $label ($sobject, $(($(wc -l <"$file") - 1)) rows in file)"
   start="$(date +%s)"
-  out="$(sf data import bulk --sobject "$sobject" --file "$file" --target-org "$ALIAS" \
-    --wait "$WAIT" --json 2>&1)"
+  # A partial failure exits nonzero but still prints the job in .data; both are read below.
+  sf data import bulk --sobject "$sobject" --file "$file" --target-org "$ALIAS" \
+    --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-load.err" </dev/null
   end="$(date +%s)"
-  job="$(printf '%s' "$out" | jq -c '.result.jobInfo // .data.jobInfo // empty' 2>/dev/null)"
-  if [[ -z "$job" ]]; then
-    log "  FAILED to run: $(printf '%s' "$out" | jq -r '.message // empty' 2>/dev/null | head -c 400)"
-    log "  elapsed: $((end - start)) s"
-    return
-  fi
-  id="$(printf '%s' "$job" | jq -r '.id')"
-  state="$(printf '%s' "$job" | jq -r '.state')"
-  processed="$(printf '%s' "$job" | jq -r '.numberRecordsProcessed')"
-  failed="$(printf '%s' "$job" | jq -r '.numberRecordsFailed')"
-  first=""
-  if [[ "$failed" != "0" && "$failed" != "null" ]]; then
-    # The CLI writes <job id>-failed-records.csv into the current directory.
-    ( cd "$DIR/work" && sf data bulk results --job-id "$id" --target-org "$ALIAS" --json >/dev/null 2>&1 )
-    first="$(python3 - "$DIR/work" "$id" <<'PY'
-import csv, glob, sys
-for path in glob.glob("%s/*%s*failed*.csv" % (sys.argv[1], sys.argv[2])):
-    with open(path, newline="", encoding="utf-8") as handle:
-        for row in csv.DictReader(handle):
-            print(row.get("sf__Error", "")[:400])
-            sys.exit(0)
-PY
-)"
-  fi
-  log "  job: $id, state: $state"
-  log "  rows processed: $processed, failed rows: $failed"
+  job_report "$label" "$outfile"
   log "  elapsed: $((end - start)) s"
-  [[ -n "$first" ]] && log "  first error: $first"
+}
+
+# split_gifts: the 5% two fund split. Giving refuses any save that leaves a gift's
+# allocations not totalling the gift, and it checks after every DML statement, so the default
+# allocation cannot be cut to 70% in one statement and the 30% row added in another. Each
+# generated script upserts both rows in one statement (about 200 gifts per script). The
+# scripts print a SCALE_SPLIT line with the counts, collected here.
+split_gifts() {
+  local script out start end line requested=0 skipped=0 rows=0 failed=0 first="" n=0 value
+  log ""
+  log "Split: second allocation (30%) on 5% of gifts, default allocation cut to 70%"
+  start="$(date +%s)"
+  for script in "$DIR"/split-apex/split-*.apex; do
+    [[ -f "$script" ]] || continue
+    n=$((n + 1))
+    out="$DIR/work/last-split.json"
+    sf apex run --file "$script" --target-org "$ALIAS" --json >"$out" 2>/dev/null </dev/null
+    if [[ "$(jq -r '.result.success // false' "$out" 2>/dev/null)" != "true" ]]; then
+      log "  $(basename "$script"): FAILED: $(jq -r '[.result.compileProblem, .result.exceptionMessage, .message] | map(select(. != null and . != "")) | join(" / ")' "$out" 2>/dev/null | head -c 500)"
+      failed=$((failed + 1))
+      continue
+    fi
+    line="$(jq -r '.result.logs // ""' "$out" | grep -o 'SCALE_SPLIT .*' | head -n 1)"
+    if [[ -z "$line" ]]; then
+      log "  $(basename "$script"): ran, but printed no SCALE_SPLIT line (log level?)"
+      continue
+    fi
+    value="${line#*requested=}"; requested=$((requested + ${value%% *}))
+    value="${line#*skipped=}"; skipped=$((skipped + ${value%% *}))
+    value="${line#*rows=}"; rows=$((rows + ${value%% *}))
+    value="${line#*failedRows=}"; failed=$((failed + ${value%% *}))
+    value="${line#*firstError=}"
+    [[ -z "$first" && -n "$value" ]] && first="$value"
+  done
+  end="$(date +%s)"
+  log "  scripts run: $n, gifts requested: $requested, skipped (not loaded or not one allocation): $skipped"
+  log "  allocation rows saved or attempted: $rows, failed rows or scripts: $failed"
+  [[ -n "$first" ]] && log "  first error: $(printf '%s' "$first" | head -c 400)"
+  log "  elapsed: $((end - start)) s"
 }
 
 generate() {
+  local extra=""
+  # A second default fund would move the org's default and rewrite Giving settings.
+  [[ "${ORG_HAS_DEFAULT:-0}" == "1" ]] && extra="--no-default-fund"
   # shellcheck disable=SC2086
-  python3 "$GENERATOR" --tier1 --out-dir "$DIR" ${SCALE_TEST_GENERATOR_ARGS:-} 2>&1 | tee -a "$RESULTS"
+  python3 "$GENERATOR" --tier1 --out-dir "$DIR" $extra ${SCALE_TEST_GENERATOR_ARGS:-} 2>&1 | tee -a "$RESULTS"
   python3 "$GENERATOR" --import-file --out-dir "$DIR" | tee -a "$RESULTS"
 }
 
-resolve() { python3 "$GENERATOR" --resolve "$@" || exit 1; }
+# resolve <in> --out <file> ...: the generator's resolve step. It reports how many rows it
+# dropped (a parent that did not load); both its lines go into the results file.
+resolve() {
+  local note
+  log ""
+  log "Resolve: $(basename "$1")"
+  note="$(python3 "$GENERATOR" --resolve "$@" 2>&1)" || { log "$note"; exit 1; }
+  log "$(printf '%s\n' "$note" | sed 's/^/  /')"
+}
 
 run() {
   log "BarnCRM tier 1 scale test load: org $ALIAS, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   log "Reminder: hold the org lock; no org test gate at the same time."
-  # Every gift gets an automatic allocation to the default fund; without one each gift fails.
+  # Every gift gets an automatic allocation to the default fund. An org with none gets the
+  # generated "Scale test General" fund as its default; an org with one keeps it.
   local default_funds setting_fund
   default_funds="$(count_of "SELECT COUNT() FROM Fund__c WHERE Is_Default__c = true AND Active__c = true")"
   setting_fund="$(sf data query --target-org "$ALIAS" --json \
-    --query "SELECT Default_Fund__c FROM Giving_Settings__c" 2>/dev/null \
+    --query "SELECT Default_Fund__c FROM Giving_Settings__c" 2>/dev/null </dev/null \
     | jq -r '[.result.records[]?.Default_Fund__c | select(. != null and . != "")] | first // empty')"
-  if [[ "$default_funds" != "1" && -z "$setting_fund" ]]; then
-    log "No default fund on $ALIAS (no active fund flagged default, none chosen in Giving settings)."
-    log "Every gift would fail. Load the sample data or choose a default fund, then run again."
-    exit 1
+  ORG_HAS_DEFAULT=0
+  if [[ "$default_funds" =~ ^[1-9][0-9]*$ || -n "$setting_fund" ]]; then
+    ORG_HAS_DEFAULT=1
+    log "Org already has a default fund; it stays the default."
+  else
+    log "No default fund on $ALIAS: the generated 'Scale test General' fund is loaded as the default."
   fi
   generate
   record_limits "before"
@@ -180,10 +295,15 @@ run() {
     --key-col Contact_Key --id-col Donor_Contact__c
   load "gifts" Gift__c "$DIR/work/gifts.csv"
 
+  # Soft credits only for gifts that loaded (and contacts that loaded); the split scripts
+  # find their gifts by External_Id__c and skip any that are missing.
+  export_to "SELECT External_Id__c FROM Gift__c WHERE External_Id__c LIKE 'SCALE-G-%'" \
+    "$DIR/work/gift-ids.csv"
   resolve "$DIR/soft_credits.csv" --out "$DIR/work/soft_credits.csv" \
-    --map "$DIR/work/contact-ids.csv" --key-col Contact_Key --id-col Contact__c
+    --map "$DIR/work/contact-ids.csv" --key-col Contact_Key --id-col Contact__c \
+    --only-col "Gift__r.External_Id__c" --only-from "$DIR/work/gift-ids.csv"
   load "soft credits" Soft_Credit__c "$DIR/work/soft_credits.csv"
-  load "allocations (second allocation on 5% of gifts)" Gift_Allocation__c "$DIR/allocations.csv"
+  split_gifts
 
   record_limits "after"
   record_counts "after"
@@ -194,32 +314,44 @@ run() {
 
 # delete_where <label> <sobject> <where clause>: bulk export the Ids, then hard delete them.
 delete_where() {
-  local file="$DIR/work/delete-$2.csv" n start end out
+  local file="$DIR/work/delete-$2.csv" n start end flag="--hard-delete" outfile="$DIR/work/last-delete.json"
+  [[ "${SCALE_TEST_SOFT_DELETE:-}" == "1" ]] && flag=""
+  log ""
+  log "Delete: $1 ($2)"
   export_to "SELECT Id FROM $2 WHERE $3" "$file"
   n=$(($(wc -l <"$file") - 1))
   if [[ "$n" -le 0 ]]; then
-    log "  $1: nothing to delete"
+    log "  nothing to delete"
     return
   fi
+  log "  $n Ids to delete${flag:+ (hard delete)}"
   start="$(date +%s)"
-  out="$(sf data delete bulk --sobject "$2" --file "$file" --target-org "$ALIAS" --hard-delete \
-    --wait "$WAIT" --json 2>&1)"
+  # shellcheck disable=SC2086
+  sf data delete bulk --sobject "$2" --file "$file" --target-org "$ALIAS" $flag \
+    --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-delete.err" </dev/null
   end="$(date +%s)"
-  log "  $1: $n Ids, $(printf '%s' "$out" | jq -r \
-    '(.result.jobInfo // .data.jobInfo // {}) | "processed \(.numberRecordsProcessed), failed \(.numberRecordsFailed), state \(.state)"' \
-    2>/dev/null || echo "no job info"), $((end - start)) s"
+  job_report "delete $1" "$outfile"
+  log "  elapsed: $((end - start)) s"
+  if [[ "$JOB_OK" != "1" || "$JOB_FAILED" != "0" || "$JOB_SUCCESS" -le 0 ]]; then
+    CLEANUP_FAILED=1
+    log "  NOTHING OR NOT EVERYTHING WAS DELETED for $1 ($JOB_SUCCESS of $n)."
+    log "  stderr: $(head -c 300 "$DIR/work/last-delete.err" 2>/dev/null)"
+    job_error_hint "$(cat "$outfile" "$DIR/work/last-delete.err" 2>/dev/null | head -c 2000)"
+  fi
 }
 
+CLEANUP_FAILED=0
 cleanup() {
   log "BarnCRM tier 1 scale test cleanup: org $ALIAS, $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-  log "Hard delete needs the Bulk API Hard Delete permission on the running user."
+  log "Hard delete needs the Bulk API Hard Delete permission on the running user"
+  log "(SCALE_TEST_SOFT_DELETE=1 deletes to the Recycle Bin instead)."
   record_counts "before cleanup"
-  log ""
-  # Children first: the master-detail rows, then gifts, then people, then households.
+  # Children first. Allocations are not deleted on their own: Giving refuses to delete a
+  # gift's allocation while the gift remains (the gift would be under-allocated), so they go
+  # with their gifts (master-detail cascade), as do soft credits; soft credits are deleted
+  # first only so their count is reported separately.
   delete_where "soft credits" Soft_Credit__c "Gift__r.External_Id__c LIKE 'SCALE-G-%'"
-  delete_where "allocations (including the automatic ones)" Gift_Allocation__c \
-    "Gift__r.External_Id__c LIKE 'SCALE-G-%'"
-  delete_where "gifts" Gift__c "External_Id__c LIKE 'SCALE-G-%'"
+  delete_where "gifts (with their allocations)" Gift__c "External_Id__c LIKE 'SCALE-G-%'"
   delete_where "contacts" Contact "Sample_Data_Key__c LIKE 'SCALE-C-%'"
   delete_where "households" Account "Sample_Data_Key__c LIKE 'SCALE-H-%'"
   if [[ "$KEEP_FUNDS" == "1" ]]; then
@@ -232,6 +364,12 @@ cleanup() {
   log "Gifts the import wizard created are not touched here: undo that import batch in the"
   log "wizard. Rerun scripts/org/seed-sample-data.sh $ALIAS if the sample data was removed."
   log "Results file: $RESULTS"
+  if [[ "$CLEANUP_FAILED" == "1" || "$SCALE_REMAINING" != "0" ]]; then
+    log ""
+    log "CLEANUP INCOMPLETE: $SCALE_REMAINING scale records remain (-1 means a count could not be"
+    log "read) or a delete job failed. See the job lines above."
+    exit 1
+  fi
 }
 
 if [[ "$MODE" == "cleanup" ]]; then

@@ -39,13 +39,13 @@ On tier 2, also read Salesforce Scale Center and run ApexGuru for the run window
 Generate CSV files with a script under `scripts/data/` (not committed with real names: use
 the sample data name lists). Keep the plan's ratios: 2.5 contacts per household, 3 gifts per
 contact on average, with a long tail (1% of donors with 50 or more gifts, so per-parent
-rollup work is uneven), 10% of gifts with a soft credit, 5% with two allocations, gift dates
+rollup work is uneven), 10% of gifts with a soft credit, 5% split across two funds (70/30), gift dates
 spread over ten years so fiscal year rollups have work to do.
 
 Load with Bulk API 2.0 (`sf data import bulk`), in this order, with Automation Control left
 on so triggers run as they would for a customer: households and contacts, then gifts, then
-soft credits and allocations. Record for each load: rows, elapsed time, failed rows and the
-first error.
+soft credits, then the fund splits (Apex, see below). Record for each load: rows, elapsed
+time, failed rows and the top errors.
 
 ### Runs and what to record
 
@@ -87,17 +87,37 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
   "Generic gift list" template's headings) for the Import row; those rows need the
   "Scale test General" fund, so run the import before cleanup, or clean up with
   `--keep-funds`. Undo the import batch in the wizard, not in cleanup.
-- The load script records the four limits above, record counts, and per load the rows, elapsed
-  seconds, failed rows and first error in `scale-test-data/results-run-<alias>-<time>.md`. It
+- The load script records the four limits above, record counts, and per load the job id, rows
+  processed and failed (read with `sf data bulk results`), elapsed seconds and the top error
+  messages with counts in `scale-test-data/results-run-<alias>-<time>.md`. Failed rows are
+  saved as `scale-test-data/work/failed-<load>.csv`. When a parent load had failed rows, the
+  next file drops the rows whose parent did not load and the results file says how many. It
   refuses any alias but `oi-test` unless `SCALE_TEST_ALLOW=1`.
 - The tier 1 files hold 4,000 households, 10,000 contacts and 30,000 gifts, plus 3,000 soft
-  credits and 1,500 second allocations. The gift trigger adds a default allocation to every
-  gift, so this loads about 78,500 records; the plan's original 60,000 gifts would have loaded
-  about 157,000, over the roughly 100,000 a scratch org's 200 MB holds. Check `DataStorageMB`
-  before loading. To change the size, set for example
-  `SCALE_TEST_GENERATOR_ARGS="--households 3000 --contacts 7500 --gifts 20000"`.
-- The load script stops before loading if the org has no default fund.
-- Hard delete needs the Bulk API Hard Delete permission on the running user.
+  credits, and 1,500 gifts to split across two funds. The gift trigger adds a default
+  allocation to every gift, and each split adds one more allocation, so this loads about 78,500
+  records (47,000 file rows, 30,000 automatic allocations, 1,500 second allocations); the
+  plan's original 60,000 gifts would have loaded about 157,000, over the roughly 100,000 a
+  scratch org's 200 MB holds. Check `DataStorageMB` before loading. To change the size, set for
+  example `SCALE_TEST_GENERATOR_ARGS="--households 3000 --contacts 7500 --gifts 20000"`.
+- Splits are not Bulk loaded. Giving refuses any save that leaves a gift's allocations not
+  totalling the gift (see "Splitting a gift one row at a time" in the gifts admin guide), and
+  checks after every DML statement, so a second 30% allocation inserted on its own is refused.
+  After the gifts load, the script runs one anonymous Apex script per 200 gifts
+  (`scale-test-data/split-apex/`), each upserting the default allocation (cut to 70%) and the
+  new 30% allocation to another fund in one statement. The results file records gifts split,
+  skipped and failed.
+- Test data avoids the org's standard duplicate rules, which Bulk API 2.0 cannot override:
+  every household has its own street address, and every contact its own first and last name
+  pair, email and phone.
+- The generated "Scale test General" fund is loaded as the default fund when the org has none,
+  so the load works without sample data; an org that already has a default keeps it. Cleanup
+  removes the generated funds.
+- Cleanup deletes soft credits, then gifts (their allocations go with them: Giving refuses to
+  delete a gift's allocation while the gift remains), contacts and households, and exits
+  nonzero when a delete job fails or records remain. Hard delete needs the Bulk API Hard Delete
+  permission on the running user (off by default, even for System Administrators); without it
+  the log says so. `SCALE_TEST_SOFT_DELETE=1` deletes to the Recycle Bin instead.
 
 ## Mobile audit
 
