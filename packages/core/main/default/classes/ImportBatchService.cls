@@ -714,6 +714,7 @@ public with sharing class ImportBatchService {
         }
         lines.addAll(logLines == null ? new List<String>() : logLines);
         lines.addAll(controlTotalLines(batch));
+        lines.addAll(ImportObjectLoader.relatedLines(batchId, dryRun));
         batch.Run_Log__c = String.join(lines, '\n').abbreviate(32768);
         if (failed == true) {
             batch.Status__c = STATUS_FAILED;

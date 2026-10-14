@@ -73,21 +73,35 @@ public with sharing class ImportBatchSelector {
      */
     @NamespaceAccessible
     public static Map<String, Integer> countRowsByStatus(Id batchId) {
-        return countRowsByStatus(batchId, null);
+        return countRowsBy(batchId, 'Status__c', null);
     }
 
     /** As above, counting only the rows the given pass processed when one is given (R-IB16). */
     @NamespaceAccessible
     public static Map<String, Integer> countRowsByStatus(Id batchId, Decimal pass) {
+        return countRowsBy(batchId, 'Status__c', pass);
+    }
+
+    /** The same for what the rows' related records did (R-IT17), for the run log. */
+    @NamespaceAccessible
+    public static Map<String, Integer> countRelatedByStatus(Id batchId) {
+        return countRowsBy(batchId, 'Related_Status__c', null);
+    }
+
+    /** The field is one of the two above, never a caller's text. */
+    private static Map<String, Integer> countRowsBy(Id batchId, String field, Decimal pass) {
         Map<String, Integer> result = new Map<String, Integer>();
         if (batchId == null) {
             return result;
         }
         List<AggregateResult> grouped = Database.queryWithBinds(
-            'SELECT Status__c status, COUNT(Id) total FROM Import_Row__c ' +
+            'SELECT ' +
+                field +
+                ' status, COUNT(Id) total FROM Import_Row__c ' +
                 'WHERE Import_Batch__c = :batchId' +
                 (pass == null ? '' : ' AND Pass_Number__c = :pass') +
-                ' GROUP BY Status__c',
+                ' GROUP BY ' +
+                field,
             new Map<String, Object>{ 'batchId' => batchId, 'pass' => pass },
             AccessLevel.SYSTEM_MODE
         );
