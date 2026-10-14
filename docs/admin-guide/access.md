@@ -70,13 +70,31 @@ The person who installs BarnCRM is given the BarnCRM Admin role automatically, a
 install and again at every upgrade, so there is always at least one person who can use this
 page. If that person was you, you can start straight away.
 
-Two things control who can use the page:
+Three things control who can use the page:
 
 1. You need the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin
    role. Anyone without it sees the page in read-only mode with a notice explaining why.
-2. The person you are giving a role to must already be a Salesforce user with a license.
+2. To give or remove a role or an extra permission you also need Salesforce's **Assign
+   Permission Sets** (or **Manage Users**) permission. A system administrator has it already. A BarnCRM Admin who is not a system
+   administrator gets it from the optional **BarnCRM Access Manager** permission set: in
+   Setup, open **Users**, choose the person, and under **Permission Set Assignments** add
+   **BarnCRM Access Manager**. Assign Permission Sets is a Salesforce-wide permission: whoever
+   holds it can also assign any permission set in Setup, not only the BarnCRM roles, so give
+   it only to people you trust with that. It is in no role because only a full Salesforce license can
+   hold it; a user with a **Salesforce Platform** license cannot be given it, so in that case
+   a colleague with a Salesforce license gives the roles. Everything else in BarnCRM Settings
+   works on a Platform license. The same permission lets the
+   [Module Manager](module-manager.md) give you a module's admin set when you turn it on.
+   Without it, the page shows who holds each role and extra permission, the **Give access**
+   button is disabled, the extra permission picker and the **Remove** buttons are hidden, and a
+   notice says why: "You can see who has each role and extra permission but not change
+   them.", followed by where the permission comes from.
+3. The person you are giving a role to must already be a Salesforce user with a license.
    Creating users is one of the few things Salesforce does not let an app do for you, so
    that step happens in Setup. See "What still needs Setup" below.
+
+Giving the extra permissions (see "Extra permissions" below) needs the same two
+permissions as giving a role.
 
 ## A five-minute walkthrough
 
@@ -106,6 +124,54 @@ Here is how she gives him access, checks it, and takes it away again.
 A person can hold more than one role. Giving David the Volunteer Coordinator role as well
 does not remove Program Staff, and removing one role leaves the other in place. Giving someone a
 role they already have changes nothing and reports no error.
+
+## Extra permissions
+
+A few BarnCRM features are in no role on purpose, because most people should not have them.
+You give them to a person on this page too, alongside their role, under **Extra permissions**.
+You never need Setup for them.
+
+| Extra permission | What it lets the person do |
+|---|---|
+| BarnCRM Find and Export | Build, run, save and export Find queries and use Data Hygiene, seeing only the records the person can already see. BarnCRM Admin already includes it. |
+| BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export. |
+| BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
+| BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
+| BarnCRM Duplicate Review | Review suggested duplicate people and households. Works only for people with a Sales Cloud or Service Cloud license. |
+| BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
+
+These six are the only permissions this section gives. It never lists or assigns any other
+permission set in your org, including a module's (see "What still needs Setup" below).
+
+To give one:
+
+1. In the **Find a person** box, find and choose the person, as for a role.
+2. In **Extra permission**, choose the permission. Its sentence from the table above appears
+   under the picker. For Bulk Delete and Erase People a warning appears as well: "This
+   permission lets the person remove data. Give it only to someone you trust to do that."
+3. Click **Give permission**, and confirm. The confirmation repeats the warning. A message says,
+   for example, "Priya Nair now has the BarnCRM Erase People permission."
+
+Each extra permission has its own card below the roles, listing who has it, with a **Remove**
+button beside each name. Removing it leaves the person's roles in place.
+
+A card lists only people given the permission directly. Someone who has it through a role (every
+BarnCRM Admin has Find and Export) is not listed, and removing it here could not take it away.
+
+Who can give extra permissions: you need Manage BarnCRM Settings, as for roles, and also what
+Salesforce itself asks for to assign a permission set in Setup: **Assign Permission Sets** (or
+**Manage Users**). A system administrator has it; anyone else gets it from BarnCRM Access
+Manager (see "How to turn it on"). Without it, the cards are shown with no buttons, under the
+notice described there.
+
+If Salesforce refuses one person, usually because their license does not allow what the
+permission grants (Duplicate Review on a Salesforce Platform license, for example), the page says
+so by name: "Priya Nair could not be given BarnCRM Duplicate Review. Their Salesforce license
+may not allow what it grants. Salesforce said: ..." followed by Salesforce's own reason. The same
+message is written to the Error Log. Removing works the same way: a person Salesforce will not
+let you remove it from is named with the reason ("BarnCRM Bulk Update could not be removed from
+Priya Nair. Salesforce said: ..."), and the others are still removed. Nothing is written to the
+Error Log when it works.
 
 ## What still needs Setup
 

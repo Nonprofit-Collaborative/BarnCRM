@@ -129,6 +129,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0118](0118-merge-settlement-after-commit.md) | A merge that cannot queue its tidy-up asks for it after commit | Accepted (builder decision) |
 | [0119](0119-import-undo-judges-edits-before-deleting.md) | Import undo judges edits before it deletes, and a rollup's save is not an edit | Accepted (builder decision) |
 | [0120](0120-households-of-deleted-people-are-tidied-once-unrestorable.md) | A household emptied by deleting people is tidied once they cannot be restored | Accepted (owner decision D-89) |
+| [0121](0121-salesforce-license-permissions-in-optional-sets.md) | Permissions only a Salesforce license can hold live in optional sets, never in a role | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

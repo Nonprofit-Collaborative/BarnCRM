@@ -22,9 +22,6 @@ import EMAIL_WHERE from '@salesforce/label/c.Core_SetupNote_Email_Where';
 import USERS_WHAT from '@salesforce/label/c.Core_SetupNote_Users_What';
 import USERS_WHY from '@salesforce/label/c.Core_SetupNote_Users_Why';
 import USERS_WHERE from '@salesforce/label/c.Core_SetupNote_Users_Where';
-import BULK_WHAT from '@salesforce/label/c.Core_SetupNote_Bulk_What';
-import BULK_WHY from '@salesforce/label/c.Core_SetupNote_Bulk_Why';
-import BULK_WHERE from '@salesforce/label/c.Core_SetupNote_Bulk_Where';
 
 /**
  * What each Core section needs from Setup, by the section name the console shows. `check`
@@ -55,8 +52,7 @@ const NOTES = {
       check: 'emailDeliverability'
     }
   ],
-  access: [{ key: 'users', what: USERS_WHAT, why: USERS_WHY, where: USERS_WHERE }],
-  import: [{ key: 'bulk', what: BULK_WHAT, why: BULK_WHY, where: BULK_WHERE }]
+  access: [{ key: 'users', what: USERS_WHAT, why: USERS_WHY, where: USERS_WHERE }]
 };
 
 /**

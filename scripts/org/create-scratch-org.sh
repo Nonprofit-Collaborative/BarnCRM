@@ -2,8 +2,9 @@
 # create-scratch-org.sh <shape> [alias] [--days N] [--no-sample-data] [--replace]
 #
 # Creates a scratch org of the given shape, deploys Core, assigns Core's permission sets, and
-# (for the platform-only shape) verifies that a Salesforce Platform license user can use every
-# packaged permission set. See docs/contributor-guide/scratch-orgs.md for the full explanation.
+# (for the platform-only shape) verifies that a Salesforce Platform license user can be given
+# every Core permission set but the optional Salesforce-license ones. See
+# docs/contributor-guide/scratch-orgs.md for the full explanation.
 #
 # Shapes (see config/scratch-defs/):
 #   platform-only     Developer edition, no Sales/Service objects available to the org's
@@ -151,28 +152,13 @@ fi
 #       object, so the source itself never depends on what a real Platform-only org lacks; and
 #   (b) here, at org-creation time for the platform-only shape only: we create a user with the
 #       "Salesforce Platform" user license and the "Standard Platform User" profile, then assign
-#       every Core permission set to that user. The "Standard Platform User" profile cannot see
-#       Sales/Service objects, so if any Core permission set grants access to an object that
-#       license cannot see, the assignment fails loudly, which is exactly the signal we want.
+#       every Core permission set to that user, except the optional sets that only a Salesforce
+#       license can hold (Duplicate Review, Access Manager; ADR-0050, ADR-0121). Salesforce
+#       refuses a set that grants an object or user permission that license cannot have, which
+#       is exactly the signal we want. scripts/org/check-platform-license.sh does this, tries
+#       every set, names every refusal, and can be rerun on an existing org.
 if [[ "$SHAPE" == "platform-only" ]]; then
-  echo "== Platform-only license check: creating Standard Platform User =="
-  PLATFORM_USER_DEF="$(mktemp)"
-  sed "s/<alias>/${ALIAS}/g" config/users/platform-user.json > "$PLATFORM_USER_DEF"
-  sf org create user --definition-file "$PLATFORM_USER_DEF" --target-org "$ALIAS"
-  rm -f "$PLATFORM_USER_DEF"
-
-  PLATFORM_USERNAME="platformuser@${ALIAS}.barncrm.test"
-
-  if [[ "$FOUND_PERMSET" -eq 1 ]]; then
-    for PS_FILE in "$PERMSET_DIR"/*.permissionset-meta.xml; do
-      [[ -e "$PS_FILE" ]] || continue
-      PS_NAME="$(basename "$PS_FILE" .permissionset-meta.xml)"
-      echo "Assigning ${PS_NAME} to ${PLATFORM_USERNAME} (Standard Platform User license check)"
-      sf org assign permset --name "$PS_NAME" --target-org "$ALIAS" --on-behalf-of "$PLATFORM_USERNAME"
-    done
-  else
-    echo "no permission sets yet; skipping Standard Platform User assignment check"
-  fi
+  scripts/org/check-platform-license.sh "$ALIAS"
 fi
 
 if [[ "$LOAD_SAMPLE_DATA" -eq 1 ]]; then

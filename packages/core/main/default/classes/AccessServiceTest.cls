@@ -476,4 +476,349 @@ private class AccessServiceTest {
             Assert.areEqual(1, dmlUsed, 'Five removals should cost one DML statement, not five.');
         }
     }
+
+    private static final String BULK_UPDATE = 'BarnCRM_Bulk_Update';
+
+    /**
+     * Counts how many direct rows link a person to a permission set.
+     *
+     * @param userId the person
+     * @param permissionSetName the permission set's API name
+     * @return the number of assignment rows
+     */
+    private static Integer countAddOn(Id userId, String permissionSetName) {
+        return [
+            SELECT COUNT()
+            FROM PermissionSetAssignment
+            WHERE AssigneeId = :userId AND PermissionSet.Name = :permissionSetName
+        ];
+    }
+
+    @IsTest
+    static void getAddOnsListsTheSixCoreAddOnsAndWarnsOnTheDestructiveOnes() {
+        System.runAs(TestUsers.admin()) {
+            Test.startTest();
+            List<AccessService.AddOn> addOns = AccessService.getAddOns();
+            Test.stopTest();
+
+            Assert.areEqual(
+                AccessService.ADD_ON_PERMISSION_SETS.size(),
+                addOns.size(),
+                'Every Core add-on the package ships should be listed, and nothing else.'
+            );
+            for (Integer i = 0; i < addOns.size(); i++) {
+                AccessService.AddOn addOn = addOns[i];
+                Assert.areEqual(
+                    AccessService.ADD_ON_PERMISSION_SETS[i],
+                    addOn.developerName,
+                    'Add-ons should come back in the page order.'
+                );
+                Assert.isTrue(
+                    String.isNotBlank(addOn.description),
+                    addOn.developerName + ' should say in one sentence what it grants.'
+                );
+                Boolean destructive =
+                    addOn.developerName == 'BarnCRM_Bulk_Delete' ||
+                    addOn.developerName == 'BarnCRM_Erase_People';
+                Assert.areEqual(
+                    destructive,
+                    addOn.isDestructive,
+                    'Only Bulk Delete and Erase People should be marked as removing data.'
+                );
+                Assert.areEqual(
+                    destructive,
+                    String.isNotBlank(addOn.warning),
+                    'Only the add-ons that remove data should carry a warning.'
+                );
+            }
+        }
+    }
+
+    @IsTest
+    static void assignAndRemoveAnAddOn() {
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+
+            Test.startTest();
+            List<String> failures = AccessService.assignAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            List<String> again = AccessService.assignAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            Boolean listed = false;
+            for (AccessService.AddOnAssignments entry : AccessService.getAddOnAssignments()) {
+                if (entry.permissionSetName == BULK_UPDATE) {
+                    for (AccessService.UserSummary person : entry.users) {
+                        listed = listed || person.userId == david.Id;
+                    }
+                }
+            }
+            Integer heldAfterAssign = countAddOn(david.Id, BULK_UPDATE);
+            AccessService.removeAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            AccessService.removeAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            Test.stopTest();
+
+            Assert.isTrue(failures.isEmpty(), 'Giving David Bulk Update should not be refused.');
+            Assert.isTrue(again.isEmpty(), 'Giving it twice should not be an error.');
+            Assert.areEqual(1, heldAfterAssign, 'David should hold Bulk Update exactly once.');
+            Assert.isTrue(listed, 'David should be listed on the Bulk Update card.');
+            Assert.areEqual(
+                0,
+                countAddOn(david.Id, BULK_UPDATE),
+                'David should not hold Bulk Update after it is removed, and removing it twice ' +
+                'should not be an error.'
+            );
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM Error_Log__c],
+                'Nothing should be logged when giving and removing work.'
+            );
+        }
+    }
+
+    @IsTest
+    static void severalPeopleAreGivenAnAddOnInOneOperation() {
+        System.runAs(TestUsers.admin()) {
+            List<User> staff = new List<User>();
+            for (Integer i = 0; i < 5; i++) {
+                staff.add(
+                    buildUser(
+                        'Staff' + i,
+                        'AddOn',
+                        String.valueOf(Math.abs(Crypto.getRandomLong())) + i
+                    )
+                );
+            }
+            insert staff;
+            Set<Id> staffIds = new Map<Id, User>(staff).keySet();
+
+            Test.startTest();
+            AccessService.assignAddOn(staffIds, BULK_UPDATE);
+            Integer dmlUsed = Limits.getDmlStatements();
+            Test.stopTest();
+
+            Assert.areEqual(
+                5,
+                [
+                    SELECT COUNT()
+                    FROM PermissionSetAssignment
+                    WHERE AssigneeId IN :staffIds AND PermissionSet.Name = :BULK_UPDATE
+                ],
+                'All five people should have been given Bulk Update.'
+            );
+            Assert.areEqual(1, dmlUsed, 'Five assignments should cost one DML statement.');
+        }
+    }
+
+    @IsTest
+    static void onlyTheCoreAddOnsCanBeGiven() {
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            List<String> refusedNames = new List<String>();
+
+            Test.startTest();
+            for (String name : new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Staff', '', null }) {
+                try {
+                    AccessService.assignAddOn(new Set<Id>{ david.Id }, name);
+                } catch (AccessService.AccessException e) {
+                    Assert.areEqual(
+                        Label.Core_Access_ErrorAddOnNotFound,
+                        e.getMessage(),
+                        'The refusal should say the permission is not one the page can give.'
+                    );
+                    refusedNames.add(String.valueOf(name));
+                }
+            }
+            Boolean removeRefused = false;
+            try {
+                AccessService.removeAddOn(new Set<Id>{ david.Id }, 'BarnCRM_Admin');
+            } catch (AccessService.AccessException e) {
+                removeRefused = true;
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                4,
+                refusedNames.size(),
+                'A permission set off the allowlist should never be given: ' + refusedNames
+            );
+            Assert.isTrue(removeRefused, 'Nor removed.');
+            Assert.areEqual(
+                0,
+                countAddOn(david.Id, 'BarnCRM_Admin'),
+                'David should not have been given BarnCRM Admin.'
+            );
+        }
+    }
+
+    @IsTest
+    static void aPersonWhoCannotAssignPermissionSetsIsRefused() {
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            User priya = insertUser('Priya', 'Nair');
+            String assignMessage;
+            String removeMessage;
+            Boolean priyaCanAssign;
+
+            Test.startTest();
+            System.runAs(priya) {
+                priyaCanAssign = AccessService.canAssignPermissionSets();
+                try {
+                    AccessService.assignAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+                } catch (AccessService.AccessException e) {
+                    assignMessage = e.getMessage();
+                }
+                try {
+                    AccessService.removeAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+                } catch (AccessService.AccessException e) {
+                    removeMessage = e.getMessage();
+                }
+            }
+            Test.stopTest();
+
+            Assert.isFalse(priyaCanAssign, 'A standard user cannot assign permission sets.');
+            Assert.areEqual(
+                Label.Core_Access_ErrorNoPermission,
+                assignMessage,
+                'Priya, without Manage BarnCRM Settings, should be refused by the service itself.'
+            );
+            Assert.areEqual(Label.Core_Access_ErrorNoPermission, removeMessage, 'Nor remove.');
+            Assert.areEqual(0, countAddOn(david.Id, BULK_UPDATE), 'Nothing should be assigned.');
+        }
+    }
+
+    @IsTest
+    static void manageSettingsWithoutAssignPermissionSetsIsRefused() {
+        // No packaged set carries Manage BarnCRM Settings without Assign Permission Sets, but
+        // an org's own can, so the Setup check is made to answer no.
+        System.runAs(TestUsers.admin()) {
+            User david = insertUser('David', 'Okafor');
+            String assignMessage;
+            String removeMessage;
+
+            Test.startTest();
+            AccessService.assignPermissionSetsOverride = false;
+            try {
+                AccessService.assignAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            } catch (AccessService.AccessException e) {
+                assignMessage = e.getMessage();
+            }
+            try {
+                AccessService.removeAddOn(new Set<Id>{ david.Id }, BULK_UPDATE);
+            } catch (AccessService.AccessException e) {
+                removeMessage = e.getMessage();
+            }
+            Test.stopTest();
+
+            Assert.areEqual(
+                Label.Core_Access_ErrorNeedsAccessManager,
+                assignMessage,
+                'The person should be told what Setup permission is missing.'
+            );
+            Assert.areEqual(
+                Label.Core_Access_ErrorNeedsAccessManager,
+                removeMessage,
+                'Nor remove them.'
+            );
+            Assert.areEqual(0, countAddOn(david.Id, BULK_UPDATE), 'Nothing should be assigned.');
+        }
+    }
+
+    @IsTest
+    static void aRefusedRemovalIsNamedWithTheReason() {
+        System.runAs(TestUsers.admin()) {
+            User david = [
+                SELECT Id, Name
+                FROM User
+                WHERE Id = :insertUser('David', 'Okafor').Id
+            ];
+            List<PermissionSetAssignment> rows = new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(AssigneeId = david.Id)
+            };
+            List<Database.DeleteResult> results = (List<Database.DeleteResult>) JSON.deserialize(
+                '[{"success":false,"errors":[{"message":"Not allowed","statusCode":' +
+                '"INSUFFICIENT_ACCESS_OR_READONLY","fields":[]}]}]',
+                List<Database.DeleteResult>.class
+            );
+
+            Test.startTest();
+            List<String> failures = AccessService.reportFailures(
+                rows,
+                AccessService.errorsOf(results),
+                new Map<Id, User>{ david.Id => david },
+                Label.Core_Access_ErrorAddOnRemoveRefused,
+                'BarnCRM Bulk Update'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, failures.size(), 'The refused person should be reported.');
+            Assert.isTrue(
+                failures[0]
+                    .startsWith('BarnCRM Bulk Update could not be removed from David Okafor.'),
+                'The message should name the permission and the person: ' + failures[0]
+            );
+        }
+    }
+
+    @IsTest
+    static void aPersonSalesforceRefusesIsNamedWithTheReason() {
+        // A real refusal needs a user whose license does not allow what the add-on grants,
+        // which a test org cannot be relied on to have. The per-row handling is proven on
+        // results shaped exactly as Database.insert returns them.
+        System.runAs(TestUsers.admin()) {
+            Map<Id, User> people = new Map<Id, User>(
+                [
+                    SELECT Id, Name
+                    FROM User
+                    WHERE
+                        Id IN :new List<Id>{
+                            insertUser('David', 'Okafor').Id,
+                            insertUser('Priya', 'Nair').Id
+                        }
+                ]
+            );
+            User david;
+            User priya;
+            for (User person : people.values()) {
+                if (person.Name == 'David Okafor') {
+                    david = person;
+                } else {
+                    priya = person;
+                }
+            }
+            List<PermissionSetAssignment> rows = new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(AssigneeId = david.Id),
+                new PermissionSetAssignment(AssigneeId = priya.Id)
+            };
+            List<Database.SaveResult> results = (List<Database.SaveResult>) JSON.deserialize(
+                '[{"success":true,"errors":[]},' +
+                    '{"success":false,"errors":[{"message":"The user license doesn\'t allow ' +
+                    'the permission: Read DuplicateRecordSet","statusCode":' +
+                    '"FIELD_INTEGRITY_EXCEPTION","fields":[]}]}]',
+                List<Database.SaveResult>.class
+            );
+
+            Test.startTest();
+            List<String> failures = AccessService.reportFailures(
+                rows,
+                AccessService.errorsOf(results),
+                people,
+                Label.Core_Access_ErrorAddOnRefused,
+                'BarnCRM Duplicate Review'
+            );
+            Test.stopTest();
+
+            Assert.areEqual(1, failures.size(), 'Only the refused person should be reported.');
+            Assert.areEqual(
+                1,
+                [SELECT COUNT() FROM Error_Log__c],
+                'The refusal should be written to the Error Log once.'
+            );
+            Assert.isTrue(
+                failures[0].startsWith('Priya Nair could not be given BarnCRM Duplicate Review.'),
+                'The message should name the person and the permission: ' + failures[0]
+            );
+            Assert.isTrue(
+                failures[0].contains('Read DuplicateRecordSet'),
+                'The message should carry Salesforce\'s own reason.'
+            );
+        }
+    }
 }

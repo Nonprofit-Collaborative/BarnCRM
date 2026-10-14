@@ -29,6 +29,12 @@ public with sharing class AccessController {
         public List<AccessService.UserSummary> users;
         @AuraEnabled
         public Id currentUserId;
+        @AuraEnabled
+        public Boolean canChangeAccess;
+        @AuraEnabled
+        public List<AccessService.AddOn> addOns;
+        @AuraEnabled
+        public List<AccessService.AddOnAssignments> addOnAssignments;
 
         /**
          * Starts a successful result that already knows who is looking at the page and
@@ -64,6 +70,89 @@ public with sharing class AccessController {
             result.message = result.canManage
                 ? e.getMessage()
                 : Label.Core_Access_ErrorRolesNotVisible;
+        }
+        // Giving a role or an add-on needs both Manage BarnCRM Settings and what Setup itself
+        // would need, so the page can disable both up front (ADR-0121).
+        result.canChangeAccess = AccessService.changeRefusal() == null;
+        // Extra permissions are loaded on their own, so a failure here never hides the roles.
+        try {
+            result.addOns = AccessService.getAddOns();
+            result.addOnAssignments = AccessService.getAddOnAssignments();
+        } catch (AccessService.AccessException e) {
+            result.addOns = new List<AccessService.AddOn>();
+            result.addOnAssignments = new List<AccessService.AddOnAssignments>();
+        }
+        return result;
+    }
+
+    /**
+     * Gives one person one of the Core add-on permission sets.
+     *
+     * @param userId the person, as an Id in text form
+     * @param permissionSetName the API name of one of the Core add-on permission sets
+     * @return success, or a structured error the page can show
+     */
+    @AuraEnabled
+    public static AccessResult assignAddOn(String userId, String permissionSetName) {
+        return changeAddOn(userId, permissionSetName, true);
+    }
+
+    /**
+     * Takes one of the Core add-on permission sets away from one person.
+     *
+     * @param userId the person, as an Id in text form
+     * @param permissionSetName the API name of one of the Core add-on permission sets
+     * @return success, or a structured error the page can show
+     */
+    @AuraEnabled
+    public static AccessResult removeAddOn(String userId, String permissionSetName) {
+        return changeAddOn(userId, permissionSetName, false);
+    }
+
+    /**
+     * Shared path for giving and taking away an add-on: the permission refusal the service
+     * would give (so the page gets a code it can branch on), input validation, then the
+     * service call, which enforces both permission checks itself.
+     *
+     * @param userId the person, as an Id in text form
+     * @param permissionSetName the API name of one of the Core add-on permission sets
+     * @param isAssign true to give the add-on, false to take it away
+     * @return success, or a structured error the page can show
+     */
+    private static AccessResult changeAddOn(
+        String userId,
+        String permissionSetName,
+        Boolean isAssign
+    ) {
+        AccessResult result = new AccessResult();
+        String refusal = AccessService.changeRefusal();
+        if (refusal != null) {
+            result.success = false;
+            result.errorCode = ERROR_NO_PERMISSION;
+            result.message = refusal;
+            return result;
+        }
+        Id assigneeId = toUserId(userId);
+        if (assigneeId == null || String.isBlank(permissionSetName)) {
+            result.success = false;
+            result.errorCode = ERROR_INVALID_INPUT;
+            result.message = Label.Core_Access_ErrorInvalidInput;
+            return result;
+        }
+        try {
+            Set<Id> people = new Set<Id>{ assigneeId };
+            List<String> refusals = isAssign
+                ? AccessService.assignAddOn(people, permissionSetName)
+                : AccessService.removeAddOn(people, permissionSetName);
+            if (!refusals.isEmpty()) {
+                // Salesforce refused the person, usually for their license: the message names
+                // them and gives Salesforce's reason, and is already in the Error Log.
+                throw new AccessService.AccessException(String.join(refusals, ' '));
+            }
+        } catch (AccessService.AccessException e) {
+            result.success = false;
+            result.errorCode = ERROR_FAILED;
+            result.message = e.getMessage();
         }
         return result;
     }
@@ -123,8 +212,10 @@ public with sharing class AccessController {
     }
 
     /**
-     * Shared path for giving and taking away a role: permission check, input validation,
-     * then the service call.
+     * Shared path for giving and taking away a role: the same permission check as for
+     * add-ons (Manage BarnCRM Settings, and Assign Permission Sets or Manage Users), so a
+     * person without the Salesforce permission gets a plain reason rather than the
+     * platform's refusal, then input validation, then the service call.
      *
      * @param userId the person, as an Id in text form
      * @param roleDeveloperName the DeveloperName of one of the five packaged roles
@@ -137,10 +228,11 @@ public with sharing class AccessController {
         Boolean isAssign
     ) {
         AccessResult result = new AccessResult();
-        if (!result.canManage) {
+        String refusal = AccessService.changeRefusal();
+        if (refusal != null) {
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
-            result.message = Label.Core_Access_ErrorNoPermission;
+            result.message = refusal;
             return result;
         }
         Id assigneeId = toUserId(userId);

@@ -21,8 +21,8 @@ added.
 The page is for administrators who can already change the org in Setup, because saving an
 entry changes the org's metadata.
 
-1. Give yourself the **BarnCRM Metadata Admin** permission set (Setup, Users, your name,
-   Permission Set Assignments). It is in no role on purpose: give it only to people who
+1. Give yourself the **BarnCRM Metadata Admin** permission set (BarnCRM Settings, Access,
+   Extra permissions). It is in no role on purpose: give it only to people who
    administer the org. Without it you do not see the page at all.
 2. If BarnCRM was installed as a package, Salesforce asks once whether the app may change
    metadata. In Setup, open **Apex Settings** and turn on **Deploy Metadata from
