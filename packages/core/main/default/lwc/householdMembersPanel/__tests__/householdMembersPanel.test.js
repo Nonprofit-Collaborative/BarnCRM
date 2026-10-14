@@ -413,6 +413,37 @@ describe('c-household-members-panel', () => {
     expect(element.shadowRoot.querySelector('.add-box')).toBeNull();
   });
 
+  it('ignores a slow search answer once the box was changed or cleared (UI-16)', async () => {
+    let answerSlow;
+    searchPeople.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          answerSlow = resolve;
+        })
+    );
+    const element = build();
+    getRecord.emit(recordOfType('Household'));
+    getMembershipMode.emit('Junction');
+    getMembers.emit(MEMBERS);
+    await flush();
+
+    element.shadowRoot.querySelector('.add-button').dispatchEvent(new CustomEvent('click'));
+    await flush();
+    const search = element.shadowRoot.querySelector('.add-search-input');
+    search.value = 'Maria';
+    search.dispatchEvent(new CustomEvent('change', { detail: { value: 'Maria' } }));
+    jest.runAllTimers();
+    await flush();
+    search.value = '';
+    search.dispatchEvent(new CustomEvent('change', { detail: { value: '' } }));
+    jest.runAllTimers();
+    await flush();
+    answerSlow([{ id: '003000000000009AAA', name: 'Maria Garcia' }]);
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.add-existing-button')).toBeNull();
+  });
+
   it('says so in plain words when adding an existing person is refused', async () => {
     searchPeople.mockResolvedValue([{ id: '003000000000009AAA', name: 'Maria Garcia' }]);
     addExistingPerson.mockRejectedValue({ body: { message: 'That person could not be added.' } });

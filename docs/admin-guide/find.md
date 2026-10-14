@@ -10,7 +10,8 @@ rows to show, and press **Run**. The results appear in a table. You can then:
 
 - **Export to CSV**: every matching record, not only the rows on screen, up to the export
   limit set in BarnCRM Settings. The file is UTF-8 with a byte-order mark, so Excel opens
-  names with accents correctly.
+  names with accents correctly. The file is named for the object and today's date in your
+  own time zone, for example `Gift__c-2026-10-13.csv`.
 - **Export to Excel**: the same rows as an Excel workbook (.xlsx).
 - **Save** the query under a name, to run it again next month.
 - **Share** a saved query, so everyone else who uses Find can open it.
@@ -104,6 +105,11 @@ a value; the operators offered depend on the field:
 - **Show to everyone who uses Find** shares the query (read only) with every user in the org
   who can use Find. Untick it to stop sharing. Only the person who saved a query can change,
   share or delete it; anyone it is shared with can open it, run it, and save their own copy.
+- **Delete** asks first, naming the query: press **Delete** in the box to remove it, or **Keep
+  it** to leave it as it is. When the query is shared, the box says that deleting it removes
+  it for everyone who uses Find. A deleted query cannot be brought back.
+- The SOQL box below the conditions updates when you pause typing, not on every key, so typing
+  a value costs one check.
 - The **Saved queries** list shows your own queries first, then the ones shared with you,
   with the name of the person who shared each. The list holds up to 500 queries; your own
   are always counted first, so shared queries never push one of yours off it.

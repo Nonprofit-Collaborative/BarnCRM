@@ -262,6 +262,32 @@ describe('c-household-naming-settings', () => {
     expect(inputs[1].value).toBe('{Salutation} {FirstName} {LastName}');
   });
 
+  it('keeps the newest preview when an earlier one answers last (UI-16)', async () => {
+    let answerSlow;
+    const element = build();
+    await flush();
+    preview.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          answerSlow = resolve;
+        })
+    );
+    preview.mockResolvedValueOnce([{ members: 'M', name: 'Newest Household' }]);
+
+    const input = element.shadowRoot.querySelectorAll('lightning-input')[0];
+    input.dispatchEvent(new CustomEvent('change', { detail: { value: 'a' } }));
+    jest.advanceTimersByTime(300);
+    input.dispatchEvent(new CustomEvent('change', { detail: { value: 'ab' } }));
+    jest.advanceTimersByTime(300);
+    await flush();
+    answerSlow([{ members: 'M', name: 'Stale Household' }]);
+    await flush();
+
+    const text = element.shadowRoot.querySelector('table').textContent;
+    expect(text).toContain('Newest Household');
+    expect(text).not.toContain('Stale Household');
+  });
+
   it('shows what went wrong when the preview cannot be produced', async () => {
     preview.mockRejectedValue({ body: { message: 'Naming is not set up yet' } });
     const element = build();

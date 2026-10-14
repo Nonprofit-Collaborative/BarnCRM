@@ -41,7 +41,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    Access, Import, and Health. You only see the ones that have something in them: Giving and
    Receipts come with the Giving module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer.
-3. Click in the **Search settings** box and type `greeting`. Results appear as you type.
+3. Click in the **Search settings** box and type `greeting`. Results appear as you type. If
+   the search cannot run, the box says so and asks you to try again, instead of saying nothing
+   matches.
    Every setting whose name, description, or section mentions greeting is listed, which
    includes the household formal and informal greeting settings.
 4. Click the result **Formal greeting pattern**. The console jumps to the Households

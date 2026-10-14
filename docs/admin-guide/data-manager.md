@@ -53,7 +53,8 @@ Start from the sample data (see [Sample data](sample-data.md)).
    **Refresh**: the bulk update is now first.
 5. In **Show**, choose **Imports**. Only your import is listed. Choose **All** again.
 6. Press **Undo** beside the bulk update. The box says how many values the undo puts back. Type
-   that number and press **Undo bulk update**. The job reads **Undoing**, then **Undone**.
+   that number and press **Undo bulk update**. The job reads **Undoing**, then **Undone**; the
+   list updates by itself while a job is running, so you do not need to press **Refresh**.
 
 ## 4. Undo from the job list
 

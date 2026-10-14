@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Polls a running data job: every 3 seconds for the first minute, every 10 seconds after,
+    one retry before giving up. Imported by bulkUpdate, bulkDelete and dataJobHistory.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

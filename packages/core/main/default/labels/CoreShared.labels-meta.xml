@@ -215,6 +215,14 @@
         <value>Search settings</value>
     </labels>
     <labels>
+        <fullName>Core_SettingsSearch_ErrorMessage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Settings search: message shown when the search could not run</shortDescription>
+        <value>The search could not run. Try again in a moment.</value>
+    </labels>
+    <labels>
         <fullName>Core_SettingsSearch_NoResultsMessage</fullName>
         <categories>Core</categories>
         <language>en_US</language>
