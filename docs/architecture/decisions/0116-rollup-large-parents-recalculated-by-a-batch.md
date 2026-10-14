@@ -47,10 +47,12 @@ showed them as failed.
    with the queue (decision 3).
 3. **A stopped run narrows down to the record that stops it.** The finalizer charges only the
    records the run was recalculating: they move to a new entry with one more attempt and the
-   reason, the rest of each entry stays as it was. A retried entry is never merged and a run
-   takes a quarter as many of its records per attempt (50, 12, 3, then 1 of a 200 slice), so a
-   record that stops every run (a flow failing on it, heap, CPU) ends Failed alone and the
-   others it shared a run with are recalculated. This replaces the halving of the next run's
+   reason, the rest of each entry stays as it was. An entry charged this way merges only with others
+   charged the same way, for the same entity and attempts, and a run takes a quarter as many
+   records per attempt (50, 12, 3, then 1 of a 200 slice), so a record that stops every run (a
+   flow failing on it, heap, CPU) ends Failed alone and the others it shared a run with are
+   recalculated. Retries of a refused save are already one record each and run at the full
+   slice. This replaces the halving of the next run's
    slice: the narrowing travels with the entries, so it survives a fresh chain.
 4. **The finalizer never queues the next run.** It publishes `Rollup_Queue_Ready__e`, whose
    subscriber starts a fresh processor (ADR-0100's doorbell). A fresh chain is neither a
