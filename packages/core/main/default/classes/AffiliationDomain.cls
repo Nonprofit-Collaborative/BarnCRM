@@ -13,6 +13,16 @@
  * that maintenance off.
  */
 public with sharing class AffiliationDomain {
+    /** The affiliations the saving user can see, by id, for the current save (PEOPLE-23). */
+    private static Map<Id, Affiliation__c> visibleById = new Map<Id, Affiliation__c>();
+
+    /**
+     * Test seam: ids treated as invisible to the saving user, because private sharing cannot
+     * be set from a test. Empty in production.
+     */
+    @TestVisible
+    private static Set<Id> hiddenForTest;
+
     /**
      * Settles the status against the dates, and takes the primary flag off anything that has
      * ended (R-AF4). A former affiliation is never the primary one: a field that still names
@@ -94,8 +104,17 @@ public with sharing class AffiliationDomain {
                 beingSaved.add(record.Id);
             }
         }
+        // The existence check reads in system mode (ADR-0021 category 2, through the upkeep
+        // selector) so an overlap the saver cannot see is still refused. The detail of a row
+        // is shown only when the user mode read also returns it.
+        visibleById = new Map<Id, Affiliation__c>();
+        for (Affiliation__c shown : AffiliationSelector.selectByPersonIds(personIds)) {
+            if (hiddenForTest == null || !hiddenForTest.contains(shown.Id)) {
+                visibleById.put(shown.Id, shown);
+            }
+        }
         Map<String, List<Affiliation__c>> existingByKey = new Map<String, List<Affiliation__c>>();
-        for (Affiliation__c existing : AffiliationSelector.selectByPersonIds(personIds)) {
+        for (Affiliation__c existing : AffiliationUpkeepSelector.selectForOverlap(personIds)) {
             if (beingSaved.contains(existing.Id)) {
                 continue;
             }
@@ -200,7 +219,12 @@ public with sharing class AffiliationDomain {
         return person + '>' + String.valueOf(record.Organization__c) + '>' + role;
     }
 
-    private static String overlapMessage(Affiliation__c existing) {
+    private static String overlapMessage(Affiliation__c clash) {
+        Affiliation__c existing = visibleById.get(clash.Id);
+        if (existing == null) {
+            // The clashing row is not visible to this user: say only that one exists.
+            return Label.Core_Affiliation_OverlapHidden;
+        }
         return String.format(
             Label.Core_Affiliation_Overlap,
             new List<String>{
